@@ -2,11 +2,13 @@
 
 A starter kit for engineering production code with LLMs. Lean templates and init prompts grounded in established standards: [Anthropic Skills](https://code.claude.com/docs/en/skills), [Claude Code subagents](https://code.claude.com/docs/en/sub-agents), [agents.md](https://agents.md), Nygard ADRs, and [Google Labs DESIGN.md](https://github.com/google-labs-code/design.md).
 
-> **Status:** v0.1 — manual workflow stable. CLI (`npx @alealvaro/agentic init`) in development on the `cli` branch, ships in v0.2.
+> **Status:** v0.1.0-beta — early. The CLI works for AGENTS.md bootstrap (`npx @alealvaro/agentic@beta init`); other artifact commands are in development. The manual workflow below stays fully usable for everything. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues).
 
 ## Prerequisites
 
 An agentic coding tool that reads markdown files. Examples here use **Claude Code** and **Codex CLI** (primary tools the author uses); the kit also works with [Antigravity](https://antigravity.google), [Gemini CLI](https://github.com/google-gemini/gemini-cli), Cursor, Continue, Aider, and any other tool that follows the [agents.md](https://agents.md) open standard.
+
+For the CLI path: Node.js 18+ (only needed if you use `npx`/`npm install`; the manual workflow has no runtime dependencies).
 
 ## What's here
 
@@ -18,7 +20,24 @@ An agentic coding tool that reads markdown files. Examples here use **Claude Cod
 
 This kit is a **reference repository, not a per-project dependency.** Templates and prompts stay here; only the generated artifacts (AGENTS.md, ARCHITECTURE.md, ADRs, etc.) end up in your target project. The pattern matches how [GitHub's spec-kit](https://github.com/github/spec-kit) and [cookiecutter](https://cookiecutter.readthedocs.io/) handle distribution — templates in one place, outputs in another, never mixed.
 
-### Setup (once)
+### Quickstart (CLI, beta)
+
+For AGENTS.md bootstrap, the fastest path is the CLI — no clone needed:
+
+```bash
+cd your-project
+npx @alealvaro/agentic@beta init
+```
+
+The CLI auto-detects greenfield/brownfield/audit mode, then prints a self-contained prompt (templates inlined) for you to paste into your agent. Add `--mode greenfield|brownfield|audit` to override detection.
+
+> **Beta scope:** Only `init` (AGENTS.md) is in v0.1.0-beta. For ARCHITECTURE.md, ADRs, design tokens, skills, and subagents, use the [manual workflow](#manual-workflow) below until those CLI commands ship.
+
+### Manual workflow
+
+Required for every artifact except AGENTS.md right now, and useful as a fallback for `init` if you want to run prompts directly without the CLI.
+
+#### Setup (once)
 
 1. Read [`WORKFLOW.md`](WORKFLOW.md) — the philosophy that everything else follows from.
 2. Clone this repo to a location outside your projects:
@@ -29,7 +48,7 @@ This kit is a **reference repository, not a per-project dependency.** Templates 
 
    **Never copy this kit into your target project.** Only the generated artifacts go there.
 
-### Give the agent access to templates
+#### Give the agent access to templates
 
 When you paste a prompt from `prompts/`, the agent needs to read the matching template in `templates/`. Two ways to grant access:
 
@@ -40,7 +59,7 @@ When you paste a prompt from `prompts/`, the agent needs to read the matching te
   The agent can then read templates via the relative paths the prompts use.
 - **Standalone** — copy the content of both `prompts/<X>.md` and `templates/<X>.md` into the agent session. No setup, slightly more friction.
 
-### Workflows by scenario
+#### Workflows by scenario
 
 **New project (greenfield).** Initialize git and set up the project structure, then paste `prompts/agents.md`. The agent interviews you about stack, build, test, conventions, and security boundaries, then writes `AGENTS.md` at the repo root. As architectural and design decisions emerge, use `prompts/architecture.md`, `prompts/adr.md`, `prompts/design.md`, `prompts/skill.md`, and `prompts/subagent.md` for each new artifact.
 
@@ -54,7 +73,7 @@ Apply judgment manually; don't let the agent rewrite specs unattended.
 
 **Project already built with agents.** Treat missing artifacts as brownfield (generate via the relevant prompt) and existing artifacts as audit (run the comparison prompt above).
 
-### What ends up in your target project
+#### What ends up in your target project
 
 Only the generated outputs — never templates, prompts, or this guide:
 
