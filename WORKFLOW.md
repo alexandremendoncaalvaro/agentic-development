@@ -166,6 +166,21 @@ JetBrains *DevEcosystem 2025*: only **44% of developers have AI integrated into 
 * **LLM-as-judge for breadth, humans for depth.**
 * **The unit under test is prompt + scaffold + model.** Changing any of the three is a release.
 
+## 14. Staged Spikes With Golden Fixtures
+
+When the *technique* is uncertain (not the spec), don't ask the agent to solve end-to-end. Break the problem into staged spikes, validate each against curated ground truth.
+
+1. **Discovery first.** Agent lists canonical approaches grounded in official docs and real examples. Pick by one explicit criterion. Output is information, not code.
+2. **Golden fixture.** Inputs with rich expected outputs — for vision: bounding boxes, sizes, lighting, difficulty tags, edge cases. JSON keyed by input path.
+3. **Pipeline with gates.** One technique per stage; each gate emits a debug artifact (`debug/01-preprocess/*.png`, intermediate JSON, log row).
+4. **Two layers.** End-to-end against the fixture *and* per-stage debug to locate where it diverged.
+
+**Why:** §9 (TDG) assumes the path is known. When you don't know it, end-to-end evaluation tells you *that* it failed, not *where*. Stage-level artifacts make the divergence inspectable, so you fix the right gate instead of guessing at the final output.
+
+**Use when** the unknown is *how* — a library choice, a CV technique, a multi-stage transformation. Skip when the *how* is routine.
+
+Combines established practices, not new terminology: [Spike (XP)](https://en.wikipedia.org/wiki/Spike_(software_development)), [golden datasets](https://arize.com/resource/golden-dataset/), [stage-segmented error analysis](https://hamel.dev/blog/posts/evals-faq/), [trajectory evaluation](https://docs.langchain.com/langsmith/trajectory-evals), [visual CV debugging](https://docs.opencv.org/3.4/d7/dcf/tutorial_cvv_introduction.html).
+
 ---
 
 These are starting points. Prune what doesn't fit your codebase.
