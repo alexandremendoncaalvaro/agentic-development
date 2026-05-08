@@ -1,0 +1,38 @@
+{
+  "name": "@TBD-scope/agentic-development",
+  "version": "0.1.0",
+  "description": "Bootstrap and audit AGENTS.md, ARCHITECTURE.md, ADRs, skills, and subagents for engineering production code with LLMs",
+  "type": "module",
+  "bin": {
+    "agentic": "./bin/agentic.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "templates/",
+    "prompts/",
+    "WORKFLOW.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node bin/agentic.js",
+    "test": "node bin/agentic.js --help && node bin/agentic.js init --help"
+  },
+  "keywords": [
+    "llm",
+    "agents",
+    "agentic",
+    "spec-driven",
+    "scaffolding",
+    "ai",
+    "claude-code",
+    "agents-md"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0"
+  }
+}
