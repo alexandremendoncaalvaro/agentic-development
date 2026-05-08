@@ -19,8 +19,11 @@ export async function run(argv) {
 
   program
     .command('init')
-    .description('Print a self-contained prompt to bootstrap AGENTS.md for the current project')
+    .description('Bootstrap AGENTS.md for the current project — interactive by default')
     .option('-m, --mode <mode>', 'force mode: auto | greenfield | brownfield | audit', 'auto')
+    .option('--copy', 'skip TUI and copy the prompt to clipboard')
+    .option('--stdout', 'skip TUI and print the prompt to stdout')
+    .option('-o, --out <file>', 'skip TUI and write the prompt to a file')
     .action(initCommand);
 
   await program.parseAsync(argv);
