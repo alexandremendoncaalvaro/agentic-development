@@ -10,9 +10,56 @@ A starter kit for engineering production code with LLMs. Lean templates and init
 
 ## How to use
 
-1. Read [`WORKFLOW.md`](WORKFLOW.md).
-2. To bootstrap a new project, paste [`prompts/agents.md`](prompts/agents.md) into your agent. It interviews you and produces `AGENTS.md`.
-3. To add an artifact later, paste the matching prompt from `prompts/`.
+This kit is a **reference repository, not a per-project dependency.** Templates and prompts stay here; only the generated artifacts (AGENTS.md, ARCHITECTURE.md, ADRs, etc.) end up in your target project. The pattern matches how [GitHub's spec-kit](https://github.com/github/spec-kit) and [cookiecutter](https://cookiecutter.readthedocs.io/) handle distribution — templates in one place, outputs in another, never mixed.
+
+### Setup (once)
+
+1. Read [`WORKFLOW.md`](WORKFLOW.md) — the philosophy that everything else follows from.
+2. Clone this repo to a location outside your projects, for example `~/dev/agentic-development/`. **Never copy this kit into your target project.** Only the generated artifacts go there.
+
+### Give the agent access to templates
+
+When you paste a prompt from `prompts/`, the agent needs to read the matching template in `templates/`. Two ways to grant access:
+
+- **Recommended** — start the agent with the kit added. In Claude Code, from your target project's directory:
+  ```
+  claude --add-dir <path-to-this-kit>
+  ```
+  The agent can then read templates via the relative paths the prompts use.
+- **Standalone** — copy the content of both `prompts/<X>.md` and `templates/<X>.md` into the agent session. No setup, slightly more friction.
+
+### Workflows by scenario
+
+**New project (greenfield).** Initialize git and set up the project structure, then paste `prompts/agents.md`. The agent interviews you about stack, build, test, conventions, and security boundaries, then writes `AGENTS.md` at the repo root. As architectural and design decisions emerge, use `prompts/architecture.md`, `prompts/adr.md`, `prompts/design.md`, `prompts/skill.md`, and `prompts/subagent.md` for each new artifact.
+
+**Existing project (brownfield).** Same prompts. The project-wide ones (`prompts/agents.md`, `prompts/architecture.md`) instruct the agent to read the codebase, verify what you told them, and flag any mismatch before writing — so contradictions get surfaced instead of trusted. The per-artifact prompts (ADR, design, skill, subagent) work on a single decision or asset and don't need this verification. Backfill ADRs only for decisions that matter going forward; don't try to rewrite history.
+
+**Revisiting / auditing existing specs.** When specs may have drifted from code, paste:
+
+> *"Read AGENTS.md (or ARCHITECTURE.md). Compare with the current state of the codebase. For every place where the spec disagrees with the code, list the disagreement and suggest whether the spec or the code should change. Do not rewrite the spec yourself — flag and wait."*
+
+Apply judgment manually; don't let the agent rewrite specs unattended.
+
+**Project already built with agents.** Treat missing artifacts as brownfield (generate via the relevant prompt) and existing artifacts as audit (run the comparison prompt above).
+
+### What ends up in your target project
+
+Only the generated outputs — never templates, prompts, or this guide:
+
+```
+your-project/
+├── AGENTS.md
+├── ARCHITECTURE.md
+├── DESIGN.md                  (optional, UI projects)
+├── doc/
+│   └── adr/
+│       └── NNNN-<title>.md
+└── .claude/
+    ├── skills/<name>/SKILL.md
+    └── agents/<name>.md
+```
+
+### Reference table
 
 | Artifact          | Template                                                                                      | Prompt                                              | Lives at                          |
 | ----------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------- |
