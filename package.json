@@ -1,5 +1,5 @@
 {
-  "name": "@alealvaro/agentic-development",
+  "name": "@alealvaro/agentic",
   "version": "0.1.0",
   "description": "Bootstrap and audit AGENTS.md, ARCHITECTURE.md, ADRs, skills, and subagents for engineering production code with LLMs",
   "type": "module",
