@@ -2,7 +2,7 @@
 
 A starter kit for engineering production code with LLMs. Lean templates and init prompts grounded in established standards: [Anthropic Skills](https://code.claude.com/docs/en/skills), [Claude Code subagents](https://code.claude.com/docs/en/sub-agents), [agents.md](https://agents.md), Nygard ADRs, and [Google Labs DESIGN.md](https://github.com/google-labs-code/design.md).
 
-> **Status:** v0.1.0-beta — early. The CLI works for AGENTS.md bootstrap (`npx @alealvaro/agentic@beta init`); other artifact commands are in development. The manual workflow below stays fully usable for everything. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues).
+> **Status:** v0.1.0-beta — early. The CLI works for AGENTS.md bootstrap (`npx @alexandrealvaro/agentic@beta init`); other artifact commands are in development. The manual workflow below stays fully usable for everything. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues).
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ For AGENTS.md bootstrap, the fastest path is the CLI — no clone needed:
 
 ```bash
 cd your-project
-npx @alealvaro/agentic@beta init
+npx @alexandrealvaro/agentic@beta init
 ```
 
 The CLI auto-detects greenfield/brownfield/audit mode, then prints a self-contained prompt (templates inlined) for you to paste into your agent. Add `--mode greenfield|brownfield|audit` to override detection.
