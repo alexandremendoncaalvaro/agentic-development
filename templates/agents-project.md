@@ -34,6 +34,7 @@ Deterministic enforcement — agent cannot skip.
 
 * Pre-commit hook (fast): `<lint, format, secret-scan>`
 * Pre-push hook (thorough): `<build + unit + integration>`
+* Visual/E2E for UI (if applicable): `<e.g., Cypress, Playwright, Claude in Chrome — leave blank for non-UI projects>`
 * Hook config lives in: `<.husky/, .pre-commit-config.yaml, .claude/settings.json — see code.claude.com/docs/en/hooks>`
 * CI blocks on: `<list>`
 

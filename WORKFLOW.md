@@ -8,18 +8,23 @@ Engineering production code with LLMs. Agentic, not vibe coding.
 
 Agents do not replace engineering. They speed up execution, but they make specification, context, validation, and review *more* important than before.
 
-Ten things to keep in mind:
+What to keep in mind:
 
 1. **Context is the product.** The agent performs only as well as the context you give it. Small, clear, relevant context beats large, noisy context.
 2. **Spec before code.** Define rules, constraints, architecture, acceptance criteria, and expected output before any implementation.
-3. **Real examples beat generic instructions.** "Follow this existing file" lands harder than "follow best practices."
-4. **A good prompt has a stop condition.** Say what to do, what not to do, and where to stop.
-5. **Plan before execution.** For non-trivial work: explore, plan, review the plan, implement, verify.
-6. **Format helps, but does not save bad thinking.** Markdown, XML, YAML, and JSON only reduce ambiguity. They don't replace clarity.
-7. **The bottleneck is judgment, not generation.** Agents generate fast; the hard part is catching what's almost right but wrong.
-8. **Review needs distance.** The context that produced a solution tends to defend it. Review with a fresh context — diff plus spec, no history.
-9. **Automation needs rails.** Hooks, tests, lint, CI, sandboxing, and permissions matter more than advisory text the agent can forget.
-10. **Autonomy requires observability.** If the agent makes decisions, log the trajectory: tool calls, intermediate outputs, failures.
+3. **Docs are for *why*, code for *what*.** History lives in git. Comments justify non-obvious choices, never restate the line.
+4. **Real examples beat generic instructions.** "Follow this existing file" lands harder than "follow best practices."
+5. **Always know the canonical path.** If you deviate, do it deliberately — never by forgetting the happy path exists.
+6. **Outcome before path.** Give the finish line — raw input plus exact expected output — and let the agent build the algorithm to connect them.
+7. **Pin load-bearing architectural decisions.** The agent will invent what isn't specified. Lock architecture into `AGENTS.md`.
+8. **A good prompt has a stop condition.** Say what to do, what not to do, and where to stop.
+9. **Plan before execution.** For non-trivial work: explore, plan, review the plan, implement, verify.
+10. **Format helps, but does not save bad thinking.** Markdown, XML, YAML, and JSON only reduce ambiguity. They don't replace clarity.
+11. **The bottleneck is judgment, not generation.** Agents generate fast; the hard part is catching what's almost right but wrong.
+12. **Review needs distance.** The context that produced a solution tends to defend it. Review with a fresh context — diff plus spec, no history.
+13. **Automation needs rails.** Hooks, tests, lint, CI, sandboxing, and permissions matter more than advisory text the agent can forget.
+14. **Autonomy requires observability.** If the agent makes decisions, log the trajectory: tool calls, intermediate outputs, failures.
+15. **Staged spikes when the technique is uncertain.** When the *how* is unknown — a library choice, a CV technique, a multi-stage transformation — break the problem into staged spikes against golden fixtures with per-stage debug artifacts.
 
 > Working with agents means trading typing for technical direction. The value is in giving the right context, setting boundaries, validating the result, and keeping "almost right" out of production.
 
@@ -57,7 +62,7 @@ Structure reduces ambiguity, but format isn't magic. Pick the right one for the 
 
 Use XML when the prompt mixes instructions, retrieved context, examples, user input, and expected output — the separation pays off when there's noise to fight. Skip it for simple prompts; if Markdown headings or plain text are clear enough, use them.
 
-No format is universally best. Claude documents XML heavily, while OpenAI and Gemini support both Markdown and XML-style structure. Standardize only after testing on the target model and task.
+No format is universally best. **An observation from my practice, not benchmarked:** I've seen consistent gains when shifting prompts to XML — most noticeably with autonomous agents, where the prompt has to land alone without conversational refinement. Direct interactive use (Claude Code, Codex) tolerates loose Markdown; unattended agents don't. Claude in particular seems to respond well to XML, which I attribute to its training, but I haven't benchmarked it. Treat this as a starting hypothesis worth testing on your own target model and task before standardizing.
 
 ## 4. Find the Happy Path
 
@@ -176,11 +181,13 @@ These are starting points. Prune what doesn't fit your codebase.
 
 This is not theory I read and copied. Most of the practices here come from years of shipping production code, with and without LLMs.
 
-A few patterns I was already using before discovering they had established names — once the industry converged on a label, I adopted it to keep the conversation easier: **Spec-Driven Design** (§1), **Outcome-Based Prompting / TDG** (§9), and **deterministic Quality Gates** (§11) all fit this category.
+**Patterns I was already using when I drafted this guide.** Several of them I used before knowing they had established names; once the industry converged on a label, I adopted it to make the conversation easier: **Spec-Driven Design** (§1), **Docs-vs-Code separation** (§2), **pattern matching by real examples** (§5), **explicit Action Commands** (§7), **Architectural Boundaries** (§8), **Outcome-Based Prompting / TDG** (§9), the **senior-reviewer technique** (§10), and **deterministic Quality Gates** (§11).
 
-A few principles came from external authority and matched problems I was already hitting: **Reviewer With Fresh Context** (§10) sharpened a habit I had; **trajectory-over-output evaluation** (§13) crystallized something I felt but hadn't articulated. The 2025 industry statistics in §12 ground the principle, they didn't generate it.
+**The XML observation in §3** is also drawn from practice, not benchmarks. It's a hypothesis worth testing on your own setup, not a settled finding.
 
-**§14 (Staged Spikes With Golden Fixtures) is my own working technique.** I have not seen it documented end-to-end as a single named pattern, but each component (spike, golden dataset, stage-segmented error analysis, trajectory evaluation, visual CV debugging) has its own lineage in the literature listed under Sources. The combination — discovery → fixture → staged pipeline with debug artifacts → two-layer evaluation — is how I attack problems where the *technique* itself is uncertain.
+**Practices that came in through iteration on this guide.** They weren't in my original draft, but each matches a problem I'd already encountered or a habit I'd only formalized loosely: **Find the Happy Path** (§4), **Explore → Plan → Implement → Commit** (§6), **The Bottleneck Is Discrimination, Not Generation** (§12 — the 2025 industry statistics ground the principle, they didn't generate it), and **Evals for Anything Autonomous** (§13).
+
+**§14 (Staged Spikes With Golden Fixtures) is my own working technique.** I haven't seen it documented end-to-end as a single named pattern, but each component (spike, golden dataset, stage-segmented error analysis, trajectory evaluation, visual CV debugging) has its own lineage in the literature listed under Sources. The combination — discovery → fixture → staged pipeline with debug artifacts → two-layer evaluation — is how I attack problems where the *technique* itself is uncertain.
 
 External claims (specific percentages, named frameworks) are cited under Sources. Everything else is operational guidance from practice or synthesis across that material — a working model, refined over time, not academic claim.
 
