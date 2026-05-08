@@ -2,6 +2,12 @@
 
 A starter kit for engineering production code with LLMs. Lean templates and init prompts grounded in established standards: [Anthropic Skills](https://code.claude.com/docs/en/skills), [Claude Code subagents](https://code.claude.com/docs/en/sub-agents), [agents.md](https://agents.md), Nygard ADRs, and [Google Labs DESIGN.md](https://github.com/google-labs-code/design.md).
 
+> **Status:** v0.1 — manual workflow stable. CLI (`npx @alealvaro/agentic init`) in development on the `cli` branch, ships in v0.2.
+
+## Prerequisites
+
+An agentic coding tool that reads markdown files. Examples here use **Claude Code** and **Codex CLI** (primary tools the author uses); the kit also works with [Antigravity](https://antigravity.google), [Gemini CLI](https://github.com/google-gemini/gemini-cli), Cursor, Continue, Aider, and any other tool that follows the [agents.md](https://agents.md) open standard.
+
 ## What's here
 
 - **[WORKFLOW.md](WORKFLOW.md)** — the philosophy: how to engineer with LLMs without vibe-coding. Read this first.
@@ -15,7 +21,13 @@ This kit is a **reference repository, not a per-project dependency.** Templates 
 ### Setup (once)
 
 1. Read [`WORKFLOW.md`](WORKFLOW.md) — the philosophy that everything else follows from.
-2. Clone this repo to a location outside your projects, for example `~/dev/agentic-development/`. **Never copy this kit into your target project.** Only the generated artifacts go there.
+2. Clone this repo to a location outside your projects:
+
+   ```bash
+   git clone https://github.com/alexandremendoncaalvaro/agentic-development.git ~/dev/agentic-development
+   ```
+
+   **Never copy this kit into your target project.** Only the generated artifacts go there.
 
 ### Give the agent access to templates
 
@@ -71,3 +83,7 @@ your-project/
 | Subagent          | [subagent](templates/subagent.md)                                                             | [prompts/subagent.md](prompts/subagent.md)          | `.claude/agents/<name>.md`        |
 
 Templates carry pure structure. Prompts carry the spec links, conventions, and the literal text to paste.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
