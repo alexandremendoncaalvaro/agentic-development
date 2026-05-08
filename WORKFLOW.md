@@ -2,7 +2,7 @@
 
 Engineering production code with LLMs. Agentic, not vibe coding.
 
-**The principle behind the rest:** context engineering beats prompt engineering. Context is finite and decays as it fills. The goal is the *smallest* set of high-signal tokens that gets the outcome — not the longest, not the most decorative, just enough.
+**The principle behind the rest:** context engineering beats prompt engineering. Context is finite and decays as it fills — aim for the smallest set of high-signal tokens that gets the outcome.
 
 ## TL;DR
 
@@ -25,11 +25,9 @@ Ten things to keep in mind:
 
 ## 1. Spec-Driven Design
 
-Define the rules before the agent writes a line. The temptation is to dump everything into `AGENTS.md` and hope it works — that always backfires. Treat your context files as having distinct purposes, because they do.
+Define the rules before the agent writes a line. The temptation is to dump everything into `AGENTS.md` and hope it works — but bloat causes the model to ignore the file. Keep one topic per Markdown file: lean and focused. And treat the three kinds of context as distinct artifacts with distinct jobs.
 
-There are three kinds of context, each with a different job.
-
-**Operational context is advisory.** `AGENTS.md` (or `CLAUDE.md` for Claude Code, which can mirror or import the same content via `@AGENTS.md`) tells the agent how to build, test, and lint, and where the security boundaries are. The agent reads it as a guide, not a contract.
+**Operational context is advisory.** `AGENTS.md` (or `CLAUDE.md` for Claude Code, which can mirror or import the same content via `@AGENTS.md`) tells the agent how to build, test, follow conventions, and where the security boundaries are. The agent reads it as a guide, not a contract. Open standard `AGENTS.md` is native in most agentic IDEs.
 
 **Canonical specs are constraints, not advice.** `DESIGN.md` (the visual contract — YAML tokens plus Markdown rationale, per Google Labs' open standard), `ARCHITECTURE.md` (system patterns and boundaries), and ADRs in `doc/adr/*.md` (Michael Nygard's pattern, with status lifecycle and superseded markers) are facts the agent must obey. If a token or pattern isn't declared here, it doesn't exist. The agent must never invent one.
 
@@ -38,7 +36,7 @@ There are three kinds of context, each with a different job.
 Two rules apply across all three:
 
 - **Acceptance criteria must be measurable.** "Build a dashboard" fails. "Loads in under 2 seconds, shows 6 months of history, passes axe accessibility" succeeds.
-- **Prune.** If removing a line wouldn't make the agent fail, cut it. Bloat causes the model to ignore the file entirely — over-explanation reads like noise, not law.
+- **Prune.** If removing a line wouldn't make the agent fail, cut it.
 
 ## 2. Docs vs. Code
 
@@ -71,7 +69,7 @@ Then check continuously, especially mid-implementation:
 
 > *"We are at step Y. Are we still on the happy path? If we deviated, was it deliberate?"*
 
-Sometimes you can't follow the happy path — that's fine. But you should always know where it is and why you left it. "I forgot it existed" is the worst answer.
+Sometimes you can't follow the happy path — that's fine. But always know where it is and why you left it.
 
 ## 5. Ground in Real Patterns
 
@@ -79,7 +77,7 @@ Don't dump the codebase into context. Anchor the model in a specific, project-re
 
 > *"Find an existing example of [similar feature]; use that exact structure."*
 
-Cite specific files, not "the codebase." And use just-in-time retrieval: pass paths or IDs and let the agent fetch via tools when it needs to read them. Pre-loading what *might* be useful is just bloat.
+Cite specific files, not "the codebase." Use just-in-time retrieval: pass paths or IDs and let the agent fetch via tools when it needs to read them.
 
 ## 6. Explore → Plan → Implement → Commit
 
@@ -90,7 +88,7 @@ For non-trivial changes, four phases:
 3. **Implement.** Execute the approved plan; verify each step before moving to the next.
 4. **Commit.** One logical change per commit.
 
-Skip this for diffs you can describe in one sentence. The ceremony has to earn its keep.
+Skip this for diffs you can describe in one sentence.
 
 ## 7. Action Commands With Stop Criteria
 
@@ -131,16 +129,16 @@ In Claude Code, this means a subagent (the `Task` tool, or a custom `.claude/age
 `AGENTS.md` is advisory. Hooks and CI are deterministic. The difference matters: text you write hoping the agent obeys is not the same as a script that exits non-zero when a rule is violated.
 
 - **Hooks for inviolable rules** (formatter, secret-scan, lint). Not text the agent might forget.
-- **Pre-commit fast** (lint, format, secrets); **pre-push thorough** (build, unit tests, integration tests). Slow pre-commits push devs to `--no-verify`, defeating the point.
+- **Pre-commit fast** (lint, format, secrets); **pre-push thorough** (build, unit tests, integration tests). Slow pre-commits push devs to `--no-verify`.
 - **Visual or E2E for UI.** Type-check confirms the code compiles, not that the feature works. Open the browser (Claude in Chrome, DevTools MCP).
 - **Sandboxing plus scoped permissions** for autonomy: allowlists, OS sandbox, classifier-reviewed auto mode. The bigger the autonomy, the more rails you need.
-- **Never bypass.** No `--no-verify`. Failing tests means not ready. The point of a gate is that it can't be talked around.
+- **Never bypass.** No `--no-verify`. Failing tests means not ready.
 
 ## 12. The Bottleneck Is Discrimination, Not Generation
 
 Modern agents handle most routine implementation. The work has shifted to catching what they got wrong.
 
-Two 2025 industry surveys point at the same wall. JetBrains' DevEcosystem 2025 reports that only **44%** of developers have AI fully or partially integrated into their workflow. Stack Overflow's 2025 Developer Survey is sharper: **66%** of developers cite "AI solutions that are almost right, but not quite" as their top frustration, and **45%** say debugging AI-generated code is more time-consuming.
+Two 2025 industry surveys point at the same wall. JetBrains' DevEcosystem 2025 reports that only **44%** of developers have AI fully or partially integrated into their workflow. Stack Overflow's 2025 Developer Survey adds: **66%** of developers cite "AI solutions that are almost right, but not quite" as their top frustration, and **45%** say debugging AI-generated code is more time-consuming.
 
 The takeaway: §10 (Reviewer) and §11 (Quality Gates) are not optional. Skipping them is where bug density grows.
 
@@ -149,9 +147,9 @@ The takeaway: §10 (Reviewer) and §11 (Quality Gates) are not optional. Skippin
 If your agent is making decisions on its own, you need evals. A few principles:
 
 - **Trajectory beats final output.** Output-only eval hides failures in tool calls, retrieval, and intermediate decisions that the final answer can mask. Log tool calls and intermediate states.
-- **Observability before evals.** Get traces first; build the eval suite on top. You can't evaluate what you can't see.
-- **LLM-as-judge for breadth, humans for depth.** Automated graders scale; humans catch what graders miss.
-- **The unit under test is prompt + scaffold + model.** Changing any of the three is a release. Treat them as one tested object.
+- **Observability before evals.** Get traces first; build the eval suite on top.
+- **LLM-as-judge for breadth, humans for depth.**
+- **The unit under test is prompt + scaffold + model.** Changing any of the three is a release.
 
 ## 14. Staged Spikes With Golden Fixtures
 
@@ -173,6 +171,18 @@ This is a combination of established practices, not new terminology: spike (XP),
 ---
 
 These are starting points. Prune what doesn't fit your codebase.
+
+## How this guide was built
+
+This is not theory I read and copied. Most of the practices here come from years of shipping production code, with and without LLMs.
+
+A few patterns I was already using before discovering they had established names — once the industry converged on a label, I adopted it to keep the conversation easier: **Spec-Driven Design** (§1), **Outcome-Based Prompting / TDG** (§9), and **deterministic Quality Gates** (§11) all fit this category.
+
+A few principles came from external authority and matched problems I was already hitting: **Reviewer With Fresh Context** (§10) sharpened a habit I had; **trajectory-over-output evaluation** (§13) crystallized something I felt but hadn't articulated. The 2025 industry statistics in §12 ground the principle, they didn't generate it.
+
+**§14 (Staged Spikes With Golden Fixtures) is my own working technique.** I have not seen it documented end-to-end as a single named pattern, but each component (spike, golden dataset, stage-segmented error analysis, trajectory evaluation, visual CV debugging) has its own lineage in the literature listed under Sources. The combination — discovery → fixture → staged pipeline with debug artifacts → two-layer evaluation — is how I attack problems where the *technique* itself is uncertain.
+
+External claims (specific percentages, named frameworks) are cited under Sources. Everything else is operational guidance from practice or synthesis across that material — a working model, refined over time, not academic claim.
 
 ## Sources
 
