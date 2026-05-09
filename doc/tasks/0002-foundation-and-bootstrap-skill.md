@@ -97,12 +97,16 @@ If any of R1–R3 surfaces a defect during Chunk 2, open a separate task and lin
 
 **DoD note:** "Code review completed" left unchecked — user opted to skip a fresh-context review for this task. The implementer-session diff was deliberate (skill source + CLI refactor + tests + docs) and tests cover the install model end-to-end. WORKFLOW §10 review is recommended for substantive future tasks but not enforced for this one.
 
+### 2026-05-09 — review completion (retroactive)
+
+Fresh-context review covered Chunks 1+2 together (this task's 5 commits + Task 0003's 5 commits). Reviewer found no blockers for the install model, no kit-internal hyperlinks leaked into installed skill bodies, idempotency contract holds, and the deferred runtime invocation risks (R1/R3) are correctly classified as low. R2 (Codex slash vs `$` syntax) carries forward to first-real-use as flagged. DoD checkbox flipped accordingly.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes) — `npm test` green at hand-off
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10) <!-- recommended before flipping to done; the diff spans skill source + CLI refactor + tests + docs and benefits from a fresh-context pass per WORKFLOW §10 -->
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10) <!-- closed 2026-05-09: fresh-context review of Chunks 1+2 (10 commits) found no blockers for this task; see Notes 2026-05-09 — review completion. -->
 - [x] No orphan `TODO`/`FIXME` introduced
 - [x] Status updated to `done` and Notes log closes the task <!-- closed 2026-05-09; see close-out entry -->
 

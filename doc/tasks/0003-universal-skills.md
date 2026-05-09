@@ -88,11 +88,29 @@ If any of R4–R6 surfaces a defect during Chunk 3 first-real-use, open a separa
 
 **ADR-0005 closure:** with the deletion of `templates/agents-general.md` and the shipping of `agentic-philosophy`, every directive in [ADR-0005 §Decision](../adr/0005-universal-agent-behavior-as-skill.md) is implemented. The "gap window" flagged in the project pickup memory (no Universal Agent Behavior anywhere between ADR-0005 acceptance and Task 0003 completion) is now closed.
 
+### 2026-05-09 — review completion
+
+Fresh-context review of Chunks 1+2 (10 commits across Tasks 0002+0003) completed.
+
+**Findings:**
+
+| Severity | Finding | Resolution |
+|---|---|---|
+| Concern | No static validation of skill frontmatter or Codex `openai.yaml` shape — typo in `name:` or malformed YAML would ship green and fail at agent load time. | Closed in commit `7e89d9f`: `test/skills.test.js` adds 18 tests parsing every `SKILL.md` frontmatter and every Codex `agents/openai.yaml`, asserting required fields and Anthropic Skills 1536-char description cap. `js-yaml` added as devDependency. `npm test` 39/39 green. |
+| Note | Cross-skill references (`agentic-bootstrap` → `agentic-philosophy`, `agentic-architecture` → `agentic-adr`) are between universal skills and stay safe through Chunk 3 per the documented plan (only design/subagent/skill go conditional). | No action; safe today and through Chunk 3. |
+| Note | Codex `agentic-task` and `agentic-adr` descriptions trim closing trigger sentences the Claude variants carry. Mild trigger-strength asymmetry, not a defect. | No action; deliberate per cc-sdd minimal-frontmatter convention. |
+| Note | `agentic-philosophy` Claude variant intentionally omits `allowed-tools` (prescriptive only); `agentic-audit` conversely sets it explicitly minus `Write` (defensive). | No action; both choices deliberate. |
+| Note | Task 0006 Plan checkbox toggle in commit `59607fd` (in a `done` task) is a clean point-edit per ADR-0004 — the deferred Plan item explicitly named Task 0003 as its closer, and this task delivered. | No action; clean provenance. |
+
+**R1–R6 honest read:** R1, R3 low and structural shape matches the spec. R2, R4 unfalsifiable until live agent session — defer fine. R5 (Codex implicit invocation on `agentic-philosophy`) is the highest residual; mitigation (broad description triggers) sound but verify on first non-trivial Codex task. R6 intentional trim, sibling `agentic-audit-docs` is the right shape if drift checking grows.
+
+DoD checkbox flipped accordingly. No follow-up tasks needed; the YAML test gap is the only one that warranted action and it's closed.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes) — `npm test` 21/21 green at flip
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10) <!-- left unchecked: user opted to skip the fresh-context review for this chunk, same call as Task 0002. The diff spans 5 skill source trees + CLI expansion + tests + docs; benefits from a future review pass when conditional skills land. -->
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10) <!-- closed 2026-05-09: fresh-context review of Chunks 1+2 surfaced one Concern (no static validation of skill frontmatter / openai.yaml shape); closed in commit 7e89d9f via test/skills.test.js + js-yaml devDep. See Notes 2026-05-09 — review completion. -->
 - [x] No orphan `TODO`/`FIXME` introduced
 - [x] Status updated to `done` and Notes log closes the task <!-- closed 2026-05-09; see close-out entry -->
