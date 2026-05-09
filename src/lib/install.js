@@ -10,13 +10,24 @@ import {
   unlinkSync,
 } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { basename, dirname, join, relative } from 'node:path';
+import { basename, dirname, join, relative, sep as PATH_SEP } from 'node:path';
 import { SCHEMA_VERSION } from './state.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const KIT_ROOT = join(__dirname, '..', '..');
 
 const MANIFEST_FILE = 'manifest.json';
+
+/**
+ * Normalize a filesystem path to forward-slash form so internal
+ * comparisons (manifest subagent declarations, state-file paths, action
+ * report paths) are platform-independent. Manifests and state files are
+ * authored with `/`; on Windows, native `path.join` and `path.relative`
+ * produce `\\`, which breaks Set/Map lookups against the canonical form.
+ */
+function toPosix(p) {
+  return PATH_SEP === '/' ? p : p.split(PATH_SEP).join('/');
+}
 
 const AGENT_LAYOUT = {
   'claude-code': {
@@ -45,7 +56,10 @@ function walkSkill(srcRoot) {
       if (statSync(abs).isDirectory()) {
         walk(abs, rel);
       } else {
-        out.push({ src: abs, rel });
+        // `rel` is the manifest-comparable path; force posix form so
+        // Windows backslashes do not break Set/Map lookups against
+        // forward-slash declarations in manifest.json.
+        out.push({ src: abs, rel: toPosix(rel) });
       }
     }
   }
@@ -200,7 +214,10 @@ export async function installSkills({
 
         const target = targetForRel(rel, layout, targetRoot, cwd, subagentSet);
         if (!target) continue;
-        const relForReport = relative(cwd, target);
+        // Force posix form so the path is identical across platforms in
+        // the action log and in the per-agent state file. Windows users
+        // sharing a state file with macOS / Linux teammates depend on it.
+        const relForReport = toPosix(relative(cwd, target));
         const prevSha = prevByPath.has(relForReport)
           ? prevByPath.get(relForReport)
           : null;
