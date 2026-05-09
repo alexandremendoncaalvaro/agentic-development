@@ -1,10 +1,10 @@
 ---
 name: agentic-philosophy
-description: Universal agent behavior — think before coding, ground in real patterns, prefer simplicity, make surgical changes, define verifiable goals, verify before claiming done. Auto-invokes on non-trivial changes, refactors, debugging, "think before coding", "ground before coding", "verify done", "before implementing", or whenever the task is ambiguous enough that guardrails matter.
+description: Universal agent behavior and documentation discipline — think before coding, ground in real patterns, prefer simplicity, make surgical changes, define verifiable goals, verify before claiming done, and write documentation that captures only definitions and decisions. Auto-invokes on non-trivial changes, refactors, debugging, "think before coding", "ground before coding", "verify done", "before implementing", on documentation work — "writing docs", "writing readme", "writing architecture", "writing adr", "writing task", "audit docs" — or whenever the task is ambiguous enough that guardrails matter.
 ---
 
 <background_information>
-Six behaviors apply to every non-trivial change. Bias toward caution over speed; for trivial diffs, use judgment.
+Six behaviors apply to every non-trivial change. Bias toward caution over speed; for trivial diffs, use judgment. A separate Documentation Discipline block applies to every document the agent writes.
 </background_information>
 
 <instructions>
@@ -19,6 +19,19 @@ Six behaviors apply to every non-trivial change. Bias toward caution over speed;
 **Goal-Driven Execution.** Define success criteria. Loop until verified. Transform vague tasks into verifiable goals ("Add validation" → "Write tests for invalid inputs, then make them pass"). Before modifying a file, list which tests cover it; run, modify, run; if none, write one first. For multi-step tasks, state a brief plan with a verify step per item.
 
 **Verify Before Claiming Done.** Type-check and tests verify code, not feature. For UI/runtime changes, exercise in a browser. Can't verify? Say so — don't claim success. Never bypass gates (`--no-verify`, skipped hooks, deleted failing tests).
+
+**Documentation Discipline.** Every document the agent writes obeys eight rules. Canonical source: `WORKFLOW.md` §2. Decision: ADR-0008.
+
+1. **Definitions and decisions only.** What is true now, plus the decisions that brought it there. No speculation, no history, no unfounded plans. A deferred decision is in scope when *recorded* — an accepted ADR or a task file is fundamentação; "we might do X later" without a record is cut.
+2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Applies to `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, specs, prose pages. **Decision-record artifacts are exempt** — ADRs under `doc/adr/` keep `**Status:**` / `**Date:**`; tasks under `doc/tasks/` keep `**Created:**` and the append-only dated `Notes` log. Outside those, use git history.
+3. **No emoji anywhere.** Not in docs, code, source comments, commit messages, PR bodies, or skill outputs. Severity and status use words; structural cues use Markdown.
+4. **Business context first.** Open with *why* — the problem, the constraint, the user — before *what* and *how*. First paragraph answers "what would break if this document didn't exist".
+5. **One scope per document. No duplication.** Link instead of copying. The canonical location owns the content; everywhere else references it.
+6. **Code is the primary documentation of behavior.** Comments justify *why* a non-obvious choice was made — never restate *what*. If the comment explains *what*, rename or refactor.
+7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a tracked work item — a GitHub Issue, or a per-task file under `doc/tasks/NNNN-*.md`. The trace must be addressable from the source line.
+8. **Tests are living documentation of behavior.** Test names and assertions read as the spec they enforce. Spec changes drive test changes; never the reverse.
+
+Walk this list before declaring any documentation task done.
 </instructions>
 
 <output_contract>
