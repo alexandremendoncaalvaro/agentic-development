@@ -357,35 +357,41 @@ test('update --yes --dry-run on a fresh init → no changes, no writes beyond st
   }
 });
 
-test('update --yes after a kit-changed file → silent update, file replaced', () => {
+test('update --yes after a kit-changed file → silent update, target replaced with current source', async () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code']);
 
-    // Forge a stale state SHA so the next update sees "kit changed".
+    // Real kit-changed scenario: target reflects an OLDER kit version (user
+    // untouched), and the recorded sourceSha matches that older content.
+    // The current kit source is what runInit just shipped — so we overwrite
+    // the target with synthetic old content and forge the SHA to match it.
+    const target = join(dir, '.claude/skills/agentic-bootstrap/SKILL.md');
+    const currentSource = readFileSync(target, 'utf8');
+    const oldBody = '# old SKILL.md from a previous kit version\n';
+    writeFileSync(target, oldBody);
+    const { createHash } = await import('node:crypto');
+    const oldSha = createHash('sha256').update(oldBody).digest('hex');
+
     const state = loadState(dir, 'claude-code');
-    const skillEntry = state.skills['agentic-bootstrap'];
-    skillEntry.files = skillEntry.files.map((f) =>
-      f.path.endsWith('SKILL.md')
-        ? { ...f, sourceSha: 'stale-sha-from-old-kit' }
-        : f
+    state.skills['agentic-bootstrap'].files = state.skills[
+      'agentic-bootstrap'
+    ].files.map((f) =>
+      f.path.endsWith('SKILL.md') ? { ...f, sourceSha: oldSha } : f
     );
     saveState(dir, 'claude-code', state);
 
-    const target = join(dir, '.claude/skills/agentic-bootstrap/SKILL.md');
-    const before = readFileSync(target, 'utf8');
-    // file content matches current source (since runInit just installed it).
-    // This is "kit changed since recorded SHA, user untouched" → silent update.
     runUpdate(dir, ['--agent', 'claude-code', '--yes']);
     const after = readFileSync(target, 'utf8');
-    assert.equal(before, after, 'file content stays current source');
+    assert.notEqual(after, oldBody, 'kit-changed-update must overwrite the old body');
+    assert.equal(after, currentSource, 'target must equal current kit source');
+
     const newState = loadState(dir, 'claude-code');
-    assert.notEqual(
-      newState.skills['agentic-bootstrap'].files.find((f) => f.path.endsWith('SKILL.md'))
-        .sourceSha,
-      'stale-sha-from-old-kit',
-      'state must be refreshed with current SHA'
-    );
+    const skillSha = newState.skills['agentic-bootstrap'].files.find((f) =>
+      f.path.endsWith('SKILL.md')
+    ).sourceSha;
+    assert.notEqual(skillSha, oldSha, 'state must be refreshed with current SHA');
+    assert.match(skillSha, /^[a-f0-9]{64}$/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -393,6 +399,91 @@ test('update --yes after a kit-changed file → silent update, file replaced', (
 
 test('update --help works', () => {
   execFileSync('node', [BIN, 'update', '--help'], { encoding: 'utf8' });
+});
+
+test('installSkills: skip on conflict records current sourceSha so a re-run with kit unchanged does not re-prompt', async () => {
+  const dir = mkScratch();
+  try {
+    // Run 1: install once.
+    await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['agentic-bootstrap'],
+    });
+
+    // User edits the file → divergent target. Forge a stale prevSha so the
+    // diff sees a real conflict (kit changed AND user changed).
+    const target = join(dir, '.claude/skills/agentic-bootstrap/SKILL.md');
+    writeFileSync(target, 'USER LOCAL EDITS\n');
+    const state = emptyState('claude-code', '0.2.0');
+    state.skills['agentic-bootstrap'] = {
+      version: '0.2.0',
+      files: [
+        {
+          path: '.claude/skills/agentic-bootstrap/SKILL.md',
+          sourceSha: 'stale-prev-sha-from-an-older-kit',
+        },
+      ],
+    };
+
+    // Run 2: conflict-prompt, user skips.
+    const skipResult = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['agentic-bootstrap'],
+      previousStates: { 'claude-code': state },
+      kitVersion: '0.3.0',
+      confirmReplace: async () => false,
+    });
+    const skipAction = skipResult.actions.find((a) =>
+      a.path.endsWith('agentic-bootstrap/SKILL.md')
+    );
+    assert.equal(skipAction.type, 'skipped');
+
+    // Skip must record the *current* kit sourceSha so the next run with kit
+    // unchanged classifies the file as user-edited-keep (silent), not a
+    // repeated conflict-prompt. Recording prevSha would re-prompt every run.
+    saveState(dir, 'claude-code', skipResult.nextStates['claude-code']);
+    const recordedSha = loadState(dir, 'claude-code').skills['agentic-bootstrap']
+      .files.find((f) => f.path.endsWith('SKILL.md')).sourceSha;
+    assert.match(recordedSha, /^[a-f0-9]{64}$/);
+    assert.notEqual(recordedSha, 'stale-prev-sha-from-an-older-kit');
+
+    // Run 3: kit unchanged. User edits still in place. Expect user-edited-keep.
+    const rerun = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['agentic-bootstrap'],
+      previousStates: { 'claude-code': loadState(dir, 'claude-code') },
+      kitVersion: '0.3.0',
+      confirmReplace: async () => {
+        throw new Error('confirmReplace must NOT fire when kit unchanged after skip');
+      },
+    });
+    const rerunAction = rerun.actions.find((a) =>
+      a.path.endsWith('agentic-bootstrap/SKILL.md')
+    );
+    assert.equal(rerunAction.type, 'kept');
+    assert.equal(readFileSync(target, 'utf8'), 'USER LOCAL EDITS\n');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('installSkills: nextStates carry SCHEMA_VERSION from state.js, not a hardcoded literal', async () => {
+  const dir = mkScratch();
+  try {
+    const result = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['agentic-bootstrap'],
+      kitVersion: '0.3.0-beta.2',
+    });
+    const { SCHEMA_VERSION } = await import('../src/lib/state.js');
+    assert.equal(result.nextStates['claude-code'].schemaVersion, SCHEMA_VERSION);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('update on legacy install (no state) → falls through to byte-compare, then writes state', () => {
