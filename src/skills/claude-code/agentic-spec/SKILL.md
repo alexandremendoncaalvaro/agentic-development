@@ -32,6 +32,10 @@ Ask one question per missing field, in this order. Skip the philosophical questi
 
 Status starts at `draft`. Created: today, ISO format. Owner: ask. Do **not** invent values — when the user does not know, leave `<TODO>` and ask.
 
+## Interview UX
+
+When the host exposes `AskUserQuestion`, use it for multi-choice prompts (`Status: draft / accepted / shipped`, owner selection from team members, scope-vs-multiple-features confirmation) and for confirmation gates with non-trivial branching. Inline text questions are an acceptable fallback only when the host lacks a structured-prompt primitive (Codex). One question per gate; do not chain three text questions when one `AskUserQuestion` card lists the options.
+
 ## Step 4 — Write the file
 
 Path: `doc/specs/<NNNN>-<short-slug>.md`. Use the template below.
