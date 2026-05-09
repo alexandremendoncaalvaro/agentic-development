@@ -61,6 +61,8 @@ Decisions the agent must follow, not reinvent.
 `<where logic, tests, docs, infra live — only if not obvious from the tree>`
 `<.claude/skills/ — list of available skills, if any>`
 `<.claude/agents/ — list of custom subagents, if any>`
+`<doc/adr/ — list of binding ADRs, if any>`
+`<doc/tasks/ — task tracking convention, if used>`
 
 ## Commit & PR Conventions
 

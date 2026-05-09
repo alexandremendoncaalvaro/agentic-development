@@ -89,7 +89,7 @@ Cite specific files, not "the codebase." Use just-in-time retrieval: pass paths 
 For non-trivial changes, four phases:
 
 1. **Explore (read-only).** Plan mode in your agent. Read, build a mental model, no edits.
-2. **Plan.** Agent writes a Markdown plan. You edit before approving.
+2. **Plan.** Agent writes a Markdown plan. You edit before approving. For non-trivial multi-step work, structure the plan as a per-task file (`doc/tasks/<NNNN>-<slug>.md`) with checkbox acceptance criteria and execution steps — the agent toggles checkboxes as it works rather than rewriting paragraphs, keeping edits cheap and resumable across sessions.
 3. **Implement.** Execute the approved plan; verify each step before moving to the next.
 4. **Commit.** One logical change per commit.
 
