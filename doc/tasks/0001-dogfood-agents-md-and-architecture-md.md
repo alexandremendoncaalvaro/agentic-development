@@ -28,6 +28,10 @@ Before writing any v0.2 code, the kit must prove it can produce its own operatio
 
 ## Notes
 
+### 2026-05-08
+
+First dogfood pass produced an `AGENTS.md` of 199 lines with two defects: (1) the bootstrap interview asked questions whose answers were already in the repo or were architectural decisions, not user input; (2) the output bundled 82 lines of generic agent advice (the documented #1 anti-pattern per agents.md / GitHub analysis). Treated as a bug — followup [Task 0006](0006-bootstrap-flow-and-agents-md-bloat-fix.md) and [ADR-0005](../adr/0005-universal-agent-behavior-as-skill.md) cover the fix and the architectural decision (Universal Agent Behavior moves to a skill, not inline). After Task 0006 lands, re-run this task's first checkbox to confirm the new flow produces an `AGENTS.md` that meets the kit's own quality bar.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

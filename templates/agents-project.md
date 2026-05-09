@@ -2,9 +2,9 @@
 
 ## Project Overview
 
-`<what this project does, who uses it, the quality bar that matters most>`
+`<one sentence: what it does, who runs it, the constraint a wrong change would violate>`
 
-**Stack:** `<languages, runtimes, frameworks, database>`
+**Stack:** `<languages + versions, runtimes, frameworks, database>`
 **Entry points:** `<main services and where to find them>`
 
 ## Setup, Build, Test
@@ -81,13 +81,7 @@ Decisions the agent must follow, not reinvent.
 
 ## Gotchas
 
-Real traps. Each one should map to an incident.
+Real traps. Each one should map to an incident or to specific code.
 
 * `<e.g., migrations not idempotent — never edit, always create new>`
 * `<e.g., DB is UTC, app displays America/Sao_Paulo>`
-
-## External Resources
-
-* Docs: `<URL>`
-* Issues: `<URL>`
-* Runbook: `<URL>`

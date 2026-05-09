@@ -31,6 +31,15 @@ First implementation chunk of v0.2 (Chunk 1 in [doc/v0.2-cli-plan.md](../v0.2-cl
 
 ## Notes
 
+### 2026-05-08
+
+Revised after [ADR-0005](../adr/0005-universal-agent-behavior-as-skill.md) and [Task 0006](0006-bootstrap-flow-and-agents-md-bloat-fix.md):
+
+- `agentic-bootstrap` skill body **does not** inline `agents-general.md`. Project content only (`agents-project.md`).
+- The skill must encode the scan-first instructions from the revised [`prompts/agents.md`](../../prompts/agents.md), not the old "interview by section" pattern.
+- Universal Agent Behavior moves to a separate skill `agentic-philosophy` — installed as part of the universal set in [Task 0003](0003-universal-skills.md), not here.
+- Acceptance criterion "Markdown body with `agents-general.md` + `agents-project.md` content inlined" in the original Plan is **superseded**. New Plan step: inline only `agents-project.md` plus the scan-first instructions.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

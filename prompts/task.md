@@ -16,7 +16,7 @@ Toggling a checkbox is a single-character `Edit` operation. Rewriting a paragrap
 >
 > Interview me to fill:
 > - Context: why this task, what problem it solves
-> - Acceptance Criteria: verifiable conditions, each as a checkbox
+> - Acceptance Criteria: measurable conditions per [WORKFLOW.md §1](../WORKFLOW.md), each as a checkbox — pass/fail must be observable, not aspirational ("loads in under 2s" not "fast enough")
 > - Plan: concrete sequential steps with file paths where applicable, each as a checkbox
 >
 > Status starts at `proposed`. Created: today. Owner: ask me. Board ref: leave blank unless I provide one. Leave Notes empty (it gets filled during execution). Definition of Done section stays as in the template.

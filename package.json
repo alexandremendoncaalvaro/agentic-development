@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "node bin/agentic.js",
-    "test": "node bin/agentic.js --help && node bin/agentic.js init --help",
+    "test": "node bin/agentic.js --help && node bin/agentic.js init --help && node test/init-output.test.js",
     "prepublishOnly": "npm test"
   },
   "keywords": [

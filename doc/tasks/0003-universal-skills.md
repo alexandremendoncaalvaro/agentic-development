@@ -37,6 +37,10 @@ Chunk 2 of v0.2 (per [doc/v0.2-cli-plan.md](../v0.2-cli-plan.md)). Extends the s
 
 ## Notes
 
+### 2026-05-08 (later)
+
+[ADR-0005](../adr/0005-universal-agent-behavior-as-skill.md) adds a fifth universal skill: `agentic-philosophy`. Body = trimmed content of `templates/agents-general.md`; description triggers on "non-trivial change", "verify", "think before coding". Same dual source tree as the other four (`src/skills/claude-code/agentic-philosophy/SKILL.md`, `src/skills/codex/agentic-philosophy/SKILL.md` + `agents/openai.yaml`). Auto-install with the universal set. Update Acceptance Criteria counts (5 skills × 2 agents = 10 `SKILL.md` + 5 Codex `openai.yaml`) when this task starts.
+
 ### 2026-05-08
 
 While auditing kit-shared docs after ADR-0004 introduced task tracking, several drifts were caught only by manual inspection (Task row missing from main README, file tree omitting `doc/tasks/`, etc.). This kind of structural consistency check — pure filesystem + grep, no LLM required — is a natural extension of `agentic-audit`. Possible scope addition for this skill or a sibling `agentic-audit-docs`:

@@ -36,7 +36,7 @@ Until the CLI covers every artifact, generate the rest by pasting prompts direct
 
 | Artifact | Prompt | Template | Lives at |
 | --- | --- | --- | --- |
-| `AGENTS.md` | [prompts/agents.md](prompts/agents.md) | [agents-general](templates/agents-general.md) + [agents-project](templates/agents-project.md) | repo root |
+| `AGENTS.md` | [prompts/agents.md](prompts/agents.md) | [agents-project](templates/agents-project.md) | repo root |
 | `ARCHITECTURE.md` | [prompts/architecture.md](prompts/architecture.md) | [architecture](templates/architecture.md) | repo root |
 | ADR | [prompts/adr.md](prompts/adr.md) | [adr](templates/adr.md) | `doc/adr/NNNN-<title>.md` |
 | Task | [prompts/task.md](prompts/task.md) | [task](templates/task.md) | `doc/tasks/NNNN-<slug>.md` |
@@ -57,7 +57,7 @@ Prompts reference templates by relative path. Two ways to give your agent access
 
 **New project (greenfield).** Initialize git and project structure, then run `agentic init` (or paste `prompts/agents.md`) for AGENTS.md. As architectural and design decisions emerge, use the manual prompts above for ARCHITECTURE.md, ADRs, DESIGN.md, skills, and subagents. Use `prompts/task.md` for non-trivial work that benefits from a checkbox-based progress tracker.
 
-**Existing project (brownfield).** Same flow. The project-wide prompts (`prompts/agents.md`, `prompts/architecture.md`) already instruct the agent to read the codebase, verify what you told them, and flag any mismatch before writing — contradictions get surfaced instead of trusted. The per-artifact prompts (ADR, task, design, skill, subagent) work on a single decision or asset and don't need codebase-wide verification. Backfill ADRs only for decisions that matter going forward.
+**Existing project (brownfield).** Same flow. The project-wide prompts (`prompts/agents.md`, `prompts/architecture.md`) follow a **scan-first pattern**: the agent reads the codebase first, pre-fills every placeholder it can verify, then asks you only about the genuine gaps and conflicts — no philosophical questions, no interview-by-section. The per-artifact prompts (ADR, task, design, skill, subagent) work on a single decision or asset and don't need codebase-wide verification. Backfill ADRs only for decisions that matter going forward.
 
 **Revisiting / auditing existing specs.** When specs may have drifted from code, paste:
 
