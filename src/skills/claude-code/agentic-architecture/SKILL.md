@@ -102,3 +102,11 @@ Currently-binding decisions. Link each to `doc/adr/`.
 ## Output contract
 
 A single `ARCHITECTURE.md` at the repo root. Every line locks a binding pattern. ADR candidates flagged in the response, not written. In audit mode: drift list only, no file written.
+
+`ARCHITECTURE.md` is a narrative document, so the Documentation Discipline rules in `WORKFLOW.md` §2 apply at write time:
+
+- No emoji anywhere in the file.
+- No dates, version stamps, `DRAFT` markers, or changelog blocks. Architecture is the current binding pattern; the lifecycle of "when did this become true" lives in ADRs and git history.
+- `Overview` is the business-context-first paragraph — *what the system does* and *what would break without it* before layers and patterns.
+- One scope: system-level patterns and boundaries. Per-decision rationale lives in ADRs; per-project operations live in `AGENTS.md`. Link, do not copy.
+- No speculation. If a layer has no observed signal, write `<TODO: not yet wired>` once; do not propose patterns that aren't already in the code.
