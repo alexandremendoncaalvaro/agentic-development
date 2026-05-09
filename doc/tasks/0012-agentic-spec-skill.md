@@ -1,6 +1,6 @@
 # Task `0012`: Ship `agentic-spec` skill + four-layer artifact stack (v0.5.0-beta.1)
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-05-09
 **Owner:** Alexandre Alvaro
 **Spec ref:**
@@ -12,35 +12,35 @@ Spec-driven development with LLMs has converged on a four-layer artifact stack (
 
 ## Acceptance Criteria
 
-- [ ] [`doc/adr/0011-agentic-spec-skill.md`](../adr/0011-agentic-spec-skill.md) exists, status `accepted`, with the Spec Kit alignment, the four-layer stack rationale, and F1–F8 reconciliations.
-- [ ] [`src/skills/claude-code/agentic-spec/SKILL.md`](../../src/skills/claude-code/agentic-spec/SKILL.md) exists with frontmatter `name: agentic-spec`, `allowed-tools: Read, Write, Glob, Bash`, and a description carrying "spec", "PRD", "feature spec", "user scenarios", "acceptance criteria" trigger keywords.
-- [ ] [`src/skills/codex/agentic-spec/SKILL.md`](../../src/skills/codex/agentic-spec/SKILL.md) exists with the matching content shaped to the Codex `<background_information>` / `<instructions>` / `<output_contract>` template, plus an `agents/openai.yaml`.
-- [ ] `agentic-spec` is in `REQUIRED_SKILLS` in [`src/commands/init.js`](../../src/commands/init.js); [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) `SKILL_DESCRIPTIONS` carries an entry; the post-install slashLine summary lists `/agentic-spec`.
-- [ ] [`templates/task.md`](../../templates/task.md) gains a `**Spec ref:**` field above `**Board ref:**`, both optional. [`src/skills/{claude-code,codex}/agentic-task/SKILL.md`](../../src/skills/claude-code/agentic-task/SKILL.md) interview list adds `Spec ref` as an optional question (default blank for solo work).
-- [ ] [`WORKFLOW.md`](../../WORKFLOW.md) §1 articulates the four-layer artifact stack (Constitution → Spec → Plan/Decisions → Code) alongside the existing three-context-type framing.
-- [ ] [`README.md`](../../README.md) skill table lists `agentic-spec`; workflows-by-scenario section adds "Specifying a feature" alongside the existing entries.
-- [ ] Tests cover: `agentic-spec` is in `UNIVERSAL_SKILLS` in [`test/init.test.js`](../../test/init.test.js); end-to-end install lands the skill at both agent paths; `SKILL_DESCRIPTIONS` covers the new skill (already enforced).
-- [ ] Dogfood install in this repo refreshed via `node bin/agentic.js update --yes`; new skill lands at `.claude/skills/agentic-spec/` and `.agents/skills/agentic-spec/`; state files updated; AGENTS.md managed-skills section regenerates.
-- [ ] [`package.json`](../../package.json) bumped to `0.5.0-beta.1` (skill set expansion + WORKFLOW.md framing change = minor bump).
-- [ ] `npm test` passes.
+- [x] [`doc/adr/0011-agentic-spec-skill.md`](../adr/0011-agentic-spec-skill.md) exists, status `accepted`, with the Spec Kit alignment, the four-layer stack rationale, and F1–F8 reconciliations.
+- [x] [`src/skills/claude-code/agentic-spec/SKILL.md`](../../src/skills/claude-code/agentic-spec/SKILL.md) exists with frontmatter `name: agentic-spec`, `allowed-tools: Read, Write, Glob, Bash`, and a description carrying "spec", "PRD", "feature spec", "user scenarios", "acceptance criteria" trigger keywords.
+- [x] [`src/skills/codex/agentic-spec/SKILL.md`](../../src/skills/codex/agentic-spec/SKILL.md) exists with the matching content shaped to the Codex `<background_information>` / `<instructions>` / `<output_contract>` template, plus an `agents/openai.yaml`.
+- [x] `agentic-spec` is in `REQUIRED_SKILLS` in [`src/commands/init.js`](../../src/commands/init.js); [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) `SKILL_DESCRIPTIONS` carries an entry; the post-install slashLine summary lists `/agentic-spec`.
+- [x] [`templates/task.md`](../../templates/task.md) gains a `**Spec ref:**` field above `**Board ref:**`, both optional. [`src/skills/{claude-code,codex}/agentic-task/SKILL.md`](../../src/skills/claude-code/agentic-task/SKILL.md) interview list adds `Spec ref` as an optional question (default blank for solo work).
+- [x] [`WORKFLOW.md`](../../WORKFLOW.md) §1 articulates the four-layer artifact stack (Constitution → Spec → Plan/Decisions → Code) alongside the existing three-context-type framing.
+- [x] [`README.md`](../../README.md) skill table lists `agentic-spec`; workflows-by-scenario section adds "Specifying a feature" alongside the existing entries.
+- [x] Tests cover: `agentic-spec` is in `UNIVERSAL_SKILLS` in [`test/init.test.js`](../../test/init.test.js); end-to-end install lands the skill at both agent paths; `SKILL_DESCRIPTIONS` covers the new skill (already enforced).
+- [x] Dogfood install in this repo refreshed via `node bin/agentic.js update --yes`; new skill lands at `.claude/skills/agentic-spec/` and `.agents/skills/agentic-spec/`; state files updated; AGENTS.md managed-skills section regenerates.
+- [x] [`package.json`](../../package.json) bumped to `0.5.0-beta.1` (skill set expansion + WORKFLOW.md framing change = minor bump).
+- [x] `npm test` passes.
 
 ## Plan
 
 - [x] Branch `feat/0012-agentic-spec` cut from `cli`.
 - [x] Write [`doc/adr/0011-agentic-spec-skill.md`](../adr/0011-agentic-spec-skill.md) in status `accepted`.
 - [x] Write this task file.
-- [ ] Implement [`src/skills/claude-code/agentic-spec/SKILL.md`](../../src/skills/claude-code/agentic-spec/SKILL.md).
-- [ ] Implement [`src/skills/codex/agentic-spec/{SKILL.md,agents/openai.yaml}`](../../src/skills/codex/agentic-spec/).
-- [ ] Update [`templates/task.md`](../../templates/task.md) with `**Spec ref:**` field; update agentic-task skill bodies to interview for it.
-- [ ] Update [`WORKFLOW.md`](../../WORKFLOW.md) §1 with four-layer stack framing.
-- [ ] Wire `agentic-spec` into [`src/commands/init.js`](../../src/commands/init.js) `REQUIRED_SKILLS` + slashLine; add description in [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) `SKILL_DESCRIPTIONS`.
-- [ ] Update [`README.md`](../../README.md) skill table + workflows-by-scenario.
-- [ ] Update tests: `UNIVERSAL_SKILLS` constant.
-- [ ] Run `node bin/agentic.js update --yes` to refresh dogfood install.
-- [ ] Bump version in [`package.json`](../../package.json).
-- [ ] Run `npm test`. Fix anything that drifted.
-- [ ] Atomic commits + PR + merge to `cli`; tag `v0.5.0-beta.1`; `npm publish --tag beta`; smoke verify.
-- [ ] Phase 2: holistic review of the kit (WORKFLOW alignment, redundancies, simplicity, daily-use flow).
+- [x] Implement [`src/skills/claude-code/agentic-spec/SKILL.md`](../../src/skills/claude-code/agentic-spec/SKILL.md).
+- [x] Implement [`src/skills/codex/agentic-spec/{SKILL.md,agents/openai.yaml}`](../../src/skills/codex/agentic-spec/).
+- [x] Update [`templates/task.md`](../../templates/task.md) with `**Spec ref:**` field; update agentic-task skill bodies to interview for it.
+- [x] Update [`WORKFLOW.md`](../../WORKFLOW.md) §1 with four-layer stack framing.
+- [x] Wire `agentic-spec` into [`src/commands/init.js`](../../src/commands/init.js) `REQUIRED_SKILLS` + slashLine; add description in [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) `SKILL_DESCRIPTIONS`.
+- [x] Update [`README.md`](../../README.md) skill table + workflows-by-scenario.
+- [x] Update tests: `UNIVERSAL_SKILLS` constant.
+- [x] Run `node bin/agentic.js update --yes` to refresh dogfood install.
+- [x] Bump version in [`package.json`](../../package.json).
+- [x] Run `npm test`. Fix anything that drifted.
+- [x] Atomic commits + PR + merge to `cli`; tag `v0.5.0-beta.1`; `npm publish --tag beta`; smoke verify.
+- [x] Phase 2: holistic review of the kit (WORKFLOW alignment, redundancies, simplicity, daily-use flow).
 
 ## Notes
 
@@ -61,11 +61,15 @@ Decision sequence with the user (F1–F8):
 
 User also asked for **Phase 2** after release: a holistic review of the kit through the lens of "is this aligned with WORKFLOW principles? are there redundancies? is the daily-use flow simple, intuitive, coherent? does it support real agentic dev (not vibe coding)?" That review runs after this task closes — likely surfaces refactor candidates that become Task 0013+.
 
+### 2026-05-09 — close-out
+
+Shipped in v0.5.0-beta.1; close-out flipped retroactively in the v0.5.1 discipline-cleanup release after the Phase 2 holistic coherence review surfaced Task 0011/0012 stale status. The Phase 2 review handoff lives at `.agentic/reviews/2026-05-09T21-39-48Z-v0.5-coherence-review.md` and produced the multi-release roadmap: v0.5.1 (cleanup) → v0.6.0 (coherence improvements) → v0.7.0 (agentic-hooks closing WORKFLOW §11) → v0.8.0 (project maturity profiles) → v0.9.0 (structured UX adoption). Task 0010 follow-ups still tracked.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
