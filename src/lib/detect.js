@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const TRIVIAL_ENTRIES = new Set([
@@ -15,6 +15,39 @@ const TRIVIAL_ENTRIES = new Set([
   'README.md',
   'LICENSE',
   'LICENSE.md',
+]);
+
+const FRONTEND_DEPS = new Set([
+  'react',
+  'vue',
+  'svelte',
+  'solid-js',
+  'preact',
+  '@angular/core',
+  'next',
+  'nuxt',
+  '@sveltejs/kit',
+]);
+
+const FRONTEND_CONFIG_FILES = [
+  'tailwind.config.js',
+  'tailwind.config.ts',
+  'tailwind.config.cjs',
+  'tailwind.config.mjs',
+  'tokens.json',
+];
+
+const SKIP_DIRS = new Set([
+  'node_modules',
+  'dist',
+  'build',
+  'out',
+  'coverage',
+  '.next',
+  '.nuxt',
+  '.svelte-kit',
+  '.cache',
+  '.parcel-cache',
 ]);
 
 /**
@@ -50,4 +83,66 @@ export function detectAgents(dir) {
   if (existsSync(join(dir, '.claude'))) agents.push('claude-code');
   if (existsSync(join(dir, '.agents'))) agents.push('codex');
   return agents;
+}
+
+function hasFrontendDep(dir) {
+  const pkgPath = join(dir, 'package.json');
+  if (!existsSync(pkgPath)) return false;
+  let pkg;
+  try {
+    pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+  } catch {
+    return false;
+  }
+  const allDeps = {
+    ...(pkg.dependencies || {}),
+    ...(pkg.devDependencies || {}),
+    ...(pkg.peerDependencies || {}),
+  };
+  return Object.keys(allDeps).some((name) => FRONTEND_DEPS.has(name));
+}
+
+function hasFrontendConfig(dir) {
+  return FRONTEND_CONFIG_FILES.some((name) => existsSync(join(dir, name)));
+}
+
+function hasJsxFiles(dir, depth = 3) {
+  if (depth < 0) return false;
+  let entries;
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return false;
+  }
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      if (SKIP_DIRS.has(entry.name) || entry.name.startsWith('.')) continue;
+      if (hasJsxFiles(join(dir, entry.name), depth - 1)) return true;
+    } else if (entry.name.endsWith('.tsx') || entry.name.endsWith('.jsx')) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Detect project features that drive conditional skill defaults.
+ * Cheap signals first; the recursive jsx scan is bounded (depth 3,
+ * skips node_modules / build dirs / dotfiles) so it stays fast on
+ * realistic project trees.
+ *
+ * Returns:
+ *   - frontend: package.json carries React/Vue/Svelte/Solid/Preact/Angular/Next/Nuxt/SvelteKit,
+ *               OR tailwind.config.* / tokens.json present, OR a *.tsx / *.jsx file is reachable.
+ *   - hasClaudeCode: `.claude/` exists.
+ *   - hasCodex: `.agents/` or `.openai/` exists.
+ */
+export function detectFeatures(dir) {
+  return {
+    frontend:
+      hasFrontendDep(dir) || hasFrontendConfig(dir) || hasJsxFiles(dir),
+    hasClaudeCode: existsSync(join(dir, '.claude')),
+    hasCodex:
+      existsSync(join(dir, '.agents')) || existsSync(join(dir, '.openai')),
+  };
 }
