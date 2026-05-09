@@ -31,7 +31,8 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `agentic-bootstrap` | spec-driven | universal | Scans the repo, writes `AGENTS.md` ≤150 lines | `/agentic-bootstrap` |
 | `agentic-architecture` | spec-driven | universal | Scans the code, writes `ARCHITECTURE.md` | `/agentic-architecture` |
 | `agentic-adr` | spec-driven | universal | Drafts `doc/adr/NNNN-<slug>.md` from the conversation | `/agentic-adr` |
-| `agentic-task` | spec-driven | universal | Drafts `doc/tasks/NNNN-<slug>.md` (checkbox + Notes format) | `/agentic-task` |
+| `agentic-spec` | spec-driven | universal | Drafts `doc/specs/NNNN-<slug>.md` — feature-level spec (User Scenarios, Requirements, Success Criteria) layer 2 of the four-layer stack | `/agentic-spec` |
+| `agentic-task` | spec-driven | universal | Drafts `doc/tasks/NNNN-<slug>.md` (checkbox + Notes format; carries `Spec ref` to link the implementing spec) | `/agentic-task` |
 | `agentic-audit` | spec-driven | universal | Read-only drift report (AGENTS.md / ARCHITECTURE.md / ADRs) | `/agentic-audit` |
 | `agentic-philosophy` | workflow-operational | universal | Universal agent guardrails — auto-loads on non-trivial work | implicit |
 | `agentic-review` | workflow-operational | universal | Fresh-context code review per WORKFLOW §10; structured findings, no "approve" | `/agentic-review <range>` |
@@ -121,6 +122,8 @@ Prompts reference templates by relative path. Two ways to give your agent access
 **Reviewing your own diff.** Run `/agentic-review <range>` (e.g. `/agentic-review main..HEAD` or `/agentic-review PR#42`). The skill assembles the diff, the relevant spec slice (`AGENTS.md`, applicable ADRs, the task's Acceptance Criteria), and delegates to a fresh-context reviewer subagent — no inherited bias from the session that wrote the code (WORKFLOW §10). Returns structured findings grouped Blocker / Concern / Note. Codex variant uses `/clear` + paste handoff since Codex has no subagent primitive.
 
 **Researching before implementation.** Run `/agentic-ground` (or let it auto-trigger on non-trivial work). The skill runs a four-source levantamento — official docs, validated open-source examples, in-repo patterns, and git history — synthesizes a happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written (WORKFLOW §4 + §5). Output is the input to whatever produces the implementation plan; the skill does not write code.
+
+**Specifying a feature.** Run `/agentic-spec` (or `/agentic-spec` with a feature name). The skill scaffolds `doc/specs/NNNN-<slug>.md` with industry-aligned mandatory sections (User Scenarios, Functional / Non-functional Requirements, Success Criteria, Edge Cases, Out of Scope, Open Questions, Related). Specs are layer 2 of the four-layer artifact stack — Constitution → Spec → Plan/Decisions → Code. One spec per feature; multiple tasks (`/agentic-task`) implement one spec; the task template carries a `Spec ref` field linking back to the spec.
 
 **Project already built with agents.** Treat missing artifacts as brownfield (run the relevant skill) and existing artifacts as audit (`/agentic-audit`).
 
