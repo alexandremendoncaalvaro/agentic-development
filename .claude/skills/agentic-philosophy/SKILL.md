@@ -1,0 +1,103 @@
+---
+name: agentic-philosophy
+description: Universal agent behavior and documentation discipline — think before coding, ground in real patterns, prefer simplicity, make surgical changes, define verifiable goals, verify before claiming done, and write documentation that captures only definitions and decisions. Auto-invokes on non-trivial changes, refactors, debugging, "think before coding", "ground before coding", "verify done", "before implementing", on documentation work — "writing docs", "writing readme", "writing architecture", "writing adr", "writing task", "audit docs" — or whenever the task is ambiguous enough that guardrails matter.
+---
+
+# /agentic-philosophy
+
+Six behaviors apply to every non-trivial change. Bias toward caution over speed; for trivial diffs, use judgment. A separate Documentation Discipline section at the end applies to every document the agent writes.
+
+## Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+## Ground Before Coding
+
+**Anchor in real patterns. Research the canonical path.**
+
+- Find the canonical/idiomatic way to do it. Note where you deviate and why.
+- Find an existing example in the codebase; reuse its structure.
+- Cite specific files, not "the codebase". Fetch via tools — don't dump code into context.
+- For non-trivial changes, explore (read-only) → plan → implement → commit. Skip for diffs you can describe in one sentence.
+
+## Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- Comments justify *why* a non-obvious choice was made, not *what* the line does. No commented-out code; no orphan `TODO`/`FIXME` — every deferred item references an issue, ADR, or follow-up.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it — don't delete it.
+
+When your changes create orphans:
+
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: every changed line should trace directly to the user's request.
+
+## Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+Before modifying a file, list which tests cover it. Run. Modify. Run. If none, write one first.
+
+For multi-step tasks, state a brief plan:
+
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+## Verify Before Claiming Done
+
+- Type-check and tests verify *code*, not *feature*.
+- For UI/runtime changes, exercise the feature in a browser.
+- Can't verify it? Say so. Don't claim success.
+- Never bypass gates (`--no-verify`, skipped hooks, deleted failing tests).
+
+## Documentation Discipline
+
+**Every document the agent writes obeys these eight rules.** The canonical source is `WORKFLOW.md` §2. ADR-0008 records the decision and its reconciliations.
+
+1. **Definitions and decisions only.** Capture what is true now and the decisions that brought it there. No speculation, no history, no unfounded plans. A deferred decision is in scope when it is *recorded* — an accepted ADR or a task file is fundamentação; "we might do X later" without a record is speculation and is cut.
+2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Applies to `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, specs, and any prose page. **Decision-record artifacts are exempt** — ADRs under `doc/adr/` keep their `**Status:**` and `**Date:**` fields (Nygard supersession requires ordering); tasks under `doc/tasks/` keep their `**Created:**` field and append-only dated `Notes` log. Outside those artifacts, use git history.
+3. **No emoji anywhere.** Not in docs, code, source comments, commit messages, PR bodies, or skill outputs. Severity and status use words; structural cues use Markdown.
+4. **Business context first.** Open every document with *why* — the problem, the constraint, the user — before *what* and *how*. The first paragraph must answer "what would break if this document didn't exist".
+5. **One scope per document. No duplication.** If two documents would say the same thing, link instead of copying. The canonical location owns the content; everywhere else references it.
+6. **Code is the primary documentation of behavior.** Comments justify *why* a non-obvious choice was made — never restate *what*. If the comment is needed to explain *what*, rename or refactor.
+7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a tracked work item — a GitHub Issue, or a per-task file under `doc/tasks/NNNN-*.md`. The trace must be addressable from the source line.
+8. **Tests are living documentation of behavior.** Test names and assertions read as the spec they enforce. Spec changes drive test changes; never the reverse.
+
+When generating or auditing a document, walk this list before declaring done.

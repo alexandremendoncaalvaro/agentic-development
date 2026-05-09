@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "kitVersion": "0.3.0-beta.1",
+  "agent": "claude-code",
+  "skills": {
+    "agentic-adr": {
+      "version": "0.3.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-adr/SKILL.md",
+          "sourceSha": "f5d7fb1229547da621e2030ae25fdbb3a95f9746417d879d191f79a77c9631a3"
+        }
+      ]
+    },
+    "agentic-architecture": {
+      "version": "0.3.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-architecture/SKILL.md",
+          "sourceSha": "f899cb1dbc0ea3f663abda694907c18931c1d633110afd14438751920ada0232"
+        }
+      ]
+    },
+    "agentic-audit": {
+      "version": "0.3.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-audit/SKILL.md",
+          "sourceSha": "6a79d3ba09f552d6277cb9d3aca6fdaa6bd16c53c34c284d222bb75fb41fd64d"
+        }
+      ]
+    },
+    "agentic-bootstrap": {
+      "version": "0.3.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-bootstrap/SKILL.md",
+          "sourceSha": "b750699c69b6bf741fd6aba9a4863e9d872c485bec8692493c2dfdca422ad3ce"
+        }
+      ]
+    },
+    "agentic-philosophy": {
+      "version": "0.3.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-philosophy/SKILL.md",
+          "sourceSha": "e1baebfe0c12220e7b205c121fd65074f44cb603cd92a71e25af183ff1c8a8e6"
+        }
+      ]
+    },
+    "agentic-review": {
+      "version": "0.3.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/agents/fresh-context-reviewer.md",
+          "sourceSha": "01c7e30a9b501a8613639da4bd8cb197cd542b91963853d9bb493d43ae725341"
+        },
+        {
+          "path": ".claude/skills/agentic-review/SKILL.md",
+          "sourceSha": "f6aae534c4bcc607b513acc72de83af281bd959c102c1f8fd81cdaa3382109e3"
+        }
+      ]
+    },
+    "agentic-subagent": {
+      "version": "0.3.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-subagent/SKILL.md",
+          "sourceSha": "91ff786c2f6f7a953ccbdaeabfaef0bb8c6c746baf279dddb0bb35d679591fa1"
+        }
+      ]
+    },
+    "agentic-task": {
+      "version": "0.3.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-task/SKILL.md",
+          "sourceSha": "858f2d2633547d997e0c2007ad1dc26d007fd9839bd3d9ed1f068dba3bc23cc4"
+        }
+      ]
+    }
+  }
+}
