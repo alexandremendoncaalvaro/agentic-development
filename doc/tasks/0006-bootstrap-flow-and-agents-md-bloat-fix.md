@@ -80,7 +80,7 @@ Every future user of `@alexandrealvaro/agentic init` reproduces the same bad UX 
   - [x] Rewrite [`prompts/agents.md`](../../prompts/agents.md) and [`src/lib/render.js`](../../src/lib/render.js) instructions: *scan → pre-fill → confirm gaps*, with explicit ≤150-line target.
   - [x] Rewrite philosophical placeholders in [`templates/agents-project.md`](../../templates/agents-project.md).
   - [x] Apply the same scan-first rewrite to sibling prompts identified in Phase 1.
-  - [ ] Apply ADR-0005 outcome to [`templates/agents-general.md`](../../templates/agents-general.md) (delete / shrink / move to skill).  <!-- deferred: keep file until agentic-philosophy skill ships in Task 0003; delete then -->
+  - [x] Apply ADR-0005 outcome to [`templates/agents-general.md`](../../templates/agents-general.md) (delete / shrink / move to skill).  <!-- closed in Task 0003: file deleted; content moved to `agentic-philosophy` skill body. -->
 - [x] **Phase 4 — fix this repo's [`AGENTS.md`](../../AGENTS.md)**
   - [x] Apply cuts per Phase 1 plan.
   - [x] Verify ≤150 lines, every line operational.
