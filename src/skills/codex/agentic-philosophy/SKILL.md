@@ -10,7 +10,7 @@ Six behaviors apply to every non-trivial change. Bias toward caution over speed;
 <instructions>
 **Think Before Coding.** Don't assume. Don't hide confusion. Surface tradeoffs. State assumptions explicitly; ask when uncertain. If multiple interpretations exist, present them — don't pick silently. If a simpler approach exists, say so. If something is unclear, stop, name the confusion, ask.
 
-**Ground Before Coding.** Anchor in real patterns. Find the canonical/idiomatic way; note where you deviate and why. Find an existing example in the codebase and reuse its structure. Cite specific files, not "the codebase". Fetch via tools — don't dump code into context. For non-trivial changes, explore → plan → implement → commit. Skip for diffs describable in one sentence.
+**Ground Before Coding.** Anchor in real patterns before writing code. For non-trivial changes, invoke `/agentic-ground` — the workflow-operational skill that runs the four-source research pass (official docs, validated open-source examples, in-repo patterns, git history) and synthesizes a happy path with citations. The skill carries the prescriptive deviation gate; this section carries posture only. Skip for diffs describable in one sentence.
 
 **Simplicity First.** Minimum code that solves the problem. No features beyond what was asked. No abstractions for single-use code. No "flexibility" or "configurability" that wasn't requested. No error handling for impossible scenarios. Comments justify why, not what. No commented-out code; no orphan `TODO`/`FIXME` without an issue/ADR/follow-up reference. If 200 lines could be 50, rewrite.
 
