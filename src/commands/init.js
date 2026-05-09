@@ -1,7 +1,16 @@
 import * as p from '@clack/prompts';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../lib/detect.js';
 import { installSkills } from '../lib/install.js';
+import { saveState, loadState } from '../lib/state.js';
 import { updateRootDoc } from '../lib/rootdoc.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(
+  readFileSync(join(__dirname, '..', '..', 'package.json'), 'utf8')
+);
 
 const VALID_AGENTS = ['claude-code', 'codex'];
 const AGENT_FLAG_VALUES = ['claude-code', 'codex', 'both'];
@@ -206,13 +215,17 @@ export async function initCommand(opts) {
   for (const agent of agents) {
     const agentSkills = skillsForAgent(agent, optedSkills);
     for (const s of agentSkills) installedSkillSet.add(s);
-    const { actions } = await installSkills({
+    const previousStates = { [agent]: loadState(cwd, agent) };
+    const { actions, nextStates } = await installSkills({
       cwd,
       agents: [agent],
       skills: agentSkills,
       confirmReplace,
+      previousStates,
+      kitVersion: pkg.version,
     });
     allActions.push(...actions);
+    saveState(cwd, agent, nextStates[agent]);
   }
 
   const skillDisplayOrder = [

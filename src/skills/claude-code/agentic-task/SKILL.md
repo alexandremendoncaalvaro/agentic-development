@@ -91,3 +91,11 @@ All Acceptance Criteria checked, plus:
 ## Output contract
 
 A single new file at `doc/tasks/<NNNN>-<short-slug>.md`. Status `proposed`. Notes empty. No existing tasks modified. No invented values.
+
+Task files are decision-record artifacts and are **exempt** from the no-dates rule (Documentation Discipline §2): the `**Created:**` field anchors the task in time and the append-only `Notes` log is dated per entry by design. The remaining Documentation Discipline rules (`WORKFLOW.md` §2) apply at write time:
+
+- No emoji anywhere in the file.
+- `Context` is the business-context-first section — *why this task exists* and *what would break without it* before *Acceptance Criteria*.
+- One scope: one task per file. If the user's request implies multiple deliverables, ask which to write first; the others become follow-up tasks.
+- No speculation. Acceptance criteria must be measurable; do not list aspirational items ("loads in under 2s", not "fast enough").
+- `Notes` is append-only and dated per entry — that is the auditability primitive, not a violation of Rule 2.

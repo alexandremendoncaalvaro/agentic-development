@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { initCommand } from './commands/init.js';
+import { updateCommand } from './commands/update.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -23,6 +24,15 @@ export async function run(argv) {
     .option('-a, --agent <agent>', 'install for a specific agent: claude-code | codex | both')
     .option('-y, --yes', 'skip confirmation prompts (non-interactive)')
     .action(initCommand);
+
+  program
+    .command('update')
+    .description('Pull upstream kit changes into an installed project (three-way diff against the saved state)')
+    .option('-a, --agent <agent>', 'restrict update to a specific agent: claude-code | codex | both')
+    .option('-y, --yes', 'skip confirmation prompts (non-interactive)')
+    .option('--dry-run', 'preview the action plan without writing any files')
+    .option('--force', 'overwrite user-edited files on conflict (non-interactive default: no)')
+    .action(updateCommand);
 
   await program.parseAsync(argv);
 }

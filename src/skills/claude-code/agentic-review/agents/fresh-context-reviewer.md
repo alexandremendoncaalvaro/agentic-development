@@ -37,9 +37,7 @@ Group findings by severity:
 - **Concern** — worth a follow-up task. Real issue, not blocking the current change.
 - **Note** — informational, no action expected. Includes "no issues found in this section".
 
-Each finding: one line, `file:line: <emoji> <severity>: <problem>. <fix>.`
-
-Use `🚨` for Blocker, `⚠️` for Concern, `ℹ️` for Note.
+Each finding: one line, `file:line: <severity>: <problem>. <fix>.` Severity is the literal word `Blocker`, `Concern`, or `Note`.
 
 End with a one-line bottom-line: `Ship as-is`, `Ship with the Concerns logged as follow-up tasks`, or `Don't ship until Blockers resolved`.
 

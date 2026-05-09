@@ -60,3 +60,10 @@ Stop after writing. Do **not** flip status to `accepted` — that requires user 
 ## Output contract
 
 A single new file at `doc/adr/<NNNN>-<short-slug>.md`. Status `proposed`. No existing ADRs modified. No invented content.
+
+ADRs are decision-record artifacts and are **exempt** from the no-dates rule (Documentation Discipline §2): the `**Status:**` lifecycle and `**Date:**` field are required for Nygard supersession ordering. The remaining Documentation Discipline rules (`WORKFLOW.md` §2) apply at write time:
+
+- No emoji anywhere in the file.
+- `Context` is the business-context-first section — the *forces* and *problem* before the *decision*.
+- One scope: one decision per ADR. If the user's request implies multiple decisions, ask which one to write first; the others become follow-up ADRs.
+- No speculation. `Decision` is a directive ("We will…"); rejected paths go in `Alternatives Considered`, not the body.

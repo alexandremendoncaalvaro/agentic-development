@@ -43,6 +43,42 @@ A short TUI shows the detected mode, agent, and feature signals (frontend / `.cl
 
 If your project already has an `AGENTS.md` (or `CLAUDE.md`), the installer appends a managed `Skills installed by agentic` section bracketed by `<!-- agentic-managed-skills:start -->` / `:end -->` markers. User content outside those markers is byte-preserved; re-runs update only the managed block.
 
+## Updating an existing project
+
+To pull upstream kit changes into a project that already has agentic skills installed:
+
+```bash
+cd your-project
+npx @alexandrealvaro/agentic@beta update
+```
+
+`update` is a separate command from `init` (clearer intent) and runs a three-way diff against a state file the kit writes at install time:
+
+* `.claude/agentic-state.json` — for Claude Code installs.
+* `.agents/agentic-state.json` — for Codex installs.
+
+These state files are committed to your repo so the whole team shares one view of what skill version is in place. They record kit version, per-skill version, and the SHA of every shipped file at the time of last install. The three-way diff uses those SHAs to distinguish *user-edited* files from *kit-changed* files and acts accordingly:
+
+| File state | Action |
+| --- | --- |
+| New file in the kit | install |
+| Kit unchanged, you didn't touch it | report unchanged |
+| Kit unchanged, you edited it | keep your edits |
+| Kit changed, you didn't touch it | silent update |
+| Kit changed, you also edited it | prompt with diff (default: skip) |
+| Skill removed from the kit or de-selected | prompt before removing your file (default: keep) |
+
+Useful flags:
+
+* `--dry-run` — print the action plan without writing anything. Always start here when you're not sure what will happen.
+* `--force` — overwrite user-edited files on conflict (non-interactive default: no). Escape hatch when you genuinely want kit-side content to win.
+* `--agent claude-code | codex | both` — restrict the update to one agent.
+* `--yes` — non-interactive, accepts defaults (skip on conflict, keep orphans). Combine with `--force` if you want overwrites in CI.
+
+If the project was installed with a kit version older than v0.3 (no state file present), the first `update` falls back to today's byte-compare behavior, then writes the state file so subsequent runs use the three-way diff.
+
+The `agentic-review` skill writes the assembled WORKFLOW §10 handoff to `.agentic/reviews/<ISO-timestamp>-<scope>.md` before delegating to the fresh-context reviewer (Claude Code) or before instructing you to `/clear` and paste (Codex). These files are ephemeral audit artifacts — add `.agentic/reviews/` to your `.gitignore`.
+
 For persistent install:
 
 ```bash
@@ -100,10 +136,14 @@ your-project/
 │   │   └── NNNN-<title>.md
 │   └── tasks/
 │       └── NNNN-<slug>.md
+├── .agentic/
+│   └── reviews/                (gitignored — ephemeral §10 review handoffs)
 ├── .claude/                    (Claude Code targets)
+│   ├── agentic-state.json      (kit install state — committed)
 │   ├── skills/agentic-*/SKILL.md
 │   └── agents/fresh-context-reviewer.md
 └── .agents/                    (Codex targets, cc-sdd convention)
+    ├── agentic-state.json      (kit install state — committed)
     └── skills/agentic-*/{SKILL.md, agents/openai.yaml}
 ```
 

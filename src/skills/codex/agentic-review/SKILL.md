@@ -25,7 +25,7 @@ Step 1 — assemble the handoff. The fresh session will get only what you print 
 - Relevant task file under `doc/tasks/` — if the diff or recent commit messages reference `Task NNNN`, read its Acceptance Criteria and Plan.
 - Recent commit messages for the range (`git log <range> --format=%B`).
 
-Step 2 — print the handoff inline. Format the message exactly as below so the user can copy it as a single block. Do not summarize what you think the diff does.
+Step 2 — write the handoff to disk. Save the assembled handoff at `.agentic/reviews/<ISO-timestamp>-<scope-slug>.md` at the repo root. Create the directory if missing. The slug encodes the scope (`branch-vs-main`, `pr-42`, `commit-abc1234`, `working-tree`). The file body is exactly the block below — no prose summary of what you think the diff does, the reviewer reads the diff itself.
 
 ```
 === AGENTIC-REVIEW HANDOFF ===
@@ -41,7 +41,7 @@ Review focus, in priority order:
 
 Skip formatting, naming opinions, stylistic preferences. Skip praise.
 
-Output: group findings by severity (Blocker / Concern / Note). Each finding one line: `file:line: <emoji> <severity>: <problem>. <fix>.` Use 🚨 / ⚠️ / ℹ️.
+Output: group findings by severity (Blocker / Concern / Note). Each finding one line: `file:line: <severity>: <problem>. <fix>.` Severity is the literal word `Blocker`, `Concern`, or `Note` — no emoji.
 
 End with a one-line bottom-line: "Ship as-is", "Ship with the Concerns logged as follow-up tasks", or "Don't ship until Blockers resolved". Do NOT synthesize an "approve" verdict.
 
@@ -54,15 +54,24 @@ End with a one-line bottom-line: "Ship as-is", "Ship with the Concerns logged as
 === END HANDOFF ===
 ```
 
-Step 3 — instruct the user. After printing the handoff, output exactly this and stop:
+Advise the user to add `.agentic/reviews/` to their `.gitignore` if it is not already — handoffs are ephemeral per-review artifacts, not committed history.
+
+Step 3 — instruct the user. After writing the handoff, output exactly this and stop:
 
 ```
-Copy the handoff above. Run `/clear` to drop the current context. Paste the handoff into the empty session. Codex will produce the structured findings.
+Handoff saved at <path>.
+
+Load it into a fresh Codex session:
+
+  cat <path> | pbcopy        # macOS
+  xclip -selection clipboard < <path>   # Linux
+
+Then in Codex: run `/clear`, paste from the clipboard, send. Codex will produce the structured findings.
 ```
 
 Do not proceed past this point in the current session.
 </instructions>
 
 <output_contract>
-One inline message containing the assembled handoff (review instructions + diff + spec slice), followed by a short instruction telling the user to /clear and paste. No file is written. The current session does not produce findings — the fresh session does, after the user re-loads the handoff. This honors WORKFLOW §10 by enforcing context isolation through `/clear` rather than via a subagent primitive Codex lacks.
+A handoff file at `.agentic/reviews/<ISO-timestamp>-<scope-slug>.md`, plus a short instruction telling the user how to load it into a fresh Codex session via `/clear` and paste. The current session does not produce findings — the fresh session does, after the user re-loads the handoff. This honors WORKFLOW §10 by enforcing context isolation through `/clear` rather than via a subagent primitive Codex lacks; the persisted file replaces the chat-scroll copy step that previously made the round-trip fragile.
 </output_contract>

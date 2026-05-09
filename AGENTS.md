@@ -44,6 +44,7 @@ Binding decisions — see `doc/adr/`. Do not reinvent.
 * **Idempotent on re-run** for filesystem ops (ADR-0002).
 * **Operational docs at repo root** ([ADR-0006](doc/adr/0006-architecture-md-at-repo-root.md)): `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md`, `WORKFLOW.md` at root. ADRs and tasks under `doc/`.
 * **Workflow-operational skill category** ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)): skills come in two categories — `spec-driven` (produces an artifact) and `workflow-operational` (executes a process from `WORKFLOW.md`). First workflow-operational skill: `agentic-review`. Each new workflow-operational skill needs its own ADR.
+* **Documentation discipline** ([ADR-0008](doc/adr/0008-documentation-discipline.md)): eight rules govern every document (canonical source `WORKFLOW.md` §2; operational delivery via the `agentic-philosophy` skill). Narrative documents — `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md` — carry no dates, version stamps, `DRAFT` markers, changelog blocks, or emoji. Decision-record artifacts under `doc/adr/` and `doc/tasks/` are exempt from the no-dates rule. Orphan `TODO`/`FIXME` references either a GitHub Issue or a `doc/tasks/NNNN-*.md` file.
 
 ## Repository Layout
 
@@ -63,7 +64,7 @@ ARCHITECTURE.md                      system-level patterns (pairs with ADRs)
 WORKFLOW.md                          philosophy doc, shipped to npm
 ```
 
-Binding ADRs: 0001-0007, all accepted. Skill source lives under `src/skills/`; the kit does not self-install into its own `.claude/skills/` (would duplicate the source). The full skill set lands across [Task 0002](doc/tasks/0002-foundation-and-bootstrap-skill.md) (bootstrap), [Task 0003](doc/tasks/0003-universal-skills.md) (universal spec-driven skills), [Task 0007](doc/tasks/0007-workflow-operational-skills-and-agentic-review.md) (`agentic-review` + workflow-operational category), and [Task 0004](doc/tasks/0004-conditional-skills-and-discovery.md) (`agentic-design`, `agentic-subagent`, `agentic-skill` + `detectFeatures()`).
+Binding ADRs: 0001-0008, all accepted. Skill source lives under `src/skills/`; the kit does not self-install into its own `.claude/skills/` (would duplicate the source). The full skill set lands across [Task 0002](doc/tasks/0002-foundation-and-bootstrap-skill.md) (bootstrap), [Task 0003](doc/tasks/0003-universal-skills.md) (universal spec-driven skills), [Task 0007](doc/tasks/0007-workflow-operational-skills-and-agentic-review.md) (`agentic-review` + workflow-operational category), and [Task 0004](doc/tasks/0004-conditional-skills-and-discovery.md) (`agentic-design`, `agentic-subagent`, `agentic-skill` + `detectFeatures()`). Documentation discipline rules ([Task 0008](doc/tasks/0008-documentation-discipline.md)) apply across narrative docs the kit ships and the docs the kit generates for downstream projects.
 
 ## Commit & PR Conventions
 
