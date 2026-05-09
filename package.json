@@ -1,6 +1,6 @@
 {
   "name": "@alexandrealvaro/agentic",
-  "version": "0.2.0-beta.1",
+  "version": "0.3.0-beta.1",
   "description": "Bootstrap and audit AGENTS.md, ARCHITECTURE.md, ADRs, skills, and subagents for engineering production code with LLMs",
   "type": "module",
   "bin": {
@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "node bin/agentic.js",
-    "test": "node bin/agentic.js --help && node bin/agentic.js init --help && node --test test/*.test.js",
+    "test": "node bin/agentic.js --help && node bin/agentic.js init --help && node bin/agentic.js update --help && node --test test/*.test.js",
     "prepublishOnly": "npm test"
   },
   "keywords": [
