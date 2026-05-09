@@ -39,6 +39,7 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `agentic-philosophy` | workflow-operational | universal | Universal agent guardrails — auto-loads on non-trivial work | implicit |
 | `agentic-review` | workflow-operational | universal | Fresh-context code review per WORKFLOW §10; structured findings, no "approve" | `/agentic-review <range>` |
 | `agentic-ground` | workflow-operational | universal | Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate per WORKFLOW §4 + §5 | `/agentic-ground` |
+| `agentic-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the four-layer artifact stack and recommends prioritized next actions; complements `agentic-audit` (drift) | `/agentic-next` |
 | `agentic-design` | spec-driven | auto if frontend detected | Bootstrap `DESIGN.md` from existing tokens (Figma, tailwind.config, tokens.json, CSS custom props) | `/agentic-design` |
 | `agentic-subagent` | spec-driven | auto if installing for Claude Code | Drafts `.claude/agents/<name>.md` (Claude Code only — Codex has no subagent primitive) | `/agentic-subagent` |
 | `agentic-skill` | spec-driven | opt-in only | Drafts a new Claude Code or Codex skill at the appropriate path | `/agentic-skill` |
@@ -151,6 +152,8 @@ The kit ships nine universal skills plus three conditional ones — twelve discr
 3. Continue from step 6 of the greenfield flow.
 
 The kit's discipline scales with the project's maturity. A solo PoC may legitimately skip `/agentic-spec` and `/agentic-adr` (the WORKFLOW §1 prune principle applies — don't add an artifact that wouldn't change agent behavior). A team product running on this kit is expected to use the full sequence and additionally invoke `/agentic-hooks` once to scaffold the deterministic gates per WORKFLOW §11 (pre-commit lint / format / secret-scan; pre-push build / unit / integration). Project maturity profiles that automate the recommendation by stack are deferred — see the next planned release.
+
+**Lost mid-flow?** Invoke `/agentic-next` at any time to survey the project's state across the four-layer artifact stack (Constitution → Spec → Plan/Decisions → Code) and get prioritized next-action recommendations. Read-only; complements `/agentic-audit` (drift detection — different question).
 
 ## Manual prompts
 
