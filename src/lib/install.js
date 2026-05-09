@@ -11,6 +11,7 @@ import {
 } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { basename, dirname, join, relative } from 'node:path';
+import { SCHEMA_VERSION } from './state.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const KIT_ROOT = join(__dirname, '..', '..');
@@ -268,6 +269,12 @@ export async function installSkills({
           copyFileSync(src, target);
         }
 
+        // Record the current source SHA on every outcome — including skip.
+        // A skip means "I have seen this kit version and chose to keep my
+        // edits"; the next run should treat the same kit version as already
+        // acknowledged (silent user-edited-keep). If we recorded the prior
+        // SHA on skip, every re-run with the kit unchanged would re-prompt
+        // the same conflict the user already declined.
         actions.push({ type: actionType, path: relForReport, agent });
         skillFiles.push({ path: relForReport, sourceSha: decision.sourceSha });
       }
@@ -279,7 +286,7 @@ export async function installSkills({
     }
 
     nextStates[agent] = {
-      schemaVersion: 1,
+      schemaVersion: SCHEMA_VERSION,
       kitVersion: kitVersion ?? prev?.kitVersion ?? null,
       agent,
       skills: nextSkills,
