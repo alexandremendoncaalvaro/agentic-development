@@ -1,10 +1,13 @@
+import { createHash } from 'node:crypto';
 import {
   copyFileSync,
   existsSync,
   mkdirSync,
   readFileSync,
   readdirSync,
+  rmSync,
   statSync,
+  unlinkSync,
 } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { basename, dirname, join, relative } from 'node:path';
@@ -25,6 +28,12 @@ const AGENT_LAYOUT = {
     sourceDir: 'src/skills/codex',
   },
 };
+
+export function agentLayout(agent) {
+  const layout = AGENT_LAYOUT[agent];
+  if (!layout) throw new Error(`unknown agent "${agent}"`);
+  return layout;
+}
 
 function walkSkill(srcRoot) {
   const out = [];
@@ -55,94 +64,290 @@ function loadManifest(srcRoot) {
   return { subagents: Array.isArray(raw.subagents) ? raw.subagents : [] };
 }
 
+function sha256Of(path) {
+  return createHash('sha256').update(readFileSync(path)).digest('hex');
+}
+
 function sameFile(a, b) {
   if (!existsSync(b)) return false;
   return readFileSync(a).equals(readFileSync(b));
 }
 
+function targetForRel(rel, layout, targetRoot, cwd, subagentSet) {
+  if (subagentSet.has(rel)) {
+    if (!layout.agentsDir) return null;
+    return join(cwd, layout.agentsDir, basename(rel));
+  }
+  return join(targetRoot, rel);
+}
+
+function resolveSkillSource(agent, skill) {
+  const layout = agentLayout(agent);
+  const srcRoot = join(KIT_ROOT, layout.sourceDir, skill);
+  if (!existsSync(srcRoot)) {
+    throw new Error(
+      `skill "${skill}" not found for agent "${agent}" (expected at ${srcRoot})`
+    );
+  }
+  const manifest = loadManifest(srcRoot);
+  const subagentSet = new Set(manifest.subagents);
+  const walked = walkSkill(srcRoot);
+  const walkedRels = new Set(walked.map(({ rel }) => rel));
+  for (const declared of subagentSet) {
+    if (!walkedRels.has(declared)) {
+      throw new Error(
+        `manifest at ${join(srcRoot, MANIFEST_FILE)} declares subagent "${declared}" but no such file exists in the skill source`
+      );
+    }
+  }
+  return { layout, srcRoot, subagentSet, walked };
+}
+
+function planFile({
+  src,
+  rel,
+  target,
+  relForReport,
+  prevSha,
+  force,
+}) {
+  const sourceSha = sha256Of(src);
+  if (!existsSync(target)) {
+    return { type: 'create', sourceSha };
+  }
+  const targetSha = sha256Of(target);
+
+  if (sourceSha === targetSha) {
+    return { type: 'unchanged', sourceSha };
+  }
+
+  if (prevSha === undefined || prevSha === null) {
+    return { type: 'legacy-divergent', sourceSha, targetSha };
+  }
+
+  if (sourceSha === prevSha) {
+    // kit unchanged since last install; differ vs. target → user edited; keep
+    return { type: 'user-edited-keep', sourceSha };
+  }
+
+  if (targetSha === prevSha) {
+    // user untouched; kit changed → silent update
+    return { type: 'kit-changed-update', sourceSha };
+  }
+
+  // both changed → conflict
+  if (force) return { type: 'conflict-force', sourceSha };
+  return { type: 'conflict-prompt', sourceSha, targetSha };
+}
+
 /**
- * Install one or more skills for one or more agents.
+ * Install one or more skills for one or more agents, with optional state-aware
+ * three-way diff against the prior install.
+ *
+ * Legacy contract (no state): default-skip on divergent files, prompt via
+ * confirmReplace. Matches v0.2 behavior.
+ *
+ * State-aware contract (previousStates supplied): three-way diff using the
+ * previous source SHA, target SHA, current source SHA. See ADR-0009.
  *
  * @param {object} opts
- * @param {string} opts.cwd  Target project root.
- * @param {string[]} opts.agents  e.g. ['claude-code', 'codex'].
- * @param {string[]} opts.skills  Skill names, e.g. ['agentic-bootstrap'].
+ * @param {string} opts.cwd
+ * @param {string[]} opts.agents
+ * @param {string[]} opts.skills
  * @param {(question: string) => Promise<boolean>} [opts.confirmReplace]
- *   Async callback used when a target file already exists with different
- *   content. Default: skip without asking (safe non-interactive default).
+ *   Callback for divergent files (legacy path or three-way conflict). Default: skip.
+ * @param {Record<string, object|null>} [opts.previousStates]
+ *   Per-agent previous state from src/lib/state.js. Missing/null entries fall
+ *   back to legacy byte-compare.
+ * @param {string} [opts.kitVersion]
+ *   Stamped into the returned nextStates as kitVersion and per-skill version.
+ * @param {boolean} [opts.dryRun]
+ *   If true, no files are written. Actions reflect what would happen.
+ * @param {boolean} [opts.force]
+ *   If true, three-way conflicts overwrite without prompting.
  *
- * @returns {Promise<{ actions: Array<{type: 'created'|'replaced'|'unchanged'|'skipped', path: string}> }>}
+ * @returns {Promise<{ actions: Array<{type, path, agent}>, nextStates: Record<string, object> }>}
  */
 export async function installSkills({
   cwd,
   agents,
   skills,
   confirmReplace = async () => false,
+  previousStates = {},
+  kitVersion = null,
+  dryRun = false,
+  force = false,
 }) {
   const actions = [];
+  const nextStates = {};
 
   for (const agent of agents) {
-    const layout = AGENT_LAYOUT[agent];
-    if (!layout) {
-      throw new Error(`unknown agent "${agent}"`);
-    }
+    const prev = previousStates[agent] ?? null;
+    const nextSkills = {};
 
     for (const skill of skills) {
-      const srcRoot = join(KIT_ROOT, layout.sourceDir, skill);
-      if (!existsSync(srcRoot)) {
-        throw new Error(
-          `skill "${skill}" not found for agent "${agent}" (expected at ${srcRoot})`
-        );
-      }
-
+      const { layout, srcRoot, subagentSet, walked } = resolveSkillSource(agent, skill);
       const targetRoot = join(cwd, layout.skillsDir, skill);
-      const manifest = loadManifest(srcRoot);
-      const subagentSet = new Set(manifest.subagents);
-      const walked = walkSkill(srcRoot);
-      const walkedRels = new Set(walked.map(({ rel }) => rel));
-      for (const declared of subagentSet) {
-        if (!walkedRels.has(declared)) {
-          throw new Error(
-            `manifest at ${join(srcRoot, MANIFEST_FILE)} declares subagent "${declared}" but no such file exists in the skill source`
-          );
-        }
-      }
+      const prevSkill = prev?.skills?.[skill] ?? null;
+      const prevByPath = new Map(
+        (prevSkill?.files ?? []).map((f) => [f.path, f.sourceSha])
+      );
+      const skillFiles = [];
 
       for (const { src, rel } of walked) {
         if (rel === MANIFEST_FILE) continue;
 
-        let target;
-        if (subagentSet.has(rel)) {
-          if (!layout.agentsDir) continue;
-          target = join(cwd, layout.agentsDir, basename(rel));
-        } else {
-          target = join(targetRoot, rel);
-        }
+        const target = targetForRel(rel, layout, targetRoot, cwd, subagentSet);
+        if (!target) continue;
         const relForReport = relative(cwd, target);
+        const prevSha = prevByPath.has(relForReport)
+          ? prevByPath.get(relForReport)
+          : null;
 
-        if (existsSync(target)) {
-          if (sameFile(src, target)) {
-            actions.push({ type: 'unchanged', path: relForReport });
-            continue;
+        const decision = planFile({
+          src,
+          rel,
+          target,
+          relForReport,
+          prevSha,
+          force,
+        });
+
+        let actionType;
+        let writeFile = false;
+
+        switch (decision.type) {
+          case 'create':
+            actionType = 'created';
+            writeFile = true;
+            break;
+          case 'unchanged':
+            actionType = 'unchanged';
+            break;
+          case 'kit-changed-update':
+            actionType = 'updated';
+            writeFile = true;
+            break;
+          case 'user-edited-keep':
+            actionType = 'kept';
+            break;
+          case 'conflict-force':
+            actionType = 'replaced';
+            writeFile = true;
+            break;
+          case 'conflict-prompt': {
+            const replace = await confirmReplace(
+              `${relForReport}: kit and your edits both changed since last install. Overwrite?`
+            );
+            if (replace) {
+              actionType = 'replaced';
+              writeFile = true;
+            } else {
+              actionType = 'skipped';
+            }
+            break;
           }
-          const replace = await confirmReplace(
-            `Replace ${relForReport}? (target differs from the kit version)`
-          );
-          if (!replace) {
-            actions.push({ type: 'skipped', path: relForReport });
-            continue;
+          case 'legacy-divergent': {
+            const replace = await confirmReplace(
+              `Replace ${relForReport}? (target differs from the kit version)`
+            );
+            if (replace) {
+              actionType = 'replaced';
+              writeFile = true;
+            } else {
+              actionType = 'skipped';
+            }
+            break;
           }
-          mkdirSync(dirname(target), { recursive: true });
-          copyFileSync(src, target);
-          actions.push({ type: 'replaced', path: relForReport });
-        } else {
-          mkdirSync(dirname(target), { recursive: true });
-          copyFileSync(src, target);
-          actions.push({ type: 'created', path: relForReport });
+          default:
+            throw new Error(`unhandled plan decision: ${decision.type}`);
         }
+
+        if (writeFile && !dryRun) {
+          mkdirSync(dirname(target), { recursive: true });
+          copyFileSync(src, target);
+        }
+
+        actions.push({ type: actionType, path: relForReport, agent });
+        skillFiles.push({ path: relForReport, sourceSha: decision.sourceSha });
       }
+
+      nextSkills[skill] = {
+        version: kitVersion ?? prevSkill?.version ?? null,
+        files: skillFiles,
+      };
     }
+
+    nextStates[agent] = {
+      schemaVersion: 1,
+      kitVersion: kitVersion ?? prev?.kitVersion ?? null,
+      agent,
+      skills: nextSkills,
+    };
   }
 
-  return { actions };
+  return { actions, nextStates };
+}
+
+/**
+ * Identify and optionally remove orphan skills — skills present in the prior
+ * state but absent from the current opted skill list. Default keep.
+ *
+ * @param {object} opts
+ * @param {string} opts.cwd
+ * @param {string} opts.agent
+ * @param {object|null} opts.previousState
+ * @param {string[]} opts.currentSkills
+ * @param {(question: string) => Promise<boolean>} [opts.confirmRemove]
+ * @param {boolean} [opts.dryRun]
+ *
+ * @returns {Promise<{ actions: Array<{type, path, agent}>, removedSkills: string[] }>}
+ */
+export async function removeOrphanSkills({
+  cwd,
+  agent,
+  previousState,
+  currentSkills,
+  confirmRemove = async () => false,
+  dryRun = false,
+}) {
+  const actions = [];
+  const removedSkills = [];
+  if (!previousState?.skills) return { actions, removedSkills };
+
+  const layout = agentLayout(agent);
+  const currentSet = new Set(currentSkills);
+
+  for (const [skill, entry] of Object.entries(previousState.skills)) {
+    if (currentSet.has(skill)) continue;
+    const remove = await confirmRemove(
+      `Remove orphan skill "${skill}" for ${agent}? (no longer in your install set)`
+    );
+    if (!remove) {
+      for (const f of entry.files) {
+        actions.push({ type: 'orphan-kept', path: f.path, agent });
+      }
+      continue;
+    }
+
+    for (const f of entry.files) {
+      const abs = join(cwd, f.path);
+      if (existsSync(abs) && !dryRun) {
+        unlinkSync(abs);
+      }
+      actions.push({ type: 'removed', path: f.path, agent });
+    }
+    // Try to drop the empty skill directory under skillsDir/<skill>.
+    const skillDir = join(cwd, layout.skillsDir, skill);
+    if (!dryRun && existsSync(skillDir)) {
+      try {
+        rmSync(skillDir, { recursive: true, force: true });
+      } catch {
+        // best-effort cleanup
+      }
+    }
+    removedSkills.push(skill);
+  }
+
+  return { actions, removedSkills };
 }
