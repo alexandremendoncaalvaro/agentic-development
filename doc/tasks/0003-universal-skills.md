@@ -37,6 +37,17 @@ Chunk 2 of v0.2 (per [doc/v0.2-cli-plan.md](../v0.2-cli-plan.md)). Extends the s
 
 ## Notes
 
+### 2026-05-08
+
+While auditing kit-shared docs after ADR-0004 introduced task tracking, several drifts were caught only by manual inspection (Task row missing from main README, file tree omitting `doc/tasks/`, etc.). This kind of structural consistency check — pure filesystem + grep, no LLM required — is a natural extension of `agentic-audit`. Possible scope addition for this skill or a sibling `agentic-audit-docs`:
+
+- Every `templates/X.md` has a matching `prompts/X.md`
+- README reference table includes every artifact in `templates/`
+- WORKFLOW.md mentions every artifact category
+- Internal cross-refs (ADR-NNNN, §N, file paths) resolve
+
+Defer the exact spec for v0.2 implementation; flag here so it does not get lost.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
