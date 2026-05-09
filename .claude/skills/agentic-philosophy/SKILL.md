@@ -20,12 +20,9 @@ Before implementing:
 
 ## Ground Before Coding
 
-**Anchor in real patterns. Research the canonical path.**
+**Anchor in real patterns before writing code.**
 
-- Find the canonical/idiomatic way to do it. Note where you deviate and why.
-- Find an existing example in the codebase; reuse its structure.
-- Cite specific files, not "the codebase". Fetch via tools — don't dump code into context.
-- For non-trivial changes, explore (read-only) → plan → implement → commit. Skip for diffs you can describe in one sentence.
+For non-trivial changes, invoke `/agentic-ground` — the workflow-operational skill that runs the four-source research pass (official docs, validated open-source examples, in-repo patterns, git history) and synthesizes a happy path with citations. The skill carries the prescriptive deviation gate; this section carries the posture only. Skip for diffs you can describe in one sentence.
 
 ## Simplicity First
 
