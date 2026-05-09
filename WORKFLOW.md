@@ -25,6 +25,7 @@ What to keep in mind:
 13. **Automation needs rails.** Hooks, tests, lint, CI, sandboxing, and permissions matter more than advisory text the agent can forget.
 14. **Autonomy requires observability.** If the agent makes decisions, log the trajectory: tool calls, intermediate outputs, failures.
 15. **Staged spikes when the technique is uncertain.** When the *how* is unknown — a library choice, a CV technique, a multi-stage transformation — break the problem into staged spikes against golden fixtures with per-stage debug artifacts.
+16. **Discipline scales with project maturity.** Same principles bind every project; the artifact set scales. A spike runs posture + research + audit; a regulated product adds spec / ADR / hooks / evals. The toolkit amplifies what the project needs — never imposes ceremony beyond it. Configurable at init; changeable as the project matures.
 
 > Working with agents means trading typing for technical direction. The value is in giving the right context, setting boundaries, validating the result, and keeping "almost right" out of production.
 
@@ -40,6 +41,8 @@ There are two complementary frames for the artifacts the kit produces. The first
 2. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; ADRs may be driven by spec constraints. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
 3. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
 4. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
+
+The four layers scale with project maturity (TL;DR #16). A spike or PoC profile may legitimately ship only Layers 1 and 4 — adding Layers 2 and 3 to a 200-line experiment is ceremony that does not change agent behavior. A team or regulated product runs all four. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
 
 ### Three context types (loading mechanism)
 
@@ -87,6 +90,8 @@ Structure reduces ambiguity, but format isn't magic. Pick the right one for the 
 Use XML when the prompt mixes instructions, retrieved context, examples, user input, and expected output — the separation pays off when there's noise to fight. Skip it for simple prompts; if Markdown headings or plain text are clear enough, use them.
 
 No format is universally best. **An observation from my practice, not benchmarked:** I've seen consistent gains when shifting prompts to XML — most noticeably with autonomous agents, where the prompt has to land alone without conversational refinement. Direct interactive use (Claude Code, Codex) tolerates loose Markdown; unattended agents don't. Claude in particular seems to respond well to XML, which I attribute to its training, but I haven't benchmarked it. Treat this as a starting hypothesis worth testing on your own target model and task before standardizing.
+
+**Host-aware structured prompts.** Hosts that expose structured-prompt primitives — Claude Code's `AskUserQuestion` (multi-choice cards) and Plan Mode (plan-approval cards) — reduce ambiguity at confirmation gates more reliably than inline text. Prefer the structured primitive when the host supports it; fall back to numbered text otherwise. Codex has no equivalent today; its skills stay on numbered text. Skills carrying confirmation gates or multi-choice interview steps prescribe this preference (ADR-0014).
 
 ## 4–5. Research Before Implementation
 
