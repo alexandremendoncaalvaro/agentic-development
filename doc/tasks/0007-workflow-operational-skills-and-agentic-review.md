@@ -1,6 +1,6 @@
 # Task 0007: Add workflow-operational skill category; ship `agentic-review` (Chunk 2.5)
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-05-09
 **Owner:** Alexandre Alvaro
 **Board ref:**

@@ -1,6 +1,6 @@
 # ADR-0007: Workflow-operational skills as a parallel category to spec-driven skills
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-05-09
 **Deciders:** Alexandre Alvaro
 
