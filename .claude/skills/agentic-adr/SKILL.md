@@ -24,6 +24,10 @@ Use the template below. Fill `Context`, `Decision`, `Consequences`, and `Alterna
 * `Consequences` lists positive and negative; do not balance for the sake of balance.
 * `Alternatives Considered` lists each rejected option with a one-line reason.
 
+## Interview UX
+
+When the host exposes `AskUserQuestion`, use it for multi-choice prompts (`Status: proposed / accepted / deprecated / superseded`, decider role selection, alternative-option ranking) and for confirmation gates with non-trivial branching. Inline text questions are the fallback only when the host lacks a structured-prompt primitive (Codex). One card per multi-choice gate beats chained text questions.
+
 ## Step 4 — Write the file
 
 Path: `doc/adr/<NNNN>-<short-slug>.md`. Slug: kebab-case, ≤6 words, derived from the decision title. Status: `proposed`. Date: today, ISO format. Deciders: ask the user.

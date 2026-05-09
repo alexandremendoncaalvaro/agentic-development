@@ -18,6 +18,8 @@ Confirm what to review. Default scopes, in priority order:
 
 If no diff exists, stop and tell the user — there's nothing to review.
 
+When the host exposes `AskUserQuestion`, use it at Step 0 to confirm the review scope as a multi-choice card (`branch vs main / PR#NN / commit-sha / working-tree`) instead of asking inline text. Falls back to numbered text on hosts without the primitive (Codex).
+
 ## Step 1 — Assemble the handoff
 
 The reviewer subagent will get **only** what you assemble here. No conversation history, no prior context.

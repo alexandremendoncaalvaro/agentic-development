@@ -44,6 +44,8 @@ Print to the user:
 
 One question per gap. Skip everything filled confidently. Do **not** ask philosophical questions ("is this doc for agents or humans?", "what is the most important quality bar?") — those are decisions, not interview material.
 
+When the host exposes Plan Mode, the agent may render the proposed `AGENTS.md` body inside the plan (the user reviews and approves before write) instead of writing-then-presenting. Plan Mode is opt-in — skip for incremental edits where the user already saw the prior content.
+
 ## Step 4 — Write the file
 
 On user confirmation, write `AGENTS.md` at the repo root. Cut every line that does not change agent behavior. No "External Resources" section (URLs are derivable from `git remote` and the manifest). No appended Universal Agent Behavior block. No marketing prose.
