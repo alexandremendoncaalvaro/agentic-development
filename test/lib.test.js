@@ -12,7 +12,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../src/lib/detect.js';
 import { installSkills } from '../src/lib/install.js';
-import { updateRootDoc } from '../src/lib/rootdoc.js';
+import { SKILL_DESCRIPTIONS, updateRootDoc } from '../src/lib/rootdoc.js';
+import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from '../src/commands/init.js';
 
 function mkScratch() {
   return mkdtempSync(join(tmpdir(), 'agentic-test-'));
@@ -497,6 +498,73 @@ test('updateRootDoc: AGENTS.md preferred when both AGENTS.md and CLAUDE.md exist
     assert.equal(readFileSync(join(dir, 'CLAUDE.md'), 'utf8'), '# CLAUDE.md\n');
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: marker strings inside a fenced code block are NOT treated as the managed section', async () => {
+  // Real risk: a user who pastes the kit's README into AGENTS.md to document
+  // it for their team would have the literal marker strings in their content.
+  // The parser must require markers on their own line at column 0.
+  const dir = mkScratch();
+  try {
+    const userBody = [
+      '# AGENTS.md',
+      '',
+      'Here is how the agentic kit marks its managed section, for reference:',
+      '',
+      '```',
+      '<!-- agentic-managed-skills:start -->',
+      '... table of skills ...',
+      '<!-- agentic-managed-skills:end -->',
+      '```',
+      '',
+      'My actual rules below.',
+      '',
+    ].join('\n');
+    writeFileSync(join(dir, 'AGENTS.md'), userBody);
+    const action = await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap'],
+      confirmAppend: async () => true,
+    });
+    // Markers inside the fenced block do NOT match (they're indented inside ```).
+    // Behavior: parser sees no section, asks confirmAppend, appends at EOF.
+    assert.equal(action.type, 'appended');
+    const after = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    assert.ok(after.startsWith(userBody), 'user content (incl. fenced markers) must be preserved');
+    // The user's literal marker text inside the fence is intact:
+    assert.match(after, /```\n<!-- agentic-managed-skills:start -->\n\.\.\. table of skills \.\.\.\n<!-- agentic-managed-skills:end -->\n```/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: malformed markers (start without end) → treated as no section, prompts to append', async () => {
+  const dir = mkScratch();
+  try {
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# AGENTS.md\n\n<!-- agentic-managed-skills:start -->\nbroken — no end marker\n'
+    );
+    const action = await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap'],
+      confirmAppend: async () => false,
+    });
+    // No matching end → parser returns null → append path → confirmAppend false → skipped.
+    assert.equal(action.type, 'skipped');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('SKILL_DESCRIPTIONS covers every skill in REQUIRED_SKILLS + CONDITIONAL_SKILLS', () => {
+  const allSkillNames = [...REQUIRED_SKILLS, ...CONDITIONAL_SKILLS.map((s) => s.name)];
+  for (const name of allSkillNames) {
+    assert.ok(
+      typeof SKILL_DESCRIPTIONS[name] === 'string' && SKILL_DESCRIPTIONS[name].length > 0,
+      `SKILL_DESCRIPTIONS missing entry for "${name}" — managed-skills section would render an empty Notes column`
+    );
   }
 });
 

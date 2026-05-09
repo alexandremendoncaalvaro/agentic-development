@@ -32,7 +32,7 @@ const ROOT_DOC_LABEL = {
   absent: '',
 };
 
-const REQUIRED_SKILLS = [
+export const REQUIRED_SKILLS = [
   'agentic-bootstrap',
   'agentic-philosophy',
   'agentic-architecture',
@@ -48,7 +48,7 @@ const REQUIRED_SKILLS = [
  * - agents: which agents have a source tree for this skill (claude-code, codex, or both).
  * - hint: shown next to the option in the TUI.
  */
-const CONDITIONAL_SKILLS = [
+export const CONDITIONAL_SKILLS = [
   {
     name: 'agentic-design',
     autoIf: (f) => f.frontend,

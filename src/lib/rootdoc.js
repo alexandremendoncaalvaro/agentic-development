@@ -4,8 +4,14 @@ import { join } from 'node:path';
 const ROOT_DOC_CANDIDATES = ['AGENTS.md', 'CLAUDE.md'];
 const SECTION_START = '<!-- agentic-managed-skills:start -->';
 const SECTION_END = '<!-- agentic-managed-skills:end -->';
+// Structural anchor: the start marker is recognized only when followed by
+// a blank line and the canonical managed-section heading. This prevents a
+// false match if the user has the literal marker strings in their own
+// content (e.g., quoting the kit's README inside a fenced code block).
+const SECTION_START_RE = /^<!-- agentic-managed-skills:start -->\n\n## Skills installed by `agentic`/m;
+const SECTION_END_RE = /^<!-- agentic-managed-skills:end -->$/m;
 
-const SKILL_DESCRIPTIONS = {
+export const SKILL_DESCRIPTIONS = {
   'agentic-bootstrap': 'Generate or audit `AGENTS.md` at the repo root.',
   'agentic-philosophy':
     'Universal agent guardrails (think before coding, verify before claiming done). Auto-loads on non-trivial work.',
@@ -56,14 +62,20 @@ function buildSection(skills) {
   return lines.join('\n');
 }
 
-function replaceSection(body, newSection) {
-  const startIdx = body.indexOf(SECTION_START);
-  const endIdx = body.indexOf(SECTION_END);
-  if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) {
-    throw new Error('managed section markers not found or out of order');
-  }
-  const before = body.slice(0, startIdx);
-  const after = body.slice(endIdx + SECTION_END.length);
+function findSectionBounds(body) {
+  const startMatch = body.match(SECTION_START_RE);
+  if (!startMatch) return null;
+  const startIdx = startMatch.index;
+  const tail = body.slice(startIdx + SECTION_START.length);
+  const endMatch = tail.match(SECTION_END_RE);
+  if (!endMatch) return null;
+  const endIdx = startIdx + SECTION_START.length + endMatch.index;
+  return { startIdx, endIdx };
+}
+
+function replaceSection(body, newSection, bounds) {
+  const before = body.slice(0, bounds.startIdx);
+  const after = body.slice(bounds.endIdx + SECTION_END.length);
   return before + newSection + after;
 }
 
@@ -93,9 +105,10 @@ export async function updateRootDoc({
 
   const body = readFileSync(found.path, 'utf8');
   const section = buildSection(skills);
+  const bounds = findSectionBounds(body);
 
-  if (body.includes(SECTION_START) && body.includes(SECTION_END)) {
-    const updated = replaceSection(body, section);
+  if (bounds) {
+    const updated = replaceSection(body, section, bounds);
     if (updated === body) return { type: 'unchanged', path: found.name };
     writeFileSync(found.path, updated);
     return { type: 'updated', path: found.name };
