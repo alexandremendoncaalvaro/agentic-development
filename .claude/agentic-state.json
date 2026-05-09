@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "kitVersion": "0.5.0-beta.1",
+  "kitVersion": "0.5.1-beta.1",
   "agent": "claude-code",
   "skills": {
     "agentic-adr": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-adr/SKILL.md",
@@ -13,7 +13,7 @@
       ]
     },
     "agentic-architecture": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-architecture/SKILL.md",
@@ -22,7 +22,7 @@
       ]
     },
     "agentic-audit": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-audit/SKILL.md",
@@ -31,7 +31,7 @@
       ]
     },
     "agentic-bootstrap": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-bootstrap/SKILL.md",
@@ -40,16 +40,16 @@
       ]
     },
     "agentic-ground": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-ground/SKILL.md",
-          "sourceSha": "52c9e6735b3fbcb53a88670514e0fed4fb0ec225d9abed0f15f27120a22f7f18"
+          "sourceSha": "f48b43282f5560f08ac2c885a0c91eaf179ba7ac994265711f8bea9d53c32be4"
         }
       ]
     },
     "agentic-philosophy": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-philosophy/SKILL.md",
@@ -58,7 +58,7 @@
       ]
     },
     "agentic-review": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/agents/fresh-context-reviewer.md",
@@ -71,7 +71,7 @@
       ]
     },
     "agentic-spec": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-spec/SKILL.md",
@@ -80,7 +80,7 @@
       ]
     },
     "agentic-subagent": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-subagent/SKILL.md",
@@ -89,7 +89,7 @@
       ]
     },
     "agentic-task": {
-      "version": "0.5.0-beta.1",
+      "version": "0.5.1-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-task/SKILL.md",
