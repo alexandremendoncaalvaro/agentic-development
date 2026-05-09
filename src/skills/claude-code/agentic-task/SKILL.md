@@ -27,6 +27,10 @@ Status starts at `proposed`. Created: today, ISO format. Notes: empty (filled du
 
 **Do not invent values.** When the user does not know something, leave `<TODO>` and ask. Stop after writing the file — do not start work.
 
+## Interview UX
+
+When the host exposes `AskUserQuestion`, use it for multi-choice prompts (status, owner selection, Spec-ref pick from existing `doc/specs/`) and for confirmation gates with non-trivial branching. Inline text questions are the fallback only when the host lacks a structured-prompt primitive (Codex). Single card per multi-choice gate beats chained text questions.
+
 ## Step 3 — Write the file
 
 Path: `doc/tasks/<NNNN>-<short-slug>.md`. Use the template below.
