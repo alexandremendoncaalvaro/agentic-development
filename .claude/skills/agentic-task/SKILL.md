@@ -20,6 +20,7 @@ Ask one question per missing field, in this order:
 * **Acceptance Criteria:** measurable conditions. Each is a checkbox; pass/fail must be observable, not aspirational ("loads in under 2s", not "fast enough").
 * **Plan:** concrete sequential steps with file paths where applicable. Each is a checkbox.
 * **Owner:** ask.
+* **Spec ref:** ask; leave blank when no spec drives this task. When a feature spec exists at `doc/specs/NNNN-<slug>.md`, link it here so the spec's `Related → Tasks` list reciprocates.
 * **Board ref:** ask; leave blank if solo work.
 
 Status starts at `proposed`. Created: today, ISO format. Notes: empty (filled during execution). Definition of Done section: copy verbatim from the template.
@@ -48,7 +49,8 @@ Status flips to `done` only when every Acceptance Criterion and every Definition
 **Status:** `<proposed | in-progress | blocked | done>`
 **Created:** `<YYYY-MM-DD>`
 **Owner:** `<name or role>`
-**Board ref:** `<external ticket URL or ID — leave blank for solo work>`
+**Spec ref:** `<doc/specs/NNNN-<slug>.md or SPEC-NNNN — blank when no spec drives this task>`
+**Board ref:** `<external ticket URL or ID — blank for solo work>`
 
 ## Context
 
