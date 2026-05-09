@@ -53,3 +53,21 @@ for (const { name, dir } of listSkills('codex')) {
     assert.equal(typeof doc?.policy?.allow_implicit_invocation, 'boolean');
   });
 }
+
+for (const agent of ['claude-code', 'codex']) {
+  for (const { name, dir } of listSkills(agent)) {
+    const manifestPath = join(dir, 'manifest.json');
+    if (!existsSync(manifestPath)) continue;
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    for (const subagentRel of manifest.subagents || []) {
+      test(`skill ${agent}/${name}: manifest subagent ${subagentRel} frontmatter parses with required fields`, () => {
+        const fm = parseFrontmatter(join(dir, subagentRel));
+        assert.equal(typeof fm.name, 'string', 'subagent name must be a string');
+        assert.equal(typeof fm.description, 'string', 'subagent description must be a string');
+        assert.ok(fm.description.length > 0, 'subagent description must not be empty');
+        assert.equal(typeof fm.tools, 'string', 'subagent tools must be a string (comma-separated)');
+        assert.equal(typeof fm.model, 'string', 'subagent model must be a string');
+      });
+    }
+  }
+}

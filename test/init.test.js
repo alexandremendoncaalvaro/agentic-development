@@ -75,6 +75,7 @@ const UNIVERSAL_SKILLS = [
   'agentic-adr',
   'agentic-task',
   'agentic-audit',
+  'agentic-review',
 ];
 
 test('init --agent both → installs the full universal skill set for both agents', () => {
@@ -111,6 +112,23 @@ test('init --agent claude-code → installs every universal skill (Claude only)'
       );
     }
     assert.ok(!existsSync(join(dir, '.agents')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('init --agent claude-code → installs the agentic-review subagent at .claude/agents/', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    assert.ok(
+      existsSync(join(dir, '.claude/agents/fresh-context-reviewer.md')),
+      'fresh-context-reviewer subagent must land at .claude/agents/'
+    );
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/agentic-review/agents')),
+      'subagent must not duplicate inside the skill dir'
+    );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

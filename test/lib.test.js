@@ -204,6 +204,53 @@ test('installSkills: unknown agent throws', async () => {
   }
 });
 
+test('installSkills: claude-code agentic-review → SKILL.md + subagent at .claude/agents/, no manifest.json copied', async () => {
+  const dir = mkScratch();
+  try {
+    const { actions } = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['agentic-review'],
+    });
+    const paths = actions.map((a) => a.path).sort();
+    assert.deepEqual(paths, [
+      '.claude/agents/fresh-context-reviewer.md',
+      '.claude/skills/agentic-review/SKILL.md',
+    ]);
+    assert.ok(existsSync(join(dir, '.claude/agents/fresh-context-reviewer.md')));
+    assert.ok(existsSync(join(dir, '.claude/skills/agentic-review/SKILL.md')));
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/agentic-review/manifest.json')),
+      'manifest.json must never be installed'
+    );
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/agentic-review/agents')),
+      'subagent must not duplicate inside the skill dir'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('installSkills: codex agentic-review → SKILL.md + openai.yaml, no subagent (Codex has no agentsDir)', async () => {
+  const dir = mkScratch();
+  try {
+    const { actions } = await installSkills({
+      cwd: dir,
+      agents: ['codex'],
+      skills: ['agentic-review'],
+    });
+    const paths = actions.map((a) => a.path).sort();
+    assert.deepEqual(paths, [
+      '.agents/skills/agentic-review/SKILL.md',
+      '.agents/skills/agentic-review/agents/openai.yaml',
+    ]);
+    assert.ok(!existsSync(join(dir, '.claude')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('installSkills: missing skill source throws', async () => {
   const dir = mkScratch();
   try {
