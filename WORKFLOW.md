@@ -49,7 +49,20 @@ Avoid putting implementation code in docs unless it's executable, generated, or 
 
 The split is simple. **Docs are for the *why*** — decisions, not history. Git tracks history; docs explain the reasoning that won't survive otherwise. **Code is for the *what*** — clean naming and small units make logic self-evident, and the more your code does this work, the less your docs need to.
 
-Comments are exceptions. They justify *why* a non-obvious choice was made — never *what* the line does. No commented-out code, and no orphan `TODO` or `FIXME`: every deferred item references an issue, ADR, or explicit follow-up.
+Comments are exceptions. They justify *why* a non-obvious choice was made — never *what* the line does. No commented-out code, and no orphan `TODO` or `FIXME`: every deferred item references a tracked work item — a GitHub Issue or a per-task file under `doc/tasks/NNNN-*.md`.
+
+### Documentation Discipline
+
+Eight rules apply to every document the agent or the human writes in the project. They are framed against the failure modes the kit has actually seen — bloated `AGENTS.md`, README pages that drift into changelogs, decision artifacts diluted by speculation.
+
+1. **Definitions and decisions only.** Documentation captures what is true now and the decisions that brought it there. Speculation, history, and unfounded plans are out. A deferred decision is in scope when it is *recorded* — an accepted ADR or a task file is fundamentação; "we might do X later" without a record is speculation and is cut.
+2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Applies to `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, specs, and any prose page. **Decision-record artifacts are exempt** — ADRs under `doc/adr/` (Nygard `Status` lifecycle requires a date) and tasks under `doc/tasks/` (append-only `Notes` log is the auditability surface). Use git history for narrative-doc evolution; keep the dated lifecycle inside the artifacts that need it.
+3. **No emoji anywhere.** Not in docs, code, source comments, commit messages, PR bodies, or skill outputs. Severity tags use plain words (`Blocker / Concern / Note`); status uses words (`accepted / superseded`); structural cues use Markdown.
+4. **Business context first.** Every document opens with *why* — the problem, the constraint, the user — before *what* and *how*. The first paragraph answers "what would break if this document didn't exist".
+5. **One scope per document. No duplication.** If two documents would say the same thing, link instead of copying. The canonical location owns the content; everywhere else references it.
+6. **Code is the primary documentation of behavior.** Comments justify *why* a non-obvious choice was made — never restate *what* the line does. If the comment is needed to explain *what*, rename or refactor.
+7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a tracked work item — a GitHub Issue, or a per-task file under `doc/tasks/NNNN-*.md` (the kit's file-based tracking surface). The trace must be addressable from the source line.
+8. **Tests are living documentation of behavior.** Test names and assertions should read as the spec they enforce. When the spec changes, the test changes; when the test changes, the spec it documents must already have changed.
 
 ## 3. Format by Evidence
 

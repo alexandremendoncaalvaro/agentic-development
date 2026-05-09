@@ -45,4 +45,11 @@ If the source has tokens DESIGN.md doesn't document, list those as additions. If
 
 <output_contract>
 A single `DESIGN.md` at the repo root. YAML frontmatter uses W3C `$value`/`$type` shape. Markdown body has one section per token group present in the source. No invented tokens. No "External Resources" section. In audit mode: a drift list, no file written.
+
+`DESIGN.md` is a narrative document, so the Documentation Discipline rules in `WORKFLOW.md` §2 apply at write time:
+- No emoji anywhere — including do's and don'ts.
+- No dates, version stamps, `DRAFT` markers, or changelog blocks. Token revisions live in git history; DESIGN.md is the current visual contract.
+- The Markdown body opens with the *why* of each token group — the visual constraint or product principle — before listing rules.
+- One scope: visual contract. Component anatomy and interaction patterns live elsewhere; link, do not copy.
+- No speculation. If a group has no source token, mark `<TODO: not yet wired>` and move on.
 </output_contract>

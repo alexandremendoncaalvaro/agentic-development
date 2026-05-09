@@ -135,4 +135,11 @@ Real traps. Each one should map to an incident or to specific code.
 
 <output_contract>
 A single `AGENTS.md` at the repo root, ≤150 lines, every line operational. No "External Resources" section. No appended Universal Agent Behavior block — that lives in the `agentic-philosophy` skill. No meta-prose explaining gaps. In audit mode: a drift list, no file written.
+
+`AGENTS.md` is a narrative document, so the Documentation Discipline rules in `WORKFLOW.md` §2 apply at write time:
+- No emoji anywhere in the file.
+- No dates, version stamps, `DRAFT` markers, or changelog blocks. Stack versions are facts (`Node ≥18`); release timelines are not.
+- `Project Overview` is the business-context-first paragraph — *why* the project exists before *what* it does.
+- One scope: this file is the operational guide for agents. Do not duplicate `ARCHITECTURE.md` patterns or ADR rationale here; link instead.
+- No speculation. If a section has no signal, write `<TODO: not yet wired>` once; do not narrate "this could be added later".
 </output_contract>

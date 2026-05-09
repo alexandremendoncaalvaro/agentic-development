@@ -29,10 +29,21 @@ ADR drift (if `doc/adr/` exists):
 - Status field — every ADR has one of `proposed | accepted | deprecated | superseded by ADR-NNNN`.
 - Superseded chains — every "superseded by ADR-NNNN" target exists.
 
+Documentation discipline drift (`WORKFLOW.md` §2 / ADR-0008). Audit narrative documents — `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, any prose page under `doc/` that is not a decision-record artifact under `doc/adr/` or `doc/tasks/`:
+- Emoji — any present? Rule 3 forbids emoji anywhere (docs, code, comments, commits, skill outputs).
+- Dates / version stamps / `DRAFT` markers / changelog blocks in narrative documents — Rule 2 forbids these. Decision-record artifacts under `doc/adr/` and `doc/tasks/` are exempt.
+- Business context first — does the first paragraph answer *why* the document exists, before *what* and *how*? Rule 4.
+- Scope duplication — does the document copy material that is canonically owned by another file? Rule 5 requires linking, not copying.
+- Speculation — phrases like "we might", "in the future", "could be added", or roadmaps without an ADR / task reference. Rule 1 forbids unfounded plans.
+
+Source code (sample, not exhaustive — flag findings, not every match):
+- Orphan `TODO` / `FIXME` — Rule 7. A reference to a GitHub Issue or a `doc/tasks/NNNN-*.md` task file makes it not orphan.
+- Commented-out code blocks — Rule 7. Removed code lives in git history.
+
 Step 3 — output. One line per finding, formatted:
 `[file or section]: spec says X, code says Y. Suggested resolution: change spec / change code / discuss.`
 
-Group by artifact. If a category has no drift, print one line: `AGENTS.md — no drift.` etc. If an audited artifact does not exist, say so explicitly rather than reporting zero findings.
+Group by artifact. If a category has no drift, print one line: `AGENTS.md — no drift.` etc. If an audited artifact does not exist, say so explicitly rather than reporting zero findings. The Documentation discipline drift category groups findings under `Documentation discipline — <category>: ...`.
 
 If something the user says contradicts what the code shows, surface the conflict. Don't silently trust the user; don't silently trust the code.
 </instructions>
