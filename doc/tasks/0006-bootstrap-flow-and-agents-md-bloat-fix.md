@@ -1,6 +1,6 @@
 # Task 0006: Fix bootstrap flow and AGENTS.md bloat (urgent — bug class)
 
-**Status:** proposed
+**Status:** done
 **Created:** 2026-05-08
 **Owner:** Alexandre Alvaro
 **Board ref:**
@@ -86,10 +86,11 @@ Every future user of `@alexandrealvaro/agentic init` reproduces the same bad UX 
   - [x] Verify ≤150 lines, every line operational.
 - [x] **Phase 5 — regression guard**
   - [x] Add smoke test or checklist file under `test/` or `doc/`.
-- [ ] **Phase 6 — close**
+- [x] **Phase 6 — close**
   - [x] Update [`README.md`](../../README.md) / [`WORKFLOW.md`](../../WORKFLOW.md) where claims drifted.
   - [x] Cross-check against neighbour tasks and revise where they encode the broken flow.
-  - [ ] Run `npm test` + smoke test. Commit. PR to `cli`.
+  - [x] Run `npm test` + smoke test. Commit. PR to `cli`. <!-- Work landed directly on `cli` (no feature branch). PR #1 was opened `cli → main` by mistake; closed without merge per branch model — see 2026-05-09 Notes entry. -->
+
 
 ## Notes
 
@@ -238,13 +239,27 @@ PR: https://github.com/alexandremendoncaalvaro/agentic-development/pull/1 (`cli`
 
 **Honest residual risk to track during 0002/0003:** skill auto-invocation reliability. Per [ADR-0005 §Consequences](../adr/0005-universal-agent-behavior-as-skill.md), if the agent does not match `description` triggers (`"think before coding"`, `"verify before claiming done"`, `"non-trivial change"`) the universal guardrails never load. Codex auto-invocation is weaker than Claude Code's. When 0003 lands, validate empirically: 20-50 mixed tasks, measure invocation rate. If &lt; ~80%, ADR-0005 needs revision (option (c) hybrid was the runner-up for a reason).
 
+### 2026-05-09 — close-out: PR #1 closed, task marked `done`
+
+**PR #1 outcome:** closed without merge. Diagnosis on resume:
+- Base/head was `cli → main` with merge state DIRTY/CONFLICTING (5 conflicts, including `package.json` and `src/lib/render.js` deleted on `main`).
+- Conflicts trace back to commit `ae85fe2` ("Restore main to Layer 1 only — CLI lives on cli branch + npm beta") which removed CLI scaffolding from `main` by intent. Branch model: `main` = stable manual workflow, `cli` = CLI development.
+- This task's Plan §6 said *"PR to `cli`"*, not to `main`. The 2026-05-08 handoff note that pinned `cli → main` was wrong and was the root cause of the dirty merge state.
+- All Task 0006 commits (`4791ec3`..`8bb7834`) already live on `cli`. Closing the PR loses no work. Re-targeting was not possible because the work was committed directly to `cli` without a separate feature branch.
+
+**Action taken:** `gh pr close 1` with rationale comment pointing back to `ae85fe2`'s branch model. `main` stays Layer 1; CLI continues to ship from `cli` + npm beta.
+
+**Verification before close:** `npm test` green (`bin/agentic.js --help` + `init --help` + `test/init-output.test.js`). No outstanding diff on `cli`.
+
+Status flipped to `done`. Plan §6 last box and DoD final two boxes checked. Picking up handoff at step 2 (re-run [Task 0001](0001-dogfood-agents-md-and-architecture-md.md) brownfield dogfood) in the next chunk of work.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (`npm test` + new smoke test)
+- [x] Local tests pass (`npm test` + new smoke test) — green at 2026-05-09 close-out
 - [x] Code review completed (fresh-context reviewer per WORKFLOW §10) — diff + this task file + ADR-0005 only, no other history
 - [x] No orphan `TODO`/`FIXME` introduced
 - [x] Re-running `agentic init` against this repo produces an `AGENTS.md` ≤150 lines with no philosophical questions during the interview <!-- structural guarantee: hand-cut AGENTS.md is 86 lines; smoke test asserts the new prompt has no Universal Agent Behavior block, no interview-by-section, and explicit ≤150-line cap. Empirical dogfood re-run is Task 0001's responsibility per its Notes pointer. -->
 - [x] Definition-of-Done in this task explicitly requires running the smoke test before close — `npm test` runs `test/init-output.test.js`; green at commit time
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
