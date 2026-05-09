@@ -1,6 +1,7 @@
 import * as p from '@clack/prompts';
 import { detectAgents, detectFeatures, detectMode } from '../lib/detect.js';
 import { installSkills } from '../lib/install.js';
+import { updateRootDoc } from '../lib/rootdoc.js';
 
 const VALID_AGENTS = ['claude-code', 'codex'];
 const AGENT_FLAG_VALUES = ['claude-code', 'codex', 'both'];
@@ -21,6 +22,14 @@ const ACTION_SYMBOL = {
   replaced: '~',
   unchanged: '·',
   skipped: '!',
+};
+
+const ROOT_DOC_LABEL = {
+  appended: '+ ',
+  updated: '~ ',
+  unchanged: '· ',
+  skipped: '! ',
+  absent: '',
 };
 
 const REQUIRED_SKILLS = [
@@ -193,8 +202,10 @@ export async function initCommand(opts) {
     : async () => false;
 
   const allActions = [];
+  const installedSkillSet = new Set();
   for (const agent of agents) {
     const agentSkills = skillsForAgent(agent, optedSkills);
+    for (const s of agentSkills) installedSkillSet.add(s);
     const { actions } = await installSkills({
       cwd,
       agents: [agent],
@@ -204,7 +215,32 @@ export async function initCommand(opts) {
     allActions.push(...actions);
   }
 
+  const skillDisplayOrder = [
+    ...REQUIRED_SKILLS,
+    ...CONDITIONAL_SKILLS.map((s) => s.name),
+  ].filter((s) => installedSkillSet.has(s));
+
+  const confirmAppend = interactive
+    ? async (path) => {
+        const answer = await p.confirm({
+          message: `Append a managed "Skills installed by agentic" section to ${path}? (existing content preserved)`,
+          initialValue: true,
+        });
+        if (p.isCancel(answer)) return false;
+        return answer;
+      }
+    : async () => true;
+
+  const rootDocAction = await updateRootDoc({
+    cwd,
+    skills: skillDisplayOrder,
+    confirmAppend,
+  });
+
   const lines = allActions.map((a) => `${ACTION_SYMBOL[a.type]} ${a.path}`);
+  if (rootDocAction.type !== 'absent') {
+    lines.push(`${ROOT_DOC_LABEL[rootDocAction.type]}${rootDocAction.path}`);
+  }
 
   if (interactive) {
     p.note(lines.join('\n'), 'Result');

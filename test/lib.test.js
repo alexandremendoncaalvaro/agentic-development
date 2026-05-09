@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../src/lib/detect.js';
 import { installSkills } from '../src/lib/install.js';
+import { updateRootDoc } from '../src/lib/rootdoc.js';
 
 function mkScratch() {
   return mkdtempSync(join(tmpdir(), 'agentic-test-'));
@@ -359,6 +360,152 @@ test('installSkills: codex agentic-review → SKILL.md + openai.yaml, no subagen
       '.agents/skills/agentic-review/agents/openai.yaml',
     ]);
     assert.ok(!existsSync(join(dir, '.claude')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: no AGENTS.md or CLAUDE.md → action absent, nothing written', async () => {
+  const dir = mkScratch();
+  try {
+    const action = await updateRootDoc({ cwd: dir, skills: ['agentic-bootstrap'] });
+    assert.equal(action.type, 'absent');
+    assert.equal(action.path, null);
+    assert.ok(!existsSync(join(dir, 'AGENTS.md')));
+    assert.ok(!existsSync(join(dir, 'CLAUDE.md')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: existing AGENTS.md, no managed section, confirm true → appended; user content preserved', async () => {
+  const dir = mkScratch();
+  try {
+    const original = '# AGENTS.md\n\nMy guide.\n';
+    writeFileSync(join(dir, 'AGENTS.md'), original);
+    const action = await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap', 'agentic-philosophy'],
+      confirmAppend: async () => true,
+    });
+    assert.equal(action.type, 'appended');
+    assert.equal(action.path, 'AGENTS.md');
+    const updated = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    assert.ok(updated.startsWith(original), 'user content must be preserved at the start');
+    assert.match(updated, /<!-- agentic-managed-skills:start -->/);
+    assert.match(updated, /<!-- agentic-managed-skills:end -->/);
+    assert.match(updated, /agentic-bootstrap/);
+    assert.match(updated, /agentic-philosophy/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: confirm false → skipped, file untouched', async () => {
+  const dir = mkScratch();
+  try {
+    const original = '# AGENTS.md\n\nMy guide.\n';
+    writeFileSync(join(dir, 'AGENTS.md'), original);
+    const action = await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap'],
+      confirmAppend: async () => false,
+    });
+    assert.equal(action.type, 'skipped');
+    assert.equal(action.path, 'AGENTS.md');
+    assert.equal(readFileSync(join(dir, 'AGENTS.md'), 'utf8'), original);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: existing managed section + same skills → unchanged', async () => {
+  const dir = mkScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
+    await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap'],
+      confirmAppend: async () => true,
+    });
+    const before = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    const action = await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap'],
+      confirmAppend: async () => true,
+    });
+    assert.equal(action.type, 'unchanged');
+    assert.equal(readFileSync(join(dir, 'AGENTS.md'), 'utf8'), before);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: existing managed section + different skill set → updated, user content preserved', async () => {
+  const dir = mkScratch();
+  try {
+    const userContent = '# AGENTS.md\n\nUser notes here.\n';
+    writeFileSync(join(dir, 'AGENTS.md'), userContent);
+    await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap'],
+      confirmAppend: async () => true,
+    });
+    const action = await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap', 'agentic-architecture'],
+      confirmAppend: async () => true,
+    });
+    assert.equal(action.type, 'updated');
+    const updated = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    assert.ok(updated.startsWith(userContent), 'user content must be preserved');
+    assert.match(updated, /agentic-architecture/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: only CLAUDE.md present → falls back to CLAUDE.md', async () => {
+  const dir = mkScratch();
+  try {
+    writeFileSync(join(dir, 'CLAUDE.md'), '# CLAUDE.md\n');
+    const action = await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap'],
+      confirmAppend: async () => true,
+    });
+    assert.equal(action.type, 'appended');
+    assert.equal(action.path, 'CLAUDE.md');
+    assert.match(readFileSync(join(dir, 'CLAUDE.md'), 'utf8'), /agentic-bootstrap/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: AGENTS.md preferred when both AGENTS.md and CLAUDE.md exist', async () => {
+  const dir = mkScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
+    writeFileSync(join(dir, 'CLAUDE.md'), '# CLAUDE.md\n');
+    const action = await updateRootDoc({
+      cwd: dir,
+      skills: ['agentic-bootstrap'],
+      confirmAppend: async () => true,
+    });
+    assert.equal(action.path, 'AGENTS.md');
+    assert.match(readFileSync(join(dir, 'AGENTS.md'), 'utf8'), /agentic-bootstrap/);
+    assert.equal(readFileSync(join(dir, 'CLAUDE.md'), 'utf8'), '# CLAUDE.md\n');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: confirmAppend defaults to false (non-interactive safe)', async () => {
+  const dir = mkScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
+    const action = await updateRootDoc({ cwd: dir, skills: ['agentic-bootstrap'] });
+    assert.equal(action.type, 'skipped');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
