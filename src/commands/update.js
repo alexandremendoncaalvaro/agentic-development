@@ -5,8 +5,26 @@ import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures } from '../lib/detect.js';
 import { installSkills, removeOrphanSkills } from '../lib/install.js';
 import { loadState, saveState } from '../lib/state.js';
+import {
+  DEFAULT_PROFILE,
+  availableConditionalsForProfile,
+  profileOrDefault,
+  requiredSkillsForProfile,
+} from '../lib/profiles.js';
 import { updateRootDoc } from '../lib/rootdoc.js';
 import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from './init.js';
+
+const CONDITIONAL_BY_NAME = Object.fromEntries(
+  CONDITIONAL_SKILLS.map((s) => [s.name, s])
+);
+
+function evaluateRule(rule, features, targetAgents) {
+  if (rule === 'frontend') return features.frontend === true;
+  if (rule === 'claude-code') return targetAgents.includes('claude-code');
+  if (rule === true) return true;
+  if (rule === false) return false;
+  return false;
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -48,18 +66,24 @@ function resolveAgents(flagValue, detectedAgents, previousAgents) {
   return ['claude-code'];
 }
 
-function pickConditionalAuto(features, targetAgents) {
-  return CONDITIONAL_SKILLS.filter(
-    (s) => s.autoIf(features) && s.agents.some((a) => targetAgents.includes(a))
-  ).map((s) => s.name);
+function pickConditionalAuto(features, targetAgents, profileName) {
+  const out = [];
+  for (const { name, rule } of availableConditionalsForProfile(profileName)) {
+    const def = CONDITIONAL_BY_NAME[name];
+    if (!def) continue;
+    if (!def.agents.some((a) => targetAgents.includes(a))) continue;
+    if (evaluateRule(rule, features, targetAgents)) out.push(name);
+  }
+  return out;
 }
 
-function skillsForAgent(agent, optedSkills) {
+function skillsForAgent(agent, profileName, optedSkills) {
+  const universal = requiredSkillsForProfile(profileName);
   const conditional = optedSkills.filter((skillName) => {
-    const def = CONDITIONAL_SKILLS.find((s) => s.name === skillName);
+    const def = CONDITIONAL_BY_NAME[skillName];
     return def && def.agents.includes(agent);
   });
-  return [...REQUIRED_SKILLS, ...conditional];
+  return [...universal, ...conditional];
 }
 
 function previousAgentsFromStates(cwd) {
@@ -71,18 +95,41 @@ function previousAgentsFromStates(cwd) {
   return out;
 }
 
-function previouslyOptedConditional(previousStates, currentAgents) {
+function previouslyOptedConditional(previousStates, currentAgents, profileName) {
+  const available = new Set(
+    availableConditionalsForProfile(profileName).map((c) => c.name)
+  );
   const opted = new Set();
   for (const agent of currentAgents) {
     const prev = previousStates[agent];
     if (!prev) continue;
     for (const skill of Object.keys(prev.skills ?? {})) {
-      if (CONDITIONAL_SKILLS.some((s) => s.name === skill)) {
+      if (
+        CONDITIONAL_BY_NAME[skill] &&
+        available.has(skill)
+      ) {
         opted.add(skill);
       }
     }
   }
   return [...opted];
+}
+
+function profileFromStates(previousStates, currentAgents) {
+  // If multiple agents disagree on profile, surface and bail. Profile is
+  // expected to match across agents in the same project.
+  const seen = new Set();
+  for (const agent of currentAgents) {
+    const prev = previousStates[agent];
+    if (prev?.profile) seen.add(prev.profile);
+  }
+  if (seen.size === 0) return DEFAULT_PROFILE;
+  if (seen.size > 1) {
+    throw new Error(
+      `state files disagree on profile (${[...seen].join(', ')}). Run \`agentic profile set <name>\` to reconcile.`
+    );
+  }
+  return [...seen][0];
 }
 
 export async function updateCommand(opts) {
@@ -107,8 +154,13 @@ export async function updateCommand(opts) {
     previousStates[agent] = loadState(cwd, agent);
   }
 
-  const previousOpted = previouslyOptedConditional(previousStates, agents);
-  const autoOpted = pickConditionalAuto(features, agents);
+  const profileName = profileFromStates(previousStates, agents);
+  const previousOpted = previouslyOptedConditional(
+    previousStates,
+    agents,
+    profileName
+  );
+  const autoOpted = pickConditionalAuto(features, agents, profileName);
   const defaultOpted = previousOpted.length ? previousOpted : autoOpted;
 
   let optedSkills;
@@ -120,17 +172,24 @@ export async function updateCommand(opts) {
     p.note(
       `Previous install: ${previousLine}\n` +
         `Updating for: ${agents.map((a) => AGENT_LABEL[a]).join(' + ')}\n` +
+        `Profile: ${profileName}\n` +
         `Kit version: ${pkg.version}`,
       'Update plan'
     );
 
-    const conditionalOptions = CONDITIONAL_SKILLS.filter((s) =>
-      s.agents.some((a) => agents.includes(a))
-    ).map((s) => ({
-      value: s.name,
-      label: s.name,
-      hint: s.autoIf(features) ? s.hintWhenAuto : s.hintWhenManual,
-    }));
+    const conditionalOptions = availableConditionalsForProfile(profileName)
+      .map(({ name, rule }) => {
+        const def = CONDITIONAL_BY_NAME[name];
+        if (!def) return null;
+        if (!def.agents.some((a) => agents.includes(a))) return null;
+        const auto = evaluateRule(rule, features, agents);
+        return {
+          value: name,
+          label: name,
+          hint: auto ? def.hintWhenAuto : def.hintWhenManual,
+        };
+      })
+      .filter(Boolean);
 
     if (conditionalOptions.length > 0) {
       const picked = await p.multiselect({
@@ -172,7 +231,7 @@ export async function updateCommand(opts) {
   const nextStates = {};
 
   for (const agent of agents) {
-    const agentSkills = skillsForAgent(agent, optedSkills);
+    const agentSkills = skillsForAgent(agent, profileName, optedSkills);
     for (const s of agentSkills) installedSkillSet.add(s);
 
     const orphanResult = await removeOrphanSkills({
@@ -196,7 +255,9 @@ export async function updateCommand(opts) {
       force,
     });
     allActions.push(...result.actions);
-    nextStates[agent] = result.nextStates[agent];
+    const next = result.nextStates[agent];
+    next.profile = profileName;
+    nextStates[agent] = next;
   }
 
   if (!dryRun) {
