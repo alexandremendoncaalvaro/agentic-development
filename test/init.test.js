@@ -78,6 +78,7 @@ const UNIVERSAL_SKILLS = [
   'agentic-audit',
   'agentic-review',
   'agentic-ground',
+  'agentic-next',
 ];
 
 test('init --agent both → installs the full universal skill set for both agents', () => {

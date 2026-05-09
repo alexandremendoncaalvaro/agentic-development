@@ -340,6 +340,7 @@ export async function initCommand(opts) {
       '/agentic-audit',
       '/agentic-review (WORKFLOW §10)',
       '/agentic-ground (WORKFLOW §4 + §5)',
+      '/agentic-next (state survey + recommendations)',
       ...(optedSkills.includes('agentic-design') ? ['/agentic-design (DESIGN.md)'] : []),
       ...(optedSkills.includes('agentic-subagent') && agents.includes('claude-code')
         ? ['/agentic-subagent']
