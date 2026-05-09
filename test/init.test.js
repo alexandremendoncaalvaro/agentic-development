@@ -151,6 +151,102 @@ test('init: re-running on installed project is idempotent', () => {
   }
 });
 
+test('init --agent claude-code on greenfield → installs agentic-subagent (Claude only); no agentic-design (no frontend); no agentic-skill (opt-in only)', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    assert.ok(
+      existsSync(join(dir, '.claude/skills/agentic-subagent/SKILL.md')),
+      'agentic-subagent must auto-install for Claude Code'
+    );
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/agentic-design')),
+      'agentic-design must NOT install without frontend signal'
+    );
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/agentic-skill')),
+      'agentic-skill must NOT auto-install (opt-in only)'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('init --agent codex on greenfield → no agentic-subagent (Claude-only source), no agentic-design, no agentic-skill', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'codex']);
+    assert.ok(
+      !existsSync(join(dir, '.agents/skills/agentic-subagent')),
+      'agentic-subagent must NOT install for Codex (no source)'
+    );
+    assert.ok(
+      !existsSync(join(dir, '.agents/skills/agentic-design')),
+      'agentic-design must NOT install without frontend signal'
+    );
+    assert.ok(
+      !existsSync(join(dir, '.agents/skills/agentic-skill')),
+      'agentic-skill must NOT auto-install (opt-in only)'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('init --agent both on a frontend project → installs agentic-design for both agents; agentic-subagent for Claude only', () => {
+  const dir = mkScratch();
+  try {
+    writeFileSync(
+      join(dir, 'package.json'),
+      JSON.stringify({ name: 'fe', dependencies: { react: '^18' } })
+    );
+    runInit(dir, ['--agent', 'both']);
+    assert.ok(
+      existsSync(join(dir, '.claude/skills/agentic-design/SKILL.md')),
+      'agentic-design must auto-install for Claude when frontend detected'
+    );
+    assert.ok(
+      existsSync(join(dir, '.agents/skills/agentic-design/SKILL.md')),
+      'agentic-design must auto-install for Codex when frontend detected'
+    );
+    assert.ok(
+      existsSync(join(dir, '.agents/skills/agentic-design/agents/openai.yaml')),
+      'agentic-design Codex openai.yaml must land'
+    );
+    assert.ok(
+      existsSync(join(dir, '.claude/skills/agentic-subagent/SKILL.md')),
+      'agentic-subagent must auto-install for Claude'
+    );
+    assert.ok(
+      !existsSync(join(dir, '.agents/skills/agentic-subagent')),
+      'agentic-subagent must NOT install for Codex'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('init --agent claude-code on a backend project → no agentic-design (no frontend signal), still installs agentic-subagent', () => {
+  const dir = mkScratch();
+  try {
+    writeFileSync(
+      join(dir, 'package.json'),
+      JSON.stringify({ name: 'api', dependencies: { express: '^4' } })
+    );
+    runInit(dir, ['--agent', 'claude-code']);
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/agentic-design')),
+      'agentic-design must NOT install for backend project'
+    );
+    assert.ok(
+      existsSync(join(dir, '.claude/skills/agentic-subagent/SKILL.md')),
+      'agentic-subagent must still install for Claude'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('init: invalid --agent value rejected', () => {
   const dir = mkScratch();
   try {
