@@ -5,6 +5,14 @@ import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../lib/detect.js';
 import { installSkills } from '../lib/install.js';
 import { saveState, loadState } from '../lib/state.js';
+import {
+  DEFAULT_PROFILE,
+  PROFILES,
+  PROFILE_NAMES,
+  availableConditionalsForProfile,
+  profileOrDefault,
+  requiredSkillsForProfile,
+} from '../lib/profiles.js';
 import { updateRootDoc } from '../lib/rootdoc.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -43,23 +51,18 @@ const ROOT_DOC_LABEL = {
   absent: '',
 };
 
-export const REQUIRED_SKILLS = [
-  'agentic-bootstrap',
-  'agentic-philosophy',
-  'agentic-architecture',
-  'agentic-adr',
-  'agentic-spec',
-  'agentic-task',
-  'agentic-audit',
-  'agentic-review',
-  'agentic-ground',
-];
+/**
+ * Backward-compatible export: the `team` profile's universal skill list.
+ * Tests and downstream code that imported REQUIRED_SKILLS pre-v0.8 get the
+ * same list. New code should call `requiredSkillsForProfile(profileName)`.
+ */
+export const REQUIRED_SKILLS = requiredSkillsForProfile('team');
 
 /**
- * Conditional skills.
- * - autoIf(features): true → pre-checked / installed by default in non-interactive.
- * - agents: which agents have a source tree for this skill (claude-code, codex, or both).
- * - hint: shown next to the option in the TUI.
+ * Backward-compatible export: the v0.7-shape conditional skill catalog.
+ * The four entries match the four conditional skills available in v0.7
+ * with their autoIf / agents / hint configuration. The profile-aware
+ * install path overrides `autoIf` per profile via `availableConditionalsForProfile`.
  */
 export const CONDITIONAL_SKILLS = [
   {
@@ -92,6 +95,10 @@ export const CONDITIONAL_SKILLS = [
   },
 ];
 
+const CONDITIONAL_BY_NAME = Object.fromEntries(
+  CONDITIONAL_SKILLS.map((s) => [s.name, s])
+);
+
 function resolveAgents(flagValue, detectedAgents) {
   if (flagValue === 'both') return ['claude-code', 'codex'];
   if (flagValue) return [flagValue];
@@ -99,24 +106,51 @@ function resolveAgents(flagValue, detectedAgents) {
   return ['claude-code'];
 }
 
-function pickConditionalAuto(features, targetAgents) {
-  return CONDITIONAL_SKILLS.filter(
-    (s) => s.autoIf(features) && s.agents.some((a) => targetAgents.includes(a))
-  ).map((s) => s.name);
+/**
+ * Translate a profile rule (`'frontend'`, `'claude-code'`, `true`, `false`)
+ * into a boolean: should this conditional auto-install for the current
+ * features and target agents?
+ */
+function evaluateRule(rule, features, targetAgents) {
+  if (rule === 'frontend') return features.frontend === true;
+  if (rule === 'claude-code') return targetAgents.includes('claude-code');
+  if (rule === true) return true;
+  if (rule === false) return false;
+  return false;
 }
 
-function skillsForAgent(agent, optedSkills) {
+function pickConditionalAuto(features, targetAgents, profileName) {
+  const out = [];
+  for (const { name, rule } of availableConditionalsForProfile(profileName)) {
+    const def = CONDITIONAL_BY_NAME[name];
+    if (!def) continue;
+    if (!def.agents.some((a) => targetAgents.includes(a))) continue;
+    if (evaluateRule(rule, features, targetAgents)) {
+      out.push(name);
+    }
+  }
+  return out;
+}
+
+function skillsForAgent(agent, profileName, optedSkills) {
+  const universal = requiredSkillsForProfile(profileName);
   const conditional = optedSkills.filter((skillName) => {
-    const def = CONDITIONAL_SKILLS.find((s) => s.name === skillName);
+    const def = CONDITIONAL_BY_NAME[skillName];
     return def && def.agents.includes(agent);
   });
-  return [...REQUIRED_SKILLS, ...conditional];
+  return [...universal, ...conditional];
 }
 
 export async function initCommand(opts) {
   if (opts.agent && !AGENT_FLAG_VALUES.includes(opts.agent)) {
     throw new Error(
       `invalid agent "${opts.agent}". Use one of: ${AGENT_FLAG_VALUES.join(', ')}`
+    );
+  }
+
+  if (opts.profile && !PROFILE_NAMES.includes(opts.profile)) {
+    throw new Error(
+      `invalid profile "${opts.profile}". Use one of: ${PROFILE_NAMES.join(', ')}`
     );
   }
 
@@ -127,18 +161,20 @@ export async function initCommand(opts) {
   const detectedAgents = detectAgents(cwd);
   const features = detectFeatures(cwd);
 
+  let profileName = profileOrDefault(opts.profile);
   let agents;
   let optedSkills;
 
   if (interactive) {
     p.intro('agentic init');
-    const featureLine = [
-      features.frontend ? 'frontend' : null,
-      features.hasClaudeCode ? '.claude/ present' : null,
-      features.hasCodex ? '.agents/.openai/ present' : null,
-    ]
-      .filter(Boolean)
-      .join(', ') || 'none';
+    const featureLine =
+      [
+        features.frontend ? 'frontend' : null,
+        features.hasClaudeCode ? '.claude/ present' : null,
+        features.hasCodex ? '.agents/.openai/ present' : null,
+      ]
+        .filter(Boolean)
+        .join(', ') || 'none';
 
     p.note(
       `Mode: ${MODE_LABEL[detectedMode]}\n` +
@@ -150,6 +186,21 @@ export async function initCommand(opts) {
         `Features: ${featureLine}`,
       'Detected context'
     );
+
+    const profileChoice = await p.select({
+      message: 'Project maturity profile?',
+      options: PROFILE_NAMES.map((name) => ({
+        value: name,
+        label: name,
+        hint: PROFILES[name].note,
+      })),
+      initialValue: profileName,
+    });
+    if (p.isCancel(profileChoice)) {
+      p.cancel('Cancelled.');
+      return;
+    }
+    profileName = profileChoice;
 
     const choice = await p.select({
       message: 'Install skills for which agent(s)?',
@@ -169,14 +220,20 @@ export async function initCommand(opts) {
     }
     agents = choice;
 
-    const conditionalOptions = CONDITIONAL_SKILLS.filter((s) =>
-      s.agents.some((a) => agents.includes(a))
-    ).map((s) => ({
-      value: s.name,
-      label: s.name,
-      hint: s.autoIf(features) ? s.hintWhenAuto : s.hintWhenManual,
-    }));
-    const initialValues = pickConditionalAuto(features, agents);
+    const conditionalOptions = availableConditionalsForProfile(profileName)
+      .map(({ name, rule }) => {
+        const def = CONDITIONAL_BY_NAME[name];
+        if (!def) return null;
+        if (!def.agents.some((a) => agents.includes(a))) return null;
+        const auto = evaluateRule(rule, features, agents);
+        return {
+          value: name,
+          label: name,
+          hint: auto ? def.hintWhenAuto : def.hintWhenManual,
+        };
+      })
+      .filter(Boolean);
+    const initialValues = pickConditionalAuto(features, agents, profileName);
 
     if (conditionalOptions.length > 0) {
       const picked = await p.multiselect({
@@ -194,14 +251,17 @@ export async function initCommand(opts) {
       optedSkills = [];
     }
 
-    const totalCount = REQUIRED_SKILLS.length + optedSkills.length;
+    const universalForProfile = requiredSkillsForProfile(profileName);
+    const totalCount = universalForProfile.length + optedSkills.length;
     const optedSummary = optedSkills.length
       ? `, plus ${optedSkills.join(', ')}`
       : '';
     const confirm = await p.confirm({
-      message: `Install ${totalCount} skill${totalCount === 1 ? '' : 's'} (${REQUIRED_SKILLS.join(
-        ', '
-      )}${optedSummary}) for ${agents.map((a) => AGENT_LABEL[a]).join(' + ')}?`,
+      message: `Install ${totalCount} skill${
+        totalCount === 1 ? '' : 's'
+      } (${universalForProfile.join(', ')}${optedSummary}) for ${agents
+        .map((a) => AGENT_LABEL[a])
+        .join(' + ')}?`,
       initialValue: true,
     });
     if (p.isCancel(confirm) || !confirm) {
@@ -210,7 +270,7 @@ export async function initCommand(opts) {
     }
   } else {
     agents = resolveAgents(opts.agent, detectedAgents);
-    optedSkills = pickConditionalAuto(features, agents);
+    optedSkills = pickConditionalAuto(features, agents, profileName);
   }
 
   const confirmReplace = interactive
@@ -224,7 +284,7 @@ export async function initCommand(opts) {
   const allActions = [];
   const installedSkillSet = new Set();
   for (const agent of agents) {
-    const agentSkills = skillsForAgent(agent, optedSkills);
+    const agentSkills = skillsForAgent(agent, profileName, optedSkills);
     for (const s of agentSkills) installedSkillSet.add(s);
     const previousStates = { [agent]: loadState(cwd, agent) };
     const { actions, nextStates } = await installSkills({
@@ -236,7 +296,9 @@ export async function initCommand(opts) {
       kitVersion: pkg.version,
     });
     allActions.push(...actions);
-    saveState(cwd, agent, nextStates[agent]);
+    const next = nextStates[agent];
+    next.profile = profileName;
+    saveState(cwd, agent, next);
   }
 
   const skillDisplayOrder = [
@@ -283,9 +345,30 @@ export async function initCommand(opts) {
         : []),
       ...(optedSkills.includes('agentic-skill') ? ['/agentic-skill'] : []),
       ...(optedSkills.includes('agentic-hooks') ? ['/agentic-hooks (WORKFLOW §11)'] : []),
-    ].join(', ');
+    ]
+      .filter((line) => {
+        // Filter the universal-set entries to only those actually installed
+        // for this profile.
+        const universalNames = requiredSkillsForProfile(profileName);
+        const universalLabels = {
+          'agentic-bootstrap': '/agentic-bootstrap (AGENTS.md)',
+          'agentic-architecture': '/agentic-architecture (ARCHITECTURE.md)',
+          'agentic-adr': '/agentic-adr',
+          'agentic-spec': '/agentic-spec (doc/specs/)',
+          'agentic-task': '/agentic-task',
+          'agentic-audit': '/agentic-audit',
+          'agentic-review': '/agentic-review (WORKFLOW §10)',
+          'agentic-ground': '/agentic-ground (WORKFLOW §4 + §5)',
+          // 'agentic-philosophy' is implicit and not listed.
+        };
+        for (const [skill, label] of Object.entries(universalLabels)) {
+          if (line === label) return universalNames.includes(skill);
+        }
+        return true;
+      })
+      .join(', ');
     p.outro(
-      `Done. In ${agents
+      `Done (profile: ${profileName}). In ${agents
         .map((a) => AGENT_LABEL[a])
         .join(' or ')}: ${slashLine}. agentic-philosophy auto-loads on non-trivial work.`
     );
