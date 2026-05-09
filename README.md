@@ -2,6 +2,8 @@
 
 A starter kit for engineering production code with LLMs. Lean templates and init prompts grounded in established standards: [Anthropic Skills](https://code.claude.com/docs/en/skills), [Claude Code subagents](https://code.claude.com/docs/en/sub-agents), [agents.md](https://agents.md), Nygard ADRs, [GitHub Spec Kit](https://github.com/github/spec-kit), and [Google Labs DESIGN.md](https://github.com/google-labs-code/design.md).
 
+**The framing.** An LLM is the super-soldier serum; the engineer is Steve Rogers. The serum amplifies what the engineer already brings — solid bases, investigation, care for quality, architecture, clean code, observability, maintainability. The kit encodes those bases as skills, ADRs, and gates so the amplification compounds in the right direction. See [WORKFLOW.md](WORKFLOW.md) for the principles.
+
 The CLI installs nine universal skills (`agentic-bootstrap`, `agentic-philosophy`, `agentic-architecture`, `agentic-adr`, `agentic-spec`, `agentic-task`, `agentic-audit`, `agentic-review`, `agentic-ground`) plus three conditional ones (`agentic-design` for frontend, `agentic-subagent` for Claude Code, `agentic-skill` opt-in) into the agent's native location. Each skill produces its artifact or runs its operation via the agent's native conversational UI; `agentic update` keeps installed skills in sync with upstream kit changes via a state-aware three-way diff. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues); current releases live under [GitHub Releases](https://github.com/alexandremendoncaalvaro/agentic-development/releases).
 
 ## Prerequisites
