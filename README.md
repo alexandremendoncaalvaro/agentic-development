@@ -35,6 +35,7 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `agentic-audit` | spec-driven | universal | Read-only drift report (AGENTS.md / ARCHITECTURE.md / ADRs) | `/agentic-audit` |
 | `agentic-philosophy` | workflow-operational | universal | Universal agent guardrails — auto-loads on non-trivial work | implicit |
 | `agentic-review` | workflow-operational | universal | Fresh-context code review per WORKFLOW §10; structured findings, no "approve" | `/agentic-review <range>` |
+| `agentic-ground` | workflow-operational | universal | Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate per WORKFLOW §4 + §5 | `/agentic-ground` |
 | `agentic-design` | spec-driven | auto if frontend detected | Bootstrap `DESIGN.md` from existing tokens (Figma, tailwind.config, tokens.json, CSS custom props) | `/agentic-design` |
 | `agentic-subagent` | spec-driven | auto if installing for Claude Code | Drafts `.claude/agents/<name>.md` (Claude Code only — Codex has no subagent primitive) | `/agentic-subagent` |
 | `agentic-skill` | spec-driven | opt-in only | Drafts a new Claude Code or Codex skill at the appropriate path | `/agentic-skill` |
@@ -118,6 +119,8 @@ Prompts reference templates by relative path. Two ways to give your agent access
 **Revisiting / auditing existing specs.** Run `/agentic-audit` from inside Claude Code or Codex. The skill reads `AGENTS.md`, `ARCHITECTURE.md`, and `doc/adr/` and produces a drift list — one finding per line, format `[file or section]: spec says X, code says Y. Suggested resolution: change spec / change code / discuss.` Read-only — never rewrites specs. Apply judgment manually before changing anything.
 
 **Reviewing your own diff.** Run `/agentic-review <range>` (e.g. `/agentic-review main..HEAD` or `/agentic-review PR#42`). The skill assembles the diff, the relevant spec slice (`AGENTS.md`, applicable ADRs, the task's Acceptance Criteria), and delegates to a fresh-context reviewer subagent — no inherited bias from the session that wrote the code (WORKFLOW §10). Returns structured findings grouped Blocker / Concern / Note. Codex variant uses `/clear` + paste handoff since Codex has no subagent primitive.
+
+**Researching before implementation.** Run `/agentic-ground` (or let it auto-trigger on non-trivial work). The skill runs a four-source levantamento — official docs, validated open-source examples, in-repo patterns, and git history — synthesizes a happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written (WORKFLOW §4 + §5). Output is the input to whatever produces the implementation plan; the skill does not write code.
 
 **Project already built with agents.** Treat missing artifacts as brownfield (run the relevant skill) and existing artifacts as audit (`/agentic-audit`).
 
