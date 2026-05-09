@@ -29,7 +29,9 @@ const AGENT_LABEL = {
 const ACTION_SYMBOL = {
   created: '+',
   replaced: '~',
+  updated: '~',
   unchanged: '·',
+  kept: '·',
   skipped: '!',
 };
 
