@@ -30,15 +30,24 @@ What to keep in mind:
 
 ## 1. Spec-Driven Design
 
-Define the rules before the agent writes a line. The temptation is to dump everything into `AGENTS.md` and hope it works — but bloat causes the model to ignore the file. Keep one topic per Markdown file: lean and focused. And treat the three kinds of context as distinct artifacts with distinct jobs.
+Define the rules before the agent writes a line. The temptation is to dump everything into `AGENTS.md` and hope it works — but bloat causes the model to ignore the file. Keep one topic per Markdown file: lean and focused.
 
-**Operational context is advisory.** `AGENTS.md` (or `CLAUDE.md` for Claude Code, which can mirror or import the same content via `@AGENTS.md`) tells the agent how to build, test, follow conventions, and where the security boundaries are. The agent reads it as a guide, not a contract. Open standard `AGENTS.md` is native in most agentic IDEs.
+There are two complementary frames for the artifacts the kit produces. The first is **purpose** — what each artifact is *for*. The second is **loading mechanism** — when each artifact reaches the agent's context.
 
-**Canonical specs are constraints, not advice.** `DESIGN.md` (the visual contract — YAML tokens plus Markdown rationale, per Google Labs' open standard), `ARCHITECTURE.md` (system patterns and boundaries), and ADRs in `doc/adr/*.md` (Michael Nygard's pattern, with status lifecycle and superseded markers) are facts the agent must obey. If a token or pattern isn't declared here, it doesn't exist. The agent must never invent one.
+### Four-layer artifact stack (purpose)
 
-**On-demand context is `SKILL.md`.** Description loads at session start (the listing is capped at 1,536 characters per the spec) and body loads only when the skill is invoked. Use it for repeatable workflows or domain knowledge that shouldn't pay a token cost on every turn.
+1. **Constitution** — `AGENTS.md` (operational guide) and `WORKFLOW.md` (engineering philosophy). Tells the agent how the project works and how the team thinks. Read every session.
+2. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; ADRs may be driven by spec constraints. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
+3. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
+4. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
 
-Two rules apply across all three:
+### Three context types (loading mechanism)
+
+- **Operational context is advisory.** `AGENTS.md` (or `CLAUDE.md` for Claude Code, which can mirror or import the same content via `@AGENTS.md`) tells the agent how to build, test, follow conventions, and where the security boundaries are. The agent reads it as a guide, not a contract. Open standard `AGENTS.md` is native in most agentic IDEs.
+- **Canonical specs are constraints, not advice.** `DESIGN.md` (the visual contract — YAML tokens plus Markdown rationale, per Google Labs' open standard), `ARCHITECTURE.md`, ADRs in `doc/adr/*.md`, and feature specs in `doc/specs/*.md` are facts the agent must obey. If a token, pattern, or success criterion isn't declared here, it doesn't exist. The agent must never invent one.
+- **On-demand context is `SKILL.md`.** Description loads at session start (the listing is capped at 1,536 characters per the spec) and body loads only when the skill is invoked. Use it for repeatable workflows or domain knowledge that shouldn't pay a token cost on every turn.
+
+Two rules apply across all of the above:
 
 - **Acceptance criteria must be measurable.** "Build a dashboard" fails. "Loads in under 2 seconds, shows 6 months of history, passes axe accessibility" succeeds.
 - **Prune.** If removing a line wouldn't make the agent fail, cut it.

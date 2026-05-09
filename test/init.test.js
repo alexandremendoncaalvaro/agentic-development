@@ -73,6 +73,7 @@ const UNIVERSAL_SKILLS = [
   'agentic-philosophy',
   'agentic-architecture',
   'agentic-adr',
+  'agentic-spec',
   'agentic-task',
   'agentic-audit',
   'agentic-review',
