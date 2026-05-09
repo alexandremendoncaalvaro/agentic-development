@@ -48,6 +48,7 @@ const ROOT_DOC_LABEL = {
   updated: '~ ',
   unchanged: '· ',
   skipped: '! ',
+  'kept-stale': '! ',
   absent: '',
 };
 
