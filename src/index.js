@@ -19,11 +19,9 @@ export async function run(argv) {
 
   program
     .command('init')
-    .description('Bootstrap AGENTS.md for the current project — interactive by default')
-    .option('-m, --mode <mode>', 'force mode: auto | greenfield | brownfield | audit', 'auto')
-    .option('--copy', 'skip TUI and copy the prompt to clipboard')
-    .option('--stdout', 'skip TUI and print the prompt to stdout')
-    .option('-o, --out <file>', 'skip TUI and write the prompt to a file')
+    .description('Install agentic skills into this project for Claude Code and/or Codex')
+    .option('-a, --agent <agent>', 'install for a specific agent: claude-code | codex | both')
+    .option('-y, --yes', 'skip confirmation prompts (non-interactive)')
     .action(initCommand);
 
   await program.parseAsync(argv);

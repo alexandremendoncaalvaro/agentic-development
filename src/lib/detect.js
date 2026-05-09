@@ -34,3 +34,20 @@ export function detectMode(dir) {
 
   return meaningful.length === 0 ? 'greenfield' : 'brownfield';
 }
+
+/**
+ * Detect which agents the project already uses, by looking for native
+ * config directories. Informs the install default; the user can always
+ * override.
+ *
+ * - `.claude/` → Claude Code
+ * - `.agents/` → Codex (cc-sdd convention, see ADR-0001)
+ *
+ * Returns an array in deterministic order: claude-code first, then codex.
+ */
+export function detectAgents(dir) {
+  const agents = [];
+  if (existsSync(join(dir, '.claude'))) agents.push('claude-code');
+  if (existsSync(join(dir, '.agents'))) agents.push('codex');
+  return agents;
+}
