@@ -68,6 +68,54 @@ test('init --agent both → installs into both .claude and .agents', () => {
   }
 });
 
+const UNIVERSAL_SKILLS = [
+  'agentic-bootstrap',
+  'agentic-philosophy',
+  'agentic-architecture',
+  'agentic-adr',
+  'agentic-task',
+  'agentic-audit',
+];
+
+test('init --agent both → installs the full universal skill set for both agents', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'both']);
+    for (const skill of UNIVERSAL_SKILLS) {
+      assert.ok(
+        existsSync(join(dir, `.claude/skills/${skill}/SKILL.md`)),
+        `Claude SKILL.md missing for ${skill}`
+      );
+      assert.ok(
+        existsSync(join(dir, `.agents/skills/${skill}/SKILL.md`)),
+        `Codex SKILL.md missing for ${skill}`
+      );
+      assert.ok(
+        existsSync(join(dir, `.agents/skills/${skill}/agents/openai.yaml`)),
+        `Codex openai.yaml missing for ${skill}`
+      );
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('init --agent claude-code → installs every universal skill (Claude only)', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    for (const skill of UNIVERSAL_SKILLS) {
+      assert.ok(
+        existsSync(join(dir, `.claude/skills/${skill}/SKILL.md`)),
+        `Claude SKILL.md missing for ${skill}`
+      );
+    }
+    assert.ok(!existsSync(join(dir, '.agents')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('init: re-running on installed project is idempotent', () => {
   const dir = mkScratch();
   try {
