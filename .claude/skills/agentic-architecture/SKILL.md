@@ -42,6 +42,8 @@ Print to the user:
 
 One question per gap.
 
+When the host exposes Plan Mode, the agent may render the proposed `ARCHITECTURE.md` body inside the plan for user approval before write. Plan Mode is opt-in — skip for incremental edits where the user already saw the prior content.
+
 ## Step 4 — Write the file
 
 On user confirmation, write `ARCHITECTURE.md` at the repo root. Cut every line that does not lock a binding pattern. At the end of the response, list any decision that should become an ADR — flag, do not write the ADR yet (use the `agentic-adr` skill for that).
