@@ -46,6 +46,35 @@ A short TUI shows the detected mode, agent, and feature signals (frontend / `.cl
 
 If your project already has an `AGENTS.md` (or `CLAUDE.md`), the installer appends a managed `Skills installed by agentic` section bracketed by `<!-- agentic-managed-skills:start -->` / `:end -->` markers. User content outside those markers is byte-preserved; re-runs update only the managed block.
 
+## Project maturity profiles
+
+The kit ships four profiles that select which skills auto-install. Same WORKFLOW principles bind every profile; only the artifact set scales.
+
+| Profile | Universal install set | Conditional posture | Recommended for |
+| --- | --- | --- | --- |
+| `poc` | philosophy, ground, audit | all blocked | spike, hackathon, exploration |
+| `solo` | + bootstrap, spec, task, review | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code | solo developer shipping a real product |
+| `team` (default) | + architecture, adr | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
+| `mature` | same as team | hooks **recommended**; future evals + spike skills land here | regulated / public-facing production |
+
+Select at init time:
+
+```bash
+npx @alexandrealvaro/agentic@beta init --profile poc
+```
+
+Or change later:
+
+```bash
+npx @alexandrealvaro/agentic@beta profile set solo    # add solo's universal skills
+npx @alexandrealvaro/agentic@beta profile show        # show current per-agent profile
+npx @alexandrealvaro/agentic@beta profile list        # list all profiles
+```
+
+`profile set` runs the equivalent of `update` after writing the new profile, so the install set matches. The state-aware three-way diff prompts before overwriting user-edited files.
+
+Existing v0.7 installs with no profile field migrate to `team` automatically — same install set as before, no user action needed.
+
 ## Updating an existing project
 
 To pull upstream kit changes into a project that already has agentic skills installed:
