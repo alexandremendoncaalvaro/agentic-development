@@ -22,6 +22,8 @@ export const SKILL_DESCRIPTIONS = {
     'Read-only drift report comparing AGENTS.md / ARCHITECTURE.md / ADRs against the code.',
   'agentic-review':
     'Fresh-context code review per WORKFLOW §10 — assemble handoff, return structured findings.',
+  'agentic-ground':
+    'Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate. WORKFLOW §4 + §5.',
   'agentic-design': 'Bootstrap `DESIGN.md` from existing tokens (frontend projects).',
   'agentic-subagent': 'Draft a new Claude Code subagent at `.claude/agents/<name>.md`.',
   'agentic-skill': 'Draft a new Claude Code or Codex skill at the appropriate path.',

@@ -51,6 +51,7 @@ export const REQUIRED_SKILLS = [
   'agentic-task',
   'agentic-audit',
   'agentic-review',
+  'agentic-ground',
 ];
 
 /**
@@ -266,6 +267,7 @@ export async function initCommand(opts) {
       '/agentic-task',
       '/agentic-audit',
       '/agentic-review (WORKFLOW §10)',
+      '/agentic-ground (WORKFLOW §4 + §5)',
       ...(optedSkills.includes('agentic-design') ? ['/agentic-design (DESIGN.md)'] : []),
       ...(optedSkills.includes('agentic-subagent') && agents.includes('claude-code')
         ? ['/agentic-subagent']
