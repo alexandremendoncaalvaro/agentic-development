@@ -1,6 +1,6 @@
 # Task `0009`: Ship `agentic update` and the reviewer-handoff-on-disk
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-05-09
 **Owner:** Alexandre Alvaro
 **Board ref:**
@@ -60,11 +60,26 @@ Decision sequence with the user:
 - D8: handoff-to-disk bundled into this task.
 - D9: `.agentic/reviews/` gitignored, ephemeral.
 
+### 2026-05-09 — close-out
+
+Implementation landed in six commits on `feat/0008-doc-discipline`:
+
+- `b2b22bf` — ADR-0009 + this task file.
+- `836b1d9` — `src/lib/state.js` plus the state-aware refactor of `src/lib/install.js` (three-way diff, force, dry-run, orphan removal).
+- `017d68d` — `src/commands/update.js`, wiring in `src/index.js`, and `src/commands/init.js` writing state on first install.
+- `b82bd75` — agentic-review handoff persisted to `.agentic/reviews/<ts>-<scope>.md` for both Claude Code and Codex.
+- `c28b859` — tests covering state load/save, schema-version refusal, three-way diff matrix, orphan-skill removal, end-to-end `agentic update --yes` on fresh and legacy installs.
+- `b05b557` — README "Updating an existing project" section + version bump to `0.3.0-beta.1`.
+
+`npm test` 100/100 green at HEAD. `agentic init --agent both --yes` plus `agentic update --agent both --yes --dry-run` exercised against a temp dir as smoke verification — state files written, dry-run reports unchanged across the board.
+
+Fresh-context review per WORKFLOW §10 deferred — task closes pending dispatch via `caveman:cavecrew-reviewer` or natively once `/agentic-review` is exercised against this branch.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
+- [x] Local tests pass (or N/A documented in Notes)
 - [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
