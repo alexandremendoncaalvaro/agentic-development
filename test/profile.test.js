@@ -102,6 +102,16 @@ test('mature profile recommends agentic-hooks (rule === true)', () => {
   assert.equal(matureRules['agentic-hooks'], true);
 });
 
+test('agentic-next is universal in every profile (navigation aid is broadly valuable)', () => {
+  for (const name of PROFILE_NAMES) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-next'),
+      `profile ${name} must include agentic-next in its universal set per ADR-0015`
+    );
+  }
+});
+
 test('init --profile poc installs only the poc universal set', () => {
   const dir = mkScratch();
   try {
