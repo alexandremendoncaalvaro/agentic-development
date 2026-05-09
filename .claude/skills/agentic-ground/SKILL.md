@@ -6,15 +6,15 @@ allowed-tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
 
 # /agentic-ground
 
-Implements WORKFLOW §4 + §5 end-to-end as a single research pass. The four sources are joined by **AND**, not OR — every non-trivial change runs the full levantamento, then synthesizes a happy path, then justifies any deviation. Output is the input to whatever skill or freeform turn produces the implementation plan; this skill does not write code.
+Implements WORKFLOW §4 + §5 end-to-end as a single research pass. The four sources are joined by **AND**, not OR — every non-trivial change runs the full research pass, then synthesizes a happy path, then justifies any deviation. Output is the input to whatever skill or freeform turn produces the implementation plan; this skill does not write code.
 
-## Step 0 — Scope the recortte
+## Step 0 — Scope the research scope
 
-Confirm what is being researched. The recortte is the smallest verifiable surface that captures the change: a function to add, a library to pick, a pattern to apply. State it in one sentence before research starts. If the surface is broader than one sentence captures, ask the user to narrow it; broad recorttes produce diluted research.
+Confirm what is being researched. The research scope is the smallest verifiable surface that captures the change: a function to add, a library to pick, a pattern to apply. State it in one sentence before research starts. If the surface is broader than one sentence captures, ask the user to narrow it; broad research scopes produce diluted research.
 
 If the change is genuinely trivial (rename, typo, one-line refactor on a tested path), skip this skill.
 
-## Step 1 — Four-source levantamento (all four required)
+## Step 1 — Four-source research pass (all four required)
 
 ### Source A — official documentation
 
@@ -22,7 +22,7 @@ For each language and library in scope, cite the canonical doc URL and version. 
 
 ### Source B — validated open-source examples
 
-Find ≥1 (prefer 2–3) public repository solving the same *technical* recortte with similar techniques. The match is technical, not domain — a CRUD-app-with-auth and a CLI-with-auth both hit "auth flow", and either is valid for the auth recortte. Use `WebSearch` (e.g. `site:github.com <recortte> language:<lang>`) and follow up with `WebFetch` of the specific file. Cite `<repo>:<path>:<line-range>` and quote the relevant block — never paraphrase code from training memory. If search is inconclusive, ask the user for a known reference.
+Find ≥1 (prefer 2–3) public repository solving the same *technical* research scope with similar techniques. The match is technical, not domain — a CRUD-app-with-auth and a CLI-with-auth both hit "auth flow", and either is valid for the auth research scope. Use `WebSearch` (e.g. `site:github.com <research scope> language:<lang>`) and follow up with `WebFetch` of the specific file. Cite `<repo>:<path>:<line-range>` and quote the relevant block — never paraphrase code from training memory. If search is inconclusive, ask the user for a known reference.
 
 ### Source C — in-repo examples
 
@@ -34,7 +34,7 @@ Run `git log --all --oneline -- <relevant-paths>`, `git log --all --grep=<keywor
 
 ## Step 2 — Happy path synthesis
 
-In one paragraph, name the most-grounded approach for the recortte and cite at least one source per Source A / B / C. Source D is included when it produced a hit; otherwise mark "no prior attempt found." The paragraph is the canonical answer the engineer would give if asked "what is the canonical, idiomatic way to solve this here?" — the question WORKFLOW.md §4 frames.
+In one paragraph, name the most-grounded approach for the research scope and cite at least one source per Source A / B / C. Source D is included when it produced a hit; otherwise mark "no prior attempt found." The paragraph is the canonical answer the engineer would give if asked "what is the canonical, idiomatic way to solve this here?" — the question WORKFLOW.md §4 frames.
 
 ## Step 3 — Deviation gate
 

@@ -4,25 +4,25 @@ description: Four-source pre-implementation research — official docs, validate
 ---
 
 <background_information>
-Implements WORKFLOW §4 + §5 end-to-end as one research pass. The four sources are joined by AND, not OR — every non-trivial change runs the full levantamento, then synthesizes a happy path, then justifies any deviation. Output is the input to whatever skill or freeform turn produces the implementation plan; this skill does not write code.
+Implements WORKFLOW §4 + §5 end-to-end as one research pass. The four sources are joined by AND, not OR — every non-trivial change runs the full research pass, then synthesizes a happy path, then justifies any deviation. Output is the input to whatever skill or freeform turn produces the implementation plan; this skill does not write code.
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire on a non-trivial change, invoke this skill manually before implementing.
 </background_information>
 
 <instructions>
-Step 0 — scope the recortte. Confirm what is being researched in one sentence. The recortte is the smallest verifiable surface that captures the change: a function to add, a library to pick, a pattern to apply. If broader than one sentence, ask the user to narrow. Skip the skill on genuinely trivial diffs (rename, typo, one-line refactor on a tested path).
+Step 0 — scope the research scope. Confirm what is being researched in one sentence. The research scope is the smallest verifiable surface that captures the change: a function to add, a library to pick, a pattern to apply. If broader than one sentence, ask the user to narrow. Skip the skill on genuinely trivial diffs (rename, typo, one-line refactor on a tested path).
 
-Step 1 — four-source levantamento, all four required:
+Step 1 — four-source research pass, all four required:
 
 Source A — official documentation. For each language and library in scope, cite the canonical doc URL and version. Read the relevant section. Ask the user for a known-good link rather than fabricating one. Output: bulleted citations, one per language/library, each with URL plus a one-line summary.
 
-Source B — validated open-source examples. ≥1 (prefer 2–3) public repository solving the same technical recortte with similar techniques. Match is technical, not domain. Cite `<repo>:<path>:<line-range>` and quote the relevant block — never paraphrase from training memory. If search is inconclusive, ask the user for a known reference.
+Source B — validated open-source examples. ≥1 (prefer 2–3) public repository solving the same technical research scope with similar techniques. Match is technical, not domain. Cite `<repo>:<path>:<line-range>` and quote the relevant block — never paraphrase from training memory. If search is inconclusive, ask the user for a known reference.
 
 Source C — in-repo examples. Grep / glob for analogous patterns. Cite `<file>:<line>` plus a one-line description of how the existing example handles the same shape. If the codebase has no analog, state that explicitly.
 
 Source D — git history. Run `git log --all --oneline -- <relevant-paths>`, `git log --all --grep=<keyword>`, sweep sibling active branches. Cite `<commit-sha>` plus touching file path and a one-line description. If empty, state "no prior attempt found." Narrow with `--grep` or `-S` on multi-thousand-commit repos.
 
-Step 2 — happy path synthesis. In one paragraph, name the most-grounded approach for the recortte and cite at least one source per Source A / B / C. Source D included when it produced a hit; otherwise mark "no prior attempt found." The paragraph is the canonical answer to "what is the canonical, idiomatic way to solve this here?"
+Step 2 — happy path synthesis. In one paragraph, name the most-grounded approach for the research scope and cite at least one source per Source A / B / C. Source D included when it produced a hit; otherwise mark "no prior attempt found." The paragraph is the canonical answer to "what is the canonical, idiomatic way to solve this here?"
 
 Step 3 — deviation gate. If the implementation about to be written deviates from the happy path, write the justification first. Must name the specific constraint, evidence, or trade-off forcing the deviation — generic "we want it differently" is insufficient. If the justification cannot be written confidently, loop back to Step 1 and look harder; do not deviate without it. Prescriptive gate, not descriptive — write the answer down.
 
