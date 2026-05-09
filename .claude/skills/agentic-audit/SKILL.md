@@ -1,6 +1,6 @@
 ---
 name: agentic-audit
-description: Read-only drift audit — compare AGENTS.md, ARCHITECTURE.md, and ADR statuses against what the code actually does. Outputs a drift list, never writes files. Use when the user wants to audit, review for drift, sanity-check, or report inconsistencies between the repo's docs and its code.
+description: Read-only drift audit — compare AGENTS.md, ARCHITECTURE.md, ADR statuses, feature specs in doc/specs/, and documentation discipline against what the code actually does. Outputs a drift list, never writes files. Use when the user wants to audit, review for drift, sanity-check, or report inconsistencies between the repo's docs and its code.
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
@@ -10,7 +10,7 @@ Read-only. Produces a drift list comparing the repo's operational docs against w
 
 ## Step 1 — Decide what to audit
 
-If the user names an artifact (`AGENTS.md`, `ARCHITECTURE.md`, ADRs), audit only that. Otherwise audit all three categories below.
+If the user names an artifact (`AGENTS.md`, `ARCHITECTURE.md`, ADRs, specs), audit only that. Otherwise audit all categories below.
 
 ## Step 2 — Run checks
 
@@ -33,6 +33,16 @@ If the user names an artifact (`AGENTS.md`, `ARCHITECTURE.md`, ADRs), audit only
 * Numbering — gaps or duplicates in `doc/adr/NNNN-*.md`?
 * Status field — every ADR has one of `proposed | accepted | deprecated | superseded by ADR-NNNN`.
 * Superseded chains — every "superseded by ADR-NNNN" target exists.
+
+### Spec drift (if `doc/specs/` exists)
+
+Structural integrity only — does **not** deep-audit spec text against shipped code (deferred per [ADR-0011](../../doc/adr/0011-agentic-spec-skill.md) Consequences).
+
+* Numbering — gaps or duplicates in `doc/specs/NNNN-*.md`?
+* Status field — every spec has one of `draft | accepted | shipped | superseded by SPEC-NNNN`.
+* Superseded chains — every "superseded by SPEC-NNNN" target exists.
+* Reciprocity — every task under `doc/tasks/NNNN-*.md` whose `Spec ref` field is non-empty points to a spec that exists. And every spec with `Status: accepted` or `shipped` has at least one entry in its `Related → Tasks` list (an accepted spec with no implementing task is a smell).
+* Success Criteria coverage — when every task that references a spec is `done`, the spec's Success Criteria checkboxes should all be checked. A spec with all tasks `done` but unchecked Success Criteria boxes is drift between work-unit completion and feature-level claim.
 
 ### Documentation discipline drift (`WORKFLOW.md` §2 / ADR-0008)
 

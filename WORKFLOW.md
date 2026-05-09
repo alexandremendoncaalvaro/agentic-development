@@ -62,16 +62,18 @@ Comments are exceptions. They justify *why* a non-obvious choice was made — ne
 
 ### Documentation Discipline
 
-Eight rules apply to every document the agent or the human writes in the project. They are framed against the failure modes the kit has actually seen — bloated `AGENTS.md`, README pages that drift into changelogs, decision artifacts diluted by speculation.
+The agent's authoritative copy of the eight-rule documentation discipline lives in the `agentic-philosophy` skill (`Documentation Discipline` section). The rules are summarized below for reference; the skill carries the full text agents read at session time. ADR-0008 records the canonical decision and the reconciliations against ADR-0004 (file-based task tracking) and ADR-0005 (universal agent behavior as a skill).
 
-1. **Definitions and decisions only.** Documentation captures what is true now and the decisions that brought it there. Speculation, history, and unfounded plans are out. A deferred decision is in scope when it is *recorded* — an accepted ADR or a task file is fundamentação; "we might do X later" without a record is speculation and is cut.
-2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Applies to `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, specs, and any prose page. **Decision-record artifacts are exempt** — ADRs under `doc/adr/` (Nygard `Status` lifecycle requires a date) and tasks under `doc/tasks/` (append-only `Notes` log is the auditability surface). Use git history for narrative-doc evolution; keep the dated lifecycle inside the artifacts that need it.
-3. **No emoji anywhere.** Not in docs, code, source comments, commit messages, PR bodies, or skill outputs. Severity tags use plain words (`Blocker / Concern / Note`); status uses words (`accepted / superseded`); structural cues use Markdown.
-4. **Business context first.** Every document opens with *why* — the problem, the constraint, the user — before *what* and *how*. The first paragraph answers "what would break if this document didn't exist".
-5. **One scope per document. No duplication.** If two documents would say the same thing, link instead of copying. The canonical location owns the content; everywhere else references it.
-6. **Code is the primary documentation of behavior.** Comments justify *why* a non-obvious choice was made — never restate *what* the line does. If the comment is needed to explain *what*, rename or refactor.
-7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a tracked work item — a GitHub Issue, or a per-task file under `doc/tasks/NNNN-*.md` (the kit's file-based tracking surface). The trace must be addressable from the source line.
-8. **Tests are living documentation of behavior.** Test names and assertions should read as the spec they enforce. When the spec changes, the test changes; when the test changes, the spec it documents must already have changed.
+1. **Definitions and decisions only.** No speculation, history, or unfounded plans.
+2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/` are exempt — their lifecycle fields are the auditability primitive.
+3. **No emoji anywhere.**
+4. **Business context first.**
+5. **One scope per document. No duplication.**
+6. **Code is the primary documentation of behavior.**
+7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a GitHub Issue or a `doc/tasks/NNNN-*.md` task.
+8. **Tests are living documentation of behavior.**
+
+The skill body explains the rationale per rule, lists the failure modes the rules counter (bloated `AGENTS.md`, README pages drifting into changelogs, decision artifacts diluted by speculation), and walks through the reconciliations. Generator skills (`agentic-bootstrap`, `agentic-architecture`, `agentic-spec`, `agentic-task`, `agentic-adr`, `agentic-design`) reject violations of these rules at write time; `agentic-audit` flags drift across narrative docs and decision-record artifacts on demand.
 
 ## 3. Format by Evidence
 
@@ -86,29 +88,17 @@ Use XML when the prompt mixes instructions, retrieved context, examples, user in
 
 No format is universally best. **An observation from my practice, not benchmarked:** I've seen consistent gains when shifting prompts to XML — most noticeably with autonomous agents, where the prompt has to land alone without conversational refinement. Direct interactive use (Claude Code, Codex) tolerates loose Markdown; unattended agents don't. Claude in particular seems to respond well to XML, which I attribute to its training, but I haven't benchmarked it. Treat this as a starting hypothesis worth testing on your own target model and task before standardizing.
 
-## 4. Find the Happy Path
+## 4–5. Research Before Implementation
 
-Before implementing, ask:
+Combines Find the Happy Path (canonical / idiomatic baseline) and Ground in Real Patterns (anchoring in project-specific examples). The kit treats both as one indivisible flow via `agentic-ground`; two prose sections would frame one operation as two separate practices.
 
-> *"What is the canonical, idiomatic way to implement [X] in [stack]? Cite official docs. List common deviations and why people take them."*
+Two sub-practices, joined into one indivisible pass.
 
-Then check continuously, especially mid-implementation:
+**Find the happy path.** Before implementing, ask: *"What is the canonical, idiomatic way to implement [X] in [stack]? Cite official docs. List common deviations and why people take them."* Mid-implementation: *"Are we still on the happy path? If we deviated, was it deliberate?"* Sometimes you can't follow the happy path — that's fine. Always know where it is and why you left it.
 
-> *"We are at step Y. Are we still on the happy path? If we deviated, was it deliberate?"*
+**Ground in real patterns.** Don't dump the codebase into context. Anchor the model in a specific, project-relevant example: *"Find an existing example of [similar feature]; use that exact structure."* Cite specific files, not "the codebase." Use just-in-time retrieval — pass paths or IDs and let the agent fetch via tools.
 
-Sometimes you can't follow the happy path — that's fine. But always know where it is and why you left it.
-
-The kit ships `agentic-ground` (workflow-operational skill) as the bound implementation of §4 + §5: it runs a four-source research pass (official docs, validated open-source examples, in-repo patterns, git history), synthesizes the happy path with citations, and gates any deviation behind an irrefutable justification before code is written.
-
-## 5. Ground in Real Patterns
-
-Don't dump the codebase into context. Anchor the model in a specific, project-relevant example.
-
-> *"Find an existing example of [similar feature]; use that exact structure."*
-
-Cite specific files, not "the codebase." Use just-in-time retrieval: pass paths or IDs and let the agent fetch via tools when it needs to read them.
-
-`agentic-ground` (see §4) is the workflow-operational skill that combines this with the other three research sources — official docs, validated OSS, and git history — into one indivisible pre-implementation pass.
+The kit ships `agentic-ground` as the workflow-operational implementation of both. It runs a four-source research pass — official docs, validated open-source examples, in-repo patterns, git history — joined by AND not OR, synthesizes the happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written. Splitting the two sub-practices into separate skills would force two invocations with overlapping research outputs and fragment the synthesis context (ADR-0010).
 
 ## 6. Explore → Plan → Implement → Commit
 
