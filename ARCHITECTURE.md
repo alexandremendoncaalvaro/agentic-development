@@ -58,6 +58,7 @@ Currently-binding decisions. Link each to `doc/adr/`.
 * [ADR-0003](doc/adr/0003-tui-with-clack-prompts.md) — `@clack/prompts` as the CLI's TUI
 * [ADR-0004](doc/adr/0004-file-based-task-tracking.md) — File-based per-task tracking with markdown checklists
 * [ADR-0005](doc/adr/0005-universal-agent-behavior-as-skill.md) — Universal Agent Behavior lives in an `agentic-philosophy` skill, not in `AGENTS.md`
+* [ADR-0006](doc/adr/0006-architecture-md-at-repo-root.md) — `ARCHITECTURE.md` lives at the repo root (matklad convention)
 
 ## Decisions to revisit (ADR candidates, not yet written)
 

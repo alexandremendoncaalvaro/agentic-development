@@ -42,6 +42,7 @@ Binding decisions — see `doc/adr/`. Do not reinvent.
 * **Universal Agent Behavior lives in `agentic-philosophy` skill, not in `AGENTS.md`** ([ADR-0005](doc/adr/0005-universal-agent-behavior-as-skill.md)). Do not bundle generic agent advice into per-project output.
 * **Bootstrap flow is scan-first, not interview-first** ([Task 0006](doc/tasks/0006-bootstrap-flow-and-agents-md-bloat-fix.md)): pre-fill from repo signals, ask only the gaps.
 * **Idempotent on re-run** for filesystem ops (ADR-0002).
+* **Operational docs at repo root** ([ADR-0006](doc/adr/0006-architecture-md-at-repo-root.md)): `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md`, `WORKFLOW.md` at root. ADRs and tasks under `doc/`.
 
 ## Repository Layout
 
@@ -61,7 +62,7 @@ ARCHITECTURE.md                      system-level patterns (pairs with ADRs)
 WORKFLOW.md                          philosophy doc, shipped to npm
 ```
 
-Binding ADRs: 0001-0005, all accepted. Skill source lives under `src/skills/`; the kit does not self-install into its own `.claude/skills/` (would duplicate the source). The full skill set lands across [Task 0002](doc/tasks/0002-foundation-and-bootstrap-skill.md) (bootstrap) and [Task 0003](doc/tasks/0003-universal-skills.md) (the rest).
+Binding ADRs: 0001-0006, all accepted. Skill source lives under `src/skills/`; the kit does not self-install into its own `.claude/skills/` (would duplicate the source). The full skill set lands across [Task 0002](doc/tasks/0002-foundation-and-bootstrap-skill.md) (bootstrap) and [Task 0003](doc/tasks/0003-universal-skills.md) (the rest).
 
 ## Commit & PR Conventions
 
