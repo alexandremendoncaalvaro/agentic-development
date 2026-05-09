@@ -2,7 +2,7 @@
 
 A starter kit for engineering production code with LLMs. Lean templates and init prompts grounded in established standards: [Anthropic Skills](https://code.claude.com/docs/en/skills), [Claude Code subagents](https://code.claude.com/docs/en/sub-agents), [agents.md](https://agents.md), Nygard ADRs, and [Google Labs DESIGN.md](https://github.com/google-labs-code/design.md).
 
-> **Status:** v0.2 in development on the `cli` branch — the CLI now installs a project-level `agentic-bootstrap` skill into Claude Code or Codex (`/agentic-bootstrap` runs the AGENTS.md flow inside your agent). v0.1.0-beta on npm still prints prompts; the v0.2 install flow ships once the universal skill set lands ([Task 0003](doc/tasks/0003-universal-skills.md)). The manual prompts below cover artifacts the CLI does not install yet. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues).
+> **Status:** v0.2 in development on the `cli` branch — the CLI installs the universal skill set (`agentic-bootstrap`, `agentic-philosophy`, `agentic-architecture`, `agentic-adr`, `agentic-task`, `agentic-audit`) into Claude Code or Codex. Each skill produces its artifact via the agent's native conversational UI. v0.1.0-beta on npm still prints prompts; the v0.2 release ships once the conditional skills and polish chunks land. The manual prompts below cover artifacts the CLI does not install yet (DESIGN.md, custom skills, subagents). Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues).
 
 ## Prerequisites
 
@@ -19,14 +19,21 @@ cd your-project
 npx @alexandrealvaro/agentic@beta init
 ```
 
-The CLI installs the `agentic-bootstrap` skill into your agent's native location:
+The CLI installs six universal skills into your agent's native location:
 
-* **Claude Code:** `.claude/skills/agentic-bootstrap/SKILL.md`
-* **Codex:** `.agents/skills/agentic-bootstrap/SKILL.md` (+ `agents/openai.yaml`)
+* **Claude Code:** `.claude/skills/<skill-name>/SKILL.md`
+* **Codex:** `.agents/skills/<skill-name>/SKILL.md` (+ `agents/openai.yaml`)
+
+| Skill | What it does | Invoke |
+| --- | --- | --- |
+| `agentic-bootstrap` | Scans the repo, writes `AGENTS.md` ≤150 lines | `/agentic-bootstrap` |
+| `agentic-architecture` | Scans the code, writes `ARCHITECTURE.md` | `/agentic-architecture` |
+| `agentic-adr` | Drafts `doc/adr/NNNN-<slug>.md` from the conversation | `/agentic-adr` |
+| `agentic-task` | Drafts `doc/tasks/NNNN-<slug>.md` (checkbox + Notes format) | `/agentic-task` |
+| `agentic-audit` | Read-only drift report (AGENTS.md / ARCHITECTURE.md / ADRs) | `/agentic-audit` |
+| `agentic-philosophy` | Universal agent guardrails — auto-loads on non-trivial work | implicit |
 
 A short TUI shows the detected mode and asks which agent to install for. Non-interactive flags: `--agent claude-code | codex | both`, `--yes` to skip confirmations. Re-running on an installed project is idempotent — unchanged files report `·`, divergent ones prompt to replace.
-
-Once installed, run `/agentic-bootstrap` inside Claude Code or Codex. The skill scans the repo, pre-fills `AGENTS.md` from observed signals, asks only the genuine gaps, then writes the file.
 
 For persistent install:
 
@@ -35,7 +42,7 @@ npm install -g @alexandrealvaro/agentic@beta
 agentic init
 ```
 
-> **Chunk 1 scope:** the CLI installs `agentic-bootstrap` only. The other skills (`agentic-architecture`, `agentic-adr`, `agentic-task`, `agentic-audit`, `agentic-design`, `agentic-skill`, `agentic-subagent`, `agentic-philosophy`) ship in [Task 0003](doc/tasks/0003-universal-skills.md) and beyond. For artifacts the CLI does not install yet, see [Manual prompts](#manual-prompts) below.
+> **Chunk 2 scope:** the universal skill set is wired. Conditional skills (`agentic-design`, `agentic-skill`, `agentic-subagent`) ship in Chunk 3; polish + npm release in Chunk 4. For artifacts the CLI does not install yet, see [Manual prompts](#manual-prompts) below.
 
 ## Manual prompts
 
@@ -62,7 +69,7 @@ Prompts reference templates by relative path. Two ways to give your agent access
 
 ## Workflows by scenario
 
-**New project (greenfield).** Initialize git and project structure, then run `agentic init` to install the bootstrap skill and `/agentic-bootstrap` inside your agent to produce AGENTS.md (or paste `prompts/agents.md` if you prefer the manual route). As architectural and design decisions emerge, use the manual prompts above for ARCHITECTURE.md, ADRs, DESIGN.md, skills, and subagents until those skills ship. Use `prompts/task.md` for non-trivial work that benefits from a checkbox-based progress tracker.
+**New project (greenfield).** Initialize git and project structure, then run `agentic init` to install the universal skill set. From inside Claude Code or Codex: `/agentic-bootstrap` produces `AGENTS.md`, `/agentic-architecture` produces `ARCHITECTURE.md`, `/agentic-adr` records each binding decision, `/agentic-task` opens trackable work items, `/agentic-audit` flags drift. `agentic-philosophy` auto-loads on non-trivial work. For DESIGN.md, custom skills, and subagents, use the manual prompts below until the conditional skills ship.
 
 **Existing project (brownfield).** Same flow. The project-wide prompts (`prompts/agents.md`, `prompts/architecture.md`) follow a **scan-first pattern**: the agent reads the codebase first, pre-fills every placeholder it can verify, then asks you only about the genuine gaps and conflicts — no philosophical questions, no interview-by-section. The per-artifact prompts (ADR, task, design, skill, subagent) work on a single decision or asset and don't need codebase-wide verification. Backfill ADRs only for decisions that matter going forward.
 

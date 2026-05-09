@@ -89,5 +89,5 @@ Real traps confirmed in code or ADRs.
 * **Skill source is read at install time** from disk via `src/lib/install.js` (`KIT_ROOT` resolves up two from `src/lib/`). Moving `src/lib/install.js` breaks that path.
 * **`detectMode` ignores dotfiles + a fixed `TRIVIAL_ENTRIES` set** (`src/lib/detect.js`). Adding a new "trivial" file (e.g., `.editorconfig`) without updating that set will misclassify a project as `brownfield`.
 * **Non-TTY bypasses TUI** (`src/commands/init.js`). `--agent` and `--yes` also force non-interactive. Don't add a prompt that runs unconditionally.
-* **Chunk 1 scope:** only `agentic-bootstrap` is wired. The README's "Manual prompts" table covers everything else; don't claim CLI coverage that isn't there.
+* **Chunk 2 scope:** the six universal skills are wired (`agentic-bootstrap`, `agentic-philosophy`, `agentic-architecture`, `agentic-adr`, `agentic-task`, `agentic-audit`). Conditional skills (`agentic-design`, `agentic-skill`, `agentic-subagent`) ship in Chunk 3 — until then, the README's "Manual prompts" table covers them. Don't claim CLI coverage that isn't there.
 * **Idempotency contract:** `installSkills` byte-compares existing target files. A user-edited skill file diverges → `confirmReplace` callback decides. Default (non-interactive) skips. Don't break this default by silently overwriting.
