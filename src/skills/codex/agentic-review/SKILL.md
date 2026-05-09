@@ -41,7 +41,7 @@ Review focus, in priority order:
 
 Skip formatting, naming opinions, stylistic preferences. Skip praise.
 
-Output: group findings by severity (Blocker / Concern / Note). Each finding one line: `file:line: <emoji> <severity>: <problem>. <fix>.` Use 🚨 / ⚠️ / ℹ️.
+Output: group findings by severity (Blocker / Concern / Note). Each finding one line: `file:line: <severity>: <problem>. <fix>.` Severity is the literal word `Blocker`, `Concern`, or `Note` — no emoji.
 
 End with a one-line bottom-line: "Ship as-is", "Ship with the Concerns logged as follow-up tasks", or "Don't ship until Blockers resolved". Do NOT synthesize an "approve" verdict.
 
