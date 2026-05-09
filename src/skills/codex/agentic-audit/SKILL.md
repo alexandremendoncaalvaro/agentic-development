@@ -29,6 +29,13 @@ ADR drift (if `doc/adr/` exists):
 - Status field — every ADR has one of `proposed | accepted | deprecated | superseded by ADR-NNNN`.
 - Superseded chains — every "superseded by ADR-NNNN" target exists.
 
+Spec drift (if `doc/specs/` exists; structural integrity only — does NOT deep-audit spec text against code, deferred per ADR-0011):
+- Numbering — gaps or duplicates in `doc/specs/NNNN-*.md`?
+- Status field — every spec has one of `draft | accepted | shipped | superseded by SPEC-NNNN`.
+- Superseded chains — every "superseded by SPEC-NNNN" target exists.
+- Reciprocity — every task with non-empty `Spec ref` points to a spec that exists; every accepted/shipped spec has at least one entry in its Related → Tasks list.
+- Success Criteria coverage — when every task referencing a spec is done, the spec's Success Criteria checkboxes should all be checked.
+
 Documentation discipline drift (`WORKFLOW.md` §2 / ADR-0008). Audit narrative documents — `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, any prose page under `doc/` that is not a decision-record artifact under `doc/adr/` or `doc/tasks/`:
 - Emoji — any present? Rule 3 forbids emoji anywhere (docs, code, comments, commits, skill outputs).
 - Dates / version stamps / `DRAFT` markers / changelog blocks in narrative documents — Rule 2 forbids these. Decision-record artifacts under `doc/adr/` and `doc/tasks/` are exempt.
