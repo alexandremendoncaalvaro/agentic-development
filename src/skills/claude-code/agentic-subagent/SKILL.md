@@ -44,7 +44,7 @@ Ask one question per missing field, in this order:
 
 ## Step 4 — Write the file
 
-Path: `.claude/agents/<name>.md` (project, committed) or `~/.claude/agents/<name>.md` (personal). Use the [Anthropic Skills subagent template](../templates/subagent.md) shape — but only declare the fields the subagent actually uses.
+Path: `.claude/agents/<name>.md` (project, committed) or `~/.claude/agents/<name>.md` (personal). Frontmatter uses the Claude Code subagents shape (see code.claude.com/docs/en/sub-agents) — declare only the fields the subagent actually uses.
 
 Body = the system prompt. Every line costs tokens on every subagent turn. Be terse. State role, scope, output format, stop criterion, and what NOT to do. Restate any convention from `AGENTS.md` the subagent must follow (it does not read `AGENTS.md`).
 
