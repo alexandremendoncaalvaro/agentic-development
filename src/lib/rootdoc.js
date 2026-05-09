@@ -29,6 +29,8 @@ export const SKILL_DESCRIPTIONS = {
   'agentic-design': 'Bootstrap `DESIGN.md` from existing tokens (frontend projects).',
   'agentic-subagent': 'Draft a new Claude Code subagent at `.claude/agents/<name>.md`.',
   'agentic-skill': 'Draft a new Claude Code or Codex skill at the appropriate path.',
+  'agentic-hooks':
+    'Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals.',
 };
 
 /**
