@@ -356,7 +356,16 @@ export async function removeOrphanSkills({
 
     for (const f of entry.files) {
       const abs = join(cwd, f.path);
-      if (existsSync(abs) && !dryRun) {
+      if (!existsSync(abs)) {
+        // State recorded the file at install time but it is gone on disk
+        // now (manually deleted, moved, or never written). Surface as a
+        // distinct action so the user sees the state-vs-reality mismatch
+        // instead of a silent "removed" line for a file that was never
+        // there.
+        actions.push({ type: 'removed-missing', path: f.path, agent });
+        continue;
+      }
+      if (!dryRun) {
         unlinkSync(abs);
       }
       actions.push({ type: 'removed', path: f.path, agent });

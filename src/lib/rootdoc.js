@@ -93,18 +93,23 @@ function replaceSection(body, newSection, bounds) {
  * Behaviour:
  *   - No root doc → returns { type: 'absent', path: null }. Skill bootstraps create the file later.
  *   - Section already present and matches → { type: 'unchanged', path }.
- *   - Section already present and stale → updated in place → { type: 'updated', path }.
+ *   - Section already present and stale → confirmReplace(path) is called; on true → updated → { type: 'updated', path }; on false → { type: 'kept-stale', path } (managed-section diverged on disk and the user chose to keep it).
  *   - Section absent → confirmAppend(path) is called; on true → appended → { type: 'appended', path }; on false → { type: 'skipped', path }.
+ *   - dryRun true → no writes; returned `type` reflects what *would* happen.
  *
  * @param {object} opts
  * @param {string} opts.cwd  Target project root.
  * @param {string[]} opts.skills  Skill names actually installed (in display order).
  * @param {(path: string) => Promise<boolean>} [opts.confirmAppend]  Async confirmation callback for the append-to-existing-file case. Default: skip.
+ * @param {(path: string) => Promise<boolean>} [opts.confirmReplace]  Async confirmation callback for the replace-existing-section case (managed section present on disk but stale). Default: replace (preserves the v0.5 behaviour where update silently regenerates the managed block on every kit / skill change). Wire to a prompt to honor user edits between markers.
+ * @param {boolean} [opts.dryRun]  When true, computes the action without writing.
  */
 export async function updateRootDoc({
   cwd,
   skills,
   confirmAppend = async () => false,
+  confirmReplace = async () => true,
+  dryRun = false,
 }) {
   const found = findRootDoc(cwd);
   if (!found) return { type: 'absent', path: null };
@@ -116,7 +121,9 @@ export async function updateRootDoc({
   if (bounds) {
     const updated = replaceSection(body, section, bounds);
     if (updated === body) return { type: 'unchanged', path: found.name };
-    writeFileSync(found.path, updated);
+    const ok = await confirmReplace(found.name);
+    if (!ok) return { type: 'kept-stale', path: found.name };
+    if (!dryRun) writeFileSync(found.path, updated);
     return { type: 'updated', path: found.name };
   }
 
@@ -124,6 +131,6 @@ export async function updateRootDoc({
   if (!ok) return { type: 'skipped', path: found.name };
 
   const sep = body.endsWith('\n') ? '\n' : '\n\n';
-  writeFileSync(found.path, body + sep + section + '\n');
+  if (!dryRun) writeFileSync(found.path, body + sep + section + '\n');
   return { type: 'appended', path: found.name };
 }
