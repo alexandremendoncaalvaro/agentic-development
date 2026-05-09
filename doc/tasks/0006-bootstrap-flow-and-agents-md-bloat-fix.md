@@ -222,6 +222,22 @@ Fresh-context reviewer (per WORKFLOW.md §10) flagged drift between spec and imp
 
 `npm test` green after corrections. The fresh-context review is the §10 / Definition-of-Done item below.
 
+### 2026-05-08 — PR opened, session handoff
+
+PR: https://github.com/alexandremendoncaalvaro/agentic-development/pull/1 (`cli` → `main`).
+
+**Status on PR open:** all Acceptance Criteria checked (two deferred to Task 0003 with justification). Definition of Done — local tests pass, code review done, no orphan TODO/FIXME, structural smoke test guards the new flow. Final two boxes (`Local tests pass` Plan §6, status flip to `done`) wait on PR merge.
+
+**Pickup pointer for the next session — in this exact order:**
+
+1. **Watch / merge PR #1.** When green, flip the status of this task from `proposed` to `done` and check the last unchecked Plan box (`Run npm test + smoke test. Commit. PR to cli.`).
+2. **Re-run [Task 0001](0001-dogfood-agents-md-and-architecture-md.md) dogfood.** Operational caveat: this repo already has `AGENTS.md`, so plain `agentic init` resolves to `audit` mode. To dogfood the brownfield flow empirically, run in a scratch worktree or force `--mode brownfield` against a copy. Confirm: ≤150 lines, no philosophical questions, no Universal Agent Behavior block, no External Resources section.
+3. **Start [Task 0002](0002-foundation-and-bootstrap-skill.md) — foundation + `agentic-bootstrap` skill (Chunk 1 of v0.2).** Notes in 0002 already record the ADR-0005 dependency: skill body inlines `agents-project.md` + scan-first instructions only; **does not** bundle `agents-general.md`.
+4. **Then [Task 0003](0003-universal-skills.md) — universal skills (Chunk 2), including the new fifth skill `agentic-philosophy`.** This is the gap closer for ADR-0005: until the skill ships and is auto-installed, generated AGENTS.md has no universal behavior anywhere. Treat as urgent after 0002.
+5. Tasks [0004](0004-conditional-skills-and-discovery.md) and [0005](0005-polish-and-publish.md) follow the v0.2-cli-plan chunk order.
+
+**Honest residual risk to track during 0002/0003:** skill auto-invocation reliability. Per [ADR-0005 §Consequences](../adr/0005-universal-agent-behavior-as-skill.md), if the agent does not match `description` triggers (`"think before coding"`, `"verify before claiming done"`, `"non-trivial change"`) the universal guardrails never load. Codex auto-invocation is weaker than Claude Code's. When 0003 lands, validate empirically: 20-50 mixed tasks, measure invocation rate. If &lt; ~80%, ADR-0005 needs revision (option (c) hybrid was the runner-up for a reason).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
