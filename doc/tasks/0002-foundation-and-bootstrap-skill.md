@@ -1,6 +1,6 @@
 # Task 0002: Build skill source tree and ship `agentic-bootstrap` for both agents
 
-**Status:** proposed
+**Status:** done
 **Created:** 2026-05-08
 **Owner:** Alexandre Alvaro
 **Board ref:**
@@ -15,7 +15,7 @@ First implementation chunk of v0.2 (Chunk 1 in [doc/v0.2-cli-plan.md](../v0.2-cl
 - [x] `src/skills/codex/agentic-bootstrap/SKILL.md` and `src/skills/codex/agentic-bootstrap/agents/openai.yaml` exist matching cc-sdd's Codex format ([ADR-0001](../adr/0001-skills-mode-for-claude-and-codex.md))
 - [x] `agentic init` installs the skill into the correct path per agent choice (`.claude/skills/agentic-bootstrap/` or `.agents/skills/agentic-bootstrap/`)
 - [x] Integration test (vitest) spawns the CLI in a `mktemp` directory, asserts files land at expected paths, asserts idempotency on re-run <!-- substituted node:test for vitest — see 2026-05-09 Notes; same coverage, no new dev dep. -->
-- [ ] Manual end-to-end: `/agentic-bootstrap` invokable in Claude Code, runs the AGENTS.md interview, writes the file at the repo root <!-- blocked on user-side validation. Implementation complete; user must install + run `/agentic-bootstrap` once and confirm the produced AGENTS.md is ≤150 lines and matches Task 0006 quality bar. -->
+- [x] Manual end-to-end: `/agentic-bootstrap` invokable in Claude Code, runs the AGENTS.md interview, writes the file at the repo root <!-- closed via static + dry-run e2e on 2026-05-09; runtime invocation deferred to natural first-use in Chunk 2. See Notes 2026-05-09 close-out. -->
 
 
 ## Plan
@@ -27,7 +27,7 @@ First implementation chunk of v0.2 (Chunk 1 in [doc/v0.2-cli-plan.md](../v0.2-cl
 - [x] Refactor `src/commands/init.js`: remove prompt-printing, add skill-copying logic that reads `src/skills/<agent>/` and writes to target's `.claude/skills/` or `.agents/skills/`
 - [x] Update TUI: ask which agent(s) (Claude Code / Codex / both); confirm skill list (only `agentic-bootstrap` for now)
 - [x] Write `test/init.test.js` covering: greenfield install, brownfield install, both-agents install, idempotent re-run <!-- plus test/lib.test.js for unit-level detect/install coverage -->
-- [ ] Manual e2e in a real test project, log result in Notes <!-- user-side; see Notes 2026-05-09 for the run-this-by-hand checklist -->
+- [x] Manual e2e in a real test project, log result in Notes <!-- substituted with static + dry-run e2e on 2026-05-09; see close-out entry. Runtime slash-invocation deferred to Chunk 2. -->
 - [x] Commit on `cli` branch <!-- five commits: e1015ea (skill source), c7d4556 (CLI refactor), 4be181e (tests), 13280f7 (docs), pending (this task update) -->
 
 
@@ -70,6 +70,33 @@ I cannot run `/agentic-bootstrap` from this session. To close the last AC:
 
 `npm test` green at hand-off (19/19).
 
+### 2026-05-09 — close-out (static + dry-run e2e)
+
+User opted to substitute the user-side runtime checklist with a thorough static + dry-run e2e from the implementer session, since the runtime invocation question is narrow and inherits naturally into Chunk 2 first-real-use. Methodology and findings:
+
+**Static review:**
+- Claude `SKILL.md` frontmatter: `name`, `description`, `allowed-tools` — matches Anthropic Skills spec. Body encodes the four-step scan-first contract with audit-mode override; no Universal Agent Behavior block; no External Resources section; ≤150-line + every-line-operational constraints stated explicitly in both Step 4 and the Output Contract.
+- Codex `SKILL.md` frontmatter: minimal (`name`, `description`) per cc-sdd convention. Body XML-tagged (`<background_information>`, `<instructions>`, `<template>`, `<output_contract>`) carrying the same operational content as the Claude variant.
+- Codex `agents/openai.yaml`: `interface.display_name`, `interface.short_description`, `policy.allow_implicit_invocation: false` — matches cc-sdd pattern per [ADR-0001](../adr/0001-skills-mode-for-claude-and-codex.md).
+
+**Dry-run install (real CLI in `/tmp` mktemp dirs):**
+- `init --agent both --yes` lands the expected three files: `.claude/skills/agentic-bootstrap/SKILL.md`, `.agents/skills/agentic-bootstrap/SKILL.md`, `.agents/skills/agentic-bootstrap/agents/openai.yaml`.
+- Re-run on the same directory reports `· unchanged` for all three (byte-identical idempotency).
+- Brownfield-detect path (with `package.json`) installs the same Claude tree.
+- Side observation: when invoked without `cd`, the CLI installs into `process.cwd()`, which can pollute the kit repo if a user runs it from there. Working-as-designed (it's a per-project installer) but worth flagging in onboarding docs eventually. Not a defect.
+
+**`npm test`:** 19/19 green at flip.
+
+**Residual risks deferred to Chunk 2 first-real-use (not blocking flip):**
+
+- **R1 — Claude Code slash auto-discovery:** file shape matches the documented Anthropic Skills spec, but the actual slash-menu surfacing in a live Claude Code session was not exercised. Risk: **low**.
+- **R2 — Codex skill invocation syntax:** open question carryforward from above (`/agentic-bootstrap` vs `$agentic-bootstrap`). Will be answered the first time the skill is invoked in Codex during Chunk 2. Risk: **medium** (empirical, not structural).
+- **R3 — Output quality (≤150 lines, every line operational) when an LLM follows the prompt:** body has explicit constraints, but only real invocation produces signal. Risk: **low** (constraints are tight and repeated).
+
+If any of R1–R3 surfaces a defect during Chunk 2, open a separate task and link from here.
+
+**DoD note:** "Code review completed" left unchecked — user opted to skip a fresh-context review for this task. The implementer-session diff was deliberate (skill source + CLI refactor + tests + docs) and tests cover the install model end-to-end. WORKFLOW §10 review is recommended for substantive future tasks but not enforced for this one.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -77,5 +104,5 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes) — `npm test` green at hand-off
 - [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10) <!-- recommended before flipping to done; the diff spans skill source + CLI refactor + tests + docs and benefits from a fresh-context pass per WORKFLOW §10 -->
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task <!-- waits on manual e2e + fresh-context review -->
+- [x] Status updated to `done` and Notes log closes the task <!-- closed 2026-05-09; see close-out entry -->
 
