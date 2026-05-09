@@ -89,6 +89,8 @@ Then check continuously, especially mid-implementation:
 
 Sometimes you can't follow the happy path — that's fine. But always know where it is and why you left it.
 
+The kit ships `agentic-ground` (workflow-operational skill) as the bound implementation of §4 + §5: it runs a four-source research pass (official docs, validated open-source examples, in-repo patterns, git history), synthesizes the happy path with citations, and gates any deviation behind an irrefutable justification before code is written.
+
 ## 5. Ground in Real Patterns
 
 Don't dump the codebase into context. Anchor the model in a specific, project-relevant example.
@@ -96,6 +98,8 @@ Don't dump the codebase into context. Anchor the model in a specific, project-re
 > *"Find an existing example of [similar feature]; use that exact structure."*
 
 Cite specific files, not "the codebase." Use just-in-time retrieval: pass paths or IDs and let the agent fetch via tools when it needs to read them.
+
+`agentic-ground` (see §4) is the workflow-operational skill that combines this with the other three research sources — official docs, validated OSS, and git history — into one indivisible pre-implementation pass.
 
 ## 6. Explore → Plan → Implement → Commit
 
