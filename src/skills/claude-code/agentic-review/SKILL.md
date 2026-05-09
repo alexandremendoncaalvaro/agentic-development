@@ -31,16 +31,22 @@ The reviewer subagent will get **only** what you assemble here. No conversation 
 
 Build the handoff as a single message: a short framing paragraph (what's being reviewed, what spec applies), followed by the diff and the spec slice. No prose summary of what you think the diff does — the reviewer reads the diff itself.
 
-## Step 2 — Delegate to the subagent
+## Step 2 — Persist the handoff to disk
 
-Invoke the bundled `fresh-context-reviewer` subagent via the `Task` tool. Pass the assembled handoff as the prompt. The subagent has read-only tools (`Read, Glob, Grep, Bash`) and no write access — it cannot accidentally modify the code under review.
+Write the assembled handoff to `.agentic/reviews/<ISO-timestamp>-<scope-slug>.md` at the repo root. The path encodes both the moment of review and a short slug for the scope (`branch-vs-main`, `pr-42`, `commit-abc1234`, `working-tree`). Create the directory if it does not exist. The file is the audit trail — the user can read it later, replay the review against an updated diff, or share it with a teammate.
 
-## Step 3 — Surface findings
+This directory is ephemeral; advise the user to add `.agentic/reviews/` to their `.gitignore` if it is not already. Handoffs are per-review artifacts, not committed history.
 
-Relay the subagent's findings to the user verbatim, grouped by severity (Blocker / Concern / Note). Do **not** add commentary defending the code. Do **not** synthesize an "approve" verdict — §10 frames the reviewer as adversarial; approval is the user's call after weighing the findings.
+## Step 3 — Delegate to the subagent
+
+Invoke the bundled `fresh-context-reviewer` subagent via the `Task` tool. Pass the assembled handoff as the prompt — the same content you wrote to disk. The subagent has read-only tools (`Read, Glob, Grep, Bash`) and no write access; it cannot accidentally modify the code under review.
+
+## Step 4 — Surface findings
+
+Relay the subagent's findings to the user verbatim, grouped by severity (Blocker / Concern / Note). Do **not** add commentary defending the code. Do **not** synthesize an "approve" verdict — §10 frames the reviewer as adversarial; approval is the user's call after weighing the findings. Reference the persisted handoff path in your reply so the user can audit what was sent.
 
 If the subagent reports zero findings across all severities, say so explicitly ("no issues found in <range>"). Empty results are real signal, not a gap.
 
 ## Output contract
 
-A structured findings list grouped Blocker / Concern / Note, each finding `file:line: <emoji> <severity>: <problem>. <fix>.`. No "approve" verdict, no defending of the code, no rewrite of the diff. Empty result is reported explicitly.
+A structured findings list grouped Blocker / Concern / Note, each finding `file:line: <severity>: <problem>. <fix>.`. The path of the persisted handoff under `.agentic/reviews/` is reported alongside. No "approve" verdict, no defending of the code, no rewrite of the diff. Empty result is reported explicitly.
