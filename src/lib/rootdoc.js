@@ -17,6 +17,8 @@ export const SKILL_DESCRIPTIONS = {
     'Universal agent guardrails (think before coding, verify before claiming done). Auto-loads on non-trivial work.',
   'agentic-architecture': 'Generate or audit `ARCHITECTURE.md` at the repo root.',
   'agentic-adr': 'Draft a new ADR at `doc/adr/NNNN-<slug>.md`.',
+  'agentic-spec':
+    'Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 2 of the four-layer artifact stack.',
   'agentic-task': 'Draft a new task at `doc/tasks/NNNN-<slug>.md`.',
   'agentic-audit':
     'Read-only drift report comparing AGENTS.md / ARCHITECTURE.md / ADRs against the code.',
