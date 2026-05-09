@@ -7,15 +7,18 @@ import {
   statSync,
 } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, join, relative } from 'node:path';
+import { basename, dirname, join, relative } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const KIT_ROOT = join(__dirname, '..', '..');
+
+const MANIFEST_FILE = 'manifest.json';
 
 const AGENT_LAYOUT = {
   'claude-code': {
     skillsDir: '.claude/skills',
     sourceDir: 'src/skills/claude-code',
+    agentsDir: '.claude/agents',
   },
   codex: {
     skillsDir: '.agents/skills',
@@ -38,6 +41,13 @@ function walkSkill(srcRoot) {
   }
   walk(srcRoot, '');
   return out;
+}
+
+function loadManifest(srcRoot) {
+  const path = join(srcRoot, MANIFEST_FILE);
+  if (!existsSync(path)) return { subagents: [] };
+  const raw = JSON.parse(readFileSync(path, 'utf8'));
+  return { subagents: Array.isArray(raw.subagents) ? raw.subagents : [] };
 }
 
 function sameFile(a, b) {
@@ -81,9 +91,19 @@ export async function installSkills({
       }
 
       const targetRoot = join(cwd, layout.skillsDir, skill);
+      const manifest = loadManifest(srcRoot);
+      const subagentSet = new Set(manifest.subagents);
 
       for (const { src, rel } of walkSkill(srcRoot)) {
-        const target = join(targetRoot, rel);
+        if (rel === MANIFEST_FILE) continue;
+
+        let target;
+        if (subagentSet.has(rel)) {
+          if (!layout.agentsDir) continue;
+          target = join(cwd, layout.agentsDir, basename(rel));
+        } else {
+          target = join(targetRoot, rel);
+        }
         const relForReport = relative(cwd, target);
 
         if (existsSync(target)) {

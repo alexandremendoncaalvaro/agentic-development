@@ -30,6 +30,7 @@ const REQUIRED_SKILLS = [
   'agentic-adr',
   'agentic-task',
   'agentic-audit',
+  'agentic-review',
 ];
 
 function resolveAgents(flagValue, detectedAgents) {
@@ -122,7 +123,7 @@ export async function initCommand(opts) {
     p.outro(
       `Done. In ${agents
         .map((a) => AGENT_LABEL[a])
-        .join(' or ')}: /agentic-bootstrap (AGENTS.md), /agentic-architecture (ARCHITECTURE.md), /agentic-adr, /agentic-task, /agentic-audit. agentic-philosophy auto-loads on non-trivial work.`
+        .join(' or ')}: /agentic-bootstrap (AGENTS.md), /agentic-architecture (ARCHITECTURE.md), /agentic-adr, /agentic-task, /agentic-audit, /agentic-review (WORKFLOW §10). agentic-philosophy auto-loads on non-trivial work.`
     );
   } else {
     for (const line of lines) {
