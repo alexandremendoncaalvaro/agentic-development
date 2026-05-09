@@ -23,7 +23,14 @@ const ACTION_SYMBOL = {
   skipped: '!',
 };
 
-const REQUIRED_SKILLS = ['agentic-bootstrap'];
+const REQUIRED_SKILLS = [
+  'agentic-bootstrap',
+  'agentic-philosophy',
+  'agentic-architecture',
+  'agentic-adr',
+  'agentic-task',
+  'agentic-audit',
+];
 
 function resolveAgents(flagValue, detectedAgents) {
   if (flagValue === 'both') return ['claude-code', 'codex'];
@@ -78,7 +85,9 @@ export async function initCommand(opts) {
     agents = choice;
 
     const confirm = await p.confirm({
-      message: `Install ${REQUIRED_SKILLS.join(', ')} for ${agents
+      message: `Install ${REQUIRED_SKILLS.length} universal skill${
+        REQUIRED_SKILLS.length === 1 ? '' : 's'
+      } (${REQUIRED_SKILLS.join(', ')}) for ${agents
         .map((a) => AGENT_LABEL[a])
         .join(' + ')}?`,
       initialValue: true,
@@ -111,9 +120,9 @@ export async function initCommand(opts) {
   if (interactive) {
     p.note(lines.join('\n'), 'Result');
     p.outro(
-      `Done. Run /agentic-bootstrap in ${agents
+      `Done. In ${agents
         .map((a) => AGENT_LABEL[a])
-        .join(' or ')} to generate AGENTS.md.`
+        .join(' or ')}: /agentic-bootstrap (AGENTS.md), /agentic-architecture (ARCHITECTURE.md), /agentic-adr, /agentic-task, /agentic-audit. agentic-philosophy auto-loads on non-trivial work.`
     );
   } else {
     for (const line of lines) {
