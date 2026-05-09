@@ -83,6 +83,13 @@ export const CONDITIONAL_SKILLS = [
     hintWhenAuto: 'opt-in',
     hintWhenManual: 'opt-in (rarely needed)',
   },
+  {
+    name: 'agentic-hooks',
+    autoIf: () => false,
+    agents: ['claude-code', 'codex'],
+    hintWhenAuto: 'opt-in',
+    hintWhenManual: 'WORKFLOW §11 hooks scaffolder (pre-commit, pre-push)',
+  },
 ];
 
 function resolveAgents(flagValue, detectedAgents) {
@@ -275,6 +282,7 @@ export async function initCommand(opts) {
         ? ['/agentic-subagent']
         : []),
       ...(optedSkills.includes('agentic-skill') ? ['/agentic-skill'] : []),
+      ...(optedSkills.includes('agentic-hooks') ? ['/agentic-hooks (WORKFLOW §11)'] : []),
     ].join(', ');
     p.outro(
       `Done. In ${agents
