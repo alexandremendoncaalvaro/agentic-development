@@ -2,6 +2,8 @@
 
 Engineering production code with LLMs. Agentic, not vibe coding.
 
+**The Steve Rogers framing.** The LLM is the super-soldier serum. The engineer is Steve Rogers. The serum amplifies what the engineer already brings — solid bases, organization, investigation, care for quality, architecture, clean code, documentation, observability, maintainability. Add the serum to a disciplined engineer and you get Captain America. Add it to an undisciplined one and you get faster sloppy at scale. This document is those bases written down as principles. The discipline is the input; the LLM is the amplifier; the kit (skills, ADRs, audits, gates) is the scaffolding that keeps the discipline intact across sessions, agents, and projects.
+
 **The principle behind the rest:** context engineering beats prompt engineering. Context is finite and decays as it fills — aim for the smallest set of high-signal tokens that gets the outcome.
 
 ## TL;DR
@@ -25,7 +27,7 @@ What to keep in mind:
 13. **Automation needs rails.** Hooks, tests, lint, CI, sandboxing, and permissions matter more than advisory text the agent can forget.
 14. **Autonomy requires observability.** If the agent makes decisions, log the trajectory: tool calls, intermediate outputs, failures.
 15. **Staged spikes when the technique is uncertain.** When the *how* is unknown — a library choice, a CV technique, a multi-stage transformation — break the problem into staged spikes against golden fixtures with per-stage debug artifacts.
-16. **Discipline scales with project maturity.** Same principles bind every project; the artifact set scales. A spike runs posture + research + audit; a regulated product adds spec / ADR / hooks / evals. The toolkit amplifies what the project needs — never imposes ceremony beyond it. Configurable at init; changeable as the project matures.
+16. **Discipline scales with project maturity.** Same principles bind every project; the artifact set scales. A spike runs posture + research + audit; a regulated product adds spec / ADR / hooks / evals. Add ceremony only where it changes agent behavior; configure at init and reconfigure as the project matures.
 
 > Working with agents means trading typing for technical direction. The value is in giving the right context, setting boundaries, validating the result, and keeping "almost right" out of production.
 
@@ -167,6 +169,8 @@ Modern agents handle most routine implementation. The work has shifted to catchi
 Two 2025 industry surveys point at the same wall. JetBrains' DevEcosystem 2025 reports that only **44%** of developers have AI fully or partially integrated into their workflow. Stack Overflow's 2025 Developer Survey adds: **66%** of developers cite "AI solutions that are almost right, but not quite" as their top frustration, and **45%** say debugging AI-generated code is more time-consuming.
 
 The takeaway: §10 (Reviewer) and §11 (Quality Gates) are not optional. Skipping them is where bug density grows.
+
+Per the Steve Rogers framing in the preamble: the serum cannot manufacture discrimination — it amplifies whatever discrimination the engineer already brings. The kit's job is to encode discrimination into the agent's context (specs, ADRs, fresh-context reviews, deterministic gates) so the amplification compounds in the disciplined direction even when the engineer is sleepy, rushed, or handing off to another collaborator.
 
 ## 13. Evals for Anything Autonomous
 
