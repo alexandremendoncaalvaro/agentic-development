@@ -1,6 +1,6 @@
 # Task 0005: Idempotency, root doc handling, README rewrite, publish v0.2.0-beta.1
 
-**Status:** blocked
+**Status:** done
 **Created:** 2026-05-08
 **Owner:** Alexandre Alvaro
 **Board ref:**
@@ -15,9 +15,9 @@ Chunk 4 of v0.2 (per [doc/v0.2-cli-plan.md](../v0.2-cli-plan.md)) — final poli
 - [x] Pre-existing `CLAUDE.md` or `AGENTS.md`: append a managed section listing the installed agentic skills, never overwrite user content. Always confirm with user before writing. <!-- updateRootDoc in src/lib/rootdoc.js. AGENTS.md preferred, CLAUDE.md fallback. Markers `<!-- agentic-managed-skills:start -->` / `:end -->` with structural fingerprint (canonical heading must follow start marker) so user content quoting the markers (e.g., kit README pasted as docs) is not clobbered. Interactive confirms via clack; non-interactive (--yes) treats the flag as pre-authorized consent for the non-destructive append. See R11 in close-out for the strict-reading interpretation gap. -->
 - [x] `README.md` on `cli` branch fully reflects v0.2 model — no stale references to v0.1's "print prompt" flow <!-- README rewrite in commit d6799a0; manual prompts reframed as the alternative path; brownfield + audit + review sections lead with slash commands; managed-skills section behavior documented inline. -->
 - [x] `package.json` version is `0.2.0-beta.1` <!-- commit 6f6583d; lockfile synced. -->
-- [ ] `npm publish --tag beta` succeeds; `npx @alexandrealvaro/agentic@beta init` runs the new flow end-to-end against a fresh project <!-- BLOCKED: requires Alexandre's npm token + 2FA. Cannot run from the implementer session. -->
-- [ ] Tag `v0.2.0-beta.1` exists locally and is pushed to origin <!-- BLOCKED: tag + push require explicit user authorization (AGENTS.md §72 / safety protocol). -->
-- [ ] `cli` branch pushed to `origin/cli`; merge to `main` deferred until I (Alexandre) decide it has matured enough in real use <!-- BLOCKED: same — push requires explicit user authorization. -->
+- [x] `npm publish --tag beta` succeeds; `npx @alexandrealvaro/agentic@beta init` runs the new flow end-to-end against a fresh project <!-- closed 2026-05-09: published as `@alexandrealvaro/agentic@0.2.0-beta.1` (token from .env, no 2FA prompt — token-mode auth). Smoke `npx -y @alexandrealvaro/agentic@beta init --agent both --yes` in mktemp installed the full universal set + agentic-subagent for Claude with the bundled subagent at .claude/agents/fresh-context-reviewer.md. agentic-design correctly absent (no frontend signal); agentic-skill correctly absent (opt-in). -->
+- [x] Tag `v0.2.0-beta.1` exists locally and is pushed to origin <!-- closed 2026-05-09: tag at 2106b96, pushed to origin. -->
+- [x] `cli` branch pushed to `origin/cli`; merge to `main` deferred until I (Alexandre) decide it has matured enough in real use <!-- closed 2026-05-09: cli pushed to origin (4726ecc..2106b96). Merge to main intentionally deferred per AC text. -->
 
 ## Plan
 
@@ -27,9 +27,9 @@ Chunk 4 of v0.2 (per [doc/v0.2-cli-plan.md](../v0.2-cli-plan.md)) — final poli
 - [x] Bump `package.json` to `0.2.0-beta.1`; update lockfile
 - [x] Run full test suite; ensure green <!-- 77/77 -->
 - [x] Manual e2e on three project types: fresh greenfield, brownfield without AGENTS.md, project with existing AGENTS.md <!-- mktemp dry-run e2e in close-out Notes (3 scenarios passed). Real Claude Code / Codex runtime invocation inherits R-class deferral. -->
-- [ ] Verify token + 2FA setup still works (reuse `.env` pattern from v0.1.0-beta.1) <!-- USER STEP -->
-- [ ] `npm publish --tag beta` <!-- USER STEP -->
-- [ ] `git tag v0.2.0-beta.1 && git push origin cli v0.2.0-beta.1` <!-- USER STEP -->
+- [x] Verify token + 2FA setup still works (reuse `.env` pattern from v0.1.0-beta.1) <!-- closed 2026-05-09: NPMJS_TOKEN in .env, sourced via `set -a && . ./.env && set +a` and written to a temp project-local .npmrc (rm'd immediately after publish). No 2FA prompt — token-mode auth. -->
+- [x] `npm publish --tag beta` <!-- closed 2026-05-09: published @alexandrealvaro/agentic@0.2.0-beta.1. -->
+- [x] `git tag v0.2.0-beta.1 && git push origin cli v0.2.0-beta.1` <!-- closed 2026-05-09: cli + tag pushed in two steps (cli first to make the tagged commit reachable on origin, then the tag). -->
 
 ## Notes
 
@@ -96,6 +96,23 @@ I cannot run `npm publish` or `git push` from this session. To close the remaini
 
 If the publish smoke surfaces defects, open a Task 0008 (post-publish hotfix) and link from here.
 
+### 2026-05-09 — publish + push completion
+
+Alexandre authorized the hand-off via "sim, pode publicar tem as chaves no .env". I ran the checklist:
+
+| Step | Result |
+|---|---|
+| Pre-flight `git status` + `npm test` | Clean working tree, 77/77 green. |
+| Push `cli` to origin | `4726ecc..2106b96  cli -> cli` |
+| `npm pack --dry-run` | 53 files, 50.3 kB, name + version correct. |
+| `npm publish --tag beta` | `+ @alexandrealvaro/agentic@0.2.0-beta.1` (NPMJS_TOKEN from .env via temp project-local .npmrc, removed immediately after publish; no 2FA prompt — token-mode auth). |
+| Smoke `npx -y @alexandrealvaro/agentic@beta init --agent both --yes` in mktemp | Installed all 7 universal skills for both agents + agentic-subagent for Claude with bundled subagent at .claude/agents/fresh-context-reviewer.md. agentic-design absent (no frontend signal); agentic-skill absent (opt-in). |
+| `git tag v0.2.0-beta.1 && git push origin v0.2.0-beta.1` | Tag at 2106b96, pushed. |
+
+All ACs + Plan items + DoD checked. Task 0005 done. **v0.2.0-beta.1 is live on npm.**
+
+Merge to `main` deferred per AC7 — Alexandre's call after real-world use.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -103,4 +120,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes) — `npm test` 77/77 green at hand-off
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10) <!-- closed 2026-05-09: kit-shape fresh-context review (caveman:cavecrew-reviewer) on the 3-commit implementation batch surfaced 1 Blocker (marker collision data-loss risk) + 3 Concerns; Blocker fixed in 2ddfc58. Concerns triaged in close-out (R11, R12, SKILL_DESCRIPTIONS sync test). -->
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task <!-- pending: status flips to `done` after the user-side publish + push checklist completes (see hand-off above). -->
+- [x] Status updated to `done` and Notes log closes the task <!-- closed 2026-05-09: see "publish + push completion" below. -->
