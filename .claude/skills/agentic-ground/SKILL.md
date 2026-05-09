@@ -55,6 +55,8 @@ Before handing off to implementation, report a soft verdict against four checks:
 
 If any check fails, surface the gap to the user and ask before proceeding rather than blocking. The user retains the authority to skip; the discipline is in surfacing, not in enforcement.
 
+When the host exposes `AskUserQuestion`, render the checkpoint as a structured multi-choice card listing the six checks with their yes/no/n.a. status plus a final `proceed / pause for more research` selector — instead of dropping the verdict as plain text. Falls back to numbered text on hosts without the primitive (Codex).
+
 ## Output contract
 
 A single message structured as:
