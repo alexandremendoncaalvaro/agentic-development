@@ -40,6 +40,7 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `agentic-design` | spec-driven | auto if frontend detected | Bootstrap `DESIGN.md` from existing tokens (Figma, tailwind.config, tokens.json, CSS custom props) | `/agentic-design` |
 | `agentic-subagent` | spec-driven | auto if installing for Claude Code | Drafts `.claude/agents/<name>.md` (Claude Code only — Codex has no subagent primitive) | `/agentic-subagent` |
 | `agentic-skill` | spec-driven | opt-in only | Drafts a new Claude Code or Codex skill at the appropriate path | `/agentic-skill` |
+| `agentic-hooks` | workflow-operational | opt-in only | Scaffolds deterministic quality gates per WORKFLOW §11 (pre-commit + pre-push); detects stack and recommends a runner (Husky / lefthook / pre-commit / native) | `/agentic-hooks` |
 
 A short TUI shows the detected mode, agent, and feature signals (frontend / `.claude/` / `.agents/` presence) and lets you toggle the conditional skills. Non-interactive flags: `--agent claude-code | codex | both`, `--yes` to skip confirmations — auto-checked conditionals (e.g., `agentic-design` if the project has React) install; `agentic-skill` stays opt-in. Re-running on an installed project is idempotent — unchanged files report `·`, divergent ones prompt to replace.
 
@@ -118,7 +119,7 @@ The kit ships nine universal skills plus three conditional ones — twelve discr
 2. Decide whether the answer becomes a spec (`/agentic-spec`) or a one-off task (`/agentic-task`).
 3. Continue from step 6 of the greenfield flow.
 
-The kit's discipline scales with the project's maturity. A solo PoC may legitimately skip `/agentic-spec` and `/agentic-adr` (the WORKFLOW §1 prune principle applies — don't add an artifact that wouldn't change agent behavior). A team product running on this kit is expected to use the full sequence; CI + hooks (deferred — see Task 0013) will eventually enforce the gates that today are advisory.
+The kit's discipline scales with the project's maturity. A solo PoC may legitimately skip `/agentic-spec` and `/agentic-adr` (the WORKFLOW §1 prune principle applies — don't add an artifact that wouldn't change agent behavior). A team product running on this kit is expected to use the full sequence and additionally invoke `/agentic-hooks` once to scaffold the deterministic gates per WORKFLOW §11 (pre-commit lint / format / secret-scan; pre-push build / unit / integration). Project maturity profiles that automate the recommendation by stack are deferred — see the next planned release.
 
 ## Manual prompts
 
