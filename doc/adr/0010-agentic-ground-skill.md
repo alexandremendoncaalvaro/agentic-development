@@ -9,11 +9,11 @@
 Real engineering practice in this kit's owner's workflow includes a four-source research pass before any non-trivial change:
 
 1. **Official documentation** for the languages and libraries in scope.
-2. **Validated open-source examples** — repos that solve the same *technical* recortte (not the same business model) with similar techniques.
+2. **Validated open-source examples** — repos that solve the same *technical* research scope (not the same business model) with similar techniques.
 3. **In-repo examples** — patterns the codebase already uses for analogous problems.
 4. **Historical examples** — git log, diffs of previous attempts, active branches that may have already tried (or solved) the same thing.
 
-The four are joined by AND, not OR. After the levantamento, the engineer states the most-grounded happy path, compares the proposed approach against it, and either confirms alignment or surfaces an irrefutable justification for any deviation. Only with that synthesis in hand does the engineer feel confident enough to decide.
+The four are joined by AND, not OR. After the research pass, the engineer states the most-grounded happy path, compares the proposed approach against it, and either confirms alignment or surfaces an irrefutable justification for any deviation. Only with that synthesis in hand does the engineer feel confident enough to decide.
 
 The kit covers parts of this:
 
@@ -31,13 +31,13 @@ The "AND not OR" requirement is also unstated — §4 and §5 read as independen
 
 ## Decision
 
-We will introduce a single workflow-operational skill, **`agentic-ground`**, that codifies the four-source levantamento + happy-path-with-deviation-gate as one indivisible flow. Combined into one skill rather than split across the two ADR-0007-§6 candidates because the practice is one flow in the engineer's hands and splitting it would force users to invoke two skills sequentially with overlapping outputs.
+We will introduce a single workflow-operational skill, **`agentic-ground`**, that codifies the four-source research pass + happy-path-with-deviation-gate as one indivisible flow. Combined into one skill rather than split across the two ADR-0007-§6 candidates because the practice is one flow in the engineer's hands and splitting it would force users to invoke two skills sequentially with overlapping outputs.
 
 1. **Skill name `agentic-ground`.** Workflow-operational per [ADR-0007](0007-workflow-operational-skills.md). Auto-installed alongside the universal skill set; lazy-loads on auto-trigger keywords (`research before coding`, `before implementing`, `which library`, `which pattern`, `non-trivial change`, `how to approach`).
 
-2. **Four-source levantamento, all four required, in this order:**
+2. **Four-source research pass, all four required, in this order:**
    - **Source A — official docs.** For each language/library in scope, cite the canonical doc URL and version. WebFetch / WebSearch when available; fall back to ask the user for a known-good link.
-   - **Source B — validated open-source examples.** ≥1 repo, prefer 2–3, that solve the same *technical* recortte. Cite `<repo>:<path>:<line>` and fetch via tools — never paraphrase code from training. If search is inconclusive, ask the user for a known reference; do not fabricate.
+   - **Source B — validated open-source examples.** ≥1 repo, prefer 2–3, that solve the same *technical* research scope. Cite `<repo>:<path>:<line>` and fetch via tools — never paraphrase code from training. If search is inconclusive, ask the user for a known reference; do not fabricate.
    - **Source C — in-repo examples.** Grep / glob for analogous patterns. Cite `<file>:<line>`.
    - **Source D — git history.** `git log --all --diff-filter=AM --grep`, recent commits, sibling branches. Surface any prior attempt or sibling solution. Cite `<commit-sha>` plus the touching file path.
 
@@ -49,7 +49,7 @@ We will introduce a single workflow-operational skill, **`agentic-ground`**, tha
 
 6. **Codex parity is asymmetric.** Auto-trigger on Codex is less mature than Claude Code's; the Codex variant of the skill states that the skill should be invoked manually for non-trivial changes when auto-trigger does not fire. Same posture as [ADR-0007](0007-workflow-operational-skills.md) on `agentic-review`.
 
-7. **Skill scope is research, not planning.** `agentic-ground` produces the levantamento + happy path + deviation justification; it does not produce a per-task file or an implementation plan. `agentic-task` and `agentic-philosophy` (Goal-Driven Execution) own those. The output of `agentic-ground` is the input to whichever skill or freeform turn produces the plan.
+7. **Skill scope is research, not planning.** `agentic-ground` produces the research pass + happy path + deviation justification; it does not produce a per-task file or an implementation plan. `agentic-task` and `agentic-philosophy` (Goal-Driven Execution) own those. The output of `agentic-ground` is the input to whichever skill or freeform turn produces the plan.
 
 ## Consequences
 
@@ -66,13 +66,13 @@ Negative / trade-offs:
 - **Skill size.** `agentic-ground` is the largest workflow-operational skill so far — four research stages plus synthesis plus gate plus checkpoint. Description must stay under the 1,536-character cap; body must remain digestible. Mitigation: structure the skill body as four numbered steps with one-paragraph rationale each, mirror the layout users already know from `agentic-review` and `agentic-bootstrap`.
 - **Source B (OSS) carries hallucination risk.** An agent asked for "an open-source example of X" can fabricate a plausible-sounding repo path. Mitigation: the skill body requires the agent to fetch the cited code via tools (not paraphrase) and to fall back to "ask the user for a known reference" when web search returns nothing decisive.
 - **Source D adds shell calls per invocation.** `git log --all` plus a few `git show <sha>` reads. Cheap on a small repo, expensive on a multi-thousand-commit monorepo. Mitigation: the skill body suggests narrowing with `--grep` or `-S` when the repo is large, and accepts "no prior attempt found" as a valid Source D result when the search is genuinely empty.
-- **Confidence gate is soft, not hard.** The agent surfaces gaps but does not block. A user who wants to skip the levantamento can. Mitigation: this matches the kit's existing posture (idempotency-default skip, default-keep on orphan) — power users get an escape hatch; the default surface enforces the discipline.
+- **Confidence gate is soft, not hard.** The agent surfaces gaps but does not block. A user who wants to skip the research pass can. Mitigation: this matches the kit's existing posture (idempotency-default skip, default-keep on orphan) — power users get an escape hatch; the default surface enforces the discipline.
 - **Codex auto-trigger is best-effort.** Description-triggered skills work well in Claude Code; Codex is uneven. Mitigation: documented in the skill body; users running Codex are advised to invoke the skill manually for non-trivial changes when auto-trigger does not fire.
 
 ## Alternatives Considered
 
-- **Two skills, `agentic-happy-path` + `agentic-research`, per ADR-0007 §6's original framing.** Rejected per E1. The four-source levantamento and the happy-path synthesis are one indivisible flow in practice; splitting forces users to invoke two skills with overlapping research outputs and fragments the context the synthesis depends on. The same scrutiny clause in [ADR-0007](0007-workflow-operational-skills.md) §6 ("each new workflow-operational skill needs its own ADR") applies — but the right unit here is one skill, not two.
-- **Expand `agentic-philosophy`'s "Ground Before Coding" section instead of shipping a new skill.** Rejected. The philosophy skill is **posture** — universal, lazy-loaded, light-touch, applied to every non-trivial turn. The four-source levantamento is **process** — orchestrated, heavier, applied when the user (or auto-trigger) asks for structured pre-implementation research. Same line ADR-0007 drew between `agentic-philosophy` (posture) and `agentic-review` (process). Mixing them would inflate the philosophy skill beyond its current size and hide the process behind a posture trigger.
+- **Two skills, `agentic-happy-path` + `agentic-research`, per ADR-0007 §6's original framing.** Rejected per E1. The four-source research pass and the happy-path synthesis are one indivisible flow in practice; splitting forces users to invoke two skills with overlapping research outputs and fragments the context the synthesis depends on. The same scrutiny clause in [ADR-0007](0007-workflow-operational-skills.md) §6 ("each new workflow-operational skill needs its own ADR") applies — but the right unit here is one skill, not two.
+- **Expand `agentic-philosophy`'s "Ground Before Coding" section instead of shipping a new skill.** Rejected. The philosophy skill is **posture** — universal, lazy-loaded, light-touch, applied to every non-trivial turn. The four-source research pass is **process** — orchestrated, heavier, applied when the user (or auto-trigger) asks for structured pre-implementation research. Same line ADR-0007 drew between `agentic-philosophy` (posture) and `agentic-review` (process). Mixing them would inflate the philosophy skill beyond its current size and hide the process behind a posture trigger.
 - **Make Source B opt-in only.** Rejected per E2. Source B is the highest-value addition over the existing kit (Sources 1 and 3 are already partially covered); making it opt-in would reproduce the same gap the ADR is closing. Hallucination risk is mitigated by the cite-and-fetch requirement.
 - **Hard-block on the confidence checkpoint.** Rejected per E5. Hard-blocks force users into adversarial workarounds when the gate fires inappropriately. A soft surface that names the gap and asks before proceeding aligns with the kit's existing default-skip / default-keep posture and respects the user's authority to decide.
 - **Include git history beyond the current repo (submodules, sibling repos).** Rejected per E4. Cross-repo history adds complexity without a clear gain — most "have I tried this before?" hits live in the current repo's log and active branches.
