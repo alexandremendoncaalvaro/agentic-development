@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "kitVersion": "0.6.0-beta.1",
+  "kitVersion": "0.7.0-beta.1",
   "agent": "codex",
   "skills": {
     "agentic-adr": {
-      "version": "0.6.0-beta.1",
+      "version": "0.7.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-adr/agents/openai.yaml",
@@ -17,7 +17,7 @@
       ]
     },
     "agentic-architecture": {
-      "version": "0.6.0-beta.1",
+      "version": "0.7.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-architecture/agents/openai.yaml",
@@ -30,7 +30,7 @@
       ]
     },
     "agentic-audit": {
-      "version": "0.6.0-beta.1",
+      "version": "0.7.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-audit/agents/openai.yaml",
@@ -43,7 +43,7 @@
       ]
     },
     "agentic-bootstrap": {
-      "version": "0.6.0-beta.1",
+      "version": "0.7.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-bootstrap/agents/openai.yaml",
@@ -56,7 +56,7 @@
       ]
     },
     "agentic-ground": {
-      "version": "0.6.0-beta.1",
+      "version": "0.7.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-ground/agents/openai.yaml",
@@ -69,7 +69,7 @@
       ]
     },
     "agentic-philosophy": {
-      "version": "0.6.0-beta.1",
+      "version": "0.7.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-philosophy/agents/openai.yaml",
@@ -82,7 +82,7 @@
       ]
     },
     "agentic-review": {
-      "version": "0.6.0-beta.1",
+      "version": "0.7.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-review/agents/openai.yaml",
@@ -95,7 +95,7 @@
       ]
     },
     "agentic-spec": {
-      "version": "0.6.0-beta.1",
+      "version": "0.7.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-spec/agents/openai.yaml",
@@ -108,7 +108,7 @@
       ]
     },
     "agentic-task": {
-      "version": "0.6.0-beta.1",
+      "version": "0.7.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-task/agents/openai.yaml",
