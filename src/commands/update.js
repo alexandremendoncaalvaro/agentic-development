@@ -47,6 +47,7 @@ const ACTION_SYMBOL = {
   kept: '·',
   skipped: '!',
   removed: '-',
+  'removed-missing': '?',
   'orphan-kept': '?',
 };
 
@@ -55,6 +56,7 @@ const ROOT_DOC_LABEL = {
   updated: '~ ',
   unchanged: '· ',
   skipped: '! ',
+  'kept-stale': '! ',
   absent: '',
 };
 
@@ -86,13 +88,24 @@ function skillsForAgent(agent, profileName, optedSkills) {
   return [...universal, ...conditional];
 }
 
-function previousAgentsFromStates(cwd) {
-  const out = [];
+/**
+ * Load every per-agent state file once. Returns `{ statesByAgent, agents }`
+ * where `agents` lists the agents whose state files exist on disk. Avoids
+ * the prior pattern of calling `loadState` twice per agent (once for
+ * presence detection, once for content); also surfaces malformed-state
+ * errors with the loader's own context, in a single pass.
+ */
+function loadStatesOnce(cwd) {
+  const statesByAgent = {};
+  const agents = [];
   for (const agent of VALID_AGENTS) {
     const state = loadState(cwd, agent);
-    if (state) out.push(agent);
+    if (state) {
+      statesByAgent[agent] = state;
+      agents.push(agent);
+    }
   }
-  return out;
+  return { statesByAgent, agents };
 }
 
 function previouslyOptedConditional(previousStates, currentAgents, profileName) {
@@ -140,18 +153,23 @@ export async function updateCommand(opts) {
   }
 
   const cwd = process.cwd();
-  const interactive = process.stdout.isTTY && !opts.yes && !opts.agent;
+  // `--agent` is purely a narrowing flag and does not imply non-interactive
+  // intent. Only `--yes` or a non-TTY shell suppress the TUI per ADR-0009.
+  const interactive = process.stdout.isTTY && !opts.yes;
   const dryRun = Boolean(opts.dryRun);
   const force = Boolean(opts.force);
 
   const detectedAgents = detectAgents(cwd);
   const features = detectFeatures(cwd);
-  const previousAgents = previousAgentsFromStates(cwd);
+  const { statesByAgent, agents: previousAgents } = loadStatesOnce(cwd);
 
   const agents = resolveAgents(opts.agent, detectedAgents, previousAgents);
+  // previousStates is the per-agent slice of statesByAgent restricted to the
+  // agents the current invocation targets. Agents outside the slice keep
+  // their state file untouched on disk.
   const previousStates = {};
   for (const agent of agents) {
-    previousStates[agent] = loadState(cwd, agent);
+    previousStates[agent] = statesByAgent[agent] ?? null;
   }
 
   const profileName = profileFromStates(previousStates, agents);
@@ -282,13 +300,24 @@ export async function updateCommand(opts) {
       }
     : async () => true;
 
-  const rootDocAction = !dryRun
-    ? await updateRootDoc({
-        cwd,
-        skills: skillDisplayOrder,
-        confirmAppend,
-      })
-    : { type: 'absent', path: null };
+  const confirmRootDocReplace = interactive
+    ? async (path) => {
+        const answer = await p.confirm({
+          message: `${path}: managed section diverged on disk. Regenerate it? (any edits between the agentic-managed-skills markers will be lost)`,
+          initialValue: false,
+        });
+        if (p.isCancel(answer)) return false;
+        return answer;
+      }
+    : async () => Boolean(force);
+
+  const rootDocAction = await updateRootDoc({
+    cwd,
+    skills: skillDisplayOrder,
+    confirmAppend,
+    confirmReplace: confirmRootDocReplace,
+    dryRun,
+  });
 
   const lines = allActions.map((a) => {
     const sym = ACTION_SYMBOL[a.type] ?? '?';

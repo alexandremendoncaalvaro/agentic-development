@@ -77,9 +77,22 @@ export function saveState(cwd, agent, state) {
 }
 
 function orderState(state) {
+  if (!state || typeof state !== 'object') {
+    throw new Error('orderState: state must be an object');
+  }
+  if (!state.skills || typeof state.skills !== 'object') {
+    throw new Error(
+      'orderState: state.skills must be an object (got ' + typeof state.skills + ')'
+    );
+  }
   const skills = {};
   for (const skillName of Object.keys(state.skills).sort()) {
     const entry = state.skills[skillName];
+    if (!entry || !Array.isArray(entry.files)) {
+      throw new Error(
+        `orderState: state.skills["${skillName}"].files must be an array`
+      );
+    }
     const files = [...entry.files].sort((a, b) => a.path.localeCompare(b.path));
     skills[skillName] = {
       version: entry.version,
