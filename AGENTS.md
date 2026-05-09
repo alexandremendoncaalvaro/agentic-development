@@ -43,6 +43,7 @@ Binding decisions — see `doc/adr/`. Do not reinvent.
 * **Bootstrap flow is scan-first, not interview-first** ([Task 0006](doc/tasks/0006-bootstrap-flow-and-agents-md-bloat-fix.md)): pre-fill from repo signals, ask only the gaps.
 * **Idempotent on re-run** for filesystem ops (ADR-0002).
 * **Operational docs at repo root** ([ADR-0006](doc/adr/0006-architecture-md-at-repo-root.md)): `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md`, `WORKFLOW.md` at root. ADRs and tasks under `doc/`.
+* **Workflow-operational skill category** ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)): skills come in two categories — `spec-driven` (produces an artifact) and `workflow-operational` (executes a process from `WORKFLOW.md`). First workflow-operational skill: `agentic-review`. Each new workflow-operational skill needs its own ADR.
 
 ## Repository Layout
 
@@ -62,7 +63,7 @@ ARCHITECTURE.md                      system-level patterns (pairs with ADRs)
 WORKFLOW.md                          philosophy doc, shipped to npm
 ```
 
-Binding ADRs: 0001-0006, all accepted. Skill source lives under `src/skills/`; the kit does not self-install into its own `.claude/skills/` (would duplicate the source). The full skill set lands across [Task 0002](doc/tasks/0002-foundation-and-bootstrap-skill.md) (bootstrap) and [Task 0003](doc/tasks/0003-universal-skills.md) (the rest).
+Binding ADRs: 0001-0007, all accepted. Skill source lives under `src/skills/`; the kit does not self-install into its own `.claude/skills/` (would duplicate the source). The full skill set lands across [Task 0002](doc/tasks/0002-foundation-and-bootstrap-skill.md) (bootstrap), [Task 0003](doc/tasks/0003-universal-skills.md) (universal spec-driven skills), and [Task 0007](doc/tasks/0007-workflow-operational-skills-and-agentic-review.md) (`agentic-review` + workflow-operational category).
 
 ## Commit & PR Conventions
 
@@ -89,5 +90,6 @@ Real traps confirmed in code or ADRs.
 * **Skill source is read at install time** from disk via `src/lib/install.js` (`KIT_ROOT` resolves up two from `src/lib/`). Moving `src/lib/install.js` breaks that path.
 * **`detectMode` ignores dotfiles + a fixed `TRIVIAL_ENTRIES` set** (`src/lib/detect.js`). Adding a new "trivial" file (e.g., `.editorconfig`) without updating that set will misclassify a project as `brownfield`.
 * **Non-TTY bypasses TUI** (`src/commands/init.js`). `--agent` and `--yes` also force non-interactive. Don't add a prompt that runs unconditionally.
-* **Chunk 2 scope:** the six universal skills are wired (`agentic-bootstrap`, `agentic-philosophy`, `agentic-architecture`, `agentic-adr`, `agentic-task`, `agentic-audit`). Conditional skills (`agentic-design`, `agentic-skill`, `agentic-subagent`) ship in Chunk 3 — until then, the README's "Manual prompts" table covers them. Don't claim CLI coverage that isn't there.
+* **Chunk 2.5 scope:** seven universal skills wired (`agentic-bootstrap`, `agentic-philosophy`, `agentic-architecture`, `agentic-adr`, `agentic-task`, `agentic-audit`, `agentic-review`). Conditional skills (`agentic-design`, `agentic-skill`, `agentic-subagent`) ship in Chunk 3 — until then, the README's "Manual prompts" table covers them. Don't claim CLI coverage that isn't there.
 * **Idempotency contract:** `installSkills` byte-compares existing target files. A user-edited skill file diverges → `confirmReplace` callback decides. Default (non-interactive) skips. Don't break this default by silently overwriting.
+* **Subagent install target:** a skill's `manifest.json` (optional) lists files that route to `.claude/agents/<basename>` instead of the default `.claude/skills/<skill>/...` path. `manifest.json` itself is never installed. Codex layout has no `agentsDir`; manifest-listed subagents are silently skipped on Codex (no subagent primitive). Currently used only by `agentic-review` (`agents/fresh-context-reviewer.md`).
