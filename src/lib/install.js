@@ -46,7 +46,12 @@ function walkSkill(srcRoot) {
 function loadManifest(srcRoot) {
   const path = join(srcRoot, MANIFEST_FILE);
   if (!existsSync(path)) return { subagents: [] };
-  const raw = JSON.parse(readFileSync(path, 'utf8'));
+  let raw;
+  try {
+    raw = JSON.parse(readFileSync(path, 'utf8'));
+  } catch (err) {
+    throw new Error(`malformed manifest at ${path}: ${err.message}`);
+  }
   return { subagents: Array.isArray(raw.subagents) ? raw.subagents : [] };
 }
 
@@ -93,8 +98,17 @@ export async function installSkills({
       const targetRoot = join(cwd, layout.skillsDir, skill);
       const manifest = loadManifest(srcRoot);
       const subagentSet = new Set(manifest.subagents);
+      const walked = walkSkill(srcRoot);
+      const walkedRels = new Set(walked.map(({ rel }) => rel));
+      for (const declared of subagentSet) {
+        if (!walkedRels.has(declared)) {
+          throw new Error(
+            `manifest at ${join(srcRoot, MANIFEST_FILE)} declares subagent "${declared}" but no such file exists in the skill source`
+          );
+        }
+      }
 
-      for (const { src, rel } of walkSkill(srcRoot)) {
+      for (const { src, rel } of walked) {
         if (rel === MANIFEST_FILE) continue;
 
         let target;

@@ -4,9 +4,9 @@ description: Fresh-context code review per WORKFLOW §10 — assemble the diff p
 ---
 
 <background_information>
-Implements WORKFLOW §10 (Reviewer With Fresh Context). The current session is biased about the code it produced — the same reasoning that wrote it defends it. This skill assembles a clean handoff and re-loads it into a fresh context so the review reads as adversarial.
+Implements WORKFLOW §10 (Reviewer With Fresh Context). The current session is biased about the code it produced — the same reasoning that wrote it defends it. This skill assembles a clean handoff and the user re-loads it into a fresh context so the review reads as adversarial.
 
-Codex has no native subagent primitive. Parity with §10 is preserved via `/clear` + handoff orchestration, at the cost of one extra UX step. Documented in [ADR-0007](workflow-operational-skills) decision item 4.
+Codex has no native subagent primitive. Parity with §10 is preserved through a manual handoff: this skill prints the assembled handoff, then the user runs `/clear` and pastes the handoff back into the empty session. One extra UX step versus Claude Code's bundled subagent.
 </background_information>
 
 <instructions>
@@ -17,7 +17,7 @@ Step 0 — scope the review. Confirm what to review. Default scopes, in priority
 
 If no diff exists, stop and tell the user — there's nothing to review.
 
-Step 1 — assemble the handoff. The fresh session will get only what you assemble here. No conversation history, no prior context.
+Step 1 — assemble the handoff. The fresh session will get only what you print here. No conversation history, no prior context.
 - Diff for the chosen scope (`git diff <range>`). Use `--stat` first; if it spans >50 files, ask the user to narrow.
 - `AGENTS.md` at the repo root, if present.
 - `ARCHITECTURE.md` at the repo root, if present.
@@ -25,32 +25,44 @@ Step 1 — assemble the handoff. The fresh session will get only what you assemb
 - Relevant task file under `doc/tasks/` — if the diff or recent commit messages reference `Task NNNN`, read its Acceptance Criteria and Plan.
 - Recent commit messages for the range (`git log <range> --format=%B`).
 
-Write the handoff to a temp file at `.agentic-review-handoff.md` (gitignored or untracked) so the fresh session can re-load it. Body: one short framing paragraph (what's being reviewed, what spec applies), then the diff and the spec slice. No prose summary of what you think the diff does.
+Step 2 — print the handoff inline. Format the message exactly as below so the user can copy it as a single block. Do not summarize what you think the diff does.
 
-Step 2 — fresh-context handoff.
-1. Tell the user: "Run `/clear` to drop the current context, then re-invoke me with `agentic-review --resume`. The handoff is at `.agentic-review-handoff.md`."
-2. Stop. Do not proceed.
+```
+=== AGENTIC-REVIEW HANDOFF ===
 
-Step 3 — on resume (`agentic-review --resume`).
-1. Read `.agentic-review-handoff.md`. If absent, stop and tell the user to start over from Step 0.
-2. Adopt the reviewer posture: senior engineer reviewing a junior PR, no inherited trust in the author's intent. The handoff and the spec are the only evidence.
-3. Review focus, in priority: bugs (null/undefined paths, off-by-one, unhandled errors, race conditions, broken invariants); spec drift (does the diff contradict AGENTS.md, an accepted ADR, or the task Acceptance Criteria?); coupling; edge cases; test coverage.
-4. Skip formatting, naming opinions, and stylistic preferences unless they change meaning. Skip praise.
+You are a senior engineer reviewing a junior PR with no prior context. The diff and the spec below are the only evidence. Do not infer history or trust the author's intent.
 
-Step 4 — output findings. Group by severity:
-- Blocker — must fix before merge. Bug, spec violation, security issue.
-- Concern — worth a follow-up task. Real issue, not blocking the current change.
-- Note — informational, no action expected.
+Review focus, in priority order:
+1. Bugs — null/undefined paths, off-by-one, unhandled errors, race conditions, broken invariants.
+2. Spec drift — does the diff contradict AGENTS.md, an accepted ADR, or the task Acceptance Criteria?
+3. Coupling — modules that shouldn't know about each other, leaked abstractions.
+4. Edge cases — empty inputs, large inputs, concurrent access, missing files, permission errors.
+5. Test coverage — does any new behavior have a corresponding test?
 
-Each finding: one line, `file:line: <emoji> <severity>: <problem>. <fix>.` Use 🚨 for Blocker, ⚠️ for Concern, ℹ️ for Note.
+Skip formatting, naming opinions, stylistic preferences. Skip praise.
 
-End with a one-line bottom-line: `Ship as-is`, `Ship with the Concerns logged as follow-up tasks`, or `Don't ship until Blockers resolved`.
+Output: group findings by severity (Blocker / Concern / Note). Each finding one line: `file:line: <emoji> <severity>: <problem>. <fix>.` Use 🚨 / ⚠️ / ℹ️.
 
-Do NOT synthesize an "approve" verdict. Do NOT rewrite the diff for the author. Do NOT defend the code. Do NOT pad with stylistic nits.
+End with a one-line bottom-line: "Ship as-is", "Ship with the Concerns logged as follow-up tasks", or "Don't ship until Blockers resolved". Do NOT synthesize an "approve" verdict.
 
-After writing findings, delete `.agentic-review-handoff.md`.
+--- DIFF ---
+<paste git diff output here>
+
+--- SPEC SLICE ---
+<paste AGENTS.md, ARCHITECTURE.md, applicable ADRs, task file Acceptance Criteria + Plan, recent commit messages>
+
+=== END HANDOFF ===
+```
+
+Step 3 — instruct the user. After printing the handoff, output exactly this and stop:
+
+```
+Copy the handoff above. Run `/clear` to drop the current context. Paste the handoff into the empty session. Codex will produce the structured findings.
+```
+
+Do not proceed past this point in the current session.
 </instructions>
 
 <output_contract>
-A structured findings list grouped Blocker / Concern / Note, each finding `file:line: <emoji> <severity>: <problem>. <fix>.`. No "approve" verdict, no defending of the code, no rewrite of the diff. Empty result is reported explicitly. Handoff temp file cleaned up at the end.
+One inline message containing the assembled handoff (review instructions + diff + spec slice), followed by a short instruction telling the user to /clear and paste. No file is written. The current session does not produce findings — the fresh session does, after the user re-loads the handoff. This honors WORKFLOW §10 by enforcing context isolation through `/clear` rather than via a subagent primitive Codex lacks.
 </output_contract>
