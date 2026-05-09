@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { DEFAULT_PROFILE, validateProfile } from './profiles.js';
 
 export const SCHEMA_VERSION = 1;
 export const STATE_FILE = 'agentic-state.json';
@@ -15,11 +16,12 @@ export function statePath(cwd, agent) {
   return join(cwd, dir, STATE_FILE);
 }
 
-export function emptyState(agent, kitVersion) {
+export function emptyState(agent, kitVersion, profile = DEFAULT_PROFILE) {
   return {
     schemaVersion: SCHEMA_VERSION,
     kitVersion,
     agent,
+    profile: validateProfile(profile),
     skills: {},
   };
 }
@@ -46,10 +48,23 @@ export function loadState(cwd, agent) {
       `state at ${path} declares agent "${raw.agent}" but expected "${agent}"`
     );
   }
+  // `profile` is optional and forward-compatible. Pre-v0.8 state files have
+  // no profile field; default to `team` per ADR-0013 (the v0.7 install set is
+  // byte-identical to the team profile).
+  let profile = DEFAULT_PROFILE;
+  if (raw.profile) {
+    try {
+      profile = validateProfile(raw.profile);
+    } catch (err) {
+      throw new Error(`state at ${path}: ${err.message}`);
+    }
+  }
+
   return {
     schemaVersion: raw.schemaVersion,
     kitVersion: raw.kitVersion ?? null,
     agent,
+    profile,
     skills: raw.skills ?? {},
   };
 }
@@ -75,6 +90,7 @@ function orderState(state) {
     schemaVersion: state.schemaVersion,
     kitVersion: state.kitVersion,
     agent: state.agent,
+    profile: state.profile ?? DEFAULT_PROFILE,
     skills,
   };
 }
