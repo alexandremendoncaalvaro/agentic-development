@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-`@alexandrealvaro/agentic` — a CLI + manual-prompt kit that bootstraps and audits AGENTS.md, ARCHITECTURE.md, ADRs, tasks, skills, and subagents for engineering production code with LLMs. Status: v0.2 in development on `cli` (skill installer); v0.1.0-beta on npm (prompt printer).
+`@alexandrealvaro/agentic` — a CLI + manual-prompt kit that bootstraps and audits AGENTS.md, ARCHITECTURE.md, ADRs, tasks, skills, and subagents for engineering production code with LLMs.
 
 **Quality bar:** docs read primarily by agents must be agent-comprehensible (terse, structured, no fluff); docs read by humans must be readable. Code: simple, secure, mature — right-sized for a CLI, no over-engineering.
 
@@ -24,7 +24,7 @@ Lint, formatter, CI: not yet wired.
 
 Deterministic enforcement — agent cannot skip. WORKFLOW §11 binding for the `team` profile this repo runs under.
 
-* **Pre-push hook (lefthook):** `npm test` runs the full 139-test suite. Bootstrap: `lefthook install` after clone. Config: [`lefthook.yml`](lefthook.yml).
+* **Pre-push hook (lefthook):** `npm test` runs the full unit + integration suite. Bootstrap: `lefthook install` after clone. Config: [`lefthook.yml`](lefthook.yml).
 * **Pre-commit hook:** intentionally absent — kit has no lint or formatter wired today. Adding lint/format gates is a separate decision (own ADR + Task per ADR-0007 §6).
 * **CI:** GitHub Actions workflow scaffolded as a follow-up (gh OAuth scope blocked the v0.11.2 push of `.github/workflows/`). Until landed, the local pre-push hook is the only deterministic gate; redundant CI is recommended once authorization unblocks.
 * **Never bypass:** no `--no-verify`, no skipped hooks, no deleted failing tests. WORKFLOW §11 binding.
@@ -48,7 +48,7 @@ Binding decisions — see `doc/adr/`. Do not reinvent.
 * **Bootstrap flow is scan-first, not interview-first** ([Task 0006](doc/tasks/0006-bootstrap-flow-and-agents-md-bloat-fix.md)): pre-fill from repo signals, ask only the gaps.
 * **Idempotent on re-run** for filesystem ops (ADR-0002).
 * **Operational docs at repo root** ([ADR-0006](doc/adr/0006-architecture-md-at-repo-root.md)): `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md`, `WORKFLOW.md` at root. ADRs and tasks under `doc/`.
-* **Workflow-operational skill category** ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)): skills come in two categories — `spec-driven` (produces an artifact) and `workflow-operational` (executes a process from `WORKFLOW.md`). First workflow-operational skill: `agentic-review`. Each new workflow-operational skill needs its own ADR.
+* **Workflow-operational skill category** ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)): skills come in two categories — `spec-driven` (produces an artifact) and `workflow-operational` (executes a process from `WORKFLOW.md`). Each new workflow-operational skill needs its own ADR.
 * **Documentation discipline** ([ADR-0008](doc/adr/0008-documentation-discipline.md)): eight rules govern every document (canonical source `WORKFLOW.md` §2; operational delivery via the `agentic-philosophy` skill). Narrative documents — `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md` — carry no dates, version stamps, `DRAFT` markers, changelog blocks, or emoji. Decision-record artifacts under `doc/adr/` and `doc/tasks/` are exempt from the no-dates rule. Orphan `TODO`/`FIXME` references either a GitHub Issue or a `doc/tasks/NNNN-*.md` file.
 
 ## Repository Layout
@@ -69,7 +69,7 @@ ARCHITECTURE.md                      system-level patterns (pairs with ADRs)
 WORKFLOW.md                          philosophy doc, shipped to npm
 ```
 
-Binding ADRs: 0001-0022, all accepted (see [`doc/adr/`](doc/adr/)). Skill source lives under `src/skills/`; the repo also self-installs the kit into its own `.claude/skills/` and `.agents/skills/` for dogfood, so contributors get the same agent surface (`/agentic-bootstrap`, `/agentic-spec`, `/agentic-task`, `/agentic-ground`, `/agentic-review`, etc.) when working on the kit itself. Source under `src/skills/` is canonical; the installed copies under `.claude/skills/` and `.agents/skills/` are kept in sync via `node bin/agentic.js update` (see [ADR-0009](doc/adr/0009-update-mechanism.md)). The full skill set lands across [Task 0002](doc/tasks/0002-foundation-and-bootstrap-skill.md) (bootstrap), [Task 0003](doc/tasks/0003-universal-skills.md) (universal spec-driven skills), [Task 0007](doc/tasks/0007-workflow-operational-skills-and-agentic-review.md) (`agentic-review` + workflow-operational category), [Task 0004](doc/tasks/0004-conditional-skills-and-discovery.md) (`agentic-design`, `agentic-subagent`, `agentic-skill` + `detectFeatures()`), [Task 0011](doc/tasks/0011-agentic-ground-skill.md) (`agentic-ground` four-source research), and [Task 0012](doc/tasks/0012-agentic-spec-skill.md) (`agentic-spec` feature-level layer). Documentation discipline rules ([Task 0008](doc/tasks/0008-documentation-discipline.md)) apply across narrative docs the kit ships and the docs the kit generates for downstream projects. Update mechanism rules ([Task 0009](doc/tasks/0009-update-mechanism.md)) define how downstream projects absorb upstream kit changes.
+Binding ADRs: see [`doc/adr/`](doc/adr/) (all accepted). Skill source lives under `src/skills/`; the repo also self-installs the kit into its own `.claude/skills/` and `.agents/skills/` for dogfood, so contributors get the same agent surface (`/agentic-bootstrap`, `/agentic-spec`, `/agentic-task`, `/agentic-ground`, `/agentic-review`, etc.) when working on the kit itself. Source under `src/skills/` is canonical; the installed copies under `.claude/skills/` and `.agents/skills/` are kept in sync via `node bin/agentic.js update` (see [ADR-0009](doc/adr/0009-update-mechanism.md)).
 
 ## Commit & PR Conventions
 
