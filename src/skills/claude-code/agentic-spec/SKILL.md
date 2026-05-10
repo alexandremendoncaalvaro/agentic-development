@@ -1,12 +1,12 @@
 ---
 name: agentic-spec
-description: Draft a feature-level specification at doc/specs/NNNN-<slug>.md following the kit's four-layer artifact stack (Constitution → Spec → Plan/Decisions → Code). Adapts GitHub Spec Kit's mandatory sections (User Scenarios, Requirements, Success Criteria) to the kit's documentation discipline. Use when the user wants to write, draft, scaffold, or open a feature spec, PRD, product requirements, feature brief, user stories, or success criteria for a feature multiple tasks will implement. Status starts at draft; the file is the binding feature contract once accepted.
+description: Draft a feature-level specification at doc/specs/NNNN-<slug>.md following the kit's five-layer artifact stack (Constitution → Domain → Spec → Plan/Decisions → Code). Adapts GitHub Spec Kit's mandatory sections (User Scenarios, Requirements, Success Criteria) to the kit's documentation discipline. Use when the user wants to write, draft, scaffold, or open a feature spec, PRD, product requirements, feature brief, user stories, or success criteria for a feature multiple tasks will implement. Status starts at draft; the file is the binding feature contract once accepted.
 allowed-tools: Read, Write, Glob, Bash
 ---
 
 # /agentic-spec
 
-Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: `draft` → `accepted` → `shipped` | `superseded by SPEC-NNNN`. Spec is the layer-2 artifact in the kit's four-layer stack — Constitution (`AGENTS.md` + `WORKFLOW.md`) → **Spec (this skill)** → Plan/Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Multiple tasks implement one spec; ADRs may be driven by spec constraints.
+Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: `draft` → `accepted` → `shipped` | `superseded by SPEC-NNNN`. Spec is the layer-3 artifact in the kit's five-layer stack — Constitution (`AGENTS.md` + `WORKFLOW.md`) → Domain (`CONTEXT.md`) → **Spec (this skill)** → Plan/Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Multiple tasks implement one spec; ADRs may be driven by spec constraints. The Domain layer (`CONTEXT.md`, ubiquitous language per Evans 2003) is the source of canonical nouns the spec must use; if the spec introduces a new noun, resolve it through `CONTEXT.md` first.
 
 ## Step 1 — Determine NNNN and slug
 
