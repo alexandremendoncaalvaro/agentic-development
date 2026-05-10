@@ -132,6 +132,55 @@ test('agentic-tdg is universal in every profile (implementation-strategy uncerta
   }
 });
 
+test('agentic-domain is universal in every profile (Layer 2 ubiquitous language applies at every maturity per ADR-0019 §4)', () => {
+  for (const name of PROFILE_NAMES) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-domain'),
+      `profile ${name} must include agentic-domain in its universal set per ADR-0019 §4`
+    );
+  }
+});
+
+test('agentic-grill is universal in every profile (interview-before-research applies at every maturity per ADR-0022)', () => {
+  for (const name of PROFILE_NAMES) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-grill'),
+      `profile ${name} must include agentic-grill in its universal set per ADR-0022`
+    );
+  }
+});
+
+test('agentic-diagnose is universal in every profile (debugging discipline applies at every maturity per ADR-0021 §3)', () => {
+  for (const name of PROFILE_NAMES) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-diagnose'),
+      `profile ${name} must include agentic-diagnose in its universal set per ADR-0021 §3`
+    );
+  }
+});
+
+test('agentic-deepen is universal in team and mature only (premature for poc and solo per ADR-0020 §4)', () => {
+  // Present in team and mature.
+  for (const name of ['team', 'mature']) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-deepen'),
+      `profile ${name} must include agentic-deepen in its universal set per ADR-0020 §4`
+    );
+  }
+  // Absent from poc and solo — architectural deepening is premature for ≤200-line experiments.
+  for (const name of ['poc', 'solo']) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      !universal.has('agentic-deepen'),
+      `profile ${name} must NOT include agentic-deepen — premature for this maturity per ADR-0020 §4`
+    );
+  }
+});
+
 test('init --profile poc installs only the poc universal set', () => {
   const dir = mkScratch();
   try {
@@ -146,9 +195,39 @@ test('init --profile poc installs only the poc universal set', () => {
     assert.ok(!existsSync(join(dir, '.claude/skills/agentic-bootstrap')));
     // agentic-spec is NOT in poc.universal — must not install.
     assert.ok(!existsSync(join(dir, '.claude/skills/agentic-spec')));
+    // agentic-deepen is NOT in poc.universal per ADR-0020 §4 — must not install.
+    assert.ok(!existsSync(join(dir, '.claude/skills/agentic-deepen')));
 
     const state = loadState(dir, 'claude-code');
     assert.equal(state.profile, 'poc');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('init --profile solo does not install agentic-deepen (premature for solo per ADR-0020 §4)', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code', '--profile', 'solo', '--yes']);
+    // solo gets the universal set per PROFILES.solo.universal — confirm
+    // the inclusions install correctly.
+    for (const skill of PROFILES.solo.universal) {
+      assert.ok(
+        existsSync(join(dir, `.claude/skills/${skill}/SKILL.md`)),
+        `expected ${skill} for solo profile`
+      );
+    }
+    // agentic-deepen is NOT in solo.universal per ADR-0020 §4 — must not
+    // install. Regression guard for the install-path level: the data-level
+    // assertion in profiles.js could pass while a bug in skillsForAgent /
+    // requiredSkillsForProfile lands deepen on disk anyway.
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/agentic-deepen')),
+      'agentic-deepen must not install at solo profile per ADR-0020 §4'
+    );
+
+    const state = loadState(dir, 'claude-code');
+    assert.equal(state.profile, 'solo');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

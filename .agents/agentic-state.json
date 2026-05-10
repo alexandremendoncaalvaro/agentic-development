@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "kitVersion": "0.14.0-beta.1",
+  "kitVersion": "0.15.0-beta.1",
   "agent": "codex",
   "profile": "team",
   "skills": {
     "agentic-adr": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-adr/agents/openai.yaml",
@@ -18,7 +18,7 @@
       ]
     },
     "agentic-architecture": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-architecture/agents/openai.yaml",
@@ -31,7 +31,7 @@
       ]
     },
     "agentic-audit": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-audit/agents/openai.yaml",
@@ -44,7 +44,7 @@
       ]
     },
     "agentic-bootstrap": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-bootstrap/agents/openai.yaml",
@@ -56,8 +56,60 @@
         }
       ]
     },
+    "agentic-deepen": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/agentic-deepen/agents/openai.yaml",
+          "sourceSha": "2da24a90b50d1f6359265eb1456c3db426847cbd222efd5ba24632b1926399d5"
+        },
+        {
+          "path": ".agents/skills/agentic-deepen/SKILL.md",
+          "sourceSha": "bb2c69a1daf39265273750ca1944986f2f41c215a766d8fd08be12721ab302bb"
+        }
+      ]
+    },
+    "agentic-diagnose": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/agentic-diagnose/agents/openai.yaml",
+          "sourceSha": "c881eb06aef7779f04dd3d2282368f813ceac836d0f9f9c1984575ed43e0fbe0"
+        },
+        {
+          "path": ".agents/skills/agentic-diagnose/SKILL.md",
+          "sourceSha": "d832e2250c886375087457827befc0bc095538974cde5e036e84209a1d4bb8a2"
+        }
+      ]
+    },
+    "agentic-domain": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/agentic-domain/agents/openai.yaml",
+          "sourceSha": "94772a25af2e101cd7cabd24c7db949d36dc6e1242ff8262b4ad8481f0b23bcb"
+        },
+        {
+          "path": ".agents/skills/agentic-domain/SKILL.md",
+          "sourceSha": "293afac10ab5d1fcb3d486fe1cf461bd2e03fef624422c12007eb83a25d43e7e"
+        }
+      ]
+    },
+    "agentic-grill": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/agentic-grill/agents/openai.yaml",
+          "sourceSha": "a581e0b29d0d3fffbf6a16e3e1f0d514f29e0b85018387ca836cfcea1781fa41"
+        },
+        {
+          "path": ".agents/skills/agentic-grill/SKILL.md",
+          "sourceSha": "a1ea228e66ec9debf2dd3c291560214c7dc3fc389a3af5ea85b6006aa79800f6"
+        }
+      ]
+    },
     "agentic-ground": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-ground/agents/openai.yaml",
@@ -70,7 +122,7 @@
       ]
     },
     "agentic-next": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-next/agents/openai.yaml",
@@ -83,7 +135,7 @@
       ]
     },
     "agentic-philosophy": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-philosophy/agents/openai.yaml",
@@ -96,7 +148,7 @@
       ]
     },
     "agentic-review": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-review/agents/openai.yaml",
@@ -109,7 +161,7 @@
       ]
     },
     "agentic-spec": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-spec/agents/openai.yaml",
@@ -122,7 +174,7 @@
       ]
     },
     "agentic-spike": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-spike/agents/openai.yaml",
@@ -135,7 +187,7 @@
       ]
     },
     "agentic-task": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-task/agents/openai.yaml",
@@ -148,7 +200,7 @@
       ]
     },
     "agentic-tdg": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".agents/skills/agentic-tdg/agents/openai.yaml",

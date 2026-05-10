@@ -372,6 +372,10 @@ export async function initCommand(opts) {
       '/agentic-next (state survey + recommendations)',
       '/agentic-spike (WORKFLOW §14 — staged spike with golden fixtures)',
       '/agentic-tdg (WORKFLOW §9 — outcome-based prompting + TDM)',
+      '/agentic-domain (CONTEXT.md — Layer 2 ubiquitous language)',
+      '/agentic-grill (interview-before-research)',
+      '/agentic-deepen (WORKFLOW §8 — deepening opportunities)',
+      '/agentic-diagnose (WORKFLOW §15 — five-phase diagnosis)',
       ...(optedSkills.includes('agentic-design') ? ['/agentic-design (DESIGN.md)'] : []),
       ...(optedSkills.includes('agentic-subagent') && agents.includes('claude-code')
         ? ['/agentic-subagent']
@@ -392,6 +396,7 @@ export async function initCommand(opts) {
           'agentic-audit': '/agentic-audit',
           'agentic-review': '/agentic-review (WORKFLOW §10)',
           'agentic-ground': '/agentic-ground (WORKFLOW §4 + §5)',
+          'agentic-deepen': '/agentic-deepen (WORKFLOW §8 — deepening opportunities)',
           // 'agentic-philosophy' is implicit and not listed.
         };
         for (const [skill, label] of Object.entries(universalLabels)) {

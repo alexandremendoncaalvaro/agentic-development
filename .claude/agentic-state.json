@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "kitVersion": "0.14.0-beta.1",
+  "kitVersion": "0.15.0-beta.1",
   "agent": "claude-code",
   "profile": "team",
   "skills": {
     "agentic-adr": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-adr/SKILL.md",
@@ -14,7 +14,7 @@
       ]
     },
     "agentic-architecture": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-architecture/SKILL.md",
@@ -23,7 +23,7 @@
       ]
     },
     "agentic-audit": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-audit/SKILL.md",
@@ -32,7 +32,7 @@
       ]
     },
     "agentic-bootstrap": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-bootstrap/SKILL.md",
@@ -40,8 +40,44 @@
         }
       ]
     },
+    "agentic-deepen": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-deepen/SKILL.md",
+          "sourceSha": "ca07bfed2d211aa48ce7e2c6eec27915d1a478543a48bdfce29c047bfb52d29e"
+        }
+      ]
+    },
+    "agentic-diagnose": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-diagnose/SKILL.md",
+          "sourceSha": "f08624b2a773d22dbf4684b657732c8fcefac0cd5fc67a7be8e170fe9a50a0a7"
+        }
+      ]
+    },
+    "agentic-domain": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-domain/SKILL.md",
+          "sourceSha": "88e3949da48f55ac6654e5051a4bc595478944ecb0dad52f9e5b1d87cc7f771c"
+        }
+      ]
+    },
+    "agentic-grill": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-grill/SKILL.md",
+          "sourceSha": "160540d76c919b819a05dae17c98b26c98669fdc90a0ead2e3666e62c71a3fae"
+        }
+      ]
+    },
     "agentic-ground": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-ground/SKILL.md",
@@ -50,7 +86,7 @@
       ]
     },
     "agentic-next": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-next/SKILL.md",
@@ -59,7 +95,7 @@
       ]
     },
     "agentic-philosophy": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-philosophy/SKILL.md",
@@ -68,7 +104,7 @@
       ]
     },
     "agentic-review": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/agents/fresh-context-reviewer.md",
@@ -81,7 +117,7 @@
       ]
     },
     "agentic-spec": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-spec/SKILL.md",
@@ -90,7 +126,7 @@
       ]
     },
     "agentic-spike": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-spike/SKILL.md",
@@ -99,7 +135,7 @@
       ]
     },
     "agentic-subagent": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-subagent/SKILL.md",
@@ -108,7 +144,7 @@
       ]
     },
     "agentic-task": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-task/SKILL.md",
@@ -117,7 +153,7 @@
       ]
     },
     "agentic-tdg": {
-      "version": "0.14.0-beta.1",
+      "version": "0.15.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/agentic-tdg/SKILL.md",
