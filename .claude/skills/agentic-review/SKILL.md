@@ -52,3 +52,10 @@ If the subagent reports zero findings across all severities, say so explicitly (
 ## Output contract
 
 A structured findings list grouped Blocker / Concern / Note, each finding `file:line: <severity>: <problem>. <fix>.`. The path of the persisted handoff under `.agentic/reviews/` is reported alongside. No "approve" verdict, no defending of the code, no rewrite of the diff. Empty result is reported explicitly.
+
+## Next
+
+- Address every Blocker before merge. Re-run `/agentic-review` on the fix to confirm it cleared.
+- Each Concern becomes a follow-up `/agentic-task`; do not let them silently accumulate.
+- Notes are informational; close them out in the original task's `Notes` log if relevant.
+- Once Blockers are clear: merge per project conventions.
