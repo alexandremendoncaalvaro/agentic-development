@@ -20,14 +20,24 @@ export const PROFILE_NAMES = ['poc', 'solo', 'team', 'mature'];
 
 export const PROFILES = {
   poc: {
-    universal: ['agentic-philosophy', 'agentic-ground', 'agentic-audit', 'agentic-next', 'agentic-spike', 'agentic-tdg'],
+    universal: [
+      'agentic-philosophy',
+      'agentic-ground',
+      'agentic-audit',
+      'agentic-next',
+      'agentic-spike',
+      'agentic-tdg',
+      'agentic-domain',
+      'agentic-grill',
+      'agentic-diagnose',
+    ],
     conditional: {
       'agentic-design': 'blocked',
       'agentic-subagent': 'blocked',
       'agentic-skill': 'blocked',
       'agentic-hooks': 'blocked',
     },
-    note: 'PoC / spike / experiment. Posture (philosophy) + research (ground) + drift (audit). No mandatory artifact-producing skills. Adds discipline you can grow into; never pre-imposes ceremony.',
+    note: 'PoC / spike / experiment. Nine universals — posture (philosophy), research (ground), drift (audit), navigation (next), spike + tdg + grill + domain + diagnose process scaffolds. No mandatory artifact-producing skills (no bootstrap / spec / task / adr / architecture). Adds discipline you can grow into; never pre-imposes ceremony.',
   },
   solo: {
     universal: [
@@ -41,6 +51,9 @@ export const PROFILES = {
       'agentic-spec',
       'agentic-task',
       'agentic-review',
+      'agentic-domain',
+      'agentic-grill',
+      'agentic-diagnose',
     ],
     conditional: {
       'agentic-architecture': false,
@@ -66,6 +79,10 @@ export const PROFILES = {
       'agentic-next',
       'agentic-spike',
       'agentic-tdg',
+      'agentic-domain',
+      'agentic-grill',
+      'agentic-deepen',
+      'agentic-diagnose',
     ],
     conditional: {
       'agentic-design': 'frontend',
@@ -73,7 +90,7 @@ export const PROFILES = {
       'agentic-skill': false,
       'agentic-hooks': false,
     },
-    note: 'Team product. Full universal stack; conditional skills auto-detect by signal. This was the v0.7 default and is the migration target for existing installs.',
+    note: 'Team product. Full universal stack including deepening (architectural refactor surfacing) and the v0.15 grill/domain/diagnose trio. Conditional skills auto-detect by signal. This was the v0.7 default and is the migration target for existing installs.',
   },
   mature: {
     universal: [
@@ -89,6 +106,10 @@ export const PROFILES = {
       'agentic-next',
       'agentic-spike',
       'agentic-tdg',
+      'agentic-domain',
+      'agentic-grill',
+      'agentic-deepen',
+      'agentic-diagnose',
     ],
     conditional: {
       'agentic-design': 'frontend',
@@ -96,7 +117,7 @@ export const PROFILES = {
       'agentic-skill': false,
       'agentic-hooks': true,
     },
-    note: 'Mature / regulated product. Recommends agentic-hooks alongside the team stack for deterministic gates per WORKFLOW §11. Future evals + spike skills land here when shipped.',
+    note: 'Mature / regulated product. Recommends agentic-hooks alongside the team stack for deterministic gates per WORKFLOW §11. Includes deepening + the v0.15 grill/domain/diagnose trio.',
   },
 };
 

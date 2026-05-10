@@ -4,7 +4,7 @@ A starter kit for engineering production code with LLMs. Lean templates and init
 
 **The framing.** An LLM is the super-soldier serum; the engineer is Steve Rogers. The serum amplifies what the engineer already brings — solid bases, investigation, care for quality, architecture, clean code, observability, maintainability. The kit encodes those bases as skills, ADRs, and gates so the amplification compounds in the right direction. See [WORKFLOW.md](WORKFLOW.md) for the principles.
 
-The CLI installs nine universal skills (`agentic-bootstrap`, `agentic-philosophy`, `agentic-architecture`, `agentic-adr`, `agentic-spec`, `agentic-task`, `agentic-audit`, `agentic-review`, `agentic-ground`) plus three conditional ones (`agentic-design` for frontend, `agentic-subagent` for Claude Code, `agentic-skill` opt-in) into the agent's native location. Each skill produces its artifact or runs its operation via the agent's native conversational UI; `agentic update` keeps installed skills in sync with upstream kit changes via a state-aware three-way diff. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues); current releases live under [GitHub Releases](https://github.com/alexandremendoncaalvaro/agentic-development/releases).
+The CLI installs sixteen universal skills at the default `team` profile (`agentic-bootstrap`, `agentic-philosophy`, `agentic-architecture`, `agentic-adr`, `agentic-spec`, `agentic-task`, `agentic-audit`, `agentic-review`, `agentic-ground`, `agentic-next`, `agentic-spike`, `agentic-tdg`, `agentic-domain`, `agentic-grill`, `agentic-deepen`, `agentic-diagnose`) plus four conditional ones (`agentic-design` for frontend, `agentic-subagent` for Claude Code, `agentic-skill` opt-in, `agentic-hooks` opt-in / recommended at `mature`) into the agent's native location. Lower profiles install fewer (`poc` = 9 universals, `solo` = 13, `team` / `mature` = 16; `agentic-deepen` is excluded from `poc` / `solo` per [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) §4). Each skill produces its artifact or runs its operation via the agent's native conversational UI; `agentic update` keeps installed skills in sync with upstream kit changes via a state-aware three-way diff. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues); current releases live under [GitHub Releases](https://github.com/alexandremendoncaalvaro/agentic-development/releases).
 
 ## Prerequisites
 
@@ -42,6 +42,10 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `agentic-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the five-layer artifact stack and recommends prioritized next actions; complements `agentic-audit` (drift) | `/agentic-next` |
 | `agentic-spike` | workflow-operational | universal | Staged spike with golden fixtures per WORKFLOW §14, for cases where the *technique* is uncertain across multiple plausible approaches; produces `spikes/NNNN-<slug>/` with discovery + fixture + pipeline-with-gates + two-layer evaluation | `/agentic-spike` |
 | `agentic-tdg` | workflow-operational | universal | Outcome-based prompting per WORKFLOW §9 — ground truth pair + Test Dependency Map + three approaches + single-criterion selection, for cases where the technique is known but the implementation strategy is uncertain | `/agentic-tdg` |
+| `agentic-domain` | spec-driven | universal | Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003); single-context or `CONTEXT-MAP.md` multi-context | `/agentic-domain` |
+| `agentic-grill` | workflow-operational | universal | Interview-before-research grilling — one question at a time with recommendation, codebase-first, sharpens vocabulary against `CONTEXT.md`, captures terms via `agentic-domain` and decisions via `agentic-adr` (three-criteria rule); upstream of `agentic-ground` | `/agentic-grill` |
+| `agentic-deepen` | workflow-operational | universal in `team` + `mature` only | Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality); three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one; pairs with `agentic-audit` | `/agentic-deepen` |
+| `agentic-diagnose` | workflow-operational | universal | Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15; five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test | `/agentic-diagnose` |
 | `agentic-design` | spec-driven | auto if frontend detected | Bootstrap `DESIGN.md` from existing tokens (Figma, tailwind.config, tokens.json, CSS custom props) | `/agentic-design` |
 | `agentic-subagent` | spec-driven | auto if installing for Claude Code | Drafts `.claude/agents/<name>.md` (Claude Code only — Codex has no subagent primitive) | `/agentic-subagent` |
 | `agentic-skill` | spec-driven | opt-in only | Drafts a new Claude Code or Codex skill at the appropriate path | `/agentic-skill` |
@@ -51,16 +55,16 @@ A short TUI shows the detected mode, agent, and feature signals (frontend / `.cl
 
 If your project already has an `AGENTS.md` (or `CLAUDE.md`), the installer appends a managed `Skills installed by agentic` section bracketed by `<!-- agentic-managed-skills:start -->` / `:end -->` markers. User content outside those markers is byte-preserved; re-runs update only the managed block.
 
-### Planned skills
+### v0.15 bundle
 
-Skills accepted by ADR but not yet implemented; tracked under [task-0020](doc/tasks/0020-mattpocock-absorptions.md). Each ships in its own minor release.
+The four skills accepted by ADR-0019 / 0020 / 0021 / 0022 (the mattpocock-absorption Phase-2 set) shipped together in v0.15.0-beta.1. Closes [task-0020](doc/tasks/0020-mattpocock-absorptions.md) Phase 2 in a single release rather than the originally-planned per-minor stack (v0.15 → v0.18). Rationale: 3 of 4 skills are direct mirrors of mature mattpocock prior art; bundling kept the WORKFLOW §15 / §8 / Layer-2 deltas coherent in one ship.
 
-| Skill | Target | Operationalizes | ADR |
-| --- | --- | --- | --- |
-| `agentic-domain` | v0.15.x | Lazy-creates / updates `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003) | [ADR-0019](doc/adr/0019-domain-language-layer.md) |
-| `agentic-grill` | v0.16.x | Interview-before-research session, upstream of `agentic-ground` | (forthcoming) |
-| `agentic-deepen` | v0.17.x | Surfaces deepening opportunities using the Ousterhout/Feathers vocabulary | [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) |
-| `agentic-diagnose` | v0.18.x | Five-phase debugging discipline per WORKFLOW §15 | [ADR-0021](doc/adr/0021-diagnose-discipline.md) |
+| Skill | ADR | Operationalizes |
+| --- | --- | --- |
+| `agentic-domain` | [ADR-0019](doc/adr/0019-domain-language-layer.md) | Layer 2 (ubiquitous language) — lazy `CONTEXT.md` lifecycle |
+| `agentic-grill` | [ADR-0022](doc/adr/0022-agentic-grill-skill.md) | Interview-before-research, upstream of `agentic-ground` |
+| `agentic-deepen` | [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) | WORKFLOW §8 vocabulary applied to refactor proposals (team + mature only) |
+| `agentic-diagnose` | [ADR-0021](doc/adr/0021-diagnose-discipline.md) | WORKFLOW §15 five-phase debugging |
 
 ## Project maturity profiles
 
@@ -68,10 +72,10 @@ The kit ships four profiles that select which skills auto-install. Same WORKFLOW
 
 | Profile | Universal install set | Conditional posture | Recommended for |
 | --- | --- | --- | --- |
-| `poc` | philosophy, ground, audit | all blocked | spike, hackathon, exploration |
-| `solo` | + bootstrap, spec, task, review | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code | solo developer shipping a real product |
-| `team` (default) | + architecture, adr | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
-| `mature` | same as team | hooks **recommended**; future evals + spike skills land here | regulated / public-facing production |
+| `poc` | 9 — philosophy, ground, audit, next, spike, tdg, domain, grill, diagnose | all blocked | spike, hackathon, exploration |
+| `solo` | 13 — + bootstrap, spec, task, review | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code | solo developer shipping a real product |
+| `team` (default) | 16 — + architecture, adr, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
+| `mature` | 16 — same as team | hooks **recommended**; deepening surfaced via `agentic-deepen` | regulated / public-facing production |
 
 Select at init time:
 
@@ -136,20 +140,21 @@ agentic init
 
 ## Recommended daily sequence
 
-The kit ships nine universal skills plus three conditional ones — twelve discrete capabilities. The sequence below is a happy path through them for the three flows that cover most daily work. Skip steps that don't apply; the kit never enforces order.
+The kit ships sixteen universal skills in the full `team` / `mature` install set; `agentic-deepen` is excluded from `poc` and `solo` per [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) §4 (concrete counts: `poc` = 9 universals, `solo` = 13, `team` / `mature` = 16). Plus four conditional skills (`agentic-design`, `agentic-subagent`, `agentic-skill`, `agentic-hooks`). The sequence below is a happy path through them for the three flows that cover most daily work. Skip steps that don't apply; the kit never enforces order.
 
 **Greenfield project, first non-trivial feature:**
 
 1. `agentic init` — install skills.
 2. `/agentic-bootstrap` — produce `AGENTS.md` (operational guide).
 3. `/agentic-architecture` — produce `ARCHITECTURE.md` once load-bearing patterns emerge.
-4. `/agentic-spec` — feature-level spec at `doc/specs/NNNN-<slug>.md` (User Scenarios, Requirements, Success Criteria).
-5. `/agentic-adr` — only when the feature forces a binding architectural decision worth recording for posterity.
-6. `/agentic-task` — work-unit decomposition; reference the spec via `Spec ref`.
-7. `/agentic-ground` — four-source research before code (`agentic-philosophy` auto-loads in parallel).
-8. Implement.
-9. `/agentic-review main..HEAD` — fresh-context §10 review before merge.
-10. `/agentic-audit` — periodic drift check across operational docs and specs.
+4. `/agentic-grill` — interview-before-research when the ask is fuzzy; resolves vocabulary into `CONTEXT.md` via `/agentic-domain` as terms surface.
+5. `/agentic-spec` — feature-level spec at `doc/specs/NNNN-<slug>.md` (User Scenarios, Requirements, Success Criteria).
+6. `/agentic-adr` — only when the feature forces a binding architectural decision worth recording for posterity (three-criteria rule: hard to reverse, surprising without context, real trade-off).
+7. `/agentic-task` — work-unit decomposition; reference the spec via `Spec ref`.
+8. `/agentic-ground` — four-source research before code (`agentic-philosophy` auto-loads in parallel).
+9. Implement.
+10. `/agentic-review main..HEAD` — fresh-context §10 review before merge.
+11. `/agentic-audit` — periodic drift check across operational docs, specs, and the `CONTEXT.md` glossary.
 
 **Brownfield project, quick fix:**
 
@@ -171,6 +176,12 @@ The kit's discipline scales with the project's maturity. A solo PoC may legitima
 **Technique uncertain across multiple plausible approaches?** Invoke `/agentic-spike` (per WORKFLOW §14) when the spec is clear but the *how* is unknown — library choice, multi-stage transformation, novel domain. The skill scaffolds a staged spike with golden fixtures + per-stage debug artifacts + two-layer evaluation under `spikes/NNNN-<slug>/`. The directory is throwaway by design; conclude with `/agentic-adr` and delete.
 
 **Technique known but implementation strategy uncertain?** Invoke `/agentic-tdg` (per WORKFLOW §9) when multiple algorithms could produce the expected output with different trade-offs along readability / performance / testability. The skill forces a ground-truth pair, lists the tests covering the file (Test Dependency Map), generates three implementation candidates, and commits to one by a single named criterion — refusing the "optimize for all three at once" failure mode. No file written; the verified implementation is the artifact, with the candidate set + criterion landing in the commit message body.
+
+**Question is fuzzy?** Invoke `/agentic-grill` (per [ADR-0022](doc/adr/0022-agentic-grill-skill.md)) before research. One question at a time with a recommended answer; codebase-first when the answer is in code; sharpens vocabulary against `CONTEXT.md`. Routes to `/agentic-ground` (research-ready), `/agentic-tdg` (implement-ready), `/agentic-spike` (technique-uncertain), or `/agentic-diagnose` (it turned out to be a bug) when the question is sharp.
+
+**Bug or performance regression?** Invoke `/agentic-diagnose` (per WORKFLOW §15). Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test. The loop is the skill; everything else is mechanical.
+
+**Stable codebase friction?** Invoke `/agentic-deepen` (per WORKFLOW §8, [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md)) on `team` / `mature` profiles. Surfaces deepening opportunities using the Module / Interface / Depth / Seam / Adapter / Leverage / Locality vocabulary and the deletion test. Premature on `poc` / `solo` — auto-install excludes them.
 
 ## Manual prompts
 

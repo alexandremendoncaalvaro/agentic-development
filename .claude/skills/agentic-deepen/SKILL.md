@@ -1,0 +1,123 @@
+---
+name: agentic-deepen
+description: Surface deepening opportunities in the codebase using the Ousterhout/Feathers vocabulary from WORKFLOW §8 (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three-phase process — explore organically, present numbered candidates with deletion-test framing, grilling loop on the chosen candidate. Pairs with `agentic-audit` (audit detects drift; deepen proposes refactors). Triggers on "deepen", "refactor for depth", "shallow module", "deletion test", "two-adapters rule", "interface is the test surface", "leverage", "locality", "/agentic-deepen". Profile-scoped to `team` and `mature` only — premature for `poc` and `solo` per ADR-0020 §4.
+allowed-tools: Read, Glob, Grep, Bash
+---
+
+# /agentic-deepen
+
+Implements [ADR-0020](../../doc/adr/0020-deep-modules-vocabulary.md) — the operational counterpart to the WORKFLOW §8 architectural vocabulary. Surfaces deepening opportunities and walks the user through them. Process scaffold; no primary file output.
+
+Profile scope: **`team` and `mature` only.** Architectural deepening is premature for ≤200-line experiments. `poc` and `solo` users do not have this skill installed; to enable deepening, re-init the project at `team` profile (`agentic profile set team`) once the codebase has stabilized enough to warrant it. Per ADR-0020 §4.
+
+## Step 0 — Confirm regime
+
+Deepen is for the *stable-codebase, friction-visible* regime. Run when at least one holds:
+
+- A module's interface is roughly as complex as its implementation (shallow module candidate).
+- A concept is bouncing between modules across recent changes (locality candidate).
+- A test cannot exercise the real bug pattern at the call site (interface-is-test-surface candidate).
+- An adapter has been introduced for a hypothetical second implementation (two-adapters-rule violation).
+- The user explicitly asks "where should this be refactored?" against a stable surface.
+
+Route elsewhere when:
+
+- The change is a one-line fix or mechanical refactor → no scaffold needed.
+- The codebase is `poc`-shaped (one-shot script, ≤200 lines, no callers): deepening is premature; ship the experiment first.
+- The friction is a *bug*, not a *shape* — `/agentic-diagnose` (WORKFLOW §15).
+- The friction is a *naming/vocabulary* drift — `/agentic-domain` ([ADR-0019](../../doc/adr/0019-domain-language-layer.md)).
+- The friction is *missing context*, not module shape — `/agentic-grill` ([ADR-0022](../../doc/adr/0022-agentic-grill-skill.md)).
+
+## Step 1 — Explore organically
+
+Before naming candidates, read.
+
+1. `Read CONTEXT.md` if it exists ([ADR-0019](../../doc/adr/0019-domain-language-layer.md)). Anchor domain vocabulary; the deepening proposals must use *Customer*, *Order*, *Triage role* — not *Service*, *Handler*, *Manager*.
+2. `Read ARCHITECTURE.md` if it exists ([ADR-0006](../../doc/adr/0006-architecture-md-at-repo-root.md)). Read accepted ADRs in `doc/adr/` covering the surface you are about to walk.
+3. Walk the codebase noting *friction*:
+   - Concepts bouncing between modules (locality fault).
+   - Interfaces as wide as their implementations (shallow modules — apply the deletion test).
+   - Tests that mock four things to exercise one path (test-surface fault).
+   - Adapters with one concrete implementation (two-adapters-rule violation, if no second is planned).
+
+Read with eyes for *shape*, not bugs. The friction is in module geometry; the bug-finding skill is `/agentic-diagnose`.
+
+## Step 2 — Present candidates numbered
+
+For each deepening opportunity, produce a short numbered entry:
+
+```markdown
+### Candidate N: <one-line title using domain + architectural vocabulary>
+
+**Files involved:** [`src/foo.ts:42`](../src/foo.ts:42), [`src/bar.ts`](../src/bar.ts).
+
+**Friction:** <one-paragraph plain English — what hurts today, who feels it, when>.
+
+**Proposal:** <one-paragraph plain English — what changes about the module shape>.
+
+**Vocabulary check:** <Module / Interface / Seam / Adapter / Depth / Leverage / Locality applied here, per WORKFLOW §8>.
+
+**Deletion test:** <if you imagine deleting the module today, what happens? If complexity vanishes → delete instead of refactoring. If complexity reappears across N callers → it earns its keep, deepen it>.
+
+**Two-adapters check:** <if introducing a seam: name the second concrete adapter that justifies it. If only one adapter exists or is planned, the seam is hypothetical — drop it from the proposal>.
+
+**Test surface impact:** <does the new shape make the right pattern testable at the call site? If not, the proposal is wrong-shaped>.
+
+**ADR conflicts:** <name any accepted ADR this proposal contradicts. Flag for reopening only if the friction warrants it; otherwise the candidate is rejected>.
+```
+
+Number candidates 1, 2, 3, ... Order by leverage × locality (largest impact first, lowest blast radius among ties). Cap at five — past five, the user has too many to weigh.
+
+## Step 3 — Grilling loop on the chosen candidate
+
+The user picks one candidate by number. Drop into a grilling loop on that one:
+
+1. Walk the design tree of the proposal branch by branch (one question per turn, recommendation included). Reuse the [`agentic-grill`](../agentic-grill/SKILL.md) discipline — codebase-first, single question, captured inline.
+2. Add new domain terms to `CONTEXT.md` lazily via `/agentic-domain` as the proposal surfaces them.
+3. Offer an ADR only when the three criteria pass (hard to reverse, surprising without context, real trade-off — per [ADR-0022](../../doc/adr/0022-agentic-grill-skill.md) §5). If a deepening proposal does not need an ADR, it does not get one — most refactors do not.
+4. When the proposal stabilizes: route to `/agentic-tdg` (WORKFLOW §9) for the implementation pass with ground-truth pair + TDM + criterion-based selection.
+
+Reject candidates the grilling loop reveals as wrong-shaped. Better to discard a candidate at this stage than to ship a deepening that doesn't deepen.
+
+## Vocabulary discipline (always on)
+
+Per [ADR-0020](../../doc/adr/0020-deep-modules-vocabulary.md), use the canonical vocabulary verbatim throughout the skill's output:
+
+- **Module** — any unit with an interface and an implementation.
+- **Interface** — what callers see.
+- **Implementation** — what they don't.
+- **Depth** — behavior leverage at the interface. Deep modules hide a lot of behavior behind a small interface.
+- **Seam** — where behavior can be altered without editing in place (Feathers).
+- **Adapter** — a concrete thing satisfying an interface at a seam. *Role*, not *substance*.
+- **Leverage** — what callers gain from depth.
+- **Locality** — what maintainers gain from depth (concentrated change, bugs, knowledge).
+
+Never use:
+
+- "Boundary" (overloaded with DDD bounded contexts) — use *Seam* or *Interface*.
+- "Service" / "Handler" / "Manager" / "Helper" without a domain noun in front — these are noise.
+- "Depth = implementation lines / interface lines" — explicitly rejected by ADR-0020. Rewards padding.
+
+When the candidate's friction touches a domain noun, use the domain noun from `CONTEXT.md` ("the *Order* aggregate"), not a generic placeholder ("the order service").
+
+## Output contract
+
+Structured conversation. No primary file written. Side-effects:
+
+- `CONTEXT.md` updates land via `/agentic-domain` when the proposal surfaces new domain terms.
+- ADR drafts land via `/agentic-adr` when the three-criteria test passes.
+- Implementation lands via `/agentic-tdg` after the proposal stabilizes — that skill produces the verified code change.
+
+Each session produces:
+
+1. A numbered list of candidates (Step 2), capped at five.
+2. A picked candidate with the grilling loop transcript (Step 3).
+3. Routing to `/agentic-tdg` with the ground-truth pair seeded from the proposal.
+
+## Next
+
+- After candidates surface but before picking: `/agentic-audit` for a broader drift check; the audit may reorder priorities.
+- After picking and grilling stabilizes: `/agentic-tdg` to implement under WORKFLOW §9 discipline.
+- If the proposal touches load-bearing architecture: `/agentic-adr` to record the decision (only when the three-criteria test passes).
+- If the deepening exposed a domain-vocabulary drift: `/agentic-domain` to update `CONTEXT.md`.
+- If the candidates all turned out to be bug-symptoms rather than shape-symptoms: `/agentic-diagnose` (WORKFLOW §15).

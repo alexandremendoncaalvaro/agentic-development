@@ -32,6 +32,14 @@ export const SKILL_DESCRIPTIONS = {
     'Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.',
   'agentic-tdg':
     'Outcome-based prompting per WORKFLOW §9. Ground truth pair + Test Dependency Map + three approaches + single-criterion selection, when the technique is known but the implementation strategy is uncertain.',
+  'agentic-domain':
+    'Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003). Captures canonical project-specific nouns with aliases-to-avoid, relationships, and flagged ambiguities. Single-context or `CONTEXT-MAP.md` multi-context.',
+  'agentic-grill':
+    'Interview-before-research grilling session — one question at a time with recommendation, codebase-first, sharpens vocabulary against `CONTEXT.md`, captures terms via `agentic-domain` and decisions via `agentic-adr` (three-criteria rule). Upstream of `agentic-ground`.',
+  'agentic-deepen':
+    'Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one. Pairs with `agentic-audit`. Profile-scoped to `team` and `mature` only.',
+  'agentic-diagnose':
+    'Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.',
   'agentic-design': 'Bootstrap `DESIGN.md` from existing tokens (frontend projects).',
   'agentic-subagent': 'Draft a new Claude Code subagent at `.claude/agents/<name>.md`.',
   'agentic-skill': 'Draft a new Claude Code or Codex skill at the appropriate path.',
