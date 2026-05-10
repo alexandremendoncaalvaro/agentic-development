@@ -370,6 +370,7 @@ export async function initCommand(opts) {
       '/agentic-review (WORKFLOW §10)',
       '/agentic-ground (WORKFLOW §4 + §5)',
       '/agentic-next (state survey + recommendations)',
+      '/agentic-spike (WORKFLOW §14 — staged spike with golden fixtures)',
       ...(optedSkills.includes('agentic-design') ? ['/agentic-design (DESIGN.md)'] : []),
       ...(optedSkills.includes('agentic-subagent') && agents.includes('claude-code')
         ? ['/agentic-subagent']
