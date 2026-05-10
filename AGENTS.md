@@ -22,7 +22,12 @@ Lint, formatter, CI: not yet wired.
 
 ## Quality Gates
 
-Deterministic gates today: `npm test` (CLI `--help` smoke + `test/lib.test.js` unit + `test/init.test.js` integration via `node --test`). Lint, format, CI hooks not yet wired.
+Deterministic enforcement — agent cannot skip. WORKFLOW §11 binding for the `team` profile this repo runs under.
+
+* **Pre-push hook (lefthook):** `npm test` runs the full 139-test suite. Bootstrap: `lefthook install` after clone. Config: [`lefthook.yml`](lefthook.yml).
+* **Pre-commit hook:** intentionally absent — kit has no lint or formatter wired today. Adding lint/format gates is a separate decision (own ADR + Task per ADR-0007 §6).
+* **CI:** GitHub Actions workflow scaffolded as a follow-up (gh OAuth scope blocked the v0.11.2 push of `.github/workflows/`). Until landed, the local pre-push hook is the only deterministic gate; redundant CI is recommended once authorization unblocks.
+* **Never bypass:** no `--no-verify`, no skipped hooks, no deleted failing tests. WORKFLOW §11 binding.
 
 ## Code Style
 
