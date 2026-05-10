@@ -71,3 +71,10 @@ ADRs are decision-record artifacts and are **exempt** from the no-dates rule (Do
 - `Context` is the business-context-first section — the *forces* and *problem* before the *decision*.
 - One scope: one decision per ADR. If the user's request implies multiple decisions, ask which one to write first; the others become follow-up ADRs.
 - No speculation. `Decision` is a directive ("We will…"); rejected paths go in `Alternatives Considered`, not the body.
+
+## Next
+
+- Continue the work the ADR was scoped to support. Status starts `proposed`; the user flips to `accepted` after review (the agent does not).
+- If the ADR touches `ARCHITECTURE.md`'s Active ADRs list, add the entry there.
+- `/agentic-task` for the work units that implement the decision.
+- `/agentic-audit` periodically to confirm the decision still holds against the code.

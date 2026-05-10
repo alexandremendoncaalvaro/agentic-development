@@ -98,3 +98,10 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 8. **Tests are living documentation of behavior.** Test names and assertions read as the spec they enforce. Spec changes drive test changes; never the reverse.
 
 When generating or auditing a document, walk this list before declaring done.
+
+## Next
+
+- Continue current work with the six behaviors active. This skill is posture, not a one-shot task.
+- `/agentic-ground` for non-trivial research before code.
+- `/agentic-next` when uncertain where to go in the workflow.
+- `/agentic-review` before merging non-trivial diffs.
