@@ -54,6 +54,9 @@ export const PROFILES = {
       'agentic-domain',
       'agentic-grill',
       'agentic-diagnose',
+      'agentic-commit',
+      'agentic-pr',
+      'agentic-merge',
     ],
     conditional: {
       'agentic-architecture': false,
@@ -83,6 +86,9 @@ export const PROFILES = {
       'agentic-grill',
       'agentic-deepen',
       'agentic-diagnose',
+      'agentic-commit',
+      'agentic-pr',
+      'agentic-merge',
     ],
     conditional: {
       'agentic-design': 'frontend',
@@ -110,6 +116,9 @@ export const PROFILES = {
       'agentic-grill',
       'agentic-deepen',
       'agentic-diagnose',
+      'agentic-commit',
+      'agentic-pr',
+      'agentic-merge',
     ],
     conditional: {
       'agentic-design': 'frontend',
