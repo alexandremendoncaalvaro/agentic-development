@@ -147,6 +147,6 @@ A single `AGENTS.md` at the repo root, ≤150 lines, every line operational. No 
 ## Next
 
 - In `team` / `mature`: run `/agentic-architecture` once load-bearing patterns emerge in the code.
-- When you start your first feature: `/agentic-spec` (Layer 2 of the four-layer artifact stack).
+- When you start your first feature: `/agentic-spec` (Layer 3 of the five-layer artifact stack).
 - Skip both above in `poc` / `solo` until the project genuinely needs them — the WORKFLOW §1 prune principle applies.
 - `agentic-philosophy` auto-loads on non-trivial work.

@@ -4,7 +4,7 @@ Engineering production code with LLMs. Agentic, not vibe coding.
 
 **The Steve Rogers framing.** The LLM is the super-soldier serum. The engineer is Steve Rogers. The serum amplifies what the engineer already brings — solid bases, organization, investigation, care for quality, architecture, clean code, documentation, observability, maintainability. Add the serum to a disciplined engineer and you get Captain America. Add it to an undisciplined one and you get faster sloppy at scale. This document is those bases written down as principles. The discipline is the input; the LLM is the amplifier; the kit (skills, ADRs, audits, gates) is the scaffolding that keeps the discipline intact across sessions, agents, and projects.
 
-**The principle behind the rest:** context engineering beats prompt engineering. Context is finite and decays as it fills — aim for the smallest set of high-signal tokens that gets the outcome.
+**The principle behind the rest:** context engineering beats prompt engineering. Context is finite and decays as it fills — aim for the smallest set of high-signal tokens that gets the outcome. Operationally: one task per session, reset rather than extend. A long-running conversation crosses from the model's high-precision zone into a low-precision one as the cross-references multiply; smaller, deliberately-loaded contexts beat larger, accreted ones.
 
 ## TL;DR
 
@@ -27,7 +27,10 @@ What to keep in mind:
 13. **Automation needs rails.** Hooks, tests, lint, CI, sandboxing, and permissions matter more than advisory text the agent can forget.
 14. **Autonomy requires observability.** If the agent makes decisions, log the trajectory: tool calls, intermediate outputs, failures.
 15. **Staged spikes when the technique is uncertain.** When the *how* is unknown — a library choice, a CV technique, a multi-stage transformation — break the problem into staged spikes against golden fixtures with per-stage debug artifacts.
-16. **Discipline scales with project maturity.** Same principles bind every project; the artifact set scales. A spike runs posture + research + audit; a regulated product adds spec / ADR / hooks / evals. Add ceremony only where it changes agent behavior; configure at init and reconfigure as the project matures.
+16. **Diagnose with discipline.** For hard bugs and performance regressions: build a fast, deterministic feedback loop *before* hypothesising. Reproduce, then generate three to five ranked falsifiable hypotheses, then change one variable at a time. The feedback loop is the skill; everything else is mechanical.
+17. **One task per session.** Context decays as it fills. Reset and reload only what the next task needs rather than extending a long conversation across many features. Smaller, deliberately-loaded contexts beat large, accreted ones.
+18. **Slice vertically, not horizontally.** Decompose a spec into thin end-to-end paths through every layer (schema, API, UI, tests) rather than one layer at a time. Each slice ships demonstrable behavior; horizontal layer-stacks ship nothing on their own.
+19. **Discipline scales with project maturity.** Same principles bind every project; the artifact set scales. A spike runs posture + research + audit; a regulated product adds spec / ADR / hooks / evals. Add ceremony only where it changes agent behavior; configure at init and reconfigure as the project matures.
 
 > Working with agents means trading typing for technical direction. The value is in giving the right context, setting boundaries, validating the result, and keeping "almost right" out of production.
 
@@ -37,14 +40,15 @@ Define the rules before the agent writes a line. The temptation is to dump every
 
 There are two complementary frames for the artifacts the kit produces. The first is **purpose** — what each artifact is *for*. The second is **loading mechanism** — when each artifact reaches the agent's context.
 
-### Four-layer artifact stack (purpose)
+### Five-layer artifact stack (purpose)
 
 1. **Constitution** — `AGENTS.md` (operational guide) and `WORKFLOW.md` (engineering philosophy). Tells the agent how the project works and how the team thinks. Read every session.
-2. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; ADRs may be driven by spec constraints. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
-3. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
-4. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
+2. **Domain** — `CONTEXT.md` at the repo root (or `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos). The project's ubiquitous language: canonical nouns, the aliases to avoid, the relationships between them, and the ambiguities that have already been resolved. Direct application of Domain-Driven Design (Evans, 2003) — when an agent and a human share the project's vocabulary, the agent uses fewer tokens to say more, and the code, tests, and conversation all converge on the same names. Created lazily — first term resolved triggers the file. ADR-0019 records the layer.
+3. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; ADRs may be driven by spec constraints. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
+4. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
+5. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
 
-The four layers scale with project maturity (TL;DR #16). A spike or PoC profile may legitimately ship only Layers 1 and 4 — adding Layers 2 and 3 to a 200-line experiment is ceremony that does not change agent behavior. A team or regulated product runs all four. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
+The five layers scale with project maturity (TL;DR #19 — Discipline scales). A spike or PoC profile may legitimately ship only Layers 1, 2, and 5 — adding Layers 3 and 4 to a 200-line experiment is ceremony that does not change agent behavior. (Domain — Layer 2 — earns its keep even at PoC because vocabulary drift starts on day one.) A team or regulated product runs all five. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
 
 ### Three context types (loading mechanism)
 
@@ -52,9 +56,10 @@ The four layers scale with project maturity (TL;DR #16). A spike or PoC profile 
 - **Canonical specs are constraints, not advice.** `DESIGN.md` (the visual contract — YAML tokens plus Markdown rationale, per Google Labs' open standard), `ARCHITECTURE.md`, ADRs in `doc/adr/*.md`, and feature specs in `doc/specs/*.md` are facts the agent must obey. If a token, pattern, or success criterion isn't declared here, it doesn't exist. The agent must never invent one.
 - **On-demand context is `SKILL.md`.** Description loads at session start (the listing is capped at 1,536 characters per the spec) and body loads only when the skill is invoked. Use it for repeatable workflows or domain knowledge that shouldn't pay a token cost on every turn.
 
-Two rules apply across all of the above:
+Three rules apply across all of the above:
 
 - **Acceptance criteria must be measurable.** "Build a dashboard" fails. "Loads in under 2 seconds, shows 6 months of history, passes axe accessibility" succeeds.
+- **Acceptance criteria must be durable, not procedural.** Describe the behavior and the interfaces — the contracts that survive a rename. Avoid file paths, line numbers, and "open file X and add line Y" wording in the criteria themselves; those rot the moment the implementation moves. Procedural execution steps belong in a separate section of the task file, not in the criteria.
 - **Prune.** If removing a line wouldn't make the agent fail, cut it.
 
 ## 2. Docs vs. Code
@@ -112,7 +117,7 @@ The kit ships `agentic-ground` as the workflow-operational implementation of bot
 For non-trivial changes, four phases:
 
 1. **Explore (read-only).** Plan mode in your agent. Read, build a mental model, no edits.
-2. **Plan.** Agent writes a Markdown plan. You edit before approving. For non-trivial multi-step work, structure the plan as a per-task file (`doc/tasks/<NNNN>-<slug>.md`) with checkbox acceptance criteria and execution steps — the agent toggles checkboxes as it works rather than rewriting paragraphs, keeping edits cheap and resumable across sessions.
+2. **Plan.** Agent writes a Markdown plan. You edit before approving. For non-trivial multi-step work, structure the plan as a per-task file (`doc/tasks/<NNNN>-<slug>.md`) with checkbox acceptance criteria and execution steps — the agent toggles checkboxes as it works rather than rewriting paragraphs, keeping edits cheap and resumable across sessions. When a spec yields more than one task, **slice vertically**: each task is a thin end-to-end path through every layer the change touches (schema, API, UI, tests), not one layer at a time. The anti-pattern is *horizontal slicing* — "first the schema task, then the API task, then the UI task" — because nothing is shippable until the last task lands. Tracer-bullet vertical slices each ship a demonstrable behavior on their own ([Hunt & Thomas, *Pragmatic Programmer*, 1999](https://en.wikipedia.org/wiki/The_Pragmatic_Programmer)). Tag each task **AFK** (specified completely enough that an autonomous agent can land it) or **HITL** (needs human judgment, taste, design review, or external access) — the dimension is orthogonal to the lifecycle status and tells parallel agents which work is theirs to take.
 3. **Implement.** Execute the approved plan; verify each step before moving to the next.
 4. **Commit.** One logical change per commit.
 
@@ -134,6 +139,27 @@ Lock the load-bearing decisions into `AGENTS.md` or `CLAUDE.md` so the agent doe
 > "Apply: **Clean Architecture** — isolate core logic from frameworks. **Small units** — single-responsibility, low indentation, no `else` chains. **Modular and testable** — no over-engineering."
 
 The agent will follow what's specified and invent what isn't. Prefer specifying.
+
+### Architectural vocabulary
+
+Architectural drift accelerates with the agent's typing speed; the counter is shared vocabulary that names the shapes that matter. The kit adopts the canonical terms from John Ousterhout's *A Philosophy of Software Design* (2018) and Michael Feathers's *Working Effectively with Legacy Code* (2004), and uses them in `ARCHITECTURE.md`, ADRs, and architecture-touching skills (ADR-0020).
+
+- **Module** — anything with an interface and an implementation; deliberately scale-agnostic (function, class, package, vertical slice).
+- **Interface** — everything a caller must know to use the module correctly: types, invariants, ordering constraints, error modes, configuration, performance characteristics. *Not* just the type signature.
+- **Implementation** — what's inside the module.
+- **Depth** — leverage at the interface. A module is **deep** when a large amount of behavior sits behind a small interface; **shallow** when the interface is nearly as complex as the implementation. Depth is a property of the interface, not of line counts (rejected framing: depth-as-implementation-to-interface line ratio rewards padding).
+- **Seam** (Feathers) — a place where behavior can be altered without editing in place; the *location* of an interface. Distinct from DDD's *bounded context*; the kit avoids "boundary" for this reason.
+- **Adapter** — a concrete thing that satisfies an interface at a seam; a role, not a substance.
+- **Leverage** — what callers get from depth: more capability per unit of interface they have to learn.
+- **Locality** — what maintainers get from depth: change, bugs, knowledge concentrated at one place rather than spread across callers.
+
+Three principles fall out of those terms:
+
+- **Deletion test.** Imagine deleting the module. If complexity vanishes, the module was a pass-through (delete it). If complexity reappears across N callers, it was earning its keep.
+- **The interface is the test surface.** Callers and tests cross the same seam. If you want to test *past* the interface, the module is probably the wrong shape.
+- **One adapter is a hypothetical seam; two adapters make it real.** Don't introduce a seam unless something actually varies across it.
+
+Skills that touch architecture (`agentic-architecture`, `agentic-adr`, the planned `agentic-deepen`) use these terms verbatim, so suggestions and reviews land in a single language.
 
 ## 9. Outcome-Based Prompting (TDG)
 
@@ -172,6 +198,8 @@ The takeaway: §10 (Reviewer) and §11 (Quality Gates) are not optional. Skippin
 
 Per the Steve Rogers framing in the preamble: the serum cannot manufacture discrimination — it amplifies whatever discrimination the engineer already brings. The kit's job is to encode discrimination into the agent's context (specs, ADRs, fresh-context reviews, deterministic gates) so the amplification compounds in the disciplined direction even when the engineer is sleepy, rushed, or handing off to another collaborator.
 
+**Two roles of judgment, not one.** Agent review (§10 fresh-context) and the deterministic gates (§11) catch the *mechanical* failures: bugs, coupling, edge cases, broken contracts, missed branches. They do not — and should not be expected to — catch what is left after that: taste, product judgment, visual feel, whether the feature actually solves the user's problem. Those require a human to look at the running thing and form an opinion. Skipping fresh-context review because "the engineer will catch it" wastes engineer attention on mechanical failures the agent should have caught. Skipping the human pass because "the agent reviewed it" ships features that compile, pass, and feel wrong. The two are complements, not substitutes.
+
 ## 13. Evals for Anything Autonomous
 
 If your agent is making decisions on its own, you need evals. A few principles:
@@ -185,6 +213,8 @@ If your agent is making decisions on its own, you need evals. A few principles:
 
 Sometimes the spec is clear but the *technique* is uncertain — you don't know which library, which CV approach, which decomposition. Don't ask the agent to solve it end-to-end. Break the problem into staged spikes and validate each one against curated ground truth.
 
+**Spike vs. prototype.** Use a *spike* (this section) when the unknown is *how* — the technique itself is uncertain across multiple plausible approaches and validation needs golden fixtures with per-stage debug. Use a *prototype* when the unknown is *what should this feel like* — UI/UX direction, the shape of an interaction, whether a state model holds up under play. Different question, different artifact, different success criterion.
+
 The flow has four parts:
 
 1. **Discovery first.** Ask the agent to list canonical approaches grounded in official docs and real examples. Pick one by an explicit criterion. The output of this step is information, not code.
@@ -197,6 +227,53 @@ The flow has four parts:
 **When to use it:** the unknown is *how* — a library choice, a CV technique, a multi-stage transformation. Skip it when the *how* is routine.
 
 This is a combination of established practices, not new terminology: spike (XP), golden datasets, stage-segmented error analysis, trajectory evaluation, and visual debugging in CV pipelines.
+
+## 15. Diagnose With Discipline
+
+For hard bugs and performance regressions, the failure mode is jumping to hypotheses before there is a way to check them. The discipline below is the counter; it owes its shape to standard debugging practice (Kernighan & Pike, *The Practice of Programming*, 1999) and the kit ships `agentic-diagnose` as the operational implementation (ADR-0021).
+
+### Phase 1 — Build a feedback loop
+
+This is *the* skill. Everything else is mechanical. A fast, deterministic, agent-runnable pass/fail signal for the bug is what makes bisection, hypothesis-testing, and instrumentation effective; without one, no amount of staring at code converges. Spend disproportionate effort here.
+
+Loop-construction techniques, in roughly increasing cost:
+
+1. Failing test at whatever seam reaches the bug — unit, integration, e2e.
+2. Curl / HTTP script against a running dev server.
+3. CLI invocation with a fixture input, diffing stdout against a known-good snapshot.
+4. Headless browser script (Playwright / Puppeteer) — drives the UI, asserts on DOM, console, network.
+5. Replay a captured trace — saved network request, payload, event log — through the code path in isolation.
+6. Throwaway harness — a minimal subset of the system that exercises the bug code path with one function call.
+7. Property / fuzz loop — when the bug is "sometimes wrong output", run many random inputs and look for the failure mode.
+8. Bisection harness — automate "boot at state X, check, repeat" so `git bisect run` works.
+9. Differential loop — run the same input through two versions or two configs and diff outputs.
+10. HITL bash script — last resort. Structure the human's clicks so the loop is still repeatable.
+
+Treat the loop as a product: faster, sharper signal, more deterministic, every iteration. A two-second deterministic loop is a debugging superpower; a thirty-second flaky loop is barely better than no loop.
+
+For non-deterministic bugs, the goal is not a clean repro but a *higher reproduction rate* — loop the trigger, parallelize, narrow timing windows, inject sleeps. A 50%-flake is debuggable; 1% is not.
+
+If a loop genuinely cannot be built, stop and say so — do not proceed to hypotheses.
+
+### Phase 2 — Reproduce
+
+Run the loop. Confirm the failure matches the user's description (not a different failure that happens to be nearby), reproduces consistently (or at a high enough rate), and the exact symptom is captured for later phases to verify the fix against. Wrong bug = wrong fix.
+
+### Phase 3 — Hypothesise
+
+Generate **three to five ranked hypotheses** before testing any of them. Single-hypothesis generation anchors on the first plausible idea.
+
+Each hypothesis must be **falsifiable**: state the prediction it makes — *"if X is the cause, then changing Y will make the bug disappear / changing Z will make it worse."* If you cannot state the prediction, the hypothesis is a vibe; sharpen it or discard it.
+
+Show the ranked list to the user before testing. Domain knowledge often re-ranks instantly ("we just deployed a change to #3"), or marks hypotheses already ruled out — a cheap checkpoint, big time saver.
+
+### Phase 4 — Instrument
+
+Each probe maps to a specific prediction from Phase 3. Change one variable at a time. Log enough that the result is unambiguous — a single instrument that confirms two predictions at once tends to confirm whichever one you were rooting for.
+
+### Phase 5 — Fix and regression-test
+
+Apply the fix. Re-run the Phase-1 loop and confirm the captured symptom is gone. Promote the loop's check into a permanent test that lives next to the code so the same failure mode cannot return silently.
 
 ---
 
@@ -214,6 +291,8 @@ This is not theory I read and copied. Most of the practices here come from years
 
 **§14 (Staged Spikes With Golden Fixtures) is my own working technique.** I haven't seen it documented end-to-end as a single named pattern, but each component (spike, golden dataset, stage-segmented error analysis, trajectory evaluation, visual CV debugging) has its own lineage in the literature listed under Sources. The combination — discovery → fixture → staged pipeline with debug artifacts → two-layer evaluation — is how I attack problems where the *technique* itself is uncertain.
 
+**Practices added through cross-pollination.** A second pass over the guide compared this kit's coverage against [Matt Pocock's `mattpocock/skills`](https://github.com/mattpocock/skills) — a separate body of agent-engineering practice grounded in the same canonical literature (DDD, *Pragmatic Programmer*, Ousterhout, Feathers, Beck). The comparison surfaced principles that earned their place in this document on independent merits: the **Domain layer** (§1 Layer 2, ADR-0019) from DDD's ubiquitous-language pattern; the **architectural vocabulary** (§8, ADR-0020) from Ousterhout's depth and Feathers's seams; **Diagnose with discipline** (§15, ADR-0021) from standard debugging practice; **vertical slicing** and **HITL/AFK tagging** (§6) from PragProg's tracer-bullet metaphor; **AI mechanical / human judgment** (§12 second paragraph). Where Pocock's framing sharpened our own — vocabulary or principle that we already gestured at without naming — the borrowed phrasing is acknowledged inline; everything else stays kit-original.
+
 External claims (specific percentages, named frameworks) are cited under Sources. Everything else is operational guidance from practice or synthesis across that material — a working model, refined over time, not academic claim.
 
 ## Sources
@@ -221,6 +300,14 @@ External claims (specific percentages, named frameworks) are cited under Sources
 **§1 — Spec-Driven Design**
 - DESIGN.md spec (Google Labs): https://github.com/google-labs-code/design.md
 - SKILL.md spec (Anthropic): https://code.claude.com/docs/en/skills
+- Domain-Driven Design (Evans, 2003) — *Domain-Driven Design: Tackling Complexity in the Heart of Software*. Source for the Domain layer (`CONTEXT.md`) and the ubiquitous-language discipline.
+
+**§6 — Explore → Plan → Implement → Commit**
+- *The Pragmatic Programmer* (Hunt & Thomas, 1999), tracer-bullet metaphor — source for the vertical-slicing principle.
+
+**§8 — Architectural Boundaries**
+- *A Philosophy of Software Design* (Ousterhout, 2018) — Module / Interface / Depth vocabulary; rejected framing of depth-as-line-ratio.
+- *Working Effectively with Legacy Code* (Feathers, 2004) — Seam vocabulary.
 
 **§12 — The Bottleneck Is Discrimination, Not Generation**
 - JetBrains *DevEcosystem 2025*: https://devecosystem-2025.jetbrains.com/artificial-intelligence
@@ -232,3 +319,7 @@ External claims (specific percentages, named frameworks) are cited under Sources
 - Stage-segmented error analysis — Hamel Husain's evals FAQ: https://hamel.dev/blog/posts/evals-faq/
 - Trajectory evaluation — LangSmith docs: https://docs.langchain.com/langsmith/trajectory-evals
 - Visual CV debugging — OpenCV cvv tutorial: https://docs.opencv.org/3.4/d7/dcf/tutorial_cvv_introduction.html
+
+**§15 — Diagnose With Discipline**
+- *The Practice of Programming* (Kernighan & Pike, 1999) — chapters on debugging and testing.
+- Falsifiability framing — Karl Popper, *The Logic of Scientific Discovery* (1959).
