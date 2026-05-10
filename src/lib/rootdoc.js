@@ -28,6 +28,8 @@ export const SKILL_DESCRIPTIONS = {
     'Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate. WORKFLOW §4 + §5.',
   'agentic-next':
     'State survey + prioritized next-action recommendations across the four-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).',
+  'agentic-spike':
+    'Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.',
   'agentic-design': 'Bootstrap `DESIGN.md` from existing tokens (frontend projects).',
   'agentic-subagent': 'Draft a new Claude Code subagent at `.claude/agents/<name>.md`.',
   'agentic-skill': 'Draft a new Claude Code or Codex skill at the appropriate path.',
