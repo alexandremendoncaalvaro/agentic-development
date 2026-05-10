@@ -36,12 +36,25 @@ export async function run(argv) {
     .option('--force', 'overwrite user-edited files on conflict (non-interactive default: no)')
     .action(updateCommand);
 
+  // Profile command accepts two positionals so `agentic profile set <name>`
+  // captures the name natively. Per review C1 (v0.11.3): the prior single-
+  // positional form had Commander swallow the second arg, leaving the
+  // documented `Usage: agentic profile set <name>` error message misleading.
+  // All forms work now:
+  //   agentic profile                          → show
+  //   agentic profile show                     → show
+  //   agentic profile list                     → list
+  //   agentic profile set <name>               → set
+  //   agentic profile <name>                   → shorthand for `set <name>`
+  //   agentic profile set --name <name>        → flag form (back-compat)
   program
-    .command('profile [subcommand]')
+    .command('profile [subcommand] [name]')
     .description('Show, list, or set the project maturity profile (poc | solo | team | mature)')
-    .option('-n, --name <name>', 'profile name when used with `set` subcommand')
+    .option('-n, --name <name>', 'profile name (alternative to positional, for `set` subcommand)')
     .option('-y, --yes', 'skip confirmation prompts (non-interactive)')
-    .action(profileCommand);
+    .action((subcommand, name, opts) =>
+      profileCommand(subcommand, { ...opts, name: opts.name ?? name })
+    );
 
   await program.parseAsync(argv);
 }

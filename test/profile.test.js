@@ -200,3 +200,105 @@ test('saveState includes profile field for new writes', () => {
 test('agentic profile --help works', () => {
   execFileSync('node', [BIN, 'profile', '--help'], { encoding: 'utf8' });
 });
+
+// C5 — profileFromStates must surface cross-agent disagreement even when
+// the current `agentic update` invocation targets only one agent.
+// Pre-fix the disagreement was silently masked because profileFromStates
+// inspected only the narrowed slice; B2 routed the full statesByAgent.
+test('agentic update --agent claude-code rejects when codex state has a different profile (B2 v0.11.3)', () => {
+  const dir = mkScratch();
+  try {
+    // Init both agents at team profile.
+    execFileSync('node', [BIN, 'init', '--agent', 'both', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    // Tamper with codex state to declare a different profile (poc),
+    // simulating the user/team that ran `agentic profile set` for codex
+    // only or hand-edited the file.
+    const codexState = loadState(dir, 'codex');
+    codexState.profile = 'poc';
+    saveState(dir, 'codex', codexState);
+
+    // Update --agent claude-code only must still detect the cross-agent
+    // disagreement and fail loudly. Pre-fix it would silently update
+    // claude-code under team profile while codex stayed at poc.
+    let stderr = '';
+    try {
+      execFileSync(
+        'node',
+        [BIN, 'update', '--agent', 'claude-code', '--yes'],
+        {
+          cwd: dir,
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'pipe'],
+        }
+      );
+      assert.fail('agentic update should have rejected mismatched profiles');
+    } catch (err) {
+      stderr = err.stderr ?? '';
+    }
+    assert.match(
+      stderr,
+      /state files disagree on profile/,
+      'cross-agent profile disagreement must surface even when --agent narrows'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// C6 — agentic profile set <name> end-to-end must capture the second
+// positional and route through update so the install set matches the
+// new profile. Pre-fix Commander silently dropped the positional and
+// `opts.name` was undefined, producing the misleading error message
+// the user saw when they followed the documented usage.
+test('agentic profile <name> shorthand sets the profile end-to-end (C6 v0.11.3)', () => {
+  const dir = mkScratch();
+  try {
+    // Init at team profile.
+    execFileSync('node', [BIN, 'init', '--agent', 'claude-code', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    assert.equal(loadState(dir, 'claude-code').profile, 'team');
+
+    // Set to poc via the shorthand `agentic profile <name>` form.
+    execFileSync('node', [BIN, 'profile', 'poc', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    // State file must record the new profile.
+    assert.equal(loadState(dir, 'claude-code').profile, 'poc');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('agentic profile set <name> two-positional form sets the profile end-to-end (C1 v0.11.3)', () => {
+  const dir = mkScratch();
+  try {
+    execFileSync('node', [BIN, 'init', '--agent', 'claude-code', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    assert.equal(loadState(dir, 'claude-code').profile, 'team');
+
+    // The form documented in the error message: `agentic profile set <name>`.
+    // Pre-fix Commander dropped the second positional and the form failed.
+    execFileSync('node', [BIN, 'profile', 'set', 'solo', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    assert.equal(loadState(dir, 'claude-code').profile, 'solo');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
