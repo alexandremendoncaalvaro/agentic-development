@@ -112,6 +112,16 @@ test('agentic-next is universal in every profile (navigation aid is broadly valu
   }
 });
 
+test('agentic-spike is universal in every profile (technique uncertainty arises at every maturity)', () => {
+  for (const name of PROFILE_NAMES) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-spike'),
+      `profile ${name} must include agentic-spike in its universal set per ADR-0017`
+    );
+  }
+});
+
 test('init --profile poc installs only the poc universal set', () => {
   const dir = mkScratch();
   try {

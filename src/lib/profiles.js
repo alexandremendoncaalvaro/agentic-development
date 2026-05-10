@@ -20,7 +20,7 @@ export const PROFILE_NAMES = ['poc', 'solo', 'team', 'mature'];
 
 export const PROFILES = {
   poc: {
-    universal: ['agentic-philosophy', 'agentic-ground', 'agentic-audit', 'agentic-next'],
+    universal: ['agentic-philosophy', 'agentic-ground', 'agentic-audit', 'agentic-next', 'agentic-spike'],
     conditional: {
       'agentic-design': 'blocked',
       'agentic-subagent': 'blocked',
@@ -35,6 +35,7 @@ export const PROFILES = {
       'agentic-ground',
       'agentic-audit',
       'agentic-next',
+      'agentic-spike',
       'agentic-bootstrap',
       'agentic-spec',
       'agentic-task',
@@ -62,6 +63,7 @@ export const PROFILES = {
       'agentic-review',
       'agentic-ground',
       'agentic-next',
+      'agentic-spike',
     ],
     conditional: {
       'agentic-design': 'frontend',
@@ -83,6 +85,7 @@ export const PROFILES = {
       'agentic-review',
       'agentic-ground',
       'agentic-next',
+      'agentic-spike',
     ],
     conditional: {
       'agentic-design': 'frontend',
