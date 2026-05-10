@@ -72,7 +72,7 @@ Comments are exceptions. They justify *why* a non-obvious choice was made — ne
 
 ### Documentation Discipline
 
-The agent's authoritative copy of the eight-rule documentation discipline lives in the `agentic-philosophy` skill (`Documentation Discipline` section). The rules are summarized below for reference; the skill carries the full text agents read at session time. ADR-0008 records the canonical decision and the reconciliations against ADR-0004 (file-based task tracking) and ADR-0005 (universal agent behavior as a skill).
+The agent's authoritative copy of the eight-rule documentation discipline lives in the `ad-philosophy` skill (`Documentation Discipline` section). The rules are summarized below for reference; the skill carries the full text agents read at session time. ADR-0008 records the canonical decision and the reconciliations against ADR-0004 (file-based task tracking) and ADR-0005 (universal agent behavior as a skill).
 
 1. **Definitions and decisions only.** No speculation, history, or unfounded plans.
 2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/` are exempt — their lifecycle fields are the auditability primitive.
@@ -83,7 +83,7 @@ The agent's authoritative copy of the eight-rule documentation discipline lives 
 7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a GitHub Issue or a `doc/tasks/NNNN-*.md` task.
 8. **Tests are living documentation of behavior.**
 
-The skill body explains the rationale per rule, lists the failure modes the rules counter (bloated `AGENTS.md`, README pages drifting into changelogs, decision artifacts diluted by speculation), and walks through the reconciliations. Generator skills (`agentic-bootstrap`, `agentic-architecture`, `agentic-spec`, `agentic-task`, `agentic-adr`, `agentic-design`) reject violations of these rules at write time; `agentic-audit` flags drift across narrative docs and decision-record artifacts on demand.
+The skill body explains the rationale per rule, lists the failure modes the rules counter (bloated `AGENTS.md`, README pages drifting into changelogs, decision artifacts diluted by speculation), and walks through the reconciliations. Generator skills (`ad-bootstrap`, `ad-architecture`, `ad-spec`, `ad-task`, `ad-adr`, `ad-design`) reject violations of these rules at write time; `ad-audit` flags drift across narrative docs and decision-record artifacts on demand.
 
 ## 3. Format by Evidence
 
@@ -102,7 +102,7 @@ No format is universally best. **An observation from my practice, not benchmarke
 
 ## 4–5. Research Before Implementation
 
-Combines Find the Happy Path (canonical / idiomatic baseline) and Ground in Real Patterns (anchoring in project-specific examples). The kit treats both as one indivisible flow via `agentic-ground`; two prose sections would frame one operation as two separate practices.
+Combines Find the Happy Path (canonical / idiomatic baseline) and Ground in Real Patterns (anchoring in project-specific examples). The kit treats both as one indivisible flow via `ad-ground`; two prose sections would frame one operation as two separate practices.
 
 Two sub-practices, joined into one indivisible pass.
 
@@ -110,7 +110,7 @@ Two sub-practices, joined into one indivisible pass.
 
 **Ground in real patterns.** Don't dump the codebase into context. Anchor the model in a specific, project-relevant example: *"Find an existing example of [similar feature]; use that exact structure."* Cite specific files, not "the codebase." Use just-in-time retrieval — pass paths or IDs and let the agent fetch via tools.
 
-The kit ships `agentic-ground` as the workflow-operational implementation of both. It runs a four-source research pass — official docs, validated open-source examples, in-repo patterns, git history — joined by AND not OR, synthesizes the happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written. Splitting the two sub-practices into separate skills would force two invocations with overlapping research outputs and fragment the synthesis context (ADR-0010).
+The kit ships `ad-ground` as the workflow-operational implementation of both. It runs a four-source research pass — official docs, validated open-source examples, in-repo patterns, git history — joined by AND not OR, synthesizes the happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written. Splitting the two sub-practices into separate skills would force two invocations with overlapping research outputs and fragment the synthesis context (ADR-0010).
 
 ## 6. Explore → Plan → Implement → Commit
 
@@ -159,7 +159,7 @@ Three principles fall out of those terms:
 - **The interface is the test surface.** Callers and tests cross the same seam. If you want to test *past* the interface, the module is probably the wrong shape.
 - **One adapter is a hypothetical seam; two adapters make it real.** Don't introduce a seam unless something actually varies across it.
 
-Skills that touch architecture (`agentic-architecture`, `agentic-adr`, the planned `agentic-deepen`) use these terms verbatim, so suggestions and reviews land in a single language.
+Skills that touch architecture (`ad-architecture`, `ad-adr`, the planned `ad-deepen`) use these terms verbatim, so suggestions and reviews land in a single language.
 
 ## 9. Outcome-Based Prompting (TDG)
 
@@ -230,7 +230,7 @@ This is a combination of established practices, not new terminology: spike (XP),
 
 ## 15. Diagnose With Discipline
 
-For hard bugs and performance regressions, the failure mode is jumping to hypotheses before there is a way to check them. The discipline below is the counter; it owes its shape to standard debugging practice (Kernighan & Pike, *The Practice of Programming*, 1999) and the kit ships `agentic-diagnose` as the operational implementation (ADR-0021).
+For hard bugs and performance regressions, the failure mode is jumping to hypotheses before there is a way to check them. The discipline below is the counter; it owes its shape to standard debugging practice (Kernighan & Pike, *The Practice of Programming*, 1999) and the kit ships `ad-diagnose` as the operational implementation (ADR-0021).
 
 ### Phase 1 — Build a feedback loop
 
