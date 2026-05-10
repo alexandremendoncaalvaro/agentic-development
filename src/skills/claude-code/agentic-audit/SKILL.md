@@ -74,3 +74,10 @@ If something the user says contradicts what the code shows, surface the conflict
 ## Output contract
 
 A drift list, no file written. Read-only operation. Empty result is reported explicitly ("no drift found across audited artifacts"), not silently. Missing artifacts are flagged, not skipped.
+
+## Next
+
+- Address each finding with one of the three resolutions named in the format ("change spec / change code / discuss").
+- For findings that require implementation: `/agentic-task` to scaffold the fix.
+- For workflow drift (where am I, what's stuck): `/agentic-next`.
+- For kit-version drift (state file behind current kit): `agentic update`.

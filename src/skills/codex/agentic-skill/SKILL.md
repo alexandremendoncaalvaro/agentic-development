@@ -40,3 +40,9 @@ Step 4 — stop after writing. Do not invoke the new skill, do not pre-fill it w
 <output_contract>
 A single new `SKILL.md` at the chosen path (plus `agents/openai.yaml` for Codex). Frontmatter declares only the fields actually used. Body is imperative and terse. No external file dependencies the user did not ask for.
 </output_contract>
+
+## Next
+
+- Test the new skill's description triggers by invoking it from a real conversation — verify auto-triggering on the keywords you chose.
+- If the skill is meant to be universal across the kit's profiles, propose an ADR + Task to add it to the profile catalog (`src/lib/profiles.js`).
+- If the skill carries a sibling subagent, declare it in `manifest.json` and add the source under `agents/`.

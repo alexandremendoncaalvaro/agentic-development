@@ -105,3 +105,10 @@ Task files are decision-record artifacts and are **exempt** from the no-dates ru
 - One scope: one task per file. If the user's request implies multiple deliverables, ask which to write first; the others become follow-up tasks.
 - No speculation. Acceptance criteria must be measurable; do not list aspirational items ("loads in under 2s", not "fast enough").
 - `Notes` is append-only and dated per entry — that is the auditability primitive, not a violation of Rule 2.
+
+## Next
+
+- Implement. Toggle Acceptance Criteria checkboxes and append to `Notes` as work lands.
+- `/agentic-review main..HEAD` (or current scope) before merge — the task DoD requires a fresh-context §10 review.
+- Flip Status to `done` once every Acceptance Criterion and Definition-of-Done item is checked.
+- If the task implements a spec, the spec's `Related → Tasks` list should reciprocate the link.
