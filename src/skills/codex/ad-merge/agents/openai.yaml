@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-merge
+  short_description: Evaluate and merge a GitHub PR per ADR-0025. Four phases — preflight, evaluate (CI / review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`. Helper posture, not blocker.
+policy:
+  allow_implicit_invocation: false

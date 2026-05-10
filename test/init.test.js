@@ -32,7 +32,7 @@ test('init --agent claude-code on greenfield → installs Claude skill', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code']);
-    assert.ok(existsSync(join(dir, '.claude/skills/agentic-bootstrap/SKILL.md')));
+    assert.ok(existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')));
     assert.ok(!existsSync(join(dir, '.agents')));
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -44,9 +44,9 @@ test('init --agent codex on brownfield → installs Codex skill + openai.yaml', 
   try {
     writeFileSync(join(dir, 'package.json'), '{"name":"x"}\n');
     runInit(dir, ['--agent', 'codex']);
-    assert.ok(existsSync(join(dir, '.agents/skills/agentic-bootstrap/SKILL.md')));
+    assert.ok(existsSync(join(dir, '.agents/skills/ad-bootstrap/SKILL.md')));
     assert.ok(
-      existsSync(join(dir, '.agents/skills/agentic-bootstrap/agents/openai.yaml'))
+      existsSync(join(dir, '.agents/skills/ad-bootstrap/agents/openai.yaml'))
     );
     assert.ok(!existsSync(join(dir, '.claude')));
   } finally {
@@ -58,10 +58,10 @@ test('init --agent both → installs into both .claude and .agents', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'both']);
-    assert.ok(existsSync(join(dir, '.claude/skills/agentic-bootstrap/SKILL.md')));
-    assert.ok(existsSync(join(dir, '.agents/skills/agentic-bootstrap/SKILL.md')));
+    assert.ok(existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')));
+    assert.ok(existsSync(join(dir, '.agents/skills/ad-bootstrap/SKILL.md')));
     assert.ok(
-      existsSync(join(dir, '.agents/skills/agentic-bootstrap/agents/openai.yaml'))
+      existsSync(join(dir, '.agents/skills/ad-bootstrap/agents/openai.yaml'))
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -69,25 +69,25 @@ test('init --agent both → installs into both .claude and .agents', () => {
 });
 
 const UNIVERSAL_SKILLS = [
-  'agentic-bootstrap',
-  'agentic-philosophy',
-  'agentic-architecture',
-  'agentic-adr',
-  'agentic-spec',
-  'agentic-task',
-  'agentic-audit',
-  'agentic-review',
-  'agentic-ground',
-  'agentic-next',
-  'agentic-spike',
-  'agentic-tdg',
-  'agentic-domain',
-  'agentic-grill',
-  'agentic-deepen',
-  'agentic-diagnose',
-  'agentic-commit',
-  'agentic-pr',
-  'agentic-merge',
+  'ad-bootstrap',
+  'ad-philosophy',
+  'ad-architecture',
+  'ad-adr',
+  'ad-spec',
+  'ad-task',
+  'ad-audit',
+  'ad-review',
+  'ad-ground',
+  'ad-next',
+  'ad-spike',
+  'ad-tdg',
+  'ad-domain',
+  'ad-grill',
+  'ad-deepen',
+  'ad-diagnose',
+  'ad-commit',
+  'ad-pr',
+  'ad-merge',
 ];
 
 test('init --agent both → installs the full universal skill set for both agents', () => {
@@ -129,7 +129,7 @@ test('init --agent claude-code → installs every universal skill (Claude only)'
   }
 });
 
-test('init --agent claude-code → installs the agentic-review subagent at .claude/agents/', () => {
+test('init --agent claude-code → installs the ad-review subagent at .claude/agents/', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code']);
@@ -138,7 +138,7 @@ test('init --agent claude-code → installs the agentic-review subagent at .clau
       'fresh-context-reviewer subagent must land at .claude/agents/'
     );
     assert.ok(
-      !existsSync(join(dir, '.claude/skills/agentic-review/agents')),
+      !existsSync(join(dir, '.claude/skills/ad-review/agents')),
       'subagent must not duplicate inside the skill dir'
     );
   } finally {
@@ -151,11 +151,11 @@ test('init: re-running on installed project is idempotent', () => {
   try {
     runInit(dir, ['--agent', 'claude-code']);
     const before = readFileSync(
-      join(dir, '.claude/skills/agentic-bootstrap/SKILL.md')
+      join(dir, '.claude/skills/ad-bootstrap/SKILL.md')
     );
     runInit(dir, ['--agent', 'claude-code']);
     const after = readFileSync(
-      join(dir, '.claude/skills/agentic-bootstrap/SKILL.md')
+      join(dir, '.claude/skills/ad-bootstrap/SKILL.md')
     );
     assert.ok(before.equals(after), 'SKILL.md must be byte-identical after re-run');
   } finally {
@@ -163,49 +163,49 @@ test('init: re-running on installed project is idempotent', () => {
   }
 });
 
-test('init --agent claude-code on greenfield → installs agentic-subagent (Claude only); no agentic-design (no frontend); no agentic-skill (opt-in only)', () => {
+test('init --agent claude-code on greenfield → installs ad-subagent (Claude only); no ad-design (no frontend); no ad-skill (opt-in only)', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code']);
     assert.ok(
-      existsSync(join(dir, '.claude/skills/agentic-subagent/SKILL.md')),
-      'agentic-subagent must auto-install for Claude Code'
+      existsSync(join(dir, '.claude/skills/ad-subagent/SKILL.md')),
+      'ad-subagent must auto-install for Claude Code'
     );
     assert.ok(
-      !existsSync(join(dir, '.claude/skills/agentic-design')),
-      'agentic-design must NOT install without frontend signal'
+      !existsSync(join(dir, '.claude/skills/ad-design')),
+      'ad-design must NOT install without frontend signal'
     );
     assert.ok(
-      !existsSync(join(dir, '.claude/skills/agentic-skill')),
-      'agentic-skill must NOT auto-install (opt-in only)'
+      !existsSync(join(dir, '.claude/skills/ad-skill')),
+      'ad-skill must NOT auto-install (opt-in only)'
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('init --agent codex on greenfield → no agentic-subagent (Claude-only source), no agentic-design, no agentic-skill', () => {
+test('init --agent codex on greenfield → no ad-subagent (Claude-only source), no ad-design, no ad-skill', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'codex']);
     assert.ok(
-      !existsSync(join(dir, '.agents/skills/agentic-subagent')),
-      'agentic-subagent must NOT install for Codex (no source)'
+      !existsSync(join(dir, '.agents/skills/ad-subagent')),
+      'ad-subagent must NOT install for Codex (no source)'
     );
     assert.ok(
-      !existsSync(join(dir, '.agents/skills/agentic-design')),
-      'agentic-design must NOT install without frontend signal'
+      !existsSync(join(dir, '.agents/skills/ad-design')),
+      'ad-design must NOT install without frontend signal'
     );
     assert.ok(
-      !existsSync(join(dir, '.agents/skills/agentic-skill')),
-      'agentic-skill must NOT auto-install (opt-in only)'
+      !existsSync(join(dir, '.agents/skills/ad-skill')),
+      'ad-skill must NOT auto-install (opt-in only)'
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('init --agent both on a frontend project → installs agentic-design for both agents; agentic-subagent for Claude only', () => {
+test('init --agent both on a frontend project → installs ad-design for both agents; ad-subagent for Claude only', () => {
   const dir = mkScratch();
   try {
     writeFileSync(
@@ -214,31 +214,31 @@ test('init --agent both on a frontend project → installs agentic-design for bo
     );
     runInit(dir, ['--agent', 'both']);
     assert.ok(
-      existsSync(join(dir, '.claude/skills/agentic-design/SKILL.md')),
-      'agentic-design must auto-install for Claude when frontend detected'
+      existsSync(join(dir, '.claude/skills/ad-design/SKILL.md')),
+      'ad-design must auto-install for Claude when frontend detected'
     );
     assert.ok(
-      existsSync(join(dir, '.agents/skills/agentic-design/SKILL.md')),
-      'agentic-design must auto-install for Codex when frontend detected'
+      existsSync(join(dir, '.agents/skills/ad-design/SKILL.md')),
+      'ad-design must auto-install for Codex when frontend detected'
     );
     assert.ok(
-      existsSync(join(dir, '.agents/skills/agentic-design/agents/openai.yaml')),
-      'agentic-design Codex openai.yaml must land'
+      existsSync(join(dir, '.agents/skills/ad-design/agents/openai.yaml')),
+      'ad-design Codex openai.yaml must land'
     );
     assert.ok(
-      existsSync(join(dir, '.claude/skills/agentic-subagent/SKILL.md')),
-      'agentic-subagent must auto-install for Claude'
+      existsSync(join(dir, '.claude/skills/ad-subagent/SKILL.md')),
+      'ad-subagent must auto-install for Claude'
     );
     assert.ok(
-      !existsSync(join(dir, '.agents/skills/agentic-subagent')),
-      'agentic-subagent must NOT install for Codex'
+      !existsSync(join(dir, '.agents/skills/ad-subagent')),
+      'ad-subagent must NOT install for Codex'
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('init --agent claude-code on a backend project → no agentic-design (no frontend signal), still installs agentic-subagent', () => {
+test('init --agent claude-code on a backend project → no ad-design (no frontend signal), still installs ad-subagent', () => {
   const dir = mkScratch();
   try {
     writeFileSync(
@@ -247,12 +247,12 @@ test('init --agent claude-code on a backend project → no agentic-design (no fr
     );
     runInit(dir, ['--agent', 'claude-code']);
     assert.ok(
-      !existsSync(join(dir, '.claude/skills/agentic-design')),
-      'agentic-design must NOT install for backend project'
+      !existsSync(join(dir, '.claude/skills/ad-design')),
+      'ad-design must NOT install for backend project'
     );
     assert.ok(
-      existsSync(join(dir, '.claude/skills/agentic-subagent/SKILL.md')),
-      'agentic-subagent must still install for Claude'
+      existsSync(join(dir, '.claude/skills/ad-subagent/SKILL.md')),
+      'ad-subagent must still install for Claude'
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });

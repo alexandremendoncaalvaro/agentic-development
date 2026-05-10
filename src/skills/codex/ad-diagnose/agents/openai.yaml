@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-diagnose
+  short_description: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test. Implements ADR-0021.
+policy:
+  allow_implicit_invocation: false
