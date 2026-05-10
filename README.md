@@ -244,11 +244,11 @@ your-project/
 │   └── reviews/                (gitignored — ephemeral §10 review handoffs)
 ├── .claude/                    (Claude Code targets)
 │   ├── agentic-state.json      (kit install state — committed)
-│   ├── skills/agentic-*/SKILL.md
+│   ├── skills/ad-*/SKILL.md
 │   └── agents/fresh-context-reviewer.md
 └── .agents/                    (Codex targets, cc-sdd convention)
     ├── agentic-state.json      (kit install state — committed)
-    └── skills/agentic-*/{SKILL.md, agents/openai.yaml}
+    └── skills/ad-*/{SKILL.md, agents/openai.yaml}
 ```
 
 The pattern matches how [GitHub's spec-kit](https://github.com/github/spec-kit) and [cookiecutter](https://cookiecutter.readthedocs.io/) handle distribution — templates in one place, outputs in another, never mixed.

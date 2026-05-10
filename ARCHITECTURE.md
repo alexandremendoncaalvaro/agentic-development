@@ -43,7 +43,7 @@ Boundary rule: only `src/lib/install.js` resolves `KIT_ROOT`-rooted paths (`impo
 * ES modules (`"type": "module"` in `package.json`). Built-in imports use the `node:` prefix (`node:fs`, `node:path`, `node:url`).
 * Files: kebab-case (`init.js`, `detect.js`, `install.js`, `rootdoc.js`).
 * Exports: camelCase functions (`detectMode`, `detectAgents`, `detectFeatures`, `installSkills`, `updateRootDoc`, `initCommand`).
-* Skill names: `agentic-<verb-or-noun>` (`ad-bootstrap`, `ad-architecture`, `ad-review`).
+* Skill names: `ad-<verb-or-noun>` (`ad-bootstrap`, `ad-architecture`, `ad-review`) per [ADR-0026](doc/adr/0026-slash-command-rename-ad-prefix.md). Historical skills under closed ADRs / tasks may reference the pre-rename `agentic-<verb-or-noun>` prefix.
 * Agent values: lowercase strings (`'claude-code' | 'codex' | 'both'`).
 
 ## Observability
@@ -87,3 +87,4 @@ Currently-binding decisions. Link each to `doc/adr/`.
 * [ADR-0023](doc/adr/0023-agentic-commit-skill.md) — Workflow-operational skill `ad-commit` for atomic Conventional Commits with DCO sign-off
 * [ADR-0024](doc/adr/0024-agentic-pr-skill.md) — Workflow-operational skill `ad-pr` for opening pull requests with uniform body shape
 * [ADR-0025](doc/adr/0025-agentic-merge-skill.md) — Workflow-operational skill `ad-merge` for evaluating and merging pull requests
+* [ADR-0026](doc/adr/0026-slash-command-rename-ad-prefix.md) — Slash-command prefix rename `agentic-` → `ad-` across all 23 skills (ergonomics)

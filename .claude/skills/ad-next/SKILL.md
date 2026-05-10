@@ -85,7 +85,7 @@ If nothing actionable surfaces, say so explicitly — empty output is real signa
 
 Apply per-profile rules at the end so the user sees output matched to their maturity:
 
-- **`poc`:** suppress Layer 3 (specs) and Layer 4 (ADRs / tasks) sections entirely if those directories do not exist. Show Layer 1 + Layer 2 + Layer 5 only. Layer 2 (Domain) renders informationally — `CONTEXT.md` missing is *not* a finding at `poc` (the file is lazy-created when the first term is resolved). Recommendation set: `/ad-ground` for research, `/ad-audit` for drift, `/agentic-update` for staleness.
+- **`poc`:** suppress Layer 3 (specs) and Layer 4 (ADRs / tasks) sections entirely if those directories do not exist. Show Layer 1 + Layer 2 + Layer 5 only. Layer 2 (Domain) renders informationally — `CONTEXT.md` missing is *not* a finding at `poc` (the file is lazy-created when the first term is resolved). Recommendation set: `/ad-ground` for research, `/ad-audit` for drift, `agentic update` for staleness.
 - **`solo`:** Layer 3 / Layer 4 render but ADR / `ARCHITECTURE.md` absence is informational — no "needs action" flag. Specs are universal at this profile; spec-without-tasks remains a real finding. Layer 2 — same lazy-creation rule as `poc`.
 - **`team`:** full survey. Default profile.
 - **`mature`:** additionally flag hooks-not-wired louder ("WORKFLOW §11 binding for `mature` profile — `/ad-hooks` recommended").
@@ -121,6 +121,6 @@ A single Markdown message structured as:
 ...
 ```
 
-No file written. No state mutation. Recommendations are advisory; the user decides whether to invoke. Cross-references `ad-audit` (drift detection), `agentic-update` (kit drift), `agentic-profile` (profile changes) where they apply.
+No file written. No state mutation. Recommendations are advisory; the user decides whether to invoke. Cross-references `ad-audit` (drift detection), `agentic update` (kit drift — CLI subcommand, not a skill), `agentic profile` (profile changes — CLI subcommand, not a skill) where they apply.
 
 When the host exposes `AskUserQuestion` (per ADR-0014) and the user follows up with a confirmation question after seeing the recommendations, prefer the structured prompt over inline text.
