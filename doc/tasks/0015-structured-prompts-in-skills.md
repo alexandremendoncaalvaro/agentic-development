@@ -1,6 +1,6 @@
 # Task `0015`: Adopt structured prompts in skills (v0.9.0-beta.1)
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-05-09
 **Owner:** Alexandre Alvaro
 **Spec ref:**
@@ -12,27 +12,27 @@ The Phase 2 holistic coherence review identified that skill confirmation gates a
 
 ## Acceptance Criteria
 
-- [ ] [`doc/adr/0014-structured-prompts-when-host-supports-them.md`](../adr/0014-structured-prompts-when-host-supports-them.md) exists, status `accepted`, with the soft-preference posture and the host-asymmetry documentation.
-- [ ] Interview-heavy Claude Code skills updated with the `AskUserQuestion` instruction: [`agentic-spec`](../../src/skills/claude-code/agentic-spec/SKILL.md), [`agentic-task`](../../src/skills/claude-code/agentic-task/SKILL.md), [`agentic-adr`](../../src/skills/claude-code/agentic-adr/SKILL.md).
-- [ ] Confirmation-heavy Claude Code skills updated: [`agentic-review`](../../src/skills/claude-code/agentic-review/SKILL.md) (scope-confirmation step), [`agentic-ground`](../../src/skills/claude-code/agentic-ground/SKILL.md) (confidence checkpoint).
-- [ ] Heavy-output generators gain optional Plan Mode reference: [`agentic-bootstrap`](../../src/skills/claude-code/agentic-bootstrap/SKILL.md), [`agentic-architecture`](../../src/skills/claude-code/agentic-architecture/SKILL.md).
-- [ ] Codex variants untouched (no equivalent primitive; existing asymmetry documentation suffices).
-- [ ] Dogfood install in this repo refreshed via `node bin/agentic.js update --yes`.
-- [ ] [`package.json`](../../package.json) bumped to `0.9.0-beta.1`.
-- [ ] `npm test` passes.
+- [x] [`doc/adr/0014-structured-prompts-when-host-supports-them.md`](../adr/0014-structured-prompts-when-host-supports-them.md) exists, status `accepted`, with the soft-preference posture and the host-asymmetry documentation.
+- [x] Interview-heavy Claude Code skills updated with the `AskUserQuestion` instruction: [`agentic-spec`](../../src/skills/claude-code/agentic-spec/SKILL.md), [`agentic-task`](../../src/skills/claude-code/agentic-task/SKILL.md), [`agentic-adr`](../../src/skills/claude-code/agentic-adr/SKILL.md).
+- [x] Confirmation-heavy Claude Code skills updated: [`agentic-review`](../../src/skills/claude-code/agentic-review/SKILL.md) (scope-confirmation step), [`agentic-ground`](../../src/skills/claude-code/agentic-ground/SKILL.md) (confidence checkpoint).
+- [x] Heavy-output generators gain optional Plan Mode reference: [`agentic-bootstrap`](../../src/skills/claude-code/agentic-bootstrap/SKILL.md), [`agentic-architecture`](../../src/skills/claude-code/agentic-architecture/SKILL.md).
+- [x] Codex variants untouched (no equivalent primitive; existing asymmetry documentation suffices).
+- [x] Dogfood install in this repo refreshed via `node bin/agentic.js update --yes`.
+- [x] [`package.json`](../../package.json) bumped to `0.9.0-beta.1`.
+- [x] `npm test` passes.
 
 ## Plan
 
 - [x] Branch `feat/v0.9.0-structured-ux` cut from `cli`.
 - [x] Write [`doc/adr/0014-structured-prompts-when-host-supports-them.md`](../adr/0014-structured-prompts-when-host-supports-them.md) in status `accepted`.
 - [x] Write this task file.
-- [ ] Add `AskUserQuestion` instruction block to interview-heavy skills (spec, task, adr).
-- [ ] Add `AskUserQuestion` instruction block to confirmation-heavy skills (review, ground).
-- [ ] Add Plan Mode opt-in note to heavy-output skills (bootstrap, architecture).
-- [ ] Run `node bin/agentic.js update --yes` to refresh dogfood install.
-- [ ] Bump version in [`package.json`](../../package.json).
-- [ ] Run `npm test`. Fix anything that drifted.
-- [ ] Atomic commits + PR + merge to `cli`; tag `v0.9.0-beta.1`; `npm publish --tag beta`; smoke verify.
+- [x] Add `AskUserQuestion` instruction block to interview-heavy skills (spec, task, adr).
+- [x] Add `AskUserQuestion` instruction block to confirmation-heavy skills (review, ground).
+- [x] Add Plan Mode opt-in note to heavy-output skills (bootstrap, architecture).
+- [x] Run `node bin/agentic.js update --yes` to refresh dogfood install.
+- [x] Bump version in [`package.json`](../../package.json).
+- [x] Run `npm test`. Fix anything that drifted.
+- [x] Atomic commits + PR + merge to `cli`; tag `v0.9.0-beta.1`; `npm publish --tag beta`; smoke verify.
 
 ## Notes
 
@@ -47,13 +47,17 @@ Decision sequence with the user (U1–U4):
 - U3: Plan Mode opt-in for spec-driven generators (bootstrap, architecture); not universal — small interactive writes don't benefit.
 - U4: Codex parity asymmetric, documented per skill. No Codex changes.
 
+### 2026-05-09 — close-out (v0.9.0-beta.1)
+
+Shipped in v0.9.0-beta.1. Close-out flipped retroactively after `/agentic-next` surfaced this task as in-progress despite the v0.9.0 release. ADR-0014 + Task 0015 + interview-heavy skills updated (spec, task, adr) + confirmation-heavy skills updated (review, ground) + Plan Mode opt-in note in heavy-output generators (bootstrap, architecture) all landed; Codex variants unchanged per the documented host asymmetry. 126/126 tests green at the time of release.
+
 The instruction is a soft preference. The skill body words it prescriptively ("use it when available") so the agent picks the structured tool by default, but the actual rendering is the agent's call at runtime.
 
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
