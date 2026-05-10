@@ -10,7 +10,7 @@ The CLI installs nineteen universal skills at the default `team` profile (`ad-bo
 
 An agentic coding tool that reads markdown files. Examples here use **Claude Code** and **Codex CLI** (primary tools the author uses); the kit also works with [Antigravity](https://antigravity.google), [Gemini CLI](https://github.com/google-gemini/gemini-cli), Cursor, Continue, Aider, and any other tool that follows the [agents.md](https://agents.md) open standard.
 
-For the CLI path: Node.js 18+. The CLI is the recommended path. Paste-into-agent prompts (see [Manual prompts](#manual-prompts) below) remain as an alternative for users who don't want to run an installer — same artifacts, same patterns.
+For the CLI path: Node.js 20+ (Node 18 is past EOL and `@clack/prompts` 1.x requires `node:util` `styleText`, which only ships in Node 20+). The CLI is the recommended path. Paste-into-agent prompts (see [Manual prompts](#manual-prompts) below) remain as an alternative for users who don't want to run an installer — same artifacts, same patterns.
 
 For the philosophy and full reasoning behind the kit, see [WORKFLOW.md](WORKFLOW.md).
 
