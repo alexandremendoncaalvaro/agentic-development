@@ -14,10 +14,8 @@
 # are introduced (own ADR + Task per ADR-0007 §6 scrutiny rule).
 #
 # Bootstrap: `lefthook install` (one-time, after cloning the repo).
-# Bypass policy per WORKFLOW §11 — no `--no-verify`. CI follow-up
-# is documented in AGENTS.md Quality Gates; the workflow file
-# (`.github/workflows/test.yml`) lands once gh OAuth `workflow` scope
-# is granted to the publishing token.
+# Bypass policy per WORKFLOW §11 — no `--no-verify`. CI mirrors this
+# gate in `.github/workflows/test.yml` across Node 18 / 20 / 22.
 
 pre-push:
   parallel: false
