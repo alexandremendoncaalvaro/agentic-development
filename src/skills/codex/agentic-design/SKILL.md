@@ -53,3 +53,9 @@ A single `DESIGN.md` at the repo root. YAML frontmatter uses W3C `$value`/`$type
 - One scope: visual contract. Component anatomy and interaction patterns live elsewhere; link, do not copy.
 - No speculation. If a group has no source token, mark `<TODO: not yet wired>` and move on.
 </output_contract>
+
+## Next
+
+- `/agentic-spec` for any feature whose scope touches the visual contract this document records.
+- `/agentic-audit` (DESIGN.md drift category) periodically when tokens change in the source.
+- `/agentic-adr` for binding visual decisions worth recording as architectural commitments.

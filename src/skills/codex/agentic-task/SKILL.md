@@ -89,3 +89,10 @@ Task files are decision-record artifacts and are exempt from the no-dates rule (
 - No speculation. Acceptance criteria must be measurable; do not list aspirational items.
 - `Notes` is append-only and dated per entry — that is the auditability primitive, not a violation of Rule 2.
 </output_contract>
+
+## Next
+
+- Implement. Toggle Acceptance Criteria checkboxes and append to `Notes` as work lands.
+- `/agentic-review main..HEAD` (or current scope) before merge — the task DoD requires a fresh-context §10 review.
+- Flip Status to `done` once every Acceptance Criterion and Definition-of-Done item is checked.
+- If the task implements a spec, the spec's `Related → Tasks` list should reciprocate the link.

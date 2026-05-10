@@ -75,3 +75,10 @@ Do not proceed past this point in the current session.
 <output_contract>
 A handoff file at `.agentic/reviews/<ISO-timestamp>-<scope-slug>.md`, plus a short instruction telling the user how to load it into a fresh Codex session via `/clear` and paste. The current session does not produce findings — the fresh session does, after the user re-loads the handoff. This honors WORKFLOW §10 by enforcing context isolation through `/clear` rather than via a subagent primitive Codex lacks; the persisted file replaces the chat-scroll copy step that previously made the round-trip fragile.
 </output_contract>
+
+## Next
+
+- Address every Blocker before merge. Re-run `/agentic-review` on the fix to confirm it cleared.
+- Each Concern becomes a follow-up `/agentic-task`; do not let them silently accumulate.
+- Notes are informational; close them out in the original task's `Notes` log if relevant.
+- Once Blockers are clear: merge per project conventions.
