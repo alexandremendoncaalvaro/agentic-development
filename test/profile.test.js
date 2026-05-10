@@ -122,6 +122,16 @@ test('agentic-spike is universal in every profile (technique uncertainty arises 
   }
 });
 
+test('agentic-tdg is universal in every profile (implementation-strategy uncertainty arises at every maturity)', () => {
+  for (const name of PROFILE_NAMES) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-tdg'),
+      `profile ${name} must include agentic-tdg in its universal set per ADR-0018`
+    );
+  }
+});
+
 test('init --profile poc installs only the poc universal set', () => {
   const dir = mkScratch();
   try {
