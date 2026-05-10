@@ -1,6 +1,6 @@
 # Task `0027`: Ship `agentic-merge` workflow-operational skill
 
-**Status:** proposed
+**Status:** done
 **Created:** 2026-05-10
 **Owner:** Alexandre Alvaro
 **Spec ref:** [ADR-0025](../adr/0025-agentic-merge-skill.md)
@@ -16,35 +16,37 @@ Profile placement: universal at `solo` / `team` / `mature`; not at `poc`.
 
 ## Acceptance Criteria
 
-- [ ] [`src/skills/claude-code/agentic-merge/SKILL.md`](../../src/skills/claude-code/agentic-merge/SKILL.md) — name, allowed-tools `Read, Bash, Grep`, trigger keywords from ADR-0025.
-- [ ] [`src/skills/codex/agentic-merge/{SKILL.md,agents/openai.yaml}`](../../src/skills/codex/agentic-merge/) — Codex parity.
-- [ ] [`src/lib/profiles.js`](../../src/lib/profiles.js) — `agentic-merge` in `solo` / `team` / `mature` `universal` lists.
-- [ ] [`src/commands/init.js`](../../src/commands/init.js) — slashLine summary lists `/agentic-merge` for non-`poc` profiles.
-- [ ] [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) — `SKILL_DESCRIPTIONS` entry.
-- [ ] [`README.md`](../../README.md) — skill table + count refreshed.
-- [ ] Four-phase body per ADR-0025 §2: preflight → evaluate → decision → merge. CI green = hard gate (with explicit user override). Other findings = warnings. Merge mode auto-detected from `gh repo view`; user asked when multiple allowed. `--delete-branch` by default.
-- [ ] Tests: profile-coverage assertion in [test/profile.test.js](../../test/profile.test.js) for `solo` / `team` / `mature` only.
-- [ ] Dogfood install refreshed; skill lands at `.claude/skills/agentic-merge/` and `.agents/skills/agentic-merge/`.
-- [ ] `npm test` passes.
+- [x] [`src/skills/claude-code/agentic-merge/SKILL.md`](../../src/skills/claude-code/agentic-merge/SKILL.md) — name, allowed-tools `Read, Bash, Grep`, trigger keywords from ADR-0025. _Post-rename path: `src/skills/claude-code/ad-merge/SKILL.md` per [ADR-0026](../adr/0026-slash-command-rename-ad-prefix.md)._
+- [x] [`src/skills/codex/agentic-merge/{SKILL.md,agents/openai.yaml}`](../../src/skills/codex/agentic-merge/) — Codex parity. Post-rename: `src/skills/codex/ad-merge/`.
+- [x] [`src/lib/profiles.js`](../../src/lib/profiles.js) — `ad-merge` in `solo` / `team` / `mature` `universal` lists.
+- [x] [`src/commands/init.js`](../../src/commands/init.js) — slashLine summary lists `/ad-merge` for non-`poc` profiles.
+- [x] [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) — `SKILL_DESCRIPTIONS` entry.
+- [x] [`README.md`](../../README.md) — skill table + count refreshed.
+- [x] Four-phase body per ADR-0025 §2: preflight → evaluate → decision → merge. CI green = hard gate (with explicit user override). Other findings = warnings. Merge mode auto-detected from `gh repo view`; user asked when multiple allowed. `--delete-branch` by default.
+- [x] Tests: profile-coverage assertion in [test/profile.test.js](../../test/profile.test.js) for `solo` / `team` / `mature` only.
+- [x] Dogfood install refreshed; skill lands at `.claude/skills/ad-merge/` and `.agents/skills/ad-merge/`.
+- [x] `npm test` passes (179/179 at closure).
 
 ## Plan
 
 - [x] Draft + accept [ADR-0025](../adr/0025-agentic-merge-skill.md).
-- [ ] Implement Claude + Codex skill bodies.
-- [ ] Wire profiles + init + rootdoc + tests.
-- [ ] Dogfood refresh.
+- [x] Implement Claude + Codex skill bodies (commits d4f7227 + post-rename b1e5cc6).
+- [x] Wire profiles + init + rootdoc + tests (commit afabd8c).
+- [x] Dogfood refresh (commits 507483d + b8fa60b).
+- [ ] PR + merge — pending user authorization on the bundled v0.15 PR.
 
 ## Notes
 
 Append-only log. Date each entry. Never rewrite past entries.
 
 - **2026-05-10** — Task opened. Decisions confirmed: CI green hard-gate (user can override loudly); review / linked-task / unresolved comments are warnings; merge mode auto-detected from repo policy; `--delete-branch` by default.
+- **2026-05-10 — Shipped.** Skill source landed in commit d4f7227; wiring in afabd8c; dogfood install in 507483d. Renamed `agentic-merge` → `ad-merge` in commits b1e5cc6 + b8fa60b per [ADR-0026](../adr/0026-slash-command-rename-ad-prefix.md). Pre-rename path preserved in this file's acceptance lines as historical record. Status flipped `proposed` → `done`.
 
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (179/179)
+- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10) — to run on the bundled v0.15 PR
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
