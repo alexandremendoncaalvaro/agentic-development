@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-pr
+  short_description: Open a GitHub pull request with a uniform body shape per ADR-0024. Four phases — preflight, scope assembly, draft body (Summary / Test plan / Links), open + report URL. `gh` CLI soft-fail with install hint.
+policy:
+  allow_implicit_invocation: false

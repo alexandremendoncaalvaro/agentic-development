@@ -67,28 +67,28 @@ export const REQUIRED_SKILLS = requiredSkillsForProfile('team');
  */
 export const CONDITIONAL_SKILLS = [
   {
-    name: 'agentic-design',
+    name: 'ad-design',
     autoIf: (f) => f.frontend,
     agents: ['claude-code', 'codex'],
     hintWhenAuto: 'detected: frontend',
     hintWhenManual: 'frontend / DESIGN.md',
   },
   {
-    name: 'agentic-subagent',
+    name: 'ad-subagent',
     autoIf: () => true,
     agents: ['claude-code'],
     hintWhenAuto: 'Claude Code only',
     hintWhenManual: 'Claude Code only',
   },
   {
-    name: 'agentic-skill',
+    name: 'ad-skill',
     autoIf: () => false,
     agents: ['claude-code', 'codex'],
     hintWhenAuto: 'opt-in',
     hintWhenManual: 'opt-in (rarely needed)',
   },
   {
-    name: 'agentic-hooks',
+    name: 'ad-hooks',
     autoIf: () => false,
     agents: ['claude-code', 'codex'],
     hintWhenAuto: 'opt-in',
@@ -103,14 +103,14 @@ export const CONDITIONAL_SKILLS = [
   // The autoIf rule here is the universal-default; per-profile overrides
   // come from `availableConditionalsForProfile`'s rule field.
   {
-    name: 'agentic-architecture',
+    name: 'ad-architecture',
     autoIf: () => true,
     agents: ['claude-code', 'codex'],
     hintWhenAuto: 'system patterns + boundaries',
     hintWhenManual: 'opt-in (recommended once load-bearing patterns emerge)',
   },
   {
-    name: 'agentic-adr',
+    name: 'ad-adr',
     autoIf: () => true,
     agents: ['claude-code', 'codex'],
     hintWhenAuto: 'binding architectural decisions (Nygard pattern)',
@@ -325,7 +325,7 @@ export async function initCommand(opts) {
     saveState(cwd, agent, nextStates[agent]);
   }
 
-  // Dedup: agentic-architecture and agentic-adr are universal at team /
+  // Dedup: ad-architecture and ad-adr are universal at team /
   // mature (in REQUIRED_SKILLS) AND conditional at solo (in
   // CONDITIONAL_SKILLS) per review B1 (v0.11.3). Without the Set, the
   // managed-skills section would list those rows twice.
@@ -361,38 +361,49 @@ export async function initCommand(opts) {
   if (interactive) {
     p.note(lines.join('\n'), 'Result');
     const slashLine = [
-      '/agentic-bootstrap (AGENTS.md)',
-      '/agentic-architecture (ARCHITECTURE.md)',
-      '/agentic-adr',
-      '/agentic-spec (doc/specs/)',
-      '/agentic-task',
-      '/agentic-audit',
-      '/agentic-review (WORKFLOW §10)',
-      '/agentic-ground (WORKFLOW §4 + §5)',
-      '/agentic-next (state survey + recommendations)',
-      '/agentic-spike (WORKFLOW §14 — staged spike with golden fixtures)',
-      '/agentic-tdg (WORKFLOW §9 — outcome-based prompting + TDM)',
-      ...(optedSkills.includes('agentic-design') ? ['/agentic-design (DESIGN.md)'] : []),
-      ...(optedSkills.includes('agentic-subagent') && agents.includes('claude-code')
-        ? ['/agentic-subagent']
+      '/ad-bootstrap (AGENTS.md)',
+      '/ad-architecture (ARCHITECTURE.md)',
+      '/ad-adr',
+      '/ad-spec (doc/specs/)',
+      '/ad-task',
+      '/ad-audit',
+      '/ad-review (WORKFLOW §10)',
+      '/ad-ground (WORKFLOW §4 + §5)',
+      '/ad-next (state survey + recommendations)',
+      '/ad-spike (WORKFLOW §14 — staged spike with golden fixtures)',
+      '/ad-tdg (WORKFLOW §9 — outcome-based prompting + TDM)',
+      '/ad-domain (CONTEXT.md — Layer 2 ubiquitous language)',
+      '/ad-grill (interview-before-research)',
+      '/ad-deepen (WORKFLOW §8 — deepening opportunities)',
+      '/ad-diagnose (WORKFLOW §15 — five-phase diagnosis)',
+      '/ad-commit (Conventional Commits + DCO sign-off)',
+      '/ad-pr (open PR with uniform body)',
+      '/ad-merge (evaluate + merge PR)',
+      ...(optedSkills.includes('ad-design') ? ['/ad-design (DESIGN.md)'] : []),
+      ...(optedSkills.includes('ad-subagent') && agents.includes('claude-code')
+        ? ['/ad-subagent']
         : []),
-      ...(optedSkills.includes('agentic-skill') ? ['/agentic-skill'] : []),
-      ...(optedSkills.includes('agentic-hooks') ? ['/agentic-hooks (WORKFLOW §11)'] : []),
+      ...(optedSkills.includes('ad-skill') ? ['/ad-skill'] : []),
+      ...(optedSkills.includes('ad-hooks') ? ['/ad-hooks (WORKFLOW §11)'] : []),
     ]
       .filter((line) => {
         // Filter the universal-set entries to only those actually installed
         // for this profile.
         const universalNames = requiredSkillsForProfile(profileName);
         const universalLabels = {
-          'agentic-bootstrap': '/agentic-bootstrap (AGENTS.md)',
-          'agentic-architecture': '/agentic-architecture (ARCHITECTURE.md)',
-          'agentic-adr': '/agentic-adr',
-          'agentic-spec': '/agentic-spec (doc/specs/)',
-          'agentic-task': '/agentic-task',
-          'agentic-audit': '/agentic-audit',
-          'agentic-review': '/agentic-review (WORKFLOW §10)',
-          'agentic-ground': '/agentic-ground (WORKFLOW §4 + §5)',
-          // 'agentic-philosophy' is implicit and not listed.
+          'ad-bootstrap': '/ad-bootstrap (AGENTS.md)',
+          'ad-architecture': '/ad-architecture (ARCHITECTURE.md)',
+          'ad-adr': '/ad-adr',
+          'ad-spec': '/ad-spec (doc/specs/)',
+          'ad-task': '/ad-task',
+          'ad-audit': '/ad-audit',
+          'ad-review': '/ad-review (WORKFLOW §10)',
+          'ad-ground': '/ad-ground (WORKFLOW §4 + §5)',
+          'ad-deepen': '/ad-deepen (WORKFLOW §8 — deepening opportunities)',
+          'ad-commit': '/ad-commit (Conventional Commits + DCO sign-off)',
+          'ad-pr': '/ad-pr (open PR with uniform body)',
+          'ad-merge': '/ad-merge (evaluate + merge PR)',
+          // 'ad-philosophy' is implicit and not listed.
         };
         for (const [skill, label] of Object.entries(universalLabels)) {
           if (line === label) return universalNames.includes(skill);
@@ -403,7 +414,7 @@ export async function initCommand(opts) {
     p.outro(
       `Done (profile: ${profileName}). In ${agents
         .map((a) => AGENT_LABEL[a])
-        .join(' or ')}: ${slashLine}. agentic-philosophy auto-loads on non-trivial work.`
+        .join(' or ')}: ${slashLine}. ad-philosophy auto-loads on non-trivial work.`
     );
   } else {
     for (const line of lines) {

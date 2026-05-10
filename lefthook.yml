@@ -4,9 +4,9 @@
 # minimum justified set for the kit's reality:
 #
 # - pre-push: `npm test` is the deterministic gate every commit pushed
-#   to origin must pass. The 139-test suite covers state, install,
-#   update, profile, frontmatter, and Windows-path regressions; running
-#   it on every push catches regressions before they reach `cli`.
+#   to origin must pass. The unit + integration suite covers state,
+#   install, update, profile, frontmatter, and Windows-path regressions;
+#   running it on every push catches regressions before they reach `cli`.
 #
 # Pre-commit is intentionally minimal — the kit has no lint or
 # formatter wired today (no eslint, prettier, or equivalent). Adding
@@ -14,10 +14,8 @@
 # are introduced (own ADR + Task per ADR-0007 §6 scrutiny rule).
 #
 # Bootstrap: `lefthook install` (one-time, after cloning the repo).
-# Bypass policy per WORKFLOW §11 — no `--no-verify`. CI follow-up
-# is documented in AGENTS.md Quality Gates; the workflow file
-# (`.github/workflows/test.yml`) lands once gh OAuth `workflow` scope
-# is granted to the publishing token.
+# Bypass policy per WORKFLOW §11 — no `--no-verify`. CI mirrors this
+# gate in `.github/workflows/test.yml` across Node 18 / 20 / 22.
 
 pre-push:
   parallel: false

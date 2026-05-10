@@ -14,7 +14,7 @@ function mkScratch() {
   return mkdtempSync(join(tmpdir(), 'agentic-windows-paths-test-'));
 }
 
-// The agentic-review skill carries a manifest.json declaring the
+// The ad-review skill carries a manifest.json declaring the
 // fresh-context-reviewer subagent at `agents/fresh-context-reviewer.md`.
 // On Windows, `path.join('agents', 'fresh-context-reviewer.md')` produces
 // `agents\\fresh-context-reviewer.md`. Manifest comparisons compare strings,
@@ -26,13 +26,13 @@ function mkScratch() {
 // This test ensures the install completes successfully and that the resulting
 // state file records the canonical forward-slash path on every platform.
 
-test('installSkills: agentic-review manifest validates on every platform (forward-slash internal paths)', async () => {
+test('installSkills: ad-review manifest validates on every platform (forward-slash internal paths)', async () => {
   const dir = mkScratch();
   try {
     const result = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-review'],
+      skills: ['ad-review'],
       kitVersion: '0.9.3-test',
     });
 
@@ -44,15 +44,15 @@ test('installSkills: agentic-review manifest validates on every platform (forwar
       'fresh-context-reviewer subagent must install at .claude/agents/'
     );
     assert.ok(
-      existsSync(join(dir, '.claude/skills/agentic-review/SKILL.md')),
-      'agentic-review SKILL.md must install at .claude/skills/agentic-review/'
+      existsSync(join(dir, '.claude/skills/ad-review/SKILL.md')),
+      'ad-review SKILL.md must install at .claude/skills/ad-review/'
     );
 
     // Returned action paths and the state-file path entries must be
     // forward-slash regardless of the platform running the test, so a
     // state file written on Windows is byte-comparable to one written on
     // macOS / Linux for the same install.
-    const reviewSkill = result.nextStates['claude-code'].skills['agentic-review'];
+    const reviewSkill = result.nextStates['claude-code'].skills['ad-review'];
     for (const f of reviewSkill.files) {
       assert.ok(
         !f.path.includes('\\'),
@@ -70,23 +70,23 @@ test('installSkills: agentic-review manifest validates on every platform (forwar
   }
 });
 
-test('installSkills: a multi-level skill (codex agentic-review with agents/openai.yaml) lands every nested file', async () => {
+test('installSkills: a multi-level skill (codex ad-review with agents/openai.yaml) lands every nested file', async () => {
   const dir = mkScratch();
   try {
     const result = await installSkills({
       cwd: dir,
       agents: ['codex'],
-      skills: ['agentic-review'],
+      skills: ['ad-review'],
       kitVersion: '0.9.3-test',
     });
     // The nested agents/openai.yaml file must land — this exercises the
     // walkSkill recursion + the join(prefix, entry) path that produced
     // backslashes on Windows pre-fix.
     assert.ok(
-      existsSync(join(dir, '.agents/skills/agentic-review/agents/openai.yaml')),
-      'nested agents/openai.yaml must install for codex agentic-review'
+      existsSync(join(dir, '.agents/skills/ad-review/agents/openai.yaml')),
+      'nested agents/openai.yaml must install for codex ad-review'
     );
-    const reviewSkill = result.nextStates.codex.skills['agentic-review'];
+    const reviewSkill = result.nextStates.codex.skills['ad-review'];
     const nested = reviewSkill.files.find((f) =>
       f.path.endsWith('agents/openai.yaml')
     );
