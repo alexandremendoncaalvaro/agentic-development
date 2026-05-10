@@ -57,3 +57,9 @@ Do not dispatch to the new subagent, do not test it. The user will exercise it t
 ## Output contract
 
 A single new file at `.claude/agents/<name>.md` (or `~/.claude/agents/<name>.md`). Frontmatter declares only the fields actually used. Body is the system prompt: terse, imperative, with explicit stop criterion. No external file dependencies the user did not ask for.
+
+## Next
+
+- Test the new subagent by exercising the workflow it serves — invoke via the `Task` tool with `subagent_type: '<name>'`.
+- Document the subagent in `AGENTS.md` (or the project's operational guide) if it is project-wide rather than personal.
+- If the subagent ships alongside a skill (manifest-listed), update the skill's `manifest.json` to declare the file.

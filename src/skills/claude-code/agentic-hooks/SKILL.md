@@ -95,3 +95,10 @@ A narrative document, so the documentation discipline rules apply at write time:
 - The Quality Gates section opens with the operational rule (gates are deterministic) before listing the gates themselves.
 - One scope: Quality Gates. Do not duplicate ARCHITECTURE.md or ADR rationale here.
 - No commented-out scripts. No orphan TODO / FIXME — every deferred command references a tracked task or GitHub Issue.
+
+## Next
+
+- Run the runner's bootstrap command (cited in Step 5 — e.g., `npm install`, `lefthook install`, `pre-commit install`).
+- Verify a deliberately-failing edit (e.g., a known lint violation) gets blocked at commit. The gate is real only when it actually fires.
+- Add a redundant CI gate (`.github/workflows/`, GitLab CI, or equivalent) so contributors cannot bypass via `--no-verify`. WORKFLOW §11 binding.
+- `/agentic-audit` periodically to confirm hooks stay wired as the project evolves.
