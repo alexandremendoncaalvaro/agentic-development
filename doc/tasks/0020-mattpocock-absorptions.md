@@ -33,12 +33,13 @@ Splitting the principles release from the skill implementations matches the patt
 - [x] [`doc/adr/0019-domain-language-layer.md`](../adr/0019-domain-language-layer.md) accepted, with placement rationale (Layer 2, not folded into Constitution) and the lazy-creation discipline.
 - [x] [`doc/adr/0020-deep-modules-vocabulary.md`](../adr/0020-deep-modules-vocabulary.md) accepted, naming the canonical terms and the rejected depth-as-line-ratio framing.
 - [x] [`doc/adr/0021-diagnose-discipline.md`](../adr/0021-diagnose-discipline.md) accepted, with the five-phase shape and the v0.15.x deferral of `agentic-diagnose`.
-- [ ] [`AGENTS.md`](../../AGENTS.md) updated to mention the new Layer 2 (Domain / `CONTEXT.md`) in the artifact-stack reference.
-- [ ] [`ARCHITECTURE.md`](../../ARCHITECTURE.md) adopts the Ousterhout/Feathers vocabulary in any architectural-shape paragraphs (no retroactive rewrite of historic patterns; new prose only).
-- [ ] [`README.md`](../../README.md) skill-table preface notes the v0.14 principles release; deferred skills (`agentic-domain`, `agentic-grill`, `agentic-deepen`, `agentic-diagnose`) are listed under "Planned" with the target minor.
-- [ ] [`package.json`](../../package.json) bumped to `0.14.0-beta.1` (principles addition + new layer = minor).
-- [ ] `npm test` passes (no test-shape change for this release; principle-only deltas).
-- [ ] Dogfood install refreshed via `node bin/agentic.js update --yes --force` so the new WORKFLOW + ADRs land in the local install paths.
+- [x] [`AGENTS.md`](../../AGENTS.md) updated to mention the new Layer 2 (Domain / `CONTEXT.md`) in the artifact-stack reference (managed-skills section regenerated from updated `src/lib/rootdoc.js` SKILL_DESCRIPTIONS).
+- [x] [`ARCHITECTURE.md`](../../ARCHITECTURE.md) Architectural Principles section updated with the five-layer stack and a new bullet for the Ousterhout/Feathers vocabulary (ADR-0020). No retroactive rewrite of historic patterns; only the principles paragraph and the new vocabulary bullet were added.
+- [x] [`README.md`](../../README.md) skill-table descriptions, "Lost mid-flow" hint, and "Specifying a feature" workflow narrative all updated to five-layer + Domain-layer citation. New "Planned skills" subsection under "Install & use" lists `agentic-domain` (v0.15.x), `agentic-grill` (v0.16.x), `agentic-deepen` (v0.17.x), `agentic-diagnose` (v0.18.x) with their accepting ADRs.
+- [x] [`package.json`](../../package.json) bumped to `0.14.0-beta.1` (principles addition + new layer = minor).
+- [x] `npm test` passes (150/150; no test-shape change for this release).
+- [x] Dogfood install refreshed via `node bin/agentic.js update --yes --force` so the new WORKFLOW + ADRs + skill body updates land in the local install paths.
+- [x] Skill source bodies renamed `four-layer` → `five-layer` across `src/skills/{claude-code,codex}/agentic-bootstrap`, `agentic-spec`, `agentic-next` plus the codex `agents/openai.yaml` short_description. Layer numbering shifted (Layer 2 = Domain; Spec is Layer 3; ADRs/tasks Layer 4; Code Layer 5) consistently across all skill bodies that reference the stack. `agentic-next` survey logic (Step 1 sections, Step 4 profile filtering, Output contract) renumbered end-to-end and gained a Layer 2 (Domain / CONTEXT.md) survey block honoring ADR-0019's lazy-creation discipline.
 
 ### Phase 2 — Deferred skill implementations (v0.15.x and later)
 
@@ -70,13 +71,15 @@ Order rationale: `agentic-domain` first because the Domain layer ships in v0.14 
 - [x] Write `doc/adr/0020-deep-modules-vocabulary.md`.
 - [x] Write `doc/adr/0021-diagnose-discipline.md`.
 - [x] Write this task file.
-- [ ] Update `AGENTS.md` artifact-stack reference for new Layer 2.
-- [ ] Update `ARCHITECTURE.md` architectural prose for the §8 vocabulary (no retro rewrite).
-- [ ] Update `README.md` (principles release callout + Planned skills section).
-- [ ] Bump `package.json` to `0.14.0-beta.1`.
-- [ ] Run `npm test` — confirm green.
-- [ ] Dogfood refresh `node bin/agentic.js update --yes --force`.
-- [ ] Atomic commits + PR + merge to `cli`; tag `v0.14.0-beta.1`; `npm publish --tag beta`; smoke verify.
+- [x] Update `AGENTS.md` artifact-stack reference for new Layer 2 (regenerated via `agentic update --yes --force` from updated `src/lib/rootdoc.js`).
+- [x] Update `ARCHITECTURE.md` architectural prose for the §8 vocabulary (no retro rewrite).
+- [x] Update `README.md` (skill-table descriptions + "Lost mid-flow" hint + "Specifying a feature" workflow + new Planned skills section).
+- [x] Update `src/lib/rootdoc.js` SKILL_DESCRIPTIONS for `agentic-spec` and `agentic-next` (source of the managed-skills section).
+- [x] Update skill source bodies under `src/skills/{claude-code,codex}/{agentic-bootstrap,agentic-spec,agentic-next}/` to the v0.14 layer numbering.
+- [x] Bump `package.json` to `0.14.0-beta.1`.
+- [x] Run `npm test` — confirm green (150/150).
+- [x] Dogfood refresh `node bin/agentic.js update --yes --force`.
+- [ ] PR + merge to `cli`; tag `v0.14.0-beta.1`; `npm publish --tag beta`; smoke verify. (Awaiting user authorization for shared-state actions per WORKFLOW §8 conservatism.)
 
 ### Phase 2 (subsequent minors)
 
@@ -89,3 +92,4 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 - **2026-05-10** — Task created on branch `feat/v0.14.0-workflow-deepening`. Phase 1 WORKFLOW edits and all three ADRs landed in the same branch. AGENTS.md / ARCHITECTURE.md / README.md / version bump / test verification / dogfood refresh remaining.
 - **2026-05-10** — Filter-strict decision pass with user reduced 18 candidate borrowings to 9 WORKFLOW changes + 3 ADRs + 4 deferred skills. Three "MAYBE" candidates skipped from WORKFLOW: grilling-as-§4.0 (lives in skill only, no principle change), specs-to-code caveat (already covered by §10 fresh-context review), DAG-as-§6.5 (operationalized in task templates, not principle-worthy). Three "SKIP" candidates rejected entirely: small-PRs bullet (redundant with §6 "one logical change per commit"), doc-rot principle (already implicit in `agentic-philosophy` Documentation Discipline + `agentic-audit`), RGR position-change in §9 (kept TDM stance per [ADR-0018](../adr/0018-agentic-tdg-skill.md); RGR tradeoff documented in this task's Notes only).
+- **2026-05-10** — Phase 1 complete except for shared-state ship steps. Two commits on branch: `928d1d1` (WORKFLOW + ADRs + task) and `a7ae1e0` (skill body rename four-layer→five-layer + dogfood refresh + version bump + AGENTS/ARCHITECTURE/README updates). 150/150 tests green. Branch ready for PR to `cli`. Tagging + publishing held back pending explicit user authorization.
