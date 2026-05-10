@@ -40,6 +40,15 @@
         }
       ]
     },
+    "agentic-commit": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-commit/SKILL.md",
+          "sourceSha": "8e254aec9c49a89753021db76347a7f1b6eed20d4e87d8c69711711c31ca29c4"
+        }
+      ]
+    },
     "agentic-deepen": {
       "version": "0.15.0-beta.1",
       "files": [
@@ -85,6 +94,15 @@
         }
       ]
     },
+    "agentic-merge": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-merge/SKILL.md",
+          "sourceSha": "1bdca0a754d4362cbb64b35152f08894b8272ea95ad2dbca496c4d05c386805d"
+        }
+      ]
+    },
     "agentic-next": {
       "version": "0.15.0-beta.1",
       "files": [
@@ -100,6 +118,15 @@
         {
           "path": ".claude/skills/agentic-philosophy/SKILL.md",
           "sourceSha": "1475b39a5d69fa6ce9f3a0e14b012d7d2475cf3775eb8fdeacb9e9662bee1bc4"
+        }
+      ]
+    },
+    "agentic-pr": {
+      "version": "0.15.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/agentic-pr/SKILL.md",
+          "sourceSha": "dfc968b532721a2d205af14843ed976556cbe6ef0c187cc74b18f54124688b98"
         }
       ]
     },
