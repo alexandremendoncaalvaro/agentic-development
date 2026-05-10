@@ -162,6 +162,51 @@ test('agentic-diagnose is universal in every profile (debugging discipline appli
   }
 });
 
+test('agentic-commit is universal in solo / team / mature only (not poc per ADR-0023)', () => {
+  for (const name of ['solo', 'team', 'mature']) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-commit'),
+      `profile ${name} must include agentic-commit in its universal set per ADR-0023`
+    );
+  }
+  const pocUniversal = new Set(PROFILES.poc.universal);
+  assert.ok(
+    !pocUniversal.has('agentic-commit'),
+    'profile poc must NOT include agentic-commit — commit ceremony aligns with artifact-producing layer per ADR-0023'
+  );
+});
+
+test('agentic-pr is universal in solo / team / mature only (not poc per ADR-0024)', () => {
+  for (const name of ['solo', 'team', 'mature']) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-pr'),
+      `profile ${name} must include agentic-pr in its universal set per ADR-0024`
+    );
+  }
+  const pocUniversal = new Set(PROFILES.poc.universal);
+  assert.ok(
+    !pocUniversal.has('agentic-pr'),
+    'profile poc must NOT include agentic-pr per ADR-0024'
+  );
+});
+
+test('agentic-merge is universal in solo / team / mature only (not poc per ADR-0025)', () => {
+  for (const name of ['solo', 'team', 'mature']) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('agentic-merge'),
+      `profile ${name} must include agentic-merge in its universal set per ADR-0025`
+    );
+  }
+  const pocUniversal = new Set(PROFILES.poc.universal);
+  assert.ok(
+    !pocUniversal.has('agentic-merge'),
+    'profile poc must NOT include agentic-merge per ADR-0025'
+  );
+});
+
 test('agentic-deepen is universal in team and mature only (premature for poc and solo per ADR-0020 §4)', () => {
   // Present in team and mature.
   for (const name of ['team', 'mature']) {

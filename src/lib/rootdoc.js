@@ -40,6 +40,12 @@ export const SKILL_DESCRIPTIONS = {
     'Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one. Pairs with `agentic-audit`. Profile-scoped to `team` and `mature` only.',
   'agentic-diagnose':
     'Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.',
+  'agentic-commit':
+    'Atomic Conventional Commits with DCO `Signed-off-by` sign-off per ADR-0023. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.',
+  'agentic-pr':
+    'Open a GitHub pull request with a uniform body shape (Summary / Test plan / Links) per ADR-0024. Four phases — preflight (`gh` auth + branch pushed), scope assembly, draft body, open + report URL. Title format = Conventional Commits.',
+  'agentic-merge':
+    'Evaluate and merge a GitHub pull request per ADR-0025. Four phases — preflight, evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`.',
   'agentic-design': 'Bootstrap `DESIGN.md` from existing tokens (frontend projects).',
   'agentic-subagent': 'Draft a new Claude Code subagent at `.claude/agents/<name>.md`.',
   'agentic-skill': 'Draft a new Claude Code or Codex skill at the appropriate path.',

@@ -376,6 +376,9 @@ export async function initCommand(opts) {
       '/agentic-grill (interview-before-research)',
       '/agentic-deepen (WORKFLOW §8 — deepening opportunities)',
       '/agentic-diagnose (WORKFLOW §15 — five-phase diagnosis)',
+      '/agentic-commit (Conventional Commits + DCO sign-off)',
+      '/agentic-pr (open PR with uniform body)',
+      '/agentic-merge (evaluate + merge PR)',
       ...(optedSkills.includes('agentic-design') ? ['/agentic-design (DESIGN.md)'] : []),
       ...(optedSkills.includes('agentic-subagent') && agents.includes('claude-code')
         ? ['/agentic-subagent']
@@ -397,6 +400,9 @@ export async function initCommand(opts) {
           'agentic-review': '/agentic-review (WORKFLOW §10)',
           'agentic-ground': '/agentic-ground (WORKFLOW §4 + §5)',
           'agentic-deepen': '/agentic-deepen (WORKFLOW §8 — deepening opportunities)',
+          'agentic-commit': '/agentic-commit (Conventional Commits + DCO sign-off)',
+          'agentic-pr': '/agentic-pr (open PR with uniform body)',
+          'agentic-merge': '/agentic-merge (evaluate + merge PR)',
           // 'agentic-philosophy' is implicit and not listed.
         };
         for (const [skill, label] of Object.entries(universalLabels)) {
