@@ -1,6 +1,6 @@
 # Task `0016`: Ship `agentic-next` workflow-operational skill (v0.10.0-beta.1)
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-05-09
 **Owner:** Alexandre Alvaro
 **Spec ref:**
@@ -12,34 +12,34 @@ User surfaced a navigation gap during real use: kit ships twelve skills + four m
 
 ## Acceptance Criteria
 
-- [ ] [`doc/adr/0015-agentic-next-skill.md`](../adr/0015-agentic-next-skill.md) exists, status `accepted`, with the five-step survey shape, profile-aware branching, and the read-only / advisory posture.
-- [ ] [`src/skills/claude-code/agentic-next/SKILL.md`](../../src/skills/claude-code/agentic-next/SKILL.md) exists with frontmatter `name: agentic-next`, `allowed-tools: Read, Glob, Grep, Bash`, and a description carrying the auto-trigger keywords ("what's next", "next step", "where am I", "project status", "doctor", "what should I do", "audit my workflow").
-- [ ] [`src/skills/codex/agentic-next/SKILL.md`](../../src/skills/codex/agentic-next/SKILL.md) exists with the matching content shaped to the Codex `<background_information>` / `<instructions>` / `<output_contract>` template plus an `agents/openai.yaml`.
-- [ ] [`src/lib/profiles.js`](../../src/lib/profiles.js) `PROFILES` catalog adds `agentic-next` to every profile's `universal` list (poc / solo / team / mature). The profile-aware survey logic is documented in the skill body, not in the catalog (skill detects profile at runtime).
-- [ ] [`src/commands/init.js`](../../src/commands/init.js) `REQUIRED_SKILLS` (the team-profile compatibility export) includes `agentic-next`; slashLine summary lists `/agentic-next`.
-- [ ] [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) `SKILL_DESCRIPTIONS` carries an entry for `agentic-next`.
-- [ ] [`README.md`](../../README.md) skill table lists `agentic-next` as the third workflow-operational universal skill alongside `agentic-philosophy` and `agentic-review`. "Recommended daily sequence" section mentions the skill as the recovery / mid-flow check.
-- [ ] Tests cover: `agentic-next` is in `UNIVERSAL_SKILLS` in [`test/init.test.js`](../../test/init.test.js); end-to-end install lands the skill at both agent paths for every profile; profile catalog tests assert `agentic-next` is in every profile's universal set.
-- [ ] Dogfood install in this repo refreshed via `node bin/agentic.js update --yes`; new skill lands at `.claude/skills/agentic-next/` and `.agents/skills/agentic-next/`.
-- [ ] [`package.json`](../../package.json) bumped to `0.10.0-beta.1` (skill set expansion = minor).
-- [ ] `npm test` passes (135 → 137+).
+- [x] [`doc/adr/0015-agentic-next-skill.md`](../adr/0015-agentic-next-skill.md) exists, status `accepted`, with the five-step survey shape, profile-aware branching, and the read-only / advisory posture.
+- [x] [`src/skills/claude-code/agentic-next/SKILL.md`](../../src/skills/claude-code/agentic-next/SKILL.md) exists with frontmatter `name: agentic-next`, `allowed-tools: Read, Glob, Grep, Bash`, and a description carrying the auto-trigger keywords ("what's next", "next step", "where am I", "project status", "doctor", "what should I do", "audit my workflow").
+- [x] [`src/skills/codex/agentic-next/SKILL.md`](../../src/skills/codex/agentic-next/SKILL.md) exists with the matching content shaped to the Codex `<background_information>` / `<instructions>` / `<output_contract>` template plus an `agents/openai.yaml`.
+- [x] [`src/lib/profiles.js`](../../src/lib/profiles.js) `PROFILES` catalog adds `agentic-next` to every profile's `universal` list (poc / solo / team / mature). The profile-aware survey logic is documented in the skill body, not in the catalog (skill detects profile at runtime).
+- [x] [`src/commands/init.js`](../../src/commands/init.js) `REQUIRED_SKILLS` (the team-profile compatibility export) includes `agentic-next`; slashLine summary lists `/agentic-next`.
+- [x] [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) `SKILL_DESCRIPTIONS` carries an entry for `agentic-next`.
+- [x] [`README.md`](../../README.md) skill table lists `agentic-next` as the third workflow-operational universal skill alongside `agentic-philosophy` and `agentic-review`. "Recommended daily sequence" section mentions the skill as the recovery / mid-flow check.
+- [x] Tests cover: `agentic-next` is in `UNIVERSAL_SKILLS` in [`test/init.test.js`](../../test/init.test.js); end-to-end install lands the skill at both agent paths for every profile; profile catalog tests assert `agentic-next` is in every profile's universal set.
+- [x] Dogfood install in this repo refreshed via `node bin/agentic.js update --yes`; new skill lands at `.claude/skills/agentic-next/` and `.agents/skills/agentic-next/`.
+- [x] [`package.json`](../../package.json) bumped to `0.10.0-beta.1` (skill set expansion = minor).
+- [x] `npm test` passes (135 → 137+).
 
 ## Plan
 
 - [x] Branch `feat/v0.10.0-agentic-next` cut from `cli`.
 - [x] Write [`doc/adr/0015-agentic-next-skill.md`](../adr/0015-agentic-next-skill.md) in status `accepted`.
 - [x] Write this task file.
-- [ ] Implement [`src/skills/claude-code/agentic-next/SKILL.md`](../../src/skills/claude-code/agentic-next/SKILL.md).
-- [ ] Implement [`src/skills/codex/agentic-next/{SKILL.md,agents/openai.yaml}`](../../src/skills/codex/agentic-next/).
-- [ ] Update [`src/lib/profiles.js`](../../src/lib/profiles.js) — add `agentic-next` to all four profiles' universal lists.
-- [ ] Update [`src/commands/init.js`](../../src/commands/init.js) — REQUIRED_SKILLS export + slashLine summary.
-- [ ] Update [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) `SKILL_DESCRIPTIONS`.
-- [ ] Update [`README.md`](../../README.md) — skill table + "Recommended daily sequence" cross-ref.
-- [ ] Update tests: `UNIVERSAL_SKILLS` constant in `test/init.test.js`; add profile-coverage assertion in `test/profile.test.js`.
-- [ ] Run `node bin/agentic.js update --yes` to refresh dogfood install.
-- [ ] Bump version in [`package.json`](../../package.json).
-- [ ] Run `npm test`. Fix anything that drifted.
-- [ ] Atomic commits + PR + merge to `cli`; tag `v0.10.0-beta.1`; `npm publish --tag beta`; smoke verify.
+- [x] Implement [`src/skills/claude-code/agentic-next/SKILL.md`](../../src/skills/claude-code/agentic-next/SKILL.md).
+- [x] Implement [`src/skills/codex/agentic-next/{SKILL.md,agents/openai.yaml}`](../../src/skills/codex/agentic-next/).
+- [x] Update [`src/lib/profiles.js`](../../src/lib/profiles.js) — add `agentic-next` to all four profiles' universal lists.
+- [x] Update [`src/commands/init.js`](../../src/commands/init.js) — REQUIRED_SKILLS export + slashLine summary.
+- [x] Update [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) `SKILL_DESCRIPTIONS`.
+- [x] Update [`README.md`](../../README.md) — skill table + "Recommended daily sequence" cross-ref.
+- [x] Update tests: `UNIVERSAL_SKILLS` constant in `test/init.test.js`; add profile-coverage assertion in `test/profile.test.js`.
+- [x] Run `node bin/agentic.js update --yes` to refresh dogfood install.
+- [x] Bump version in [`package.json`](../../package.json).
+- [x] Run `npm test`. Fix anything that drifted.
+- [x] Atomic commits + PR + merge to `cli`; tag `v0.10.0-beta.1`; `npm publish --tag beta`; smoke verify.
 
 ## Notes
 
@@ -57,11 +57,15 @@ Decision sequence with the user (N1–N7):
 - N6: auto-trigger keywords cover multiple mental models for the same intent.
 - N7: complements `agentic-audit`, not folded in. Audit = drift; next = navigation. Skill bodies cross-reference.
 
+### 2026-05-09 — close-out (v0.10.0-beta.1)
+
+Shipped in v0.10.0-beta.1. Close-out flipped retroactively after `/agentic-next` itself surfaced this task as in-progress despite the v0.10.0 release — fitting meta-validation that the skill works on real state. ADR-0015 + Task 0016 + `src/skills/{claude-code,codex}/agentic-next/` + agents/openai.yaml + profile catalog updates (universal in all four profiles) + init.js wiring + README updates + UNIVERSAL_SKILLS extension all landed; 139/139 tests green at the time of release.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task

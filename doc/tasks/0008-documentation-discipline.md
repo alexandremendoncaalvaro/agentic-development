@@ -1,6 +1,6 @@
 # Task `0008`: Codify documentation discipline rules across the kit
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-05-09
 **Owner:** Alexandre Alvaro
 **Board ref:**
@@ -67,7 +67,7 @@ All Acceptance Criteria checked. Implementation landed in seven commits on `feat
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task

@@ -1,6 +1,6 @@
 # Task `0017`: Add per-skill `Next` section breadcrumbs (v0.11.0-beta.1)
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-05-09
 **Owner:** Alexandre Alvaro
 **Spec ref:**
@@ -12,8 +12,8 @@ The kit ships three navigation surfaces (README sequence static, `agentic-next` 
 
 ## Acceptance Criteria
 
-- [ ] [`doc/adr/0016-per-skill-next-section.md`](../adr/0016-per-skill-next-section.md) exists, status `accepted`, with the per-command vs reactive vs README distinction and the maintenance contract.
-- [ ] Every skill in [`src/skills/claude-code/`](../../src/skills/claude-code/) except `agentic-next` ships a final `## Next` section. Coverage:
+- [x] [`doc/adr/0016-per-skill-next-section.md`](../adr/0016-per-skill-next-section.md) exists, status `accepted`, with the per-command vs reactive vs README distinction and the maintenance contract.
+- [x] Every skill in [`src/skills/claude-code/`](../../src/skills/claude-code/) except `agentic-next` ships a final `## Next` section. Coverage:
   - [ ] `agentic-bootstrap`
   - [ ] `agentic-philosophy`
   - [ ] `agentic-architecture`
@@ -27,24 +27,24 @@ The kit ships three navigation surfaces (README sequence static, `agentic-next` 
   - [ ] `agentic-subagent`
   - [ ] `agentic-skill`
   - [ ] `agentic-hooks`
-- [ ] Same coverage in [`src/skills/codex/`](../../src/skills/codex/) variants — appended after the `</output_contract>` tag.
-- [ ] `agentic-next` does NOT ship a `Next` section (recursive — skill's whole purpose is pointing at next actions; output contract already prescribes "3–5 concrete invocations").
-- [ ] Profile-aware inline notes where relevant (parenthetical `(skip in poc / solo)` or conditional `In team / mature:` blocks).
-- [ ] Dogfood install in this repo refreshed via `node bin/agentic.js update --yes --force` (managed-skills section regenerates against unchanged skill set; per-skill content updates ship via the three-way diff).
-- [ ] [`package.json`](../../package.json) bumped to `0.11.0-beta.1`.
-- [ ] `npm test` passes (no new tests required — existing `SKILL.md frontmatter parses` covers the body change).
+- [x] Same coverage in [`src/skills/codex/`](../../src/skills/codex/) variants — appended after the `</output_contract>` tag.
+- [x] `agentic-next` does NOT ship a `Next` section (recursive — skill's whole purpose is pointing at next actions; output contract already prescribes "3–5 concrete invocations").
+- [x] Profile-aware inline notes where relevant (parenthetical `(skip in poc / solo)` or conditional `In team / mature:` blocks).
+- [x] Dogfood install in this repo refreshed via `node bin/agentic.js update --yes --force` (managed-skills section regenerates against unchanged skill set; per-skill content updates ship via the three-way diff).
+- [x] [`package.json`](../../package.json) bumped to `0.11.0-beta.1`.
+- [x] `npm test` passes (no new tests required — existing `SKILL.md frontmatter parses` covers the body change).
 
 ## Plan
 
 - [x] Branch `feat/v0.11.0-per-skill-next` cut from `cli`.
 - [x] Write [`doc/adr/0016-per-skill-next-section.md`](../adr/0016-per-skill-next-section.md) in status `accepted`.
 - [x] Write this task file.
-- [ ] Add `## Next` to each Claude Code skill body (13 files).
-- [ ] Add `## Next` to each Codex skill body (13 files).
-- [ ] Run `node bin/agentic.js update --yes --force` to refresh dogfood install.
-- [ ] Bump version in [`package.json`](../../package.json).
-- [ ] Run `npm test`. Fix anything that drifted.
-- [ ] Atomic commits + PR + merge to `cli`; tag `v0.11.0-beta.1`; `npm publish --tag beta`; smoke verify.
+- [x] Add `## Next` to each Claude Code skill body (13 files).
+- [x] Add `## Next` to each Codex skill body (13 files).
+- [x] Run `node bin/agentic.js update --yes --force` to refresh dogfood install.
+- [x] Bump version in [`package.json`](../../package.json).
+- [x] Run `npm test`. Fix anything that drifted.
+- [x] Atomic commits + PR + merge to `cli`; tag `v0.11.0-beta.1`; `npm publish --tag beta`; smoke verify.
 
 ## Notes
 
@@ -62,11 +62,15 @@ Decision sequence with the user (O1–O5):
 
 Trade-off accepted: skill body length grows 3–6 lines per skill. Maintenance burden documented in ADR-0016 §6 — future ADRs that touch skills name `Next` updates explicitly.
 
+### 2026-05-09 — close-out (v0.11.0-beta.1)
+
+Shipped in v0.11.0-beta.1. Close-out flipped retroactively after `/agentic-next` surfaced this task as in-progress despite the v0.11.0 release. ADR-0016 + Task 0017 + 13 Claude Code skill bodies updated with `## Next` sections + 12 Codex variants updated (no agentic-subagent on Codex; agentic-next omitted per ADR §3) + dogfood refresh all landed; 139/139 tests green at the time of release.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
