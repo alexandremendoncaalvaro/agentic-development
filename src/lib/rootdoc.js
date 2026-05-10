@@ -18,7 +18,7 @@ export const SKILL_DESCRIPTIONS = {
   'agentic-architecture': 'Generate or audit `ARCHITECTURE.md` at the repo root.',
   'agentic-adr': 'Draft a new ADR at `doc/adr/NNNN-<slug>.md`.',
   'agentic-spec':
-    'Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 2 of the four-layer artifact stack.',
+    'Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 3 of the five-layer artifact stack.',
   'agentic-task': 'Draft a new task at `doc/tasks/NNNN-<slug>.md`.',
   'agentic-audit':
     'Read-only drift report comparing AGENTS.md / ARCHITECTURE.md / ADRs against the code.',
@@ -27,7 +27,7 @@ export const SKILL_DESCRIPTIONS = {
   'agentic-ground':
     'Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate. WORKFLOW §4 + §5.',
   'agentic-next':
-    'State survey + prioritized next-action recommendations across the four-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).',
+    'State survey + prioritized next-action recommendations across the five-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).',
   'agentic-spike':
     'Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.',
   'agentic-tdg':

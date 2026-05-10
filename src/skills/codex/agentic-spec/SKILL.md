@@ -1,10 +1,10 @@
 ---
 name: agentic-spec
-description: Draft a feature-level specification at doc/specs/NNNN-<slug>.md following the four-layer artifact stack (Constitution → Spec → Plan/Decisions → Code). Adapts GitHub Spec Kit's mandatory sections (User Scenarios, Requirements, Success Criteria) to the kit's documentation discipline. Use when the user wants to write, draft, scaffold, or open a feature spec, PRD, product requirements, feature brief, user stories, or success criteria. Status starts at draft.
+description: Draft a feature-level specification at doc/specs/NNNN-<slug>.md following the five-layer artifact stack (Constitution → Domain → Spec → Plan/Decisions → Code). Adapts GitHub Spec Kit's mandatory sections (User Scenarios, Requirements, Success Criteria) to the kit's documentation discipline. Use when the user wants to write, draft, scaffold, or open a feature spec, PRD, product requirements, feature brief, user stories, or success criteria. Status starts at draft.
 ---
 
 <background_information>
-Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: draft → accepted → shipped | superseded by SPEC-NNNN. Spec is the layer-2 artifact in the kit's four-layer stack — Constitution (`AGENTS.md` + `WORKFLOW.md`) → Spec (this skill) → Plan/Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Multiple tasks implement one spec; ADRs may be driven by spec constraints.
+Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: draft → accepted → shipped | superseded by SPEC-NNNN. Spec is the layer-3 artifact in the kit's five-layer stack — Constitution (`AGENTS.md` + `WORKFLOW.md`) → Domain (`CONTEXT.md`) → Spec (this skill) → Plan/Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Multiple tasks implement one spec; ADRs may be driven by spec constraints. The Domain layer (ubiquitous language per Evans 2003) is the source of canonical nouns the spec must use; if the spec introduces a new noun, resolve it through `CONTEXT.md` first.
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user asks to "draft a spec" or "write a PRD" on a non-trivial feature, invoke this skill manually.
 </background_information>

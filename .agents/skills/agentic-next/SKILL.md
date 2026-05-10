@@ -1,6 +1,6 @@
 ---
 name: agentic-next
-description: Survey the project's state across the four-layer artifact stack and recommend prioritized next actions, modeled on `flutter doctor`. Use when the user asks "what's next", "next step", "where am I", "project status", "doctor", "what should I do", "audit my workflow". Read-only; complements `agentic-audit` (drift detection, a different question). Profile-aware — `poc` suppresses Layer 2/3 noise, `team`/`mature` run the full survey.
+description: Survey the project's state across the five-layer artifact stack and recommend prioritized next actions, modeled on `flutter doctor`. Use when the user asks "what's next", "next step", "where am I", "project status", "doctor", "what should I do", "audit my workflow". Read-only; complements `agentic-audit` (drift detection, a different question). Profile-aware — `poc` suppresses Layer 3/4 noise, `team`/`mature` run the full survey.
 ---
 
 <background_information>
@@ -20,15 +20,17 @@ Step 0 — read state. Detect baseline:
 
 Do not parse skill bodies. Do not run tests. Do not invoke other skills.
 
-Step 1 — layer-by-layer status. Render four sections in this exact order. Use words for status (`present`, `in flight`, `missing`, `stale`) — no emoji.
+Step 1 — layer-by-layer status. Render five sections in this exact order. Use words for status (`present`, `in flight`, `missing`, `stale`) — no emoji.
 
 Layer 1 — Constitution: AGENTS.md / CLAUDE.md, WORKFLOW.md, ARCHITECTURE.md, DESIGN.md (frontend only).
 
-Layer 2 — Specs (doc/specs/): for each file, report Status + count of tasks whose Spec ref points at it. Flag specs with Status: accepted and zero implementing tasks.
+Layer 2 — Domain (CONTEXT.md): present at repo root, *or* CONTEXT-MAP.md plus per-context CONTEXT.md files? Lazy-created per ADR-0019 — `missing` is valid for projects whose first domain term has not been resolved yet, not a finding to flag in poc / solo. For each present file, flag empty-glossary (Language section with zero terms).
 
-Layer 3 — Plans / Decisions: doc/adr/ counts by status, flag proposed ADRs with their slug. doc/tasks/ counts by status, list in-progress + blocked with slug and Spec ref. Flag tasks with no Spec ref and no Board ref as orphans.
+Layer 3 — Specs (doc/specs/): for each file, report Status + count of tasks whose Spec ref points at it. Flag specs with Status: accepted and zero implementing tasks.
 
-Layer 4 — Code: branch + ahead count, tests wired? (npm test / pytest / cargo test / go test), hooks wired? (.husky / lefthook.yml / .pre-commit-config.yaml / .git/hooks/), CI wired? (.github/workflows / .gitlab-ci.yml / .circleci/).
+Layer 4 — Plans / Decisions: doc/adr/ counts by status, flag proposed ADRs with their slug. doc/tasks/ counts by status, list in-progress + blocked with slug and Spec ref. Flag tasks with no Spec ref and no Board ref as orphans.
+
+Layer 5 — Code: branch + ahead count, tests wired? (npm test / pytest / cargo test / go test), hooks wired? (.husky / lefthook.yml / .pre-commit-config.yaml / .git/hooks/), CI wired? (.github/workflows / .gitlab-ci.yml / .circleci/).
 
 Step 2 — cross-cut signals:
 - Pending fresh-context review: branch ≥1 commits ahead of main with no .agentic/reviews/<ts>-*.md for the current range → recommend agentic-review.
@@ -48,8 +50,8 @@ Priority heuristic:
 If nothing actionable surfaces, say so: "No urgent next action. Continue current work or invoke `/agentic-audit` for a full drift check."
 
 Step 4 — profile-aware filtering. Apply at the end:
-- poc: suppress Layer 2/3 sections if those directories do not exist. Show Layer 1 + Layer 4 only. Recommendation set: `/agentic-ground`, `/agentic-audit`, `agentic update`.
-- solo: Layer 2/3 render; ADR / ARCHITECTURE.md absence is informational, not a flag. Specs are universal; spec-without-tasks remains a real finding.
+- poc: suppress Layer 3/4 sections if those directories do not exist. Show Layer 1 + Layer 2 + Layer 5 only. Layer 2 (Domain) renders informationally — CONTEXT.md missing is *not* a finding (lazy-created). Recommendation set: `/agentic-ground`, `/agentic-audit`, `agentic update`.
+- solo: Layer 3/4 render; ADR / ARCHITECTURE.md absence is informational, not a flag. Specs are universal; spec-without-tasks remains a real finding. Layer 2 — same lazy-creation rule as poc.
 - team: full survey (default).
 - mature: additionally flag hooks-not-wired louder (WORKFLOW §11 binding for mature profile).
 </instructions>
@@ -66,13 +68,16 @@ A single Markdown message structured as:
 ### Layer 1 — Constitution
 <one-line status per artifact>
 
-### Layer 2 — Specs (doc/specs/)
+### Layer 2 — Domain (CONTEXT.md)
+<present / lazy-missing per ADR-0019; glossary-empty flag if file exists but has no terms>
+
+### Layer 3 — Specs (doc/specs/)
 <spec list with status + task count, or "no specs">
 
-### Layer 3 — Plans / Decisions
+### Layer 4 — Plans / Decisions
 <ADR + task summaries with explicit flags>
 
-### Layer 4 — Code
+### Layer 5 — Code
 <branch / tests / hooks / CI status>
 
 ### Recommended next (priority)
