@@ -94,6 +94,28 @@ export const CONDITIONAL_SKILLS = [
     hintWhenAuto: 'opt-in',
     hintWhenManual: 'WORKFLOW §11 hooks scaffolder (pre-commit, pre-push)',
   },
+  // The next two skills are universal in `team` / `mature` profiles
+  // (declared in PROFILES['team' / 'mature'].universal in src/lib/profiles.js)
+  // and conditional/opt-in in `solo`. They must appear in this catalog so
+  // `availableConditionalsForProfile('solo')` lookups in `pickConditionalAuto`
+  // succeed — without these entries, `if (!def) continue` silently skipped
+  // them and a `solo` user could not opt-in to either (review B1, v0.11.3).
+  // The autoIf rule here is the universal-default; per-profile overrides
+  // come from `availableConditionalsForProfile`'s rule field.
+  {
+    name: 'agentic-architecture',
+    autoIf: () => true,
+    agents: ['claude-code', 'codex'],
+    hintWhenAuto: 'system patterns + boundaries',
+    hintWhenManual: 'opt-in (recommended once load-bearing patterns emerge)',
+  },
+  {
+    name: 'agentic-adr',
+    autoIf: () => true,
+    agents: ['claude-code', 'codex'],
+    hintWhenAuto: 'binding architectural decisions (Nygard pattern)',
+    hintWhenManual: 'opt-in (recommended for binding decisions worth recording)',
+  },
 ];
 
 const CONDITIONAL_BY_NAME = Object.fromEntries(
@@ -295,16 +317,23 @@ export async function initCommand(opts) {
       confirmReplace,
       previousStates,
       kitVersion: pkg.version,
+      profile: profileName,
     });
     allActions.push(...actions);
-    const next = nextStates[agent];
-    next.profile = profileName;
-    saveState(cwd, agent, next);
+    // installSkills now stamps `profile` into nextStates per review C3.
+    // No post-hoc injection.
+    saveState(cwd, agent, nextStates[agent]);
   }
 
+  // Dedup: agentic-architecture and agentic-adr are universal at team /
+  // mature (in REQUIRED_SKILLS) AND conditional at solo (in
+  // CONDITIONAL_SKILLS) per review B1 (v0.11.3). Without the Set, the
+  // managed-skills section would list those rows twice.
   const skillDisplayOrder = [
-    ...REQUIRED_SKILLS,
-    ...CONDITIONAL_SKILLS.map((s) => s.name),
+    ...new Set([
+      ...REQUIRED_SKILLS,
+      ...CONDITIONAL_SKILLS.map((s) => s.name),
+    ]),
   ].filter((s) => installedSkillSet.has(s));
 
   const confirmAppend = interactive

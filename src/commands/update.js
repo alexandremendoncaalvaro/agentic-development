@@ -128,18 +128,27 @@ function previouslyOptedConditional(previousStates, currentAgents, profileName) 
   return [...opted];
 }
 
-function profileFromStates(previousStates, currentAgents) {
-  // If multiple agents disagree on profile, surface and bail. Profile is
-  // expected to match across agents in the same project.
+function profileFromStates(statesByAgent, currentAgents) {
+  // Profile must match across every installed agent in the project — not
+  // only across the agents the current invocation targets. Without this,
+  // `--agent claude-code` on a project where codex was installed with a
+  // different profile masks the disagreement and produces inconsistent
+  // installs. Per review B2 (v0.11.3): always inspect the FULL set of
+  // loaded states, not the narrowed slice.
   const seen = new Set();
-  for (const agent of currentAgents) {
-    const prev = previousStates[agent];
-    if (prev?.profile) seen.add(prev.profile);
+  for (const [agent, state] of Object.entries(statesByAgent)) {
+    if (state?.profile) seen.add(state.profile);
   }
-  if (seen.size === 0) return DEFAULT_PROFILE;
+  if (seen.size === 0) {
+    // No state on disk for any agent. Fall back to the default; current
+    // invocation is a fresh / legacy install handled by the legacy path.
+    return DEFAULT_PROFILE;
+  }
   if (seen.size > 1) {
     throw new Error(
-      `state files disagree on profile (${[...seen].join(', ')}). Run \`agentic profile set <name>\` to reconcile.`
+      `state files disagree on profile (${[...seen].join(
+        ', '
+      )}). Run \`agentic profile set <name>\` to reconcile across all installed agents before re-running update.`
     );
   }
   return [...seen][0];
@@ -172,7 +181,10 @@ export async function updateCommand(opts) {
     previousStates[agent] = statesByAgent[agent] ?? null;
   }
 
-  const profileName = profileFromStates(previousStates, agents);
+  // Pass the FULL loaded set, not the narrowed slice. profileFromStates
+  // surfaces cross-agent disagreement even when the current invocation
+  // targets only one agent (review B2, v0.11.3).
+  const profileName = profileFromStates(statesByAgent, agents);
   const previousOpted = previouslyOptedConditional(
     previousStates,
     agents,
@@ -269,13 +281,14 @@ export async function updateCommand(opts) {
       confirmReplace,
       previousStates: { [agent]: previousStates[agent] ?? null },
       kitVersion: pkg.version,
+      profile: profileName,
       dryRun,
       force,
     });
     allActions.push(...result.actions);
-    const next = result.nextStates[agent];
-    next.profile = profileName;
-    nextStates[agent] = next;
+    // installSkills now stamps `profile` into nextStates per review C3.
+    // No post-hoc injection.
+    nextStates[agent] = result.nextStates[agent];
   }
 
   if (!dryRun) {
@@ -284,9 +297,15 @@ export async function updateCommand(opts) {
     }
   }
 
+  // Dedup: agentic-architecture and agentic-adr are universal at team /
+  // mature (in REQUIRED_SKILLS) AND conditional at solo (in
+  // CONDITIONAL_SKILLS) per review B1 (v0.11.3). Without the Set, the
+  // managed-skills section would list those rows twice.
   const skillDisplayOrder = [
-    ...REQUIRED_SKILLS,
-    ...CONDITIONAL_SKILLS.map((s) => s.name),
+    ...new Set([
+      ...REQUIRED_SKILLS,
+      ...CONDITIONAL_SKILLS.map((s) => s.name),
+    ]),
   ].filter((s) => installedSkillSet.has(s));
 
   const confirmAppend = interactive
