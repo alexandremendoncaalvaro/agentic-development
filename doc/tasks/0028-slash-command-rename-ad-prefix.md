@@ -1,6 +1,6 @@
 # Task `0028`: Rename slash-command prefix `agentic-` → `ad-`
 
-**Status:** proposed
+**Status:** done
 **Created:** 2026-05-10
 **Owner:** Alexandre Alvaro
 **Spec ref:** [ADR-0026](../adr/0026-slash-command-rename-ad-prefix.md)
@@ -15,35 +15,37 @@ Scope strictly inside skill identity surface; `agentic` brand stays on CLI binar
 ## Acceptance Criteria
 
 - [x] [ADR-0026](../adr/0026-slash-command-rename-ad-prefix.md) accepted with the 23-skill mapping table and the rename-surface / preserve scope.
-- [ ] Source skill directories renamed: `src/skills/claude-code/agentic-*/` → `src/skills/claude-code/ad-*/` and `src/skills/codex/agentic-*/` → `src/skills/codex/ad-*/`.
-- [ ] SKILL.md frontmatter `name:` fields rewritten across all 23 Claude Code skills.
-- [ ] Codex `agents/openai.yaml` `display_name:` fields rewritten across all 23 Codex skills.
-- [ ] Inside skill bodies: all `/agentic-X` slash-command references and bare `agentic-X` cross-skill mentions rewritten to `/ad-X` / `ad-X`.
-- [ ] `src/lib/profiles.js`, `src/commands/init.js`, `src/lib/rootdoc.js` skill-name strings rewritten.
-- [ ] `test/init.test.js` UNIVERSAL_SKILLS list, `test/profile.test.js` assertions, and any other test skill-name strings rewritten.
-- [ ] `agentic update --yes --force` run to refresh dogfood install: old `.claude/skills/agentic-*/` + `.agents/skills/agentic-*/` dirs removed; new `ad-*` dirs land; state files updated.
-- [ ] Narrative docs (`README.md`, `AGENTS.md`, `ARCHITECTURE.md`) refresh: skill tables, counts unchanged, cross-references updated, single forward-pointing note on the rename for historical context.
-- [ ] `npm test` passes.
+- [x] Source skill directories renamed: `src/skills/claude-code/agentic-*/` → `src/skills/claude-code/ad-*/` and `src/skills/codex/agentic-*/` → `src/skills/codex/ad-*/`.
+- [x] SKILL.md frontmatter `name:` fields rewritten across all 23 Claude Code skills.
+- [x] Codex `agents/openai.yaml` `display_name:` fields rewritten across all 23 Codex skills.
+- [x] Inside skill bodies: all `/agentic-X` slash-command references and bare `agentic-X` cross-skill mentions rewritten to `/ad-X` / `ad-X`.
+- [x] `src/lib/profiles.js`, `src/commands/init.js`, `src/lib/rootdoc.js` skill-name strings rewritten.
+- [x] `test/init.test.js` UNIVERSAL_SKILLS list, `test/profile.test.js` assertions, and any other test skill-name strings rewritten.
+- [x] `agentic update --yes --force` run to refresh dogfood install: old `.claude/skills/agentic-*/` + `.agents/skills/agentic-*/` dirs removed; new `ad-*` dirs land; state files updated.
+- [x] Narrative docs (`README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `WORKFLOW.md`) refresh: skill tables, counts unchanged, cross-references updated, single forward-pointing note on the rename for historical context (AGENTS.md Gotchas).
+- [x] `npm test` passes (179/179 at closure).
 
 ## Plan
 
-- [x] Draft + accept [ADR-0026](../adr/0026-slash-command-rename-ad-prefix.md).
-- [ ] Mechanical rename across source skill dirs + frontmatter + bodies + wiring + tests (single atomic commit — logically one concern).
-- [ ] Dogfood refresh via `agentic update --yes --force`.
-- [ ] Narrative doc refresh + global forward-pointer.
-- [ ] Atomic commits + PR + merge.
+- [x] Draft + accept [ADR-0026](../adr/0026-slash-command-rename-ad-prefix.md) (commit b5a7089).
+- [x] Mechanical rename across source skill dirs + frontmatter + bodies + wiring + tests (commit b1e5cc6).
+- [x] Dogfood refresh via `agentic update --yes --force` (commit b8fa60b).
+- [x] `.gitignore` exclude `.claude/settings.local.json` — accidentally captured side fix (commit b601b50).
+- [x] Narrative doc refresh + global forward-pointer (commit e5f46d1).
+- [ ] PR + merge — pending user authorization on the bundled v0.15 PR.
 
 ## Notes
 
 Append-only log. Date each entry. Never rewrite past entries.
 
 - **2026-05-10** — Task opened. Decisions confirmed: rename slash commands + skill dirs only; preserve `agentic` brand; historical refs handled via single forward-pointer in narrative docs; commit split = ADR + rename + dogfood + docs.
+- **2026-05-10 — Shipped.** Five-commit chain b5a7089 → b1e5cc6 → b8fa60b → b601b50 → e5f46d1. 23 skills renamed across source + dogfood + frontmatter + wiring + tests + narrative docs. ADR/task filenames under `doc/` preserved as historical record. `agentic` brand preserved (CLI binary, npm package, repo, state files, managed-doc marker). Status flipped `proposed` → `done`.
 
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (179/179)
+- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10) — to run on the bundled v0.15 PR
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
