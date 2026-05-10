@@ -1,6 +1,6 @@
 # Task `0019`: Ship `agentic-tdg` workflow-operational skill (v0.13.0-beta.1)
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-05-10
 **Owner:** Alexandre Alvaro
 **Spec ref:**
@@ -29,11 +29,11 @@ WORKFLOW.md §9 (Outcome-Based Prompting / TDG) is documented but only partially
 - [x] Branch `feat/v0.13.0-agentic-tdg` cut from `cli`.
 - [x] Write [`doc/adr/0018-agentic-tdg-skill.md`](../adr/0018-agentic-tdg-skill.md).
 - [x] Write this task file.
-- [ ] Implement [`src/skills/claude-code/agentic-tdg/SKILL.md`](../../src/skills/claude-code/agentic-tdg/SKILL.md).
-- [ ] Implement [`src/skills/codex/agentic-tdg/{SKILL.md,agents/openai.yaml}`](../../src/skills/codex/agentic-tdg/).
-- [ ] Wire profiles + init + rootdoc + README + tests.
-- [ ] Dogfood refresh + version bump.
-- [ ] Atomic commits + PR + merge to `cli`; tag `v0.13.0-beta.1`; `npm publish --tag beta`; smoke verify.
+- [x] Implement [`src/skills/claude-code/agentic-tdg/SKILL.md`](../../src/skills/claude-code/agentic-tdg/SKILL.md).
+- [x] Implement [`src/skills/codex/agentic-tdg/{SKILL.md,agents/openai.yaml}`](../../src/skills/codex/agentic-tdg/).
+- [x] Wire profiles + init + rootdoc + README + tests.
+- [x] Dogfood refresh + version bump.
+- [x] Atomic commits + PR + merge to `cli`; tag `v0.13.0-beta.1`; `npm publish --tag beta`; smoke verify.
 
 ## Notes
 
@@ -43,11 +43,13 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 ADR-0018 lifts §9 directly. Step 0 disambiguation against `agentic-spike` (§14 unknown-technique regime) prevents over-trigger. agentic-plan-mode (§6) and agentic-eval (§13) remain deferred per ADR-0007 §6.
 
+Shipped v0.13.0-beta.1: PR #23 merged into `cli` at `c2e11c2`; tag `v0.13.0-beta.1` pushed; `npm publish --tag beta` succeeded; smoke-verified `npx @alexandrealvaro/agentic@beta init --agent claude-code --yes` lands `.claude/skills/agentic-tdg/SKILL.md` in fresh scratch dir. 150 tests pass (was 148).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
+- [x] Local tests pass (or N/A documented in Notes)
 - [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
