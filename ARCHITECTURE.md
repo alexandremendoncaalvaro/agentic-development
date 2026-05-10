@@ -34,8 +34,8 @@ Boundary rule: only `src/lib/install.js` resolves `KIT_ROOT`-rooted paths (`impo
 * **Output dispatch:** TUI uses `@clack/prompts` panels (`p.intro`, `p.note`, `p.outro`); non-interactive writes per-file action lines to `stderr` so `stdout` stays parseable.
 * **Input validation:** Commander parses args; `init` enforces an enum guard on `--agent` via `AGENT_FLAG_VALUES`. No schema library — the option surface is a single string enum and a boolean.
 * **Error handling:** thrown errors bubble to `bin/agentic.js`, which prints `agentic: <message>` and exits 1. No try/catch inside command logic, except `loadManifest` which wraps `JSON.parse` to give a useful message on malformed manifest.
-* **Workflow-operational vs spec-driven skills:** ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) `agentic-philosophy`, `agentic-review`, and `agentic-ground` are workflow-operational (execute a process from `WORKFLOW.md`); the others are spec-driven (produce a documentation artifact). The category is informational; the install path is the same. `agentic-review` ships with a bundled subagent at `.claude/agents/fresh-context-reviewer.md` via the manifest mechanism.
-* **Five-layer artifact stack:** ([ADR-0011](doc/adr/0011-agentic-spec-skill.md), [ADR-0019](doc/adr/0019-domain-language-layer.md), [WORKFLOW.md §1](WORKFLOW.md)) Constitution (`AGENTS.md` + `WORKFLOW.md`) → Domain (`CONTEXT.md` — ubiquitous language per Evans 2003, lazy-created) → Spec (`doc/specs/NNNN-<slug>.md`) → Plan / Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Each artifact has its own scaffolding skill (Domain layer skill `agentic-domain` deferred to v0.15.x per [task-0020](doc/tasks/0020-mattpocock-absorptions.md)); tasks carry an optional `Spec ref` field linking back to the spec they implement.
+* **Workflow-operational vs spec-driven skills:** ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) `agentic-philosophy`, `agentic-review`, `agentic-ground`, `agentic-next`, `agentic-spike`, `agentic-tdg`, `agentic-grill`, `agentic-deepen`, `agentic-diagnose`, and the opt-in `agentic-hooks` are workflow-operational (execute a process from `WORKFLOW.md`); the others are spec-driven (produce a documentation artifact). The category is informational; the install path is the same. `agentic-review` ships with a bundled subagent at `.claude/agents/fresh-context-reviewer.md` via the manifest mechanism.
+* **Five-layer artifact stack:** ([ADR-0011](doc/adr/0011-agentic-spec-skill.md), [ADR-0019](doc/adr/0019-domain-language-layer.md), [WORKFLOW.md §1](WORKFLOW.md)) Constitution (`AGENTS.md` + `WORKFLOW.md`) → Domain (`CONTEXT.md` — ubiquitous language per Evans 2003, lazy-created) → Spec (`doc/specs/NNNN-<slug>.md`) → Plan / Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Each artifact has its own scaffolding skill; tasks carry an optional `Spec ref` field linking back to the spec they implement.
 * **Architectural vocabulary:** ([ADR-0020](doc/adr/0020-deep-modules-vocabulary.md), [WORKFLOW.md §8](WORKFLOW.md)) Module / Interface / Implementation / Depth / Seam / Adapter / Leverage / Locality drawn from Ousterhout 2018 + Feathers 2004. Used verbatim in new architectural prose; depth-as-line-ratio framing rejected.
 
 ## Naming Conventions
@@ -49,7 +49,7 @@ Boundary rule: only `src/lib/install.js` resolves `KIT_ROOT`-rooted paths (`impo
 ## Observability
 
 * Logs: `process.stderr.write(...)` for per-file action lines in non-interactive flows; `@clack/prompts` panels interactively. No structured logging.
-* Metrics: N/A — short-lived CLI, no telemetry ([Open question §200 in `doc/v0.2-cli-plan.md`](doc/v0.2-cli-plan.md)).
+* Metrics: N/A — short-lived CLI, no telemetry.
 * Traces: N/A.
 
 ## Deployment Topology
@@ -73,11 +73,14 @@ Currently-binding decisions. Link each to `doc/adr/`.
 * [ADR-0009](doc/adr/0009-update-mechanism.md) — `agentic update` mechanism with per-agent state file and three-way diff
 * [ADR-0010](doc/adr/0010-agentic-ground-skill.md) — Workflow-operational skill `agentic-ground` for four-source pre-implementation research
 * [ADR-0011](doc/adr/0011-agentic-spec-skill.md) — Spec-driven skill `agentic-spec` for feature-level specification at `doc/specs/NNNN-<slug>.md`
-
-## Decisions to revisit (ADR candidates, not yet written)
-
-Flagged here so they don't drift. Not yet ADRs.
-
-* **Boundary rule** — `src/lib/install.js` as sole owner of `KIT_ROOT` reads. Becomes binding once a second `src/lib/*` module also needs kit access.
-* **stderr = action log** — observable contract for piping (`agentic init --agent both --yes 2> install.log`). Promote to ADR if external automation depends on the format.
-* **Manifest schema** — `manifest.json` currently carries only `subagents: string[]`. If future workflow-operational skills need additional sibling-tree targets (hooks, templates, etc.), the schema grows. Keep the addition in a single ADR rather than ad-hoc fields.
+* [ADR-0012](doc/adr/0012-agentic-hooks-skill.md) — Workflow-operational skill `agentic-hooks` for deterministic quality gates
+* [ADR-0013](doc/adr/0013-project-maturity-profiles.md) — Project maturity profiles (`poc` / `solo` / `team` / `mature`) select install set
+* [ADR-0014](doc/adr/0014-structured-prompts-when-host-supports-them.md) — Skills prefer `AskUserQuestion` when host exposes structured prompts
+* [ADR-0015](doc/adr/0015-agentic-next-skill.md) — Workflow-operational skill `agentic-next` for state survey + next-action recommendations
+* [ADR-0016](doc/adr/0016-per-skill-next-section.md) — Each skill ends with a `Next` section cross-referencing follow-on skills
+* [ADR-0017](doc/adr/0017-agentic-spike-skill.md) — Workflow-operational skill `agentic-spike` for staged spikes with golden fixtures
+* [ADR-0018](doc/adr/0018-agentic-tdg-skill.md) — Workflow-operational skill `agentic-tdg` for outcome-based prompting + Test Dependency Map
+* [ADR-0019](doc/adr/0019-domain-language-layer.md) — Domain language layer (`CONTEXT.md`) as Layer 2 of the five-layer artifact stack
+* [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) — Ousterhout/Feathers vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality) as canonical architectural terms
+* [ADR-0021](doc/adr/0021-diagnose-discipline.md) — Workflow-operational skill `agentic-diagnose` for disciplined diagnosis loops
+* [ADR-0022](doc/adr/0022-agentic-grill-skill.md) — Workflow-operational skill `agentic-grill` for interview-before-research grilling sessions
