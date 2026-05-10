@@ -17,12 +17,33 @@ const AGENT_LABEL = {
 };
 
 function readProjectProfile(cwd) {
+  // Returns { agent: profileName }. Use `loadProjectStates(cwd)` instead
+  // when you need both the profile and the full state objects in a single
+  // pass (avoids the TOCTOU window where state files could be deleted
+  // between two reads — review C2, v0.11.3).
   const perAgent = {};
   for (const agent of VALID_AGENTS) {
     const state = loadState(cwd, agent);
     if (state) perAgent[agent] = state.profile ?? DEFAULT_PROFILE;
   }
   return perAgent;
+}
+
+function loadProjectStates(cwd) {
+  // Single-pass load of every per-agent state file. Returns
+  // { statesByAgent, profilesByAgent }. Both objects share the same agent
+  // keys so callers can iterate one and look up the other without a
+  // second filesystem read.
+  const statesByAgent = {};
+  const profilesByAgent = {};
+  for (const agent of VALID_AGENTS) {
+    const state = loadState(cwd, agent);
+    if (state) {
+      statesByAgent[agent] = state;
+      profilesByAgent[agent] = state.profile ?? DEFAULT_PROFILE;
+    }
+  }
+  return { statesByAgent, profilesByAgent };
 }
 
 function showProfile(cwd) {
@@ -64,8 +85,12 @@ function formatRule(rule) {
 async function setProfile(cwd, name, opts) {
   validateProfile(name);
 
-  const perAgent = readProjectProfile(cwd);
-  if (Object.keys(perAgent).length === 0) {
+  // Single load — reuse below to write. Avoids the TOCTOU window where
+  // state files could be deleted between read and re-read (review C2,
+  // v0.11.3). Previous implementation called readProjectProfile then
+  // loadState again per agent in the write loop.
+  const { statesByAgent, profilesByAgent } = loadProjectStates(cwd);
+  if (Object.keys(statesByAgent).length === 0) {
     throw new Error(
       'no agentic install detected. Run `agentic init --profile <name>` first.'
     );
@@ -73,7 +98,7 @@ async function setProfile(cwd, name, opts) {
 
   const interactive = process.stdout.isTTY && !opts.yes;
 
-  const currentProfiles = [...new Set(Object.values(perAgent))];
+  const currentProfiles = [...new Set(Object.values(profilesByAgent))];
   if (currentProfiles.length === 1 && currentProfiles[0] === name) {
     process.stdout.write(`Profile already \`${name}\` for all installed agents. No change.\n`);
     return;
@@ -82,7 +107,7 @@ async function setProfile(cwd, name, opts) {
   if (interactive) {
     p.intro(`agentic profile set ${name}`);
     p.note(
-      Object.entries(perAgent)
+      Object.entries(profilesByAgent)
         .map(([agent, profile]) => `${AGENT_LABEL[agent]}: ${profile} → ${name}`)
         .join('\n'),
       'Profile change'
@@ -101,9 +126,9 @@ async function setProfile(cwd, name, opts) {
   }
 
   // Write the new profile to each installed agent's state file before
-  // running update, so update reads the new profile.
-  for (const agent of Object.keys(perAgent)) {
-    const state = loadState(cwd, agent);
+  // running update, so update reads the new profile. Reuses the in-memory
+  // states loaded above — no second filesystem read.
+  for (const [agent, state] of Object.entries(statesByAgent)) {
     state.profile = name;
     saveState(cwd, agent, state);
   }
