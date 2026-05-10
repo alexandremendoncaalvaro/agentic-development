@@ -6,7 +6,7 @@
 
 **Quality bar:** docs read primarily by agents must be agent-comprehensible (terse, structured, no fluff); docs read by humans must be readable. Code: simple, secure, mature — right-sized for a CLI, no over-engineering.
 
-**Stack:** Node.js ≥18, ESM, plain JavaScript. Deps: `commander` (CLI), `@clack/prompts` (TUI). No DB, no build step, no framework.
+**Stack:** Node.js ≥20, ESM, plain JavaScript. Deps: `commander` (CLI), `@clack/prompts` (TUI — requires `node:util` `styleText`, Node 20+). No DB, no build step, no framework.
 **Entry points:** `bin/agentic.js` (npm bin) → `src/index.js` (commander wiring) → `src/commands/<verb>.js`. Today: only `init`. Skill source under `src/skills/<agent>/<skill>/`, copied into the target's `.claude/skills/` or `.agents/skills/` at install time.
 
 ## Setup, Build, Test
@@ -18,7 +18,7 @@ node bin/agentic.js init --agent both -y  # non-interactive
 npm test                                  # CLI --help smoke + node:test suite under test/
 ```
 
-Lint, formatter: not yet wired. CI runs `npm test` across Node 18 / 20 / 22 on every push and PR targeting `main` or `cli` ([`.github/workflows/test.yml`](.github/workflows/test.yml)).
+Lint, formatter: not yet wired. CI runs `npm test` across Node 20 / 22 on every push and PR targeting `main` or `cli` ([`.github/workflows/test.yml`](.github/workflows/test.yml)).
 
 ## Quality Gates
 
@@ -26,7 +26,7 @@ Deterministic enforcement — agent cannot skip. WORKFLOW §11 binding for the `
 
 * **Pre-push hook (lefthook):** `npm test` runs the full unit + integration suite. Bootstrap: `lefthook install` after clone. Config: [`lefthook.yml`](lefthook.yml).
 * **Pre-commit hook:** intentionally absent — kit has no lint or formatter wired today. Adding lint/format gates is a separate decision (own ADR + Task per ADR-0007 §6).
-* **CI:** GitHub Actions workflow at [`.github/workflows/test.yml`](.github/workflows/test.yml) runs `npm test` across Node 18 / 20 / 22 on every push and PR targeting `main` or `cli`. Redundant with the local pre-push hook; both stay wired so a missing local install does not skip the gate.
+* **CI:** GitHub Actions workflow at [`.github/workflows/test.yml`](.github/workflows/test.yml) runs `npm test` across Node 20 / 22 on every push and PR targeting `main` or `cli`. Redundant with the local pre-push hook; both stay wired so a missing local install does not skip the gate.
 * **Never bypass:** no `--no-verify`, no skipped hooks, no deleted failing tests. WORKFLOW §11 binding.
 
 ## Code Style
