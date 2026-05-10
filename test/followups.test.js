@@ -26,10 +26,10 @@ test('removeOrphanSkills: file recorded in state but missing on disk → removed
     // Forge a state that claims a skill was installed at a path that does
     // not exist on disk.
     const state = emptyState('claude-code', '0.9.4-test');
-    state.skills['agentic-bootstrap'] = {
+    state.skills['ad-bootstrap'] = {
       version: '0.9.4-test',
       files: [
-        { path: '.claude/skills/agentic-bootstrap/SKILL.md', sourceSha: 'aaa' },
+        { path: '.claude/skills/ad-bootstrap/SKILL.md', sourceSha: 'aaa' },
       ],
     };
 
@@ -43,7 +43,7 @@ test('removeOrphanSkills: file recorded in state but missing on disk → removed
 
     assert.equal(result.removedSkills.length, 1);
     const action = result.actions.find((a) =>
-      a.path.endsWith('agentic-bootstrap/SKILL.md')
+      a.path.endsWith('ad-bootstrap/SKILL.md')
     );
     assert.equal(
       action.type,
@@ -68,7 +68,7 @@ test('updateRootDoc: dryRun=true returns the would-be action without writing', a
 
     const action = await updateRootDoc({
       cwd: dir,
-      skills: ['agentic-bootstrap', 'agentic-philosophy'],
+      skills: ['ad-bootstrap', 'ad-philosophy'],
       confirmAppend: async () => true,
       dryRun: true,
     });
@@ -92,7 +92,7 @@ test('updateRootDoc: dryRun=true reports `updated` for stale section without wri
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
     await updateRootDoc({
       cwd: dir,
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       confirmAppend: async () => true,
     });
     const afterFirst = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
@@ -101,7 +101,7 @@ test('updateRootDoc: dryRun=true reports `updated` for stale section without wri
     // but leave the file untouched.
     const action = await updateRootDoc({
       cwd: dir,
-      skills: ['agentic-bootstrap', 'agentic-architecture'],
+      skills: ['ad-bootstrap', 'ad-architecture'],
       confirmReplace: async () => true,
       dryRun: true,
     });
@@ -126,14 +126,14 @@ test('updateRootDoc: bounds present + content diverged + confirmReplace=false �
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
     await updateRootDoc({
       cwd: dir,
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       confirmAppend: async () => true,
     });
     const afterBootstrap = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
 
     const action = await updateRootDoc({
       cwd: dir,
-      skills: ['agentic-bootstrap', 'agentic-architecture'],
+      skills: ['ad-bootstrap', 'ad-architecture'],
       confirmReplace: async () => false,
     });
     assert.equal(action.type, 'kept-stale');
@@ -159,7 +159,7 @@ test('saveState (via orderState): malformed state with non-array files throws wi
       agent: 'claude-code',
       profile: 'team',
       skills: {
-        'agentic-bootstrap': {
+        'ad-bootstrap': {
           version: '0.9.4-test',
           // files is missing entirely — orderState must surface the
           // missing-array shape with a clear error rather than crash on
@@ -169,7 +169,7 @@ test('saveState (via orderState): malformed state with non-array files throws wi
     };
     assert.throws(
       () => saveState(dir, 'claude-code', malformed),
-      /orderState: state\.skills\["agentic-bootstrap"\]\.files must be an array/
+      /orderState: state\.skills\["ad-bootstrap"\]\.files must be an array/
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });

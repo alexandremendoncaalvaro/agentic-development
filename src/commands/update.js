@@ -297,7 +297,7 @@ export async function updateCommand(opts) {
     }
   }
 
-  // Dedup: agentic-architecture and agentic-adr are universal at team /
+  // Dedup: ad-architecture and ad-adr are universal at team /
   // mature (in REQUIRED_SKILLS) AND conditional at solo (in
   // CONDITIONAL_SKILLS) per review B1 (v0.11.3). Without the Set, the
   // managed-skills section would list those rows twice.

@@ -89,139 +89,139 @@ test('availableConditionalsForProfile omits blocked entries', () => {
   // team allows the four v0.7-shape conditionals.
   const teamAvailable = availableConditionalsForProfile('team');
   const teamNames = teamAvailable.map((c) => c.name);
-  assert.ok(teamNames.includes('agentic-design'));
-  assert.ok(teamNames.includes('agentic-subagent'));
-  assert.ok(teamNames.includes('agentic-skill'));
-  assert.ok(teamNames.includes('agentic-hooks'));
+  assert.ok(teamNames.includes('ad-design'));
+  assert.ok(teamNames.includes('ad-subagent'));
+  assert.ok(teamNames.includes('ad-skill'));
+  assert.ok(teamNames.includes('ad-hooks'));
 });
 
-test('mature profile recommends agentic-hooks (rule === true)', () => {
+test('mature profile recommends ad-hooks (rule === true)', () => {
   const matureRules = Object.fromEntries(
     availableConditionalsForProfile('mature').map((c) => [c.name, c.rule])
   );
-  assert.equal(matureRules['agentic-hooks'], true);
+  assert.equal(matureRules['ad-hooks'], true);
 });
 
-test('agentic-next is universal in every profile (navigation aid is broadly valuable)', () => {
+test('ad-next is universal in every profile (navigation aid is broadly valuable)', () => {
   for (const name of PROFILE_NAMES) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-next'),
-      `profile ${name} must include agentic-next in its universal set per ADR-0015`
+      universal.has('ad-next'),
+      `profile ${name} must include ad-next in its universal set per ADR-0015`
     );
   }
 });
 
-test('agentic-spike is universal in every profile (technique uncertainty arises at every maturity)', () => {
+test('ad-spike is universal in every profile (technique uncertainty arises at every maturity)', () => {
   for (const name of PROFILE_NAMES) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-spike'),
-      `profile ${name} must include agentic-spike in its universal set per ADR-0017`
+      universal.has('ad-spike'),
+      `profile ${name} must include ad-spike in its universal set per ADR-0017`
     );
   }
 });
 
-test('agentic-tdg is universal in every profile (implementation-strategy uncertainty arises at every maturity)', () => {
+test('ad-tdg is universal in every profile (implementation-strategy uncertainty arises at every maturity)', () => {
   for (const name of PROFILE_NAMES) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-tdg'),
-      `profile ${name} must include agentic-tdg in its universal set per ADR-0018`
+      universal.has('ad-tdg'),
+      `profile ${name} must include ad-tdg in its universal set per ADR-0018`
     );
   }
 });
 
-test('agentic-domain is universal in every profile (Layer 2 ubiquitous language applies at every maturity per ADR-0019 §4)', () => {
+test('ad-domain is universal in every profile (Layer 2 ubiquitous language applies at every maturity per ADR-0019 §4)', () => {
   for (const name of PROFILE_NAMES) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-domain'),
-      `profile ${name} must include agentic-domain in its universal set per ADR-0019 §4`
+      universal.has('ad-domain'),
+      `profile ${name} must include ad-domain in its universal set per ADR-0019 §4`
     );
   }
 });
 
-test('agentic-grill is universal in every profile (interview-before-research applies at every maturity per ADR-0022)', () => {
+test('ad-grill is universal in every profile (interview-before-research applies at every maturity per ADR-0022)', () => {
   for (const name of PROFILE_NAMES) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-grill'),
-      `profile ${name} must include agentic-grill in its universal set per ADR-0022`
+      universal.has('ad-grill'),
+      `profile ${name} must include ad-grill in its universal set per ADR-0022`
     );
   }
 });
 
-test('agentic-diagnose is universal in every profile (debugging discipline applies at every maturity per ADR-0021 §3)', () => {
+test('ad-diagnose is universal in every profile (debugging discipline applies at every maturity per ADR-0021 §3)', () => {
   for (const name of PROFILE_NAMES) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-diagnose'),
-      `profile ${name} must include agentic-diagnose in its universal set per ADR-0021 §3`
+      universal.has('ad-diagnose'),
+      `profile ${name} must include ad-diagnose in its universal set per ADR-0021 §3`
     );
   }
 });
 
-test('agentic-commit is universal in solo / team / mature only (not poc per ADR-0023)', () => {
+test('ad-commit is universal in solo / team / mature only (not poc per ADR-0023)', () => {
   for (const name of ['solo', 'team', 'mature']) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-commit'),
-      `profile ${name} must include agentic-commit in its universal set per ADR-0023`
+      universal.has('ad-commit'),
+      `profile ${name} must include ad-commit in its universal set per ADR-0023`
     );
   }
   const pocUniversal = new Set(PROFILES.poc.universal);
   assert.ok(
-    !pocUniversal.has('agentic-commit'),
-    'profile poc must NOT include agentic-commit — commit ceremony aligns with artifact-producing layer per ADR-0023'
+    !pocUniversal.has('ad-commit'),
+    'profile poc must NOT include ad-commit — commit ceremony aligns with artifact-producing layer per ADR-0023'
   );
 });
 
-test('agentic-pr is universal in solo / team / mature only (not poc per ADR-0024)', () => {
+test('ad-pr is universal in solo / team / mature only (not poc per ADR-0024)', () => {
   for (const name of ['solo', 'team', 'mature']) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-pr'),
-      `profile ${name} must include agentic-pr in its universal set per ADR-0024`
+      universal.has('ad-pr'),
+      `profile ${name} must include ad-pr in its universal set per ADR-0024`
     );
   }
   const pocUniversal = new Set(PROFILES.poc.universal);
   assert.ok(
-    !pocUniversal.has('agentic-pr'),
-    'profile poc must NOT include agentic-pr per ADR-0024'
+    !pocUniversal.has('ad-pr'),
+    'profile poc must NOT include ad-pr per ADR-0024'
   );
 });
 
-test('agentic-merge is universal in solo / team / mature only (not poc per ADR-0025)', () => {
+test('ad-merge is universal in solo / team / mature only (not poc per ADR-0025)', () => {
   for (const name of ['solo', 'team', 'mature']) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-merge'),
-      `profile ${name} must include agentic-merge in its universal set per ADR-0025`
+      universal.has('ad-merge'),
+      `profile ${name} must include ad-merge in its universal set per ADR-0025`
     );
   }
   const pocUniversal = new Set(PROFILES.poc.universal);
   assert.ok(
-    !pocUniversal.has('agentic-merge'),
-    'profile poc must NOT include agentic-merge per ADR-0025'
+    !pocUniversal.has('ad-merge'),
+    'profile poc must NOT include ad-merge per ADR-0025'
   );
 });
 
-test('agentic-deepen is universal in team and mature only (premature for poc and solo per ADR-0020 §4)', () => {
+test('ad-deepen is universal in team and mature only (premature for poc and solo per ADR-0020 §4)', () => {
   // Present in team and mature.
   for (const name of ['team', 'mature']) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('agentic-deepen'),
-      `profile ${name} must include agentic-deepen in its universal set per ADR-0020 §4`
+      universal.has('ad-deepen'),
+      `profile ${name} must include ad-deepen in its universal set per ADR-0020 §4`
     );
   }
   // Absent from poc and solo — architectural deepening is premature for ≤200-line experiments.
   for (const name of ['poc', 'solo']) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      !universal.has('agentic-deepen'),
-      `profile ${name} must NOT include agentic-deepen — premature for this maturity per ADR-0020 §4`
+      !universal.has('ad-deepen'),
+      `profile ${name} must NOT include ad-deepen — premature for this maturity per ADR-0020 §4`
     );
   }
 });
@@ -236,12 +236,12 @@ test('init --profile poc installs only the poc universal set', () => {
         `expected ${skill} for poc profile`
       );
     }
-    // agentic-bootstrap is NOT in poc.universal — must not install.
-    assert.ok(!existsSync(join(dir, '.claude/skills/agentic-bootstrap')));
-    // agentic-spec is NOT in poc.universal — must not install.
-    assert.ok(!existsSync(join(dir, '.claude/skills/agentic-spec')));
-    // agentic-deepen is NOT in poc.universal per ADR-0020 §4 — must not install.
-    assert.ok(!existsSync(join(dir, '.claude/skills/agentic-deepen')));
+    // ad-bootstrap is NOT in poc.universal — must not install.
+    assert.ok(!existsSync(join(dir, '.claude/skills/ad-bootstrap')));
+    // ad-spec is NOT in poc.universal — must not install.
+    assert.ok(!existsSync(join(dir, '.claude/skills/ad-spec')));
+    // ad-deepen is NOT in poc.universal per ADR-0020 §4 — must not install.
+    assert.ok(!existsSync(join(dir, '.claude/skills/ad-deepen')));
 
     const state = loadState(dir, 'claude-code');
     assert.equal(state.profile, 'poc');
@@ -250,7 +250,7 @@ test('init --profile poc installs only the poc universal set', () => {
   }
 });
 
-test('init --profile solo does not install agentic-deepen (premature for solo per ADR-0020 §4)', () => {
+test('init --profile solo does not install ad-deepen (premature for solo per ADR-0020 §4)', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code', '--profile', 'solo', '--yes']);
@@ -262,13 +262,13 @@ test('init --profile solo does not install agentic-deepen (premature for solo pe
         `expected ${skill} for solo profile`
       );
     }
-    // agentic-deepen is NOT in solo.universal per ADR-0020 §4 — must not
+    // ad-deepen is NOT in solo.universal per ADR-0020 §4 — must not
     // install. Regression guard for the install-path level: the data-level
     // assertion in profiles.js could pass while a bug in skillsForAgent /
     // requiredSkillsForProfile lands deepen on disk anyway.
     assert.ok(
-      !existsSync(join(dir, '.claude/skills/agentic-deepen')),
-      'agentic-deepen must not install at solo profile per ADR-0020 §4'
+      !existsSync(join(dir, '.claude/skills/ad-deepen')),
+      'ad-deepen must not install at solo profile per ADR-0020 §4'
     );
 
     const state = loadState(dir, 'claude-code');
