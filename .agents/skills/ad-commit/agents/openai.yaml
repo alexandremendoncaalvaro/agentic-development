@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-commit
+  short_description: Atomic Conventional Commits with DCO `Signed-off-by` sign-off per ADR-0023. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.
+policy:
+  allow_implicit_invocation: false

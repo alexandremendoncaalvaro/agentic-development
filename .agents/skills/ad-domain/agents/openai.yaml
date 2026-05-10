@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-domain
+  short_description: Lazy lifecycle owner of CONTEXT.md (Layer 2 — ubiquitous language per Evans 2003). Captures canonical project-specific nouns with aliases-to-avoid, relationships, and flagged ambiguities. Single-context or CONTEXT-MAP.md multi-context. Implements ADR-0019.
+policy:
+  allow_implicit_invocation: false

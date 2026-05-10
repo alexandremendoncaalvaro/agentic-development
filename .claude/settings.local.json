@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm test *)",
+      "Bash(node bin/agentic.js update --yes)",
+      "Bash(node bin/agentic.js update --yes --force)",
+      "Bash(node bin/agentic.js update --yes --force --remove-orphans)",
+      "Bash(node *)"
+    ]
+  }
+}

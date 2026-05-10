@@ -4,133 +4,133 @@
   "agent": "claude-code",
   "profile": "team",
   "skills": {
-    "agentic-adr": {
+    "ad-adr": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-adr/SKILL.md",
-          "sourceSha": "b45f03f0f42aeb1662ce46f8290611524711ba87ea647cb4cc265574652836bb"
+          "path": ".claude/skills/ad-adr/SKILL.md",
+          "sourceSha": "19096f91c1a430619d33c985f0637c7bdcf63f62a38effb1407db037d907c57c"
         }
       ]
     },
-    "agentic-architecture": {
+    "ad-architecture": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-architecture/SKILL.md",
-          "sourceSha": "91e05fb157799d9411b99d0c1a68e8477386e63b235c335f69dc92d18940e79b"
+          "path": ".claude/skills/ad-architecture/SKILL.md",
+          "sourceSha": "fcfc15064216246cffe0d975733c97c974085bca48808340b55602f4fdfe110e"
         }
       ]
     },
-    "agentic-audit": {
+    "ad-audit": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-audit/SKILL.md",
-          "sourceSha": "7e835ebf1ff97d20e39b50dfb0e3cbb99d70a6b177283e304265c0749cb518c3"
+          "path": ".claude/skills/ad-audit/SKILL.md",
+          "sourceSha": "41faa8dfb1df3fd6b51c5ee11c8d7bcd94d8e4eca5361b91be8e7ced2fe997f1"
         }
       ]
     },
-    "agentic-bootstrap": {
+    "ad-bootstrap": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-bootstrap/SKILL.md",
-          "sourceSha": "8b58e34e9c1a818743b31d9138c13272b6146a802a57fddbb52259c80a9f4bcd"
+          "path": ".claude/skills/ad-bootstrap/SKILL.md",
+          "sourceSha": "67a109786c5286b67ad8f09a27a33c558121227e702f0188a4e4b75ff2c36861"
         }
       ]
     },
-    "agentic-commit": {
+    "ad-commit": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-commit/SKILL.md",
-          "sourceSha": "8e254aec9c49a89753021db76347a7f1b6eed20d4e87d8c69711711c31ca29c4"
+          "path": ".claude/skills/ad-commit/SKILL.md",
+          "sourceSha": "96212aba93b2fffffaa16786558f3346696a92ed0b17b3c19ea1576b00833c93"
         }
       ]
     },
-    "agentic-deepen": {
+    "ad-deepen": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-deepen/SKILL.md",
-          "sourceSha": "ca07bfed2d211aa48ce7e2c6eec27915d1a478543a48bdfce29c047bfb52d29e"
+          "path": ".claude/skills/ad-deepen/SKILL.md",
+          "sourceSha": "d00f20330bb3e7089afbcf3c58bb30574902ed27657bdc578cc1bc0929ab3eec"
         }
       ]
     },
-    "agentic-diagnose": {
+    "ad-diagnose": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-diagnose/SKILL.md",
-          "sourceSha": "f08624b2a773d22dbf4684b657732c8fcefac0cd5fc67a7be8e170fe9a50a0a7"
+          "path": ".claude/skills/ad-diagnose/SKILL.md",
+          "sourceSha": "27fe3a23658d862a9495e6ec9dc83247be9b4ff6519711abb1cd11eb784c8dd4"
         }
       ]
     },
-    "agentic-domain": {
+    "ad-domain": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-domain/SKILL.md",
-          "sourceSha": "88e3949da48f55ac6654e5051a4bc595478944ecb0dad52f9e5b1d87cc7f771c"
+          "path": ".claude/skills/ad-domain/SKILL.md",
+          "sourceSha": "b4b7aa6a075d258b392a6e60a30715559a5ab65b1c6c99a1d2914f4842dfb41e"
         }
       ]
     },
-    "agentic-grill": {
+    "ad-grill": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-grill/SKILL.md",
-          "sourceSha": "160540d76c919b819a05dae17c98b26c98669fdc90a0ead2e3666e62c71a3fae"
+          "path": ".claude/skills/ad-grill/SKILL.md",
+          "sourceSha": "0cf502c9b35141c38aed5212410fcba609d055edb7f295409767a17344f69627"
         }
       ]
     },
-    "agentic-ground": {
+    "ad-ground": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-ground/SKILL.md",
-          "sourceSha": "b72032abadb69615e4b2520f2dd528afea8eb518fb0db6f6dade76d9c117200b"
+          "path": ".claude/skills/ad-ground/SKILL.md",
+          "sourceSha": "4716df961d40ea1132d267accfde1888e03fe1620888ad886e76817621477db2"
         }
       ]
     },
-    "agentic-merge": {
+    "ad-merge": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-merge/SKILL.md",
-          "sourceSha": "1bdca0a754d4362cbb64b35152f08894b8272ea95ad2dbca496c4d05c386805d"
+          "path": ".claude/skills/ad-merge/SKILL.md",
+          "sourceSha": "d9f99c5aaa89ab42064eca457937ce881d3c8e784b37c25de60e2e431d5fb7a9"
         }
       ]
     },
-    "agentic-next": {
+    "ad-next": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-next/SKILL.md",
-          "sourceSha": "65a8006022ad1ccd22f9d27c3f9d2ea591e91e48431a996dd5c9d3a3df49fb26"
+          "path": ".claude/skills/ad-next/SKILL.md",
+          "sourceSha": "45dc96a334c232a132ede9df70b6d3381fdb8348c9f98c9ca5825a881d97c738"
         }
       ]
     },
-    "agentic-philosophy": {
+    "ad-philosophy": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-philosophy/SKILL.md",
-          "sourceSha": "1475b39a5d69fa6ce9f3a0e14b012d7d2475cf3775eb8fdeacb9e9662bee1bc4"
+          "path": ".claude/skills/ad-philosophy/SKILL.md",
+          "sourceSha": "a97165505835885f06487200b5ab299d821dfb9fb8fe3430e45dcb98ca4ff87b"
         }
       ]
     },
-    "agentic-pr": {
+    "ad-pr": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-pr/SKILL.md",
-          "sourceSha": "dfc968b532721a2d205af14843ed976556cbe6ef0c187cc74b18f54124688b98"
+          "path": ".claude/skills/ad-pr/SKILL.md",
+          "sourceSha": "7f4de1de3444b546666d5c1e491d1d65a24b4aaa11ae7bb5c14ecbe05eb78267"
         }
       ]
     },
-    "agentic-review": {
+    "ad-review": {
       "version": "0.15.0-beta.1",
       "files": [
         {
@@ -138,53 +138,53 @@
           "sourceSha": "01c7e30a9b501a8613639da4bd8cb197cd542b91963853d9bb493d43ae725341"
         },
         {
-          "path": ".claude/skills/agentic-review/SKILL.md",
-          "sourceSha": "d4aa6b77a9956b6dea59f93d0157beef5e7143fd797dcc50228d4b938113f390"
+          "path": ".claude/skills/ad-review/SKILL.md",
+          "sourceSha": "96a10baba168b17cff6e7982ad6ad5f62308a44e3c7276bb7456974bf69a9c46"
         }
       ]
     },
-    "agentic-spec": {
+    "ad-spec": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-spec/SKILL.md",
-          "sourceSha": "1523c299d4f94182eab4834bf4e569e5d02698f7bbdc4cd4a67cad405c62973f"
+          "path": ".claude/skills/ad-spec/SKILL.md",
+          "sourceSha": "8841dd7a59384cbffe217210af259e1dd4abaeb12e1ad3cb8fc4aa6d3a03141e"
         }
       ]
     },
-    "agentic-spike": {
+    "ad-spike": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-spike/SKILL.md",
-          "sourceSha": "1557a1ef57a127b7afdcec399f3591f18a3c2910140e31b421a672a2bf8465b5"
+          "path": ".claude/skills/ad-spike/SKILL.md",
+          "sourceSha": "12a738f0cc9cd6cb49859a1b8471fc192b8f7af09789202e952ec9b8eeb6aeea"
         }
       ]
     },
-    "agentic-subagent": {
+    "ad-subagent": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-subagent/SKILL.md",
-          "sourceSha": "1d76cab8c211b471bf990e7956367cc6d57d2ef91884792a3ff4b51733bbba11"
+          "path": ".claude/skills/ad-subagent/SKILL.md",
+          "sourceSha": "d22f4f15de4b613484401bc12ca0209abf45da94b24d890f10a2d24a53193024"
         }
       ]
     },
-    "agentic-task": {
+    "ad-task": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-task/SKILL.md",
-          "sourceSha": "1a37a27007bbb7e1c897925bdbca0ff92db2d34a8e2e7aa559fa0d4d289b7694"
+          "path": ".claude/skills/ad-task/SKILL.md",
+          "sourceSha": "b1dabc7a0cf502f69606be08b7fab7d79c08a1e713f82df70947293cf7e9e36f"
         }
       ]
     },
-    "agentic-tdg": {
+    "ad-tdg": {
       "version": "0.15.0-beta.1",
       "files": [
         {
-          "path": ".claude/skills/agentic-tdg/SKILL.md",
-          "sourceSha": "306b51293bba7727c4ba42443bebcb2634c6f2bd1aee20e898f954d496b144a9"
+          "path": ".claude/skills/ad-tdg/SKILL.md",
+          "sourceSha": "1d230766aef50c21ae8e55ead49fb05eb78d0167e7a2a66c8fa18a6c3eabb75b"
         }
       ]
     }

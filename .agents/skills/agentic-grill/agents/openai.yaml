@@ -1,5 +1,0 @@
-interface:
-  display_name: agentic-grill
-  short_description: Interview-before-research grilling per ADR-0022. One question at a time with recommendation, codebase-first, sharpens vocabulary against CONTEXT.md, captures terms via agentic-domain and decisions via agentic-adr (three-criteria rule). Upstream of agentic-ground.
-policy:
-  allow_implicit_invocation: false
