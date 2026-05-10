@@ -242,6 +242,20 @@ test('init --profile poc installs only the poc universal set', () => {
     assert.ok(!existsSync(join(dir, '.claude/skills/ad-spec')));
     // ad-deepen is NOT in poc.universal per ADR-0020 §4 — must not install.
     assert.ok(!existsSync(join(dir, '.claude/skills/ad-deepen')));
+    // ad-commit / ad-pr / ad-merge are NOT in poc.universal per
+    // ADR-0023 / ADR-0024 / ADR-0025 — must not install at poc.
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/ad-commit')),
+      'ad-commit must not install at poc profile per ADR-0023'
+    );
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/ad-pr')),
+      'ad-pr must not install at poc profile per ADR-0024'
+    );
+    assert.ok(
+      !existsSync(join(dir, '.claude/skills/ad-merge')),
+      'ad-merge must not install at poc profile per ADR-0025'
+    );
 
     const state = loadState(dir, 'claude-code');
     assert.equal(state.profile, 'poc');

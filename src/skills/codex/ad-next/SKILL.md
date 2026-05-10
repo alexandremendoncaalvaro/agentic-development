@@ -85,5 +85,5 @@ A single Markdown message structured as:
 2. <action> — <one-line reason>
 ```
 
-No file written. No state mutation. Recommendations are advisory; the user decides whether to invoke. Cross-references `ad-audit` (drift detection), `agentic-update` (kit drift), `agentic-profile` (profile changes) where they apply.
+No file written. No state mutation. Recommendations are advisory; the user decides whether to invoke. Cross-references `ad-audit` (drift detection), `agentic update` (kit drift — CLI subcommand, not a skill), `agentic profile` (profile changes — CLI subcommand, not a skill) where they apply.
 </output_contract>
