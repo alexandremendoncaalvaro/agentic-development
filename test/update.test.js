@@ -45,13 +45,13 @@ test('init writes state.json for claude-code', () => {
     const state = loadState(dir, 'claude-code');
     assert.ok(state, 'state file must exist after init');
     assert.equal(state.agent, 'claude-code');
-    assert.ok(state.skills['agentic-bootstrap']);
+    assert.ok(state.skills['ad-bootstrap']);
     assert.ok(
-      state.skills['agentic-bootstrap'].files.some((f) =>
-        f.path.endsWith('agentic-bootstrap/SKILL.md')
+      state.skills['ad-bootstrap'].files.some((f) =>
+        f.path.endsWith('ad-bootstrap/SKILL.md')
       )
     );
-    assert.ok(state.skills['agentic-bootstrap'].files[0].sourceSha.match(/^[a-f0-9]{64}$/));
+    assert.ok(state.skills['ad-bootstrap'].files[0].sourceSha.match(/^[a-f0-9]{64}$/));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -75,7 +75,7 @@ test('installSkills: state-aware re-run on identical files → unchanged actions
     const first = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       kitVersion: '0.3.0-test',
     });
     saveState(dir, 'claude-code', first.nextStates['claude-code']);
@@ -83,7 +83,7 @@ test('installSkills: state-aware re-run on identical files → unchanged actions
     const second = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       previousStates: { 'claude-code': loadState(dir, 'claude-code') },
       kitVersion: '0.3.0-test',
     });
@@ -102,25 +102,25 @@ test('installSkills: kit changed + user untouched → kit-changed-update silent'
     await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
     });
 
     // Simulate the "previous kit version's content" by overwriting the target with
     // an older body, and computing the SHA of that older body for the state file.
     // This is the real shape of "kit changed since last install": target reflects
     // the OLD source (user untouched), current kit source differs.
-    const target = join(dir, '.claude/skills/agentic-bootstrap/SKILL.md');
+    const target = join(dir, '.claude/skills/ad-bootstrap/SKILL.md');
     const oldBody = '# old SKILL.md from a previous kit version\n';
     writeFileSync(target, oldBody);
     const { createHash } = await import('node:crypto');
     const oldSha = createHash('sha256').update(oldBody).digest('hex');
 
     const state = emptyState('claude-code', '0.2.0');
-    state.skills['agentic-bootstrap'] = {
+    state.skills['ad-bootstrap'] = {
       version: '0.2.0',
       files: [
         {
-          path: '.claude/skills/agentic-bootstrap/SKILL.md',
+          path: '.claude/skills/ad-bootstrap/SKILL.md',
           sourceSha: oldSha,
         },
       ],
@@ -129,12 +129,12 @@ test('installSkills: kit changed + user untouched → kit-changed-update silent'
     const result = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       previousStates: { 'claude-code': state },
       kitVersion: '0.3.0',
     });
     const skillAction = result.actions.find((a) =>
-      a.path.endsWith('agentic-bootstrap/SKILL.md')
+      a.path.endsWith('ad-bootstrap/SKILL.md')
     );
     assert.equal(skillAction.type, 'updated');
     assert.notEqual(
@@ -153,24 +153,24 @@ test('installSkills: kit unchanged + user edited → kept (silent, preserves use
     const first = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       kitVersion: '0.3.0-test',
     });
     saveState(dir, 'claude-code', first.nextStates['claude-code']);
 
     // User edits the file.
-    const target = join(dir, '.claude/skills/agentic-bootstrap/SKILL.md');
+    const target = join(dir, '.claude/skills/ad-bootstrap/SKILL.md');
     writeFileSync(target, 'USER LOCAL CHANGES\n');
 
     const result = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       previousStates: { 'claude-code': loadState(dir, 'claude-code') },
       kitVersion: '0.3.0-test',
     });
     const skillAction = result.actions.find((a) =>
-      a.path.endsWith('agentic-bootstrap/SKILL.md')
+      a.path.endsWith('ad-bootstrap/SKILL.md')
     );
     assert.equal(skillAction.type, 'kept');
     assert.equal(readFileSync(target, 'utf8'), 'USER LOCAL CHANGES\n');
@@ -185,31 +185,31 @@ test('installSkills: kit changed + user changed + force=false → conflict-promp
     await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
     });
     const state = emptyState('claude-code', '0.2.0');
-    state.skills['agentic-bootstrap'] = {
+    state.skills['ad-bootstrap'] = {
       version: '0.2.0',
       files: [
         {
-          path: '.claude/skills/agentic-bootstrap/SKILL.md',
+          path: '.claude/skills/ad-bootstrap/SKILL.md',
           sourceSha: 'stale-sha-different-from-current-source-and-current-target-content',
         },
       ],
     };
-    const target = join(dir, '.claude/skills/agentic-bootstrap/SKILL.md');
+    const target = join(dir, '.claude/skills/ad-bootstrap/SKILL.md');
     writeFileSync(target, 'USER LOCAL CHANGES\n');
 
     const result = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       previousStates: { 'claude-code': state },
       kitVersion: '0.3.0',
       confirmReplace: async () => false,
     });
     const skillAction = result.actions.find((a) =>
-      a.path.endsWith('agentic-bootstrap/SKILL.md')
+      a.path.endsWith('ad-bootstrap/SKILL.md')
     );
     assert.equal(skillAction.type, 'skipped');
     assert.equal(readFileSync(target, 'utf8'), 'USER LOCAL CHANGES\n');
@@ -224,31 +224,31 @@ test('installSkills: kit changed + user changed + force=true → replaced', asyn
     await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
     });
     const state = emptyState('claude-code', '0.2.0');
-    state.skills['agentic-bootstrap'] = {
+    state.skills['ad-bootstrap'] = {
       version: '0.2.0',
       files: [
         {
-          path: '.claude/skills/agentic-bootstrap/SKILL.md',
+          path: '.claude/skills/ad-bootstrap/SKILL.md',
           sourceSha: 'stale-sha-different-from-current-source-and-current-target-content',
         },
       ],
     };
-    const target = join(dir, '.claude/skills/agentic-bootstrap/SKILL.md');
+    const target = join(dir, '.claude/skills/ad-bootstrap/SKILL.md');
     writeFileSync(target, 'USER LOCAL CHANGES\n');
 
     const result = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       previousStates: { 'claude-code': state },
       kitVersion: '0.3.0',
       force: true,
     });
     const skillAction = result.actions.find((a) =>
-      a.path.endsWith('agentic-bootstrap/SKILL.md')
+      a.path.endsWith('ad-bootstrap/SKILL.md')
     );
     assert.equal(skillAction.type, 'replaced');
     assert.notEqual(readFileSync(target, 'utf8'), 'USER LOCAL CHANGES\n');
@@ -263,16 +263,16 @@ test('installSkills: dry-run writes nothing, returns plan', async () => {
     const result = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       kitVersion: '0.3.0-test',
       dryRun: true,
     });
     const skillAction = result.actions.find((a) =>
-      a.path.endsWith('agentic-bootstrap/SKILL.md')
+      a.path.endsWith('ad-bootstrap/SKILL.md')
     );
     assert.equal(skillAction.type, 'created');
     assert.ok(
-      !existsSync(join(dir, '.claude/skills/agentic-bootstrap/SKILL.md')),
+      !existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')),
       'dry-run must not write files'
     );
   } finally {
@@ -286,24 +286,24 @@ test('removeOrphanSkills: previous skill no longer in opted set → prompt → c
     await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
     });
     const state = emptyState('claude-code', '0.3.0');
-    state.skills['agentic-bootstrap'] = {
+    state.skills['ad-bootstrap'] = {
       version: '0.3.0',
-      files: [{ path: '.claude/skills/agentic-bootstrap/SKILL.md', sourceSha: 'sha' }],
+      files: [{ path: '.claude/skills/ad-bootstrap/SKILL.md', sourceSha: 'sha' }],
     };
 
     const result = await removeOrphanSkills({
       cwd: dir,
       agent: 'claude-code',
       previousState: state,
-      currentSkills: ['agentic-philosophy'],
+      currentSkills: ['ad-philosophy'],
       confirmRemove: async () => false,
     });
     assert.equal(result.removedSkills.length, 0);
     assert.ok(
-      existsSync(join(dir, '.claude/skills/agentic-bootstrap/SKILL.md')),
+      existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')),
       'file must remain when keep'
     );
     assert.equal(result.actions[0].type, 'orphan-kept');
@@ -318,24 +318,24 @@ test('removeOrphanSkills: confirmRemove=true → file deleted, action removed', 
     await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
     });
     const state = emptyState('claude-code', '0.3.0');
-    state.skills['agentic-bootstrap'] = {
+    state.skills['ad-bootstrap'] = {
       version: '0.3.0',
-      files: [{ path: '.claude/skills/agentic-bootstrap/SKILL.md', sourceSha: 'sha' }],
+      files: [{ path: '.claude/skills/ad-bootstrap/SKILL.md', sourceSha: 'sha' }],
     };
 
     const result = await removeOrphanSkills({
       cwd: dir,
       agent: 'claude-code',
       previousState: state,
-      currentSkills: ['agentic-philosophy'],
+      currentSkills: ['ad-philosophy'],
       confirmRemove: async () => true,
     });
-    assert.deepEqual(result.removedSkills, ['agentic-bootstrap']);
+    assert.deepEqual(result.removedSkills, ['ad-bootstrap']);
     assert.ok(
-      !existsSync(join(dir, '.claude/skills/agentic-bootstrap/SKILL.md')),
+      !existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')),
       'file must be deleted'
     );
     assert.equal(result.actions[0].type, 'removed');
@@ -366,7 +366,7 @@ test('update --yes after a kit-changed file → silent update, target replaced w
     // untouched), and the recorded sourceSha matches that older content.
     // The current kit source is what runInit just shipped — so we overwrite
     // the target with synthetic old content and forge the SHA to match it.
-    const target = join(dir, '.claude/skills/agentic-bootstrap/SKILL.md');
+    const target = join(dir, '.claude/skills/ad-bootstrap/SKILL.md');
     const currentSource = readFileSync(target, 'utf8');
     const oldBody = '# old SKILL.md from a previous kit version\n';
     writeFileSync(target, oldBody);
@@ -374,8 +374,8 @@ test('update --yes after a kit-changed file → silent update, target replaced w
     const oldSha = createHash('sha256').update(oldBody).digest('hex');
 
     const state = loadState(dir, 'claude-code');
-    state.skills['agentic-bootstrap'].files = state.skills[
-      'agentic-bootstrap'
+    state.skills['ad-bootstrap'].files = state.skills[
+      'ad-bootstrap'
     ].files.map((f) =>
       f.path.endsWith('SKILL.md') ? { ...f, sourceSha: oldSha } : f
     );
@@ -387,7 +387,7 @@ test('update --yes after a kit-changed file → silent update, target replaced w
     assert.equal(after, currentSource, 'target must equal current kit source');
 
     const newState = loadState(dir, 'claude-code');
-    const skillSha = newState.skills['agentic-bootstrap'].files.find((f) =>
+    const skillSha = newState.skills['ad-bootstrap'].files.find((f) =>
       f.path.endsWith('SKILL.md')
     ).sourceSha;
     assert.notEqual(skillSha, oldSha, 'state must be refreshed with current SHA');
@@ -408,19 +408,19 @@ test('installSkills: skip on conflict records current sourceSha so a re-run with
     await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
     });
 
     // User edits the file → divergent target. Forge a stale prevSha so the
     // diff sees a real conflict (kit changed AND user changed).
-    const target = join(dir, '.claude/skills/agentic-bootstrap/SKILL.md');
+    const target = join(dir, '.claude/skills/ad-bootstrap/SKILL.md');
     writeFileSync(target, 'USER LOCAL EDITS\n');
     const state = emptyState('claude-code', '0.2.0');
-    state.skills['agentic-bootstrap'] = {
+    state.skills['ad-bootstrap'] = {
       version: '0.2.0',
       files: [
         {
-          path: '.claude/skills/agentic-bootstrap/SKILL.md',
+          path: '.claude/skills/ad-bootstrap/SKILL.md',
           sourceSha: 'stale-prev-sha-from-an-older-kit',
         },
       ],
@@ -430,13 +430,13 @@ test('installSkills: skip on conflict records current sourceSha so a re-run with
     const skipResult = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       previousStates: { 'claude-code': state },
       kitVersion: '0.3.0',
       confirmReplace: async () => false,
     });
     const skipAction = skipResult.actions.find((a) =>
-      a.path.endsWith('agentic-bootstrap/SKILL.md')
+      a.path.endsWith('ad-bootstrap/SKILL.md')
     );
     assert.equal(skipAction.type, 'skipped');
 
@@ -444,7 +444,7 @@ test('installSkills: skip on conflict records current sourceSha so a re-run with
     // unchanged classifies the file as user-edited-keep (silent), not a
     // repeated conflict-prompt. Recording prevSha would re-prompt every run.
     saveState(dir, 'claude-code', skipResult.nextStates['claude-code']);
-    const recordedSha = loadState(dir, 'claude-code').skills['agentic-bootstrap']
+    const recordedSha = loadState(dir, 'claude-code').skills['ad-bootstrap']
       .files.find((f) => f.path.endsWith('SKILL.md')).sourceSha;
     assert.match(recordedSha, /^[a-f0-9]{64}$/);
     assert.notEqual(recordedSha, 'stale-prev-sha-from-an-older-kit');
@@ -453,7 +453,7 @@ test('installSkills: skip on conflict records current sourceSha so a re-run with
     const rerun = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       previousStates: { 'claude-code': loadState(dir, 'claude-code') },
       kitVersion: '0.3.0',
       confirmReplace: async () => {
@@ -461,7 +461,7 @@ test('installSkills: skip on conflict records current sourceSha so a re-run with
       },
     });
     const rerunAction = rerun.actions.find((a) =>
-      a.path.endsWith('agentic-bootstrap/SKILL.md')
+      a.path.endsWith('ad-bootstrap/SKILL.md')
     );
     assert.equal(rerunAction.type, 'kept');
     assert.equal(readFileSync(target, 'utf8'), 'USER LOCAL EDITS\n');
@@ -476,7 +476,7 @@ test('installSkills: nextStates carry SCHEMA_VERSION from state.js, not a hardco
     const result = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['agentic-bootstrap'],
+      skills: ['ad-bootstrap'],
       kitVersion: '0.3.0-beta.2',
     });
     const { SCHEMA_VERSION } = await import('../src/lib/state.js');
@@ -497,7 +497,7 @@ test('update on legacy install (no state) → falls through to byte-compare, the
     runUpdate(dir, ['--agent', 'claude-code', '--yes']);
     const after = loadState(dir, 'claude-code');
     assert.ok(after, 'state must be written after first update on legacy install');
-    assert.ok(after.skills['agentic-bootstrap']);
+    assert.ok(after.skills['ad-bootstrap']);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

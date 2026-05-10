@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-tdg
+  short_description: Outcome-based prompting per WORKFLOW §9. Ground truth pair + Test Dependency Map + three approaches + single-criterion selection. For implementation-strategy uncertainty when the technique is known; routes to ad-spike if the technique itself is uncertain.
+policy:
+  allow_implicit_invocation: false

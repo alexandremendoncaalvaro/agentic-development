@@ -12,30 +12,44 @@ const SECTION_START_RE = /^<!-- agentic-managed-skills:start -->\n\n## Skills in
 const SECTION_END_RE = /^<!-- agentic-managed-skills:end -->$/m;
 
 export const SKILL_DESCRIPTIONS = {
-  'agentic-bootstrap': 'Generate or audit `AGENTS.md` at the repo root.',
-  'agentic-philosophy':
+  'ad-bootstrap': 'Generate or audit `AGENTS.md` at the repo root.',
+  'ad-philosophy':
     'Universal agent guardrails (think before coding, verify before claiming done). Auto-loads on non-trivial work.',
-  'agentic-architecture': 'Generate or audit `ARCHITECTURE.md` at the repo root.',
-  'agentic-adr': 'Draft a new ADR at `doc/adr/NNNN-<slug>.md`.',
-  'agentic-spec':
+  'ad-architecture': 'Generate or audit `ARCHITECTURE.md` at the repo root.',
+  'ad-adr': 'Draft a new ADR at `doc/adr/NNNN-<slug>.md`.',
+  'ad-spec':
     'Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 3 of the five-layer artifact stack.',
-  'agentic-task': 'Draft a new task at `doc/tasks/NNNN-<slug>.md`.',
-  'agentic-audit':
+  'ad-task': 'Draft a new task at `doc/tasks/NNNN-<slug>.md`.',
+  'ad-audit':
     'Read-only drift report comparing AGENTS.md / ARCHITECTURE.md / ADRs against the code.',
-  'agentic-review':
+  'ad-review':
     'Fresh-context code review per WORKFLOW §10 — assemble handoff, return structured findings.',
-  'agentic-ground':
+  'ad-ground':
     'Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate. WORKFLOW §4 + §5.',
-  'agentic-next':
+  'ad-next':
     'State survey + prioritized next-action recommendations across the five-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).',
-  'agentic-spike':
+  'ad-spike':
     'Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.',
-  'agentic-tdg':
+  'ad-tdg':
     'Outcome-based prompting per WORKFLOW §9. Ground truth pair + Test Dependency Map + three approaches + single-criterion selection, when the technique is known but the implementation strategy is uncertain.',
-  'agentic-design': 'Bootstrap `DESIGN.md` from existing tokens (frontend projects).',
-  'agentic-subagent': 'Draft a new Claude Code subagent at `.claude/agents/<name>.md`.',
-  'agentic-skill': 'Draft a new Claude Code or Codex skill at the appropriate path.',
-  'agentic-hooks':
+  'ad-domain':
+    'Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003). Captures canonical project-specific nouns with aliases-to-avoid, relationships, and flagged ambiguities. Single-context or `CONTEXT-MAP.md` multi-context.',
+  'ad-grill':
+    'Interview-before-research grilling session — one question at a time with recommendation, codebase-first, sharpens vocabulary against `CONTEXT.md`, captures terms via `ad-domain` and decisions via `ad-adr` (three-criteria rule). Upstream of `ad-ground`.',
+  'ad-deepen':
+    'Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one. Pairs with `ad-audit`. Profile-scoped to `team` and `mature` only.',
+  'ad-diagnose':
+    'Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.',
+  'ad-commit':
+    'Atomic Conventional Commits with DCO `Signed-off-by` sign-off per ADR-0023. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.',
+  'ad-pr':
+    'Open a GitHub pull request with a uniform body shape (Summary / Test plan / Links) per ADR-0024. Four phases — preflight (`gh` auth + branch pushed), scope assembly, draft body, open + report URL. Title format = Conventional Commits.',
+  'ad-merge':
+    'Evaluate and merge a GitHub pull request per ADR-0025. Four phases — preflight, evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`.',
+  'ad-design': 'Bootstrap `DESIGN.md` from existing tokens (frontend projects).',
+  'ad-subagent': 'Draft a new Claude Code subagent at `.claude/agents/<name>.md`.',
+  'ad-skill': 'Draft a new Claude Code or Codex skill at the appropriate path.',
+  'ad-hooks':
     'Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals.',
 };
 
@@ -66,7 +80,7 @@ function buildSection(skills) {
   for (const skill of skills) {
     const note = SKILL_DESCRIPTIONS[skill] || '';
     const invoke =
-      skill === 'agentic-philosophy' ? '_(implicit)_' : `\`/${skill}\``;
+      skill === 'ad-philosophy' ? '_(implicit)_' : `\`/${skill}\``;
     lines.push(`| \`${skill}\` | ${invoke} | ${note} |`);
   }
   lines.push('');

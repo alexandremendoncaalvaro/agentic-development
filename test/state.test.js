@@ -51,9 +51,9 @@ test('loadState/saveState: round-trip preserves shape', () => {
   const dir = mkScratch();
   try {
     const state = emptyState('claude-code', '0.3.0-beta.1');
-    state.skills['agentic-bootstrap'] = {
+    state.skills['ad-bootstrap'] = {
       version: '0.3.0-beta.1',
-      files: [{ path: '.claude/skills/agentic-bootstrap/SKILL.md', sourceSha: 'abc' }],
+      files: [{ path: '.claude/skills/ad-bootstrap/SKILL.md', sourceSha: 'abc' }],
     };
     saveState(dir, 'claude-code', state);
     assert.ok(existsSync(join(dir, STATE_DIRS['claude-code'], STATE_FILE)));
@@ -61,9 +61,9 @@ test('loadState/saveState: round-trip preserves shape', () => {
     assert.equal(loaded.kitVersion, '0.3.0-beta.1');
     assert.equal(loaded.agent, 'claude-code');
     assert.equal(loaded.schemaVersion, SCHEMA_VERSION);
-    assert.deepEqual(loaded.skills['agentic-bootstrap'], {
+    assert.deepEqual(loaded.skills['ad-bootstrap'], {
       version: '0.3.0-beta.1',
-      files: [{ path: '.claude/skills/agentic-bootstrap/SKILL.md', sourceSha: 'abc' }],
+      files: [{ path: '.claude/skills/ad-bootstrap/SKILL.md', sourceSha: 'abc' }],
     });
   } finally {
     rmSync(dir, { recursive: true, force: true });
