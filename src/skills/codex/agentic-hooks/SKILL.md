@@ -60,3 +60,10 @@ Documentation discipline rules apply at write time:
 - One scope: Quality Gates. No duplication of ARCHITECTURE.md or ADR rationale.
 - No commented-out scripts. No orphan TODO / FIXME.
 </output_contract>
+
+## Next
+
+- Run the runner's bootstrap command (cited in Step 5 — e.g., `npm install`, `lefthook install`, `pre-commit install`).
+- Verify a deliberately-failing edit (e.g., a known lint violation) gets blocked at commit.
+- Add a redundant CI gate so contributors cannot bypass via `--no-verify`. WORKFLOW §11 binding.
+- `/agentic-audit` periodically to confirm hooks stay wired as the project evolves.

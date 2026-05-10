@@ -93,3 +93,9 @@ A single `ARCHITECTURE.md` at the repo root. Every line locks a binding pattern.
 - One scope: system-level patterns and boundaries. Per-decision rationale lives in ADRs; per-project operations live in `AGENTS.md`. Link, do not copy.
 - No speculation. If a layer has no observed signal, write `<TODO: not yet wired>` once; do not propose patterns absent from the code.
 </output_contract>
+
+## Next
+
+- `/agentic-spec` when starting a feature whose scope spans the patterns this document records.
+- `/agentic-adr` for any binding decision that surfaced while writing or auditing this file (one decision per ADR).
+- `/agentic-audit` periodically to check pattern drift between this document and the code.

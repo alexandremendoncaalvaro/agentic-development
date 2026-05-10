@@ -37,3 +37,10 @@ Walk this list before declaring any documentation task done.
 <output_contract>
 This skill emits no file. Its job is to set the agent's working posture for the next non-trivial change.
 </output_contract>
+
+## Next
+
+- Continue current work with the six behaviors active. This skill is posture, not a one-shot task.
+- `/agentic-ground` for non-trivial research before code.
+- `/agentic-next` when uncertain where to go in the workflow.
+- `/agentic-review` before merging non-trivial diffs.
