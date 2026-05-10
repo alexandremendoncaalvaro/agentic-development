@@ -40,6 +40,7 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `agentic-review` | workflow-operational | universal | Fresh-context code review per WORKFLOW §10; structured findings, no "approve" | `/agentic-review <range>` |
 | `agentic-ground` | workflow-operational | universal | Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate per WORKFLOW §4 + §5 | `/agentic-ground` |
 | `agentic-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the four-layer artifact stack and recommends prioritized next actions; complements `agentic-audit` (drift) | `/agentic-next` |
+| `agentic-spike` | workflow-operational | universal | Staged spike with golden fixtures per WORKFLOW §14, for cases where the *technique* is uncertain across multiple plausible approaches; produces `spikes/NNNN-<slug>/` with discovery + fixture + pipeline-with-gates + two-layer evaluation | `/agentic-spike` |
 | `agentic-design` | spec-driven | auto if frontend detected | Bootstrap `DESIGN.md` from existing tokens (Figma, tailwind.config, tokens.json, CSS custom props) | `/agentic-design` |
 | `agentic-subagent` | spec-driven | auto if installing for Claude Code | Drafts `.claude/agents/<name>.md` (Claude Code only — Codex has no subagent primitive) | `/agentic-subagent` |
 | `agentic-skill` | spec-driven | opt-in only | Drafts a new Claude Code or Codex skill at the appropriate path | `/agentic-skill` |
@@ -154,6 +155,8 @@ The kit ships nine universal skills plus three conditional ones — twelve discr
 The kit's discipline scales with the project's maturity. A solo PoC may legitimately skip `/agentic-spec` and `/agentic-adr` (the WORKFLOW §1 prune principle applies — don't add an artifact that wouldn't change agent behavior). A team product running on this kit is expected to use the full sequence and additionally invoke `/agentic-hooks` once to scaffold the deterministic gates per WORKFLOW §11 (pre-commit lint / format / secret-scan; pre-push build / unit / integration). Project maturity profiles that automate the recommendation by stack are deferred — see the next planned release.
 
 **Lost mid-flow?** Invoke `/agentic-next` at any time to survey the project's state across the four-layer artifact stack (Constitution → Spec → Plan/Decisions → Code) and get prioritized next-action recommendations. Read-only; complements `/agentic-audit` (drift detection — different question).
+
+**Technique uncertain across multiple plausible approaches?** Invoke `/agentic-spike` (per WORKFLOW §14) when the spec is clear but the *how* is unknown — library choice, multi-stage transformation, novel domain. The skill scaffolds a staged spike with golden fixtures + per-stage debug artifacts + two-layer evaluation under `spikes/NNNN-<slug>/`. The directory is throwaway by design; conclude with `/agentic-adr` and delete.
 
 ## Manual prompts
 
