@@ -97,25 +97,27 @@ State the project's policy. Examples by stack:
 
 ### 3.1 Object Calisthenics (Bay, *ThoughtWorks Anthology*, 2008)
 
-Nine rules. Pick a tier. Tier is editable as the project matures.
+Definitional. State the tier the project adopts. Tier is editable as the project matures (append a rationale paragraph; do not delete the prior tier statement).
 
-- [ ] **Rule 1** — One level of indentation per method (guideline, not absolute).
-- [ ] **Rule 2** — Don't use the `else` keyword (prefer early returns / guard clauses).
-- [ ] **Rule 3** — Wrap all primitives and strings that carry domain meaning.
-- [ ] **Rule 4** — First-class collections (a class that wraps a collection contains nothing else).
-- [ ] **Rule 5** — One dot per line (Law of Demeter).
-- [ ] **Rule 6** — Don't abbreviate.
-- [ ] **Rule 7** — Keep all entities small (classes ≤50 lines, methods ≤5 lines is the rigid target; loosen by project).
-- [ ] **Rule 8** — No classes with more than two instance variables.
-- [ ] **Rule 9** — No getters / setters / properties (tell, don't ask).
+**Tier:** `<loose | moderate | strict>`.
 
-**Tiers:**
+**Tier definitions:**
 
-- **Loose** — Rules 6, 7 (relaxed), 1 (guideline).
-- **Moderate** — Loose + Rules 2, 3, 4.
-- **Strict** — All nine.
+- **Loose** — Rule 6 (no abbreviations), Rule 7 (small entities, relaxed targets), Rule 1 (one level of indentation as a guideline).
+- **Moderate** — Loose + Rule 2 (no `else`), Rule 3 (wrap primitives), Rule 4 (first-class collections).
+- **Strict** — All nine: Loose + Moderate + Rule 5 (one dot per line / Law of Demeter), Rule 8 (≤2 instance variables per class), Rule 9 (no getters / setters / properties — tell, don't ask).
 
-> **This project's tier:** `<loose | moderate | strict>`.
+**Full rule reference (Bay 2008):**
+
+1. One level of indentation per method.
+2. Don't use the `else` keyword.
+3. Wrap all primitives and strings that carry domain meaning.
+4. First-class collections.
+5. One dot per line (Law of Demeter).
+6. Don't abbreviate.
+7. Keep all entities small.
+8. No classes with more than two instance variables.
+9. No getters / setters / properties.
 
 ### 3.2 Cognitive Complexity
 

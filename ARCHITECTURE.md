@@ -35,7 +35,7 @@ Boundary rule: only `src/lib/install.js` resolves `KIT_ROOT`-rooted paths (`impo
 * **Input validation:** Commander parses args; `init` enforces an enum guard on `--agent` via `AGENT_FLAG_VALUES`. No schema library — the option surface is a single string enum and a boolean.
 * **Error handling:** thrown errors bubble to `bin/agentic.js`, which prints `agentic: <message>` and exits 1. No try/catch inside command logic, except `loadManifest` which wraps `JSON.parse` to give a useful message on malformed manifest.
 * **Workflow-operational vs spec-driven skills:** ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) `ad-philosophy`, `ad-review`, `ad-ground`, `ad-next`, `ad-spike`, `ad-tdg`, `ad-grill`, `ad-deepen`, `ad-diagnose`, `ad-commit`, `ad-pr`, `ad-merge`, and the opt-in `ad-hooks` are workflow-operational (execute a process from `WORKFLOW.md` or the kit's commit/PR/merge conventions); the others are spec-driven (produce a documentation artifact). The category is informational; the install path is the same. `ad-review` ships with a bundled subagent at `.claude/agents/fresh-context-reviewer.md` via the manifest mechanism.
-* **Five-layer artifact stack:** ([ADR-0011](doc/adr/0011-agentic-spec-skill.md), [ADR-0019](doc/adr/0019-domain-language-layer.md), [WORKFLOW.md §1](WORKFLOW.md)) Constitution (`AGENTS.md` + `WORKFLOW.md`) → Domain (`CONTEXT.md` — ubiquitous language per Evans 2003, lazy-created) → Spec (`doc/specs/NNNN-<slug>.md`) → Plan / Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Each artifact has its own scaffolding skill; tasks carry an optional `Spec ref` field linking back to the spec they implement.
+* **Six-layer artifact stack** ([WORKFLOW.md §1](WORKFLOW.md)): Constitution (`AGENTS.md` + `WORKFLOW.md` + `GUIDELINES.md`) → Domain (`CONTEXT.md` — ubiquitous language per Evans 2003, lazy-created) → Product (`doc/product/PRD.md`) → Spec (`doc/specs/NNNN-<slug>.md`) → Plan / Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Each artifact has its own scaffolding skill; tasks carry an optional `Spec ref` field linking back to the spec they implement.
 * **Architectural vocabulary:** ([ADR-0020](doc/adr/0020-deep-modules-vocabulary.md), [WORKFLOW.md §8](WORKFLOW.md)) Module / Interface / Implementation / Depth / Seam / Adapter / Leverage / Locality drawn from Ousterhout 2018 + Feathers 2004. Used verbatim in new architectural prose; depth-as-line-ratio framing rejected.
 
 ## Naming Conventions
@@ -58,33 +58,3 @@ Published on npm as `@alexandrealvaro/agentic` (`beta` dist-tag). Consumers run 
 
 Test layout: `test/lib.test.js` (unit — `detectMode`, `detectAgents`, `detectFeatures`, `installSkills`, `updateRootDoc`), `test/init.test.js` (integration — spawns the CLI in `mktemp` directories), `test/state.test.js` (state file load / save / schema-version refusal / deterministic ordering), `test/update.test.js` (state-aware three-way diff matrix + `agentic update` end-to-end including the legacy-no-state fallback), `test/skills.test.js` (static — parses every `SKILL.md` frontmatter, every Codex `agents/openai.yaml`, every manifest-listed subagent file).
 
-## Active ADRs
-
-Currently-binding decisions. Link each to `doc/adr/`.
-
-* [ADR-0001](doc/adr/0001-skills-mode-for-claude-and-codex.md) — Skills mode for both Claude Code and Codex
-* [ADR-0002](doc/adr/0002-two-phase-architecture.md) — Two-phase architecture (CLI install + agent skills)
-* [ADR-0003](doc/adr/0003-tui-with-clack-prompts.md) — `@clack/prompts` as the CLI's TUI
-* [ADR-0004](doc/adr/0004-file-based-task-tracking.md) — File-based per-task tracking with markdown checklists
-* [ADR-0005](doc/adr/0005-universal-agent-behavior-as-skill.md) — Universal Agent Behavior lives in an `ad-philosophy` skill, not in `AGENTS.md`
-* [ADR-0006](doc/adr/0006-architecture-md-at-repo-root.md) — `ARCHITECTURE.md` lives at the repo root (matklad convention)
-* [ADR-0007](doc/adr/0007-workflow-operational-skills.md) — Workflow-operational skills as a parallel category to spec-driven skills
-* [ADR-0008](doc/adr/0008-documentation-discipline.md) — Documentation discipline rules ship as a section of `ad-philosophy`, not a separate skill or `AGENTS.md` block
-* [ADR-0009](doc/adr/0009-update-mechanism.md) — `agentic update` mechanism with per-agent state file and three-way diff
-* [ADR-0010](doc/adr/0010-agentic-ground-skill.md) — Workflow-operational skill `ad-ground` for four-source pre-implementation research
-* [ADR-0011](doc/adr/0011-agentic-spec-skill.md) — Spec-driven skill `ad-spec` for feature-level specification at `doc/specs/NNNN-<slug>.md`
-* [ADR-0012](doc/adr/0012-agentic-hooks-skill.md) — Workflow-operational skill `ad-hooks` for deterministic quality gates
-* [ADR-0013](doc/adr/0013-project-maturity-profiles.md) — Project maturity profiles (`poc` / `solo` / `team` / `mature`) select install set
-* [ADR-0014](doc/adr/0014-structured-prompts-when-host-supports-them.md) — Skills prefer `AskUserQuestion` when host exposes structured prompts
-* [ADR-0015](doc/adr/0015-agentic-next-skill.md) — Workflow-operational skill `ad-next` for state survey + next-action recommendations
-* [ADR-0016](doc/adr/0016-per-skill-next-section.md) — Each skill ends with a `Next` section cross-referencing follow-on skills
-* [ADR-0017](doc/adr/0017-agentic-spike-skill.md) — Workflow-operational skill `ad-spike` for staged spikes with golden fixtures
-* [ADR-0018](doc/adr/0018-agentic-tdg-skill.md) — Workflow-operational skill `ad-tdg` for outcome-based prompting + Test Dependency Map
-* [ADR-0019](doc/adr/0019-domain-language-layer.md) — Domain language layer (`CONTEXT.md`) as Layer 2 of the five-layer artifact stack
-* [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) — Ousterhout/Feathers vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality) as canonical architectural terms
-* [ADR-0021](doc/adr/0021-diagnose-discipline.md) — Workflow-operational skill `ad-diagnose` for disciplined diagnosis loops
-* [ADR-0022](doc/adr/0022-agentic-grill-skill.md) — Workflow-operational skill `ad-grill` for interview-before-research grilling sessions
-* [ADR-0023](doc/adr/0023-agentic-commit-skill.md) — Workflow-operational skill `ad-commit` for atomic Conventional Commits with DCO sign-off
-* [ADR-0024](doc/adr/0024-agentic-pr-skill.md) — Workflow-operational skill `ad-pr` for opening pull requests with uniform body shape
-* [ADR-0025](doc/adr/0025-agentic-merge-skill.md) — Workflow-operational skill `ad-merge` for evaluating and merging pull requests
-* [ADR-0026](doc/adr/0026-slash-command-rename-ad-prefix.md) — Slash-command prefix rename `agentic-` → `ad-` across all 23 skills (ergonomics)

@@ -42,9 +42,9 @@ There are two complementary frames for the artifacts the kit produces. The first
 
 ### Six-layer artifact stack (purpose)
 
-1. **Constitution** — `WORKFLOW.md` (universal engineering philosophy, kit-shipped), `AGENTS.md` (project-specific compressed rules read every session), and `GUIDELINES.md` (project-specific full engineering reference: Clean Architecture binding, SOLID application, Object Calisthenics tier, code standards, complexity discipline, API rules, performance standards, build system, static analysis, quality gates, testing strategy, git workflow, documentation, security). The trinity answers "how this project is built" at three compression levels — principles, distilled rules, full reference. `AGENTS.md` and `GUIDELINES.md` are project-owned and lazy; `WORKFLOW.md` is kit-shipped. ADR-0029 records the trinity.
-2. **Domain** — `CONTEXT.md` at the repo root (or `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos). The project's ubiquitous language: canonical nouns, the aliases to avoid, the relationships between them, and the ambiguities that have already been resolved. Direct application of Domain-Driven Design (Evans, 2003) — when an agent and a human share the project's vocabulary, the agent uses fewer tokens to say more, and the code, tests, and conversation all converge on the same names. Created lazily — first term resolved triggers the file. ADR-0019 records the layer.
-3. **Product** — `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` plus `doc/product/PRODUCT-MAP.md` (multi-product). Product-level scope: target user, problem, goals, non-goals, success metrics, multi-feature roadmap, cross-feature constraints. One PRD per product; feature specs (Layer 4) inherit target user, success metrics, and constraints from the PRD. Created lazily when a product is being scoped. ADR-0027 records the layer.
+1. **Constitution** — `WORKFLOW.md` (universal engineering philosophy, kit-shipped), `AGENTS.md` (project-specific compressed rules read every session), and `GUIDELINES.md` (project-specific full engineering reference: Clean Architecture binding, SOLID application, Object Calisthenics tier, code standards, complexity discipline, API rules, performance standards, build system, static analysis, quality gates, testing strategy, git workflow, documentation, security). The trinity answers "how this project is built" at three compression levels — principles, distilled rules, full reference. `AGENTS.md` and `GUIDELINES.md` are project-owned and lazy; `WORKFLOW.md` is kit-shipped.
+2. **Domain** — `CONTEXT.md` at the repo root (or `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos). The project's ubiquitous language: canonical nouns, the aliases to avoid, the relationships between them, and the ambiguities that have already been resolved. Direct application of Domain-Driven Design (Evans, 2003) — when an agent and a human share the project's vocabulary, the agent uses fewer tokens to say more, and the code, tests, and conversation all converge on the same names. Created lazily — first term resolved triggers the file.
+3. **Product** — `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` plus `doc/product/PRODUCT-MAP.md` (multi-product). Product-level scope: target user, problem, goals, non-goals, success metrics, multi-feature roadmap, cross-feature constraints. One PRD per product; feature specs (Layer 4) inherit target user, success metrics, and constraints from the PRD. Created lazily when a product is being scoped.
 4. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; specs reference their parent PRD for product-scope inheritance. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
 5. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
 6. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
@@ -73,18 +73,22 @@ Comments are exceptions. They justify *why* a non-obvious choice was made — ne
 
 ### Documentation Discipline
 
-The agent's authoritative copy of the eight-rule documentation discipline lives in the `ad-philosophy` skill (`Documentation Discipline` section). The rules are summarized below for reference; the skill carries the full text agents read at session time. ADR-0008 records the canonical decision.
+The agent's authoritative copy of the documentation discipline lives in the `ad-philosophy` skill (`Documentation Discipline` section). The rules are summarized below for reference; the skill carries the full text agents read at session time.
 
 1. **Definitions and decisions only.** No speculation, history, or unfounded plans.
-2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/` are exempt — their lifecycle fields are the auditability primitive.
+2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are exempt — their lifecycle fields are the auditability primitive.
 3. **No emoji anywhere.**
 4. **Business context first.**
 5. **One scope per document. No duplication.**
 6. **Code is the primary documentation of behavior.**
 7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a GitHub Issue or a `doc/tasks/NNNN-*.md` task.
 8. **Tests are living documentation of behavior.**
+9. **Single responsibility per document, named by layer.** Each document plays exactly one role — **definition** (pillar Layers 1, 2, 3 plus `ARCHITECTURE.md`; read-mostly after defined; no per-item tracking UI), **decision-record** (ADRs, Specs; single `Status:` field; mostly immutable after acceptance), or **tracking** (Tasks; full checkbox / append-only-Notes UI is their job). A document does not take on adjacent layers' responsibilities.
+10. **Each layer owns its directory index. No duplication across docs.** `doc/adr/` is the canonical ADR index; `doc/tasks/`, `doc/specs/`, `doc/product/` likewise own their layers. Other documents do not list / digest / re-state these indices.
+11. **Cross-references must be load-bearing.** If you can delete the reference and the surrounding statement still stands, the reference was decoration — drop it.
+12. **Universal-vs-kit-state separation.** `WORKFLOW.md` ships to downstream projects and carries universal principles only — it does not cite kit-specific ADR numbers. The kit's adoption of each principle is recorded in `doc/adr/` (kit-internal). Literature citations remain (they are universal load-bearing references).
 
-The skill body explains the rationale per rule and the failure modes each counters (bloated `AGENTS.md`, README pages drifting into changelogs, decision artifacts diluted by speculation). Generator skills (`ad-bootstrap`, `ad-architecture`, `ad-spec`, `ad-task`, `ad-adr`, `ad-design`) reject violations at write time; `ad-audit` flags drift across narrative docs and decision-record artifacts on demand.
+The skill body explains the rationale per rule and the failure modes each counters (bloated `AGENTS.md`, README pages drifting into changelogs, decision artifacts diluted by speculation, definition documents accumulating per-item tracking UI, pillar documents duplicating adjacent layers' indices). Generator skills reject violations at write time; `ad-audit` flags drift across narrative docs and decision-record artifacts on demand.
 
 ## 3. Format by Evidence
 
@@ -99,7 +103,7 @@ Use XML when the prompt mixes instructions, retrieved context, examples, user in
 
 No format is universally best. XML separation pays off most for autonomous agents, where the prompt has to land alone without conversational refinement; interactive use (Claude Code, Codex) tolerates loose Markdown. Claude appears to respond well to XML, plausibly an artifact of training. Treat this as a working hypothesis worth testing on your own target model and task before standardizing.
 
-**Host-aware structured prompts.** Hosts that expose structured-prompt primitives — Claude Code's `AskUserQuestion` (multi-choice cards) and Plan Mode (plan-approval cards) — reduce ambiguity at confirmation gates more reliably than inline text. Prefer the structured primitive when the host supports it; fall back to numbered text otherwise. Codex has no equivalent today; its skills stay on numbered text. Skills carrying confirmation gates or multi-choice interview steps prescribe this preference (ADR-0014).
+**Host-aware structured prompts.** Hosts that expose structured-prompt primitives — Claude Code's `AskUserQuestion` (multi-choice cards) and Plan Mode (plan-approval cards) — reduce ambiguity at confirmation gates more reliably than inline text. Prefer the structured primitive when the host supports it; fall back to numbered text otherwise. Codex has no equivalent today; its skills stay on numbered text.
 
 ## 4–5. Research Before Implementation
 
@@ -109,7 +113,7 @@ Two sub-practices, joined into one indivisible pass: find the canonical baseline
 
 **Ground in real patterns.** Don't dump the codebase into context. Anchor the model in a specific, project-relevant example: *"Find an existing example of [similar feature]; use that exact structure."* Cite specific files, not "the codebase." Use just-in-time retrieval — pass paths or IDs and let the agent fetch via tools.
 
-The kit ships `ad-ground` as the operational implementation (ADR-0010). It runs a four-source research pass — official docs, validated open-source examples, in-repo patterns, git history — joined by AND not OR, synthesizes the happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written.
+A research pass joining four sources — official docs, validated open-source examples, in-repo patterns, git history — by AND not OR, synthesizing the happy path with citations from each source, and gating any deviation behind an irrefutable justification before code is written, is the operational shape.
 
 ## 6. Explore → Plan → Implement → Commit
 
@@ -141,7 +145,7 @@ The agent will follow what's specified and invent what isn't. Prefer specifying.
 
 ### Architectural vocabulary
 
-Architectural drift accelerates with the agent's typing speed; the counter is shared vocabulary that names the shapes that matter. The kit adopts the canonical terms from John Ousterhout's *A Philosophy of Software Design* (2018) and Michael Feathers's *Working Effectively with Legacy Code* (2004), and uses them in `ARCHITECTURE.md`, ADRs, and architecture-touching skills (ADR-0020).
+Architectural drift accelerates with the agent's typing speed; the counter is shared vocabulary that names the shapes that matter. The canonical terms come from John Ousterhout's *A Philosophy of Software Design* (2018) and Michael Feathers's *Working Effectively with Legacy Code* (2004).
 
 - **Module** — anything with an interface and an implementation; deliberately scale-agnostic (function, class, package, vertical slice).
 - **Interface** — everything a caller must know to use the module correctly: types, invariants, ordering constraints, error modes, configuration, performance characteristics. *Not* just the type signature.
@@ -328,7 +332,7 @@ This guide is operational practice, not theory. Most principles come from years 
 
 §14 (Staged Spikes With Golden Fixtures) is the author's own working technique — each component (spike, golden dataset, stage-segmented error analysis, trajectory evaluation, visual CV debugging) has its own lineage in the literature under Sources; the combination — discovery → fixture → staged pipeline with debug artifacts → two-layer evaluation — is original to this kit.
 
-A cross-pollination pass against [Matt Pocock's `mattpocock/skills`](https://github.com/mattpocock/skills) — a separate body of agent-engineering practice grounded in the same canonical literature (DDD, *Pragmatic Programmer*, Ousterhout, Feathers, Beck) — surfaced principles that earned their place on independent merits: the **Domain layer** (§1 Layer 2, ADR-0019), the **architectural vocabulary** (§8, ADR-0020), **Diagnose with discipline** (§15, ADR-0021), **vertical slicing** and **HITL/AFK tagging** (§6), and **AI mechanical / human judgment** (§12). Where Pocock's framing sharpened our own, the borrowed phrasing is acknowledged inline; everything else stays kit-original.
+A cross-pollination pass against [Matt Pocock's `mattpocock/skills`](https://github.com/mattpocock/skills) — a separate body of agent-engineering practice grounded in the same canonical literature (DDD, *Pragmatic Programmer*, Ousterhout, Feathers, Beck) — surfaced principles that earned their place on independent merits: the **Domain layer** (§1 Layer 2), the **architectural vocabulary** (§8), **Diagnose with discipline** (§15), **vertical slicing** and **HITL/AFK tagging** (§6), and **AI mechanical / human judgment** (§12). Where Pocock's framing sharpened our own, the borrowed phrasing is acknowledged inline; everything else stays kit-original.
 
 External claims (specific percentages, named frameworks) are cited under Sources. Everything else is operational guidance from practice or synthesis across that material — a working model, refined over time, not academic claim.
 

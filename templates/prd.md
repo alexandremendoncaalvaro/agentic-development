@@ -19,9 +19,11 @@ Owner: <Name>
 
 ## Goals
 
-- [ ] <Measurable outcome 1>
-- [ ] <Measurable outcome 2>
-- [ ] <Measurable outcome 3>
+Definitional. State 3–5 measurable outcomes the product is for. Tracking of whether each is met lives in per-feature tasks, not here.
+
+- <Measurable outcome 1>
+- <Measurable outcome 2>
+- <Measurable outcome 3>
 
 ## Non-goals
 
@@ -30,18 +32,18 @@ Owner: <Name>
 
 ## Success Metrics
 
-Product-level KPIs. Each measurable; each names the measurement source.
+Definitional. Product-level KPIs that count, and the measurement source for each. Whether a metric is currently met is not tracked here.
 
-- [ ] <Metric — measurement source>
-- [ ] <Metric — measurement source>
+- <Metric> — <measurement source>
+- <Metric> — <measurement source>
 
 ## Roadmap
 
-Multi-feature scope. Each line names a feature, the user value, and rough sequence. No dates.
+Multi-feature scope tiers. No status annotations (no "shipped" / "in progress" — those belong to tasks). Each line names a feature, the user value, and the tier it sits in.
 
-- **MVP** — <feature> — <user value>
-- **Next** — <feature> — <user value>
-- **Later** — <feature> — <user value>
+- **MVP tier** — <feature> — <user value>
+- **Next tier** — <feature> — <user value>
+- **Later tier** — <feature> — <user value>
 
 ## Constraints
 
