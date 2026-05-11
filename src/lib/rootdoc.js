@@ -26,7 +26,8 @@ const SKILL_PATH_BY_AGENT = {
  * Per task-0029, every kit skill carries a kit-specific `summary:` field
  * alongside the Anthropic-spec `description:` field. `description:` is
  * trigger-keyword-rich for the agent's skill router; `summary:` is the
- * ≤120-char compressed cell that lands in the managed AGENTS.md table.
+ * compressed cell (≤320 chars, enforced by `test/skills.test.js`) that
+ * lands in the managed AGENTS.md table.
  *
  * Tries each known target-tree location in order. Throws if no installed
  * copy has the field — a missing summary surfaces an incomplete install
@@ -39,12 +40,17 @@ function readSkillSummary(cwd, skill) {
     if (!existsSync(path)) continue;
     found = true;
     const body = readFileSync(path, 'utf8');
-    const match = body.match(/^summary:\s*(.+)$/m);
+    // Horizontal whitespace only between `summary:` and the value. JavaScript
+    // `\s` matches `\n`, so `\s*` would silently consume the line break and
+    // capture the following frontmatter line as the summary when the field
+    // is present but empty. Restricting to `[ \t]*` keeps the match on one
+    // line and lets an empty-summary line fall through to the throw below.
+    const match = body.match(/^summary:[ \t]*(.+)$/m);
     if (match) return match[1].trim();
   }
   if (found) {
     throw new Error(
-      `skill ${skill} is installed but no SKILL.md carries the required \`summary:\` frontmatter field`
+      `skill ${skill} is installed but no SKILL.md carries a non-empty \`summary:\` frontmatter field`
     );
   }
   throw new Error(

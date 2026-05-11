@@ -32,7 +32,7 @@ Scope strictly inside skill identity surface; `agentic` brand stays on CLI binar
 - [x] Dogfood refresh via `agentic update --yes --force` (commit b8fa60b).
 - [x] `.gitignore` exclude `.claude/settings.local.json` — accidentally captured side fix (commit b601b50).
 - [x] Narrative doc refresh + global forward-pointer (commit e5f46d1).
-- [ ] PR + merge — pending user authorization on the bundled v0.15 PR.
+- [x] PR + merge — landed via PR #25 (merge commit d7fd731) on 2026-05-10.
 
 ## Notes
 
@@ -46,6 +46,6 @@ Append-only log. Date each entry. Never rewrite past entries.
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (179/179)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10) — to run on the bundled v0.15 PR
+- [x] Code review completed — fresh-context review on the v0.15 + rename bundle (artifact: .agentic/reviews/2026-05-10T23-30-00Z-v0.15.0-bundle-with-rename-review.md, gitignored). 5 Concerns surfaced and addressed in fix commit a5c31eb before merge.
 - [x] No orphan `TODO`/`FIXME` introduced
 - [x] Status updated to `done` and Notes log closes the task
