@@ -52,7 +52,7 @@
         },
         {
           "path": ".agents/skills/ad-bootstrap/SKILL.md",
-          "sourceSha": "7a865acd58c65152061bf41830abf77fd9b039d24e4b188359c6f50b36fbfc27"
+          "sourceSha": "f9729440dfd3bcee59de7a37bb0a8b4fdd8605b2eb5ed525c9ed134c696d32a8"
         }
       ]
     },
@@ -134,6 +134,19 @@
         }
       ]
     },
+    "ad-guidelines": {
+      "version": "0.15.2-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-guidelines/agents/openai.yaml",
+          "sourceSha": "bb04165b9fbfeaa203483d1de938b0a51c50a4d544238ad01c34a56f1559286d"
+        },
+        {
+          "path": ".agents/skills/ad-guidelines/SKILL.md",
+          "sourceSha": "e09256c5ca67011f197dba3a3a350e2e5ca2edfb7e732c19ea5c787d4376596e"
+        }
+      ]
+    },
     "ad-merge": {
       "version": "0.15.2-beta.1",
       "files": [
@@ -156,7 +169,7 @@
         },
         {
           "path": ".agents/skills/ad-next/SKILL.md",
-          "sourceSha": "1a50fdb2da5cc243bf7e087c53df1f153e42f9c5e289e9cea74621d8a628c0a2"
+          "sourceSha": "c8d798fb05ce94b0aa4acd9ff06c812fba404009e1b9c4514fee5b5dbe98dbf1"
         }
       ]
     },
@@ -186,6 +199,19 @@
         }
       ]
     },
+    "ad-prd": {
+      "version": "0.15.2-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-prd/agents/openai.yaml",
+          "sourceSha": "2d95d47eda0bb22d23a86e39c9fa31671474d9194d7efd40f8d3863fe49cc42e"
+        },
+        {
+          "path": ".agents/skills/ad-prd/SKILL.md",
+          "sourceSha": "48f4c9f9788ea2fc36a09d519b8643d516ab7b07f1f5fc2b716a7943bdb40e8a"
+        }
+      ]
+    },
     "ad-review": {
       "version": "0.15.2-beta.1",
       "files": [
@@ -208,7 +234,7 @@
         },
         {
           "path": ".agents/skills/ad-spec/SKILL.md",
-          "sourceSha": "6270794c87c7647aeb46d9e9e917f72e529ec550209c51ae2c6ff6394aff09da"
+          "sourceSha": "d5d726831bb522bd38c7e89e54718bc6a96216b1e21206f5aa54b4c8fbcb7def"
         }
       ]
     },
@@ -235,6 +261,19 @@
         {
           "path": ".agents/skills/ad-task/SKILL.md",
           "sourceSha": "9ca3924df605e7c69d311624ef39dc36d4aaaab95cb6e942cb1c764969e8831c"
+        }
+      ]
+    },
+    "ad-tdd": {
+      "version": "0.15.2-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-tdd/agents/openai.yaml",
+          "sourceSha": "3be3d1c3676e7cc29ef8b2d4389e90b51ac6fc1e2589796bca5724402fd0e51d"
+        },
+        {
+          "path": ".agents/skills/ad-tdd/SKILL.md",
+          "sourceSha": "fc2715cf26505f263346a614c5753a2943cdfe9a30afb420c6f96cbd26b4cbdc"
         }
       ]
     },

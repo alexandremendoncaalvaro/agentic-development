@@ -38,8 +38,9 @@ export const PROFILES = {
       'ad-skill': 'blocked',
       'ad-hooks': 'blocked',
       'ad-prd': 'blocked',
+      'ad-guidelines': 'blocked',
     },
-    note: 'PoC / spike / experiment. Ten universals — posture (philosophy), research (ground), drift (audit), navigation (next), spike + tdg + tdd + grill + domain + diagnose process scaffolds. No mandatory artifact-producing skills (no bootstrap / spec / task / adr / architecture / prd). Adds discipline you can grow into; never pre-imposes ceremony.',
+    note: 'PoC / spike / experiment. Ten universals — posture (philosophy), research (ground), drift (audit), navigation (next), spike + tdg + tdd + grill + domain + diagnose process scaffolds. No mandatory artifact-producing skills (no bootstrap / spec / task / adr / architecture / prd / guidelines). Adds discipline you can grow into; never pre-imposes ceremony.',
   },
   solo: {
     universal: [
@@ -52,6 +53,7 @@ export const PROFILES = {
       'ad-tdd',
       'ad-bootstrap',
       'ad-prd',
+      'ad-guidelines',
       'ad-spec',
       'ad-task',
       'ad-review',
@@ -70,7 +72,7 @@ export const PROFILES = {
       'ad-skill': false,
       'ad-hooks': false,
     },
-    note: 'Solo developer shipping a real product. PRD, specs and tasks are universal; ADRs and architecture are opt-in for binding decisions only.',
+    note: 'Solo developer shipping a real product. PRD, engineering guidelines, specs and tasks are universal; ADRs and architecture are opt-in for binding decisions only.',
   },
   team: {
     universal: [
@@ -79,6 +81,7 @@ export const PROFILES = {
       'ad-architecture',
       'ad-adr',
       'ad-prd',
+      'ad-guidelines',
       'ad-spec',
       'ad-task',
       'ad-audit',
@@ -102,7 +105,7 @@ export const PROFILES = {
       'ad-skill': false,
       'ad-hooks': false,
     },
-    note: 'Team product. Full universal stack including PRD, TDD (deterministic guardrail), deepening, and the grill/domain/diagnose trio. Conditional skills auto-detect by signal.',
+    note: 'Team product. Full universal stack including PRD, engineering guidelines, TDD, deepening, and the grill/domain/diagnose trio. Conditional skills auto-detect by signal.',
   },
   mature: {
     universal: [
@@ -111,6 +114,7 @@ export const PROFILES = {
       'ad-architecture',
       'ad-adr',
       'ad-prd',
+      'ad-guidelines',
       'ad-spec',
       'ad-task',
       'ad-audit',
@@ -134,7 +138,7 @@ export const PROFILES = {
       'ad-skill': false,
       'ad-hooks': true,
     },
-    note: 'Mature / regulated product. Recommends ad-hooks alongside the team stack for deterministic gates per WORKFLOW §11. Full universal stack including PRD, TDD, deepening, and the grill/domain/diagnose trio.',
+    note: 'Mature / regulated product. Recommends ad-hooks alongside the team stack for deterministic gates per WORKFLOW §11. Full universal stack including PRD, engineering guidelines, TDD, deepening, and the grill/domain/diagnose trio.',
   },
 };
 
