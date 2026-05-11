@@ -1,6 +1,7 @@
 ---
 name: ad-pr
 description: Open a GitHub pull request with a uniform body shape per ADR-0024. Four phases — preflight (`gh` auth + branch pushed), scope assembly (commits + diff vs base), draft body (Summary / Test plan / Links), open + report URL. Title format = Conventional Commits, type inferred from the dominant commit type in the range. `gh` CLI soft-fail with install hint. Triggers on "open a PR", "create a pull request", "submit a PR", "gh pr create", "/ad-pr".
+summary: Open a GitHub pull request with a uniform body shape (Summary / Test plan / Links) per ADR-0024. Four phases — preflight (`gh` auth + branch pushed), scope assembly, draft body, open + report URL. Title format = Conventional Commits.
 allowed-tools: Read, Bash, Glob, Grep
 ---
 

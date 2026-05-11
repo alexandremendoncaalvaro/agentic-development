@@ -1,6 +1,7 @@
 ---
 name: ad-commit
 description: Atomic Conventional Commits with DCO `Signed-off-by` sign-off per ADR-0023. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Stage-split is interactive; identity comes from `git config user.name` / `user.email`. No `Co-Authored-By`. Helper posture, not blocker. Triggers on "commit this", "stage and commit", "atomic commit", "Conventional Commit", "sign off", "DCO", "split this commit", "/ad-commit".
+summary: Atomic Conventional Commits with DCO `Signed-off-by` sign-off per ADR-0023. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.
 allowed-tools: Read, Bash
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: ad-philosophy
 description: Universal agent behavior and documentation discipline — think before coding, ground in real patterns, prefer simplicity, make surgical changes, define verifiable goals, verify before claiming done, and write documentation that captures only definitions and decisions. Auto-invokes on non-trivial changes, refactors, debugging, "think before coding", "ground before coding", "verify done", "before implementing", on documentation work — "writing docs", "writing readme", "writing architecture", "writing adr", "writing task", "audit docs" — or whenever the task is ambiguous enough that guardrails matter.
+summary: Universal agent guardrails (think before coding, verify before claiming done). Auto-loads on non-trivial work.
 ---
 
 <background_information>

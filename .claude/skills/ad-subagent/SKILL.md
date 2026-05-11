@@ -1,6 +1,7 @@
 ---
 name: ad-subagent
 description: Draft a new Claude Code subagent at .claude/agents/<name>.md, using the official subagents format. Use when the user wants to create, write, draft, or scaffold a custom Claude Code subagent for delegated work (fresh-context reviewer, codebase researcher, diff auditor, etc.). Asks one question per missing field; never invents roles or tool sets. Claude Code only — Codex has no subagent primitive.
+summary: Draft a new Claude Code subagent at `.claude/agents/<name>.md`.
 allowed-tools: Read, Write, Glob, Bash
 ---
 

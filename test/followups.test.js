@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   mkdtempSync,
   rmSync,
+  mkdirSync,
   writeFileSync,
   readFileSync,
   existsSync,
@@ -15,6 +16,19 @@ import { updateRootDoc } from '../src/lib/rootdoc.js';
 
 function mkScratch() {
   return mkdtempSync(join(tmpdir(), 'agentic-followups-test-'));
+}
+
+// Per task-0029, updateRootDoc reads the table cell from each installed
+// SKILL.md's `summary:` frontmatter field at section-build time. Tests
+// that exercise the rendered table need at minimum a SKILL.md per skill
+// they reference; this helper writes the smallest valid one.
+function seedInstalledSkill(cwd, skill, summary = `Test fixture for ${skill}.`) {
+  const dir = join(cwd, '.claude/skills', skill);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, 'SKILL.md'),
+    `---\nname: ${skill}\ndescription: Test fixture.\nsummary: ${summary}\n---\n`
+  );
 }
 
 // C3 — removeOrphanSkills must surface "state recorded a file that is gone
@@ -62,6 +76,8 @@ test('removeOrphanSkills: file recorded in state but missing on disk → removed
 test('updateRootDoc: dryRun=true returns the would-be action without writing', async () => {
   const dir = mkScratch();
   try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
+    seedInstalledSkill(dir, 'ad-philosophy');
     const original = '# AGENTS.md\n\nProject docs.\n';
     writeFileSync(join(dir, 'AGENTS.md'), original);
     const before = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
@@ -88,6 +104,8 @@ test('updateRootDoc: dryRun=true returns the would-be action without writing', a
 test('updateRootDoc: dryRun=true reports `updated` for stale section without writing', async () => {
   const dir = mkScratch();
   try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
+    seedInstalledSkill(dir, 'ad-architecture');
     // Bootstrap a managed section first.
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
     await updateRootDoc({
@@ -123,6 +141,8 @@ test('updateRootDoc: dryRun=true reports `updated` for stale section without wri
 test('updateRootDoc: bounds present + content diverged + confirmReplace=false → kept-stale (file untouched)', async () => {
   const dir = mkScratch();
   try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
+    seedInstalledSkill(dir, 'ad-architecture');
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
     await updateRootDoc({
       cwd: dir,

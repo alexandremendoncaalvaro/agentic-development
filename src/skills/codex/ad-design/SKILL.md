@@ -1,6 +1,7 @@
 ---
 name: ad-design
 description: Generate DESIGN.md at the repo root by scanning existing design tokens (Figma export, tailwind.config, tokens.json, stylesheet) and synthesizing W3C-compatible YAML frontmatter + Markdown rationale per the Google Labs design.md spec. Use when the user wants to bootstrap, scaffold, generate, document, or audit DESIGN.md (visual contract — colors, typography, spacing, motion). Frontend projects only.
+summary: Bootstrap `DESIGN.md` from existing tokens (frontend projects).
 ---
 
 <background_information>
