@@ -4,7 +4,7 @@ A starter kit for engineering production code with LLMs. Lean templates and init
 
 **The framing.** An LLM is the super-soldier serum; the engineer is Steve Rogers. The serum amplifies what the engineer already brings — solid bases, investigation, care for quality, architecture, clean code, observability, maintainability. The kit encodes those bases as skills, ADRs, and gates so the amplification compounds in the right direction. See [WORKFLOW.md](WORKFLOW.md) for the principles.
 
-The CLI installs nineteen universal skills at the default `team` profile (`ad-bootstrap`, `ad-philosophy`, `ad-architecture`, `ad-adr`, `ad-spec`, `ad-task`, `ad-audit`, `ad-review`, `ad-ground`, `ad-next`, `ad-spike`, `ad-tdg`, `ad-domain`, `ad-grill`, `ad-deepen`, `ad-diagnose`, `ad-commit`, `ad-pr`, `ad-merge`) plus four conditional ones (`ad-design` for frontend, `ad-subagent` for Claude Code, `ad-skill` opt-in, `ad-hooks` opt-in / recommended at `mature`) into the agent's native location. Lower profiles install fewer (`poc` = 9 universals, `solo` = 16, `team` / `mature` = 19; `ad-deepen` is excluded from `poc` / `solo` per [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) §4; `ad-commit` / `ad-pr` / `ad-merge` are excluded from `poc` per [ADR-0023](doc/adr/0023-agentic-commit-skill.md) / [ADR-0024](doc/adr/0024-agentic-pr-skill.md) / [ADR-0025](doc/adr/0025-agentic-merge-skill.md)). Each skill produces its artifact or runs its operation via the agent's native conversational UI; `agentic update` keeps installed skills in sync with upstream kit changes via a state-aware three-way diff. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues); current releases live under [GitHub Releases](https://github.com/alexandremendoncaalvaro/agentic-development/releases).
+The CLI installs a universal skill set at the default `team` profile plus four conditional skills (`ad-design` for frontend, `ad-subagent` for Claude Code, `ad-skill` opt-in, `ad-hooks` opt-in / recommended at `mature`) into the agent's native location. The full skill table is below; profile counts and exclusions are summarized under [Project maturity profiles](#project-maturity-profiles). Each skill produces its artifact or runs its operation via the agent's native conversational UI; `agentic update` keeps installed skills in sync with upstream kit changes via a state-aware three-way diff. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues); releases live under [GitHub Releases](https://github.com/alexandremendoncaalvaro/agentic-development/releases).
 
 ## Prerequisites
 
@@ -33,15 +33,18 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `ad-bootstrap` | spec-driven | universal | Scans the repo, writes `AGENTS.md` ≤150 lines | `/ad-bootstrap` |
 | `ad-architecture` | spec-driven | universal | Scans the code, writes `ARCHITECTURE.md` | `/ad-architecture` |
 | `ad-adr` | spec-driven | universal | Drafts `doc/adr/NNNN-<slug>.md` from the conversation | `/ad-adr` |
-| `ad-spec` | spec-driven | universal | Drafts `doc/specs/NNNN-<slug>.md` — feature-level spec (User Scenarios, Requirements, Success Criteria) layer 3 of the five-layer stack | `/ad-spec` |
+| `ad-prd` | spec-driven | universal in `solo` / `team` / `mature` | Drafts or updates `doc/product/PRD.md` (or per-product `<slug>.md`) — Layer 3, product-level scope (target user, problem, success metrics, multi-feature roadmap) feature specs inherit from. Distinct from `ad-spec` (feature-level). Lazy lifecycle. | `/ad-prd` |
+| `ad-guidelines` | spec-driven | universal in `solo` / `team` / `mature` | Drafts or updates `GUIDELINES.md` — the project's full engineering reference (Clean Architecture, SOLID, Object Calisthenics loose/moderate/strict per Bay 2008, code standards, complexity discipline, testing strategy, security). Layer 1 Constitution trinity member alongside `WORKFLOW.md` and `AGENTS.md`. Scan-first; pre-suggested defaults from canon. Lazy lifecycle. | `/ad-guidelines` |
+| `ad-spec` | spec-driven | universal | Drafts `doc/specs/NNNN-<slug>.md` — feature-level spec (User Scenarios, Requirements, Success Criteria) Layer 4 of the six-layer stack; references parent PRD for product-scope inheritance | `/ad-spec` |
 | `ad-task` | spec-driven | universal | Drafts `doc/tasks/NNNN-<slug>.md` (checkbox + Notes format; carries `Spec ref` to link the implementing spec) | `/ad-task` |
 | `ad-audit` | spec-driven | universal | Read-only drift report (AGENTS.md / ARCHITECTURE.md / ADRs) | `/ad-audit` |
 | `ad-philosophy` | workflow-operational | universal | Universal agent guardrails — auto-loads on non-trivial work | implicit |
 | `ad-review` | workflow-operational | universal | Fresh-context code review per WORKFLOW §10; structured findings, no "approve" | `/ad-review <range>` |
 | `ad-ground` | workflow-operational | universal | Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate per WORKFLOW §4 + §5 | `/ad-ground` |
-| `ad-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the five-layer artifact stack and recommends prioritized next actions; complements `ad-audit` (drift) | `/ad-next` |
+| `ad-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the six-layer artifact stack and recommends prioritized next actions; complements `ad-audit` (drift) | `/ad-next` |
 | `ad-spike` | workflow-operational | universal | Staged spike with golden fixtures per WORKFLOW §14, for cases where the *technique* is uncertain across multiple plausible approaches; produces `spikes/NNNN-<slug>/` with discovery + fixture + pipeline-with-gates + two-layer evaluation | `/ad-spike` |
 | `ad-tdg` | workflow-operational | universal | Outcome-based prompting per WORKFLOW §9 — ground truth pair + Test Dependency Map + three approaches + single-criterion selection, for cases where the technique is known but the implementation strategy is uncertain | `/ad-tdg` |
+| `ad-tdd` | workflow-operational | universal | Test-Driven Development per WORKFLOW §16 — red-green-refactor as deterministic LLM guardrail. Five phases — confirm regime, plan vertically, tracer bullet, incremental loop, refactor while green. Distinct from `ad-tdg`; routes to it for strategy selection inside the GREEN phase | `/ad-tdd` |
 | `ad-domain` | spec-driven | universal | Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003); single-context or `CONTEXT-MAP.md` multi-context | `/ad-domain` |
 | `ad-grill` | workflow-operational | universal | Interview-before-research grilling — one question at a time with recommendation, codebase-first, sharpens vocabulary against `CONTEXT.md`, captures terms via `ad-domain` and decisions via `ad-adr` (three-criteria rule); upstream of `ad-ground` | `/ad-grill` |
 | `ad-deepen` | workflow-operational | universal in `team` + `mature` only | Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality); three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one; pairs with `ad-audit` | `/ad-deepen` |
@@ -58,27 +61,16 @@ A short TUI shows the detected mode, agent, and feature signals (frontend / `.cl
 
 If your project already has an `AGENTS.md` (or `CLAUDE.md`), the installer appends a managed `Skills installed by agentic` section bracketed by `<!-- agentic-managed-skills:start -->` / `:end -->` markers. User content outside those markers is byte-preserved; re-runs update only the managed block.
 
-### v0.15 bundle
-
-The four skills accepted by ADR-0019 / 0020 / 0021 / 0022 (the mattpocock-absorption Phase-2 set) shipped together in v0.15.0-beta.1. Closes [task-0020](doc/tasks/0020-mattpocock-absorptions.md) Phase 2 in a single release rather than the originally-planned per-minor stack (v0.15 → v0.18). Rationale: 3 of 4 skills are direct mirrors of mature mattpocock prior art; bundling kept the WORKFLOW §15 / §8 / Layer-2 deltas coherent in one ship.
-
-| Skill | ADR | Operationalizes |
-| --- | --- | --- |
-| `ad-domain` | [ADR-0019](doc/adr/0019-domain-language-layer.md) | Layer 2 (ubiquitous language) — lazy `CONTEXT.md` lifecycle |
-| `ad-grill` | [ADR-0022](doc/adr/0022-agentic-grill-skill.md) | Interview-before-research, upstream of `ad-ground` |
-| `ad-deepen` | [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) | WORKFLOW §8 vocabulary applied to refactor proposals (team + mature only) |
-| `ad-diagnose` | [ADR-0021](doc/adr/0021-diagnose-discipline.md) | WORKFLOW §15 five-phase debugging |
-
 ## Project maturity profiles
 
 The kit ships four profiles that select which skills auto-install. Same WORKFLOW principles bind every profile; only the artifact set scales.
 
 | Profile | Universal install set | Conditional posture | Recommended for |
 | --- | --- | --- | --- |
-| `poc` | 9 — philosophy, ground, audit, next, spike, tdg, domain, grill, diagnose | all blocked | spike, hackathon, exploration |
-| `solo` | 16 — + bootstrap, spec, task, review, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code | solo developer shipping a real product |
-| `team` (default) | 19 — + architecture, adr, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
-| `mature` | 19 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
+| `poc` | 10 — philosophy, ground, audit, next, spike, tdg, tdd, domain, grill, diagnose | all blocked; `ad-prd` + `ad-guidelines` blocked | spike, hackathon, exploration |
+| `solo` | 19 — + bootstrap, prd, guidelines, spec, task, review, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code | solo developer shipping a real product |
+| `team` (default) | 22 — + architecture, adr, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
+| `mature` | 22 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
 
 Select at init time:
 
@@ -95,8 +87,6 @@ npx @alexandrealvaro/agentic@beta profile list        # list all profiles
 ```
 
 `profile set` runs the equivalent of `update` after writing the new profile, so the install set matches. The state-aware three-way diff prompts before overwriting user-edited files.
-
-Existing v0.7 installs with no profile field migrate to `team` automatically — same install set as before, no user action needed.
 
 ## Updating an existing project
 
@@ -130,8 +120,6 @@ Useful flags:
 * `--agent claude-code | codex | both` — restrict the update to one agent.
 * `--yes` — non-interactive, accepts defaults (skip on conflict, keep orphans). Combine with `--force` if you want overwrites in CI.
 
-If the project was installed with a kit version older than v0.3 (no state file present), the first `update` falls back to today's byte-compare behavior, then writes the state file so subsequent runs use the three-way diff.
-
 The `ad-review` skill writes the assembled WORKFLOW §10 handoff to `.agentic/reviews/<ISO-timestamp>-<scope>.md` before delegating to the fresh-context reviewer (Claude Code) or before instructing you to `/clear` and paste (Codex). These files are ephemeral audit artifacts — add `.agentic/reviews/` to your `.gitignore`.
 
 For persistent install:
@@ -143,21 +131,23 @@ agentic init
 
 ## Recommended daily sequence
 
-The kit ships nineteen universal skills in the full `team` / `mature` install set; `ad-deepen` is excluded from `poc` and `solo` per [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) §4, and `ad-commit` / `ad-pr` / `ad-merge` are excluded from `poc` per [ADR-0023](doc/adr/0023-agentic-commit-skill.md) / [ADR-0024](doc/adr/0024-agentic-pr-skill.md) / [ADR-0025](doc/adr/0025-agentic-merge-skill.md) (concrete counts: `poc` = 9 universals, `solo` = 16, `team` / `mature` = 19). Plus four conditional skills (`ad-design`, `ad-subagent`, `ad-skill`, `ad-hooks`). The sequence below is a happy path through them for the three flows that cover most daily work. Skip steps that don't apply; the kit never enforces order.
+The sequence below is a happy path for the three flows that cover most daily work. Skip steps that don't apply; the kit never enforces order. Profile-specific install sets and conditional skills are summarized under [Project maturity profiles](#project-maturity-profiles).
 
 **Greenfield project, first non-trivial feature:**
 
 1. `agentic init` — install skills.
-2. `/ad-bootstrap` — produce `AGENTS.md` (operational guide).
-3. `/ad-architecture` — produce `ARCHITECTURE.md` once load-bearing patterns emerge.
-4. `/ad-grill` — interview-before-research when the ask is fuzzy; resolves vocabulary into `CONTEXT.md` via `/ad-domain` as terms surface.
-5. `/ad-spec` — feature-level spec at `doc/specs/NNNN-<slug>.md` (User Scenarios, Requirements, Success Criteria).
-6. `/ad-adr` — only when the feature forces a binding architectural decision worth recording for posterity (three-criteria rule: hard to reverse, surprising without context, real trade-off).
-7. `/ad-task` — work-unit decomposition; reference the spec via `Spec ref`.
-8. `/ad-ground` — four-source research before code (`ad-philosophy` auto-loads in parallel).
-9. Implement.
-10. `/ad-review main..HEAD` — fresh-context §10 review before merge.
-11. `/ad-audit` — periodic drift check across operational docs, specs, and the `CONTEXT.md` glossary.
+2. `/ad-bootstrap` — produce `AGENTS.md` (distilled session-load rules).
+3. `/ad-guidelines` — produce `GUIDELINES.md` (full engineering reference: Clean Architecture, SOLID, Object Calisthenics tier, testing strategy, security). Excluded from `poc`. After writing, refresh `AGENTS.md` so its engineering sections point to `GUIDELINES.md`.
+4. `/ad-architecture` — produce `ARCHITECTURE.md` once load-bearing patterns emerge.
+5. `/ad-prd` — scope the product (target user, problem, success metrics, multi-feature roadmap) at `doc/product/PRD.md`. Excluded from `poc` profile.
+6. `/ad-grill` — interview-before-research when the ask is fuzzy; resolves vocabulary into `CONTEXT.md` via `/ad-domain` as terms surface.
+7. `/ad-spec` — feature-level spec at `doc/specs/NNNN-<slug>.md`; inherits target user, success metrics, and constraints from the PRD.
+8. `/ad-adr` — only when the feature forces a binding architectural decision worth recording for posterity (three-criteria rule: hard to reverse, surprising without context, real trade-off).
+9. `/ad-task` — work-unit decomposition; reference the spec via `Spec ref`.
+10. `/ad-ground` — four-source research before code (`ad-philosophy` auto-loads in parallel).
+11. Implement — `/ad-tdd` when the behavior is test-expressible up front (red-green-refactor); `/ad-tdg` when the technique is known but the implementation strategy is uncertain.
+12. `/ad-review main..HEAD` — fresh-context §10 review before merge.
+13. `/ad-audit` — periodic drift check across operational docs, PRD, guidelines, specs, and the `CONTEXT.md` glossary.
 
 **Brownfield project, quick fix:**
 
@@ -170,15 +160,17 @@ The kit ships nineteen universal skills in the full `team` / `mature` install se
 
 1. `/ad-ground` — runs the four-source research pass and surfaces the happy path with citations.
 2. Decide whether the answer becomes a spec (`/ad-spec`) or a one-off task (`/ad-task`).
-3. Continue from step 6 of the greenfield flow.
+3. Continue from step 8 of the greenfield flow.
 
-The kit's discipline scales with the project's maturity. A solo PoC may legitimately skip `/ad-spec` and `/ad-adr` (the WORKFLOW §1 prune principle applies — don't add an artifact that wouldn't change agent behavior). A team product running on this kit is expected to use the full sequence and additionally invoke `/ad-hooks` once to scaffold the deterministic gates per WORKFLOW §11 (pre-commit lint / format / secret-scan; pre-push build / unit / integration). Project maturity profiles that automate the recommendation by stack are deferred — see the next planned release.
+The kit's discipline scales with the project's maturity. A solo PoC may legitimately skip `/ad-spec` and `/ad-adr` (the WORKFLOW §1 prune principle applies — don't add an artifact that wouldn't change agent behavior). A team product running on this kit is expected to use the full sequence and additionally invoke `/ad-hooks` once to scaffold the deterministic gates per WORKFLOW §11 (pre-commit lint / format / secret-scan; pre-push build / unit / integration).
 
-**Lost mid-flow?** Invoke `/ad-next` at any time to survey the project's state across the five-layer artifact stack (Constitution → Domain → Spec → Plan/Decisions → Code) and get prioritized next-action recommendations. Read-only; complements `/ad-audit` (drift detection — different question).
+**Lost mid-flow?** Invoke `/ad-next` at any time to survey the project's state across the six-layer artifact stack (Constitution → Domain → Product → Spec → Plan/Decisions → Code) and get prioritized next-action recommendations. Read-only; complements `/ad-audit` (drift detection — different question).
 
 **Technique uncertain across multiple plausible approaches?** Invoke `/ad-spike` (per WORKFLOW §14) when the spec is clear but the *how* is unknown — library choice, multi-stage transformation, novel domain. The skill scaffolds a staged spike with golden fixtures + per-stage debug artifacts + two-layer evaluation under `spikes/NNNN-<slug>/`. The directory is throwaway by design; conclude with `/ad-adr` and delete.
 
 **Technique known but implementation strategy uncertain?** Invoke `/ad-tdg` (per WORKFLOW §9) when multiple algorithms could produce the expected output with different trade-offs along readability / performance / testability. The skill forces a ground-truth pair, lists the tests covering the file (Test Dependency Map), generates three implementation candidates, and commits to one by a single named criterion — refusing the "optimize for all three at once" failure mode. No file written; the verified implementation is the artifact, with the candidate set + criterion landing in the commit message body.
+
+**Behavior is test-expressible up front?** Invoke `/ad-tdd` (per WORKFLOW §16) when the change has a clear behavior to express as a test — a new API capability, a bug-driven regression test, a refactor with a known contract. Red-green-refactor as deterministic LLM guardrail: one test → red → minimum code → green → repeat. Horizontal-slicing anti-pattern (bulk-write tests, then bulk-write code) is rejected. Distinct from `/ad-tdg`; route to `/ad-tdg` inside the GREEN phase when the strategy for that test cycle is uncertain.
 
 **Question is fuzzy?** Invoke `/ad-grill` (per [ADR-0022](doc/adr/0022-agentic-grill-skill.md)) before research. One question at a time with a recommended answer; codebase-first when the answer is in code; sharpens vocabulary against `CONTEXT.md`. Routes to `/ad-ground` (research-ready), `/ad-tdg` (implement-ready), `/ad-spike` (technique-uncertain), or `/ad-diagnose` (it turned out to be a bug) when the question is sharp.
 
@@ -221,7 +213,11 @@ Prompts reference templates by relative path. Two ways to give your agent access
 
 **Researching before implementation.** Run `/ad-ground` (or let it auto-trigger on non-trivial work). The skill runs a four-source research pass — official docs, validated open-source examples, in-repo patterns, and git history — synthesizes a happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written (WORKFLOW §4 + §5). Output is the input to whatever produces the implementation plan; the skill does not write code.
 
-**Specifying a feature.** Run `/ad-spec` (or `/ad-spec` with a feature name). The skill scaffolds `doc/specs/NNNN-<slug>.md` with industry-aligned mandatory sections (User Scenarios, Functional / Non-functional Requirements, Success Criteria, Edge Cases, Out of Scope, Open Questions, Related). Specs are layer 3 of the five-layer artifact stack — Constitution → Domain → Spec → Plan/Decisions → Code. One spec per feature; multiple tasks (`/ad-task`) implement one spec; the task template carries a `Spec ref` field linking back to the spec.
+**Scoping a product.** Run `/ad-prd` when you are scoping a product (not a single feature) — target user, problem, success metrics across multiple features, roadmap, cross-feature constraints. The skill scaffolds `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` plus `doc/product/PRODUCT-MAP.md` (multi-product). Layer 3 of the six-layer stack; feature specs (`/ad-spec`) reference back to it for product-scope inheritance. Excluded from `poc` profile.
+
+**Defining engineering standards.** Run `/ad-guidelines` to write `GUIDELINES.md` — the project's full engineering reference: Clean Architecture binding, SOLID, Object Calisthenics tier (loose / moderate / strict per Bay 2008), naming conventions, error handling, complexity discipline, testing strategy, security policy. Scan-first — reads the language toolchain, existing test/lint/format config, and existing `AGENTS.md` engineering sections; pre-fills detected fields; asks only the genuine gaps and preference questions. Layer 1 Constitution trinity member alongside `WORKFLOW.md` (kit-shipped philosophy) and `AGENTS.md` (distilled session-load rules). Excluded from `poc` profile.
+
+**Specifying a feature.** Run `/ad-spec` (or `/ad-spec` with a feature name). The skill scaffolds `doc/specs/NNNN-<slug>.md` with industry-aligned mandatory sections (User Scenarios, Functional / Non-functional Requirements, Success Criteria, Edge Cases, Out of Scope, Open Questions, Related). Specs are Layer 4 of the six-layer artifact stack — Constitution → Domain → Product → Spec → Plan/Decisions → Code. One spec per feature; multiple tasks (`/ad-task`) implement one spec; the task template carries a `Spec ref` field linking back to the spec; the spec references its parent PRD for product-scope inheritance.
 
 **Project already built with agents.** Treat missing artifacts as brownfield (run the relevant skill) and existing artifacts as audit (`/ad-audit`).
 
@@ -266,7 +262,7 @@ node bin/agentic.js init
 
 Branch layout:
 - `main` — manual workflow source of truth (no CLI code; the npm package gets promoted here when mature).
-- `cli` — CLI development (you're here). Beta releases are published from this branch.
+- `cli` — CLI development. Beta releases are published from this branch.
 
 ## License
 
