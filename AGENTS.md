@@ -38,18 +38,7 @@ See [`GUIDELINES.md`](GUIDELINES.md) §2 for the full reference. Non-negotiable 
 
 ## Architectural Principles
 
-Binding decisions — see `doc/adr/`. Do not reinvent.
-
-* **Two-phase architecture** ([ADR-0002](doc/adr/0002-two-phase-architecture.md)): CLI handles filesystem only; agents handle content via skills. CLI never interviews for content; skills never set up filesystem.
-* **Skills, not slash commands** ([ADR-0001](doc/adr/0001-skills-mode-for-claude-and-codex.md)): `.claude/skills/agentic-<name>/SKILL.md` for Claude Code; `.agents/skills/agentic-<name>/SKILL.md` + `agents/openai.yaml` for Codex.
-* **TUI = `@clack/prompts` only** ([ADR-0003](doc/adr/0003-tui-with-clack-prompts.md)). Always check `isCancel` after each prompt. Bypass TUI when `!process.stdout.isTTY`, or when `--agent` or `--yes` is passed.
-* **Per-task markdown files** ([ADR-0004](doc/adr/0004-file-based-task-tracking.md)): `doc/tasks/NNNN-<slug>.md`. LLM edits = checkbox toggles + append-only Notes. Never rewrite existing sections.
-* **Universal Agent Behavior lives in `ad-philosophy` skill, not in `AGENTS.md`** ([ADR-0005](doc/adr/0005-universal-agent-behavior-as-skill.md)). Do not bundle generic agent advice into per-project output.
-* **Bootstrap flow is scan-first, not interview-first** ([Task 0006](doc/tasks/0006-bootstrap-flow-and-agents-md-bloat-fix.md)): pre-fill from repo signals, ask only the gaps.
-* **Idempotent on re-run** for filesystem ops (ADR-0002).
-* **Operational docs at repo root** ([ADR-0006](doc/adr/0006-architecture-md-at-repo-root.md)): `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md`, `WORKFLOW.md` at root. ADRs and tasks under `doc/`.
-* **Workflow-operational skill category** ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)): skills come in two categories — `spec-driven` (produces an artifact) and `workflow-operational` (executes a process from `WORKFLOW.md`). Each new workflow-operational skill needs its own ADR.
-* **Documentation discipline** ([ADR-0008](doc/adr/0008-documentation-discipline.md)): eight rules govern every document (canonical source `WORKFLOW.md` §2; operational delivery via the `ad-philosophy` skill). Narrative documents — `README.md`, `AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md` — carry no dates, version stamps, `DRAFT` markers, changelog blocks, or emoji. Decision-record artifacts under `doc/adr/` and `doc/tasks/` are exempt from the no-dates rule. Orphan `TODO`/`FIXME` references either a GitHub Issue or a `doc/tasks/NNNN-*.md` file.
+Binding decisions live in [`doc/adr/`](doc/adr/). Do not reinvent.
 
 ## Repository Layout
 

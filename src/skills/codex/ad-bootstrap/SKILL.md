@@ -96,12 +96,7 @@ Only what differs from language defaults.
 
 ## Architectural Principles
 
-Decisions the agent must follow, not reinvent.
-
-* `<e.g., Clean Architecture — core logic isolated from frameworks>`
-* `<e.g., Repository pattern for all DB access>`
-* `<e.g., All HTTP handlers go through middleware in `src/middleware/`>`
-* `<e.g., Single responsibility, no `else` chains, low indentation>`
+Binding decisions live in [`doc/adr/`](doc/adr/). Do not reinvent.
 
 ## Repository Layout
 
