@@ -1,6 +1,7 @@
 ---
 name: ad-task
 description: Draft a new task tracking file at doc/tasks/NNNN-<short-slug>.md, using a checkbox-toggle + append-only-Notes format optimized for LLM editing. Use when the user wants to create, draft, scaffold, or open a task, ticket, work item, or backlog entry tracked in the repo. Status starts at proposed.
+summary: Draft a new task at `doc/tasks/NNNN-<slug>.md`.
 ---
 
 <background_information>

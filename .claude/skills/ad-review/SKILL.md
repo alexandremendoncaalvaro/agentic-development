@@ -1,6 +1,7 @@
 ---
 name: ad-review
 description: Fresh-context code review per WORKFLOW §10 — assemble the diff plus the relevant spec slice (AGENTS.md, applicable ADRs, the task's Acceptance Criteria), delegate to a bundled fresh-context-reviewer subagent with no inherited context, return a structured findings list. Use when the user wants to review a diff, branch, PR, or recent commits against the project's spec, audit for bugs / coupling / edge cases / spec drift, or run a §10 senior-reviewing-junior pass. Adversarial framing — never emits an "approve" verdict.
+summary: Fresh-context code review per WORKFLOW §10 — assemble handoff, return structured findings.
 allowed-tools: Read, Glob, Grep, Bash, Task
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: ad-ground
 description: Four-source pre-implementation research — official docs, validated open-source examples, in-repo patterns, and git history — then synthesize a happy path and gate any deviation with an irrefutable justification before code is written. Auto-invokes on non-trivial work, refactors, library or pattern selection, "research before coding", "before implementing", "which library", "which pattern", "how to approach", "ground before coding". Workflow-operational counterpart to WORKFLOW.md §4 (Find the Happy Path) and §5 (Ground in Real Patterns); pairs with ad-philosophy (posture) and ad-review (post-implementation §10 review).
+summary: Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate. WORKFLOW §4 + §5.
 allowed-tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
 ---
 

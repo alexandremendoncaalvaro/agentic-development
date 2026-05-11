@@ -1,6 +1,7 @@
 ---
 name: ad-deepen
 description: Surface deepening opportunities in the codebase using the Ousterhout/Feathers vocabulary from WORKFLOW §8 (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three-phase process — explore organically, present numbered candidates with deletion-test framing, grilling loop on the chosen candidate. Pairs with `ad-audit` (audit detects drift; deepen proposes refactors). Triggers on "deepen", "refactor for depth", "shallow module", "deletion test", "two-adapters rule", "interface is the test surface", "leverage", "locality", "/ad-deepen". Profile-scoped to `team` and `mature` only — premature for `poc` and `solo` per ADR-0020 §4.
+summary: Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one. Pairs with `ad-audit`. Profile-scoped to `team` and `mature` only.
 ---
 
 <background_information>
