@@ -36,7 +36,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-bootstrap/SKILL.md",
-          "sourceSha": "74c5e7c62aebe931961008f7290803709f437fc9db34818c7b69d8d0175b8c7e"
+          "sourceSha": "13cdb44e16782c369320640b7dc991f90d3afa90b0b91970cc2cb6aa7207659b"
         }
       ]
     },
@@ -94,6 +94,15 @@
         }
       ]
     },
+    "ad-guidelines": {
+      "version": "0.15.2-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-guidelines/SKILL.md",
+          "sourceSha": "d6ecf840de566e9fc3f789103410cffcbacd4ba2b455a73e6dad344dc18d340f"
+        }
+      ]
+    },
     "ad-merge": {
       "version": "0.15.2-beta.1",
       "files": [
@@ -108,7 +117,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "f5d9959987d9350467afd028d0c420ca4bddf112774ddae054f9918187980cf6"
+          "sourceSha": "1b362851a5e2cc8c72f9f145b5d7b5a91cf713438aa20fbe2d578cb0dfaca797"
         }
       ]
     },
@@ -130,6 +139,15 @@
         }
       ]
     },
+    "ad-prd": {
+      "version": "0.15.2-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-prd/SKILL.md",
+          "sourceSha": "7c824d4e1b1c30310d537fa96ddfd2a955067b5d771cc7db62ce46d596780d7b"
+        }
+      ]
+    },
     "ad-review": {
       "version": "0.15.2-beta.1",
       "files": [
@@ -148,7 +166,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-spec/SKILL.md",
-          "sourceSha": "bb71b3db29487af179fa0f19a446b4749106d4b39c3cfe11d859a068204be67b"
+          "sourceSha": "a919c9a44459d4127a1358d6a88595981fc44b2cc6fe1255d22c6919037652ff"
         }
       ]
     },
@@ -176,6 +194,15 @@
         {
           "path": ".claude/skills/ad-task/SKILL.md",
           "sourceSha": "490383977bf48fae9ee67bda905780afd3b3ee7f233501228cdad0b691adf312"
+        }
+      ]
+    },
+    "ad-tdd": {
+      "version": "0.15.2-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-tdd/SKILL.md",
+          "sourceSha": "28c570a0253729b4f3de3ab2b12142459d39be7300e2a745758ff587f503ea99"
         }
       ]
     },
