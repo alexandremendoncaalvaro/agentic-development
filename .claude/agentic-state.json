@@ -27,7 +27,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "fd2239e6d9deda312135fca7b6c83d12c53fb76b8f6fd6f3016fd4bededc09f2"
+          "sourceSha": "0b4e854331efbc647bb38752239ddbed32c3ccbc1b5fd0e2ff6767ad6fc300bb"
         }
       ]
     },
@@ -36,7 +36,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-bootstrap/SKILL.md",
-          "sourceSha": "ca5659b1ca2d1a84fc1558b356241ee25e93f06faa73a182673bc9d9457a1852"
+          "sourceSha": "9ac8d5955b0c50bede029c98fe451a9e829570e69111fb4c69cb0c347bc849a6"
         }
       ]
     },

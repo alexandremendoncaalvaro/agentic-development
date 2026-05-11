@@ -39,7 +39,7 @@
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "08f11d42a9083d8fab7dec44122ef8fda40b9390aeb2aa28ae0936b85da30d8c"
+          "sourceSha": "c9cc4d6f5430121cce0187c534fa1e703fd7234d92a26a7bb0ec307d3787d280"
         }
       ]
     },
@@ -52,7 +52,7 @@
         },
         {
           "path": ".agents/skills/ad-bootstrap/SKILL.md",
-          "sourceSha": "f9ab9a35e8a6f7fec85aea798f6f4109973fc7f22d79d6113f390d161aac0f70"
+          "sourceSha": "cd7dfebc5fd8be60f05e8874fb7fc50e68f9b09461da8da223441be225ba639b"
         }
       ]
     },
