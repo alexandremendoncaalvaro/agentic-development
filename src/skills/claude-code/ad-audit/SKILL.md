@@ -37,7 +37,7 @@ If the user names an artifact (`AGENTS.md`, `ARCHITECTURE.md`, ADRs, specs), aud
 
 ### Spec drift (if `doc/specs/` exists)
 
-Structural integrity only — does **not** deep-audit spec text against shipped code (deferred per [ADR-0011](../../doc/adr/0011-agentic-spec-skill.md) Consequences).
+Structural integrity only — does **not** deep-audit spec text against shipped code (deferred per ADR-0011 Consequences).
 
 * Numbering — gaps or duplicates in `doc/specs/NNNN-*.md`?
 * Status field — every spec has one of `draft | accepted | shipped | superseded by SPEC-NNNN`.

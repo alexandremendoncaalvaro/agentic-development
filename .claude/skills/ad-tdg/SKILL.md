@@ -94,7 +94,7 @@ Rejected:
 
 The discipline: refuse "optimize for readability AND performance AND testability". Tradeoffs are real — naming the criterion makes them visible.
 
-When the host exposes `AskUserQuestion` (per ADR-0014), render the three candidates as a structured multi-choice card with the criterion as the framing question.
+When the host exposes `AskUserQuestion`, render the three candidates as a structured multi-choice card with the criterion as the framing question.
 
 ## Step 5 — Implement + verify
 

@@ -87,9 +87,9 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Documentation Discipline
 
-**Every document the agent writes obeys these eight rules.** The canonical source is `WORKFLOW.md` §2. ADR-0008 records the decision and its reconciliations.
+**Every document the agent writes obeys these eleven rules.**
 
-1. **Definitions and decisions only.** Capture what is true now and the decisions that brought it there. No speculation, no history, no unfounded plans. A deferred decision is in scope when it is *recorded* — an accepted ADR or a task file is fundamentação; "we might do X later" without a record is speculation and is cut.
+1. **Definitions and decisions only.** Capture what is true now and the decisions that brought it there. No speculation, no history, no unfounded plans. A deferred decision is in scope when it is *recorded* — an accepted ADR or a task file is the basis; "we might do X later" without a record is speculation and is cut.
 2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Applies to `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, specs, and any prose page. **Decision-record artifacts are exempt** — ADRs under `doc/adr/` keep their `**Status:**` and `**Date:**` fields (Nygard supersession requires ordering); tasks under `doc/tasks/` keep their `**Created:**` field and append-only dated `Notes` log. Outside those artifacts, use git history.
 3. **No emoji anywhere.** Not in docs, code, source comments, commit messages, PR bodies, or skill outputs. Severity and status use words; structural cues use Markdown.
 4. **Business context first.** Open every document with *why* — the problem, the constraint, the user — before *what* and *how*. The first paragraph must answer "what would break if this document didn't exist".
@@ -97,6 +97,9 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 6. **Code is the primary documentation of behavior.** Comments justify *why* a non-obvious choice was made — never restate *what*. If the comment is needed to explain *what*, rename or refactor.
 7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a tracked work item — a GitHub Issue, or a per-task file under `doc/tasks/NNNN-*.md`. The trace must be addressable from the source line.
 8. **Tests are living documentation of behavior.** Test names and assertions read as the spec they enforce. Spec changes drive test changes; never the reverse.
+9. **Single responsibility per document.** Each document plays one role — *definition* (pillar docs; read-mostly; no per-item tracking UI), *decision-record* (ADRs, specs; single `Status:` field; mostly immutable after acceptance), or *tracking* (tasks; full checkbox / append-only-Notes UI). A definition doc with checkboxes or a decision-record with granular per-item tracking has taken on adjacent layers' responsibilities.
+10. **Each layer owns its directory index.** `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are canonical indices of their layers. Other documents do not list or digest these indices — filesystem listing is the index.
+11. **Cross-references must be load-bearing.** Test: if removing the reference leaves the surrounding statement intact, the reference was decoration — drop it. Literature citations are load-bearing by definition.
 
 When generating or auditing a document, walk this list before declaring done.
 

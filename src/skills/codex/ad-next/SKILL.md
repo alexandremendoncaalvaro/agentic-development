@@ -72,10 +72,10 @@ A single Markdown message structured as:
 <one-line status per artifact>
 
 ### Layer 2 — Domain (CONTEXT.md)
-<present / lazy-missing per ADR-0019; glossary-empty flag if file exists but has no terms>
+<present / lazy-missing; glossary-empty flag if file exists but has no terms>
 
 ### Layer 3 — Product (doc/product/)
-<present / lazy-missing per ADR-0027; PRD status + implementing-spec count if file exists>
+<present / lazy-missing; PRD status + implementing-spec count if file exists>
 
 ### Layer 4 — Specs (doc/specs/)
 <spec list with status + task count, or "no specs">

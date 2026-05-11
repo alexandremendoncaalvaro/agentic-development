@@ -7,7 +7,7 @@
 
 ## Context
 
-The kit installs skill source files into a user's repo at `init` time, but has no way to absorb upstream kit changes once those files are in place. Users on v0.2.0-beta.1 (the deciders' own `agentic-development` repo plus a second repo) need a coherent `update` command. Decision recorded in [ADR-0009](../adr/0009-update-mechanism.md): a Copier-style re-render with a per-agent state file (`.claude/agentic-state.json`, `.agents/agentic-state.json`), a three-way diff, default-skip on user edits, `--force` and `--dry-run` flags, and removal handling for orphan skills. Bundled with this work: the WORKFLOW §10 reviewer handoff is persisted to `.agentic/reviews/<ISO-timestamp>-<scope>.md` so the §10 contract has a real artifact rather than only an in-flight chat fragment.
+The kit installs skill source files into a user's repo at `init` time, but has no way to absorb upstream kit changes once those files are in place. Users on v0.2.0-beta.1 (the deciders' own `agentic-development` repo plus a second repo) need a coherent `update` command. Decision recorded in ADR-0009: a Copier-style re-render with a per-agent state file (`.claude/agentic-state.json`, `.agents/agentic-state.json`), a three-way diff, default-skip on user edits, `--force` and `--dry-run` flags, and removal handling for orphan skills. Bundled with this work: the WORKFLOW §10 reviewer handoff is persisted to `.agentic/reviews/<ISO-timestamp>-<scope>.md` so the §10 contract has a real artifact rather than only an in-flight chat fragment.
 
 ## Acceptance Criteria
 

@@ -89,8 +89,8 @@ No abbreviations except established domain terms: `cli`, `cwd`, `fs`, `os`, `tty
 ### 2.5 Forbidden Patterns
 
 - No commented-out code. Delete; version control keeps history.
-- No orphan `TODO` / `FIXME`. Reference a GitHub Issue or a `doc/tasks/NNNN-*.md` file (per [WORKFLOW §2](WORKFLOW.md) rule #7).
-- No `--no-verify` to bypass hooks (per [ADR-0023](doc/adr/0023-agentic-commit-skill.md)).
+- No orphan `TODO` / `FIXME`. Reference a GitHub Issue or a `doc/tasks/NNNN-*.md` file.
+- No `--no-verify` to bypass hooks.
 - No `--no-gpg-sign`. DCO `Signed-off-by` is non-negotiable.
 - No `try` block that loses error context. Re-throw with `cause:`.
 
@@ -153,7 +153,7 @@ Tier is editable as the project matures (append a rationale paragraph; do not de
 ### 4.3 Documentation Requirement
 
 - Public surfaces: JSDoc on exported functions in `src/lib/` (purpose, parameters, return value, throws).
-- Internal helpers: comments explain *why* a non-obvious choice was made, never *what* (per [WORKFLOW §2](WORKFLOW.md) rule #6).
+- Internal helpers: comments explain *why* a non-obvious choice was made, never *what*.
 
 ### 4.4 Versioning
 
@@ -220,7 +220,7 @@ Developer commits
 - **Pre-commit hook:** intentionally absent today. Adding lint/format gates is a separate decision (own ADR + Task per [ADR-0007](doc/adr/0007-workflow-operational-skills.md) §6).
 - **Pre-push hook:** `npm test` runs the full suite. Mandatory before push.
 - **CI:** mirrors pre-push across Node 20 / 22 matrix. Redundant with the local hook; both stay wired so a missing local install does not skip the gate.
-- **Never bypass.** No `--no-verify`, no skipped hooks, no deleted failing tests (per [ADR-0023](doc/adr/0023-agentic-commit-skill.md)).
+- **Never bypass.** No `--no-verify`, no skipped hooks, no deleted failing tests.
 
 ---
 
@@ -281,16 +281,16 @@ The Test Dependency Map (TDM) — list which tests cover a file before modifying
 
 ### 10.2 Commit Messages
 
-[Conventional Commits 1.0](https://www.conventionalcommits.org/). Use `/ad-commit` for the disciplined flow per [ADR-0023](doc/adr/0023-agentic-commit-skill.md).
+[Conventional Commits 1.0](https://www.conventionalcommits.org/). Use `/ad-commit` for the disciplined flow.
 
 - Subject: imperative, ≤72 chars, no trailing period.
 - Body explains *why* when non-obvious. References `Closes task-NNNN`, `Per ADR-NNNN`, `Fixes #N`.
 - **DCO sign-off:** every commit carries `Signed-off-by: <Name> <email>`. Use `git commit --signoff` or `/ad-commit`.
-- **No `Co-Authored-By` trailer** (per [ADR-0023](doc/adr/0023-agentic-commit-skill.md) §Decision 1 — DCO only).
+- **No `Co-Authored-By` trailer**.
 
 ### 10.3 Pull Requests
 
-Open via `/ad-pr` per [ADR-0024](doc/adr/0024-agentic-pr-skill.md). Uniform body shape:
+Open via `/ad-pr`. Uniform body shape:
 
 ```
 ## Summary
@@ -307,28 +307,31 @@ PR title format: Conventional Commits (type inferred from dominant commit type i
 
 ### 10.4 Merge
 
-Evaluate + merge via `/ad-merge` per [ADR-0025](doc/adr/0025-agentic-merge-skill.md). CI green = hard gate. Fresh-context review, linked task, unresolved comments, mergeability surface as warnings.
+Evaluate + merge via `/ad-merge`. CI green = hard gate. Fresh-context review, linked task, unresolved comments, mergeability surface as warnings.
 
 Merge mode: merge commits (preserves atomic commit history). `--delete-branch` by default.
 
 ### 10.5 Never Bypass
 
-No `--no-verify`, no skipped hooks, no deleted failing tests (per [ADR-0023](doc/adr/0023-agentic-commit-skill.md) and [WORKFLOW.md §11](WORKFLOW.md)).
+No `--no-verify`, no skipped hooks, no deleted failing tests (per [WORKFLOW.md §11](WORKFLOW.md)).
 
 ---
 
 ## 11. Documentation Standards
 
-The eight-rule discipline from [WORKFLOW.md §2](WORKFLOW.md) (operationalized by the `ad-philosophy` skill, canonical source [ADR-0008](doc/adr/0008-documentation-discipline.md)) binds every document. Summary:
+Every document in this repo follows these rules:
 
-1. Definitions and decisions only. No speculation, history, or unfounded plans.
-2. No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents. Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are exempt.
-3. No emoji anywhere.
-4. Business context first.
-5. One scope per document. No duplication.
-6. Code is the primary documentation of behavior.
-7. No commented-out code; no orphan `TODO`/`FIXME` in source.
-8. Tests are living documentation of behavior.
+1. **Definitions and decisions only.** No speculation, history, or unfounded plans.
+2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are exempt — their lifecycle fields are the auditability primitive.
+3. **No emoji anywhere.** Docs, code, comments, commits, PR bodies.
+4. **Business context first.** Open every document with *why* — the problem, the constraint, the user.
+5. **One scope per document. No duplication.** Canonical location owns the content; cross-references load-bearing only.
+6. **Code is the primary documentation of behavior.** Comments justify *why* a non-obvious choice was made.
+7. **No commented-out code; no orphan `TODO`/`FIXME` in source.** Every deferred item references a GitHub Issue or a `doc/tasks/NNNN-*.md` task.
+8. **Tests are living documentation of behavior.** Test names read as the spec they enforce.
+9. **Single responsibility per document.** Definition / decision-record / tracking — one role per document; no per-item tracking UI in definition docs.
+10. **Each layer owns its directory index.** `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are canonical indices; no digest of those indices in other documents.
+11. **Cross-references must be load-bearing.** If removing a reference leaves the surrounding statement intact, the reference was decoration — drop it.
 
 ### 11.1 Document Scope
 
@@ -340,7 +343,7 @@ The eight-rule discipline from [WORKFLOW.md §2](WORKFLOW.md) (operationalized b
 | `GUIDELINES.md` (this document) | Project-specific engineering standards | Engineers |
 | `ARCHITECTURE.md` | Source structure and dependency rules | Engineers |
 | `doc/product/PRD.md` | Product-level scope (target user, success metrics, roadmap) | Product + engineering |
-| `doc/specs/NNNN-*.md` | Feature-level specifications (kit does not currently use specs — work tracked as tasks) | Engineers |
+| `doc/specs/NNNN-*.md` | Feature-level specifications | Engineers |
 | `doc/adr/NNNN-*.md` | Binding architectural decisions (Nygard format) | Engineers, future maintainers |
 | `doc/tasks/NNNN-*.md` | Per-work-unit plan + acceptance criteria | Engineers |
 

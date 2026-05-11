@@ -18,7 +18,7 @@ Three execution layers under `src/`, plus kit content read at runtime:
 Kit content lives under `src/skills/<agent>/<skill>/` and is read at runtime by `src/lib/install.js` only:
 
 * `src/skills/claude-code/<skill>/SKILL.md` — Markdown body, Anthropic Skills frontmatter, optional `manifest.json` declaring sibling-tree subagent files, optional `agents/<subagent>.md` files routed to `.claude/agents/`.
-* `src/skills/codex/<skill>/SKILL.md` plus `agents/openai.yaml` — XML body + minimal frontmatter (cc-sdd convention), per [ADR-0001](doc/adr/0001-skills-mode-for-claude-and-codex.md).
+* `src/skills/codex/<skill>/SKILL.md` plus `agents/openai.yaml` — XML body + minimal frontmatter (cc-sdd convention),.
 * `templates/`, `prompts/` — kit-shipped baselines for the manual paste-into-agent flow. Not loaded at runtime by the installer; only mentioned by the README's `Manual prompts` section.
 * `doc/adr/`, `doc/tasks/`, `WORKFLOW.md`, `AGENTS.md`, `ARCHITECTURE.md` — kit documentation. Not loaded at runtime.
 
@@ -43,7 +43,7 @@ Boundary rule: only `src/lib/install.js` resolves `KIT_ROOT`-rooted paths (`impo
 * ES modules (`"type": "module"` in `package.json`). Built-in imports use the `node:` prefix (`node:fs`, `node:path`, `node:url`).
 * Files: kebab-case (`init.js`, `detect.js`, `install.js`, `rootdoc.js`).
 * Exports: camelCase functions (`detectMode`, `detectAgents`, `detectFeatures`, `installSkills`, `updateRootDoc`, `initCommand`).
-* Skill names: `ad-<verb-or-noun>` (`ad-bootstrap`, `ad-architecture`, `ad-review`) per [ADR-0026](doc/adr/0026-slash-command-rename-ad-prefix.md). Historical skills under closed ADRs / tasks may reference the pre-rename `agentic-<verb-or-noun>` prefix.
+* Skill names: `ad-<verb-or-noun>` (`ad-bootstrap`, `ad-architecture`, `ad-review`). Historical skills under closed ADRs / tasks may reference the pre-rename `agentic-<verb-or-noun>` prefix.
 * Agent values: lowercase strings (`'claude-code' | 'codex' | 'both'`).
 
 ## Observability

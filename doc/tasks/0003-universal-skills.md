@@ -9,7 +9,7 @@
 
 Chunk 2 of v0.2 (per [doc/v0.2-cli-plan.md](../v0.2-cli-plan.md)). Extends the skill set to the full universal group: the four skills installed for every project regardless of stack. After this task, `agentic init` produces a complete kit for any greenfield/brownfield project; the only thing missing for a full release is the conditional skills (Chunk 3) and polish (Chunk 4).
 
-`agentic-task` is included here per [ADR-0004](../adr/0004-file-based-task-tracking.md). Board sync stays out of scope (deferred to v0.3 as `agentic-task-sync`).
+`agentic-task` is included here. Board sync stays out of scope (deferred to v0.3 as `agentic-task-sync`).
 
 ## Acceptance Criteria
 
@@ -30,7 +30,7 @@ Chunk 2 of v0.2 (per [doc/v0.2-cli-plan.md](../v0.2-cli-plan.md)). Extends the s
 - [x] Write `agentic-task` for Codex
 - [x] Write `agentic-audit` for Claude Code (read-only drift report, no file written; embeds the audit prompt) <!-- new content; no `prompts/audit.md` existed. Minimal drift-check scope (AGENTS.md / ARCHITECTURE.md / ADR statuses). Doc-consistency checks flagged in 2026-05-08 Notes deferred to a sibling skill. -->
 - [x] Write `agentic-audit` for Codex
-- [x] Write `agentic-philosophy` for Claude Code (body = trimmed `templates/agents-general.md`) <!-- added per ADR-0005; carried in the same commit as the other four. allow_implicit_invocation: true on Codex side per ADR-0005 §32. -->
+- [x] Write `agentic-philosophy` for Claude Code (body = trimmed `templates/agents-general.md`) <!-- added; carried in the same commit as the other four. allow_implicit_invocation: true on Codex side' ' -->
 - [x] Write `agentic-philosophy` for Codex
 - [x] Delete `templates/agents-general.md` after `agentic-philosophy` lands (ADR-0005 §33) <!-- done in commit 59607fd; git detected the move as a 75% rename → claude-code/agentic-philosophy/SKILL.md, preserving blame. Closes the deferred checkbox in Task 0006. -->
 - [x] Update install logic in `src/commands/init.js` to copy all universal skills by default
@@ -42,7 +42,7 @@ Chunk 2 of v0.2 (per [doc/v0.2-cli-plan.md](../v0.2-cli-plan.md)). Extends the s
 
 ### 2026-05-08 (later)
 
-[ADR-0005](../adr/0005-universal-agent-behavior-as-skill.md) adds a fifth universal skill: `agentic-philosophy`. Body = trimmed content of `templates/agents-general.md`; description triggers on "non-trivial change", "verify", "think before coding". Same dual source tree as the other four (`src/skills/claude-code/agentic-philosophy/SKILL.md`, `src/skills/codex/agentic-philosophy/SKILL.md` + `agents/openai.yaml`). Auto-install with the universal set. Update Acceptance Criteria counts (5 skills × 2 agents = 10 `SKILL.md` + 5 Codex `openai.yaml`) when this task starts.
+ADR-0005 adds a fifth universal skill: `agentic-philosophy`. Body = trimmed content of `templates/agents-general.md`; description triggers on "non-trivial change", "verify", "think before coding". Same dual source tree as the other four (`src/skills/claude-code/agentic-philosophy/SKILL.md`, `src/skills/codex/agentic-philosophy/SKILL.md` + `agents/openai.yaml`). Auto-install with the universal set. Update Acceptance Criteria counts (5 skills × 2 agents = 10 `SKILL.md` + 5 Codex `openai.yaml`) when this task starts.
 
 ### 2026-05-08
 
@@ -63,7 +63,7 @@ All 5 universal skills landed; `agentic init` now installs the full universal se
 
 | Commit | Scope |
 |---|---|
-| `59607fd` | `src/skills/{claude-code,codex}/` source for `agentic-philosophy`, `agentic-architecture`, `agentic-adr`, `agentic-task`, `agentic-audit`. Deletes `templates/agents-general.md` per [ADR-0005](../adr/0005-universal-agent-behavior-as-skill.md) §33; git detected the move as a 75% rename → `agentic-philosophy/SKILL.md`. Toggles the deferred checkbox in [Task 0006](0006-bootstrap-flow-and-agents-md-bloat-fix.md) Plan that flagged this exact deletion. |
+| `59607fd` | `src/skills/{claude-code,codex}/` source for `agentic-philosophy`, `agentic-architecture`, `agentic-adr`, `agentic-task`, `agentic-audit`. Deletes `templates/agents-general.md`' ' git detected the move as a 75% rename → `agentic-philosophy/SKILL.md`. Toggles the deferred checkbox in [Task 0006](0006-bootstrap-flow-and-agents-md-bloat-fix.md) Plan that flagged this exact deletion. |
 | `9e67fc7` | `src/commands/init.js` — `REQUIRED_SKILLS` expanded to all 6 universal skills. TUI confirm prompt and post-install outro updated to surface the new slash commands. |
 | `9df4cdb` | `test/init.test.js` — two new integration tests assert the full universal set lands at the documented paths for `--agent both` (18 files) and `--agent claude-code` (6 files). 21/21 green. |
 | `aae4d95` | `README.md` + `AGENTS.md` aligned: status badge, install description with per-skill table, scoping callouts updated from "Chunk 1" to "Chunk 2" status. |
@@ -71,9 +71,9 @@ All 5 universal skills landed; `agentic init` now installs the full universal se
 
 **Static + dry-run e2e methodology** (same as Task 0002 close-out):
 
-- **Frontmatter validation:** every Claude `SKILL.md` carries `name`, `description`, and `allowed-tools` (omitted on `agentic-philosophy`, which is prescriptive only). Every Codex `SKILL.md` carries minimal frontmatter (`name`, `description`) per cc-sdd convention. Every Codex `agents/openai.yaml` carries `interface.display_name`, `interface.short_description`, and `policy.allow_implicit_invocation` — set to `true` only on `agentic-philosophy` per [ADR-0005](../adr/0005-universal-agent-behavior-as-skill.md) §32, `false` on the other four.
+- **Frontmatter validation:** every Claude `SKILL.md` carries `name`, `description`, and `allowed-tools` (omitted on `agentic-philosophy`, which is prescriptive only). Every Codex `SKILL.md` carries minimal frontmatter (`name`, `description`) per cc-sdd convention. Every Codex `agents/openai.yaml` carries `interface.display_name`, `interface.short_description`, and `policy.allow_implicit_invocation` — set to `true` only on `agentic-philosophy`' ' `false` on the other four.
 - **Body shape:** Claude bodies use Markdown headings, four-step scan-first contract where applicable (`agentic-bootstrap`, `agentic-architecture`, `agentic-audit`), and inlined templates fenced as ` ```` markdown` blocks. Codex bodies use `<background_information>`, `<instructions>`, `<template>`, `<output_contract>` tags carrying the same operational content.
-- **No kit-internal hyperlinks** in any installed-skill body — paths like `[ADR-0004](doc/adr/0004-...)` or `[WORKFLOW.md §1](WORKFLOW.md)` were dropped from skill bodies during drafting because they would dangle in the user's project. Cross-skill references stay (`use the agentic-adr skill`) since those are stable inside the installed set.
+- **No kit-internal hyperlinks** in any installed-skill body — paths like `ADR-0004` or `[WORKFLOW.md §1](WORKFLOW.md)` were dropped from skill bodies during drafting because they would dangle in the user's project. Cross-skill references stay (`use the agentic-adr skill`) since those are stable inside the installed set.
 - **Dry-run install in `/tmp` mktemp:** `init --agent both --yes` lands all 18 expected files (12 Claude SKILL.md + 6 Codex SKILL.md + 6 Codex `openai.yaml` — counting `agentic-bootstrap` from Task 0002, since it's also installed). Re-run on the same directory reports `· unchanged` for every file (byte-identical idempotency).
 
 **`npm test`:** 21/21 green at flip (was 19 in Task 0002; +2 universal-set integration tests).

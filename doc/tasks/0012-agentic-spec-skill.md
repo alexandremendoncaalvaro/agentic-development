@@ -8,7 +8,7 @@
 
 ## Context
 
-Spec-driven development with LLMs has converged on a four-layer artifact stack (constitution → spec → plan/decisions → code), most prominently in [GitHub Spec Kit](https://github.com/github/spec-kit). The kit covers layers 1, 3, and 4 but has no primitive for the feature-level spec layer. [ADR-0011](../adr/0011-agentic-spec-skill.md) accepts a new spec-driven skill `agentic-spec` that scaffolds `doc/specs/NNNN-<slug>.md`, adapts Spec Kit's mandatory sections to the kit's documentation discipline, expands `WORKFLOW.md` §1 with the four-layer stack framing, and adds a `Spec ref` field to the task template so tasks and specs are explicitly linked. F1–F8 reconciliations recorded in the ADR.
+Spec-driven development with LLMs has converged on a four-layer artifact stack (constitution → spec → plan/decisions → code), most prominently in [GitHub Spec Kit](https://github.com/github/spec-kit). The kit covers layers 1, 3, and 4 but has no primitive for the feature-level spec layer. ADR-0011 accepts a new spec-driven skill `agentic-spec` that scaffolds `doc/specs/NNNN-<slug>.md`, adapts Spec Kit's mandatory sections to the kit's documentation discipline, expands `WORKFLOW.md` §1 with the four-layer stack framing, and adds a `Spec ref` field to the task template so tasks and specs are explicitly linked. F1–F8 reconciliations recorded in the ADR.
 
 ## Acceptance Criteria
 

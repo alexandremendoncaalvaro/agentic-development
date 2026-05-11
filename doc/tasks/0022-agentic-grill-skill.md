@@ -3,7 +3,7 @@
 **Status:** done
 **Created:** 2026-05-10
 **Owner:** Alexandre Alvaro
-**Spec ref:** [ADR-0022](../adr/0022-agentic-grill-skill.md)
+**Spec ref:** ADR-0022
 **Board ref:**
 
 ## Context
@@ -32,7 +32,7 @@ Universal across all profiles per [task-0020](0020-mattpocock-absorptions.md) Ph
 
 ## Plan
 
-- [x] Draft + accept [ADR-0022](../adr/0022-agentic-grill-skill.md).
+- [x] Draft + accept ADR-0022.
 - [x] Implement [Claude](../../src/skills/claude-code/agentic-grill/SKILL.md) + [Codex](../../src/skills/codex/agentic-grill/SKILL.md) skill bodies.
 - [x] Wire profiles + init + rootdoc + README + tests.
 - [x] Cross-skill routing disambiguation in the `agentic-grill` body (`agentic-ground` / `agentic-tdg` / `agentic-spike` / `agentic-diagnose`).

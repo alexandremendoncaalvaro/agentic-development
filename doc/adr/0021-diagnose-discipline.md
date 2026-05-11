@@ -54,7 +54,7 @@ Add a new section **`WORKFLOW.md` §15: Diagnose With Discipline** (renumbering 
    - From `agentic-review`'s findings — Blockers tagged "needs reproduction" route to `agentic-diagnose`.
    - From `agentic-spike` — when the spike's per-stage debug surfaces a bug *inside* a stage rather than between stages, the bug becomes a `agentic-diagnose` problem with the stage's input as the loop seed.
 
-6. **Output of the skill.** Like `agentic-tdg` (per [ADR-0018](0018-agentic-tdg-skill.md) §3), `agentic-diagnose` writes no separate artifact. The output is the verified fix + the regression test that lands through normal commits. Loop construction notes, ranked hypotheses, and the falsified ones go into the commit message body or the task's `Notes` log when one exists.
+6. **Output of the skill.** Like `agentic-tdg`, `agentic-diagnose` writes no separate artifact. The output is the verified fix + the regression test that lands through normal commits. Loop construction notes, ranked hypotheses, and the falsified ones go into the commit message body or the task's `Notes` log when one exists.
 
 ## Consequences
 
@@ -88,8 +88,8 @@ Add a new section **`WORKFLOW.md` §15: Diagnose With Discipline** (renumbering 
 - Karl Popper, *The Logic of Scientific Discovery* (1959) — falsifiability as a hypothesis-quality test.
 - [`mattpocock/skills` `diagnose/SKILL.md`](https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnose/SKILL.md) — five-phase shape and the Phase-1 framing borrowed with attribution.
 - [ADR-0007](0007-workflow-operational-skills.md) — workflow-operational skill pattern + auto-trigger asymmetry.
-- [ADR-0010](0010-agentic-ground-skill.md) — adjacent regime (research before implementation).
-- [ADR-0017](0017-agentic-spike-skill.md) — adjacent regime (technique uncertain).
-- [ADR-0018](0018-agentic-tdg-skill.md) — adjacent regime (implementation strategy uncertain); skill output discipline this ADR mirrors.
+- ADR-0010 — adjacent regime (research before implementation).
+- ADR-0017 — adjacent regime (technique uncertain).
+- ADR-0018 — adjacent regime (implementation strategy uncertain); skill output discipline this ADR mirrors.
 - [`WORKFLOW.md`](../../WORKFLOW.md) §15 — the section this ADR ships into.
 - [task-0020](../tasks/0020-mattpocock-absorptions.md) — implementation rollout tracking the deferred skill.

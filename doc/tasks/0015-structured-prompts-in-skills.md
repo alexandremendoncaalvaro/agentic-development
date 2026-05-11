@@ -8,7 +8,7 @@
 
 ## Context
 
-The Phase 2 holistic coherence review identified that skill confirmation gates and multi-choice interview steps render as plain text instead of structured cards in the host's UI. The user articulated the friction explicitly: "sinto falta do claude e o codex abrindo aquelas caixinhas pra sugerir algo ou confirmar algo." [ADR-0014](../adr/0014-structured-prompts-when-host-supports-them.md) accepts a documentation-only change — Claude Code skill bodies prescribe `AskUserQuestion` and Plan Mode when the host exposes them, falling back to numbered text otherwise. Codex variants are unchanged (no equivalent primitive).
+The Phase 2 holistic coherence review identified that skill confirmation gates and multi-choice interview steps render as plain text instead of structured cards in the host's UI. The user articulated the friction explicitly: "sinto falta do claude e o codex abrindo aquelas caixinhas pra sugerir algo ou confirmar algo." ADR-0014 accepts a documentation-only change — Claude Code skill bodies prescribe `AskUserQuestion` and Plan Mode when the host exposes them, falling back to numbered text otherwise. Codex variants are unchanged (no equivalent primitive).
 
 ## Acceptance Criteria
 

@@ -8,7 +8,7 @@
 
 ## Context
 
-The kit ships three navigation surfaces (README sequence static, `agentic-next` reactive snapshot, `agentic init` slashLine inventory) but has no per-command breadcrumb that says "after this skill, what's natural to do next?" Industry research surfaced this as the most-common pattern in mature CLIs (rails, gh, heroku, vue, cookiecutter, yeoman, Spec Kit). [ADR-0016](../adr/0016-per-skill-next-section.md) accepts: each skill body ships a final `Next` section with 1–2 prescriptive next-action breadcrumbs, profile-aware where it matters. Documentation-only at the source layer; no new skill / command / schema.
+The kit ships three navigation surfaces (README sequence static, `agentic-next` reactive snapshot, `agentic init` slashLine inventory) but has no per-command breadcrumb that says "after this skill, what's natural to do next?" Industry research surfaced this as the most-common pattern in mature CLIs (rails, gh, heroku, vue, cookiecutter, yeoman, Spec Kit). ADR-0016 accepts: each skill body ships a final `Next` section with 1–2 prescriptive next-action breadcrumbs, profile-aware where it matters. Documentation-only at the source layer; no new skill / command / schema.
 
 ## Acceptance Criteria
 

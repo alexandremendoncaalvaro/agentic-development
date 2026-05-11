@@ -28,15 +28,16 @@ What to keep in mind:
 14. **Autonomy requires observability.** If the agent makes decisions, log the trajectory: tool calls, intermediate outputs, failures.
 15. **Staged spikes when the technique is uncertain.** When the *how* is unknown — a library choice, a CV technique, a multi-stage transformation — break the problem into staged spikes against golden fixtures with per-stage debug artifacts.
 16. **Diagnose with discipline.** For hard bugs and performance regressions: build a fast, deterministic feedback loop *before* hypothesising. Reproduce, then generate three to five ranked falsifiable hypotheses, then change one variable at a time. The feedback loop is the skill; everything else is mechanical.
-17. **One task per session.** Context decays as it fills. Reset and reload only what the next task needs rather than extending a long conversation across many features. Smaller, deliberately-loaded contexts beat large, accreted ones.
-18. **Slice vertically, not horizontally.** Decompose a spec into thin end-to-end paths through every layer (schema, API, UI, tests) rather than one layer at a time. Each slice ships demonstrable behavior; horizontal layer-stacks ship nothing on their own.
-19. **Discipline scales with project maturity.** Same principles bind every project; the artifact set scales. A spike runs posture + research + audit; a regulated product adds spec / ADR / hooks / evals. Add ceremony only where it changes agent behavior; configure at init and reconfigure as the project matures.
+17. **TDD as deterministic guardrail.** When behavior is test-expressible up front: tracer-bullet test → minimum code → green → refactor. One test at a time; tests verify behavior through public interfaces, not implementation. Pairs with TDG inside the GREEN phase of any cycle where multiple implementation strategies are plausible.
+18. **One task per session.** Reset rather than extend; reload only what the next task needs.
+19. **Slice vertically, not horizontally.** Decompose a spec into thin end-to-end paths through every layer (schema, API, UI, tests) rather than one layer at a time. Each slice ships demonstrable behavior; horizontal layer-stacks ship nothing on their own.
+20. **Discipline scales with project maturity.** Same principles bind every project; the artifact set scales. A spike runs posture + research + audit; a regulated product adds spec / ADR / hooks / evals. Add ceremony only where it changes agent behavior; configure at init and reconfigure as the project matures.
 
 > Working with agents means trading typing for technical direction. The value is in giving the right context, setting boundaries, validating the result, and keeping "almost right" out of production.
 
 ## 1. Spec-Driven Design
 
-Define the rules before the agent writes a line. The temptation is to dump everything into `AGENTS.md` and hope it works — but bloat causes the model to ignore the file. Keep one topic per Markdown file: lean and focused.
+Define the rules before the agent writes a line. The temptation is to dump everything into `AGENTS.md` and hope it works — but bloat causes the model to ignore the file. One topic per file.
 
 There are two complementary frames for the artifacts the kit produces. The first is **purpose** — what each artifact is *for*. The second is **loading mechanism** — when each artifact reaches the agent's context.
 
@@ -46,10 +47,10 @@ There are two complementary frames for the artifacts the kit produces. The first
 2. **Domain** — `CONTEXT.md` at the repo root (or `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos). The project's ubiquitous language: canonical nouns, the aliases to avoid, the relationships between them, and the ambiguities that have already been resolved. Direct application of Domain-Driven Design (Evans, 2003) — when an agent and a human share the project's vocabulary, the agent uses fewer tokens to say more, and the code, tests, and conversation all converge on the same names. Created lazily — first term resolved triggers the file.
 3. **Product** — `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` plus `doc/product/PRODUCT-MAP.md` (multi-product). Product-level scope: target user, problem, goals, non-goals, success metrics, multi-feature roadmap, cross-feature constraints. One PRD per product; feature specs (Layer 4) inherit target user, success metrics, and constraints from the PRD. Created lazily when a product is being scoped.
 4. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; specs reference their parent PRD for product-scope inheritance. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
-5. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
+5. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for. Layer 5 spans three document roles — `ARCHITECTURE.md` is definition, ADRs are decision-record, tasks are tracking — write each per its role, not as a single class.
 6. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
 
-The six layers scale with project maturity (TL;DR #19 — Discipline scales). A spike or PoC profile may legitimately ship only Layers 1, 2, and 6 — adding Layers 3, 4, and 5 to a 200-line experiment is ceremony that does not change agent behavior. (Domain — Layer 2 — earns its keep even at PoC because vocabulary drift starts on day one.) A team or regulated product runs all six. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
+The six layers scale with project maturity (TL;DR #20 — Discipline scales). A spike or PoC profile may legitimately ship only Layers 1, 2, and 6 — adding Layers 3, 4, and 5 to a 200-line experiment is ceremony that does not change agent behavior. (Domain — Layer 2 — earns its keep even at PoC because vocabulary drift starts on day one.) A team or regulated product runs all six. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
 
 ### Three context types (loading mechanism)
 
@@ -73,7 +74,7 @@ Comments are exceptions. They justify *why* a non-obvious choice was made — ne
 
 ### Documentation Discipline
 
-The agent's authoritative copy of the documentation discipline lives in the `ad-philosophy` skill (`Documentation Discipline` section). The rules are summarized below for reference; the skill carries the full text agents read at session time.
+The rules below are canonical.
 
 1. **Definitions and decisions only.** No speculation, history, or unfounded plans.
 2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are exempt — their lifecycle fields are the auditability primitive.
@@ -88,7 +89,7 @@ The agent's authoritative copy of the documentation discipline lives in the `ad-
 11. **Cross-references must be load-bearing.** If you can delete the reference and the surrounding statement still stands, the reference was decoration — drop it.
 12. **Universal-vs-kit-state separation.** `WORKFLOW.md` ships to downstream projects and carries universal principles only — it does not cite kit-specific ADR numbers. The kit's adoption of each principle is recorded in `doc/adr/` (kit-internal). Literature citations remain (they are universal load-bearing references).
 
-The skill body explains the rationale per rule and the failure modes each counters (bloated `AGENTS.md`, README pages drifting into changelogs, decision artifacts diluted by speculation, definition documents accumulating per-item tracking UI, pillar documents duplicating adjacent layers' indices). Generator skills reject violations at write time; `ad-audit` flags drift across narrative docs and decision-record artifacts on demand.
+The twelve rules above are the authoritative Documentation Discipline contract. They counter recurring failure modes: session-load files bloated past relevance, README pages drifting into changelogs, decision artifacts diluted by speculation, definition documents accumulating per-item tracking UI, and pillar documents duplicating adjacent layers' indices.
 
 ## 3. Format by Evidence
 
@@ -162,7 +163,7 @@ Three principles fall out of those terms:
 - **The interface is the test surface.** Callers and tests cross the same seam. If you want to test *past* the interface, the module is probably the wrong shape.
 - **One adapter is a hypothetical seam; two adapters make it real.** Don't introduce a seam unless something actually varies across it.
 
-Skills that touch architecture (`ad-architecture`, `ad-adr`, the planned `ad-deepen`) use these terms verbatim, so suggestions and reviews land in a single language.
+Architectural skills should use these terms verbatim, so suggestions and reviews land in a single language.
 
 ## 9. Outcome-Based Prompting (TDG)
 
@@ -228,8 +229,6 @@ The flow has four parts:
 **Why this beats end-to-end:** §9 (TDG) assumes the path is known. When you don't know it, end-to-end evaluation tells you *that* it failed, not *where*. Stage-level artifacts make the divergence inspectable, so you fix the right gate instead of guessing at the final output.
 
 **When to use it:** the unknown is *how* — a library choice, a CV technique, a multi-stage transformation. Skip it when the *how* is routine.
-
-The named components (spike, golden datasets, stage-segmented error analysis, trajectory evaluation, visual CV debugging) each have their own lineage under Sources; the combination is the contribution.
 
 ## 15. Diagnose With Discipline
 

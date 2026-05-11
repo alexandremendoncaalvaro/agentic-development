@@ -7,7 +7,7 @@ allowed-tools: Read, Glob, Grep, Bash
 
 # /ad-grill
 
-Implements [ADR-0022](../../doc/adr/0022-agentic-grill-skill.md) — the upstream-of-research phase. Process scaffold for sharpening fuzzy asks before any code, research, or spec work begins. Sits upstream of [`ad-ground`](../ad-ground/SKILL.md); routes to it (and the other implementation-phase skills) when the question is sharp enough to act on.
+Implements ADR-0022 — the upstream-of-research phase. Process scaffold for sharpening fuzzy asks before any code, research, or spec work begins. Sits upstream of [`ad-ground`](../ad-ground/SKILL.md); routes to it (and the other implementation-phase skills) when the question is sharp enough to act on.
 
 No primary file output. Side-effects land in `CONTEXT.md` (via [`ad-domain`](../ad-domain/SKILL.md)) and ADRs (via [`ad-adr`](../ad-adr/SKILL.md)) — both lazy, both belonging to other skills.
 
@@ -35,7 +35,7 @@ Before asking a single question, look. Most "what does this do?" questions are a
 
 Process:
 
-1. `Read CONTEXT.md` if it exists ([ADR-0019](../../doc/adr/0019-domain-language-layer.md)). Anchor vocabulary first; nothing else makes sense without it.
+1. `Read CONTEXT.md` if it exists. Anchor vocabulary first; nothing else makes sense without it.
 2. `Read CONTEXT-MAP.md` if it exists; load the per-context glossaries that match the surface.
 3. `Glob` / `Grep` the surface the question touches — file names, function names, the user's nouns and their plausible aliases.
 4. `Read` the matched files in the order most likely to answer the surface question.
@@ -85,7 +85,7 @@ When a term resolves or a decision crystallizes, capture immediately. Never batc
 
 **Term resolved → `/ad-domain`.** Route to [`ad-domain`](../ad-domain/SKILL.md) with the canonical noun, the aliases to avoid, and the one-sentence definition. The skill writes to `CONTEXT.md`.
 
-**Decision crystallized → maybe `/ad-adr`.** Offer an ADR only when **all three** are true (Pocock's discipline; mirrors [ADR-0022](../../doc/adr/0022-agentic-grill-skill.md) §5):
+**Decision crystallized → maybe `/ad-adr`.** Offer an ADR only when **all three** are true (Pocock's discipline; mirrors ADR-0022 §5):
 
 1. **Hard to reverse.** Changing the decision later costs meaningfully.
 2. **Surprising without context.** A future reader will wonder *why was it done this way?*

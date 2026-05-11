@@ -7,7 +7,7 @@
 
 ## Context
 
-Eight prescriptive documentation-discipline rules brought from another project need to become standard for this kit and every project the kit bootstraps. Rules are universal and prescriptive, so they fit the loading mechanism [ADR-0005](../adr/0005-universal-agent-behavior-as-skill.md) chose for universal agent behavior — the `agentic-philosophy` skill, lazy-loaded on non-trivial work — extended with a `Documentation Discipline` section. Decision recorded in [ADR-0008](../adr/0008-documentation-discipline.md), including reconciliation of two collisions (Rule 2 with Nygard ADR/task date fields; Rule 7 with [ADR-0004](../adr/0004-file-based-task-tracking.md) file-based tracking) and the scope of "anywhere" for Rule 3 (emoji).
+Eight prescriptive documentation-discipline rules brought from another project need to become standard for this kit and every project the kit bootstraps. Rules are universal and prescriptive, so they fit the loading mechanism ADR-0005 chose for universal agent behavior — the `agentic-philosophy` skill, lazy-loaded on non-trivial work — extended with a `Documentation Discipline` section. Decision recorded in [ADR-0008](../adr/0008-documentation-discipline.md), including reconciliation of two collisions (Rule 2 with Nygard ADR/task date fields; Rule 7 with ADR-0004 file-based tracking) and the scope of "anywhere" for Rule 3 (emoji).
 
 ## Acceptance Criteria
 
@@ -43,7 +43,7 @@ Append-only log. Date each entry. Never rewrite past entries.
 Decision sequence with the user, captured before implementation:
 
 - R1: ADRs and tasks are explicit exceptions to Rule 2; rule applies to narrative docs only.
-- R2: tighten Rule 7 to accept either GitHub Issues or `doc/tasks/NNNN-*.md`, preserving [ADR-0004](../adr/0004-file-based-task-tracking.md).
+- R2: tighten Rule 7 to accept either GitHub Issues or `doc/tasks/NNNN-*.md`, preserving ADR-0004.
 - R3: emoji rule applies anywhere — docs, code, comments, commits, skill outputs.
 - R4: when the user records a decision in this kit, that record is the fundamentação; "speculation" is what is *not* recorded.
 

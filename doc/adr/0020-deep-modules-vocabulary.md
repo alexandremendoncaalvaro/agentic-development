@@ -37,7 +37,7 @@ Adopt the Ousterhout/Feathers vocabulary verbatim in `WORKFLOW.md` §8 (the "Arc
    - **Already shipped** — `agentic-architecture`, `agentic-adr`, `agentic-audit`, `agentic-review` (when reviewing architectural-decision diffs): bodies updated to use Module/Interface/Depth/Seam/Adapter and to apply the deletion test.
    - **Planned** — `agentic-deepen` (an `improve-codebase-architecture`-equivalent surfacing deepening opportunities). Universal across `team` and `mature` profiles per the same logic that universalizes architectural skills today; absent from `poc` because architectural deepening is premature for ≤200-line experiments.
 
-5. **Domain glossary stays separate from architectural vocabulary.** Per [ADR-0019](0019-domain-language-layer.md), `CONTEXT.md` holds project-specific nouns (Customer, Order, Triage role); the architectural vocabulary holds generic engineering nouns (Module, Seam, Adapter). Skills that write either check the other before writing — a glossary entry that names "Module" or "Seam" is misplaced (belongs to architecture vocabulary, not domain), and an architecture term that names "Customer" or "Order" is misplaced (belongs to domain glossary).
+5. **Domain glossary stays separate from architectural vocabulary.** Per ADR-0019, `CONTEXT.md` holds project-specific nouns (Customer, Order, Triage role); the architectural vocabulary holds generic engineering nouns (Module, Seam, Adapter). Skills that write either check the other before writing — a glossary entry that names "Module" or "Seam" is misplaced (belongs to architecture vocabulary, not domain), and an architecture term that names "Customer" or "Order" is misplaced (belongs to domain glossary).
 
 6. **No `LANGUAGE.md` file in this kit.** Pocock ships the vocabulary in a per-skill reference file. The kit ships it inline in `WORKFLOW.md` §8 because (a) WORKFLOW is universal and read by every skill, (b) introducing a new top-level reference file fragments the constitutional layer (Constitution + WORKFLOW + the future Domain layer is already three files), (c) the planned `agentic-deepen` skill can reference WORKFLOW §8 directly.
 
@@ -73,8 +73,8 @@ Adopt the Ousterhout/Feathers vocabulary verbatim in `WORKFLOW.md` §8 (the "Arc
 - Michael Feathers, *Working Effectively with Legacy Code* (2004) — Seam definition.
 - [`mattpocock/skills` `improve-codebase-architecture/LANGUAGE.md`](https://github.com/mattpocock/skills/blob/main/skills/engineering/improve-codebase-architecture/LANGUAGE.md) — the composition we borrow with attribution; source of the rejected-framings discipline.
 - [`mattpocock/skills` `improve-codebase-architecture/SKILL.md`](https://github.com/mattpocock/skills/blob/main/skills/engineering/improve-codebase-architecture/SKILL.md) — the operational counterpart to the vocabulary; the planned `agentic-deepen` skill draws from it.
-- [ADR-0006](0006-architecture-md-at-repo-root.md) — top-level `ARCHITECTURE.md` decision the new vocabulary updates.
+- ADR-0006 — top-level `ARCHITECTURE.md` decision the new vocabulary updates.
 - [ADR-0008](0008-documentation-discipline.md) — definitions-and-decisions-only rule that constrains how the vocabulary lands in old ADRs.
-- [ADR-0019](0019-domain-language-layer.md) — domain glossary, kept separate from architectural vocabulary.
+- ADR-0019 — domain glossary, kept separate from architectural vocabulary.
 - [`WORKFLOW.md`](../../WORKFLOW.md) §8 — the section this ADR ships into.
 - [task-0020](../tasks/0020-mattpocock-absorptions.md) — rollout into existing architecture-touching skills + new `agentic-deepen` skill.

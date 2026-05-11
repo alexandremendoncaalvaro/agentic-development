@@ -8,7 +8,7 @@
 
 ## Context
 
-The Phase 2 holistic coherence review (handoff at `.agentic/reviews/2026-05-09T21-39-48Z-v0.5-coherence-review.md`) identified `WORKFLOW.md` §11 (Quality Gates) as the largest vibe-coding escape hatch in the kit: §11 names deterministic gates as the highest-priority practice, but the kit ships zero hooks. [ADR-0012](../adr/0012-agentic-hooks-skill.md) accepts a new conditional workflow-operational skill `agentic-hooks` that detects the project's stack, recommends a hook runner (Husky / lefthook / pre-commit / native), and scaffolds the lint+format+secret-scan / build+unit+integration gates §11 names. Opt-in (not auto-installed). Pairs with the upcoming v0.8 profiles work — `team` and `mature` profiles will recommend invoking the skill.
+The Phase 2 holistic coherence review (handoff at `.agentic/reviews/2026-05-09T21-39-48Z-v0.5-coherence-review.md`) identified `WORKFLOW.md` §11 (Quality Gates) as the largest vibe-coding escape hatch in the kit: §11 names deterministic gates as the highest-priority practice, but the kit ships zero hooks. ADR-0012 accepts a new conditional workflow-operational skill `agentic-hooks` that detects the project's stack, recommends a hook runner (Husky / lefthook / pre-commit / native), and scaffolds the lint+format+secret-scan / build+unit+integration gates §11 names. Opt-in (not auto-installed). Pairs with the upcoming v0.8 profiles work — `team` and `mature` profiles will recommend invoking the skill.
 
 ## Acceptance Criteria
 

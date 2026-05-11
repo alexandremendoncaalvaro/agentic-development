@@ -12,7 +12,7 @@ First implementation chunk of v0.2 (Chunk 1 in [doc/v0.2-cli-plan.md](../v0.2-cl
 ## Acceptance Criteria
 
 - [x] `src/skills/claude-code/agentic-bootstrap/SKILL.md` exists with frontmatter matching Anthropic's Skills format (`name`, `description`, `allowed-tools`, `argument-hint`) <!-- argument-hint omitted: the skill takes no positional argument; description triggers cover invocation. -->
-- [x] `src/skills/codex/agentic-bootstrap/SKILL.md` and `src/skills/codex/agentic-bootstrap/agents/openai.yaml` exist matching cc-sdd's Codex format ([ADR-0001](../adr/0001-skills-mode-for-claude-and-codex.md))
+- [x] `src/skills/codex/agentic-bootstrap/SKILL.md` and `src/skills/codex/agentic-bootstrap/agents/openai.yaml` exist matching cc-sdd's Codex format
 - [x] `agentic init` installs the skill into the correct path per agent choice (`.claude/skills/agentic-bootstrap/` or `.agents/skills/agentic-bootstrap/`)
 - [x] Integration test (vitest) spawns the CLI in a `mktemp` directory, asserts files land at expected paths, asserts idempotency on re-run <!-- substituted node:test for vitest — see 2026-05-09 Notes; same coverage, no new dev dep. -->
 - [x] Manual end-to-end: `/agentic-bootstrap` invokable in Claude Code, runs the AGENTS.md interview, writes the file at the repo root <!-- closed via static + dry-run e2e on 2026-05-09; runtime invocation deferred to natural first-use in Chunk 2. See Notes 2026-05-09 close-out. -->
@@ -35,7 +35,7 @@ First implementation chunk of v0.2 (Chunk 1 in [doc/v0.2-cli-plan.md](../v0.2-cl
 
 ### 2026-05-08
 
-Revised after [ADR-0005](../adr/0005-universal-agent-behavior-as-skill.md) and [Task 0006](0006-bootstrap-flow-and-agents-md-bloat-fix.md):
+Revised after ADR-0005 and [Task 0006](0006-bootstrap-flow-and-agents-md-bloat-fix.md):
 
 - `agentic-bootstrap` skill body **does not** inline `agents-general.md`. Project content only (`agents-project.md`).
 - The skill must encode the scan-first instructions from the revised [`prompts/agents.md`](../../prompts/agents.md), not the old "interview by section" pattern.
@@ -48,7 +48,7 @@ All implementation items done across five commits on `cli`:
 
 | Commit | Scope |
 |---|---|
-| `e1015ea` | `src/skills/{claude-code,codex}/agentic-bootstrap/` source files (SKILL.md + Codex `agents/openai.yaml`). Both bodies encode the four-step scan-first contract with audit-mode override; agents-general.md NOT inlined per ADR-0005. |
+| `e1015ea` | `src/skills/{claude-code,codex}/agentic-bootstrap/` source files (SKILL.md + Codex `agents/openai.yaml`). Both bodies encode the four-step scan-first contract with audit-mode override; agents-general.md NOT inlined. |
 | `c7d4556` | Refactor `src/commands/init.js` from prompt-printer to skill-installer. Adds `src/lib/install.js` (pure copy logic with byte-comparison idempotency) and `detectAgents()` in `src/lib/detect.js`. Drops `src/lib/render.js`, the old `--copy`/`--stdout`/`--out`/`--mode` flags, and the `clipboardy` dependency. New flags: `--agent <claude-code|codex|both>`, `--yes`. |
 | `4be181e` | `test/lib.test.js` (unit) + `test/init.test.js` (integration via `execFileSync` in `mktemp`). 19/19 pass. node:test instead of vitest — same coverage, no new dev dep. The vitest decision can be revisited in Chunk 2/3 when the test surface justifies it. |
 | `13280f7` | README + AGENTS.md aligned with the install flow; AGENTS.md gotchas updated to flag the new install.js KIT_ROOT path and the divergent-target idempotency contract. |
@@ -77,7 +77,7 @@ User opted to substitute the user-side runtime checklist with a thorough static 
 **Static review:**
 - Claude `SKILL.md` frontmatter: `name`, `description`, `allowed-tools` — matches Anthropic Skills spec. Body encodes the four-step scan-first contract with audit-mode override; no Universal Agent Behavior block; no External Resources section; ≤150-line + every-line-operational constraints stated explicitly in both Step 4 and the Output Contract.
 - Codex `SKILL.md` frontmatter: minimal (`name`, `description`) per cc-sdd convention. Body XML-tagged (`<background_information>`, `<instructions>`, `<template>`, `<output_contract>`) carrying the same operational content as the Claude variant.
-- Codex `agents/openai.yaml`: `interface.display_name`, `interface.short_description`, `policy.allow_implicit_invocation: false` — matches cc-sdd pattern per [ADR-0001](../adr/0001-skills-mode-for-claude-and-codex.md).
+- Codex `agents/openai.yaml`: `interface.display_name`, `interface.short_description`, `policy.allow_implicit_invocation: false` — matches cc-sdd pattern.
 
 **Dry-run install (real CLI in `/tmp` mktemp dirs):**
 - `init --agent both --yes` lands the expected three files: `.claude/skills/agentic-bootstrap/SKILL.md`, `.agents/skills/agentic-bootstrap/SKILL.md`, `.agents/skills/agentic-bootstrap/agents/openai.yaml`.

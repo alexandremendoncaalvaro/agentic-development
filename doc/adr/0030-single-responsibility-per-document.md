@@ -53,7 +53,7 @@ Test: if the reference is deleted, does the surrounding statement still stand?
 - **Yes** → the reference is decoration. Drop it.
 - **No** → the reference is load-bearing. Keep it.
 
-Example. *"The kit's `ad-prd` skill produces `doc/product/PRD.md` per [ADR-0027](...)"* — the ADR reference adds nothing the sentence doesn't already say (the skill produces the artifact). Drop the cite. The ADR exists in `doc/adr/` and is discoverable through normal browsing.
+Example. *"The kit's `ad-prd` skill produces `doc/product/PRD.md` per ADR-0027"* — the ADR reference adds nothing the sentence doesn't already say (the skill produces the artifact). Drop the cite. The ADR exists in `doc/adr/` and is discoverable through normal browsing.
 
 Counter-example. *"The Domain layer adopts ubiquitous-language discipline from Evans (2003, DDD ch. 2)"* — the literature citation IS load-bearing because the principle's authority comes from the cited source. Keep the cite.
 

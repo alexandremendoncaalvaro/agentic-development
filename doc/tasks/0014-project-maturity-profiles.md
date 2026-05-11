@@ -8,7 +8,7 @@
 
 ## Context
 
-Phase 2 of the holistic coherence review surfaced that the kit assumes "team product" as the implicit default install set. The user articulated the principle ("Steve Rogers / Capitão América" metaphor) — the kit must amplify, not coerce, and the same toolkit should scale from solo PoC to mature regulated product without ceremony jumps. [ADR-0013](../adr/0013-project-maturity-profiles.md) accepts four profiles (`poc`, `solo`, `team`, `mature`) selectable at init, recorded in the state file, and changeable later via a new `agentic profile` command. Default `team` preserves v0.7 behavior; existing installs migrate transparently.
+Phase 2 of the holistic coherence review surfaced that the kit assumes "team product" as the implicit default install set. The user articulated the principle ("Steve Rogers / Capitão América" metaphor) — the kit must amplify, not coerce, and the same toolkit should scale from solo PoC to mature regulated product without ceremony jumps. ADR-0013 accepts four profiles (`poc`, `solo`, `team`, `mature`) selectable at init, recorded in the state file, and changeable later via a new `agentic profile` command. Default `team` preserves v0.7 behavior; existing installs migrate transparently.
 
 ## Acceptance Criteria
 

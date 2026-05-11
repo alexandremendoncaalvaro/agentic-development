@@ -14,13 +14,13 @@
 - Hand-tuned ≤80-char string in `rootdoc.js` `SKILL_DESCRIPTIONS` dict (drives the managed `Skills installed by agentic` table in downstream AGENTS.md).
 - README skill-table row (drives human discoverability).
 
-Grilling Phase 1 settled render policy: section-build-time live read from installed SKILL.md (Branch B). Disk stays canonical per ADR-0009.
+Grilling Phase 1 settled render policy: section-build-time live read from installed SKILL.md (Branch B). Disk stays canonical.
 
 Grilling Phase 2 revealed the original proposal ("read `description`, drop dict") is wrong-shaped — frontmatter descriptions are 334-680 chars with trigger keywords; first-sentence truncation is 100-300 chars and reads worse than the hand-tuned table copy. Two audiences want different content.
 
 Refined shape: add a kit-specific `summary:` frontmatter field per skill. Anthropic-spec `description` stays trigger-keyword-rich for the skill router. `summary` carries the compressed cell for AGENTS.md table + future readers. `rootdoc.js` reads `summary` from installed SKILL.md frontmatter at render time. Single source of truth per audience.
 
-Three-criteria ADR rule (per ADR-0022 §5): hard-to-reverse marginal, surprising borderline, real-trade-off yes → skip ADR per default-skip. Convention documented in AGENTS.md Gotchas.
+Three-criteria ADR rule: hard-to-reverse marginal, surprising borderline, real-trade-off yes → skip ADR per default-skip. Convention documented in AGENTS.md Gotchas.
 
 ## Acceptance Criteria
 

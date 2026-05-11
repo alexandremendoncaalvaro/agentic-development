@@ -8,7 +8,7 @@
 
 ## Context
 
-User surfaced a navigation gap during real use: kit ships twelve skills + four maturity profiles + four artifact layers, but no primitive answers "given my current state, what should I invoke next?" README "Recommended daily sequence" (v0.6) is static prose; `agentic-audit` detects drift but does not advise on workflow order. [ADR-0015](../adr/0015-agentic-next-skill.md) accepts a new workflow-operational skill `agentic-next` modeled on `flutter doctor`: layer-by-layer state survey + profile-aware filtering + prioritized concrete next-action recommendations. Universal install across every profile.
+User surfaced a navigation gap during real use: kit ships twelve skills + four maturity profiles + four artifact layers, but no primitive answers "given my current state, what should I invoke next?" README "Recommended daily sequence" (v0.6) is static prose; `agentic-audit` detects drift but does not advise on workflow order. ADR-0015 accepts a new workflow-operational skill `agentic-next` modeled on `flutter doctor`: layer-by-layer state survey + profile-aware filtering + prioritized concrete next-action recommendations. Universal install across every profile.
 
 ## Acceptance Criteria
 

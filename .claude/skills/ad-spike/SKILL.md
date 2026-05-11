@@ -210,9 +210,9 @@ Spikes that conclude inconclusively get an ADR too — `Decision: defer; the spi
 
 ## Output contract
 
-A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout above (discovery README, fixtures, pipeline, debug per stage, eval results). The directory is throwaway by design — promote-or-delete lifecycle per ADR-0017 §4. No `Status: shipped` lifecycle; spikes do not "ship" — they conclude with an ADR.
+A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout above (discovery README, fixtures, pipeline, debug per stage, eval results). The directory is throwaway by design — promote-or-delete lifecycle' ' No `Status: shipped` lifecycle; spikes do not "ship" — they conclude with an ADR.
 
-When the host exposes `AskUserQuestion` (per ADR-0014), use it for the Step 1 selection criterion confirmation and the Step 5 promote/delete decision.
+When the host exposes `AskUserQuestion`, use it for the Step 1 selection criterion confirmation and the Step 5 promote/delete decision.
 
 ## Next
 
