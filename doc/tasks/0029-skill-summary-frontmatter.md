@@ -26,10 +26,10 @@ Three-criteria ADR rule (per ADR-0022 §5): hard-to-reverse marginal, surprising
 
 - [x] `summary:` field added to all 23 Claude Code SKILL.md frontmatter files under `src/skills/claude-code/ad-*/SKILL.md`.
 - [x] `summary:` field added to all 22 Codex SKILL.md frontmatter files under `src/skills/codex/ad-*/SKILL.md` (no `ad-subagent` on Codex).
-- [x] `summary:` values match current `SKILL_DESCRIPTIONS` dict semantics (≤120 chars, table-ready, no trigger-keyword padding).
+- [x] `summary:` values match current `SKILL_DESCRIPTIONS` dict semantics (≤320 chars, table-ready, no trigger-keyword padding — the 320 cap is the enforced static-coverage invariant in `test/skills.test.js`; the relaxation from the originally-drafted 120 lands here so the existing hand-tuned descriptions (longest is `ad-deepen` at 298 chars) keep their information without rewriting).
 - [x] `src/lib/rootdoc.js`: `SKILL_DESCRIPTIONS` dict removed; `buildSection` reads `summary:` from each installed `SKILL.md` at render time (target-tree, not source-tree — `rootdoc.js` has no kit-root access).
 - [x] Parser: hand-rolled frontmatter line scan (no new runtime dep on js-yaml; matches the kit's no-build-step shape).
-- [x] Failure mode: missing `summary:` in installed SKILL.md → throw with a clear `agentic: skill <name> missing required summary field in installed SKILL.md` message. Tight failure surfaces incomplete kit installs early.
+- [x] Failure mode: missing or empty `summary:` in installed SKILL.md → `readSkillSummary` throws with a clear `skill <name> is installed but no SKILL.md carries a non-empty \`summary:\` frontmatter field` message; if the skill is referenced but not installed at any location, throws `skill <name> not found at any installed location; cannot read summary`. The shipped wording differs from the original AC draft; tight failure surfaces incomplete kit installs early either way. v0.15.2 added the empty-summary guard via regex tightening (`\s*` → `[ \t]*`) after the posthumous review caught the latent capture-next-line bug.
 - [x] `test/skills.test.js`: static assertion that every source SKILL.md (Claude + Codex) carries a non-empty `summary:` field.
 - [x] `test/lib.test.js`: `updateRootDoc` test fixture skills carry `summary:` so the section-render path exercises the new reader.
 - [x] AGENTS.md Gotchas: one-line convention note pointing at this task.
@@ -51,6 +51,7 @@ Three-criteria ADR rule (per ADR-0022 §5): hard-to-reverse marginal, surprising
 Append-only log. Date each entry. Never rewrite past entries.
 
 - **2026-05-10** — Task opened after `/ad-deepen` grilling loop refined the proposal shape. Phase 1: section-build-time live read (Branch B). Phase 2: `summary:` field is the kit-specific extension; original "use Anthropic-spec `description`" shape rejected as too lossy for table cells.
+- **2026-05-10 — v0.15.2 follow-up.** Posthumous fresh-context review of the d7fd731..9163acc range surfaced one Blocker + four Concerns. Blocker: `/^summary:\s*(.+)$/m` in `readSkillSummary` — `\s` matches `\n` in JavaScript, so an empty-summary skill silently captured the next frontmatter line. Fixed by restricting to horizontal whitespace `[ \t]*`. Concerns: cap drift (120 vs 320) reconciled to 320 in AC + JSDoc; failure-mode wording reconciled to shipped string in AC; throw-path tests added (empty-summary + skill-not-found); `seedInstalledSkill` parameterized for `agent: 'codex'` and a Codex-only-install integration test added. v0.15.2-beta.1 publishes the regex fix.
 - **2026-05-10 — Shipped.** Three-commit chain on branch `refactor/v0.15.1-skill-summary-frontmatter`:
   - `2f8e449` adds `summary:` to all 45 SKILL.md files.
   - `2778c77` refactors `rootdoc.js` (drops dict, adds `readSkillSummary`; lazy buildSection; updated tests).

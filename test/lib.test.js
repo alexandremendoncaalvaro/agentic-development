@@ -23,8 +23,16 @@ function mkScratch() {
 // SKILL.md's `summary:` frontmatter field at section-build time. Tests
 // that exercise the rendered table need at minimum a SKILL.md per skill
 // they reference; this helper writes the smallest valid one.
-function seedInstalledSkill(cwd, skill, summary = `Test fixture for ${skill}.`) {
-  const dir = join(cwd, '.claude/skills', skill);
+//
+// `agent` defaults to claude-code; pass 'codex' to exercise the .agents
+// path that readSkillSummary walks as the second iteration of its loop.
+function seedInstalledSkill(
+  cwd,
+  skill,
+  { summary = `Test fixture for ${skill}.`, agent = 'claude-code' } = {}
+) {
+  const skillsDir = agent === 'codex' ? '.agents/skills' : '.claude/skills';
+  const dir = join(cwd, skillsDir, skill);
   mkdirSync(dir, { recursive: true });
   writeFileSync(
     join(dir, 'SKILL.md'),
