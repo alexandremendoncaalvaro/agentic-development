@@ -33,13 +33,14 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `ad-bootstrap` | spec-driven | universal | Scans the repo, writes `AGENTS.md` ≤150 lines | `/ad-bootstrap` |
 | `ad-architecture` | spec-driven | universal | Scans the code, writes `ARCHITECTURE.md` | `/ad-architecture` |
 | `ad-adr` | spec-driven | universal | Drafts `doc/adr/NNNN-<slug>.md` from the conversation | `/ad-adr` |
-| `ad-spec` | spec-driven | universal | Drafts `doc/specs/NNNN-<slug>.md` — feature-level spec (User Scenarios, Requirements, Success Criteria) layer 3 of the five-layer stack | `/ad-spec` |
+| `ad-prd` | spec-driven | universal in `solo` / `team` / `mature` | Drafts or updates `doc/product/PRD.md` (or per-product `<slug>.md`) — Layer 3, product-level scope (target user, problem, success metrics, multi-feature roadmap) feature specs inherit from. Distinct from `ad-spec` (feature-level). Lazy lifecycle. | `/ad-prd` |
+| `ad-spec` | spec-driven | universal | Drafts `doc/specs/NNNN-<slug>.md` — feature-level spec (User Scenarios, Requirements, Success Criteria) Layer 4 of the six-layer stack; references parent PRD for product-scope inheritance | `/ad-spec` |
 | `ad-task` | spec-driven | universal | Drafts `doc/tasks/NNNN-<slug>.md` (checkbox + Notes format; carries `Spec ref` to link the implementing spec) | `/ad-task` |
 | `ad-audit` | spec-driven | universal | Read-only drift report (AGENTS.md / ARCHITECTURE.md / ADRs) | `/ad-audit` |
 | `ad-philosophy` | workflow-operational | universal | Universal agent guardrails — auto-loads on non-trivial work | implicit |
 | `ad-review` | workflow-operational | universal | Fresh-context code review per WORKFLOW §10; structured findings, no "approve" | `/ad-review <range>` |
 | `ad-ground` | workflow-operational | universal | Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate per WORKFLOW §4 + §5 | `/ad-ground` |
-| `ad-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the five-layer artifact stack and recommends prioritized next actions; complements `ad-audit` (drift) | `/ad-next` |
+| `ad-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the six-layer artifact stack and recommends prioritized next actions; complements `ad-audit` (drift) | `/ad-next` |
 | `ad-spike` | workflow-operational | universal | Staged spike with golden fixtures per WORKFLOW §14, for cases where the *technique* is uncertain across multiple plausible approaches; produces `spikes/NNNN-<slug>/` with discovery + fixture + pipeline-with-gates + two-layer evaluation | `/ad-spike` |
 | `ad-tdg` | workflow-operational | universal | Outcome-based prompting per WORKFLOW §9 — ground truth pair + Test Dependency Map + three approaches + single-criterion selection, for cases where the technique is known but the implementation strategy is uncertain | `/ad-tdg` |
 | `ad-domain` | spec-driven | universal | Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003); single-context or `CONTEXT-MAP.md` multi-context | `/ad-domain` |
@@ -64,10 +65,10 @@ The kit ships four profiles that select which skills auto-install. Same WORKFLOW
 
 | Profile | Universal install set | Conditional posture | Recommended for |
 | --- | --- | --- | --- |
-| `poc` | 9 — philosophy, ground, audit, next, spike, tdg, domain, grill, diagnose | all blocked | spike, hackathon, exploration |
-| `solo` | 16 — + bootstrap, spec, task, review, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code | solo developer shipping a real product |
-| `team` (default) | 19 — + architecture, adr, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
-| `mature` | 19 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
+| `poc` | 9 — philosophy, ground, audit, next, spike, tdg, domain, grill, diagnose | all blocked; `ad-prd` blocked | spike, hackathon, exploration |
+| `solo` | 17 — + bootstrap, prd, spec, task, review, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code | solo developer shipping a real product |
+| `team` (default) | 20 — + architecture, adr, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
+| `mature` | 20 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
 
 Select at init time:
 
@@ -135,14 +136,15 @@ The sequence below is a happy path for the three flows that cover most daily wor
 1. `agentic init` — install skills.
 2. `/ad-bootstrap` — produce `AGENTS.md` (operational guide).
 3. `/ad-architecture` — produce `ARCHITECTURE.md` once load-bearing patterns emerge.
-4. `/ad-grill` — interview-before-research when the ask is fuzzy; resolves vocabulary into `CONTEXT.md` via `/ad-domain` as terms surface.
-5. `/ad-spec` — feature-level spec at `doc/specs/NNNN-<slug>.md` (User Scenarios, Requirements, Success Criteria).
-6. `/ad-adr` — only when the feature forces a binding architectural decision worth recording for posterity (three-criteria rule: hard to reverse, surprising without context, real trade-off).
-7. `/ad-task` — work-unit decomposition; reference the spec via `Spec ref`.
-8. `/ad-ground` — four-source research before code (`ad-philosophy` auto-loads in parallel).
-9. Implement.
-10. `/ad-review main..HEAD` — fresh-context §10 review before merge.
-11. `/ad-audit` — periodic drift check across operational docs, specs, and the `CONTEXT.md` glossary.
+4. `/ad-prd` — scope the product (target user, problem, success metrics, multi-feature roadmap) at `doc/product/PRD.md`. Excluded from `poc` profile.
+5. `/ad-grill` — interview-before-research when the ask is fuzzy; resolves vocabulary into `CONTEXT.md` via `/ad-domain` as terms surface.
+6. `/ad-spec` — feature-level spec at `doc/specs/NNNN-<slug>.md`; inherits target user, success metrics, and constraints from the PRD.
+7. `/ad-adr` — only when the feature forces a binding architectural decision worth recording for posterity (three-criteria rule: hard to reverse, surprising without context, real trade-off).
+8. `/ad-task` — work-unit decomposition; reference the spec via `Spec ref`.
+9. `/ad-ground` — four-source research before code (`ad-philosophy` auto-loads in parallel).
+10. Implement.
+11. `/ad-review main..HEAD` — fresh-context §10 review before merge.
+12. `/ad-audit` — periodic drift check across operational docs, PRD, specs, and the `CONTEXT.md` glossary.
 
 **Brownfield project, quick fix:**
 
@@ -155,11 +157,11 @@ The sequence below is a happy path for the three flows that cover most daily wor
 
 1. `/ad-ground` — runs the four-source research pass and surfaces the happy path with citations.
 2. Decide whether the answer becomes a spec (`/ad-spec`) or a one-off task (`/ad-task`).
-3. Continue from step 6 of the greenfield flow.
+3. Continue from step 7 of the greenfield flow.
 
 The kit's discipline scales with the project's maturity. A solo PoC may legitimately skip `/ad-spec` and `/ad-adr` (the WORKFLOW §1 prune principle applies — don't add an artifact that wouldn't change agent behavior). A team product running on this kit is expected to use the full sequence and additionally invoke `/ad-hooks` once to scaffold the deterministic gates per WORKFLOW §11 (pre-commit lint / format / secret-scan; pre-push build / unit / integration).
 
-**Lost mid-flow?** Invoke `/ad-next` at any time to survey the project's state across the five-layer artifact stack (Constitution → Domain → Spec → Plan/Decisions → Code) and get prioritized next-action recommendations. Read-only; complements `/ad-audit` (drift detection — different question).
+**Lost mid-flow?** Invoke `/ad-next` at any time to survey the project's state across the six-layer artifact stack (Constitution → Domain → Product → Spec → Plan/Decisions → Code) and get prioritized next-action recommendations. Read-only; complements `/ad-audit` (drift detection — different question).
 
 **Technique uncertain across multiple plausible approaches?** Invoke `/ad-spike` (per WORKFLOW §14) when the spec is clear but the *how* is unknown — library choice, multi-stage transformation, novel domain. The skill scaffolds a staged spike with golden fixtures + per-stage debug artifacts + two-layer evaluation under `spikes/NNNN-<slug>/`. The directory is throwaway by design; conclude with `/ad-adr` and delete.
 
@@ -206,7 +208,9 @@ Prompts reference templates by relative path. Two ways to give your agent access
 
 **Researching before implementation.** Run `/ad-ground` (or let it auto-trigger on non-trivial work). The skill runs a four-source research pass — official docs, validated open-source examples, in-repo patterns, and git history — synthesizes a happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written (WORKFLOW §4 + §5). Output is the input to whatever produces the implementation plan; the skill does not write code.
 
-**Specifying a feature.** Run `/ad-spec` (or `/ad-spec` with a feature name). The skill scaffolds `doc/specs/NNNN-<slug>.md` with industry-aligned mandatory sections (User Scenarios, Functional / Non-functional Requirements, Success Criteria, Edge Cases, Out of Scope, Open Questions, Related). Specs are layer 3 of the five-layer artifact stack — Constitution → Domain → Spec → Plan/Decisions → Code. One spec per feature; multiple tasks (`/ad-task`) implement one spec; the task template carries a `Spec ref` field linking back to the spec.
+**Scoping a product.** Run `/ad-prd` when you are scoping a product (not a single feature) — target user, problem, success metrics across multiple features, roadmap, cross-feature constraints. The skill scaffolds `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` plus `doc/product/PRODUCT-MAP.md` (multi-product). Layer 3 of the six-layer stack; feature specs (`/ad-spec`) reference back to it for product-scope inheritance. Excluded from `poc` profile.
+
+**Specifying a feature.** Run `/ad-spec` (or `/ad-spec` with a feature name). The skill scaffolds `doc/specs/NNNN-<slug>.md` with industry-aligned mandatory sections (User Scenarios, Functional / Non-functional Requirements, Success Criteria, Edge Cases, Out of Scope, Open Questions, Related). Specs are Layer 4 of the six-layer artifact stack — Constitution → Domain → Product → Spec → Plan/Decisions → Code. One spec per feature; multiple tasks (`/ad-task`) implement one spec; the task template carries a `Spec ref` field linking back to the spec; the spec references its parent PRD for product-scope inheritance.
 
 **Project already built with agents.** Treat missing artifacts as brownfield (run the relevant skill) and existing artifacts as audit (`/ad-audit`).
 
