@@ -21,11 +21,11 @@ The spec captures **one** feature. If the user's request implies multiple featur
 
 Ask one question per missing field, in this order. Skip the philosophical questions and the questions whose answers are already obvious from the conversation.
 
-* **Context:** business context first per ADR-0008. *Why* the feature exists, the user / constraint / problem it addresses, the cost of *not* building it.
+* **Context:** business context first. *Why* the feature exists, the user / constraint / problem it addresses, the cost of *not* building it.
 * **User Scenarios:** Given-When-Then for the key flows. Each scenario must be independently testable. Multiple scenarios when the feature has more than one path.
-* **Functional Requirements:** testable statements. Each as a checkbox. *"User can sign in with email and password"* — yes. *"Authentication should be secure"* — no, that's not a requirement, it's a hope.
-* **Non-functional Requirements:** performance, security, accessibility, observability — only the constraints that bind. Skip when there are none.
-* **Success Criteria:** measurable per [`WORKFLOW.md` §1](../../WORKFLOW.md). Each as a checkbox. Pass/fail must be observable, not aspirational. *"Loads in under 2 seconds at p95 over 7 days"* — yes. *"Loads fast"* — no.
+* **Functional Requirements:** testable statements. Plain bullets (no checkbox — Spec is decision-record, not tracking; implementation tracking lives in per-Spec tasks). *"User can sign in with email and password"* — yes. *"Authentication should be secure"* — no, that's not a requirement, it's a hope.
+* **Non-functional Requirements:** performance, security, accessibility, observability — only the constraints that bind. Plain bullets. Skip when there are none.
+* **Success Criteria:** measurable per [`WORKFLOW.md` §1](../../WORKFLOW.md). Plain bullets — pass/fail must be observable, not aspirational. *"Loads in under 2 seconds at p95 over 7 days"* — yes. *"Loads fast"* — no. Per-criterion progress tracking lives in tasks; the Spec carries the criteria definitions and a single `Status:` field per [ADR-0030](../../doc/adr/0030-single-responsibility-per-document.md) §1.
 * **Edge Cases:** empty inputs, large inputs, concurrent access, missing prerequisites, permission errors. Surface them before code is written, not after a bug report.
 * **Out of Scope:** explicit non-goals. Anything readers might assume is in scope but isn't. Prevents scope creep without an audit trail.
 * **Open Questions:** deferred decisions. Each becomes a follow-up ADR or an explicit punt with a rationale.
@@ -47,12 +47,13 @@ Stop after writing. Do **not** flip status to `accepted` — that requires user 
 
 When the user later works on the spec, edit the file by:
 
-* Toggling Success Criteria checkboxes as feature lands incrementally.
 * Appending to **Open Questions** (close them with the resolution; never delete them).
 * Flipping `Status` to `accepted` once the user signs off and tasks start being created.
-* Flipping `Status` to `shipped` after release.
+* Flipping `Status` to `shipped` after release — once all per-Spec tasks complete.
 * Flipping `Status` to `superseded by SPEC-NNNN` when a later spec replaces this one.
 * Adding `Tasks` entries to `Related` as tasks are created against this spec.
+
+Implementation tracking (per-criterion progress) lives in the per-Spec tasks, **not** in the Spec itself. The Spec is the contract; tasks track its construction.
 
 Never rewrite existing prose — append rationale to **Open Questions** as a resolution paragraph rather than mutating the original requirement text.
 
@@ -82,19 +83,19 @@ Never rewrite existing prose — append rationale to **Open Questions** as a res
 
 ### Functional
 
-- [ ] `<R1: testable statement>`
-- [ ] `<R2>`
+- `<R1: testable statement>`
+- `<R2>`
 
 ### Non-functional
 
-- [ ] `<perf / security / a11y / observability — only when binding>`
+- `<perf / security / a11y / observability — only when binding>`
 
 ## Success Criteria
 
-Measurable conditions. Each as a checkbox; pass/fail observable, not aspirational.
+Definitional. Measurable conditions; pass/fail observable, not aspirational. Per-criterion progress tracking lives in per-Spec tasks, not here.
 
-- [ ] `<criterion 1: measurable, observable>`
-- [ ] `<criterion 2>`
+- `<criterion 1: measurable, observable>`
+- `<criterion 2>`
 
 ## Edge Cases
 

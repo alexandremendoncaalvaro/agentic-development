@@ -18,9 +18,9 @@ Step 2 — confirm scope. The spec captures one feature. If the user's request i
 Step 3 — interview to fill. Ask one question per missing field, in this order:
 - Context: business context first per ADR-0008. Why the feature exists, the user / constraint / problem it addresses, the cost of not building it.
 - User Scenarios: Given-When-Then for the key flows. Each scenario independently testable.
-- Functional Requirements: testable statements. Each as a checkbox.
+- Functional Requirements: testable statements. Plain bullets (no checkbox — Spec is decision-record per ADR-0030 §1; implementation tracking lives in per-Spec tasks).
 - Non-functional Requirements: perf / security / a11y / observability — only when binding.
-- Success Criteria: measurable per WORKFLOW.md §1. Each as a checkbox; pass/fail observable, not aspirational.
+- Success Criteria: measurable per WORKFLOW.md §1. Plain bullets; pass/fail observable, not aspirational. Per-criterion progress tracking lives in per-Spec tasks.
 - Edge Cases: empty inputs, large inputs, concurrent access, missing prerequisites, permission errors.
 - Out of Scope: explicit non-goals.
 - Open Questions: deferred decisions. Each becomes an ADR or a documented punt.
@@ -32,7 +32,7 @@ Step 4 — write the file. Path: `doc/specs/<NNNN>-<short-slug>.md`. Use the tem
 
 Stop after writing. Do NOT flip status to accepted — that requires user review.
 
-Step 5 — editing guidance for later turns. Toggle Success Criteria checkboxes as feature lands. Append to Open Questions; close with resolution paragraphs, never delete. Flip Status to accepted on user sign-off, shipped after release, superseded when replaced. Add tasks to Related as they are created. Never rewrite existing prose — append rationale to Open Questions rather than mutating original requirement text.
+Step 5 — editing guidance for later turns. Append to Open Questions; close with resolution paragraphs, never delete. Flip Status to accepted on user sign-off; shipped once all per-Spec tasks complete; superseded when replaced. Add tasks to Related as they are created. Implementation tracking (per-criterion progress) lives in per-Spec tasks, not in the Spec. Never rewrite existing prose — append rationale to Open Questions rather than mutating original requirement text.
 </instructions>
 
 <template path="doc/specs/NNNN-<slug>.md">
@@ -59,19 +59,19 @@ Step 5 — editing guidance for later turns. Toggle Success Criteria checkboxes 
 
 ### Functional
 
-- [ ] `<R1: testable statement>`
-- [ ] `<R2>`
+- `<R1: testable statement>`
+- `<R2>`
 
 ### Non-functional
 
-- [ ] `<perf / security / a11y / observability — only when binding>`
+- `<perf / security / a11y / observability — only when binding>`
 
 ## Success Criteria
 
-Measurable conditions. Each as a checkbox; pass/fail observable, not aspirational.
+Definitional. Measurable conditions; pass/fail observable, not aspirational. Per-criterion progress tracking lives in per-Spec tasks.
 
-- [ ] `<criterion 1: measurable, observable>`
-- [ ] `<criterion 2>`
+- `<criterion 1: measurable, observable>`
+- `<criterion 2>`
 
 ## Edge Cases
 
