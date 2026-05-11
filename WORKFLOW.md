@@ -167,7 +167,7 @@ Give the finish line first, not the path:
 1. **Ground truth.** Raw input plus exact expected output.
 2. **Command the implementation.** The algorithm that connects the two.
 3. **Iterate by criterion.** Ask for three approaches; pick by *one* explicit criterion (readability, performance, *or* testability — not all three at once).
-4. **Test Dependency Map, not procedural TDD.** Don't tell the agent "do TDD" — tell it *which* tests cover the file. *"Before modifying X.ts, list which tests cover it. Run. Modify. Run. If none cover it, write one first."*
+4. **Test Dependency Map as pre-flight.** Before any change, tell the agent *which* tests cover the file. *"Before modifying X.ts, list which tests cover it. Run. Modify. Run. If none cover it, write one first."* TDM is orthogonal to the implementation regime: it pairs with TDG (this section) when the implementation strategy is the uncertain axis, and with TDD (§16) when the behavior is test-expressible up front. TDM rejects cargo-cult test-first ceremony, not test-first development itself.
 
 ## 10. Reviewer With Fresh Context
 
@@ -274,6 +274,50 @@ Each probe maps to a specific prediction from Phase 3. Change one variable at a 
 
 Apply the fix. Re-run the Phase-1 loop and confirm the captured symptom is gone. Promote the loop's check into a permanent test that lives next to the code so the same failure mode cannot return silently.
 
+## 16. Test-Driven Development (TDD)
+
+TDG (§9) gives the agent the finish line and asks it to find the path. TDD asks the agent to express one behavior as a test, drive the minimum implementation that makes the test pass, then deepen. The two are distinct LLM disciplines; the Test Dependency Map (§9, item 4) is a pre-flight that pairs with either.
+
+TDD is the cleanest **deterministic guardrail** when the change has a clear behavior to express up front: a failing test is unambiguous, so the "almost right but not quite" failure mode (§12) cannot ship silently. **Good tests read like a specification** — *"user can checkout with a valid cart"* tells you the capability exists. **Bad tests couple to implementation** — mock internal collaborators, assert on private state, or query the database directly when the public interface is what the caller uses. A test that breaks on a rename but not on a behavior change was testing implementation, not behavior.
+
+### Phase 1 — Plan vertically
+
+Before writing a test or code:
+
+1. Read `CONTEXT.md` so test names and interface vocabulary land in the project's ubiquitous language.
+2. Confirm the public interface — what does the caller need to know? Types, ordering, error modes. Interface design *is* testability design.
+3. Identify deepening opportunities (Layer 2 vocabulary per §8): small interface, deep implementation.
+4. List the behaviors to test, not the implementation steps. Pick the **first** behavior — the one that proves end-to-end the path works. The rest defer until the tracer bullet lands.
+5. Establish the green baseline. For existing code, list the tests already covering the surface (TDM, §9.4) and run them. For new code, write the first test fresh.
+6. Get the user's approval on the plan in one sentence before any test or code is written.
+
+### Phase 2 — Tracer bullet
+
+Write ONE test that confirms ONE behavior through the public interface. `RED → GREEN → end-to-end path proven`. The fail-reason matters: a test failing because the function is undefined is not the same as a test failing because the assertion is wrong; only the latter proves the test verifies behavior rather than the existence of a symbol.
+
+Do not write a second test until this one is green.
+
+### Phase 3 — Incremental loop
+
+For each remaining behavior: `RED → minimum code → GREEN`. Three rules:
+
+- **One test at a time.** Bulk-writing all tests first then all implementation is *horizontal slicing* — the named anti-pattern. Bulk-written tests verify *imagined* behavior, not actual behavior; the suite becomes insensitive to real changes and you outrun your headlights, committing to test structure before understanding the implementation.
+- **Only enough code to pass the current test.** Anticipating the next test bloats the implementation and couples it to assumptions not yet verified.
+- **Tests verify behavior through public interfaces.** No private-method tests, no internal-collaborator mocks, no direct database/file-system assertions when the public interface is what the caller uses. A test that breaks on a rename but not on a behavior change was testing implementation, not behavior.
+
+### Phase 4 — Refactor
+
+Once all planned tests pass: extract duplication, deepen modules (move complexity behind smaller interfaces), apply SOLID where natural. Run tests after each refactor step. **Never refactor while RED** — get to green first, then refactor with the green baseline as the safety net.
+
+The refactor phase is where deepening (§8) happens. Treat tests as a fixed contract; the implementation is free to change shape as long as the contract holds.
+
+### TDD vs TDG — when to use which
+
+- **TDD** — behavior is known and test-expressible up front. The test is the contract; implementation follows.
+- **TDG** — behavior may not yet be testable as a single pair, but the outcome is known. Three candidate implementations + one criterion picks the path.
+
+When both apply (test-expressible AND multiple implementation strategies are plausible), use TDD as the outer loop and TDG inside the GREEN phase to select the strategy for that cycle.
+
 ---
 
 These are starting points. Prune what doesn't fit your codebase.
@@ -316,4 +360,10 @@ External claims (specific percentages, named frameworks) are cited under Sources
 **§15 — Diagnose With Discipline**
 - *The Practice of Programming* (Kernighan & Pike, 1999) — chapters on debugging and testing.
 - Falsifiability framing — Karl Popper, *The Logic of Scientific Discovery* (1959).
+
+**§16 — Test-Driven Development (TDD)**
+- *Test-Driven Development: By Example* (Kent Beck, 2002) — canonical red-green-refactor framing.
+- *Working Effectively with Legacy Code* (Feathers, 2004) — seams as test surfaces.
+- *Unit Testing Principles, Practices, and Patterns* (Khorikov, 2020) — behavior-vs-implementation test classification.
+- [`mattpocock/skills` engineering/tdd](https://github.com/mattpocock/skills/blob/main/skills/engineering/tdd/SKILL.md) — vertical-tracer-bullet framing adopted with attribution.
 
