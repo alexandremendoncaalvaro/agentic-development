@@ -1,6 +1,7 @@
 ---
 name: ad-adr
 description: Draft a new ADR (Architecture Decision Record) at doc/adr/NNNN-<short-title>.md, using Michael Nygard's Context/Decision/Consequences/Alternatives pattern. Use when the user wants to record, write, draft, propose, or document an architecture decision. Status starts at proposed.
+summary: Draft a new ADR at `doc/adr/NNNN-<slug>.md`.
 ---
 
 <background_information>

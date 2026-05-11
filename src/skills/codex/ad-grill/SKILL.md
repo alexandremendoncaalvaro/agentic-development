@@ -1,6 +1,7 @@
 ---
 name: ad-grill
 description: Interview-before-research grilling session that challenges a fuzzy ask against the existing codebase, sharpens vocabulary against `CONTEXT.md`, and resolves the design tree branch by branch. One question at a time, codebase-first when an answer is in code, with each question carrying a recommended answer. Triggers on "grill me", "interview me", "stress test the plan", "challenge my assumptions", "before implementing", "ask me questions", "fuzzy ask", "sharpen the question", "what should I clarify", "/ad-grill". Routes to `ad-ground` once the question is research-ready, `ad-tdg` once the technique is settled, `ad-spike` for technique discovery, `ad-diagnose` for debugging.
+summary: Interview-before-research grilling session — one question at a time with recommendation, codebase-first, sharpens vocabulary against `CONTEXT.md`, captures terms via `ad-domain` and decisions via `ad-adr` (three-criteria rule). Upstream of `ad-ground`.
 ---
 
 <background_information>

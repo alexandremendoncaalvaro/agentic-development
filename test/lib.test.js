@@ -12,11 +12,24 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../src/lib/detect.js';
 import { installSkills } from '../src/lib/install.js';
-import { SKILL_DESCRIPTIONS, updateRootDoc } from '../src/lib/rootdoc.js';
+import { updateRootDoc } from '../src/lib/rootdoc.js';
 import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from '../src/commands/init.js';
 
 function mkScratch() {
   return mkdtempSync(join(tmpdir(), 'agentic-test-'));
+}
+
+// Per task-0029, updateRootDoc reads the table cell from each installed
+// SKILL.md's `summary:` frontmatter field at section-build time. Tests
+// that exercise the rendered table need at minimum a SKILL.md per skill
+// they reference; this helper writes the smallest valid one.
+function seedInstalledSkill(cwd, skill, summary = `Test fixture for ${skill}.`) {
+  const dir = join(cwd, '.claude/skills', skill);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, 'SKILL.md'),
+    `---\nname: ${skill}\ndescription: Test fixture.\nsummary: ${summary}\n---\n`
+  );
 }
 
 test('detectMode: empty directory → greenfield', () => {
@@ -382,6 +395,8 @@ test('updateRootDoc: no AGENTS.md or CLAUDE.md → action absent, nothing writte
 test('updateRootDoc: existing AGENTS.md, no managed section, confirm true → appended; user content preserved', async () => {
   const dir = mkScratch();
   try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
+    seedInstalledSkill(dir, 'ad-philosophy');
     const original = '# AGENTS.md\n\nMy guide.\n';
     writeFileSync(join(dir, 'AGENTS.md'), original);
     const action = await updateRootDoc({
@@ -423,6 +438,7 @@ test('updateRootDoc: confirm false → skipped, file untouched', async () => {
 test('updateRootDoc: existing managed section + same skills → unchanged', async () => {
   const dir = mkScratch();
   try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
     await updateRootDoc({
       cwd: dir,
@@ -445,6 +461,8 @@ test('updateRootDoc: existing managed section + same skills → unchanged', asyn
 test('updateRootDoc: existing managed section + different skill set → updated, user content preserved', async () => {
   const dir = mkScratch();
   try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
+    seedInstalledSkill(dir, 'ad-architecture');
     const userContent = '# AGENTS.md\n\nUser notes here.\n';
     writeFileSync(join(dir, 'AGENTS.md'), userContent);
     await updateRootDoc({
@@ -469,6 +487,7 @@ test('updateRootDoc: existing managed section + different skill set → updated,
 test('updateRootDoc: only CLAUDE.md present → falls back to CLAUDE.md', async () => {
   const dir = mkScratch();
   try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
     writeFileSync(join(dir, 'CLAUDE.md'), '# CLAUDE.md\n');
     const action = await updateRootDoc({
       cwd: dir,
@@ -486,6 +505,7 @@ test('updateRootDoc: only CLAUDE.md present → falls back to CLAUDE.md', async 
 test('updateRootDoc: AGENTS.md preferred when both AGENTS.md and CLAUDE.md exist', async () => {
   const dir = mkScratch();
   try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
     writeFileSync(join(dir, 'CLAUDE.md'), '# CLAUDE.md\n');
     const action = await updateRootDoc({
@@ -507,6 +527,7 @@ test('updateRootDoc: marker strings inside a fenced code block are NOT treated a
   // The parser must require markers on their own line at column 0.
   const dir = mkScratch();
   try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
     const userBody = [
       '# AGENTS.md',
       '',
@@ -558,15 +579,11 @@ test('updateRootDoc: malformed markers (start without end) → treated as no sec
   }
 });
 
-test('SKILL_DESCRIPTIONS covers every skill in REQUIRED_SKILLS + CONDITIONAL_SKILLS', () => {
-  const allSkillNames = [...REQUIRED_SKILLS, ...CONDITIONAL_SKILLS.map((s) => s.name)];
-  for (const name of allSkillNames) {
-    assert.ok(
-      typeof SKILL_DESCRIPTIONS[name] === 'string' && SKILL_DESCRIPTIONS[name].length > 0,
-      `SKILL_DESCRIPTIONS missing entry for "${name}" — managed-skills section would render an empty Notes column`
-    );
-  }
-});
+// Per task-0029, the table cell text now lives in each source SKILL.md's
+// `summary:` frontmatter field, read by rootdoc.js at section-build time.
+// The equivalent static-coverage assertion (every kit skill carries
+// `summary:`) lives in test/skills.test.js alongside the other frontmatter
+// invariants.
 
 test('updateRootDoc: confirmAppend defaults to false (non-interactive safe)', async () => {
   const dir = mkScratch();

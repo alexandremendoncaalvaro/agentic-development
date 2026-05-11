@@ -39,6 +39,18 @@ for (const agent of ['claude-code', 'codex']) {
         fm.description.length <= 1536,
         `description must be ≤1536 chars (Anthropic Skills spec); got ${fm.description.length}`
       );
+      // Per task-0029, every kit skill carries a kit-specific `summary:`
+      // field for the managed AGENTS.md table cell. Without it, rootdoc.js
+      // throws at section-build time.
+      assert.equal(typeof fm.summary, 'string', 'summary must be a string (task-0029)');
+      assert.ok(fm.summary.length > 0, 'summary must not be empty');
+      assert.ok(
+        fm.summary.length <= 320,
+        `summary must be ≤320 chars (compressed table cell); got ${fm.summary.length}. ` +
+          `If you need more space, you are probably pasting the Anthropic ` +
+          `description verbatim — strip the trigger keywords and keep only ` +
+          `the one-or-two-sentence functional summary.`
+      );
     });
   }
 }
