@@ -100,19 +100,24 @@ No abbreviations except established domain terms: `cli`, `cwd`, `fs`, `os`, `tty
 
 ### 3.1 Object Calisthenics (Bay, *ThoughtWorks Anthology*, 2008)
 
-**Tier: Loose.** Functional JS doesn't map cleanly to several OC rules (instance-variable counts, getter/setter bans, wrap-primitives are OOP-shaped). The kit adopts the three rules that apply universally:
+**Tier: Loose.** Functional JS doesn't map cleanly to several OC rules (instance-variable counts, getter/setter bans, wrap-primitives are OOP-shaped).
 
-- [x] **Rule 1** — One level of indentation per function (guideline). Refactor deeper paths into named helpers.
-- [ ] Rule 2 — Don't use `else` (loose; early returns preferred, not enforced).
-- [ ] Rule 3 — Wrap primitives that carry domain meaning (skip; JS lacks zero-cost newtypes).
-- [ ] Rule 4 — First-class collections (skip; arrays + Set are idiomatic).
-- [ ] Rule 5 — One dot per line / Law of Demeter (skip).
-- [x] **Rule 6** — Don't abbreviate. Established domain terms exempt (`cli`, `cwd`, `fs`).
-- [x] **Rule 7** — Keep entities small. Function ~50 lines target; file ~200 lines target.
-- [ ] Rule 8 — ≤2 instance variables (N/A; not class-heavy).
-- [ ] Rule 9 — No getters / setters (N/A).
+**Adopted rules:**
 
-Tier is editable in this section over time — moderate or strict can re-check rules.
+- **Rule 1** — One level of indentation per function (guideline). Refactor deeper paths into named helpers.
+- **Rule 6** — Don't abbreviate. Established domain terms exempt (`cli`, `cwd`, `fs`).
+- **Rule 7** — Keep entities small. Function ~50 lines target; file ~200 lines target.
+
+**Skipped rules and rationale:**
+
+- **Rule 2** (no `else`) — early returns preferred but not enforced.
+- **Rule 3** (wrap primitives) — JS lacks zero-cost newtypes.
+- **Rule 4** (first-class collections) — arrays + `Set` are idiomatic.
+- **Rule 5** (one dot per line / Law of Demeter) — not class-heavy codebase.
+- **Rule 8** (≤2 instance variables) — N/A; not class-heavy.
+- **Rule 9** (no getters / setters) — N/A.
+
+Tier is editable as the project matures (append a rationale paragraph; do not delete the prior tier statement).
 
 ### 3.2 Cognitive Complexity
 
