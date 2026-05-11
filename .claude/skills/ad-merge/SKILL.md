@@ -1,13 +1,13 @@
 ---
 name: ad-merge
-description: Evaluate and merge a GitHub pull request per ADR-0025. Four phases — preflight (`gh` auth + PR resolution), evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings yielding to user), merge via `gh pr merge` with auto-detected mode (squash / rebase / merge) and `--delete-branch`. Helper posture per ADR-0025 §3 — surfaces warnings, does not block on the senior engineer's judgment. Triggers on "merge this PR", "evaluate the PR", "is it mergeable", "gh pr merge", "/ad-merge".
-summary: Evaluate and merge a GitHub pull request per ADR-0025. Four phases — preflight, evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`.
+description: Evaluate and merge a GitHub pull request. Four phases — preflight (`gh` auth + PR resolution), evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings yielding to user), merge via `gh pr merge` with auto-detected mode (squash / rebase / merge) and `--delete-branch`. Helper posture' ' — surfaces warnings, does not block on the senior engineer's judgment. Triggers on "merge this PR", "evaluate the PR", "is it mergeable", "gh pr merge", "/ad-merge".
+summary: Evaluate and merge a GitHub pull request. Four phases — preflight, evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`.
 allowed-tools: Read, Bash, Grep
 ---
 
 # /ad-merge
 
-Implements [ADR-0025](../../doc/adr/0025-agentic-merge-skill.md). Evaluates a PR's mergeability and performs the merge via `gh pr merge`. CI green is the only hard gate; everything else surfaces as a warning the senior engineer decides on.
+Implements ADR-0025. Evaluates a PR's mergeability and performs the merge via `gh pr merge`. CI green is the only hard gate; everything else surfaces as a warning the senior engineer decides on.
 
 ## Step 0 — Confirm regime
 
@@ -18,8 +18,8 @@ Run when:
 
 Route elsewhere when:
 
-- No PR exists yet → `/ad-pr` ([ADR-0024](../../doc/adr/0024-agentic-pr-skill.md)) first.
-- Commits are not on the branch yet → `/ad-commit` ([ADR-0023](../../doc/adr/0023-agentic-commit-skill.md)) first.
+- No PR exists yet → `/ad-pr` first.
+- Commits are not on the branch yet → `/ad-commit` first.
 
 ## Phase 1 — Preflight
 
@@ -115,4 +115,4 @@ The output is a merged PR. The skill returns:
 - After merge: pull the latest base locally (`git checkout <base> && git pull`).
 - If the merge surfaced a recurring drift (no fresh-context review on multiple PRs, no linked task on several merges): `/ad-audit` to scan for systemic gaps, or update `WORKFLOW.md` §10 / §11 expectations.
 - If the merge closed a task: confirm the task file's `Status:` is `done` and the Notes log captures the merge commit URL.
-- If the merge shipped a binding decision worth recording: `/ad-adr` (three-criteria rule per [ADR-0022](../../doc/adr/0022-agentic-grill-skill.md) §5 — hard to reverse, surprising without context, real trade-off).
+- If the merge shipped a binding decision worth recording: `/ad-adr` (three-criteria rule' ' — hard to reverse, surprising without context, real trade-off).

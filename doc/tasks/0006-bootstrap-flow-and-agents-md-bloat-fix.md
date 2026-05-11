@@ -46,7 +46,7 @@ Every future user of `@alexandrealvaro/agentic init` reproduces the same bad UX 
   - (b) Stays only in [`WORKFLOW.md`](../../WORKFLOW.md), removed from `AGENTS.md` output
   - (c) Trimmed to ≤15 lines and kept inline (compromise)
 - [x] Decision implemented: [`templates/agents-general.md`](../../templates/agents-general.md) and [`src/lib/render.js`](../../src/lib/render.js) updated accordingly
-- [ ] If skill route chosen, skill scaffolding added per ADR-0001 conventions  <!-- deferred to Task 0003 per ADR-0005 §Decision item 3 -->
+- [ ] If skill route chosen, skill scaffolding added per ADR-0001 conventions  <!-- deferred to Task 0003' ' item 3 -->
 
 
 ### Self-fix (backward-looking — this repo's own [`AGENTS.md`](../../AGENTS.md))

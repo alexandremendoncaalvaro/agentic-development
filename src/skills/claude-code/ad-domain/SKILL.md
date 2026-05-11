@@ -7,7 +7,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # /ad-domain
 
-Implements [ADR-0019](../../doc/adr/0019-domain-language-layer.md) — Layer 2 of the artifact stack. Lazy lifecycle owner of `CONTEXT.md`. Process scaffold for capturing the project's ubiquitous language.
+Implements ADR-0019 — Layer 2 of the artifact stack. Lazy lifecycle owner of `CONTEXT.md`. Process scaffold for capturing the project's ubiquitous language.
 
 The skill owns *capture* of vocabulary. The *trigger* for most updates lives in adjacent skills:
 
@@ -43,7 +43,7 @@ _Avoid_: <Alias 1>, <Alias 2>. <Why each is misleading>.
 **Related code:** [`path/to/file.ts:42`](../path/to/file.ts:42), [`path/to/other.ts`](../path/to/other.ts).
 ```
 
-Resolution discipline (per ADR-0019 §2):
+Resolution discipline:
 
 - **Be opinionated.** One canonical name. Others become `_Avoid_` aliases with a one-line reason.
 - **One-sentence definitions.** If it takes a paragraph, the term is not yet sharp.
@@ -52,7 +52,7 @@ Resolution discipline (per ADR-0019 §2):
 
 ## Step 2 — Locate the insertion point
 
-`CONTEXT.md` has three canonical sections (per ADR-0019 §2):
+`CONTEXT.md` has three canonical sections:
 
 ```markdown
 # <Project Name> — Domain Glossary
@@ -84,7 +84,7 @@ For first creation, the file shape is:
 
 _Lazy artifact — only contains terms that have been resolved through grilling, spec drafting, or explicit capture. Empty entries are worse than no entry; speculation belongs elsewhere._
 
-_Maintained by `/ad-domain` per [ADR-0019](doc/adr/0019-domain-language-layer.md)._
+_Maintained by `/ad-domain`._
 
 ## Language
 

@@ -3,14 +3,14 @@
 **Status:** done
 **Created:** 2026-05-10
 **Owner:** Alexandre Alvaro
-**Spec ref:** [ADR-0019](../adr/0019-domain-language-layer.md)
+**Spec ref:** ADR-0019
 **Board ref:**
 
 ## Context
 
-[ADR-0019](../adr/0019-domain-language-layer.md) accepts the Domain layer (`CONTEXT.md`) as Layer 2 of the artifact stack and defines its lazy-creation discipline. v0.14.0-beta.1 shipped the principle (WORKFLOW renumbering, ADR, doc updates, skill-body rename four-layer→five-layer); the operationalizing skill is deferred to its own minor per [task-0020](0020-mattpocock-absorptions.md) Phase 2 schedule.
+ADR-0019 accepts the Domain layer (`CONTEXT.md`) as Layer 2 of the artifact stack and defines its lazy-creation discipline. v0.14.0-beta.1 shipped the principle (WORKFLOW renumbering, ADR, doc updates, skill-body rename four-layer→five-layer); the operationalizing skill is deferred to its own minor per [task-0020](0020-mattpocock-absorptions.md) Phase 2 schedule.
 
-`agentic-domain` lazily creates and updates `CONTEXT.md` from grilling sessions, spec drafting, or explicit `/agentic-domain` invocation. Universal across all profiles per ADR-0019 §4. First skill in the Phase 2 rollout because the layer landed in v0.14.
+`agentic-domain` lazily creates and updates `CONTEXT.md` from grilling sessions, spec drafting, or explicit `/agentic-domain` invocation. Universal across all profiles' ' First skill in the Phase 2 rollout because the layer landed in v0.14.
 
 ## Acceptance Criteria
 
@@ -21,16 +21,16 @@
 - [x] [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) — `SKILL_DESCRIPTIONS` entry.
 - [x] [`README.md`](../../README.md) — skill table + recommended-sequence cross-reference.
 - [ ] Wire-ins per ADR-0019: `agentic-bootstrap` inserts `CONTEXT.md` pointer in `AGENTS.md` once the file exists; `agentic-spec` consumes glossary in spec drafts; `agentic-architecture` consumes glossary in architecture prose; `agentic-audit` flags drift between glossary terms and code identifiers. _Deferred — these are integrations into existing skills, separable from the `agentic-domain` skill itself. Tracked as a follow-up in [task-0020](0020-mattpocock-absorptions.md) Notes._
-- [x] Tests: profile-coverage assertion in [test/profile.test.js](../../test/profile.test.js) (`agentic-domain` universal in every profile per ADR-0019 §4); end-to-end install in [test/init.test.js](../../test/init.test.js) UNIVERSAL_SKILLS.
+- [x] Tests: profile-coverage assertion in [test/profile.test.js](../../test/profile.test.js) (`agentic-domain` universal in every profile' ' end-to-end install in [test/init.test.js](../../test/init.test.js) UNIVERSAL_SKILLS.
 - [x] Dogfood install refreshed; skill lands at `.claude/skills/agentic-domain/` and `.agents/skills/agentic-domain/`.
 - [x] [`package.json`](../../package.json) bumped to `0.15.0-beta.1` (shipped together with the other three Phase-2 skills as the v0.15 bundle).
 - [x] `npm test` passes (166/166 at closure).
 
 ## Plan
 
-- [x] Implement [Claude](../../src/skills/claude-code/agentic-domain/SKILL.md) + [Codex](../../src/skills/codex/agentic-domain/SKILL.md) skill bodies per ADR-0019.
+- [x] Implement [Claude](../../src/skills/claude-code/agentic-domain/SKILL.md) + [Codex](../../src/skills/codex/agentic-domain/SKILL.md) skill bodies.
 - [x] Wire profiles + init + rootdoc + README + tests.
-- [ ] Wire-ins to bootstrap / spec / architecture / audit per ADR-0019 §5. _Deferred to follow-up; not blocking v0.15 ship._
+- [ ] Wire-ins to bootstrap / spec / architecture / audit' ' _Deferred to follow-up; not blocking v0.15 ship._
 - [x] Dogfood refresh + version bump (bundled with v0.15.0-beta.1).
 - [ ] Atomic commits + PR + merge to `cli`; tag `v0.15.0-beta.1`; `npm publish --tag beta`; smoke verify. _Pending user authorization for shared-state actions (bundled commit/PR/tag/publish covers all four v0.15 skills together)._
 

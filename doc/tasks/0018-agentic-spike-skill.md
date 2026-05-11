@@ -8,14 +8,14 @@
 
 ## Context
 
-WORKFLOW.md §14 (Staged Spikes With Golden Fixtures) is documented but unautomated — the same gap [ADR-0007](../adr/0007-workflow-operational-skills.md) §1 names. /agentic-next survey on the kit's own repo flagged it as one of the deferred §6 candidates with the most-established prior art (XP spike, golden datasets, trajectory evaluation, stage-segmented error analysis, visual CV debugging). [ADR-0017](../adr/0017-agentic-spike-skill.md) accepts a workflow-operational skill `agentic-spike` that scaffolds the four-stage flow (discovery → golden fixture → pipeline with gates → two-layer evaluation), output to `spikes/NNNN-<slug>/`, promote-or-delete lifecycle.
+WORKFLOW.md §14 (Staged Spikes With Golden Fixtures) is documented but unautomated — the same gap [ADR-0007](../adr/0007-workflow-operational-skills.md) §1 names. /agentic-next survey on the kit's own repo flagged it as one of the deferred §6 candidates with the most-established prior art (XP spike, golden datasets, trajectory evaluation, stage-segmented error analysis, visual CV debugging). ADR-0017 accepts a workflow-operational skill `agentic-spike` that scaffolds the four-stage flow (discovery → golden fixture → pipeline with gates → two-layer evaluation), output to `spikes/NNNN-<slug>/`, promote-or-delete lifecycle.
 
 ## Acceptance Criteria
 
 - [x] [`doc/adr/0017-agentic-spike-skill.md`](../adr/0017-agentic-spike-skill.md) exists, status `accepted`, with the four-stage body, the disambiguation against `agentic-ground` in Step 0, and the promote-or-delete lifecycle.
 - [x] [`src/skills/claude-code/agentic-spike/SKILL.md`](../../src/skills/claude-code/agentic-spike/SKILL.md) exists with frontmatter `name: agentic-spike`, `allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch, WebSearch`, and a description carrying the auto-trigger keywords.
 - [x] [`src/skills/codex/agentic-spike/SKILL.md`](../../src/skills/codex/agentic-spike/SKILL.md) exists with the matching content shaped to the Codex `<background_information>` / `<instructions>` / `<output_contract>` template plus an `agents/openai.yaml`.
-- [x] [`src/lib/profiles.js`](../../src/lib/profiles.js) `PROFILES` catalog adds `agentic-spike` to every profile's `universal` list (poc / solo / team / mature). Universal install per ADR-0017 §1.
+- [x] [`src/lib/profiles.js`](../../src/lib/profiles.js) `PROFILES` catalog adds `agentic-spike` to every profile's `universal` list (poc / solo / team / mature). Universal install' '
 - [x] [`src/commands/init.js`](../../src/commands/init.js) `REQUIRED_SKILLS` (the team-profile compatibility export) includes `agentic-spike` automatically (derived from team universal); slashLine summary lists `/agentic-spike`.
 - [x] [`src/lib/rootdoc.js`](../../src/lib/rootdoc.js) `SKILL_DESCRIPTIONS` carries an entry for `agentic-spike`.
 - [x] [`README.md`](../../README.md) skill table lists `agentic-spike`. "Recommended daily sequence" mentions when the skill auto-invokes (technique uncertain across multiple plausible approaches).

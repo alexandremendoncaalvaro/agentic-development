@@ -1,13 +1,13 @@
 ---
 name: ad-commit
-description: Atomic Conventional Commits with DCO `Signed-off-by` sign-off per ADR-0023. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Stage-split is interactive; identity comes from `git config user.name` / `user.email`. No `Co-Authored-By`. Helper posture, not blocker. Triggers on "commit this", "stage and commit", "atomic commit", "Conventional Commit", "sign off", "DCO", "split this commit", "/ad-commit".
-summary: Atomic Conventional Commits with DCO `Signed-off-by` sign-off per ADR-0023. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.
+description: Atomic Conventional Commits with DCO `Signed-off-by` sign-off. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Stage-split is interactive; identity comes from `git config user.name` / `user.email`. No `Co-Authored-By`. Helper posture, not blocker. Triggers on "commit this", "stage and commit", "atomic commit", "Conventional Commit", "sign off", "DCO", "split this commit", "/ad-commit".
+summary: Atomic Conventional Commits with DCO `Signed-off-by` sign-off. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.
 allowed-tools: Read, Bash
 ---
 
 # /ad-commit
 
-Implements [ADR-0023](../../doc/adr/0023-agentic-commit-skill.md). Drafts atomic Conventional Commits with DCO `Signed-off-by` sign-off. Helper, not blocker — the senior engineer keeps decision authority.
+Implements ADR-0023. Drafts atomic Conventional Commits with DCO `Signed-off-by` sign-off. Helper, not blocker — the senior engineer keeps decision authority.
 
 ## Step 0 — Confirm regime
 
@@ -18,8 +18,8 @@ Run when the user wants to land changes as commits and at least one holds:
 
 Route elsewhere when:
 
-- The user wants to open a PR after committing → continue with `/ad-pr` ([ADR-0024](../../doc/adr/0024-agentic-pr-skill.md)) after this skill finishes.
-- The user wants to merge an open PR → `/ad-merge` ([ADR-0025](../../doc/adr/0025-agentic-merge-skill.md)).
+- The user wants to open a PR after committing → continue with `/ad-pr` after this skill finishes.
+- The user wants to merge an open PR → `/ad-merge`.
 - The diff is unfinished work that should not land yet → say so; do not commit speculatively.
 
 ## Phase 1 — Scope intake
@@ -161,7 +161,7 @@ The output is one or more atomic commits on the current branch. Each commit:
 
 ## Next
 
-- After commits land: `/ad-pr` ([ADR-0024](../../doc/adr/0024-agentic-pr-skill.md)) to open the PR with a uniform body shape.
-- After PR is open and CI is green: `/ad-merge` ([ADR-0025](../../doc/adr/0025-agentic-merge-skill.md)) to evaluate and merge.
+- After commits land: `/ad-pr` to open the PR with a uniform body shape.
+- After PR is open and CI is green: `/ad-merge` to evaluate and merge.
 - If the diff also surfaced a refactor opportunity: `/ad-deepen` (when on `team` / `mature` profile per [ADR-0020](../../doc/adr/0020-deep-modules-vocabulary.md) §4).
 - If a hook failure exposed a recurring drift: `/ad-audit`.

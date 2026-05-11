@@ -33,11 +33,11 @@ Render six sections in this exact order. For each section, list what is present,
 - `DESIGN.md` present? (frontend projects only)
 
 **Layer 2 — Domain (`CONTEXT.md`).**
-- `CONTEXT.md` present at repo root, *or* `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos? (Lazy-created per [ADR-0019](../adr/0019-domain-language-layer.md) — `missing` is a valid state for projects whose first domain term has not been resolved yet, not a finding to flag in `poc` / `solo`.)
+- `CONTEXT.md` present at repo root, *or* `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos? (Lazy-created per ADR-0019 — `missing` is a valid state for projects whose first domain term has not been resolved yet, not a finding to flag in `poc` / `solo`.)
 - For each present `CONTEXT.md`, report whether the Language section has at least one term with an `_Avoid_:` line — empty glossary is worse than no glossary.
 
 **Layer 3 — Product (`doc/product/`).**
-- `doc/product/PRD.md` present (single-product), *or* `PRODUCT-MAP.md` plus per-product `<slug>.md` files (multi-product)? (Lazy-created per [ADR-0027](../adr/0027-product-layer.md) — `missing` is a valid state at `poc` profile, where PRD is excluded entirely.)
+- `doc/product/PRD.md` present (single-product), *or* `PRODUCT-MAP.md` plus per-product `<slug>.md` files (multi-product)? (Lazy-created per ADR-0027 — `missing` is a valid state at `poc` profile, where PRD is excluded entirely.)
 - For each present PRD, report `Status` (`draft` / `accepted` / `superseded`) and the count of feature specs whose `Related → PRD` field points at it. Flag PRDs with `Status: accepted` and zero implementing specs — same stuck-state pattern as accepted-spec-with-zero-tasks at Layer 4.
 
 **Layer 4 — Specs (`doc/specs/`).**
@@ -109,10 +109,10 @@ A single Markdown message structured as:
 <one-line status per artifact>
 
 ### Layer 2 — Domain (CONTEXT.md)
-<present / lazy-missing per ADR-0019; glossary-empty flag if file exists but has no terms>
+<present / lazy-missing; glossary-empty flag if file exists but has no terms>
 
 ### Layer 3 — Product (doc/product/)
-<present / lazy-missing per ADR-0027; PRD status + implementing-spec count if file exists>
+<present / lazy-missing; PRD status + implementing-spec count if file exists>
 
 ### Layer 4 — Specs (doc/specs/)
 <spec list with status + task count, or "no specs">
@@ -131,4 +131,4 @@ A single Markdown message structured as:
 
 No file written. No state mutation. Recommendations are advisory; the user decides whether to invoke. Cross-references `ad-audit` (drift detection), `agentic update` (kit drift — CLI subcommand, not a skill), `agentic profile` (profile changes — CLI subcommand, not a skill) where they apply.
 
-When the host exposes `AskUserQuestion` (per ADR-0014) and the user follows up with a confirmation question after seeing the recommendations, prefer the structured prompt over inline text.
+When the host exposes `AskUserQuestion` and the user follows up with a confirmation question after seeing the recommendations, prefer the structured prompt over inline text.

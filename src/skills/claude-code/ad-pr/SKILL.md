@@ -1,13 +1,13 @@
 ---
 name: ad-pr
-description: Open a GitHub pull request with a uniform body shape per ADR-0024. Four phases — preflight (`gh` auth + branch pushed), scope assembly (commits + diff vs base), draft body (Summary / Test plan / Links), open + report URL. Title format = Conventional Commits, type inferred from the dominant commit type in the range. `gh` CLI soft-fail with install hint. Triggers on "open a PR", "create a pull request", "submit a PR", "gh pr create", "/ad-pr".
-summary: Open a GitHub pull request with a uniform body shape (Summary / Test plan / Links) per ADR-0024. Four phases — preflight (`gh` auth + branch pushed), scope assembly, draft body, open + report URL. Title format = Conventional Commits.
+description: Open a GitHub pull request with a uniform body shape. Four phases — preflight (`gh` auth + branch pushed), scope assembly (commits + diff vs base), draft body (Summary / Test plan / Links), open + report URL. Title format = Conventional Commits, type inferred from the dominant commit type in the range. `gh` CLI soft-fail with install hint. Triggers on "open a PR", "create a pull request", "submit a PR", "gh pr create", "/ad-pr".
+summary: Open a GitHub pull request with a uniform body shape (Summary / Test plan / Links). Four phases — preflight (`gh` auth + branch pushed), scope assembly, draft body, open + report URL. Title format = Conventional Commits.
 allowed-tools: Read, Bash, Glob, Grep
 ---
 
 # /ad-pr
 
-Implements [ADR-0024](../../doc/adr/0024-agentic-pr-skill.md). Opens a PR via `gh pr create` with a uniform body shape (Summary / Test plan / Links). Helper, not blocker — warnings surface but do not refuse when the user authorizes.
+Implements ADR-0024. Opens a PR via `gh pr create` with a uniform body shape (Summary / Test plan / Links). Helper, not blocker — warnings surface but do not refuse when the user authorizes.
 
 ## Step 0 — Confirm regime
 
@@ -18,8 +18,8 @@ Run when:
 
 Route elsewhere when:
 
-- The branch has uncommitted or unsplit work → `/ad-commit` first ([ADR-0023](../../doc/adr/0023-agentic-commit-skill.md)).
-- The user wants to merge an already-open PR → `/ad-merge` ([ADR-0025](../../doc/adr/0025-agentic-merge-skill.md)).
+- The branch has uncommitted or unsplit work → `/ad-commit` first.
+- The user wants to merge an already-open PR → `/ad-merge`.
 
 ## Phase 1 — Preflight
 
@@ -130,6 +130,6 @@ The output is an opened PR on GitHub. The skill returns the PR URL.
 ## Next
 
 - After PR opens and CI starts: monitor via `gh pr checks`.
-- When CI is green: `/ad-merge` ([ADR-0025](../../doc/adr/0025-agentic-merge-skill.md)) to evaluate and merge.
+- When CI is green: `/ad-merge` to evaluate and merge.
 - If a fresh-context review is wanted before merge: `/ad-review` (WORKFLOW §10) — the review artifact lands in `.agentic/reviews/` and `ad-merge` checks for it.
 - If preflight surfaced "no CI workflow file": `/ad-hooks` (when installed) covers local gates; remote CI is a separate concern outside this skill.

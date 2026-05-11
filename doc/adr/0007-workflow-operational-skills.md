@@ -6,7 +6,7 @@
 
 ## Context
 
-Surfaced during planning of [Task 0003](../tasks/0003-universal-skills.md) (Chunk 2 of v0.2). The current skill set in [`doc/v0.2-cli-plan.md`](../v0.2-cli-plan.md) (table at lines 80–89) is uniformly **spec-driven**: every planned skill produces a documentation artifact (`AGENTS.md`, `ARCHITECTURE.md`, ADR, task file, `DESIGN.md`, `SKILL.md`, subagent file, drift report). [ADR-0005](0005-universal-agent-behavior-as-skill.md) added one prescriptive skill (`agentic-philosophy`) but it carries content, not process.
+Surfaced during planning of [Task 0003](../tasks/0003-universal-skills.md) (Chunk 2 of v0.2). The current skill set in [`doc/v0.2-cli-plan.md`](../v0.2-cli-plan.md) (table at lines 80–89) is uniformly **spec-driven**: every planned skill produces a documentation artifact (`AGENTS.md`, `ARCHITECTURE.md`, ADR, task file, `DESIGN.md`, `SKILL.md`, subagent file, drift report). ADR-0005 added one prescriptive skill (`agentic-philosophy`) but it carries content, not process.
 
 [`WORKFLOW.md`](../../WORKFLOW.md) declares 14 numbered practices. Only §1 (Spec-Driven Design) maps to a planned skill. §4 (Find the Happy Path), §5 (Ground in Real Patterns), §6 (Explore → Plan → Implement → Commit), §9 (Outcome-Based Prompting / TDG), §10 (Reviewer With Fresh Context), §11 (Quality Gates scaffolding), and §14 (Staged Spikes With Golden Fixtures) describe **operations the agent performs**, not artifacts it produces. None has a planned skill.
 
@@ -37,7 +37,7 @@ Positive:
 - Closes the documented-but-unautomated gap on WORKFLOW §10. The DoD checkbox stops being a manual coordination tax.
 - Establishes a coherent axis for future skills: artifact (spec-driven) vs process (workflow-operational). Naming improves — `agentic-review` reads as a verb, mirroring the operation it performs.
 - The kit dogfoods §10 instead of only mandating it. The new `.claude/agents/` directory in this repo makes the practice concrete for users reading the source.
-- Aligns with [ADR-0001](0001-skills-mode-for-claude-and-codex.md) (everything ships as skills, no special cases) and [ADR-0002](0002-two-phase-architecture.md) (CLI installs, agent runs).
+- Aligns with ADR-0001 (everything ships as skills, no special cases) and [ADR-0002](0002-two-phase-architecture.md) (CLI installs, agent runs).
 - Mirrors prior art: [Anthropic Skills documentation](https://code.claude.com/docs/en/skills) treats skills as task-shaped capabilities, and [Claude Code subagents](https://code.claude.com/docs/en/sub-agents) make role-shaped delegation a first-class primitive — the same line we are drawing internally.
 
 Negative / trade-offs:
@@ -52,5 +52,5 @@ Negative / trade-offs:
 - **Document the §10 review pattern only; no shipped automation.** Rejected. This is the current state. It produces inconsistency (1) above — the kit obligates a practice it does not ship.
 - **Pre-bake the reviewer subagent without an orchestrating skill.** Rejected. A standalone subagent file gives the user the worker but not the trigger; they still hand-assemble the handoff (diff + spec slice + acceptance criteria) every time. The skill is the part that codifies *what to load into the fresh context*, which is the failure mode §10 is built to prevent.
 - **Bundle the reviewer into `agentic-subagent` (Chunk 3).** Rejected. `agentic-subagent` *generates* new subagents from a template; it does not *deliver* a specific pre-baked one. Coupling them conflates meta-tooling with operational tooling and forces users into Chunk 3 for a Chunk-2-class need.
-- **Ship at user level (`~/.claude/skills/`) instead of project level.** Rejected for the same reason as [ADR-0001](0001-skills-mode-for-claude-and-codex.md): not committable, not shareable, no team review.
+- **Ship at user level (`~/.claude/skills/`) instead of project level.** Rejected for the same reason as ADR-0001: not committable, not shareable, no team review.
 - **Wait for v0.3 to introduce the workflow-operational category as a whole.** Rejected. §10 is already required by every task DoD in v0.2. Deferring the category leaves the inconsistency open through release.

@@ -8,7 +8,7 @@
 
 ## Context
 
-WORKFLOW.md §9 (Outcome-Based Prompting / TDG) is documented but only partially automated — the §9.4 TDM clause is inline in `agentic-philosophy` Goal-Driven Execution; the other three sub-practices (ground truth pair, three approaches, single-criterion selection) have no implementing skill. [ADR-0018](../adr/0018-agentic-tdg-skill.md) accepts a workflow-operational skill `agentic-tdg` that scaffolds the four §9 sub-practices end-to-end. Distinguishes from `agentic-spike` (§14, unknown-technique regime) by Step 0 routing.
+WORKFLOW.md §9 (Outcome-Based Prompting / TDG) is documented but only partially automated — the §9.4 TDM clause is inline in `agentic-philosophy` Goal-Driven Execution; the other three sub-practices (ground truth pair, three approaches, single-criterion selection) have no implementing skill. ADR-0018 accepts a workflow-operational skill `agentic-tdg` that scaffolds the four §9 sub-practices end-to-end. Distinguishes from `agentic-spike` (§14, unknown-technique regime) by Step 0 routing.
 
 ## Acceptance Criteria
 

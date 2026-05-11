@@ -25,7 +25,7 @@ Route elsewhere when:
 - The bug is one-line obvious (typo, off-by-one) — fix it directly; the skill is overkill.
 - The bug is a clean ground-truth-pair regression (test was passing, output unchanged, now failing) → `/ad-tdg` (WORKFLOW §9). TDG handles it with the existing pair as the verification surface.
 - The technique itself is uncertain across multiple plausible approaches → `/ad-spike` (WORKFLOW §14).
-- The spec or expected behavior is unclear → `/ad-grill` ([ADR-0022](../../doc/adr/0022-agentic-grill-skill.md)). Sharpen the question before diagnosing.
+- The spec or expected behavior is unclear → `/ad-grill`. Sharpen the question before diagnosing.
 
 ## Phase 1 — Build a feedback loop
 
@@ -90,7 +90,7 @@ If you cannot state the prediction, the hypothesis is a vibe — discard or shar
 
 **Show the ranked list to the user before testing.** They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they have already ruled out. Cheap checkpoint, big time saver. Don't block on it — proceed with your ranking if the user is AFK.
 
-Read [`CONTEXT.md`](../../CONTEXT.md) if it exists ([ADR-0019](../../doc/adr/0019-domain-language-layer.md)) and ADRs in `doc/adr/` covering the surface — domain vocabulary and prior decisions sharpen the hypotheses.
+Read [`CONTEXT.md`](../../CONTEXT.md) if it exists and ADRs in `doc/adr/` covering the surface — domain vocabulary and prior decisions sharpen the hypotheses.
 
 ## Phase 4 — Instrument
 
