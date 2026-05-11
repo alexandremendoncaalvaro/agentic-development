@@ -11,47 +11,46 @@ const SECTION_END = '<!-- agentic-managed-skills:end -->';
 const SECTION_START_RE = /^<!-- agentic-managed-skills:start -->\n\n## Skills installed by `agentic`/m;
 const SECTION_END_RE = /^<!-- agentic-managed-skills:end -->$/m;
 
-export const SKILL_DESCRIPTIONS = {
-  'ad-bootstrap': 'Generate or audit `AGENTS.md` at the repo root.',
-  'ad-philosophy':
-    'Universal agent guardrails (think before coding, verify before claiming done). Auto-loads on non-trivial work.',
-  'ad-architecture': 'Generate or audit `ARCHITECTURE.md` at the repo root.',
-  'ad-adr': 'Draft a new ADR at `doc/adr/NNNN-<slug>.md`.',
-  'ad-spec':
-    'Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 3 of the five-layer artifact stack.',
-  'ad-task': 'Draft a new task at `doc/tasks/NNNN-<slug>.md`.',
-  'ad-audit':
-    'Read-only drift report comparing AGENTS.md / ARCHITECTURE.md / ADRs against the code.',
-  'ad-review':
-    'Fresh-context code review per WORKFLOW §10 — assemble handoff, return structured findings.',
-  'ad-ground':
-    'Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate. WORKFLOW §4 + §5.',
-  'ad-next':
-    'State survey + prioritized next-action recommendations across the five-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).',
-  'ad-spike':
-    'Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.',
-  'ad-tdg':
-    'Outcome-based prompting per WORKFLOW §9. Ground truth pair + Test Dependency Map + three approaches + single-criterion selection, when the technique is known but the implementation strategy is uncertain.',
-  'ad-domain':
-    'Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003). Captures canonical project-specific nouns with aliases-to-avoid, relationships, and flagged ambiguities. Single-context or `CONTEXT-MAP.md` multi-context.',
-  'ad-grill':
-    'Interview-before-research grilling session — one question at a time with recommendation, codebase-first, sharpens vocabulary against `CONTEXT.md`, captures terms via `ad-domain` and decisions via `ad-adr` (three-criteria rule). Upstream of `ad-ground`.',
-  'ad-deepen':
-    'Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one. Pairs with `ad-audit`. Profile-scoped to `team` and `mature` only.',
-  'ad-diagnose':
-    'Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.',
-  'ad-commit':
-    'Atomic Conventional Commits with DCO `Signed-off-by` sign-off per ADR-0023. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.',
-  'ad-pr':
-    'Open a GitHub pull request with a uniform body shape (Summary / Test plan / Links) per ADR-0024. Four phases — preflight (`gh` auth + branch pushed), scope assembly, draft body, open + report URL. Title format = Conventional Commits.',
-  'ad-merge':
-    'Evaluate and merge a GitHub pull request per ADR-0025. Four phases — preflight, evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`.',
-  'ad-design': 'Bootstrap `DESIGN.md` from existing tokens (frontend projects).',
-  'ad-subagent': 'Draft a new Claude Code subagent at `.claude/agents/<name>.md`.',
-  'ad-skill': 'Draft a new Claude Code or Codex skill at the appropriate path.',
-  'ad-hooks':
-    'Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals.',
+// Where installed SKILL.md files live per agent. Mirrors the install layout
+// (see ADR-0001). updateRootDoc is called per-target-project after install,
+// so reads happen against the just-written installed copy — not the kit
+// source tree (which rootdoc.js has no access to anyway).
+const SKILL_PATH_BY_AGENT = {
+  'claude-code': '.claude/skills',
+  codex: '.agents/skills',
 };
+
+/**
+ * Read the `summary:` line from an installed SKILL.md frontmatter block.
+ *
+ * Per task-0029, every kit skill carries a kit-specific `summary:` field
+ * alongside the Anthropic-spec `description:` field. `description:` is
+ * trigger-keyword-rich for the agent's skill router; `summary:` is the
+ * ≤120-char compressed cell that lands in the managed AGENTS.md table.
+ *
+ * Tries each known target-tree location in order. Throws if no installed
+ * copy has the field — a missing summary surfaces an incomplete install
+ * loudly instead of silently producing empty table cells.
+ */
+function readSkillSummary(cwd, skill) {
+  let found = false;
+  for (const skillsDir of Object.values(SKILL_PATH_BY_AGENT)) {
+    const path = join(cwd, skillsDir, skill, 'SKILL.md');
+    if (!existsSync(path)) continue;
+    found = true;
+    const body = readFileSync(path, 'utf8');
+    const match = body.match(/^summary:\s*(.+)$/m);
+    if (match) return match[1].trim();
+  }
+  if (found) {
+    throw new Error(
+      `skill ${skill} is installed but no SKILL.md carries the required \`summary:\` frontmatter field`
+    );
+  }
+  throw new Error(
+    `skill ${skill} not found at any installed location; cannot read summary`
+  );
+}
 
 /**
  * Find the first existing root doc; null if none.
@@ -65,7 +64,7 @@ function findRootDoc(cwd) {
   return null;
 }
 
-function buildSection(skills) {
+function buildSection(cwd, skills) {
   const lines = [];
   lines.push(SECTION_START);
   lines.push('');
@@ -78,7 +77,7 @@ function buildSection(skills) {
   lines.push('| Skill | Invoke | Notes |');
   lines.push('| --- | --- | --- |');
   for (const skill of skills) {
-    const note = SKILL_DESCRIPTIONS[skill] || '';
+    const note = readSkillSummary(cwd, skill);
     const invoke =
       skill === 'ad-philosophy' ? '_(implicit)_' : `\`/${skill}\``;
     lines.push(`| \`${skill}\` | ${invoke} | ${note} |`);
@@ -135,10 +134,13 @@ export async function updateRootDoc({
   if (!found) return { type: 'absent', path: null };
 
   const body = readFileSync(found.path, 'utf8');
-  const section = buildSection(skills);
   const bounds = findSectionBounds(body);
 
+  // Build the section lazily — readSkillSummary touches the installed
+  // SKILL.md files (per task-0029). When the user declines a section
+  // append/replace, there is no reason to walk every installed skill.
   if (bounds) {
+    const section = buildSection(cwd, skills);
     const updated = replaceSection(body, section, bounds);
     if (updated === body) return { type: 'unchanged', path: found.name };
     const ok = await confirmReplace(found.name);
@@ -150,6 +152,7 @@ export async function updateRootDoc({
   const ok = await confirmAppend(found.name);
   if (!ok) return { type: 'skipped', path: found.name };
 
+  const section = buildSection(cwd, skills);
   const sep = body.endsWith('\n') ? '\n' : '\n\n';
   if (!dryRun) writeFileSync(found.path, body + sep + section + '\n');
   return { type: 'appended', path: found.name };
