@@ -1,6 +1,7 @@
 ---
 name: ad-next
 description: Survey the project's state across the five-layer artifact stack and recommend prioritized next actions, modeled on `flutter doctor`. Use when the user asks "what's next", "next step", "where am I", "project status", "doctor", "what should I do", "audit my workflow", or whenever a navigation aid is needed mid-flow. Read-only; complements `ad-audit` (drift detection, a different question). Profile-aware — `poc` suppresses Layer 3 / 4 noise, `team` / `mature` run the full survey.
+summary: State survey + prioritized next-action recommendations across the five-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).
 allowed-tools: Read, Glob, Grep, Bash
 ---
 

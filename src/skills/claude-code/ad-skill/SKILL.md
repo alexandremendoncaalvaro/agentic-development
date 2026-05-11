@@ -1,6 +1,7 @@
 ---
 name: ad-skill
 description: Draft a new Claude Code or Codex skill at .claude/skills/<name>/SKILL.md (or .agents/skills/<name>/SKILL.md for Codex), using the Anthropic Skills format. Use when the user wants to create, write, draft, or scaffold a custom skill for an agentic coding tool. Asks one question per missing field; never invents skill names or triggers.
+summary: Draft a new Claude Code or Codex skill at the appropriate path.
 allowed-tools: Read, Write, Glob, Bash
 ---
 
