@@ -1,7 +1,7 @@
 ---
 name: ad-next
-description: Survey the project's state across the five-layer artifact stack and recommend prioritized next actions, modeled on `flutter doctor`. Use when the user asks "what's next", "next step", "where am I", "project status", "doctor", "what should I do", "audit my workflow", or whenever a navigation aid is needed mid-flow. Read-only; complements `ad-audit` (drift detection, a different question). Profile-aware — `poc` suppresses Layer 3 / 4 noise, `team` / `mature` run the full survey.
-summary: State survey + prioritized next-action recommendations across the five-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).
+description: Survey the project's state across the six-layer artifact stack and recommend prioritized next actions, modeled on `flutter doctor`. Use when the user asks "what's next", "next step", "where am I", "project status", "doctor", "what should I do", "audit my workflow", or whenever a navigation aid is needed mid-flow. Read-only; complements `ad-audit` (drift detection, a different question). Profile-aware — `poc` suppresses Layer 3 / 4 / 5 noise, `team` / `mature` run the full survey.
+summary: State survey + prioritized next-action recommendations across the six-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
@@ -24,7 +24,7 @@ Do not parse skill bodies. Do not run tests. Do not invoke other skills. The sur
 
 ## Step 1 — Layer-by-layer status
 
-Render five sections in this exact order. For each section, list what is present, what is in flight, what is missing or stale. Use words for status (`present`, `in flight`, `missing`, `stale`) — no emoji.
+Render six sections in this exact order. For each section, list what is present, what is in flight, what is missing or stale. Use words for status (`present`, `in flight`, `missing`, `stale`) — no emoji.
 
 **Layer 1 — Constitution.**
 - `AGENTS.md` (or `CLAUDE.md`) present?
@@ -36,7 +36,11 @@ Render five sections in this exact order. For each section, list what is present
 - `CONTEXT.md` present at repo root, *or* `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos? (Lazy-created per [ADR-0019](../adr/0019-domain-language-layer.md) — `missing` is a valid state for projects whose first domain term has not been resolved yet, not a finding to flag in `poc` / `solo`.)
 - For each present `CONTEXT.md`, report whether the Language section has at least one term with an `_Avoid_:` line — empty glossary is worse than no glossary.
 
-**Layer 3 — Specs (`doc/specs/`).**
+**Layer 3 — Product (`doc/product/`).**
+- `doc/product/PRD.md` present (single-product), *or* `PRODUCT-MAP.md` plus per-product `<slug>.md` files (multi-product)? (Lazy-created per [ADR-0027](../adr/0027-product-layer.md) — `missing` is a valid state at `poc` profile, where PRD is excluded entirely.)
+- For each present PRD, report `Status` (`draft` / `accepted` / `superseded`) and the count of feature specs whose `Related → PRD` field points at it. Flag PRDs with `Status: accepted` and zero implementing specs — same stuck-state pattern as accepted-spec-with-zero-tasks at Layer 4.
+
+**Layer 4 — Specs (`doc/specs/`).**
 
 For each spec file, report `Status` and the count of tasks whose `Spec ref` field points at it:
 
@@ -47,13 +51,13 @@ For each spec file, report `Status` and the count of tasks whose `Spec ref` fiel
 
 Flag specs with `Status: accepted` and zero implementing tasks — that is the most common stuck state.
 
-**Layer 4 — Plans / Decisions.**
+**Layer 5 — Plans / Decisions.**
 
 `doc/adr/` — count by status: `proposed`, `accepted`, `deprecated`, `superseded`. Flag any `proposed` ADRs explicitly with their slug — they need a decision.
 
 `doc/tasks/` — count by status: `proposed`, `in-progress`, `blocked`, `done`. List in-progress and blocked tasks with their slugs and `Spec ref`. Flag tasks with no `Spec ref` and no `Board ref` as orphans (no clear scope tie).
 
-**Layer 5 — Code.**
+**Layer 6 — Code.**
 - Branch: `<name>` (`<n>` commits ahead of `main` if applicable).
 - Tests: wired? (presence of `npm test` script / `pytest` / `cargo test` / `go test ./...`).
 - Hooks: wired? (presence of `.husky/`, `lefthook.yml`, `.pre-commit-config.yaml`, or active `.git/hooks/` scripts).
@@ -86,8 +90,8 @@ If nothing actionable surfaces, say so explicitly — empty output is real signa
 
 Apply per-profile rules at the end so the user sees output matched to their maturity:
 
-- **`poc`:** suppress Layer 3 (specs) and Layer 4 (ADRs / tasks) sections entirely if those directories do not exist. Show Layer 1 + Layer 2 + Layer 5 only. Layer 2 (Domain) renders informationally — `CONTEXT.md` missing is *not* a finding at `poc` (the file is lazy-created when the first term is resolved). Recommendation set: `/ad-ground` for research, `/ad-audit` for drift, `agentic update` for staleness.
-- **`solo`:** Layer 3 / Layer 4 render but ADR / `ARCHITECTURE.md` absence is informational — no "needs action" flag. Specs are universal at this profile; spec-without-tasks remains a real finding. Layer 2 — same lazy-creation rule as `poc`.
+- **`poc`:** suppress Layer 3 (Product), Layer 4 (Specs), and Layer 5 (ADRs / tasks) sections entirely if those directories do not exist. Show Layer 1 + Layer 2 + Layer 6 only. Layer 2 (Domain) and Layer 3 (Product) render informationally — `CONTEXT.md` missing and `PRD.md` missing are *not* findings at `poc` (both are lazy-created; PRD is also profile-excluded). Recommendation set: `/ad-ground` for research, `/ad-audit` for drift, `agentic update` for staleness.
+- **`solo`:** Layer 3 / Layer 4 / Layer 5 render but ADR / `ARCHITECTURE.md` absence is informational — no "needs action" flag. PRD is universal at this profile; PRD-without-specs is a real finding. Specs are universal; spec-without-tasks remains a real finding. Layer 2 — same lazy-creation rule as `poc`.
 - **`team`:** full survey. Default profile.
 - **`mature`:** additionally flag hooks-not-wired louder ("WORKFLOW §11 binding for `mature` profile — `/ad-hooks` recommended").
 
@@ -107,13 +111,16 @@ A single Markdown message structured as:
 ### Layer 2 — Domain (CONTEXT.md)
 <present / lazy-missing per ADR-0019; glossary-empty flag if file exists but has no terms>
 
-### Layer 3 — Specs (doc/specs/)
+### Layer 3 — Product (doc/product/)
+<present / lazy-missing per ADR-0027; PRD status + implementing-spec count if file exists>
+
+### Layer 4 — Specs (doc/specs/)
 <spec list with status + task count, or "no specs">
 
-### Layer 4 — Plans / Decisions
+### Layer 5 — Plans / Decisions
 <ADR + task summaries with explicit flags>
 
-### Layer 5 — Code
+### Layer 6 — Code
 <branch / tests / hooks / CI status>
 
 ### Recommended next (priority)

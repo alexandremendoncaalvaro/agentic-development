@@ -1,13 +1,13 @@
 ---
 name: ad-spec
-description: Draft a feature-level specification at doc/specs/NNNN-<slug>.md following the five-layer artifact stack (Constitution → Domain → Spec → Plan/Decisions → Code). Adapts GitHub Spec Kit's mandatory sections (User Scenarios, Requirements, Success Criteria) to the kit's documentation discipline. Use when the user wants to write, draft, scaffold, or open a feature spec, PRD, product requirements, feature brief, user stories, or success criteria. Status starts at draft.
-summary: Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 3 of the five-layer artifact stack.
+description: Draft a feature-level specification at doc/specs/NNNN-<slug>.md following the six-layer artifact stack (Constitution → Domain → Product → Spec → Plan/Decisions → Code). Adapts GitHub Spec Kit's mandatory sections (User Scenarios, Requirements, Success Criteria) to the kit's documentation discipline. Use when the user wants to write, draft, scaffold, or open a feature spec, feature brief, user stories, or success criteria for one feature. Product-level scoping (PRD, multi-feature roadmap, target user, product success metrics) belongs to `ad-prd` (Layer 3). Status starts at draft.
+summary: Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 4 of the six-layer artifact stack. References parent PRD (`ad-prd`, Layer 3) for product-scope inheritance.
 ---
 
 <background_information>
-Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: draft → accepted → shipped | superseded by SPEC-NNNN. Spec is the layer-3 artifact in the kit's five-layer stack — Constitution (`AGENTS.md` + `WORKFLOW.md`) → Domain (`CONTEXT.md`) → Spec (this skill) → Plan/Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Multiple tasks implement one spec; ADRs may be driven by spec constraints. The Domain layer (ubiquitous language per Evans 2003) is the source of canonical nouns the spec must use; if the spec introduces a new noun, resolve it through `CONTEXT.md` first.
+Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: draft → accepted → shipped | superseded by SPEC-NNNN. Spec is the layer-4 artifact in the kit's six-layer stack — Constitution (`AGENTS.md` + `WORKFLOW.md`) → Domain (`CONTEXT.md`) → Product (`doc/product/PRD.md`) → Spec (this skill) → Plan/Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Multiple tasks implement one spec; ADRs may be driven by spec constraints. The Domain layer (ubiquitous language per Evans 2003) is the source of canonical nouns the spec must use; if the spec introduces a new noun, resolve it through `CONTEXT.md` first. The Product layer (PRD) is the source of target user, product-level success metrics, and cross-feature constraints the spec inherits from.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user asks to "draft a spec" or "write a PRD" on a non-trivial feature, invoke this skill manually.
+Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user asks to "draft a spec" for a single feature, invoke this skill manually. If the user asks for a "PRD" or "product requirements" — route them to `ad-prd` instead; PRDs are Layer 3 (product-level), not feature-level.
 </background_information>
 
 <instructions>

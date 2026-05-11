@@ -40,15 +40,16 @@ Define the rules before the agent writes a line. The temptation is to dump every
 
 There are two complementary frames for the artifacts the kit produces. The first is **purpose** — what each artifact is *for*. The second is **loading mechanism** — when each artifact reaches the agent's context.
 
-### Five-layer artifact stack (purpose)
+### Six-layer artifact stack (purpose)
 
 1. **Constitution** — `AGENTS.md` (operational guide) and `WORKFLOW.md` (engineering philosophy). Tells the agent how the project works and how the team thinks. Read every session.
 2. **Domain** — `CONTEXT.md` at the repo root (or `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos). The project's ubiquitous language: canonical nouns, the aliases to avoid, the relationships between them, and the ambiguities that have already been resolved. Direct application of Domain-Driven Design (Evans, 2003) — when an agent and a human share the project's vocabulary, the agent uses fewer tokens to say more, and the code, tests, and conversation all converge on the same names. Created lazily — first term resolved triggers the file. ADR-0019 records the layer.
-3. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; ADRs may be driven by spec constraints. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
-4. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
-5. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
+3. **Product** — `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` plus `doc/product/PRODUCT-MAP.md` (multi-product). Product-level scope: target user, problem, goals, non-goals, success metrics, multi-feature roadmap, cross-feature constraints. One PRD per product; feature specs (Layer 4) inherit target user, success metrics, and constraints from the PRD. Created lazily when a product is being scoped. ADR-0027 records the layer.
+4. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; specs reference their parent PRD for product-scope inheritance. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
+5. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
+6. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
 
-The five layers scale with project maturity (TL;DR #19 — Discipline scales). A spike or PoC profile may legitimately ship only Layers 1, 2, and 5 — adding Layers 3 and 4 to a 200-line experiment is ceremony that does not change agent behavior. (Domain — Layer 2 — earns its keep even at PoC because vocabulary drift starts on day one.) A team or regulated product runs all five. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
+The six layers scale with project maturity (TL;DR #19 — Discipline scales). A spike or PoC profile may legitimately ship only Layers 1, 2, and 6 — adding Layers 3, 4, and 5 to a 200-line experiment is ceremony that does not change agent behavior. (Domain — Layer 2 — earns its keep even at PoC because vocabulary drift starts on day one.) A team or regulated product runs all six. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
 
 ### Three context types (loading mechanism)
 
@@ -315,3 +316,4 @@ External claims (specific percentages, named frameworks) are cited under Sources
 **§15 — Diagnose With Discipline**
 - *The Practice of Programming* (Kernighan & Pike, 1999) — chapters on debugging and testing.
 - Falsifiability framing — Karl Popper, *The Logic of Scientific Discovery* (1959).
+
