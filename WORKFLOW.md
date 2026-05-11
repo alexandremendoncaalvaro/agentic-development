@@ -40,15 +40,16 @@ Define the rules before the agent writes a line. The temptation is to dump every
 
 There are two complementary frames for the artifacts the kit produces. The first is **purpose** — what each artifact is *for*. The second is **loading mechanism** — when each artifact reaches the agent's context.
 
-### Five-layer artifact stack (purpose)
+### Six-layer artifact stack (purpose)
 
-1. **Constitution** — `AGENTS.md` (operational guide) and `WORKFLOW.md` (engineering philosophy). Tells the agent how the project works and how the team thinks. Read every session.
+1. **Constitution** — `WORKFLOW.md` (universal engineering philosophy, kit-shipped), `AGENTS.md` (project-specific compressed rules read every session), and `GUIDELINES.md` (project-specific full engineering reference: Clean Architecture binding, SOLID application, Object Calisthenics tier, code standards, complexity discipline, API rules, performance standards, build system, static analysis, quality gates, testing strategy, git workflow, documentation, security). The trinity answers "how this project is built" at three compression levels — principles, distilled rules, full reference. `AGENTS.md` and `GUIDELINES.md` are project-owned and lazy; `WORKFLOW.md` is kit-shipped. ADR-0029 records the trinity.
 2. **Domain** — `CONTEXT.md` at the repo root (or `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos). The project's ubiquitous language: canonical nouns, the aliases to avoid, the relationships between them, and the ambiguities that have already been resolved. Direct application of Domain-Driven Design (Evans, 2003) — when an agent and a human share the project's vocabulary, the agent uses fewer tokens to say more, and the code, tests, and conversation all converge on the same names. Created lazily — first term resolved triggers the file. ADR-0019 records the layer.
-3. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; ADRs may be driven by spec constraints. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
-4. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
-5. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
+3. **Product** — `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` plus `doc/product/PRODUCT-MAP.md` (multi-product). Product-level scope: target user, problem, goals, non-goals, success metrics, multi-feature roadmap, cross-feature constraints. One PRD per product; feature specs (Layer 4) inherit target user, success metrics, and constraints from the PRD. Created lazily when a product is being scoped. ADR-0027 records the layer.
+4. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; specs reference their parent PRD for product-scope inheritance. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
+5. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for.
+6. **Code** — the implementation. Code is the primary documentation of behavior; comments justify non-obvious choices.
 
-The five layers scale with project maturity (TL;DR #19 — Discipline scales). A spike or PoC profile may legitimately ship only Layers 1, 2, and 5 — adding Layers 3 and 4 to a 200-line experiment is ceremony that does not change agent behavior. (Domain — Layer 2 — earns its keep even at PoC because vocabulary drift starts on day one.) A team or regulated product runs all five. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
+The six layers scale with project maturity (TL;DR #19 — Discipline scales). A spike or PoC profile may legitimately ship only Layers 1, 2, and 6 — adding Layers 3, 4, and 5 to a 200-line experiment is ceremony that does not change agent behavior. (Domain — Layer 2 — earns its keep even at PoC because vocabulary drift starts on day one.) A team or regulated product runs all six. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
 
 ### Three context types (loading mechanism)
 
@@ -72,7 +73,7 @@ Comments are exceptions. They justify *why* a non-obvious choice was made — ne
 
 ### Documentation Discipline
 
-The agent's authoritative copy of the eight-rule documentation discipline lives in the `ad-philosophy` skill (`Documentation Discipline` section). The rules are summarized below for reference; the skill carries the full text agents read at session time. ADR-0008 records the canonical decision and the reconciliations against ADR-0004 (file-based task tracking) and ADR-0005 (universal agent behavior as a skill).
+The agent's authoritative copy of the eight-rule documentation discipline lives in the `ad-philosophy` skill (`Documentation Discipline` section). The rules are summarized below for reference; the skill carries the full text agents read at session time. ADR-0008 records the canonical decision.
 
 1. **Definitions and decisions only.** No speculation, history, or unfounded plans.
 2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/` are exempt — their lifecycle fields are the auditability primitive.
@@ -83,7 +84,7 @@ The agent's authoritative copy of the eight-rule documentation discipline lives 
 7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a GitHub Issue or a `doc/tasks/NNNN-*.md` task.
 8. **Tests are living documentation of behavior.**
 
-The skill body explains the rationale per rule, lists the failure modes the rules counter (bloated `AGENTS.md`, README pages drifting into changelogs, decision artifacts diluted by speculation), and walks through the reconciliations. Generator skills (`ad-bootstrap`, `ad-architecture`, `ad-spec`, `ad-task`, `ad-adr`, `ad-design`) reject violations of these rules at write time; `ad-audit` flags drift across narrative docs and decision-record artifacts on demand.
+The skill body explains the rationale per rule and the failure modes each counters (bloated `AGENTS.md`, README pages drifting into changelogs, decision artifacts diluted by speculation). Generator skills (`ad-bootstrap`, `ad-architecture`, `ad-spec`, `ad-task`, `ad-adr`, `ad-design`) reject violations at write time; `ad-audit` flags drift across narrative docs and decision-record artifacts on demand.
 
 ## 3. Format by Evidence
 
@@ -96,21 +97,19 @@ Structure reduces ambiguity, but format isn't magic. Pick the right one for the 
 
 Use XML when the prompt mixes instructions, retrieved context, examples, user input, and expected output — the separation pays off when there's noise to fight. Skip it for simple prompts; if Markdown headings or plain text are clear enough, use them.
 
-No format is universally best. **An observation from my practice, not benchmarked:** I've seen consistent gains when shifting prompts to XML — most noticeably with autonomous agents, where the prompt has to land alone without conversational refinement. Direct interactive use (Claude Code, Codex) tolerates loose Markdown; unattended agents don't. Claude in particular seems to respond well to XML, which I attribute to its training, but I haven't benchmarked it. Treat this as a starting hypothesis worth testing on your own target model and task before standardizing.
+No format is universally best. XML separation pays off most for autonomous agents, where the prompt has to land alone without conversational refinement; interactive use (Claude Code, Codex) tolerates loose Markdown. Claude appears to respond well to XML, plausibly an artifact of training. Treat this as a working hypothesis worth testing on your own target model and task before standardizing.
 
 **Host-aware structured prompts.** Hosts that expose structured-prompt primitives — Claude Code's `AskUserQuestion` (multi-choice cards) and Plan Mode (plan-approval cards) — reduce ambiguity at confirmation gates more reliably than inline text. Prefer the structured primitive when the host supports it; fall back to numbered text otherwise. Codex has no equivalent today; its skills stay on numbered text. Skills carrying confirmation gates or multi-choice interview steps prescribe this preference (ADR-0014).
 
 ## 4–5. Research Before Implementation
 
-Combines Find the Happy Path (canonical / idiomatic baseline) and Ground in Real Patterns (anchoring in project-specific examples). The kit treats both as one indivisible flow via `ad-ground`; two prose sections would frame one operation as two separate practices.
-
-Two sub-practices, joined into one indivisible pass.
+Two sub-practices, joined into one indivisible pass: find the canonical baseline (Happy Path) and anchor it in project-specific examples (Ground in Real Patterns).
 
 **Find the happy path.** Before implementing, ask: *"What is the canonical, idiomatic way to implement [X] in [stack]? Cite official docs. List common deviations and why people take them."* Mid-implementation: *"Are we still on the happy path? If we deviated, was it deliberate?"* Sometimes you can't follow the happy path — that's fine. Always know where it is and why you left it.
 
 **Ground in real patterns.** Don't dump the codebase into context. Anchor the model in a specific, project-relevant example: *"Find an existing example of [similar feature]; use that exact structure."* Cite specific files, not "the codebase." Use just-in-time retrieval — pass paths or IDs and let the agent fetch via tools.
 
-The kit ships `ad-ground` as the workflow-operational implementation of both. It runs a four-source research pass — official docs, validated open-source examples, in-repo patterns, git history — joined by AND not OR, synthesizes the happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written. Splitting the two sub-practices into separate skills would force two invocations with overlapping research outputs and fragment the synthesis context (ADR-0010).
+The kit ships `ad-ground` as the operational implementation (ADR-0010). It runs a four-source research pass — official docs, validated open-source examples, in-repo patterns, git history — joined by AND not OR, synthesizes the happy path with citations from each source, and gates any deviation behind an irrefutable justification before code is written.
 
 ## 6. Explore → Plan → Implement → Commit
 
@@ -168,7 +167,7 @@ Give the finish line first, not the path:
 1. **Ground truth.** Raw input plus exact expected output.
 2. **Command the implementation.** The algorithm that connects the two.
 3. **Iterate by criterion.** Ask for three approaches; pick by *one* explicit criterion (readability, performance, *or* testability — not all three at once).
-4. **Test Dependency Map, not procedural TDD.** Don't tell the agent "do TDD" — tell it *which* tests cover the file. *"Before modifying X.ts, list which tests cover it. Run. Modify. Run. If none cover it, write one first."*
+4. **Test Dependency Map as pre-flight.** Before any change, tell the agent *which* tests cover the file. *"Before modifying X.ts, list which tests cover it. Run. Modify. Run. If none cover it, write one first."* TDM is orthogonal to the implementation regime: it pairs with TDG (this section) when the implementation strategy is the uncertain axis, and with TDD (§16) when the behavior is test-expressible up front. TDM rejects cargo-cult test-first ceremony, not test-first development itself.
 
 ## 10. Reviewer With Fresh Context
 
@@ -192,7 +191,7 @@ In Claude Code, this means a subagent (the `Task` tool, or a custom `.claude/age
 
 Modern agents handle most routine implementation. The work has shifted to catching what they got wrong.
 
-Two 2025 industry surveys point at the same wall. JetBrains' DevEcosystem 2025 reports that only **44%** of developers have AI fully or partially integrated into their workflow. Stack Overflow's 2025 Developer Survey adds: **66%** of developers cite "AI solutions that are almost right, but not quite" as their top frustration, and **45%** say debugging AI-generated code is more time-consuming.
+Industry data underlines the wall. Recent JetBrains and Stack Overflow developer surveys show a majority frustration with "AI solutions that are almost right, but not quite," and a near-majority report that debugging AI-generated code costs more time than writing it from scratch. See Sources for the surveys.
 
 The takeaway: §10 (Reviewer) and §11 (Quality Gates) are not optional. Skipping them is where bug density grows.
 
@@ -226,11 +225,11 @@ The flow has four parts:
 
 **When to use it:** the unknown is *how* — a library choice, a CV technique, a multi-stage transformation. Skip it when the *how* is routine.
 
-This is a combination of established practices, not new terminology: spike (XP), golden datasets, stage-segmented error analysis, trajectory evaluation, and visual debugging in CV pipelines.
+The named components (spike, golden datasets, stage-segmented error analysis, trajectory evaluation, visual CV debugging) each have their own lineage under Sources; the combination is the contribution.
 
 ## 15. Diagnose With Discipline
 
-For hard bugs and performance regressions, the failure mode is jumping to hypotheses before there is a way to check them. The discipline below is the counter; it owes its shape to standard debugging practice (Kernighan & Pike, *The Practice of Programming*, 1999) and the kit ships `ad-diagnose` as the operational implementation (ADR-0021).
+For hard bugs and performance regressions, the failure mode is jumping to hypotheses before there is a way to check them. The discipline below is the counter, grounded in standard debugging practice (Kernighan & Pike, *The Practice of Programming*).
 
 ### Phase 1 — Build a feedback loop
 
@@ -275,23 +274,61 @@ Each probe maps to a specific prediction from Phase 3. Change one variable at a 
 
 Apply the fix. Re-run the Phase-1 loop and confirm the captured symptom is gone. Promote the loop's check into a permanent test that lives next to the code so the same failure mode cannot return silently.
 
+## 16. Test-Driven Development (TDD)
+
+TDG (§9) gives the agent the finish line and asks it to find the path. TDD asks the agent to express one behavior as a test, drive the minimum implementation that makes the test pass, then deepen. The two are distinct LLM disciplines; the Test Dependency Map (§9, item 4) is a pre-flight that pairs with either.
+
+TDD is the cleanest **deterministic guardrail** when the change has a clear behavior to express up front: a failing test is unambiguous, so the "almost right but not quite" failure mode (§12) cannot ship silently. **Good tests read like a specification** — *"user can checkout with a valid cart"* tells you the capability exists. **Bad tests couple to implementation** — mock internal collaborators, assert on private state, or query the database directly when the public interface is what the caller uses. A test that breaks on a rename but not on a behavior change was testing implementation, not behavior.
+
+### Phase 1 — Plan vertically
+
+Before writing a test or code:
+
+1. Read `CONTEXT.md` so test names and interface vocabulary land in the project's ubiquitous language.
+2. Confirm the public interface — what does the caller need to know? Types, ordering, error modes. Interface design *is* testability design.
+3. Identify deepening opportunities (Layer 2 vocabulary per §8): small interface, deep implementation.
+4. List the behaviors to test, not the implementation steps. Pick the **first** behavior — the one that proves end-to-end the path works. The rest defer until the tracer bullet lands.
+5. Establish the green baseline. For existing code, list the tests already covering the surface (TDM, §9.4) and run them. For new code, write the first test fresh.
+6. Get the user's approval on the plan in one sentence before any test or code is written.
+
+### Phase 2 — Tracer bullet
+
+Write ONE test that confirms ONE behavior through the public interface. `RED → GREEN → end-to-end path proven`. The fail-reason matters: a test failing because the function is undefined is not the same as a test failing because the assertion is wrong; only the latter proves the test verifies behavior rather than the existence of a symbol.
+
+Do not write a second test until this one is green.
+
+### Phase 3 — Incremental loop
+
+For each remaining behavior: `RED → minimum code → GREEN`. Three rules:
+
+- **One test at a time.** Bulk-writing all tests first then all implementation is *horizontal slicing* — the named anti-pattern. Bulk-written tests verify *imagined* behavior, not actual behavior; the suite becomes insensitive to real changes and you outrun your headlights, committing to test structure before understanding the implementation.
+- **Only enough code to pass the current test.** Anticipating the next test bloats the implementation and couples it to assumptions not yet verified.
+- **Tests verify behavior through public interfaces.** No private-method tests, no internal-collaborator mocks, no direct database/file-system assertions when the public interface is what the caller uses. A test that breaks on a rename but not on a behavior change was testing implementation, not behavior.
+
+### Phase 4 — Refactor
+
+Once all planned tests pass: extract duplication, deepen modules (move complexity behind smaller interfaces), apply SOLID where natural. Run tests after each refactor step. **Never refactor while RED** — get to green first, then refactor with the green baseline as the safety net.
+
+The refactor phase is where deepening (§8) happens. Treat tests as a fixed contract; the implementation is free to change shape as long as the contract holds.
+
+### TDD vs TDG — when to use which
+
+- **TDD** — behavior is known and test-expressible up front. The test is the contract; implementation follows.
+- **TDG** — behavior may not yet be testable as a single pair, but the outcome is known. Three candidate implementations + one criterion picks the path.
+
+When both apply (test-expressible AND multiple implementation strategies are plausible), use TDD as the outer loop and TDG inside the GREEN phase to select the strategy for that cycle.
+
 ---
 
 These are starting points. Prune what doesn't fit your codebase.
 
-## How this guide was built
+## Provenance
 
-This is not theory I read and copied. Most of the practices here come from years of shipping production code, with and without LLMs.
+This guide is operational practice, not theory. Most principles come from years of shipping production code, with and without LLMs; some were in use before the industry converged on labels for them, and once a label landed the kit adopted it to make the conversation easier.
 
-**Patterns I was already using when I drafted this guide.** Several of them I used before knowing they had established names; once the industry converged on a label, I adopted it to make the conversation easier: **Spec-Driven Design** (§1), **Docs-vs-Code separation** (§2), **pattern matching by real examples** (§5), **explicit Action Commands** (§7), **Architectural Boundaries** (§8), **Outcome-Based Prompting / TDG** (§9), the **senior-reviewer technique** (§10), and **deterministic Quality Gates** (§11).
+§14 (Staged Spikes With Golden Fixtures) is the author's own working technique — each component (spike, golden dataset, stage-segmented error analysis, trajectory evaluation, visual CV debugging) has its own lineage in the literature under Sources; the combination — discovery → fixture → staged pipeline with debug artifacts → two-layer evaluation — is original to this kit.
 
-**The XML observation in §3** is also drawn from practice, not benchmarks. It's a hypothesis worth testing on your own setup, not a settled finding.
-
-**Practices that came in through iteration on this guide.** They weren't in my original draft, but each matches a problem I'd already encountered or a habit I'd only formalized loosely: **Find the Happy Path** (§4), **Explore → Plan → Implement → Commit** (§6), **The Bottleneck Is Discrimination, Not Generation** (§12 — the 2025 industry statistics ground the principle, they didn't generate it), and **Evals for Anything Autonomous** (§13).
-
-**§14 (Staged Spikes With Golden Fixtures) is my own working technique.** I haven't seen it documented end-to-end as a single named pattern, but each component (spike, golden dataset, stage-segmented error analysis, trajectory evaluation, visual CV debugging) has its own lineage in the literature listed under Sources. The combination — discovery → fixture → staged pipeline with debug artifacts → two-layer evaluation — is how I attack problems where the *technique* itself is uncertain.
-
-**Practices added through cross-pollination.** A second pass over the guide compared this kit's coverage against [Matt Pocock's `mattpocock/skills`](https://github.com/mattpocock/skills) — a separate body of agent-engineering practice grounded in the same canonical literature (DDD, *Pragmatic Programmer*, Ousterhout, Feathers, Beck). The comparison surfaced principles that earned their place in this document on independent merits: the **Domain layer** (§1 Layer 2, ADR-0019) from DDD's ubiquitous-language pattern; the **architectural vocabulary** (§8, ADR-0020) from Ousterhout's depth and Feathers's seams; **Diagnose with discipline** (§15, ADR-0021) from standard debugging practice; **vertical slicing** and **HITL/AFK tagging** (§6) from PragProg's tracer-bullet metaphor; **AI mechanical / human judgment** (§12 second paragraph). Where Pocock's framing sharpened our own — vocabulary or principle that we already gestured at without naming — the borrowed phrasing is acknowledged inline; everything else stays kit-original.
+A cross-pollination pass against [Matt Pocock's `mattpocock/skills`](https://github.com/mattpocock/skills) — a separate body of agent-engineering practice grounded in the same canonical literature (DDD, *Pragmatic Programmer*, Ousterhout, Feathers, Beck) — surfaced principles that earned their place on independent merits: the **Domain layer** (§1 Layer 2, ADR-0019), the **architectural vocabulary** (§8, ADR-0020), **Diagnose with discipline** (§15, ADR-0021), **vertical slicing** and **HITL/AFK tagging** (§6), and **AI mechanical / human judgment** (§12). Where Pocock's framing sharpened our own, the borrowed phrasing is acknowledged inline; everything else stays kit-original.
 
 External claims (specific percentages, named frameworks) are cited under Sources. Everything else is operational guidance from practice or synthesis across that material — a working model, refined over time, not academic claim.
 
@@ -323,3 +360,10 @@ External claims (specific percentages, named frameworks) are cited under Sources
 **§15 — Diagnose With Discipline**
 - *The Practice of Programming* (Kernighan & Pike, 1999) — chapters on debugging and testing.
 - Falsifiability framing — Karl Popper, *The Logic of Scientific Discovery* (1959).
+
+**§16 — Test-Driven Development (TDD)**
+- *Test-Driven Development: By Example* (Kent Beck, 2002) — canonical red-green-refactor framing.
+- *Working Effectively with Legacy Code* (Feathers, 2004) — seams as test surfaces.
+- *Unit Testing Principles, Practices, and Patterns* (Khorikov, 2020) — behavior-vs-implementation test classification.
+- [`mattpocock/skills` engineering/tdd](https://github.com/mattpocock/skills/blob/main/skills/engineering/tdd/SKILL.md) — vertical-tracer-bullet framing adopted with attribution.
+

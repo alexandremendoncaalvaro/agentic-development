@@ -30,14 +30,17 @@ export const PROFILES = {
       'ad-domain',
       'ad-grill',
       'ad-diagnose',
+      'ad-tdd',
     ],
     conditional: {
       'ad-design': 'blocked',
       'ad-subagent': 'blocked',
       'ad-skill': 'blocked',
       'ad-hooks': 'blocked',
+      'ad-prd': 'blocked',
+      'ad-guidelines': 'blocked',
     },
-    note: 'PoC / spike / experiment. Nine universals — posture (philosophy), research (ground), drift (audit), navigation (next), spike + tdg + grill + domain + diagnose process scaffolds. No mandatory artifact-producing skills (no bootstrap / spec / task / adr / architecture). Adds discipline you can grow into; never pre-imposes ceremony.',
+    note: 'PoC / spike / experiment. Ten universals — posture (philosophy), research (ground), drift (audit), navigation (next), spike + tdg + tdd + grill + domain + diagnose process scaffolds. No mandatory artifact-producing skills (no bootstrap / spec / task / adr / architecture / prd / guidelines). Adds discipline you can grow into; never pre-imposes ceremony.',
   },
   solo: {
     universal: [
@@ -47,7 +50,10 @@ export const PROFILES = {
       'ad-next',
       'ad-spike',
       'ad-tdg',
+      'ad-tdd',
       'ad-bootstrap',
+      'ad-prd',
+      'ad-guidelines',
       'ad-spec',
       'ad-task',
       'ad-review',
@@ -66,7 +72,7 @@ export const PROFILES = {
       'ad-skill': false,
       'ad-hooks': false,
     },
-    note: 'Solo developer shipping a real product. Specs and tasks are universal; ADRs and architecture are opt-in for binding decisions only.',
+    note: 'Solo developer shipping a real product. PRD, engineering guidelines, specs and tasks are universal; ADRs and architecture are opt-in for binding decisions only.',
   },
   team: {
     universal: [
@@ -74,6 +80,8 @@ export const PROFILES = {
       'ad-philosophy',
       'ad-architecture',
       'ad-adr',
+      'ad-prd',
+      'ad-guidelines',
       'ad-spec',
       'ad-task',
       'ad-audit',
@@ -82,6 +90,7 @@ export const PROFILES = {
       'ad-next',
       'ad-spike',
       'ad-tdg',
+      'ad-tdd',
       'ad-domain',
       'ad-grill',
       'ad-deepen',
@@ -96,7 +105,7 @@ export const PROFILES = {
       'ad-skill': false,
       'ad-hooks': false,
     },
-    note: 'Team product. Full universal stack including deepening (architectural refactor surfacing) and the v0.15 grill/domain/diagnose trio. Conditional skills auto-detect by signal. This was the v0.7 default and is the migration target for existing installs.',
+    note: 'Team product. Full universal stack including PRD, engineering guidelines, TDD, deepening, and the grill/domain/diagnose trio. Conditional skills auto-detect by signal.',
   },
   mature: {
     universal: [
@@ -104,6 +113,8 @@ export const PROFILES = {
       'ad-philosophy',
       'ad-architecture',
       'ad-adr',
+      'ad-prd',
+      'ad-guidelines',
       'ad-spec',
       'ad-task',
       'ad-audit',
@@ -112,6 +123,7 @@ export const PROFILES = {
       'ad-next',
       'ad-spike',
       'ad-tdg',
+      'ad-tdd',
       'ad-domain',
       'ad-grill',
       'ad-deepen',
@@ -126,7 +138,7 @@ export const PROFILES = {
       'ad-skill': false,
       'ad-hooks': true,
     },
-    note: 'Mature / regulated product. Recommends ad-hooks alongside the team stack for deterministic gates per WORKFLOW §11. Includes deepening + the v0.15 grill/domain/diagnose trio.',
+    note: 'Mature / regulated product. Recommends ad-hooks alongside the team stack for deterministic gates per WORKFLOW §11. Full universal stack including PRD, engineering guidelines, TDD, deepening, and the grill/domain/diagnose trio.',
   },
 };
 
