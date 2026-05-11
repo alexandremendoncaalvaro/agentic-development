@@ -4,7 +4,7 @@ A starter kit for engineering production code with LLMs. Lean templates and init
 
 **The framing.** An LLM is the super-soldier serum; the engineer is Steve Rogers. The serum amplifies what the engineer already brings — solid bases, investigation, care for quality, architecture, clean code, observability, maintainability. The kit encodes those bases as skills, ADRs, and gates so the amplification compounds in the right direction. See [WORKFLOW.md](WORKFLOW.md) for the principles.
 
-The CLI installs nineteen universal skills at the default `team` profile (`ad-bootstrap`, `ad-philosophy`, `ad-architecture`, `ad-adr`, `ad-spec`, `ad-task`, `ad-audit`, `ad-review`, `ad-ground`, `ad-next`, `ad-spike`, `ad-tdg`, `ad-domain`, `ad-grill`, `ad-deepen`, `ad-diagnose`, `ad-commit`, `ad-pr`, `ad-merge`) plus four conditional ones (`ad-design` for frontend, `ad-subagent` for Claude Code, `ad-skill` opt-in, `ad-hooks` opt-in / recommended at `mature`) into the agent's native location. Lower profiles install fewer (`poc` = 9 universals, `solo` = 16, `team` / `mature` = 19; `ad-deepen` is excluded from `poc` / `solo` per [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) §4; `ad-commit` / `ad-pr` / `ad-merge` are excluded from `poc` per [ADR-0023](doc/adr/0023-agentic-commit-skill.md) / [ADR-0024](doc/adr/0024-agentic-pr-skill.md) / [ADR-0025](doc/adr/0025-agentic-merge-skill.md)). Each skill produces its artifact or runs its operation via the agent's native conversational UI; `agentic update` keeps installed skills in sync with upstream kit changes via a state-aware three-way diff. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues); current releases live under [GitHub Releases](https://github.com/alexandremendoncaalvaro/agentic-development/releases).
+The CLI installs a universal skill set at the default `team` profile plus four conditional skills (`ad-design` for frontend, `ad-subagent` for Claude Code, `ad-skill` opt-in, `ad-hooks` opt-in / recommended at `mature`) into the agent's native location. The full skill table is below; profile counts and exclusions are summarized under [Project maturity profiles](#project-maturity-profiles). Each skill produces its artifact or runs its operation via the agent's native conversational UI; `agentic update` keeps installed skills in sync with upstream kit changes via a state-aware three-way diff. Report rough edges via [GitHub Issues](https://github.com/alexandremendoncaalvaro/agentic-development/issues); releases live under [GitHub Releases](https://github.com/alexandremendoncaalvaro/agentic-development/releases).
 
 ## Prerequisites
 
@@ -58,17 +58,6 @@ A short TUI shows the detected mode, agent, and feature signals (frontend / `.cl
 
 If your project already has an `AGENTS.md` (or `CLAUDE.md`), the installer appends a managed `Skills installed by agentic` section bracketed by `<!-- agentic-managed-skills:start -->` / `:end -->` markers. User content outside those markers is byte-preserved; re-runs update only the managed block.
 
-### v0.15 bundle
-
-The four skills accepted by ADR-0019 / 0020 / 0021 / 0022 (the mattpocock-absorption Phase-2 set) shipped together in v0.15.0-beta.1. Closes [task-0020](doc/tasks/0020-mattpocock-absorptions.md) Phase 2 in a single release rather than the originally-planned per-minor stack (v0.15 → v0.18). Rationale: 3 of 4 skills are direct mirrors of mature mattpocock prior art; bundling kept the WORKFLOW §15 / §8 / Layer-2 deltas coherent in one ship.
-
-| Skill | ADR | Operationalizes |
-| --- | --- | --- |
-| `ad-domain` | [ADR-0019](doc/adr/0019-domain-language-layer.md) | Layer 2 (ubiquitous language) — lazy `CONTEXT.md` lifecycle |
-| `ad-grill` | [ADR-0022](doc/adr/0022-agentic-grill-skill.md) | Interview-before-research, upstream of `ad-ground` |
-| `ad-deepen` | [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) | WORKFLOW §8 vocabulary applied to refactor proposals (team + mature only) |
-| `ad-diagnose` | [ADR-0021](doc/adr/0021-diagnose-discipline.md) | WORKFLOW §15 five-phase debugging |
-
 ## Project maturity profiles
 
 The kit ships four profiles that select which skills auto-install. Same WORKFLOW principles bind every profile; only the artifact set scales.
@@ -95,8 +84,6 @@ npx @alexandrealvaro/agentic@beta profile list        # list all profiles
 ```
 
 `profile set` runs the equivalent of `update` after writing the new profile, so the install set matches. The state-aware three-way diff prompts before overwriting user-edited files.
-
-Existing v0.7 installs with no profile field migrate to `team` automatically — same install set as before, no user action needed.
 
 ## Updating an existing project
 
@@ -130,8 +117,6 @@ Useful flags:
 * `--agent claude-code | codex | both` — restrict the update to one agent.
 * `--yes` — non-interactive, accepts defaults (skip on conflict, keep orphans). Combine with `--force` if you want overwrites in CI.
 
-If the project was installed with a kit version older than v0.3 (no state file present), the first `update` falls back to today's byte-compare behavior, then writes the state file so subsequent runs use the three-way diff.
-
 The `ad-review` skill writes the assembled WORKFLOW §10 handoff to `.agentic/reviews/<ISO-timestamp>-<scope>.md` before delegating to the fresh-context reviewer (Claude Code) or before instructing you to `/clear` and paste (Codex). These files are ephemeral audit artifacts — add `.agentic/reviews/` to your `.gitignore`.
 
 For persistent install:
@@ -143,7 +128,7 @@ agentic init
 
 ## Recommended daily sequence
 
-The kit ships nineteen universal skills in the full `team` / `mature` install set; `ad-deepen` is excluded from `poc` and `solo` per [ADR-0020](doc/adr/0020-deep-modules-vocabulary.md) §4, and `ad-commit` / `ad-pr` / `ad-merge` are excluded from `poc` per [ADR-0023](doc/adr/0023-agentic-commit-skill.md) / [ADR-0024](doc/adr/0024-agentic-pr-skill.md) / [ADR-0025](doc/adr/0025-agentic-merge-skill.md) (concrete counts: `poc` = 9 universals, `solo` = 16, `team` / `mature` = 19). Plus four conditional skills (`ad-design`, `ad-subagent`, `ad-skill`, `ad-hooks`). The sequence below is a happy path through them for the three flows that cover most daily work. Skip steps that don't apply; the kit never enforces order.
+The sequence below is a happy path for the three flows that cover most daily work. Skip steps that don't apply; the kit never enforces order. Profile-specific install sets and conditional skills are summarized under [Project maturity profiles](#project-maturity-profiles).
 
 **Greenfield project, first non-trivial feature:**
 
@@ -172,7 +157,7 @@ The kit ships nineteen universal skills in the full `team` / `mature` install se
 2. Decide whether the answer becomes a spec (`/ad-spec`) or a one-off task (`/ad-task`).
 3. Continue from step 6 of the greenfield flow.
 
-The kit's discipline scales with the project's maturity. A solo PoC may legitimately skip `/ad-spec` and `/ad-adr` (the WORKFLOW §1 prune principle applies — don't add an artifact that wouldn't change agent behavior). A team product running on this kit is expected to use the full sequence and additionally invoke `/ad-hooks` once to scaffold the deterministic gates per WORKFLOW §11 (pre-commit lint / format / secret-scan; pre-push build / unit / integration). Project maturity profiles that automate the recommendation by stack are deferred — see the next planned release.
+The kit's discipline scales with the project's maturity. A solo PoC may legitimately skip `/ad-spec` and `/ad-adr` (the WORKFLOW §1 prune principle applies — don't add an artifact that wouldn't change agent behavior). A team product running on this kit is expected to use the full sequence and additionally invoke `/ad-hooks` once to scaffold the deterministic gates per WORKFLOW §11 (pre-commit lint / format / secret-scan; pre-push build / unit / integration).
 
 **Lost mid-flow?** Invoke `/ad-next` at any time to survey the project's state across the five-layer artifact stack (Constitution → Domain → Spec → Plan/Decisions → Code) and get prioritized next-action recommendations. Read-only; complements `/ad-audit` (drift detection — different question).
 
@@ -266,7 +251,7 @@ node bin/agentic.js init
 
 Branch layout:
 - `main` — manual workflow source of truth (no CLI code; the npm package gets promoted here when mature).
-- `cli` — CLI development (you're here). Beta releases are published from this branch.
+- `cli` — CLI development. Beta releases are published from this branch.
 
 ## License
 
