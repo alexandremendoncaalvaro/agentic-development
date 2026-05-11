@@ -22,12 +22,32 @@ function mkScratch() {
 // SKILL.md's `summary:` frontmatter field at section-build time. Tests
 // that exercise the rendered table need at minimum a SKILL.md per skill
 // they reference; this helper writes the smallest valid one.
-function seedInstalledSkill(cwd, skill, summary = `Test fixture for ${skill}.`) {
-  const dir = join(cwd, '.claude/skills', skill);
+//
+// `agent` defaults to claude-code; pass 'codex' to exercise the .agents
+// path that readSkillSummary walks as the second iteration of its loop.
+function seedInstalledSkill(
+  cwd,
+  skill,
+  { summary = `Test fixture for ${skill}.`, agent = 'claude-code' } = {}
+) {
+  const skillsDir = agent === 'codex' ? '.agents/skills' : '.claude/skills';
+  const dir = join(cwd, skillsDir, skill);
   mkdirSync(dir, { recursive: true });
   writeFileSync(
     join(dir, 'SKILL.md'),
     `---\nname: ${skill}\ndescription: Test fixture.\nsummary: ${summary}\n---\n`
+  );
+}
+
+// Writes a SKILL.md whose frontmatter has `summary:` present but empty.
+// Used by the throw-path tests below; mirrors the latent regex bug
+// (\s vs [ \t]) that the v0.15.2 review caught.
+function seedInstalledSkillWithEmptySummary(cwd, skill) {
+  const dir = join(cwd, '.claude/skills', skill);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, 'SKILL.md'),
+    `---\nname: ${skill}\ndescription: Test fixture.\nsummary:\n---\n`
   );
 }
 
@@ -210,6 +230,72 @@ test('saveState (via orderState): missing skills object throws', () => {
       () => saveState(dir, 'claude-code', malformed),
       /orderState: state\.skills must be an object/
     );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// Task-0029 v0.15.2 review finding: readSkillSummary must throw loudly
+// when an installed SKILL.md is missing the `summary:` field, instead of
+// silently producing an empty table cell. The latent regex bug (\s vs
+// [ \t]) would have caused this path to capture the next frontmatter
+// line as the summary — caught by the posthumous review and fixed
+// before the v0.15.2 publish.
+test('updateRootDoc: installed SKILL.md missing summary field → throws', async () => {
+  const dir = mkScratch();
+  try {
+    seedInstalledSkillWithEmptySummary(dir, 'ad-bootstrap');
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
+    await assert.rejects(
+      updateRootDoc({
+        cwd: dir,
+        skills: ['ad-bootstrap'],
+        confirmAppend: async () => true,
+      }),
+      /missing|empty.*summary/i
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('updateRootDoc: skill referenced but not installed at any location → throws', async () => {
+  const dir = mkScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
+    await assert.rejects(
+      updateRootDoc({
+        cwd: dir,
+        skills: ['ad-nonexistent'],
+        confirmAppend: async () => true,
+      }),
+      /not found at any installed location/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// readSkillSummary walks both .claude/skills/ and .agents/skills/ in
+// SKILL_PATH_BY_AGENT order. A Codex-only install (no .claude/skills/
+// dir) must resolve summary from the .agents/skills/ path. Pre-fix the
+// test suite never exercised this branch.
+test('updateRootDoc: Codex-only install resolves summary from .agents/skills/', async () => {
+  const dir = mkScratch();
+  try {
+    seedInstalledSkill(dir, 'ad-bootstrap', {
+      summary: 'Codex-side summary cell.',
+      agent: 'codex',
+    });
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
+    const action = await updateRootDoc({
+      cwd: dir,
+      skills: ['ad-bootstrap'],
+      confirmAppend: async () => true,
+    });
+    assert.equal(action.type, 'appended');
+    const body = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    assert.match(body, /Codex-side summary cell\./);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
