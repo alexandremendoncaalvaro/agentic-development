@@ -1,6 +1,7 @@
 ---
 name: ad-spec
 description: Draft a feature-level specification at doc/specs/NNNN-<slug>.md following the five-layer artifact stack (Constitution → Domain → Spec → Plan/Decisions → Code). Adapts GitHub Spec Kit's mandatory sections (User Scenarios, Requirements, Success Criteria) to the kit's documentation discipline. Use when the user wants to write, draft, scaffold, or open a feature spec, PRD, product requirements, feature brief, user stories, or success criteria. Status starts at draft.
+summary: Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 3 of the five-layer artifact stack.
 ---
 
 <background_information>
