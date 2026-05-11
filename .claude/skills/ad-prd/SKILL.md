@@ -58,7 +58,7 @@ Ask **one question at a time**, in this order. Skip questions whose answers are 
 - **Product.** Name and one-sentence positioning. *"X is a Y that does Z for W."*
 - **Target User.** Specific role / persona, not "developers" or "users". Cite the primary success-bearing user; secondary users go under Personas if they affect the product shape.
 - **Problem.** What the target user can't do today, or does badly today. The cost of the status quo. *"What breaks if this product does not exist?"*
-- **Goals.** 3–5 measurable outcomes the product is for. Each as a checkbox; pass/fail must be observable.
+- **Goals.** 3–5 measurable outcomes the product is for. State each as a plain bullet (no checkbox — PRD is definition, not tracking). Pass/fail must be observable; tracking of whether each goal is met lives in per-feature tasks.
 - **Non-goals.** Explicit out-of-scope items readers might assume are in scope. Prevents scope creep without an audit trail.
 - **Success Metrics.** Product-level KPIs — measurable and durable, not procedural. *"Weekly active users above N at 90 days"* — yes. *"Users love it"* — no. Each metric carries the measurement source (analytics event, survey, business dashboard).
 - **Roadmap.** Multi-feature scope. Each line names a feature, the user value it carries, and the (rough) sequence. Concrete enough to drive `/ad-spec` later; not a binding commitment. Mark `MVP`, `Next`, `Later`; no dates.
@@ -90,7 +90,7 @@ Stop after writing. Do **not** flip status to `accepted` — that requires user 
 
 When the user later works on the PRD:
 
-- Toggle Success Metrics checkboxes as the product hits each measurable outcome.
+- Update Success Metrics phrasing only when a metric definition changes; per-metric status tracking lives in per-feature tasks, not in the PRD.
 - Append to **Open Questions** — close them with a resolution paragraph; never delete the original question line.
 - Flip `Status` to `accepted` once the user signs off and feature specs start being written against this PRD.
 - Flip `Status` to `superseded by <slug>` when a later PRD replaces this one.

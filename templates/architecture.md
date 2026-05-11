@@ -31,10 +31,3 @@ System-level patterns and boundaries. Pair with ADRs in `doc/adr/` for individua
 ## Deployment Topology
 
 `<how services run in prod: containers, orchestration, scaling rules>`
-
-## Active ADRs
-
-Currently-binding decisions. Link each to `doc/adr/`.
-
-* ADR-0001 — `<title>`
-* ADR-0002 — `<title>`
