@@ -22,19 +22,19 @@ Lint, formatter: not yet wired. CI runs `npm test` across Node 20 / 22 on every 
 
 ## Quality Gates
 
-Deterministic enforcement — agent cannot skip. WORKFLOW §11 binding for the `team` profile this repo runs under.
+See [`GUIDELINES.md`](GUIDELINES.md) §8 for the full reference. Non-negotiable subset:
 
-* **Pre-push hook (lefthook):** `npm test` runs the full unit + integration suite. Bootstrap: `lefthook install` after clone. Config: [`lefthook.yml`](lefthook.yml).
-* **Pre-commit hook:** intentionally absent — kit has no lint or formatter wired today. Adding lint/format gates is a separate decision (own ADR + Task per ADR-0007 §6).
-* **CI:** GitHub Actions workflow at [`.github/workflows/test.yml`](.github/workflows/test.yml) runs `npm test` across Node 20 / 22 on every push and PR targeting `main` or `cli`. Redundant with the local pre-push hook; both stay wired so a missing local install does not skip the gate.
-* **Never bypass:** no `--no-verify`, no skipped hooks, no deleted failing tests. WORKFLOW §11 binding.
+* Pre-push (`lefthook`) runs `npm test`; CI (`.github/workflows/test.yml`) mirrors across Node 20 / 22.
+* No pre-commit hook today — lint/format not yet wired.
+* Never bypass: no `--no-verify`, no skipped hooks, no deleted failing tests.
 
 ## Code Style
 
-* ESM only (`"type": "module"`). Never `require()`.
+See [`GUIDELINES.md`](GUIDELINES.md) §2 for the full reference. Non-negotiable subset:
+
+* ESM only (`"type": "module"`); `node:` prefix for built-ins.
 * Named exports, no default exports.
-* 2-space indent, single quotes, semicolons (matches `src/index.js`, `src/commands/init.js`).
-* `node:` prefix for Node built-ins (`node:fs`, `node:path`, `node:url`).
+* 2-space indent, single quotes, semicolons.
 
 ## Architectural Principles
 
@@ -73,19 +73,20 @@ Binding ADRs: see [`doc/adr/`](doc/adr/) (all accepted). Skill source lives unde
 
 ## Commit & PR Conventions
 
-* **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, `build:`, `ci:`). Imperative subject. Body explains *why* when non-obvious.
-* **Branches:** `main` = stable promotion target. `cli` = active dev (functions like `develop`); beta releases publish from here. Feature branches: `feat/<slug>`, `fix/<slug>`, `chore/<slug>`.
-* **PRs require:** green CI (once wired), self-review, link to task/ADR when applicable.
-* **Never push directly to `main` or `cli`.** Always PR.
+See [`GUIDELINES.md`](GUIDELINES.md) §10 for the full reference. Non-negotiable subset:
+
+* Conventional Commits format. Use `/ad-commit` for the disciplined flow.
+* DCO `Signed-off-by` trailer on every commit (no `Co-Authored-By`).
+* Never push directly to `main` or `cli` — always open a PR via `/ad-pr`.
 
 ## Security & Privacy
 
-* **Secrets:** `.env` (gitignored, never committed). Currently holds `NPMJS_TOKEN` consumed manually for `npm publish`.
-* **Files agent must not read or modify:** `.env`, `.env.local`, `.npmrc`, `node_modules/`.
-* **Data classification:** no user data, no PII. CLI is offline, no network calls, no telemetry.
-* **Pre-approved commands (no prompt):** `node bin/agentic.js *`, `npm test`, `npm start`, `npm install`, `git status|diff|log|show`, `gh pr|issue view`.
-* **MCP servers approved:** none.
-* **Never bypass quality gates** (`--no-verify`, deleted failing tests, hooks skipped) once wired.
+See [`GUIDELINES.md`](GUIDELINES.md) §12 for the full reference. Non-negotiable subset:
+
+* `.env`, `.env.local`, `.npmrc`, `node_modules/` — agent never reads or modifies.
+* No user data, no PII, no telemetry. CLI is offline.
+* Pre-approved commands (no prompt): `node bin/agentic.js *`, `npm test|start|install`, `git status|diff|log|show`, `gh pr|issue view`.
+* No MCP servers approved.
 
 ## Gotchas
 
