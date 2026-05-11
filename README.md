@@ -43,6 +43,7 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `ad-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the six-layer artifact stack and recommends prioritized next actions; complements `ad-audit` (drift) | `/ad-next` |
 | `ad-spike` | workflow-operational | universal | Staged spike with golden fixtures per WORKFLOW §14, for cases where the *technique* is uncertain across multiple plausible approaches; produces `spikes/NNNN-<slug>/` with discovery + fixture + pipeline-with-gates + two-layer evaluation | `/ad-spike` |
 | `ad-tdg` | workflow-operational | universal | Outcome-based prompting per WORKFLOW §9 — ground truth pair + Test Dependency Map + three approaches + single-criterion selection, for cases where the technique is known but the implementation strategy is uncertain | `/ad-tdg` |
+| `ad-tdd` | workflow-operational | universal | Test-Driven Development per WORKFLOW §16 — red-green-refactor as deterministic LLM guardrail. Five phases — confirm regime, plan vertically, tracer bullet, incremental loop, refactor while green. Distinct from `ad-tdg`; routes to it for strategy selection inside the GREEN phase | `/ad-tdd` |
 | `ad-domain` | spec-driven | universal | Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003); single-context or `CONTEXT-MAP.md` multi-context | `/ad-domain` |
 | `ad-grill` | workflow-operational | universal | Interview-before-research grilling — one question at a time with recommendation, codebase-first, sharpens vocabulary against `CONTEXT.md`, captures terms via `ad-domain` and decisions via `ad-adr` (three-criteria rule); upstream of `ad-ground` | `/ad-grill` |
 | `ad-deepen` | workflow-operational | universal in `team` + `mature` only | Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality); three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one; pairs with `ad-audit` | `/ad-deepen` |
@@ -65,10 +66,10 @@ The kit ships four profiles that select which skills auto-install. Same WORKFLOW
 
 | Profile | Universal install set | Conditional posture | Recommended for |
 | --- | --- | --- | --- |
-| `poc` | 9 — philosophy, ground, audit, next, spike, tdg, domain, grill, diagnose | all blocked; `ad-prd` blocked | spike, hackathon, exploration |
-| `solo` | 17 — + bootstrap, prd, spec, task, review, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code | solo developer shipping a real product |
-| `team` (default) | 20 — + architecture, adr, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
-| `mature` | 20 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
+| `poc` | 10 — philosophy, ground, audit, next, spike, tdg, tdd, domain, grill, diagnose | all blocked; `ad-prd` blocked | spike, hackathon, exploration |
+| `solo` | 18 — + bootstrap, prd, spec, task, review, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code | solo developer shipping a real product |
+| `team` (default) | 21 — + architecture, adr, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
+| `mature` | 21 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
 
 Select at init time:
 
@@ -142,7 +143,7 @@ The sequence below is a happy path for the three flows that cover most daily wor
 7. `/ad-adr` — only when the feature forces a binding architectural decision worth recording for posterity (three-criteria rule: hard to reverse, surprising without context, real trade-off).
 8. `/ad-task` — work-unit decomposition; reference the spec via `Spec ref`.
 9. `/ad-ground` — four-source research before code (`ad-philosophy` auto-loads in parallel).
-10. Implement.
+10. Implement — `/ad-tdd` when the behavior is test-expressible up front (red-green-refactor); `/ad-tdg` when the technique is known but the implementation strategy is uncertain.
 11. `/ad-review main..HEAD` — fresh-context §10 review before merge.
 12. `/ad-audit` — periodic drift check across operational docs, PRD, specs, and the `CONTEXT.md` glossary.
 
@@ -166,6 +167,8 @@ The kit's discipline scales with the project's maturity. A solo PoC may legitima
 **Technique uncertain across multiple plausible approaches?** Invoke `/ad-spike` (per WORKFLOW §14) when the spec is clear but the *how* is unknown — library choice, multi-stage transformation, novel domain. The skill scaffolds a staged spike with golden fixtures + per-stage debug artifacts + two-layer evaluation under `spikes/NNNN-<slug>/`. The directory is throwaway by design; conclude with `/ad-adr` and delete.
 
 **Technique known but implementation strategy uncertain?** Invoke `/ad-tdg` (per WORKFLOW §9) when multiple algorithms could produce the expected output with different trade-offs along readability / performance / testability. The skill forces a ground-truth pair, lists the tests covering the file (Test Dependency Map), generates three implementation candidates, and commits to one by a single named criterion — refusing the "optimize for all three at once" failure mode. No file written; the verified implementation is the artifact, with the candidate set + criterion landing in the commit message body.
+
+**Behavior is test-expressible up front?** Invoke `/ad-tdd` (per WORKFLOW §16) when the change has a clear behavior to express as a test — a new API capability, a bug-driven regression test, a refactor with a known contract. Red-green-refactor as deterministic LLM guardrail: one test → red → minimum code → green → repeat. Horizontal-slicing anti-pattern (bulk-write tests, then bulk-write code) is rejected. Distinct from `/ad-tdg`; route to `/ad-tdg` inside the GREEN phase when the strategy for that test cycle is uncertain.
 
 **Question is fuzzy?** Invoke `/ad-grill` (per [ADR-0022](doc/adr/0022-agentic-grill-skill.md)) before research. One question at a time with a recommended answer; codebase-first when the answer is in code; sharpens vocabulary against `CONTEXT.md`. Routes to `/ad-ground` (research-ready), `/ad-tdg` (implement-ready), `/ad-spike` (technique-uncertain), or `/ad-diagnose` (it turned out to be a bug) when the question is sharp.
 
