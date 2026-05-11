@@ -1,6 +1,7 @@
 ---
 name: ad-domain
 description: Lazily create or update `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003) at the repo root, or `CONTEXT-MAP.md` plus per-context `CONTEXT.md` for multi-context repos. Captures canonical project-specific nouns, the aliases to avoid, the relationships between them, and resolved ambiguities. Triggers on "domain term", "ubiquitous language", "glossary", "what should we call", "naming drift", "canonical noun", "_Avoid_", "/ad-domain", or whenever a grilling/spec/architecture session resolves a vocabulary question. Lazy by design — file only exists when there is something to write.
+summary: Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003). Captures canonical project-specific nouns with aliases-to-avoid, relationships, and flagged ambiguities. Single-context or `CONTEXT-MAP.md` multi-context.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
