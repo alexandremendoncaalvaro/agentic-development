@@ -54,6 +54,20 @@ There are two complementary frames for the artifacts the kit produces. The first
 
 The six layers scale with project maturity (TL;DR #20 — Discipline scales). A spike or PoC profile may legitimately ship only Layers 1, 2, and 6 — adding Layers 3, 4, and 5 to a 200-line experiment is ceremony that does not change agent behavior. (Domain — Layer 2 — earns its keep even at PoC because vocabulary drift starts on day one.) A team or regulated product runs all six. The kit's profiles (`poc`, `solo`, `team`, `mature`) configure which layers auto-install per project and are changeable as the project matures; the principles in this document bind every profile, only the artifact set differs.
 
+### New product inception order
+
+A new product starts with a thin activation bootstrap, then product discovery. The activation bootstrap exists only to load the operating surface: session rules, repeatable skills, and the smallest project context needed for the agent to follow the workflow. It does not decide architecture, decompose the repo, or generate technical plans for a product that is not yet understood.
+
+The substantive order is:
+
+1. **Domain and product discovery.** Clarify the target user, problem, constraints, canonical vocabulary, success metrics, and non-goals. When the idea is fuzzy, interview first; when terms are unstable, capture the domain language as it stabilizes.
+2. **PRD.** Record product-level scope, metrics, constraints, and roadmap. This is the first product contract.
+3. **Feature spec.** Narrow one product slice into behavior, acceptance criteria, and non-goals. The feature spec inherits target user, metrics, and constraints from the PRD.
+4. **Technical plan and decisions.** Update architecture, ADRs, and tasks only for the constraints the spec actually creates.
+5. **Code and gates.** Implement vertical slices, verify through tests and quality gates, then review with fresh context.
+
+Durable repository rules belong after product framing when they would otherwise invent architecture from weak product context. The exception is a brownfield repo whose existing code already provides the product and architecture context; there, bootstrap is an audit of what is true, not a substitute for discovery.
+
 ### Three context types (loading mechanism)
 
 - **Operational context is advisory.** `AGENTS.md` (or `CLAUDE.md` for Claude Code, which can mirror or import the same content via `@AGENTS.md`) tells the agent how to build, test, follow conventions, and where the security boundaries are. The agent reads it as a guide, not a contract. Open standard `AGENTS.md` is native in most agentic IDEs.
