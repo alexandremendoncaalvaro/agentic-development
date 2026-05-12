@@ -6,6 +6,8 @@ Engineering production code with LLMs. Agentic, not vibe coding.
 
 **The principle behind the rest:** context engineering beats prompt engineering. Context is finite and decays as it fills — aim for the smallest set of high-signal tokens that gets the outcome. Operationally: one task per session, reset rather than extend. A long-running conversation crosses from the model's high-precision zone into a low-precision one as the cross-references multiply; smaller, deliberately-loaded contexts beat larger, accreted ones.
 
+For visual maps of the recurring flows, see [`WORKFLOW-FLOWS.md`](WORKFLOW-FLOWS.md). This file remains the canonical prose contract.
+
 ## TL;DR
 
 Agents do not replace engineering. They speed up execution, but they make specification, context, validation, and review *more* important than before.
@@ -369,4 +371,3 @@ External claims (specific percentages, named frameworks) are cited under Sources
 - *Working Effectively with Legacy Code* (Feathers, 2004) — seams as test surfaces.
 - *Unit Testing Principles, Practices, and Patterns* (Khorikov, 2020) — behavior-vs-implementation test classification.
 - [`mattpocock/skills` engineering/tdd](https://github.com/mattpocock/skills/blob/main/skills/engineering/tdd/SKILL.md) — vertical-tracer-bullet framing adopted with attribution.
-
