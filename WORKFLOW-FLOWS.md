@@ -40,6 +40,36 @@ flowchart TD
 
 Source: `WORKFLOW.md` section 1, "Six-layer artifact stack".
 
+## New Product Inception
+
+```mermaid
+flowchart TD
+    Idea["Product idea or business brief"]
+    Activation["Thin activation bootstrap<br>session rules and skills"]
+    Discovery["Discovery interview<br>problem, user, constraints"]
+    Domain["CONTEXT.md<br>canonical vocabulary"]
+    Prd["doc/product/PRD.md<br>product contract"]
+    Spec["doc/specs/NNNN-slug.md<br>feature contract"]
+    Plan["ARCHITECTURE.md, ADRs, tasks<br>technical plan and decisions"]
+    Code["Vertical slices<br>tests and quality gates"]
+    Review["Fresh-context review<br>commit or PR"]
+    Guard["Guardrail<br>no durable architecture before product context"]
+
+    Idea --> Activation
+    Activation --> Discovery
+    Discovery --> Domain
+    Discovery --> Prd
+    Domain --> Prd
+    Prd --> Spec
+    Spec --> Plan
+    Plan --> Code
+    Code --> Review
+    Activation -.-> Guard
+    Guard -.-> Plan
+```
+
+Source: `WORKFLOW.md` section 1, "New product inception order".
+
 ## Non-Trivial Change
 
 ```mermaid
