@@ -13,7 +13,7 @@ The skill creates a working directory under `spikes/NNNN-<slug>/` and fills it s
 
 ## Step 0 — Confirm uncertainty
 
-The skill is for *unknown technique* across multiple plausible approaches, not for *non-trivial work* in general. If a single happy path is obvious, **do not start a spike**. If the *how* is knowable from official docs / OSS examples / in-repo patterns / git history, route to `ad-ground` and stop.
+The skill is for *unknown technique* across multiple plausible approaches, not for *non-trivial work* in general. If a single happy path is obvious, **do not start a spike**. If the *how* is knowable from official docs / implementation references / in-repo patterns / git history, route to `ad-ground` and stop.
 
 Concrete tests to run before starting:
 
@@ -30,7 +30,7 @@ List canonical approaches grounded in **official docs and real examples**. Pick 
 Candidate-listing process:
 
 1. Search official documentation for the language / library / domain in question. Cite URL + version.
-2. Search public OSS for repos that solve the same technical recortte. Cite `<repo>:<path>:<line-range>` and fetch via tools — never paraphrase from training memory.
+2. Search public implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists) for solutions to the same technical recortte. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and fetch via tools; never paraphrase from training memory.
 3. Survey in-repo for analogous patterns the codebase already uses. Cite `<file>:<line>` or "no analog found".
 4. Survey git history for prior attempts at the same problem. Cite `<commit-sha>` or "no prior attempt".
 

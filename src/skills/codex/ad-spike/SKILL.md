@@ -26,7 +26,7 @@ Step 1 — discovery. List canonical approaches grounded in official docs and re
 
 Process:
 - Search official documentation. Cite URL + version.
-- Search OSS for repos solving the same recortte. Cite `<repo>:<path>:<line-range>`; fetch via tools, never paraphrase from training memory.
+- Search public implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists) for solutions to the same recortte. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and fetch via tools; never paraphrase from training memory.
 - Survey in-repo for analogous patterns. Cite `<file>:<line>` or "no analog found".
 - Survey git history for prior attempts. Cite `<commit-sha>` or "no prior attempt".
 

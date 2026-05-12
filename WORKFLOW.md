@@ -114,7 +114,7 @@ Two sub-practices, joined into one indivisible pass: find the canonical baseline
 
 **Ground in real patterns.** Don't dump the codebase into context. Anchor the model in a specific, project-relevant example: *"Find an existing example of [similar feature]; use that exact structure."* Cite specific files, not "the codebase." Use just-in-time retrieval — pass paths or IDs and let the agent fetch via tools.
 
-A research pass joining four sources — official docs, validated open-source examples, in-repo patterns, git history — by AND not OR, synthesizing the happy path with citations from each source, and gating any deviation behind an irrefutable justification before code is written, is the operational shape.
+A research pass joining four sources — official docs, validated implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists), in-repo patterns, git history — by AND not OR, synthesizing the happy path with citations from each source, and gating any deviation behind an irrefutable justification before code is written, is the operational shape.
 
 ## 6. Explore → Plan → Implement → Commit
 
