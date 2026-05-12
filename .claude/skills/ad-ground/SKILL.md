@@ -23,7 +23,7 @@ For each language and library in scope, cite the canonical doc URL and version. 
 
 ### Source B — validated implementation references
 
-Find ≥1 (prefer 2–3) public implementation references solving the same *technical* research scope with similar techniques. References include open-source repos, Stack Overflow / forum answers, blog posts, gists, official cookbooks — anything with citable code or an explicit code-bearing answer. The match is technical, not domain — a CRUD-app-with-auth and a CLI-with-auth both hit "auth flow", and either is valid for the auth research scope. Use `WebSearch` (e.g. `site:github.com <research scope> language:<lang>`, `site:stackoverflow.com <research scope>`, `<library> <research scope> example`) and follow up with `WebFetch` of the specific page. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and quote the relevant block. Never paraphrase code from training memory. If search is inconclusive, ask the user for a known reference.
+Find ≥1 (prefer 2–3) public implementation references solving the same *technical* research scope with similar techniques. References include open-source repos, Stack Overflow / forum answers, blog posts, and gists — anything with citable code or an explicit code-bearing answer. The match is technical, not domain — a CRUD-app-with-auth and a CLI-with-auth both hit "auth flow", and either is valid for the auth research scope. Use `WebSearch` (e.g. `site:github.com <research scope> language:<lang>`, `site:stackoverflow.com <research scope>`, `<library> <research scope> example`) and follow up with `WebFetch` of the specific page. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / forum / blog / gist — and quote the relevant block. Never paraphrase code from training memory. If search is inconclusive, ask the user for a known reference.
 
 ### Source C — in-repo examples
 
@@ -70,7 +70,11 @@ A single message structured as:
 - <lang/lib>: <URL@version> — <one-line summary>
 
 ## Source B — validated implementation references
-- <source>:<locator> — <one-line summary>
+- <repo>:<path>:<line-range> — <one-line summary>   # repo form
+  ```
+  <quoted code block>
+  ```
+- <URL> — <one-line summary>                         # Stack Overflow / forum / blog / gist
   ```
   <quoted code block>
   ```
