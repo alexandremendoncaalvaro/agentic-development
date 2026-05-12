@@ -12,6 +12,7 @@
     "templates/",
     "prompts/",
     "WORKFLOW.md",
+    "WORKFLOW-FLOWS.md",
     "README.md",
     "LICENSE"
   ],
