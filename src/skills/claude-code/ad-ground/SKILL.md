@@ -1,7 +1,7 @@
 ---
 name: ad-ground
-description: Four-source pre-implementation research — official docs, validated open-source examples, in-repo patterns, and git history — then synthesize a happy path and gate any deviation with an irrefutable justification before code is written. Auto-invokes on non-trivial work, refactors, library or pattern selection, "research before coding", "before implementing", "which library", "which pattern", "how to approach", "ground before coding". Workflow-operational counterpart to WORKFLOW.md §4 (Find the Happy Path) and §5 (Ground in Real Patterns); pairs with ad-philosophy (posture) and ad-review (post-implementation §10 review).
-summary: Four-source pre-implementation research (docs / OSS / in-repo / git history) + happy-path synthesis + deviation gate. WORKFLOW §4 + §5.
+description: Four-source pre-implementation research — official docs, validated implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists), in-repo patterns, and git history — then synthesize a happy path and gate any deviation with an irrefutable justification before code is written. Auto-invokes on non-trivial work, refactors, library or pattern selection, "research before coding", "before implementing", "which library", "which pattern", "how to approach", "ground before coding". Workflow-operational counterpart to WORKFLOW.md §4 (Find the Happy Path) and §5 (Ground in Real Patterns); pairs with ad-philosophy (posture) and ad-review (post-implementation §10 review).
+summary: Four-source pre-implementation research (docs / impl-refs / in-repo / git history) + happy-path synthesis + deviation gate. WORKFLOW §4 + §5.
 allowed-tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
 ---
 
@@ -21,9 +21,9 @@ If the change is genuinely trivial (rename, typo, one-line refactor on a tested 
 
 For each language and library in scope, cite the canonical doc URL and version. Use `WebFetch` to confirm the page exists and read the relevant section; use `WebSearch` to locate it if the URL is unknown. If neither produces a confident hit, ask the user for a known-good link rather than fabricating one. Output: bulleted citations, one per language/library, each with URL plus a one-line summary of the relevant guidance.
 
-### Source B — validated open-source examples
+### Source B — validated implementation references
 
-Find ≥1 (prefer 2–3) public repository solving the same *technical* research scope with similar techniques. The match is technical, not domain — a CRUD-app-with-auth and a CLI-with-auth both hit "auth flow", and either is valid for the auth research scope. Use `WebSearch` (e.g. `site:github.com <research scope> language:<lang>`) and follow up with `WebFetch` of the specific file. Cite `<repo>:<path>:<line-range>` and quote the relevant block — never paraphrase code from training memory. If search is inconclusive, ask the user for a known reference.
+Find ≥1 (prefer 2–3) public implementation references solving the same *technical* research scope with similar techniques. References include open-source repos, Stack Overflow / forum answers, blog posts, gists, official cookbooks — anything with citable code or an explicit code-bearing answer. The match is technical, not domain — a CRUD-app-with-auth and a CLI-with-auth both hit "auth flow", and either is valid for the auth research scope. Use `WebSearch` (e.g. `site:github.com <research scope> language:<lang>`, `site:stackoverflow.com <research scope>`, `<library> <research scope> example`) and follow up with `WebFetch` of the specific page. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and quote the relevant block. Never paraphrase code from training memory. If search is inconclusive, ask the user for a known reference.
 
 ### Source C — in-repo examples
 
@@ -48,7 +48,7 @@ The gate is prescriptive, not descriptive: WORKFLOW §4 asks "was the deviation 
 Before handing off to implementation, report a soft verdict against four checks:
 
 - A consulted (≥1 official-doc citation per language/library)
-- B consulted (≥1 OSS citation, with cite-and-fetched code)
+- B consulted (≥1 implementation-reference citation, with cite-and-fetched code)
 - C consulted (in-repo analog cited or "no analog found" stated)
 - D checked (commits / branches surveyed; hit cited or "no prior attempt found")
 - Happy path declared (Step 2)
@@ -69,8 +69,8 @@ A single message structured as:
 ## Source A — official documentation
 - <lang/lib>: <URL@version> — <one-line summary>
 
-## Source B — validated open-source examples
-- <repo>:<path>:<line-range> — <one-line summary>
+## Source B — validated implementation references
+- <source>:<locator> — <one-line summary>
   ```
   <quoted code block>
   ```

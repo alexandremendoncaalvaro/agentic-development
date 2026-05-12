@@ -23,7 +23,7 @@ Before implementing:
 
 **Anchor in real patterns before writing code.**
 
-For non-trivial changes, invoke `/ad-ground` — the workflow-operational skill that runs the four-source research pass (official docs, validated open-source examples, in-repo patterns, git history) and synthesizes a happy path with citations. The skill carries the prescriptive deviation gate; this section carries the posture only. Skip for diffs you can describe in one sentence.
+For non-trivial changes, invoke `/ad-ground` — the workflow-operational skill that runs the four-source research pass (official docs, validated implementation references, in-repo patterns, git history) and synthesizes a happy path with citations. The skill carries the prescriptive deviation gate; this section carries the posture only. Skip for diffs you can describe in one sentence.
 
 ## Simplicity First
 
