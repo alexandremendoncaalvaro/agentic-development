@@ -1,11 +1,11 @@
 ---
-name: ad-clean
-description: Sweep completed plan files (tasks Status:done, specs Status:shipped, PRDs Status:superseded, ADRs Status:superseded or deprecated) out of the working tree and into git history via `git rm`. Use when the user wants to clean, prune, archive, or sweep done tasks / shipped specs / superseded PRDs / superseded or deprecated ADRs / completed legacy plan documents. Hard-delete-only — git history is the ledger, no in-tree archive subdirectory, no `CHANGELOG.md` (Rule #2 forbids changelogs in narrative documents). ADRs with `Status: accepted` are removable only when the user names them and the substance is verifiably absorbed into a binding doc (ARCHITECTURE.md / GUIDELINES.md / AGENTS.md / code).
+name: ad-archive
+description: Hard-delete completed plan files (tasks Status:done, specs Status:shipped, PRDs Status:superseded, ADRs Status:superseded or deprecated) via `git rm`, leaving git history as the only ledger. Use when the user wants to archive, clean, prune, or sweep finished decision-records out of the working tree. No `CHANGELOG.md`, no `archive/` subdir (both violate kit discipline). Accepted ADRs removable only when the user names them and an absorption check passes — the ADR's substance must be grep-findable in a binding doc (ARCHITECTURE.md / GUIDELINES.md / AGENTS.md / code).
 summary: Hard-delete completed plan files (tasks / specs / PRDs / superseded ADRs) into git history. ADR-accepted requires absorption proof.
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
-# /ad-clean
+# /ad-archive
 
 Removes plan files whose decision-record lifecycle is over. Git history retains the content; the working tree stops paying context cost on artifacts the LLM no longer needs to scan.
 
@@ -13,9 +13,9 @@ Removes plan files whose decision-record lifecycle is over. Git history retains 
 
 Decision-record artifacts (`doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/`) carry their lifecycle in a `Status:` frontmatter field. Once an item reaches a terminal state (task `done`, spec `shipped`, PRD `superseded`, ADR `superseded` / `deprecated`), keeping the file in the working tree adds tokens every time an agent globs the directory but adds zero binding force — the work has shipped, the decision has been replaced, or the rationale has been absorbed into a permanent doc.
 
-`/ad-clean` removes them via `git rm`. Three rules anchor the design:
+`/ad-archive` removes them via `git rm`. Three rules anchor the design:
 
-- **No `CHANGELOG.md`, no `archive/` subdirectory.** `WORKFLOW.md` Rule #2 forbids changelogs in narrative documents; an `archive/` subdir still expands under directory globs and defeats the point. Git history is the ledger; `/ad-commit` after `/ad-clean` is the breadcrumb. `git log --diff-filter=D -- doc/adr/` reaches it when needed.
+- **No `CHANGELOG.md`, no `archive/` subdirectory.** `WORKFLOW.md` Rule #2 forbids changelogs in narrative documents; an `archive/` subdir still expands under directory globs and defeats the point. Git history is the ledger; `/ad-commit` after `/ad-archive` is the breadcrumb. `git log --diff-filter=D -- doc/adr/` reaches it when needed.
 - **Status-driven, not age-driven.** A done task removed two days after completion is fine. An accepted ADR untouched for two years is not a candidate — accepted means binding.
 - **Accepted ADRs require absorption proof.** Nygard's tradition treats accepted ADRs as immutable. The kit's lean-tree value justifies removal only when the ADR's substance — not just its slug citation — has been moved into a binding document such that deletion loses no information. The skill enforces this by grepping the named target for the ADR's core claim before allowing `git rm`.
 
@@ -76,7 +76,7 @@ For each named accepted ADR:
 2. Extract two-to-four substance keywords from the ADR's title and Decision section (not the slug — substance). Example: ADR-0004 "File-based task tracking" → keywords `file-based`, `task tracking`, `doc/tasks`, `Markdown`.
 3. Grep the absorption target for each keyword. Require at least one keyword to match. (Title-derived literal keywords may collide; substance keywords are the test.)
 4. If the grep fails: refuse removal. Print:
-   > ADR-NNNN absorption not verified. Substance keyword `<X>` not found in `<target>`. Absorb the rationale first (edit the binding doc), then re-run `/ad-clean` and re-name this ADR.
+   > ADR-NNNN absorption not verified. Substance keyword `<X>` not found in `<target>`. Absorb the rationale first (edit the binding doc), then re-run `/ad-archive` and re-name this ADR.
 5. If the grep succeeds: add to the removal set, print the matched location as evidence.
 
 Do not silently downgrade the check. The absorption rule is the design's load-bearing constraint — it is the reason hard-delete is safe.
