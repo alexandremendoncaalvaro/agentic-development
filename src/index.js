@@ -5,6 +5,7 @@ import { dirname, join } from 'node:path';
 import { initCommand } from './commands/init.js';
 import { updateCommand } from './commands/update.js';
 import { profileCommand } from './commands/profile.js';
+import { menuCommand } from './commands/menu.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -55,6 +56,13 @@ export async function run(argv) {
     .action((subcommand, name, opts) =>
       profileCommand(subcommand, { ...opts, name: opts.name ?? name })
     );
+
+  // No-args + interactive TTY → show the picker. Anything else (flags,
+  // subcommand, --help, --version, piped stdin) falls through to commander.
+  if (argv.length === 2 && process.stdin.isTTY && process.stdout.isTTY) {
+    await menuCommand(run);
+    return;
+  }
 
   await program.parseAsync(argv);
 }
