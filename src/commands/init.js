@@ -370,6 +370,7 @@ export async function initCommand(opts) {
       '/ad-review (WORKFLOW §10)',
       '/ad-ground (WORKFLOW §4 + §5)',
       '/ad-next (state survey + recommendations)',
+      '/ad-clean (sweep done tasks / shipped specs / superseded ADRs into git history)',
       '/ad-spike (WORKFLOW §14 — staged spike with golden fixtures)',
       '/ad-tdg (WORKFLOW §9 — outcome-based prompting + TDM)',
       '/ad-domain (CONTEXT.md — Layer 2 ubiquitous language)',
@@ -397,6 +398,8 @@ export async function initCommand(opts) {
           'ad-spec': '/ad-spec (doc/specs/)',
           'ad-task': '/ad-task',
           'ad-audit': '/ad-audit',
+          'ad-clean':
+            '/ad-clean (sweep done tasks / shipped specs / superseded ADRs into git history)',
           'ad-review': '/ad-review (WORKFLOW §10)',
           'ad-ground': '/ad-ground (WORKFLOW §4 + §5)',
           'ad-deepen': '/ad-deepen (WORKFLOW §8 — deepening opportunities)',
