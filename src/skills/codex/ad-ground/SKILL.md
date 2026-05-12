@@ -17,7 +17,7 @@ Step 1 — four-source research pass, all four required:
 
 Source A — official documentation. For each language and library in scope, cite the canonical doc URL and version. Read the relevant section. Ask the user for a known-good link rather than fabricating one. Output: bulleted citations, one per language/library, each with URL plus a one-line summary.
 
-Source B — validated implementation references. ≥1 (prefer 2–3) public reference (open-source repo, Stack Overflow / forum answer, blog post, gist, official cookbook) solving the same technical research scope with similar techniques. Match is technical, not domain. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and quote the relevant block. Never paraphrase from training memory. If search is inconclusive, ask the user for a known reference.
+Source B — validated implementation references. ≥1 (prefer 2–3) public reference (open-source repo, Stack Overflow / forum answer, blog post, gist) solving the same technical research scope with similar techniques. Match is technical, not domain. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / forum / blog / gist — and quote the relevant block. Never paraphrase from training memory. If search is inconclusive, ask the user for a known reference.
 
 Source C — in-repo examples. Grep / glob for analogous patterns. Cite `<file>:<line>` plus a one-line description of how the existing example handles the same shape. If the codebase has no analog, state that explicitly.
 
@@ -49,7 +49,11 @@ A single message structured as:
 - <lang/lib>: <URL@version> — <one-line summary>
 
 ## Source B — validated implementation references
-- <source>:<locator> — <one-line summary>
+- <repo>:<path>:<line-range> — <one-line summary>   # repo form
+  ```
+  <quoted code block>
+  ```
+- <URL> — <one-line summary>                         # Stack Overflow / forum / blog / gist
   ```
   <quoted code block>
   ```
