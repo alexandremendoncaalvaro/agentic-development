@@ -112,6 +112,15 @@
         }
       ]
     },
+    "ad-handoff": {
+      "version": "0.16.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-handoff/SKILL.md",
+          "sourceSha": "56c3b87f00b5a89010256b8bde5ff012d91d74dfc703508fcead2efe2e43ae4c"
+        }
+      ]
+    },
     "ad-merge": {
       "version": "0.16.0-beta.1",
       "files": [

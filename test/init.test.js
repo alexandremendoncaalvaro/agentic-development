@@ -88,6 +88,7 @@ const UNIVERSAL_SKILLS = [
   'ad-commit',
   'ad-pr',
   'ad-merge',
+  'ad-handoff',
 ];
 
 test('init --agent both → installs the full universal skill set for both agents', () => {

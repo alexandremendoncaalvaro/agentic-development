@@ -160,6 +160,19 @@
         }
       ]
     },
+    "ad-handoff": {
+      "version": "0.16.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-handoff/agents/openai.yaml",
+          "sourceSha": "03013e0e2c657e8e978d38567b2a8f8c1e61cba1b57c1e48648c41a002f1de93"
+        },
+        {
+          "path": ".agents/skills/ad-handoff/SKILL.md",
+          "sourceSha": "e1e4bdc9f938fa7b21c2269e7062d173325860a2c4c7264668276e28d2f50151"
+        }
+      ]
+    },
     "ad-merge": {
       "version": "0.16.0-beta.1",
       "files": [
