@@ -262,8 +262,7 @@ node bin/agentic.js init
 ```
 
 Branch layout:
-- `main` — manual workflow source of truth (no CLI code; the npm package gets promoted here when mature).
-- `cli` — CLI development. Beta releases are published from this branch.
+- `main` — single source of truth. Kit + CLI live together; npm beta releases are published from here.
 
 ## License
 
