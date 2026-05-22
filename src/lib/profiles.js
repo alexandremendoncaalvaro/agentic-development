@@ -32,6 +32,7 @@ export const PROFILES = {
       'ad-grill',
       'ad-diagnose',
       'ad-tdd',
+      'ad-handoff',
     ],
     conditional: {
       'ad-design': 'blocked',
@@ -65,6 +66,7 @@ export const PROFILES = {
       'ad-commit',
       'ad-pr',
       'ad-merge',
+      'ad-handoff',
     ],
     conditional: {
       'ad-architecture': false,
@@ -101,6 +103,7 @@ export const PROFILES = {
       'ad-commit',
       'ad-pr',
       'ad-merge',
+      'ad-handoff',
     ],
     conditional: {
       'ad-design': 'frontend',
@@ -135,6 +138,7 @@ export const PROFILES = {
       'ad-commit',
       'ad-pr',
       'ad-merge',
+      'ad-handoff',
     ],
     conditional: {
       'ad-design': 'frontend',

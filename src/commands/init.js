@@ -380,6 +380,7 @@ export async function initCommand(opts) {
       '/ad-commit (Conventional Commits + DCO sign-off)',
       '/ad-pr (open PR with uniform body)',
       '/ad-merge (evaluate + merge PR)',
+      '/ad-handoff (compact session → $TMPDIR/agentic-handoffs/)',
       ...(optedSkills.includes('ad-design') ? ['/ad-design (DESIGN.md)'] : []),
       ...(optedSkills.includes('ad-subagent') && agents.includes('claude-code')
         ? ['/ad-subagent']
@@ -406,6 +407,8 @@ export async function initCommand(opts) {
           'ad-commit': '/ad-commit (Conventional Commits + DCO sign-off)',
           'ad-pr': '/ad-pr (open PR with uniform body)',
           'ad-merge': '/ad-merge (evaluate + merge PR)',
+          'ad-handoff':
+            '/ad-handoff (compact session → $TMPDIR/agentic-handoffs/)',
           // 'ad-philosophy' is implicit and not listed.
         };
         for (const [skill, label] of Object.entries(universalLabels)) {
