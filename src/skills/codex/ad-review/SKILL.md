@@ -1,7 +1,7 @@
 ---
 name: ad-review
 description: |
-  Run this skill whenever the user asks for a code review, diff review, branch review, PR review, "revisa esse diff", "faz code review", "review main..HEAD", or invokes /ad-review.
+  Run this skill when the user explicitly invokes `/ad-review` or names it ("run ad-review", "use the ad-review skill"), or when the user asks for a code review with an explicit scope ("review this branch", "review main..HEAD", "revisa esse diff <range>"). Auto-trigger note: `allow_implicit_invocation: true` is set so review-language can fire the skill, but this also means broad review-adjacent conversation may auto-invoke a multi-step file-writing workflow. If a request is ambiguous, ask the user to confirm scope before invoking.
   Mechanical shape: ONE pass in the current session. The skill assembles the diff plus the relevant context, then produces a single review with findings grouped under `## Standards Findings` and `## Spec Findings` — two axes, one session. Standards = does the diff conform to AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs? Spec = does the diff match the originating task / spec / PRD? The two-axis structure exists so neither axis masks the other.
   No `/clear`. No spawning subagents from the skill (Codex skills cannot spawn agents — only the user can, via natural language, and that is an optional escalation documented at the bottom). The skill writes a single audit-trail handoff file at `.agentic/reviews/<ISO>-<scope>.md` for the record, then performs the review inline.
 summary: Single-session two-axis code review per WORKFLOW §10 (Codex variant). Reads diff + binding docs + originating spec, returns findings under `## Standards Findings` and `## Spec Findings`. Writes audit trail to `.agentic/reviews/`. No `/clear`; user-initiated subagent escalation documented for §10 ideal.
@@ -33,6 +33,7 @@ The two-axis split is structural rigor — same reviewer, but findings must be c
 - Do NOT merge the two axes into a single findings list. The split is the rigor; merging is the bias the skill exists to prevent.
 - Do NOT produce an "approve" verdict. WORKFLOW §10 frames the review as adversarial; approval is the senior engineer's call after weighing both axes.
 - Do NOT skip writing the audit-trail file at `.agentic/reviews/`. The file lets the user re-run the review later against an updated diff or share it with a teammate.
+- Do NOT begin Step 1 or any file I/O before printing the Step 0 announce line. The user must see the operational shape (one pass, one audit-trail file, axis-separated output) before the skill starts reading/writing — otherwise the agent silently drifts into work the user did not consent to.
 </anti-patterns>
 
 <background_information>
@@ -129,7 +130,7 @@ Step 5 — review. Apply the two axes with discipline. Read the diff once, class
 - "function returns undefined on empty input" → Standards (a code-quality bug).
 - "function returns undefined on empty input, but the spec required `[]`" → Spec (the spec line is what's broken).
 
-When in genuinely doubt, place it in Standards.
+When in genuine doubt, place it in Standards.
 
 Step 6 — output. Print findings under two headings, in this exact order:
 
