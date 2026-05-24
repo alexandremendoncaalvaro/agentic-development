@@ -83,6 +83,7 @@ Tracked as work items, not deferred decisions:
 
 ## Related
 
+- PRD: [`doc/product/PRD.md`](../product/PRD.md) — MVP tier covers `ad-review` as part of the workflow-operational core skill set.
 - ADRs: ADR-0007 (workflow-operational skills category, of which `ad-review` is the canonical instance; Codex consequence stanza superseded by 2026-05-24 Addendum — see `doc/adr/0007-workflow-operational-skills.md`).
 - Tasks: `doc/tasks/0001-verify-codex-config-toml-agents-syntax.md`, `doc/tasks/0002-audit-single-session-axis-bleed.md`.
 - Supersedes / Depends on: supersedes the original single-axis `ad-review` (pre-v0.17.0-beta.1).
