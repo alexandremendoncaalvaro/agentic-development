@@ -243,11 +243,11 @@
       "files": [
         {
           "path": ".agents/skills/ad-review/agents/openai.yaml",
-          "sourceSha": "eeb73a7c1be1ffee53b31d6ca10997414a2455bf9162a4b150beb2eff6e48f6a"
+          "sourceSha": "a32186c67c68459b70fcb0a658bc1933aec880d9e0b83ffb86470305d4a6ffe0"
         },
         {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "3e8faf8fcb3dbb080d5fc39d29e99ceac6babf1885bf6b6ee559dd501189cecf"
+          "sourceSha": "bb045dea59f4b494a068f0460002ff9b7a2ee001b9ea027bc979b25cd3345f89"
         }
       ]
     },
