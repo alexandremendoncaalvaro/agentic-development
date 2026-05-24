@@ -18,7 +18,7 @@ node bin/agentic.js init --agent both -y  # non-interactive
 npm test                                  # CLI --help smoke + node:test suite under test/
 ```
 
-Lint, formatter: not yet wired. CI runs `npm test` across Node 20 / 22 on every push and PR targeting `main` or `cli` ([`.github/workflows/test.yml`](.github/workflows/test.yml)).
+Lint, formatter: not yet wired. CI runs `npm test` across Node 20 / 22 on every push and PR targeting `main` ([`.github/workflows/test.yml`](.github/workflows/test.yml)).
 
 ## Quality Gates
 
@@ -54,12 +54,12 @@ prompts/                             manual paste-into-agent prompts shipped to 
 test/*.test.js                       unit + integration suite (node:test)
 WORKFLOW.md                          Layer 1 Constitution — philosophy doc, shipped to npm
 GUIDELINES.md                        Layer 1 Constitution — full engineering reference
-ARCHITECTURE.md                      system-level patterns (pairs with ADRs)
+ARCHITECTURE.md                      Layer 1 — system-level patterns (pairs with ADRs)
 CONTEXT.md                           Layer 2 Domain — canonical project nouns and aliases-to-avoid (lazy; only when terms have been resolved)
 doc/product/PRD.md                   Layer 3 Product — product-level scope (target user, problem, success metrics, roadmap)
 doc/specs/NNNN-<slug>.md             Layer 4 Spec — feature-level specifications
-doc/tasks/NNNN-<slug>.md             Layer 5 Plan — task tracking with checkbox AC + append-only Notes
-doc/adr/NNNN-<slug>.md               Layer 5 Decision — binding ADRs (Nygard format)
+doc/adr/NNNN-<slug>.md               Layer 5 Plans / Decisions — binding ADRs (Nygard format)
+doc/tasks/NNNN-<slug>.md             Layer 5 Plans / Decisions — task tracking with checkbox AC + append-only Notes
 ```
 
 Binding ADRs: see [`doc/adr/`](doc/adr/) (all accepted). Skill source lives under `src/skills/`; the repo also self-installs the kit into its own `.claude/skills/` and `.agents/skills/` for dogfood, so contributors get the same agent surface (`/ad-bootstrap`, `/ad-spec`, `/ad-task`, `/ad-ground`, `/ad-review`, etc.) when working on the kit itself. Source under `src/skills/` is canonical; the installed copies under `.claude/skills/` and `.agents/skills/` are kept in sync via `node bin/agentic.js update`.
