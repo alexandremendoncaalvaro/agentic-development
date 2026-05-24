@@ -1,8 +1,8 @@
 # PRD — `@alexandrealvaro/agentic`
 
-Status: draft
+Status: accepted
 Created: 2026-05-11
-Updated: 2026-05-11
+Updated: 2026-05-24
 Owner: Alexandre Alvaro
 
 ## Product
@@ -83,13 +83,16 @@ What binds across the entire product. Skip the section if none.
 Deferred decisions. Each becomes a future ADR, a spec-time decision, or an explicit punt with rationale. Never delete a question — append a resolution paragraph.
 
 - **When does `cli` promote to `main` and tag 1.0?** Criteria not yet locked. Candidates: (a) all MVP roadmap items shipped + own-dogfood audit clean; (b) external adoption threshold reached. Decision needs ADR.
+  - **Partial resolution (2026-05-24):** the `cli` branch was consolidated into `main` — `main` is now the single source of truth for kit + CLI; npm beta publishes from `main`. The 1.0-tag criterion remains open; this only collapses the prior two-branch model. See README.md "Branch layout" and the consolidation commit `b69056e`.
 - **Should the kit ship IDE-native integrations** (VS Code extension, JetBrains plugin) or stay agents.md-based? Current posture is the latter — keep the kit small, let host integrations be community contributions. Reconsider if adoption stalls on host-onboarding friction.
 - **Telemetry policy when going hosted.** If a hosted variant ships, opt-in telemetry vs strict offline. Decision deferred until a hosted variant is on the roadmap (not currently).
 - **How to measure "kit landed correctly" without telemetry.** Indirect signals (test green at install, audit clean) cover *correctness*; do not cover *fit*. Survey or community-channel signal is the open question.
 - **Whether `doc/specs/` becomes a universal artifact for the kit itself**, or work continues to be tracked exclusively as `doc/tasks/` per the existing pattern. The kit currently does not have a single feature spec — only tasks.
+  - **Resolution (2026-05-24):** `doc/specs/` is universal for the kit going forward. Backfilled `0001-session-handoff-skill.md` (Status: shipped) and `0002-two-axis-fresh-context-review.md` (Status: shipped) on 2026-05-24 to close the gap retroactively for the ad-handoff and two-axis ad-review features. Future feature-level work on the kit lands a spec under `doc/specs/` before tasks decompose against it, per the `team` profile expectation. Tasks continue to carry `Spec ref` to their parent spec.
 
 ## Related
 
 - **ADRs:** see [`doc/adr/`](../adr/) for the canonical ledger.
-- **Specs:** none yet — kit tracks work as tasks ([`doc/tasks/`](../tasks/)). Open question above on whether `doc/specs/` becomes a universal artifact for the kit.
+- **Specs:** [`doc/specs/0001-session-handoff-skill.md`](../specs/0001-session-handoff-skill.md) (shipped), [`doc/specs/0002-two-axis-fresh-context-review.md`](../specs/0002-two-axis-fresh-context-review.md) (shipped). See [`doc/specs/`](../specs/) for the canonical ledger.
+- **Tasks:** see [`doc/tasks/`](../tasks/) for the canonical ledger.
 - **Supersedes:** none.

@@ -77,6 +77,7 @@ None at ship time. The skill is in production use at `v0.17.0-beta.1` and forwar
 
 ## Related
 
+- PRD: [`doc/product/PRD.md`](../product/PRD.md) — MVP tier covers `ad-handoff` implicitly as part of the workflow-operational core skill set.
 - ADRs: ADR-0007 (workflow-operational skills category, of which `ad-handoff` is a member); ADR-0008 (documentation discipline — handoff files are exempt from the no-dates rule for the same reason ADRs / tasks / specs are).
 - Tasks: none — the skill shipped before the kit's task discipline applied to the kit's own development.
 - Supersedes / Depends on: depends on the `ad-*` skill set being installed (the `Suggested skills` section assumes them).
