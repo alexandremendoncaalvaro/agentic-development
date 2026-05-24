@@ -57,11 +57,24 @@ Edited `src/skills/codex/ad-review/SKILL.md` "Optional escalation" block (commit
 
 `/ad-review` of the change is a DoD requirement; deferred to a single combined review of all 0001 + 0002 followup work.
 
+### `2026-05-24` (second entry — DoD §10 review completion)
+
+The deferred §10 review landed as part of the Task 0002 Range C audit. Audit trail at `.agentic/reviews/20260524T051331Z-v0.17.3-vs-v0.17.4-axis-bleed-rangeC.md` (combined handoff) plus three reviewer reports (two-axis split: Standards + Spec subagents; Codex-simulation single-session). Range C covers `v0.17.3-beta.1..v0.17.4-beta.1`, which is exactly the range that ships this task's fix commit `02fb82b`.
+
+Findings against the SKILL.md edit produced by this task:
+
+- **Real bug confirmed:** the TOML triple-quoted `developer_instructions` value was indented 7 spaces, which would have been preserved verbatim in the parsed string. Fixed in commit `<TBD>` — dedented the body inside the triple-quoted string to column 0 and added an inline note about TOML's whitespace handling.
+- **Real bug confirmed:** the narrative skill body carried a date stamp ("subagents shipped Dec 2025"), violating ADR-0008 R1 (narrative docs are in scope for the no-dates rule; only ADRs / tasks / specs are exempt). Fixed in the same commit — replaced with "see [docs] for the current rollout state".
+- **Required-vs-optional field annotations missing.** Fixed in the same commit — added inline `# optional — omit to inherit parent session` style comments next to optional TOML fields.
+- **False-positive flagged:** both axis-bounded Spec reviewer AND the Codex-simulation reviewer flagged `model = "gpt-5.4"` as a fabricated model identifier. Web-verified against `developers.openai.com/codex/subagents`: the docs explicitly list `gpt-5.3-codex-spark`, `gpt-5.4`, and `gpt-5.4-mini` as example identifiers. The fix shipped here is correct; the reviewers were confidently wrong. Recorded as a reviewer-pattern finding for the Task 0002 audit (no web access for subagents → platform-identifier verification is structurally hard).
+
+DoD code-review checkbox now ticked. Task remains closed.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10) — deferred per Notes 2026-05-24
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10) — see Notes 2026-05-24 (second entry) below
 - [x] No orphan `TODO`/`FIXME` introduced
 - [x] Status updated to `done` and Notes log closes the task

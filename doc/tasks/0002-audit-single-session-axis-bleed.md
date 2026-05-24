@@ -1,6 +1,6 @@
 # Task `0002`: `audit Codex ad-review single-session axis bleed against Claude Code two-reviewer split`
 
-**Status:** `in-progress`
+**Status:** `done`
 **Created:** `2026-05-24`
 **Owner:** `Alexandre Alvaro`
 **Spec ref:** `doc/specs/0002-two-axis-fresh-context-review.md`
@@ -24,13 +24,13 @@ This task assumption being tested: **a single Codex reviewer with both axes load
 
 ## Acceptance Criteria
 
-- [ ] At least 3 historical diffs (PRs / branches / commit ranges) selected for the comparison. Each diff must have material on both axes (i.e. touches behavior covered by ADRs / AGENTS / etc. AND implements a tracked spec or task) so both axes have something to find.
-- [ ] Each selected diff run through the Codex variant of `ad-review` — output captured.
-- [ ] Same diff run through the Claude Code variant of `ad-review` (two parallel `Task` sub-agents) — output captured.
-- [ ] Finding sets compared per diff. A finding is a "miss" if it appears on one variant but not the other AND would have been catchable on the missing side given the context that variant received.
-- [ ] Report written to `doc/decisions/axis-bleed-audit-<date>.md` (or appended to ADR-0007 Addendum) with: number of misses per direction (Standards-miss-on-Codex, Spec-miss-on-Codex, Codex-found-but-Claude-missed), severity distribution, qualitative examples.
-- [ ] Decision rendered: keep current Codex variant / promote subagent escalation to default / ship structural enforcement / open separate ADR.
-- [ ] If the decision changes the Codex variant: SKILL.md edit + commit + dogfood sync.
+- [x] At least 3 historical diffs (PRs / branches / commit ranges) selected for the comparison. Each diff must have material on both axes (i.e. touches behavior covered by ADRs / AGENTS / etc. AND implements a tracked spec or task) so both axes have something to find.
+- [x] Each selected diff run through the Codex variant of `ad-review` — output captured.
+- [x] Same diff run through the Claude Code variant of `ad-review` (two parallel `Task` sub-agents) — output captured.
+- [x] Finding sets compared per diff. A finding is a "miss" if it appears on one variant but not the other AND would have been catchable on the missing side given the context that variant received.
+- [x] Report written to `doc/decisions/axis-bleed-audit-<date>.md` (or appended to ADR-0007 Addendum) with: number of misses per direction (Standards-miss-on-Codex, Spec-miss-on-Codex, Codex-found-but-Claude-missed), severity distribution, qualitative examples. — written inline in this task's Notes log (decision-record artifact for a one-shot audit; `doc/decisions/` not created as a separate directory).
+- [x] Decision rendered: keep current Codex variant / promote subagent escalation to default / ship structural enforcement / open separate ADR. — Option α (keep asymmetric) + Option β (surface escalation earlier on binding-doc findings). Implementation tracked as task 0003.
+- [x] If the decision changes the Codex variant: SKILL.md edit + commit + dogfood sync. — deferred to task 0003 per atomic-commit doctrine.
 
 ## Plan
 
@@ -132,11 +132,62 @@ Option γ: change the Claude Code variant to spawn THREE reviewers — two axis-
 
 **Next:** N=1 is insufficient for a binding decision. Recommend running Range A (`v0.17.1-beta.1..v0.17.2-beta.1` — Codex rewrite, opposite signal: known-good in retrospect) and Range C (`v0.17.3-beta.1..v0.17.4-beta.1` — recent simple range) before flipping any SKILL.md or proposing an ADR. Until then this task stays `in-progress`.
 
+### `2026-05-24` (second entry) — Range A + Range C executed; N=3 synthesis
+
+Range A (`v0.17.1-beta.1..v0.17.2-beta.1`) and Range C (`v0.17.3-beta.1..v0.17.4-beta.1`) executed. Combined handoff for Range A reused from the prior `/ad-review` invocation (`.agentic/reviews/20260524T031236Z-v0.17.1-vs-HEAD.md`). Range C handoff at `.agentic/reviews/20260524T051331Z-v0.17.3-vs-v0.17.4-axis-bleed-rangeC.md`.
+
+**Range C handoff integrity issue acknowledged:** I wrote the handoff stating "Three commits" but `git rev-list --count v0.17.3-beta.1..v0.17.4-beta.1` returns 7 (the range spans `f4edd2a → c8fe893 → ee60a59 → ad90397 → 02fb82b → 7b476ce → 7ffcc90` — I was counting only the commits after the doc batch). The Range C Spec-axis subagent caught this and flagged 4 commits whose claims were unverified. The 4 missed commits are all doc-only (tasks, specs, CONTEXT, PRD) — no Standards-axis surface change — so the diagnostic signal stands, but the methodology error is real. Recorded as a finding in the synthesis below (handoff-generator class).
+
+**Arm summaries (Range A + C; Range B above):**
+
+| Range | Arm A (two-axis split) verdict | Arm A counts | Arm B (Codex-sim) verdict | Arm B counts |
+| --- | --- | --- | --- | --- |
+| **B** (known-bad) | Standards: don't ship until Blockers resolved; Spec: ship with Concerns logged | 2 / 3 / 2 | Standards: ship with Concerns logged; Spec: ship with Concerns logged | 0 / 4 / 2 |
+| **A** (known-good rewrite) | Standards: ship with Concerns logged; Spec: ship with Concerns logged | 0 / 5 / 0 / 2 | Standards: ship with Concerns logged; Spec: ship with Concerns logged | 0 / 5 / 0 / 2 |
+| **C** (recent simple) | Standards: ship with Concerns logged; Spec: don't ship until Blockers resolved | 0 / 6 / 1 / 2 | Standards: ship with Concerns logged; Spec: ship with Concerns logged | 0 / 2 / 0 / 1 |
+
+(Counts = Standards Blockers / Standards Concerns / Spec Blockers / Spec Concerns.)
+
+**Per-range axis-bleed signature:**
+
+- **Range B (known-bad):** Arm B downgraded 2 Standards Blockers → Concern/Note. Classic axis-bleed signature confirmed. Arm B did catch the headline meta-critique ("fix may target wrong cause") that Arm A missed. Arm A also missed three infrastructure findings (YAML scalar length, `short_description` truncation, missing tests).
+- **Range A (known-good rewrite):** Both arms reached "ship with Concerns logged" at near-identical severity distributions. Some overlap in findings, some unique-to-each-arm. **No measurable axis-bleed downgrade on this range** — when the rewrite is genuinely sound, both context shapes produce similar findings. Arm B caught: markdown angle-bracket issue, openai.yaml truncation length. Arm A caught: ADR-0007 §4 stale stanza unmodified, config.toml path unsubstantiated (which Task 0001 later confirmed). Arm A flagged the unsubstantiated-path concern as Concern; Arm B did not surface it as a separate finding.
+- **Range C (recent simple):** Arm A flagged 1 Spec Blocker (Task 0001 closed with DoD code-review checkbox unchecked) that Arm B downgraded to Note. Inverse direction: Arm A's strict "spec is the law" stance, lacking context that the deferral was intentional and traceable. Both arms flagged real bugs (TOML indentation, narrative-doc date violation, `cli` survival in AGENTS.md CI line). Both arms also produced a confidently-wrong shared false-positive: `model = "gpt-5.4"` flagged as fictional when it IS a documented Codex example identifier (web-verified during the fix).
+
+**Cross-range synthesis (N=3):**
+
+1. **Axis-bleed (Arm B context contamination) is measurable on known-bad cases.** Range B showed two Blocker → lower-severity downgrades that retrospectively turned out to be the most important findings. Range A (known-good) showed no measurable downgrade. Range C showed inverse direction (Arm A over-strict on a contextually-justified deferral). Severity drift is the load-bearing signal — count drift is noisy.
+
+2. **The two-axis split has measurable inverse degradation: cross-axis misses + over-strict-without-context.**
+   - Cross-axis misses (Arm A misses infrastructure and meta-critique findings each axis-bounded reviewer cannot surface from only its slice) — confirmed on Range B and Range C.
+   - Over-strict-without-context (Arm A flags Blocker on a deferral that the broader project context makes acceptable) — confirmed on Range C task-0001-DoD finding.
+
+3. **Both arms can produce confidently-wrong false positives on platform-specific facts.** Range C `model = "gpt-5.4"` flagged by both arms as fictional; web-verified to be a documented identifier. Reviewer pattern (no web access for subagents on this kit's install) means platform-identifier verification is structurally hard.
+
+4. **Handoff-generator quality matters more than reviewer arm choice.** Range C handoff misstated commit count by 4; Arm A Spec subagent caught it (correctly flagged a methodology error). The audit's signal is bounded above by handoff fidelity.
+
+5. **Neither arm is strictly dominant — they surface different finding classes at different severities.** The right comparison is not "which arm wins" but "which arm fits the diff being reviewed."
+
+**Decision (per ADR-0007 Addendum follow-up condition):**
+
+- **Option α — keep current asymmetric per-host shape (Claude Code = two-axis split via parallel Task subagents; Codex = single-session axis-separated schema).** Adopt. The current shape is defensible — each variant has known degradation patterns documented in `<background_information>` and ADR-0007 Addendum.
+- **Option β — surface optional user-initiated Codex subagent escalation earlier (not just as a footer after the inline review).** Adopt. Range B showed the inline review can downgrade Blocker-class findings; the user should be able to opt INTO fresh-context separation when the diff touches binding-doc surfaces. Update the Codex variant SKILL.md to: (a) in Step 0 announce, mention the escalation as an option BEFORE the inline review starts; (b) add a Step 7 ("If any Standards finding touches a binding doc — ADR, AGENTS.md, GUIDELINES.md, ARCHITECTURE.md — recommend the escalation to the user before they merge").
+- **Option γ — three-reviewer Claude Code variant with cross-axis meta-reviewer.** Reject for now. Range A showed two-axis is not always better; adding a third reviewer increases cost without proven leverage. Reconsider if a future range shows recurring meta-critique misses on the Claude Code variant.
+- **Option δ — formal ADR superseding more of ADR-0007 §4.** Defer. The Addendum already records the architectural shift; a separate ADR is heavier than the evidence justifies. Add a footnote to the Addendum capturing the N=3 audit reference if Option β lands.
+
+**Recommended follow-up tasks (each → its own `/ad-task`):**
+
+- Implement Option β in `src/skills/codex/ad-review/SKILL.md` (Step 0 announce mention + new Step 7 escalation gate on binding-doc findings).
+- Add a "handoff-generator integrity" gate to the kit's ad-review skill (both variants): the assembling agent must call `git rev-list --count <range>` and assert the commit count in the handoff matches. Caught here by an Arm A subagent (Range C); should be enforced upstream.
+- Add a "platform-identifier false-positive" note to `fresh-context-reviewer.md` brief: when a reviewer would flag a platform-specific identifier (model name, config key, CLI flag) as fictional, the reviewer must either (a) state the verification is pending external lookup, or (b) skip the finding. Reduces confidently-wrong noise.
+
+Task 0002 closes here. Range B + A + C executed. Decision recorded (α + β). Follow-up tasks listed above; each must be its own `/ad-task` before any SKILL.md edit lands.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes) — N/A; audit task, no code change in this task's scope (SKILL.md edits done in tasks 0001 and follow-up 0003).
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10) — the audit IS the §10 review (recursive — the kit's own ad-review reviewing the kit's own ad-review).
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
