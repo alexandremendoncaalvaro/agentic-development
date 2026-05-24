@@ -52,10 +52,14 @@ src/skills/<agent>/<skill>/          skill source — copied into target's
 templates/                           manual templates shipped to npm
 prompts/                             manual paste-into-agent prompts shipped to npm
 test/*.test.js                       unit + integration suite (node:test)
-doc/adr/NNNN-<slug>.md               binding ADRs (Nygard format)
-doc/tasks/NNNN-<slug>.md             task tracking
+WORKFLOW.md                          Layer 1 Constitution — philosophy doc, shipped to npm
+GUIDELINES.md                        Layer 1 Constitution — full engineering reference
 ARCHITECTURE.md                      system-level patterns (pairs with ADRs)
-WORKFLOW.md                          philosophy doc, shipped to npm
+CONTEXT.md                           Layer 2 Domain — canonical project nouns and aliases-to-avoid (lazy; only when terms have been resolved)
+doc/product/PRD.md                   Layer 3 Product — product-level scope (target user, problem, success metrics, roadmap)
+doc/specs/NNNN-<slug>.md             Layer 4 Spec — feature-level specifications
+doc/tasks/NNNN-<slug>.md             Layer 5 Plan — task tracking with checkbox AC + append-only Notes
+doc/adr/NNNN-<slug>.md               Layer 5 Decision — binding ADRs (Nygard format)
 ```
 
 Binding ADRs: see [`doc/adr/`](doc/adr/) (all accepted). Skill source lives under `src/skills/`; the repo also self-installs the kit into its own `.claude/skills/` and `.agents/skills/` for dogfood, so contributors get the same agent surface (`/ad-bootstrap`, `/ad-spec`, `/ad-task`, `/ad-ground`, `/ad-review`, etc.) when working on the kit itself. Source under `src/skills/` is canonical; the installed copies under `.claude/skills/` and `.agents/skills/` are kept in sync via `node bin/agentic.js update`.
@@ -66,7 +70,7 @@ See [`GUIDELINES.md`](GUIDELINES.md) §10 for the full reference. Non-negotiable
 
 * Conventional Commits format. Use `/ad-commit` for the disciplined flow.
 * DCO `Signed-off-by` trailer on every commit (no `Co-Authored-By`).
-* Never push directly to `main` or `cli` — always open a PR via `/ad-pr`.
+* Never push directly to `main` — always open a PR via `/ad-pr`.
 
 ## Security & Privacy
 
