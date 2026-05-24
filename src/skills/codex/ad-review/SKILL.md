@@ -163,9 +163,36 @@ Do NOT synthesize an overall "approve" verdict. §10 frames the review as advers
 If the user wants the §10 ideal (a reviewer with no inherited bias), tell them after Step 6:
 
 ```
-For a fresh-context review, you can spawn a Codex subagent manually:
-  > spawn an agent to act as a senior code reviewer. Read <audit-path> and report findings under ## Standards Findings and ## Spec Findings only.
-The subagent loads only the handoff file, so it has no inherited context from this session. Requires Codex 2025+ with the `[agents]` block configured in ~/.codex/config.toml.
+For a fresh-context review, declare a Codex subagent and spawn it manually.
+
+1. Create a standalone subagent TOML file at one of:
+     ~/.codex/agents/fresh-context-reviewer.toml          (personal — shared across all projects)
+     .codex/agents/fresh-context-reviewer.toml            (project-scoped — committed with the repo)
+
+   Minimum body (per developers.openai.com/codex/subagents):
+
+       name = "fresh-context-reviewer"
+       description = "Adversarial §10 reviewer. Reads only the handoff file."
+       model = "gpt-5.4"
+       model_reasoning_effort = "high"
+       sandbox_mode = "read-only"
+       developer_instructions = """
+       Read only the handoff file the user passes. No prior context.
+       Report findings under ## Standards Findings and ## Spec Findings.
+       Each finding one line: file:line: <severity>: <problem>. <fix>.
+       Severity is the literal word Blocker, Concern, or Note.
+       Do NOT synthesize an "approve" verdict.
+       """
+
+2. From a fresh Codex session, spawn it against the audit-trail file:
+
+     > spawn the fresh-context-reviewer agent. Read <audit-path>.
+
+The subagent loads only the handoff file, so it has no inherited context from this
+session. Requires Codex 2025+ (subagents shipped Dec 2025 per
+developers.openai.com/codex/subagents). NOTE: the [agents] block in
+~/.codex/config.toml is for global subagent settings (max_threads, max_depth)
+only — not for declaring individual subagents.
 ```
 
 Do not spawn the agent yourself — Codex skills cannot. Only the user's natural-language command can.
