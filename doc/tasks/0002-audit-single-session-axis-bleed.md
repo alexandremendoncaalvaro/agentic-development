@@ -3,7 +3,7 @@
 **Status:** `proposed`
 **Created:** `2026-05-24`
 **Owner:** `Alexandre Alvaro`
-**Spec ref:** ``
+**Spec ref:** `doc/specs/0002-two-axis-fresh-context-review.md`
 **Board ref:** ``
 
 ## Context
