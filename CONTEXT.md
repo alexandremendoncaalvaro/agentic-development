@@ -1,0 +1,100 @@
+# `@alexandrealvaro/agentic` — Domain Glossary
+
+_Lazy artifact — only contains terms that have been resolved through grilling, spec drafting, or explicit capture. Empty entries are worse than no entry; speculation belongs elsewhere._
+
+_Maintained by `/ad-domain`._
+
+## Language
+
+### Kit
+
+**Definition:** the `@alexandrealvaro/agentic` npm package — a CLI plus the source-of-truth `src/skills/` tree that installs the `ad-*` skill set (and bundled Claude Code subagents) into a target project's agent surface.
+
+_Avoid_: "framework" (the kit prescribes nothing at runtime; it just installs files); "tool" (overloaded with host primitives like `Read` / `Bash`); "CLI" (the CLI is `bin/agentic.js` — one part of the kit, not the whole).
+
+**Related code:** [`package.json`](package.json), [`bin/agentic.js`](bin/agentic.js), [`src/skills/`](src/skills/).
+
+### Profile
+
+**Definition:** a project-maturity tier (`poc` / `solo` / `team` / `mature`) declared in the install state file. Bounds which skills auto-install and which conditional rules apply. Tiers form a monotone superset chain — `poc ⊆ solo ⊆ team ⊆ mature`.
+
+_Avoid_: "mode" (mode is detected from filesystem signals: `audit | greenfield | brownfield` — orthogonal axis); "level" (overloaded with severity); "tier" (acceptable in prose but not as the canonical noun).
+
+**Related code:** [`src/lib/profiles.js`](src/lib/profiles.js), [`src/commands/profile.js`](src/commands/profile.js).
+
+### Workflow-operational skill
+
+**Definition:** a skill that **executes a process** rather than producing a persistent artifact. Examples: `ad-review` (runs a §10 review), `ad-commit` (drafts and writes a commit), `ad-handoff` (compacts a session), `ad-diagnose` (runs the §15 diagnosis loop), `ad-philosophy` (loads posture guardrails).
+
+_Avoid_: "command" (`/ad-review` is the *invocation*, not the skill); "behavior skill" (vague).
+
+**Related code:** [`doc/adr/0007-workflow-operational-skills.md`](doc/adr/0007-workflow-operational-skills.md), [`src/skills/claude-code/ad-review/`](src/skills/claude-code/ad-review/), [`src/skills/claude-code/ad-commit/`](src/skills/claude-code/ad-commit/).
+
+### Spec-driven skill
+
+**Definition:** a skill that **produces a persistent artifact** at a known path. Examples: `ad-spec` (writes `doc/specs/NNNN-<slug>.md`), `ad-task` (writes `doc/tasks/NNNN-<slug>.md`), `ad-adr` (writes `doc/adr/NNNN-<slug>.md`), `ad-architecture` (writes `ARCHITECTURE.md`), `ad-bootstrap` (writes `AGENTS.md`), `ad-domain` (writes `CONTEXT.md`).
+
+_Avoid_: "generator skill" (implies one-shot; spec-driven skills are lazy and reentrant); "artifact skill" (clumsy).
+
+**Related code:** [`doc/adr/0007-workflow-operational-skills.md`](doc/adr/0007-workflow-operational-skills.md), [`src/skills/claude-code/ad-spec/`](src/skills/claude-code/ad-spec/), [`src/skills/claude-code/ad-task/`](src/skills/claude-code/ad-task/).
+
+### Fresh-context review
+
+**Definition:** WORKFLOW §10 practice — a code review performed without inherited bias from the session that wrote the code. The reviewer reads only the assembled handoff (diff plus spec slice); no conversation history; no prior context. Implementation differs per host (see **Two-axis review**).
+
+_Avoid_: "clean-context review" (non-standard); "independent review" (ambiguous — could mean independent reviewer-as-human); "PR review" (PR is one scope of `ad-review`, not the practice).
+
+**Related code:** [`WORKFLOW.md`](WORKFLOW.md), [`doc/adr/0007-workflow-operational-skills.md`](doc/adr/0007-workflow-operational-skills.md), [`src/skills/claude-code/ad-review/`](src/skills/claude-code/ad-review/).
+
+### Two-axis review
+
+**Definition:** the kit's implementation of fresh-context review — splits the review into two independent axes so neither can mask the other:
+
+- **Standards axis** — does the diff conform to AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs? Bugs, coupling, edge cases, vocabulary drift.
+- **Spec axis** — does the diff match what the originating task / spec / PRD asked for? Missing requirements, scope creep, wrong implementation against quoted spec line.
+
+On Claude Code, the two axes run as parallel `Task` sub-agent calls with axis-bounded handoffs. On Codex, they run as a single-session pass with axis-separated output (Codex skills cannot programmatically spawn sub-agents — see ADR-0007 Addendum 2026-05-24). Each axis ends with its own verdict; no cross-axis re-ranking; no synthesized "approve".
+
+_Avoid_: "dual review" (ambiguous — could mean two reviewers of the same axis); "Standards/Spec split" (clumsy as a noun phrase); "split review" (unclear what's split).
+
+**Related code:** [`doc/specs/0002-two-axis-fresh-context-review.md`](doc/specs/0002-two-axis-fresh-context-review.md), [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md), [`src/skills/claude-code/ad-review/agents/fresh-context-reviewer.md`](src/skills/claude-code/ad-review/agents/fresh-context-reviewer.md).
+
+### Handoff
+
+**Definition:** a structured markdown file the kit writes to carry context from one session to another. The kit ships **two** disjoint handoff flavours that share the noun — see **Session handoff** and **Review handoff** for the disambiguated definitions. Bare "handoff" is ambiguous; in prose, always qualify.
+
+_Avoid_: using "handoff" without a qualifier (`session` / `review`) — the two flavours go to different paths and serve different purposes.
+
+**Related code:** see the two disambiguated entries.
+
+### Session handoff
+
+**Definition:** the markdown file `ad-handoff` writes to `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md`. Compacts the current agent session — live working-tree state, open artifacts, unresolved decisions, in-flight diff, recent errors, suggested next skills — so a fresh agent (post-`/clear`, agent switch, or context-window pressure) can pick the work up cold. References PRD / spec / task / ADR by path; never duplicates them. Redacts secrets before writing. Per-session OS-temp-dir ephemeral; never committed.
+
+_Avoid_: "context dump" (passive — `ad-handoff` curates, doesn't dump); "session export" (implies the agent state is portable; only the curated subset is); "handoff file" (acceptable in informal prose but not as the canonical noun).
+
+**Related code:** [`doc/specs/0001-session-handoff-skill.md`](doc/specs/0001-session-handoff-skill.md), [`src/skills/claude-code/ad-handoff/SKILL.md`](src/skills/claude-code/ad-handoff/SKILL.md), [`src/skills/codex/ad-handoff/SKILL.md`](src/skills/codex/ad-handoff/SKILL.md).
+
+### Review handoff
+
+**Definition:** the markdown file `ad-review` writes to `.agentic/reviews/<ISO>-<scope>{,-standards,-spec}.md`. Carries the diff plus the spec slice the fresh-context reviewer receives. Serves as the audit trail for the review — the user can replay the review against an updated diff or share it with a teammate. Ephemeral per-review artifact; `.agentic/reviews/` belongs in `.gitignore`. On Claude Code, two files (`-standards.md` + `-spec.md`) when two-axis runs; on Codex, one combined file (per ADR-0007 Addendum 2026-05-24).
+
+_Avoid_: "review snapshot" (snapshot implies frozen-in-time database state); "review log" (log implies append-only history); "review context" (too generic).
+
+**Related code:** [`doc/specs/0002-two-axis-fresh-context-review.md`](doc/specs/0002-two-axis-fresh-context-review.md), [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md), [`.agentic/reviews/`](.agentic/reviews/).
+
+## Relationships
+
+- A **Kit** install bounds itself by a single **Profile** per agent surface (`.claude/skills/` and `.agents/skills/` each carry their own profile state).
+- A **Profile** declares which **Workflow-operational skills** and **Spec-driven skills** install universally and which install conditionally.
+- A **Fresh-context review** is implemented as a **Two-axis review** on every kit-supported host; the implementation differs per host but the noun does not.
+- A **Two-axis review** produces one or more **Review handoffs** as its audit trail.
+- A **Session handoff** and a **Review handoff** are sibling flavours of **Handoff**; they share neither path nor lifecycle. Each is owned by exactly one skill (`ad-handoff` and `ad-review` respectively).
+
+## Flagged ambiguities
+
+- "**handoff**" was used in commit messages and skill bodies during the v0.17 cycle to mean both **Session handoff** (output of `ad-handoff`) and **Review handoff** (output of `ad-review`) — resolved by this glossary. Both flavours retain the unqualified noun in informal prose, but commits / SKILL.md / specs / ADRs must qualify going forward.
+
+- "**fresh-context review**" vs "**two-axis review**" — not synonyms. Fresh-context is the WORKFLOW §10 practice (the *what*); two-axis is the kit's implementation (the *how*). Other implementations of fresh-context review are conceivable (one-axis with rotating reviewers, n-axis split, etc.) — the kit ships the two-axis flavour today. Specs and ADRs that discuss the practice use "fresh-context"; those that discuss the implementation use "two-axis".
+
+- "**subagent**" — the Claude Code primitive (`.claude/agents/<name>.md`) is distinct from a Codex sub-agent role (`[agents]` block in `~/.codex/config.toml`). Both are *user-side* role declarations consumed by their host. The kit ships exactly one Claude Code subagent (`fresh-context-reviewer`) and zero Codex sub-agents (Codex sub-agents must be user-initiated per ADR-0007 Addendum 2026-05-24). When the host is ambiguous in prose, write "Claude Code subagent" or "Codex sub-agent" explicitly.
