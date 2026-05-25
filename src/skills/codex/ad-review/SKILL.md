@@ -35,6 +35,7 @@ The two-axis split is structural rigor — same reviewer, but findings must be c
 - Do NOT skip writing the audit-trail file at `.agentic/reviews/`. The file lets the user re-run the review later against an updated diff or share it with a teammate.
 - Do NOT begin Step 1 or any file I/O before printing the Step 0 announce line. The user must see the operational shape (one pass, one audit-trail file, axis-separated output) before the skill starts reading/writing — otherwise the agent silently drifts into work the user did not consent to.
 - Do NOT skip Step 7 when a Standards-axis finding touches a binding doc (AGENTS / ARCHITECTURE / GUIDELINES / CONTEXT / ADR). The escalation recommendation is the Option β gate per task 0002 Notes; omitting it lets a downgraded premise-critical finding ship silently.
+- Do NOT write the handoff if `git rev-list --count <range>` and the count of `### <sha>` entries in `## Spec slice — commit messages` disagree. The audit downstream depends on this invariant (task 0004 handoff-integrity gate).
 </anti-patterns>
 
 <background_information>
@@ -63,6 +64,8 @@ If no diff exists, stop and tell the user — there's nothing to review.
 
 Capture the diff command once: `git diff <range>` (use `...` three-dot for ref-vs-ref so the comparison is against the merge-base). Note the commit list with `git log <range> --format=%B`.
 
+**Handoff-integrity gate (task 0004).** Compute the commit count: `git rev-list --count <range>`. Bind it to `N`. The handoff header must include the literal line `Range: <range> (N commits)`. The `## Spec slice — commit messages` section must contain exactly `N` `### <sha> <subject>` entries. If your body has fewer, you mis-bounded the range — stop and re-scope. The single-session review signal is bounded above by handoff fidelity; a quiet count mismatch produces a silently-incomplete review (caught in the task 0002 Range C measurement when a 7-commit range shipped a handoff claiming "Three commits").
+
 Size guard: if `git diff <range> --stat` reports >50 files, ask the user to narrow scope before continuing — reviewing a giant diff in one pass loses signal.
 
 Step 2 — read Standards sources. Read what exists; do not fabricate references.
@@ -89,8 +92,7 @@ File body:
 ```
 === AGENTIC-REVIEW HANDOFF (single-session, two-axis) ===
 
-Range:   <git diff <range>>
-Commits: <git log <range> --format=%h\ %s>
+Range: <range-spec> (N commits)        # N = git rev-list --count <range-spec>; assert MUST equal the count of ### entries below
 
 --- DIFF ---
 <git diff output>
@@ -99,16 +101,24 @@ Commits: <git log <range> --format=%h\ %s>
 <AGENTS.md, ARCHITECTURE.md, GUIDELINES.md, CONTEXT.md / CONTEXT-MAP.md,
 applicable accepted ADRs, CONTRIBUTING.md>
 
+--- SPEC slice — commit messages ---
+### <sha1> <subject1>
+<body1>
+### <sha2> <subject2>
+<body2>
+... (exactly N entries)
+
 --- SPEC SOURCES ---
 <task file Acceptance Criteria + Plan, originating spec, parent PRD,
-recent commit messages, originating issue body if fetched — or
-"no spec source provided">
+originating issue body if fetched — or "no spec source provided">
 
 --- TOOLING NOTE ---
 <list of machine-enforced configs found — skip what they already check>
 
 === END HANDOFF ===
 ```
+
+After write, print `wc -l <path>` alongside the path so the user has a sanity-check value. Verify the handoff-integrity gate from Step 1 still holds: the commit-message section has exactly `N` `### <sha>` entries.
 
 Advise the user to add `.agentic/reviews/` to `.gitignore` if it isn't already — handoffs are ephemeral audit artifacts, not committed history.
 

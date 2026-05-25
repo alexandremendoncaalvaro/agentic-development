@@ -23,6 +23,8 @@ When the host exposes `AskUserQuestion`, use it at Step 0 to confirm the review 
 
 Capture the diff command once: `git diff <range>` (use `...` three-dot for ref-vs-ref so the comparison is against the merge-base). Note the commit list with `git log <range> --format=%B`.
 
+**Handoff-integrity gate (task 0004).** Compute the commit count: `git rev-list --count <range>`. Bind it to `N`. The handoff header must include the literal line `Range: <range> (N commits)`. The `## Spec slice — commit messages` section must contain exactly `N` `### <sha> <subject>` entries. If your body has fewer, you mis-bounded the range — stop and re-scope. The subagent's review signal is bounded above by handoff fidelity; a quiet count mismatch produces silently-incomplete reviews (caught in the task 0002 Range C measurement when a 7-commit range shipped a handoff claiming "Three commits").
+
 ## Step 1 — Identify Standards sources
 
 Anything in the repo that documents how code should be written. Read what exists; do not fabricate references.
@@ -104,6 +106,8 @@ If Step 2 found no spec, write the Spec handoff as a single block: `no spec sour
 ## Step 4 — Persist both handoffs to disk
 
 Write both files to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-{standards,spec}.md` at the repo root. Create the directory if it does not exist. The `<scope-slug>` encodes the review target (`branch-vs-main`, `pr-42`, `commit-abc1234`, `working-tree`).
+
+After write, print `wc -l <path>` alongside each handoff path so the user has a sanity-check value. Verify the handoff-integrity gate from Step 0 still holds: the commit-message section must have exactly `N` `### <sha>` entries where `N = git rev-list --count <range>`. If it doesn't, do not dispatch — re-scope and rebuild.
 
 Advise the user to add `.agentic/reviews/` to their `.gitignore` if it is not already — handoffs are ephemeral per-review artifacts, not committed history.
 
