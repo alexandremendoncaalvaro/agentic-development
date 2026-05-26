@@ -34,8 +34,8 @@ The two-axis split is structural rigor — same reviewer, but findings must be c
 - Do NOT produce an "approve" verdict. WORKFLOW §10 frames the review as adversarial; approval is the senior engineer's call after weighing both axes.
 - Do NOT skip writing the audit-trail file at `.agentic/reviews/`. The file lets the user re-run the review later against an updated diff or share it with a teammate.
 - Do NOT begin Step 1 or any file I/O before printing the Step 0 announce line. The user must see the operational shape (one pass, one audit-trail file, axis-separated output) before the skill starts reading/writing — otherwise the agent silently drifts into work the user did not consent to.
-- Do NOT skip Step 7 when a Standards-axis finding touches a binding doc (AGENTS / ARCHITECTURE / GUIDELINES / CONTEXT / ADR). The escalation recommendation is the Option β gate per task 0002 Notes; omitting it lets a downgraded premise-critical finding ship silently.
-- Do NOT write the handoff if `git rev-list --count <range>` and the count of `### <sha>` entries in `## Spec slice — commit messages` disagree. The audit downstream depends on this invariant (task 0004 handoff-integrity gate).
+- Do NOT skip Step 7 when a Standards-axis finding touches a binding doc (AGENTS / ARCHITECTURE / GUIDELINES / CONTEXT / ADR). Omitting the escalation recommendation lets a downgraded premise-critical finding ship silently.
+- Do NOT write the handoff if `git rev-list --count <range>` and the count of `### <sha>` entries in `## Spec slice — commit messages` disagree. Downstream review fidelity depends on this invariant.
 </anti-patterns>
 
 <background_information>
@@ -52,7 +52,7 @@ Step 0 — announce. Print the shape so the user sees it before any work:
 ```
 Running ad-review (Codex single-pass two-axis). I will read the diff and binding context, write an audit trail to .agentic/reviews/, then report findings under ## Standards Findings and ## Spec Findings in this session.
 
-NOTE on §10 fidelity: a single-session reviewer with both axes loaded can rationalize across them (axis-bleed, measured at N=3 in task 0002). If any Standards finding I produce touches a binding doc (AGENTS / ARCHITECTURE / GUIDELINES / CONTEXT / ADR), I will recommend the user-initiated subagent escalation at Step 7 so you can re-run that finding under fresh context. The escalation TOML schema is at the bottom of this skill.
+NOTE on §10 fidelity: a single-session reviewer with both axes loaded can rationalize across them (axis-bleed). If any Standards finding I produce touches a binding doc (AGENTS / ARCHITECTURE / GUIDELINES / CONTEXT / ADR), I will recommend the user-initiated subagent escalation at Step 7 so you can re-run that finding under fresh context. The escalation TOML schema is at the bottom of this skill.
 ```
 
 Step 1 — scope the review. Confirm what to review. Default scopes, in priority order:
@@ -64,7 +64,7 @@ If no diff exists, stop and tell the user — there's nothing to review.
 
 Capture the diff command once: `git diff <range>` (use `...` three-dot for ref-vs-ref so the comparison is against the merge-base). Note the commit list with `git log <range> --format=%B`.
 
-**Handoff-integrity gate (task 0004).** Compute the commit count: `git rev-list --count <range>`. Bind it to `N`. The handoff header must include the literal line `Range: <range> (N commits)`. The `## Spec slice — commit messages` section must contain exactly `N` `### <sha> <subject>` entries. If your body has fewer, you mis-bounded the range — stop and re-scope. The single-session review signal is bounded above by handoff fidelity; a quiet count mismatch produces a silently-incomplete review (caught in the task 0002 Range C measurement when a 7-commit range shipped a handoff claiming "Three commits").
+**Handoff-integrity gate.** Compute the commit count: `git rev-list --count <range>`. Bind it to `N`. The handoff header must include the literal line `Range: <range> (N commits)`. The `## Spec slice — commit messages` section must contain exactly `N` `### <sha> <subject>` entries. If your body has fewer, you mis-bounded the range — stop and re-scope. The single-session review signal is bounded above by handoff fidelity; a quiet count mismatch produces a silently-incomplete review.
 
 Size guard: if `git diff <range> --stat` reports >50 files, ask the user to narrow scope before continuing — reviewing a giant diff in one pass loses signal.
 
@@ -183,12 +183,12 @@ Step 7 — recommend escalation when binding-doc findings exist. Scan the Step 6
 If at least one such finding exists, print verbatim:
 
 ```
-Binding-doc finding(s) detected on the Standards axis. The single-session reviewer can downgrade premise-critical findings on these files (axis-bleed, measured at N=3 in task 0002 — Range B downgraded two Standards Blockers to Concern/Note). Recommend re-running each binding-doc finding under fresh context via the Optional Escalation block at the bottom of this skill before merging.
+Binding-doc finding(s) detected on the Standards axis. The single-session reviewer can downgrade premise-critical findings on these files (axis-bleed). Recommend re-running each binding-doc finding under fresh context via the Optional Escalation block at the bottom of this skill before merging.
 ```
 
 If no Standards finding touches a binding doc, Step 7 is silent — emit nothing.
 
-This step is the Option β escalation gate per task 0003 (doc/tasks/0003-codex-ad-review-option-beta-escalation-gate.md) and the decision recorded in task 0002 Notes.
+This step is the Option β escalation gate. The decision and the N=3 axis-bleed audit it rests on are recorded in git history (archived tasks 0002 and 0003 — recover via `git log --diff-filter=D -- doc/tasks/`).
 
 **Optional escalation — true fresh-context review via subagent (user-initiated only).**
 If the user wants the §10 ideal (a reviewer with no inherited bias), tell them after Step 6 / Step 7:
