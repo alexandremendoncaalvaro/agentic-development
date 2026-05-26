@@ -171,11 +171,11 @@
       "files": [
         {
           "path": ".claude/agents/fresh-context-reviewer.md",
-          "sourceSha": "5d2308263035517976a5065ca5ba84c626fd061cb0a3c796fa84c9ba8f780f85"
+          "sourceSha": "f594c733941ce163d1799eb2a5c2b1264880e8a6f53b9eac93fb3e3a6e7dc0b1"
         },
         {
           "path": ".claude/skills/ad-review/SKILL.md",
-          "sourceSha": "e3fc227709ee41e6d3b4009a2d379e8a46c86e5b1a45acc15365d6b7a033267b"
+          "sourceSha": "450e3cd167e920a70d0747253ca85bec7b875c4874ddfc18d48e792477a86c9f"
         }
       ]
     },

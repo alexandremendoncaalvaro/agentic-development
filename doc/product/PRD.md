@@ -88,11 +88,11 @@ Deferred decisions. Each becomes a future ADR, a spec-time decision, or an expli
 - **Telemetry policy when going hosted.** If a hosted variant ships, opt-in telemetry vs strict offline. Decision deferred until a hosted variant is on the roadmap (not currently).
 - **How to measure "kit landed correctly" without telemetry.** Indirect signals (test green at install, audit clean) cover *correctness*; do not cover *fit*. Survey or community-channel signal is the open question.
 - **Whether `doc/specs/` becomes a universal artifact for the kit itself**, or work continues to be tracked exclusively as `doc/tasks/` per the existing pattern. The kit currently does not have a single feature spec — only tasks.
-  - **Resolution (2026-05-24):** `doc/specs/` is universal for the kit going forward. Backfilled `0001-session-handoff-skill.md` (Status: shipped) and `0002-two-axis-fresh-context-review.md` (Status: shipped) on 2026-05-24 to close the gap retroactively for the ad-handoff and two-axis ad-review features. Future feature-level work on the kit lands a spec under `doc/specs/` before tasks decompose against it, per the `team` profile expectation. Tasks continue to carry `Spec ref` to their parent spec.
+  - **Resolution:** `doc/specs/` is universal for the kit going forward. Two backfilled specs (ad-handoff and two-axis ad-review) shipped and were swept into git history per `/ad-archive`; consult `git log --diff-filter=D -- doc/specs/` for the archived ledger. Future feature-level work on the kit lands a spec under `doc/specs/` before tasks decompose against it, per the `team` profile expectation. Tasks carry `Spec ref` to their parent spec.
 
 ## Related
 
 - **ADRs:** see [`doc/adr/`](../adr/) for the canonical ledger.
-- **Specs:** [`doc/specs/0001-session-handoff-skill.md`](../specs/0001-session-handoff-skill.md) (shipped), [`doc/specs/0002-two-axis-fresh-context-review.md`](../specs/0002-two-axis-fresh-context-review.md) (shipped). See [`doc/specs/`](../specs/) for the canonical ledger.
+- **Specs:** see [`doc/specs/`](../specs/) for live specs. Shipped specs archived per `/ad-archive`; recover via `git log --diff-filter=D -- doc/specs/`.
 - **Tasks:** see [`doc/tasks/`](../tasks/) for the canonical ledger.
 - **Supersedes:** none.

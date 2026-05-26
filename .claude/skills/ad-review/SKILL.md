@@ -23,7 +23,7 @@ When the host exposes `AskUserQuestion`, use it at Step 0 to confirm the review 
 
 Capture the diff command once: `git diff <range>` (use `...` three-dot for ref-vs-ref so the comparison is against the merge-base). Note the commit list with `git log <range> --format=%B`.
 
-**Handoff-integrity gate (task 0004).** Compute the commit count: `git rev-list --count <range>`. Bind it to `N`. The handoff header must include the literal line `Range: <range> (N commits)`. The `## Spec slice — commit messages` section must contain exactly `N` `### <sha> <subject>` entries. If your body has fewer, you mis-bounded the range — stop and re-scope. The subagent's review signal is bounded above by handoff fidelity; a quiet count mismatch produces silently-incomplete reviews (caught in the task 0002 Range C measurement when a 7-commit range shipped a handoff claiming "Three commits").
+**Handoff-integrity gate.** Compute the commit count: `git rev-list --count <range>`. Bind it to `N`. The handoff header must include the literal line `Range: <range> (N commits)`. The `## Spec slice — commit messages` section must contain exactly `N` `### <sha> <subject>` entries. If your body has fewer, you mis-bounded the range — stop and re-scope. The subagent's review signal is bounded above by handoff fidelity; a quiet count mismatch produces silently-incomplete reviews.
 
 ## Step 1 — Identify Standards sources
 

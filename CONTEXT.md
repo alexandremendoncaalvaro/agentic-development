@@ -57,7 +57,7 @@ On Claude Code, the two axes run as parallel `Task` sub-agent calls with axis-bo
 
 _Avoid_: "dual review" (ambiguous — could mean two reviewers of the same axis); "Standards/Spec split" (clumsy as a noun phrase); "split review" (unclear what's split).
 
-**Related code:** [`doc/specs/0002-two-axis-fresh-context-review.md`](doc/specs/0002-two-axis-fresh-context-review.md), [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md), [`src/skills/claude-code/ad-review/agents/fresh-context-reviewer.md`](src/skills/claude-code/ad-review/agents/fresh-context-reviewer.md).
+**Related code:** [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md), [`src/skills/claude-code/ad-review/agents/fresh-context-reviewer.md`](src/skills/claude-code/ad-review/agents/fresh-context-reviewer.md).
 
 ### Handoff
 
@@ -73,7 +73,7 @@ _Avoid_: using "handoff" without a qualifier (`session` / `review`) — the two 
 
 _Avoid_: "context dump" (passive — `ad-handoff` curates, doesn't dump); "session export" (implies the agent state is portable; only the curated subset is); "handoff file" (acceptable in informal prose but not as the canonical noun).
 
-**Related code:** [`doc/specs/0001-session-handoff-skill.md`](doc/specs/0001-session-handoff-skill.md), [`src/skills/claude-code/ad-handoff/SKILL.md`](src/skills/claude-code/ad-handoff/SKILL.md), [`src/skills/codex/ad-handoff/SKILL.md`](src/skills/codex/ad-handoff/SKILL.md).
+**Related code:** [`src/skills/claude-code/ad-handoff/SKILL.md`](src/skills/claude-code/ad-handoff/SKILL.md), [`src/skills/codex/ad-handoff/SKILL.md`](src/skills/codex/ad-handoff/SKILL.md).
 
 ### Review handoff
 
@@ -81,7 +81,7 @@ _Avoid_: "context dump" (passive — `ad-handoff` curates, doesn't dump); "sessi
 
 _Avoid_: "review snapshot" (snapshot implies frozen-in-time database state); "review log" (log implies append-only history); "review context" (too generic).
 
-**Related code:** [`doc/specs/0002-two-axis-fresh-context-review.md`](doc/specs/0002-two-axis-fresh-context-review.md), [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md), [`.agentic/reviews/`](.agentic/reviews/).
+**Related code:** [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md), [`.agentic/reviews/`](.agentic/reviews/).
 
 ## Relationships
 
