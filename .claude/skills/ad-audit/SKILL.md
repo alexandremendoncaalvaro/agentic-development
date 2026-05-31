@@ -48,10 +48,10 @@ Structural integrity only — does **not** deep-audit spec text against shipped 
 
 ### Documentation discipline drift (`WORKFLOW.md` §2 / ADR-0008)
 
-Audit narrative documents — `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, any prose page under `doc/` that is not a decision-record artifact under `doc/adr/` or `doc/tasks/`:
+Audit narrative documents — `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, and prose pages under `doc/` that are not lifecycle-managed artifacts under `doc/product/`, `doc/specs/`, `doc/adr/`, or `doc/tasks/`:
 
 * Emoji — any present? Rule 3 forbids emoji anywhere (docs, code, comments, commits, skill outputs).
-* Dates / version stamps / `DRAFT` markers / changelog blocks in narrative documents — Rule 2 forbids these. Decision-record artifacts under `doc/adr/` and `doc/tasks/` are exempt.
+* Dates / version stamps / `DRAFT` markers / changelog blocks in narrative documents — Rule 2 forbids these. Lifecycle-managed artifacts under `doc/product/`, `doc/specs/`, `doc/adr/`, and `doc/tasks/` are exempt.
 * Business context first — does the first paragraph answer *why* the document exists, before *what* and *how*? Rule 4.
 * Scope duplication — does the document copy material that is canonically owned by another file (`AGENTS.md` repeating `ARCHITECTURE.md` patterns; `README.md` re-stating ADR rationale)? Rule 5 requires linking, not copying.
 * Speculation — phrases like "we might", "in the future", "could be added", or roadmaps without an ADR / task reference. Rule 1 forbids unfounded plans.

@@ -55,6 +55,14 @@ Status starts at `draft`. Created: today, ISO format. Updated: today, ISO format
 
 Ask **one question at a time**, in this order. Skip questions whose answers are already obvious from the Step 1 scan; surface what the scan found and ask only for confirmation.
 
+If the product framing is vague ("improve efficiency", "build a dashboard", "use AI", "make it easier"), run a short sharpening pass before filling the PRD fields. Keep these as facilitation notes, not PRD sections:
+
+- **Today statement.** "Today, `<target user>` must `<painful workflow>` when `<trigger>`. They need a way to `<unmet need>`."
+- **How Might We.** Reframe the problem broad enough to allow multiple solutions, narrow enough to exclude generic improvement.
+- **North Star.** "Deploy `<what>` to change `<metric 1>` and `<metric 2>` so that `<ultimate outcome>`." Require baseline, target, and measurement source when available.
+
+If the user starts with a solution, validate it against the Today statement and North Star before accepting it into Roadmap. If it serves a different user, fails to move the named metrics, or prescribes implementation before the problem is clear, route back to `/ad-grill`.
+
 - **Product.** Name and one-sentence positioning. *"X is a Y that does Z for W."*
 - **Target User.** Specific role / persona, not "developers" or "users". Cite the primary success-bearing user; secondary users go under Personas if they affect the product shape.
 - **Problem.** What the target user can't do today, or does badly today. The cost of the status quo. *"What breaks if this product does not exist?"*

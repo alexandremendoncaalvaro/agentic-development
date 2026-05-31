@@ -38,9 +38,9 @@ Spec drift (if `doc/specs/` exists; structural integrity only — does NOT deep-
 - No checkbox UI — per ADR-0030 §1, Spec is decision-record (not tracking). Functional Requirements / Non-functional Requirements / Success Criteria must use plain bullets, not `- [ ]` checkboxes; implementation tracking lives in per-Spec tasks.
 - Status / task aggregate alignment — when every task referencing a spec is done, the spec's Status should be `shipped`. A spec with all tasks done but Status: accepted is drift between work-unit completion and feature-level claim.
 
-Documentation discipline drift (`WORKFLOW.md` §2 / ADR-0008). Audit narrative documents — `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, any prose page under `doc/` that is not a decision-record artifact under `doc/adr/` or `doc/tasks/`:
+Documentation discipline drift (`WORKFLOW.md` §2 / ADR-0008). Audit narrative documents — `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, and prose pages under `doc/` that are not lifecycle-managed artifacts under `doc/product/`, `doc/specs/`, `doc/adr/`, or `doc/tasks/`:
 - Emoji — any present? Rule 3 forbids emoji anywhere (docs, code, comments, commits, skill outputs).
-- Dates / version stamps / `DRAFT` markers / changelog blocks in narrative documents — Rule 2 forbids these. Decision-record artifacts under `doc/adr/` and `doc/tasks/` are exempt.
+- Dates / version stamps / `DRAFT` markers / changelog blocks in narrative documents — Rule 2 forbids these. Lifecycle-managed artifacts under `doc/product/`, `doc/specs/`, `doc/adr/`, and `doc/tasks/` are exempt.
 - Business context first — does the first paragraph answer *why* the document exists, before *what* and *how*? Rule 4.
 - Scope duplication — does the document copy material that is canonically owned by another file? Rule 5 requires linking, not copying.
 - Speculation — phrases like "we might", "in the future", "could be added", or roadmaps without an ADR / task reference. Rule 1 forbids unfounded plans.

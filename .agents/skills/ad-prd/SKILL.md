@@ -37,9 +37,17 @@ Only after the scan produces no answer does the skill ask the user. Asking the u
 
 Step 2 — determine slug and target file. Single product (default): `doc/product/PRD.md`. Multi-product: ask whether this is a multi-product repo; if yes, file path is `doc/product/<product-slug>.md` and a `doc/product/PRODUCT-MAP.md` index lists each product. Slug: kebab-case, ≤4 words, derived from the product name.
 
-Status starts at `draft`. Created: today, ISO format. Owner: ask once — defaults to the repo's primary committer (from `git config user.name`) if unset.
+Status starts at `draft`. Created: today, ISO format. Updated: today, ISO format. Owner: ask once — defaults to the repo's primary committer (from `git config user.name`) if unset.
 
 Step 3 — interview to fill. Ask one question at a time, in this order. Skip questions whose answers are already obvious from the Step 1 scan; surface what the scan found and ask only for confirmation.
+
+If the product framing is vague ("improve efficiency", "build a dashboard", "use AI", "make it easier"), run a short sharpening pass before filling the PRD fields. Keep these as facilitation notes, not PRD sections:
+
+- Today statement. "Today, `<target user>` must `<painful workflow>` when `<trigger>`. They need a way to `<unmet need>`."
+- How Might We. Reframe the problem broad enough to allow multiple solutions, narrow enough to exclude generic improvement.
+- North Star. "Deploy `<what>` to change `<metric 1>` and `<metric 2>` so that `<ultimate outcome>`." Require baseline, target, and measurement source when available.
+
+If the user starts with a solution, validate it against the Today statement and North Star before accepting it into Roadmap. If it serves a different user, fails to move the named metrics, or prescribes implementation before the problem is clear, route back to `ad-grill`.
 
 - Product. Name and one-sentence positioning. *"X is a Y that does Z for W."*
 - Target User. Specific role / persona, not "developers" or "users". Cite the primary success-bearing user; secondary users go under Personas if they affect the product shape.
@@ -68,7 +76,7 @@ Step 6 — editing guidance for later turns. When the user later works on the PR
 - Add Roadmap lines as the product grows; mark superseded roadmap items with a strikethrough and a one-line note, do not delete them.
 - Add Related → Specs entries as `ad-spec` runs reference this PRD.
 
-Never rewrite existing prose — append rationale to Open Questions as a resolution paragraph rather than mutating the original requirement text. Append-only Notes discipline.
+Never rewrite existing prose — append rationale to Open Questions as a resolution paragraph rather than mutating the original requirement text. Open Questions is the append-only resolution surface.
 </instructions>
 
 <output_contract>
