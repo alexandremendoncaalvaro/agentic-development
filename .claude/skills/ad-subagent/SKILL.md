@@ -1,7 +1,7 @@
 ---
 name: ad-subagent
-description: Draft a new Claude Code subagent at .claude/agents/<name>.md, using the official subagents format. Use when the user wants to create, write, draft, or scaffold a custom Claude Code subagent for delegated work (fresh-context reviewer, codebase researcher, diff auditor, etc.). Asks one question per missing field; never invents roles or tool sets. Claude Code only — Codex has no subagent primitive.
-summary: Draft a new Claude Code subagent at `.claude/agents/<name>.md`.
+description: Draft a new Claude Code subagent at .claude/agents/<name>.md, using the official subagents format. Use when the user wants to create, write, draft, or scaffold a custom Claude Code subagent for delegated work (fresh-context reviewer, codebase researcher, docs researcher, test designer, bug reproducer, bounded implementation worker). Asks one question per missing field; never invents roles or tool sets.
+summary: Draft a host-specific custom subagent for bounded delegated work — Claude Code `.claude/agents/<name>.md`, Codex `.codex/agents/<name>.toml`.
 allowed-tools: Read, Write, Glob, Bash
 ---
 
@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Glob, Bash
 
 Drafts `.claude/agents/<name>.md` (project) or `~/.claude/agents/<name>.md` (personal). Spec: [code.claude.com/docs/en/sub-agents](https://code.claude.com/docs/en/sub-agents).
 
-The body becomes the subagent's full system prompt. The subagent does **not** inherit `AGENTS.md` / `CLAUDE.md` from the parent — restate any convention it must follow.
+The body becomes the subagent's role prompt. A named subagent starts with fresh conversation context and its own tools/model settings; do not rely on parent-session memory. Restate task-specific constraints and cite any project files it must follow.
 
 ## Step 1 — Confirm target
 
@@ -27,8 +27,14 @@ Common pre-baked shapes (from `prompts/subagent.md`):
 | Fresh-context reviewer | `Read, Glob, Grep, Bash` | `sonnet` | Matches WORKFLOW §10. No write tools. |
 | Codebase researcher | use built-in `Explore` | inherit | Don't build custom unless you need different tools. |
 | Diff-only auditor | `Read, Bash` | `sonnet` | Pair with `permissionMode: dontAsk` for read-only runs. |
+| Docs researcher | `Read, WebFetch` or docs MCP | inherit | Confirms versioned APIs; returns citations only. |
+| Test designer | `Read, Glob, Grep` | inherit | Proposes public-interface tests from spec/task; no production edits. |
+| Bug reproducer | `Read, Bash, Write` | inherit | Builds the smallest failing loop, then stops before broad fixes. |
+| Bounded worker | scoped write tools | inherit | Owns a disjoint file/module set; returns changed paths + verification. |
 
 Built-in subagents (`Explore`, `Plan`, `general-purpose`) cover most cases. Build custom only when you need a specific role, scoped tools, persistent memory, or a different model.
+
+Delegation-fit gate: build a custom subagent only when the role repeats, the work is self-contained, the output can be summarized or bounded to a disjoint patch, or the role needs tool/model/sandbox restrictions. Keep frequent back-and-forth, tightly coupled implementation, and the immediate blocking step in the main conversation.
 
 ## Step 3 — Interview to fill
 
@@ -47,7 +53,7 @@ Ask one question per missing field, in this order:
 
 Path: `.claude/agents/<name>.md` (project, committed) or `~/.claude/agents/<name>.md` (personal). Frontmatter uses the Claude Code subagents shape (see code.claude.com/docs/en/sub-agents) — declare only the fields the subagent actually uses.
 
-Body = the system prompt. Every line costs tokens on every subagent turn. Be terse. State role, scope, output format, stop criterion, and what NOT to do. Restate any convention from `AGENTS.md` the subagent must follow (it does not read `AGENTS.md`).
+Body = the role prompt. Every line costs tokens on every subagent turn. Be terse. State role, scope, output format, stop criterion, and what NOT to do. Restate task-specific constraints and point to project files for load-bearing conventions.
 
 Edits to subagent files on disk require a session restart to take effect; agents created via Claude Code's `/agents` UI take effect immediately.
 

@@ -72,13 +72,26 @@ for (const agent of ['claude-code', 'codex']) {
     if (!existsSync(manifestPath)) continue;
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
     for (const subagentRel of manifest.subagents || []) {
-      test(`skill ${agent}/${name}: manifest subagent ${subagentRel} frontmatter parses with required fields`, () => {
-        const fm = parseFrontmatter(join(dir, subagentRel));
-        assert.equal(typeof fm.name, 'string', 'subagent name must be a string');
-        assert.equal(typeof fm.description, 'string', 'subagent description must be a string');
-        assert.ok(fm.description.length > 0, 'subagent description must not be empty');
-        assert.equal(typeof fm.tools, 'string', 'subagent tools must be a string (comma-separated)');
-        assert.equal(typeof fm.model, 'string', 'subagent model must be a string');
+      test(`skill ${agent}/${name}: manifest subagent ${subagentRel} parses with required fields`, () => {
+        const subagentPath = join(dir, subagentRel);
+        if (agent === 'claude-code') {
+          const fm = parseFrontmatter(subagentPath);
+          assert.equal(typeof fm.name, 'string', 'subagent name must be a string');
+          assert.equal(typeof fm.description, 'string', 'subagent description must be a string');
+          assert.ok(fm.description.length > 0, 'subagent description must not be empty');
+          assert.equal(typeof fm.tools, 'string', 'subagent tools must be a string (comma-separated)');
+          assert.equal(typeof fm.model, 'string', 'subagent model must be a string');
+          return;
+        }
+
+        const text = readFileSync(subagentPath, 'utf8');
+        assert.match(text, /^name = ".+"/m, 'Codex subagent must declare name');
+        assert.match(text, /^description = ".+"/m, 'Codex subagent must declare description');
+        assert.match(
+          text,
+          /^developer_instructions = """[\s\S]+"""$/m,
+          'Codex subagent must declare developer_instructions'
+        );
       });
     }
   }

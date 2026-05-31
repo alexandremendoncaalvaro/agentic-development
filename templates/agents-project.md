@@ -54,8 +54,8 @@ Binding decisions live in [`doc/adr/`](doc/adr/). Do not reinvent.
 ## Repository Layout
 
 `<where logic, tests, docs, infra live — only if not obvious from the tree>`
-`<.claude/skills/ — list of available skills, if any>`
-`<.claude/agents/ — list of custom subagents, if any>`
+`<.claude/skills/ or .agents/skills/ — list of available skills, if any>`
+`<.claude/agents/ or .codex/agents/ — list of custom subagents, if any>`
 `<doc/adr/ — list of binding ADRs, if any>`
 `<doc/tasks/ — task tracking convention, if used>`
 

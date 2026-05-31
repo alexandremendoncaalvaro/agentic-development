@@ -368,7 +368,7 @@ test('installSkills: claude-code ad-review → SKILL.md + subagent at .claude/ag
   }
 });
 
-test('installSkills: codex ad-review → SKILL.md + openai.yaml, no subagent (Codex has no agentsDir)', async () => {
+test('installSkills: codex ad-review → SKILL.md + openai.yaml + bundled subagent', async () => {
   const dir = mkScratch();
   try {
     const { actions } = await installSkills({
@@ -380,7 +380,9 @@ test('installSkills: codex ad-review → SKILL.md + openai.yaml, no subagent (Co
     assert.deepEqual(paths, [
       '.agents/skills/ad-review/SKILL.md',
       '.agents/skills/ad-review/agents/openai.yaml',
+      '.codex/agents/fresh-context-reviewer.toml',
     ]);
+    assert.ok(existsSync(join(dir, '.codex/agents/fresh-context-reviewer.toml')));
     assert.ok(!existsSync(join(dir, '.claude')));
   } finally {
     rmSync(dir, { recursive: true, force: true });

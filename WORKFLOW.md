@@ -56,7 +56,7 @@ The six layers scale with project maturity (TL;DR #20 — Discipline scales). A 
 
 ### New product inception order
 
-A new product starts with a thin activation bootstrap, then product discovery. The activation bootstrap exists only to load the operating surface: session rules, repeatable skills, and the smallest project context needed for the agent to follow the workflow. It does not decide architecture, decompose the repo, or generate technical plans for a product that is not yet understood.
+A new product starts with tool activation, then product discovery. Tool activation means `agentic init`: install the skills and the minimum operating surface so the agent can follow the workflow. It does not mean `/ad-bootstrap` yet. `AGENTS.md` is the agent's operational guide; it should be generated after enough product context exists to avoid inventing architecture or project rules from a weak business brief.
 
 The substantive order is:
 
@@ -141,6 +141,8 @@ For non-trivial changes, four phases:
 3. **Implement.** Execute the approved plan; verify each step before moving to the next.
 4. **Commit.** One logical change per commit.
 
+**Delegation with bounded context.** Delegate to a subagent only when the context packet can stand alone: goal, relevant sources, allowed tools and write scope, output contract, and stop criterion. Good delegation shapes are sidecar codebase research, versioned docs/API research, test design from a spec, bug reproduction with a feedback loop, a bounded worker on disjoint files, and fresh-context review. Keep product judgment, frequent back-and-forth, tightly coupled implementation, taste/design calls, and the immediate blocking step in the main session. In task files, **AFK** marks candidate work for explicit agent delegation; **HITL** marks work that needs human or main-session judgment. Use `/ad-handoff` when the packet is larger than one clean chat turn.
+
 Skip this for diffs you can describe in one sentence.
 
 ## 7. Action Commands With Stop Criteria
@@ -196,7 +198,7 @@ The agent that wrote the code is biased about it. The same reasoning that produc
 
 > *"Open a fresh agent with no history. Give it only the diff and the spec. Review as a strict Senior reviewing a Junior PR. Be ruthless about bugs, coupling, edge cases."*
 
-In Claude Code, this means a subagent (the `Task` tool, or a custom `.claude/agents/*.md` file). Without that infrastructure: `/clear`, new context, paste diff plus spec.
+In Claude Code, this means a subagent (the `Task` tool, or a custom `.claude/agents/*.md` file). In Codex, use an explicit subagent workflow with a custom `.codex/agents/*.toml` file and a handoff/audit file as the bounded input. Without subagent infrastructure: fresh context, paste diff plus spec, and keep the review separate from the authoring session.
 
 ## 11. Quality Gates: Determinism Over Persuasion
 
@@ -360,6 +362,8 @@ External claims (specific percentages, named frameworks) are cited under Sources
 
 **§6 — Explore → Plan → Implement → Commit**
 - *The Pragmatic Programmer* (Hunt & Thomas, 1999), tracer-bullet metaphor — source for the vertical-slicing principle.
+- Claude Code subagents: https://code.claude.com/docs/en/sub-agents — source for fresh-context, scoped-tool delegation in Claude Code.
+- Codex subagents: https://developers.openai.com/codex/subagents — source for explicit Codex subagent workflows and `.codex/agents/*.toml` custom agents.
 
 **§8 — Architectural Boundaries**
 - *A Philosophy of Software Design* (Ousterhout, 2018) — Module / Interface / Depth vocabulary; rejected framing of depth-as-line-ratio.
