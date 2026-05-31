@@ -76,9 +76,9 @@ export const CONDITIONAL_SKILLS = [
   {
     name: 'ad-subagent',
     autoIf: () => true,
-    agents: ['claude-code'],
-    hintWhenAuto: 'Claude Code only',
-    hintWhenManual: 'Claude Code only',
+    agents: ['claude-code', 'codex'],
+    hintWhenAuto: 'subagent scaffolder',
+    hintWhenManual: 'subagent scaffolder',
   },
   {
     name: 'ad-skill',
@@ -382,9 +382,7 @@ export async function initCommand(opts) {
       '/ad-merge (evaluate + merge PR)',
       '/ad-handoff (compact session → $TMPDIR/agentic-handoffs/)',
       ...(optedSkills.includes('ad-design') ? ['/ad-design (DESIGN.md)'] : []),
-      ...(optedSkills.includes('ad-subagent') && agents.includes('claude-code')
-        ? ['/ad-subagent']
-        : []),
+      ...(optedSkills.includes('ad-subagent') ? ['/ad-subagent'] : []),
       ...(optedSkills.includes('ad-skill') ? ['/ad-skill'] : []),
       ...(optedSkills.includes('ad-hooks') ? ['/ad-hooks (WORKFLOW §11)'] : []),
     ]

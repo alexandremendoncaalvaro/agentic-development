@@ -3,12 +3,12 @@ name: ad-review
 description: |
   Run this skill when the user explicitly invokes `/ad-review` or names it ("run ad-review", "use the ad-review skill"), or when the user asks for a code review with an explicit scope ("review this branch", "review main..HEAD", "revisa esse diff <range>"). Auto-trigger note: `allow_implicit_invocation: true` is set so review-language can fire the skill, but this also means broad review-adjacent conversation may auto-invoke a multi-step file-writing workflow. If a request is ambiguous, ask the user to confirm scope before invoking.
   Mechanical shape: ONE pass in the current session. The skill assembles the diff plus the relevant context, then produces a single review with findings grouped under `## Standards Findings` and `## Spec Findings` — two axes, one session. Standards = does the diff conform to AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs? Spec = does the diff match the originating task / spec / PRD? The two-axis structure exists so neither axis masks the other.
-  No `/clear`. No spawning subagents from the skill (Codex skills cannot spawn agents — only the user can, via natural language, and that is an optional escalation documented at the bottom). The skill writes a single audit-trail handoff file at `.agentic/reviews/<ISO>-<scope>.md` for the record, then performs the review inline.
-summary: Single-session two-axis code review per WORKFLOW §10 (Codex variant). Reads diff + binding docs + originating spec, returns findings under `## Standards Findings` and `## Spec Findings`. Writes audit trail to `.agentic/reviews/`. No `/clear`; user-initiated subagent escalation documented for §10 ideal.
+  No `/clear`. No silent subagent spawn from the skill: Codex subagents are explicit user-directed workflows. The skill writes a single audit-trail handoff file at `.agentic/reviews/<ISO>-<scope>.md` for the record, then performs the review inline. For §10 ideal, use the bundled `fresh-context-reviewer` Codex subagent against that audit-trail file.
+summary: Two-axis code review per WORKFLOW §10. Claude Code uses fresh-context subagents; Codex writes an audit trail, reviews inline by default, and ships a reviewer subagent for explicit escalation.
 ---
 
 <how-this-runs-on-codex>
-Codex skills run inline in the current session. Skills cannot spawn subagents — only the user can, via natural-language commands like `"spawn an agent to review X using <prompt>"`. So this skill does the review in one pass with disciplined axis-separated output.
+Codex skills run inline in the current session. Codex supports subagent workflows, but spawning is explicit user-directed orchestration, not something this skill does silently. So the default review is one pass with disciplined axis-separated output; the optional escalation uses the bundled `fresh-context-reviewer` subagent against the persisted audit-trail file.
 
 Mechanical shape:
 
@@ -29,7 +29,7 @@ The two-axis split is structural rigor — same reviewer, but findings must be c
 
 <anti-patterns>
 - Do NOT call `/clear` and ask the user to paste handoffs. `/clear` nukes the terminal + context together on Codex — the UX is heavy and unnecessary. Single-session review is the right shape on Codex.
-- Do NOT try to spawn subagents from inside this skill. Codex skills cannot programmatically spawn agents; only the user can, via natural language. The skill that tried to instruct "/clear + paste twice" was wrong — that workflow was inherited from a stale assumption (ADR-0007) when Codex had no subagents at all.
+- Do NOT silently spawn subagents from inside this skill. Codex subagents are explicit user-directed workflows; the audit-trail file is the context packet the user can hand to a spawned reviewer.
 - Do NOT merge the two axes into a single findings list. The split is the rigor; merging is the bias the skill exists to prevent.
 - Do NOT produce an "approve" verdict. WORKFLOW §10 frames the review as adversarial; approval is the senior engineer's call after weighing both axes.
 - Do NOT skip writing the audit-trail file at `.agentic/reviews/`. The file lets the user re-run the review later against an updated diff or share it with a teammate.
@@ -39,11 +39,11 @@ The two-axis split is structural rigor — same reviewer, but findings must be c
 </anti-patterns>
 
 <background_information>
-Implements WORKFLOW §10 (Reviewer With Adversarial Discipline). On Claude Code, §10 is delivered via two parallel `Task` subagent calls with fresh context. Codex skills cannot spawn agents, so the Codex variant ships the next-best discipline: **structural axis separation inside a single review pass**. The reviewer cannot rationalize a Spec pass as covering Standards (or vice versa) because the output schema forces both lists to be produced separately.
+Implements WORKFLOW §10 (Reviewer With Adversarial Discipline). On Claude Code, §10 is delivered via two parallel `Task` subagent calls with fresh context. On Codex, the skill defaults to **structural axis separation inside a single review pass** and ships a bundled `fresh-context-reviewer` TOML for explicit user-spawned escalation. The inline reviewer cannot rationalize a Spec pass as covering Standards (or vice versa) because the output schema forces both lists to be produced separately.
 
 The two-axis dichotomy is borrowed from [mattpocock/skills/review](https://github.com/mattpocock/skills/blob/main/skills/in-progress/review/SKILL.md) and bound to this kit's six-layer artifact stack (Constitution → Domain → Product → Spec → Plan/Decisions → Code).
 
-For Codex users who want true fresh-context review (the §10 ideal), spawn a subagent manually after the skill writes the audit-trail file — see the "Optional escalation" block at the bottom of the instructions.
+For Codex users who want true fresh-context review (the §10 ideal), spawn the bundled subagent manually after the skill writes the audit-trail file — see the "Optional escalation" block at the bottom of the instructions.
 </background_information>
 
 <instructions>
@@ -190,17 +190,20 @@ If no Standards finding touches a binding doc, Step 7 is silent — emit nothing
 
 This step is the Option β escalation gate. The decision and the N=3 axis-bleed audit it rests on are recorded in git history (archived tasks 0002 and 0003 — recover via `git log --diff-filter=D -- doc/tasks/`).
 
-**Optional escalation — true fresh-context review via subagent (user-initiated only).**
+**Optional escalation — true fresh-context review via subagent (explicit user-spawned).**
 If the user wants the §10 ideal (a reviewer with no inherited bias), tell them after Step 6 / Step 7:
 
 ```
-For a fresh-context review, declare a Codex subagent and spawn it manually.
+For a fresh-context review, spawn the bundled Codex reviewer subagent against the audit-trail file.
 
-1. Create a standalone subagent TOML file at one of:
+1. If the project was installed with agentic, the bundled reviewer should already exist at:
+     .codex/agents/fresh-context-reviewer.toml
+
+   If it is missing, create it with `/ad-subagent` or a standalone TOML file at one of:
      ~/.codex/agents/fresh-context-reviewer.toml          (personal — shared across all projects)
      .codex/agents/fresh-context-reviewer.toml            (project-scoped — committed with the repo)
 
-   Minimum body (per developers.openai.com/codex/subagents). Required fields:
+   Minimum custom body (per developers.openai.com/codex/subagents). Required fields:
    `name`, `description`, `developer_instructions`. Optional fields: `model`,
    `model_reasoning_effort`, `sandbox_mode`. NOTE on TOML indentation: the
    triple-quoted `developer_instructions` string preserves leading whitespace
@@ -220,19 +223,18 @@ For a fresh-context review, declare a Codex subagent and spawn it manually.
    Do NOT synthesize an "approve" verdict.
    """
 
-2. From a fresh Codex session, spawn it against the audit-trail file:
+2. From Codex, explicitly spawn it against the audit-trail file:
 
      > spawn the fresh-context-reviewer agent. Read <audit-path>.
 
 The subagent loads only the handoff file, so it has no inherited context from this
-session. Requires a Codex CLI version with subagent support (see
-developers.openai.com/codex/subagents for the current rollout state).
+session. Requires Codex subagent support (see developers.openai.com/codex/subagents).
 NOTE: the [agents] block in ~/.codex/config.toml is for global subagent
 settings (max_threads, max_depth) only — not for declaring individual
 subagents.
 ```
 
-Do not spawn the agent yourself — Codex skills cannot. Only the user's natural-language command can.
+Do not silently spawn the agent yourself. The user must explicitly request the escalation.
 </instructions>
 
 <output_contract>
@@ -240,7 +242,7 @@ Do not spawn the agent yourself — Codex skills cannot. Only the user's natural
 - One review reply in the current session with findings under `## Standards Findings` and `## Spec Findings`, each axis with its own end-line verdict (`ship as-is` / `ship with the Concerns logged` / `don't ship until Blockers resolved` / `skipped — no spec source provided`).
 - One aggregate summary line at the end with axis counts, worst finding, and audit-trail path.
 - One Step 7 escalation recommendation line IF any Standards-axis finding touches a binding doc (AGENTS / ARCHITECTURE / GUIDELINES / CONTEXT / ADR). Silent otherwise.
-- No "approve" verdict. No `/clear` choreography. No skill-initiated subagent spawn (only documented as a user-initiated escalation).
+- No "approve" verdict. No `/clear` choreography. No silent subagent spawn; the bundled subagent is for explicit escalation against the audit-trail file.
 </output_contract>
 
 ## Next

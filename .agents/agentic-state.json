@@ -65,7 +65,7 @@
         },
         {
           "path": ".agents/skills/ad-bootstrap/SKILL.md",
-          "sourceSha": "e6859e57d01d6aee1cb1918de2bf7524efc4fa5520337d71298f9a6393471d31"
+          "sourceSha": "3c90471074dcab13a3c9bcae667f428cc8f8d59762edc3b2110a0f4e324a22c1"
         }
       ]
     },
@@ -169,7 +169,7 @@
         },
         {
           "path": ".agents/skills/ad-handoff/SKILL.md",
-          "sourceSha": "e1e4bdc9f938fa7b21c2269e7062d173325860a2c4c7264668276e28d2f50151"
+          "sourceSha": "01114b2e44742c9e3fc2d46b9856dc9b5ffd1ff38efdab202938c649019a2c9d"
         }
       ]
     },
@@ -195,7 +195,7 @@
         },
         {
           "path": ".agents/skills/ad-next/SKILL.md",
-          "sourceSha": "821f3727995ba5541bacae4de74af461c754fe5eef2185a0b7db2d91c68456bc"
+          "sourceSha": "3982b8a0fcb842eaf42876047a48773340d26a58645538ce66e75a9b990358ca"
         }
       ]
     },
@@ -243,11 +243,15 @@
       "files": [
         {
           "path": ".agents/skills/ad-review/agents/openai.yaml",
-          "sourceSha": "a32186c67c68459b70fcb0a658bc1933aec880d9e0b83ffb86470305d4a6ffe0"
+          "sourceSha": "40ef8c3d937fa61a69ab2b58f4e94562a860fb6c8a131b000204ce211d2ae28f"
         },
         {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "6dd017cfbe4ad8cb6c0748ef26b8537ed9ad9c502f0256e6144e080fd6116e68"
+          "sourceSha": "eda772621e896251b0506d2e16e790a57abc739e47938fa10f9d5e11f74cbcd8"
+        },
+        {
+          "path": ".codex/agents/fresh-context-reviewer.toml",
+          "sourceSha": "96e2e2daf8da8c207a34082d5acb9f7d1b17c94916de1124d2a40cfaf6e91af1"
         }
       ]
     },
@@ -277,6 +281,19 @@
         }
       ]
     },
+    "ad-subagent": {
+      "version": "0.17.7-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-subagent/agents/openai.yaml",
+          "sourceSha": "a8c8ebff93b3f22074a62870d42db80e3393673247c972d1b06637602ab6e249"
+        },
+        {
+          "path": ".agents/skills/ad-subagent/SKILL.md",
+          "sourceSha": "72d984be13c03286a5af8b5e94211da1bbddc3dacb5a214c2288d106a15f1ac5"
+        }
+      ]
+    },
     "ad-task": {
       "version": "0.17.7-beta.1",
       "files": [
@@ -286,7 +303,7 @@
         },
         {
           "path": ".agents/skills/ad-task/SKILL.md",
-          "sourceSha": "9ca3924df605e7c69d311624ef39dc36d4aaaab95cb6e942cb1c764969e8831c"
+          "sourceSha": "a82b855b5ae6138083eb8a59acf28d8b19f9ef220f8c28eeb3181a22c42a9d22"
         }
       ]
     },

@@ -3,6 +3,7 @@
 **Status:** `<proposed | in-progress | blocked | done>`
 **Created:** `<YYYY-MM-DD>`
 **Owner:** `<name or role>`
+**Execution:** `<AFK | HITL>`
 **Spec ref:** `<doc/specs/NNNN-<slug>.md or SPEC-NNNN — blank when no spec drives this task>`
 **Board ref:** `<external ticket URL or ID — blank for solo work>`
 

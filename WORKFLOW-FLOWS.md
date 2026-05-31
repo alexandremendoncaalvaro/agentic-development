@@ -1,6 +1,6 @@
 # Workflow Flows
 
-`WORKFLOW.md` is the canonical prose contract. This file is its operational map: after installing `agentic`, use these flows to decide which skill to invoke next and in what order. If a diagram conflicts with `WORKFLOW.md`, `WORKFLOW.md` wins.
+`WORKFLOW.md` is the canonical prose contract. This file is its visual quick-start: after installing `agentic`, use these flows to decide which skill to invoke next and in what order. If a diagram conflicts with `WORKFLOW.md`, `WORKFLOW.md` wins.
 
 ## Reading Rule
 
@@ -58,8 +58,8 @@ flowchart TD
     Mature["mature<br>regulated or gate-heavy product"]
 
     PocFlow["Use /ad-grill, /ad-ground, /ad-spike, /ad-tdg, /ad-tdd, /ad-diagnose, /ad-audit, /ad-next<br>Do not create PRD/spec/task/ADR unless the project graduates"]
-    SoloFlow["Add /ad-bootstrap, /ad-prd, /ad-guidelines, /ad-spec, /ad-task, /ad-review, /ad-commit, /ad-pr, /ad-merge<br>/ad-architecture and /ad-adr are opt-in"]
-    TeamFlow["Use the full artifact stack<br>/ad-architecture, /ad-adr, and /ad-deepen are in the normal path"]
+    SoloFlow["Available beyond poc: /ad-prd, /ad-bootstrap, /ad-guidelines, /ad-spec, /ad-task, /ad-review, /ad-commit, /ad-pr, /ad-merge<br>/ad-architecture and /ad-adr are opt-in"]
+    TeamFlow["Use the full artifact stack after product framing<br>/ad-architecture, /ad-adr, and /ad-deepen are in the normal path"]
     MatureFlow["Team flow plus /ad-hooks as an expected gate-wiring step"]
 
     Work --> Poc
@@ -80,15 +80,15 @@ Use this when the project has no durable product framing yet, or when a greenfie
 
 ```mermaid
 flowchart TD
-    Init["agentic init"]
-    Bootstrap["/ad-bootstrap<br>AGENTS.md session-load rules"]
-    Guidelines["/ad-guidelines<br>GUIDELINES.md engineering reference"]
-    Frontend{"Frontend project with tokens or styles?"}
-    Design["/ad-design<br>DESIGN.md visual contract"]
+    Init["agentic init<br>install skills only"]
     ProductFuzzy{"Product ask fuzzy?"}
     Grill["/ad-grill<br>interview before research"]
     Domain["/ad-domain<br>capture resolved vocabulary in CONTEXT.md"]
     Prd["/ad-prd<br>product scope, target user, metrics, roadmap"]
+    Bootstrap["/ad-bootstrap<br>AGENTS.md session-load rules derived from context"]
+    Guidelines["/ad-guidelines<br>GUIDELINES.md engineering reference"]
+    Frontend{"Frontend project with tokens or styles?"}
+    Design["/ad-design<br>DESIGN.md visual contract"]
     Feature["Pick one MVP feature"]
     Spec["/ad-spec<br>feature contract"]
     ArchitectureNeeded{"Feature creates or reveals system pattern?"}
@@ -101,17 +101,17 @@ flowchart TD
     Review["/ad-review main..HEAD"]
     Ship["/ad-commit -> /ad-pr -> /ad-merge<br>as project workflow requires"]
 
-    Init --> Bootstrap
-    Bootstrap --> Guidelines
-    Guidelines --> Frontend
-    Frontend -->|yes| Design
-    Frontend -->|no| ProductFuzzy
-    Design --> ProductFuzzy
+    Init --> ProductFuzzy
     ProductFuzzy -->|yes| Grill
     Grill --> Domain
     Domain --> Prd
     ProductFuzzy -->|no| Prd
-    Prd --> Feature
+    Prd --> Bootstrap
+    Bootstrap --> Guidelines
+    Guidelines --> Frontend
+    Frontend -->|yes| Design
+    Frontend -->|no| Feature
+    Design --> Feature
     Feature --> Spec
     Spec --> ArchitectureNeeded
     ArchitectureNeeded -->|yes| Architecture
@@ -252,6 +252,51 @@ flowchart TD
 ```
 
 Source: `WORKFLOW.md` sections 4-5, 9, 14, 16.
+
+## Delegation Gate
+
+Use this before asking for a subagent. The question is not "can an agent do it?", it is "can the work be handed over with a bounded packet and a clear stop condition?"
+
+```mermaid
+flowchart TD
+    Work["Candidate work"]
+    Packet{"Can you write a bounded packet?<br>goal, sources, scope, output, stop"}
+    Main["Keep in main session<br>explore, plan, implement, verify"]
+    Human{"Needs product judgment,<br>taste, frequent back-and-forth,<br>or immediate blocking decision?"}
+    Hitl["Mark /ad-task Execution: HITL<br>or keep with the human/main session"]
+    Shape{"Which bounded shape?"}
+    Review["/ad-review<br>fresh-context review"]
+    Research["Sidecar research<br>codebase, docs/API, examples"]
+    Test["Test designer<br>public-interface cases from spec/task"]
+    Repro["Bug reproducer<br>small failing loop, then stop"]
+    Worker["Bounded worker<br>disjoint files/modules only"]
+    Reusable{"Role repeats or needs<br>tools/model/sandbox restrictions?"}
+    Subagent["/ad-subagent<br>Claude: .claude/agents/*.md<br>Codex: .codex/agents/*.toml"]
+    Existing["Use built-in/existing agent<br>or one explicit one-off spawn"]
+    Handoff["/ad-handoff<br>when the packet is too large for one turn"]
+
+    Work --> Packet
+    Packet -->|no| Main
+    Packet -->|yes| Human
+    Human -->|yes| Hitl
+    Human -->|no| Shape
+    Shape --> Review
+    Shape --> Research
+    Shape --> Test
+    Shape --> Repro
+    Shape --> Worker
+    Review --> Reusable
+    Research --> Reusable
+    Test --> Reusable
+    Repro --> Reusable
+    Worker --> Reusable
+    Reusable -->|yes| Subagent
+    Reusable -->|no| Existing
+    Packet -->|too large| Handoff
+    Handoff --> Existing
+```
+
+Source: `WORKFLOW.md` sections 6 and 10; Claude Code subagents docs; Codex subagents docs; `ad-subagent`, `ad-task`, `ad-handoff`, and `ad-review` skill contracts.
 
 ## Bug Or Performance Regression
 
