@@ -49,7 +49,7 @@ Only after the scan produces no answer does the skill ask. Asking the user about
 
 **Multi-product.** Ask whether this is a multi-product repo. If yes, the file path is `doc/product/<product-slug>.md` and a `doc/product/PRODUCT-MAP.md` index lists each product. Slug: kebab-case, ≤4 words, derived from the product name.
 
-Status starts at `draft`. Created: today, ISO format. Owner: ask once — defaults to the repo's primary committer (from `git config user.name`) if unset.
+Status starts at `draft`. Created: today, ISO format. Updated: today, ISO format. Owner: ask once — defaults to the repo's primary committer (from `git config user.name`) if unset.
 
 ## Step 3 — Interview to fill
 
@@ -97,7 +97,7 @@ When the user later works on the PRD:
 - Add `Roadmap` lines as the product grows; mark superseded roadmap items with a strikethrough and a one-line note, do not delete them (the audit trail survives renames).
 - Add `Related → Specs` entries as `/ad-spec` runs reference this PRD.
 
-Never rewrite existing prose — append rationale to **Open Questions** as a resolution paragraph rather than mutating the original requirement text. Append-only Notes discipline.
+Never rewrite existing prose — append rationale to **Open Questions** as a resolution paragraph rather than mutating the original requirement text. Open Questions is the append-only resolution surface.
 
 ## Output contract
 

@@ -37,7 +37,7 @@ Only after the scan produces no answer does the skill ask the user. Asking the u
 
 Step 2 — determine slug and target file. Single product (default): `doc/product/PRD.md`. Multi-product: ask whether this is a multi-product repo; if yes, file path is `doc/product/<product-slug>.md` and a `doc/product/PRODUCT-MAP.md` index lists each product. Slug: kebab-case, ≤4 words, derived from the product name.
 
-Status starts at `draft`. Created: today, ISO format. Owner: ask once — defaults to the repo's primary committer (from `git config user.name`) if unset.
+Status starts at `draft`. Created: today, ISO format. Updated: today, ISO format. Owner: ask once — defaults to the repo's primary committer (from `git config user.name`) if unset.
 
 Step 3 — interview to fill. Ask one question at a time, in this order. Skip questions whose answers are already obvious from the Step 1 scan; surface what the scan found and ask only for confirmation.
 
@@ -68,7 +68,7 @@ Step 6 — editing guidance for later turns. When the user later works on the PR
 - Add Roadmap lines as the product grows; mark superseded roadmap items with a strikethrough and a one-line note, do not delete them.
 - Add Related → Specs entries as `ad-spec` runs reference this PRD.
 
-Never rewrite existing prose — append rationale to Open Questions as a resolution paragraph rather than mutating the original requirement text. Append-only Notes discipline.
+Never rewrite existing prose — append rationale to Open Questions as a resolution paragraph rather than mutating the original requirement text. Open Questions is the append-only resolution surface.
 </instructions>
 
 <output_contract>
