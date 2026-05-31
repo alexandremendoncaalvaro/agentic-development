@@ -86,14 +86,26 @@ test('installSkills: a multi-level skill (codex ad-review with agents/openai.yam
       existsSync(join(dir, '.agents/skills/ad-review/agents/openai.yaml')),
       'nested agents/openai.yaml must install for codex ad-review'
     );
+    assert.ok(
+      existsSync(join(dir, '.codex/agents/fresh-context-reviewer.toml')),
+      'Codex fresh-context-reviewer subagent must install at .codex/agents/'
+    );
     const reviewSkill = result.nextStates.codex.skills['ad-review'];
     const nested = reviewSkill.files.find((f) =>
       f.path.endsWith('agents/openai.yaml')
     );
+    const subagent = reviewSkill.files.find((f) =>
+      f.path.endsWith('.codex/agents/fresh-context-reviewer.toml')
+    );
     assert.ok(nested, 'state must record the nested agents/openai.yaml entry');
+    assert.ok(subagent, 'state must record the Codex subagent entry');
     assert.ok(
       !nested.path.includes('\\'),
       `state path must use forward-slash, got: ${nested.path}`
+    );
+    assert.ok(
+      !subagent.path.includes('\\'),
+      `state path must use forward-slash, got: ${subagent.path}`
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });

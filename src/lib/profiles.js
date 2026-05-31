@@ -72,7 +72,7 @@ export const PROFILES = {
       'ad-architecture': false,
       'ad-adr': false,
       'ad-design': 'frontend',
-      'ad-subagent': 'claude-code',
+      'ad-subagent': true,
       'ad-skill': false,
       'ad-hooks': false,
     },
@@ -107,7 +107,7 @@ export const PROFILES = {
     ],
     conditional: {
       'ad-design': 'frontend',
-      'ad-subagent': 'claude-code',
+      'ad-subagent': true,
       'ad-skill': false,
       'ad-hooks': false,
     },
@@ -142,7 +142,7 @@ export const PROFILES = {
     ],
     conditional: {
       'ad-design': 'frontend',
-      'ad-subagent': 'claude-code',
+      'ad-subagent': true,
       'ad-skill': false,
       'ad-hooks': true,
     },

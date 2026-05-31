@@ -39,6 +39,7 @@ const AGENT_LAYOUT = {
   codex: {
     skillsDir: '.agents/skills',
     sourceDir: 'src/skills/codex',
+    agentsDir: '.codex/agents',
   },
 };
 

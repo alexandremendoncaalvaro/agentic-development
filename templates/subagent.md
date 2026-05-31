@@ -1,3 +1,5 @@
+# Claude Code Subagent Template
+
 ---
 # Required
 name: <unique-name>                  # lowercase + hyphens
@@ -20,8 +22,8 @@ description: <when Claude should delegate to this subagent>
 # initialPrompt: <auto-submitted as first user turn when run as main agent>
 ---
 
-<System prompt: the subagent's role, scope, and stop criteria.
+<Role prompt: the subagent's role, scope, and stop criteria.
 
 State the role in one sentence. Define what it should do when invoked, what
-output format to return, and what NOT to do. The subagent does not read
-AGENTS.md — restate any convention it must follow.>
+output format to return, and what NOT to do. Do not rely on parent-session
+memory; cite any project files this subagent must read.>

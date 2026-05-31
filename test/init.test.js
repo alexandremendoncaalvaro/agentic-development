@@ -164,7 +164,7 @@ test('init: re-running on installed project is idempotent', () => {
   }
 });
 
-test('init --agent claude-code on greenfield → installs ad-subagent (Claude only); no ad-design (no frontend); no ad-skill (opt-in only)', () => {
+test('init --agent claude-code on greenfield → installs ad-subagent; no ad-design (no frontend); no ad-skill (opt-in only)', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code']);
@@ -185,13 +185,17 @@ test('init --agent claude-code on greenfield → installs ad-subagent (Claude on
   }
 });
 
-test('init --agent codex on greenfield → no ad-subagent (Claude-only source), no ad-design, no ad-skill', () => {
+test('init --agent codex on greenfield → installs ad-subagent; no ad-design, no ad-skill', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'codex']);
     assert.ok(
-      !existsSync(join(dir, '.agents/skills/ad-subagent')),
-      'ad-subagent must NOT install for Codex (no source)'
+      existsSync(join(dir, '.agents/skills/ad-subagent/SKILL.md')),
+      'ad-subagent must auto-install for Codex'
+    );
+    assert.ok(
+      existsSync(join(dir, '.agents/skills/ad-subagent/agents/openai.yaml')),
+      'ad-subagent Codex openai.yaml must land'
     );
     assert.ok(
       !existsSync(join(dir, '.agents/skills/ad-design')),
@@ -206,7 +210,7 @@ test('init --agent codex on greenfield → no ad-subagent (Claude-only source), 
   }
 });
 
-test('init --agent both on a frontend project → installs ad-design for both agents; ad-subagent for Claude only', () => {
+test('init --agent both on a frontend project → installs ad-design and ad-subagent for both agents', () => {
   const dir = mkScratch();
   try {
     writeFileSync(
@@ -231,8 +235,12 @@ test('init --agent both on a frontend project → installs ad-design for both ag
       'ad-subagent must auto-install for Claude'
     );
     assert.ok(
-      !existsSync(join(dir, '.agents/skills/ad-subagent')),
-      'ad-subagent must NOT install for Codex'
+      existsSync(join(dir, '.agents/skills/ad-subagent/SKILL.md')),
+      'ad-subagent must auto-install for Codex'
+    );
+    assert.ok(
+      existsSync(join(dir, '.agents/skills/ad-subagent/agents/openai.yaml')),
+      'ad-subagent Codex openai.yaml must land'
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });

@@ -9,7 +9,7 @@ Process scaffold for compacting a long or near-exhausted session into a handoff 
 
 The skill exists because long sessions accumulate inherited bias (WORKFLOW §12 — "almost right" failures compound) and because session-window pressure forces ad-hoc summarisation that loses the parts the next agent actually needs. Handoffs replace ad-hoc summarisation with a structured artifact.
 
-Codex has no subagent primitive and no shared session memory across `/clear`. Handoff via the OS temp dir is the only durable bridge between two Codex sessions — treat it as load-bearing, not optional. Codex auto-trigger on description keywords is less mature than Claude Code's; if auto-invocation does not fire when the user mentions handing off, compacting, or `/clear`, invoke this skill manually.
+Codex subagents and sessions do not share the parent conversation history by magic, and `/clear` discards local context. Handoff via the OS temp dir is the durable bridge between Codex sessions or explicit subagent work — treat it as load-bearing, not optional. Codex auto-trigger on description keywords is less mature than Claude Code's; if auto-invocation does not fire when the user mentions handing off, compacting, or `/clear`, invoke this skill manually.
 </background_information>
 
 <instructions>
@@ -113,7 +113,7 @@ Suggested-skills picks from the installed `ad-*` set. Common patterns:
 - Stuck on a bug → `ad-diagnose`.
 - Spec unclear → `ad-grill`.
 - About to land work → `ad-commit` → `ad-pr` → `ad-merge`.
-- Ready for fresh-context review → `ad-review main..HEAD` (Codex variant uses `/clear` + paste handoff since Codex has no subagent primitive — exactly the pattern this skill scaffolds).
+- Ready for fresh-context review → `ad-review main..HEAD` (Codex writes an audit-trail handoff, then can explicitly spawn the bundled reviewer subagent against that file when the user asks).
 
 Write the file. Print the absolute path so the user can paste it into the next session.
 
@@ -136,6 +136,6 @@ Do not auto-execute `/clear` or anything destructive. The user decides when to d
 
 ## Next
 
-- Paste the handoff path into the next session: `cat /tmp/agentic-handoffs/<file>.md` then `/clear`, then paste contents as the first message.
+- Paste the handoff path into the next session or hand it to an explicit subagent: `cat /tmp/agentic-handoffs/<file>.md`, then `/clear` or spawn the relevant agent with the path.
 - If the handoff surfaced an unresolved decision worth recording: open an ADR with `ad-adr` before the next agent picks the work up.
 - If the handoff surfaced a vocabulary drift (a term you kept paraphrasing): `ad-domain` to land it in `CONTEXT.md` so the next agent inherits the canonical noun.

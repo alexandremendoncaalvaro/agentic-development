@@ -1,0 +1,27 @@
+name = "<unique_name>"
+description = "<when Codex should use this agent>"
+# model = "<model-id>"                 # optional; omit to inherit parent default
+# model_reasoning_effort = "high"      # optional
+# sandbox_mode = "read-only"           # optional: read-only | workspace-write | danger-full-access
+
+developer_instructions = """
+You are a <role>.
+
+Scope:
+- <what this agent owns>
+
+Allowed sources:
+- <files, docs, tools, or handoff path it may use>
+
+Do:
+- <allowed action>
+
+Do not:
+- <explicit non-goal>
+
+Output:
+- <format the parent session expects>
+
+Stop when:
+- <stop criterion>
+"""

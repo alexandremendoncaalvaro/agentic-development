@@ -1,34 +1,44 @@
 # Bootstrap a Subagent
 
-Spec: [code.claude.com/docs/en/sub-agents](https://code.claude.com/docs/en/sub-agents)
+Specs:
+- Claude Code: https://code.claude.com/docs/en/sub-agents
+- Codex: https://developers.openai.com/codex/subagents
 
-A custom Claude Code subagent runs with isolated context, scoped tools, and its own system prompt. The body of the file becomes the subagent's full system prompt — it does **not** inherit AGENTS.md / CLAUDE.md from the parent.
+A custom subagent is useful when the work can be handed over with bounded context, scoped tools/sandbox, and a clear stop condition. Do not create one for a one-off question, frequent back-and-forth, product judgment, visual taste, or tightly coupled implementation.
 
 ## Where it lives
 
-- Project (versioned): `.claude/agents/<name>.md`
-- Personal: `~/.claude/agents/<name>.md`
+- Claude Code project: `.claude/agents/<name>.md`
+- Claude Code personal: `~/.claude/agents/<name>.md`
+- Codex project: `.codex/agents/<name>.toml`
+- Codex personal: `~/.codex/agents/<name>.toml`
 
-Edits to files on disk require a session restart; agents created via `/agents` take effect immediately.
+## Good fits
 
-## Common patterns
-
-| Pattern                | Tools                       | Model      | Notes                                                   |
-| ---------------------- | --------------------------- | ---------- | ------------------------------------------------------- |
-| Fresh-context reviewer | `Read, Glob, Grep, Bash`    | `sonnet`   | Matches WORKFLOW §10. No write tools.                   |
-| Codebase researcher    | use built-in **Explore**    | inherit    | Don't build custom unless you need different tools.     |
-| Diff-only auditor      | `Read, Bash`                | `sonnet`   | Pair with `permissionMode: dontAsk` for read-only runs. |
-
-Built-in subagents (`Explore`, `Plan`, `general-purpose`) cover most cases. Build a custom one only when you need a specific role, scoped tools, persistent memory, or a different model.
+| Pattern | Host target | Notes |
+| --- | --- | --- |
+| Fresh-context reviewer | Claude or Codex | Matches WORKFLOW §10. Read-only; no write tools. |
+| Codebase researcher | built-in when available | Build custom only when the repo needs a persistent role. |
+| Docs/API researcher | Claude or Codex | Returns citations and version notes only. |
+| Test designer | Claude or Codex | Reads spec/task and proposes public-interface tests; no production edits. |
+| Bug reproducer | Claude or Codex | Builds the smallest failing loop, then stops before broad fixes. |
+| Bounded worker | Claude or Codex | Owns a disjoint file/module set; returns changed paths and verification. |
 
 ## Paste to your agent
 
-> Read the subagents spec at https://code.claude.com/docs/en/sub-agents and the structure in [`templates/subagent.md`](../templates/subagent.md). Create a project subagent at `.claude/agents/<name>.md` for `<role and trigger>`.
+> Read the relevant subagent spec for my host:
+> - Claude Code: https://code.claude.com/docs/en/sub-agents
+> - Codex: https://developers.openai.com/codex/subagents
+>
+> Then read the templates in [`templates/subagent.md`](../templates/subagent.md) and [`templates/codex-subagent.toml`](../templates/codex-subagent.toml).
+>
+> Create a project subagent for `<Claude Code | Codex>` at the correct path for `<role and trigger>`.
 >
 > Constraints:
-> - `description` is the routing signal — Claude reads it to decide whether to delegate. Be specific.
-> - Body = full system prompt; every line costs tokens on every subagent turn. Be terse.
-> - Don't restate AGENTS.md. Subagents don't read it. State only what differs.
-> - Limit tools deliberately. A reviewer with `Write` access stops being a reviewer.
-> - Tell the subagent where to stop.
-> - Frontmatter: `name`, `description`, plus only the fields you actually need from the spec. **Do not invent fields not in the spec.**
+> - First apply the delegation-fit gate: use a custom subagent only if the role repeats, the work is self-contained, the output is bounded, or the role needs tool/model/sandbox restrictions.
+> - `description` is the routing signal. Be specific about when the host should delegate.
+> - State goal, scope, allowed sources, output format, and stop criterion.
+> - Limit tools/sandbox deliberately. A reviewer with write access stops being a reviewer.
+> - Do not rely on parent-session memory; cite any project files the subagent must read.
+> - Use Claude Markdown/frontmatter for Claude Code; use TOML with `name`, `description`, and `developer_instructions` for Codex.
+> - Do not invent fields not in the selected host's spec.

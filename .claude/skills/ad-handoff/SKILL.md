@@ -153,6 +153,6 @@ Do **not** auto-execute `/clear` or anything destructive. The user decides when 
 
 - Paste the handoff path into the next session: `cat /tmp/agentic-handoffs/<file>.md` (or the host-specific opener).
 - On Claude Code: `/clear` then `Read <path>` as the first turn.
-- On Codex: `/clear` then paste the file contents — Codex has no subagent primitive and no shared session memory.
+- On Codex: `/clear` then paste the file contents, or explicitly spawn a Codex subagent with the handoff path as its context packet.
 - If the handoff surfaced an unresolved decision worth recording: open an ADR with `/ad-adr` before the next agent picks the work up.
 - If the handoff surfaced a vocabulary drift (a term you kept paraphrasing): `/ad-domain` to land it in `CONTEXT.md` so the next agent inherits the canonical noun.
