@@ -91,6 +91,16 @@ State the project's policy. Examples by stack:
 - No `--no-verify` to bypass hooks.
 - No `std::exit` / `abort` / `process.exit()` / `os.Exit()` inside library code — return errors and let callers decide.
 
+### 2.5 Canonical Examples
+
+Optional. Include only paths to source files the team explicitly wants future agents to imitate. Do not paste code here; code remains the source of truth.
+
+| Pattern | Canonical file | What to copy |
+|---------|----------------|--------------|
+| Boundary / entry point | `<path:line>` | `<validation, dependency wiring, error mapping>` |
+| Core / domain logic | `<path:line>` | `<data shape, dependency direction, error style>` |
+| Test | `<path:line>` | `<fixture shape, assertion style, public-interface coverage>` |
+
 ---
 
 ## 3. Complexity Discipline

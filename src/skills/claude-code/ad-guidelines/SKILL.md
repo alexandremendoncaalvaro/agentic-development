@@ -73,6 +73,10 @@ Before asking any preference question, look. The repo answers most fields.
 - Read `doc/adr/` for binding decisions about error handling, naming, dependency injection — those are pre-existing decisions; carry them forward.
 - Read `CONTEXT.md` if it exists — domain vocabulary the guidelines must respect.
 
+### Canonical examples
+
+For brownfield projects, identify candidate source files that future agents should imitate. Prefer one boundary example, one core/domain function, and one test. Record paths only, never pasted snippets. If no representative code exists, omit the section until the project has examples worth copying.
+
 ### Profile and project posture
 
 Read `.claude/agentic-state.json` / `.agents/agentic-state.json` for the active profile. Profile affects strictness defaults (mature → strict Object Calisthenics by default; solo → loose by default).
@@ -85,6 +89,7 @@ Open `templates/guidelines.md`. Fill detected fields before any interview:
 
 - **§2.1 Naming conventions** — fill the per-language convention table from the canonical conventions of the detected language (snake_case / PascalCase / camelCase / UPPER_SNAKE / kebab-case / file extensions).
 - **§2.2 Error handling** — fill the idiom of the detected language (`std::expected` for C++, `Result<T, E>` for Rust, discriminated unions for TS, typed exceptions for Python, error returns for Go).
+- **§2.5 Canonical examples** — when representative code exists, fill a small table of source-file paths for boundary code, core/domain logic, and tests. Confirm the picks with the user before writing; do not declare weak code canonical.
 - **§6.1 Toolchain** — fill language + version, build system + version, source-of-truth config file.
 - **§6.2 Dependency manager** — fill from detected manifest.
 - **§7 Static analysis** — fill the linter, formatter, and naming-enforcement tools detected in the repo.
@@ -147,6 +152,10 @@ Ask the boundary questions:
 
 Default: reference `WORKFLOW.md §2` + `ad-philosophy`. Ask only if the project needs project-specific extensions (e.g., Doxygen-style public-API docs, OpenAPI spec, ADR cadence rule).
 
+### 3.7 Canonical examples confirmation
+
+If Step 1 found candidate examples, present the paths and ask whether each should be treated as canonical. Keep at most one row per pattern unless two variants are genuinely necessary. If the user cannot endorse an example, omit the section; bad exemplars are worse than no exemplars.
+
 ## Step 4 — AGENTS.md reciprocity
 
 After writing `GUIDELINES.md`, the kit's `ad-bootstrap` skill writes AGENTS.md sections that point to GUIDELINES.md sections instead of duplicating content. Example:
@@ -181,6 +190,7 @@ Stop after writing. Print a one-line summary: "Wrote GUIDELINES.md with N sectio
 - Object Calisthenics tier change → update §3.1 checked rules; never delete the rule list (audit trail).
 - Adding a new language to the project → expand §2.1 naming table with a per-language row; do not rewrite existing rows.
 - New static-analysis tool → add a row to §7; reference the config file path.
+- Canonical example change → update §2.5 to point at the new source file; do not paste code into GUIDELINES.md.
 - Perf budget change → update §5; never delete the previous budget without recording the rationale.
 - Documentation extensions → append to §11.1 table.
 
