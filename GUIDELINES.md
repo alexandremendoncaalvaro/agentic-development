@@ -221,6 +221,7 @@ Developer commits
 - **Pre-push hook:** `npm test` runs the full suite. Mandatory before push.
 - **CI:** mirrors pre-push across Node 20 / 22 matrix. Redundant with the local hook; both stay wired so a missing local install does not skip the gate.
 - **Never bypass.** No `--no-verify`, no skipped hooks, no deleted failing tests.
+- **CI failure is a local gate gap** ([WORKFLOW.md §11](WORKFLOW.md), TL;DR #22, [ADR-0032](doc/adr/0032-ci-failure-is-local-gate-gap.md)). Pre-push mirrors what CI runs — same commands, same matrix when it changes the failure surface. If CI catches something pre-push did not, close the gate locally; do not iterate red CI runs. `/ad-pr` refuses to open a PR on local red; `/ad-hooks` diffs pre-push against the CI config and warns on drift.
 
 ---
 
