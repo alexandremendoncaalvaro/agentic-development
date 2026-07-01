@@ -34,6 +34,8 @@ What to keep in mind:
 18. **One task per session.** Reset rather than extend; reload only what the next task needs.
 19. **Slice vertically, not horizontally.** Decompose a spec into thin end-to-end paths through every layer (schema, API, UI, tests) rather than one layer at a time. Each slice ships demonstrable behavior; horizontal layer-stacks ship nothing on their own.
 20. **Discipline scales with project maturity.** Same principles bind every project; the artifact set scales. A spike runs posture + research + audit; a regulated product adds spec / ADR / hooks / evals. Add ceremony only where it changes agent behavior; configure at init and reconfigure as the project matures.
+21. **Decide when grounded, ask when judgment.** The engineer is the boss, not the co-pilot. The agent is not being watched line by line; it is expected to bring decisions, not fork points. Grounded decisions land without a question — a canonical happy path with citations, a single-criterion winner among TDG approaches, a well-established industry pattern. Design/taste, product tradeoffs, irreversible or high-blast-radius actions, and genuinely close calls escalate with a recommendation plus why the alternatives are weaker.
+22. **CI failure is a local gate gap.** Pre-push mirrors what CI runs — same commands, same matrix. If CI catches something pre-push did not, the fix is to close the gate locally, not to iterate red CI runs. Pushing red-CI diffs burns cloud minutes and normalizes broken main.
 
 > Working with agents means trading typing for technical direction. The value is in giving the right context, setting boundaries, validating the result, and keeping "almost right" out of production.
 
@@ -154,6 +156,26 @@ Leave no room for interpretation. Tell the model where to stop.
 
 The stop criterion is as important as the action. Without it, the agent generalizes outward and you end up trimming output you didn't ask for.
 
+### Decide when grounded, ask when judgment
+
+Stop criteria bound *what to do*; this subsection bounds *whether to ask*. The engineer running the agent is not reading every file, doc, or diff the agent read to get to its recommendation. Treat the relationship as employee-to-boss, not co-pilot-to-pilot: the agent brings decisions with a recommendation, and only escalates when the choice requires human judgment.
+
+Default is decide, not ask:
+
+- **Grounded happy path.** `/ad-ground` returned a canonical path with citations across all four sources — take it. Do not ask.
+- **Single-criterion winner (§9 TDG).** Three approaches, one wins by the picked criterion (readability *or* performance *or* testability). Pick it. Do not survey.
+- **Well-established industry pattern.** The canonical library, the standard shape, the statistically dominant approach in the stack. Take it. Do not ask.
+- **Deterministic outcome.** Type-check passes, tests pass, gate scripts pass. State the result. Do not ask if it should be taken as done.
+
+Ask only when:
+
+- **Design or taste.** UX shape, product tradeoff, naming that carries brand — outputs a human has to look at and form an opinion about.
+- **Irreversible or high blast radius.** Destructive git ops, shared-state mutations, published artifacts, force-pushes. Match the confirmation to the blast radius of the action, not to the size of the diff.
+- **Genuinely close calls.** Two options tied on the picked criterion; the tie-break is a preference the agent cannot ground.
+- **Fuzzy spec.** The ask itself is under-specified — route to `/ad-grill`, not a raw open question.
+
+Shape of the ask when it is warranted: one question, recommended answer first, why the alternatives are weaker. Not a survey of every option the agent considered; that pushes the synthesis work back onto the boss.
+
 ## 8. Architectural Boundaries
 
 Lock the load-bearing decisions into `AGENTS.md` or `CLAUDE.md` so the agent doesn't relitigate them every session:
@@ -209,6 +231,7 @@ In Claude Code, this means a subagent (the `Task` tool, or a custom `.claude/age
 - **Visual or E2E for UI.** Type-check confirms the code compiles, not that the feature works. Open the browser (Claude in Chrome, DevTools MCP).
 - **Sandboxing plus scoped permissions** for autonomy: allowlists, OS sandbox, classifier-reviewed auto mode. The bigger the autonomy, the more rails you need.
 - **Never bypass.** No `--no-verify`. Failing tests means not ready.
+- **CI failure is a local gate gap.** Pre-push must mirror what CI runs — same commands (`test`, `lint`, `typecheck`, `build`) and, when they matter for the failure surface, the same matrix (language versions, OS targets, feature flags). If CI catches something pre-push did not, the deterministic fix is to close the gate locally and re-push, not to iterate red CI runs. Skills that open pull requests verify local gates green as part of preflight; skills that scaffold hooks read the CI config and warn on drift between the two.
 
 ## 12. The Bottleneck Is Discrimination, Not Generation
 
