@@ -154,5 +154,5 @@ Each session produces:
 - After fix + regression test land: `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10. Diagnose verifies the symptom is gone; §10 review checks coupling, edge cases, spec drift the fix did not cover.
 - If Phase 5 found no correct seam for the regression test and the profile is `team` / `mature`: `/ad-deepen` to surface the deepening opportunity that would create one (Test surface impact line in the candidate template). On `poc` / `solo`, capture the gap in the commit message and the task Notes — `ad-deepen` is not installed at those profiles.
 - If Phase 1 could not build a loop and the user provided a captured artifact: re-enter Phase 1 with the artifact as the loop seed.
-- If the bug turned out to be a vocabulary drift (the term in code did not match the term in the spec): `/ad-domain` to update `CONTEXT.md` and `/ad-audit` to scan for further drift.
+- If the bug turned out to be a vocabulary drift (the term in code did not match the term in the spec): `/ad-domain` to update `CONTEXT.md` and `/ad-drift` to scan for further drift.
 - If the bug is one of several in a related cluster: `/ad-task` to capture the cluster as a tracked task with this diagnose run cited in the Notes.

@@ -85,5 +85,5 @@ Never rewrite existing prose — append rationale to Open Questions as a resolut
 - Status starts `draft`; never flipped to `accepted` by the skill.
 - No dates inside narrative prose; the `Created` and `Updated` lifecycle fields are decision-record primitives, exempt from the no-dates rule.
 
-After writing the PRD: route to `ad-spec` for each `MVP` roadmap item. When the PRD surfaces an architectural commitment, route to `ad-adr`. When a roadmap item is technique-uncertain, route to `ad-spike` (WORKFLOW §14). When the PRD framing is fuzzy, route to `ad-grill` to sharpen and return. Periodic drift check: `ad-audit` flags feature specs whose target user or success metrics contradict the PRD.
+After writing the PRD: route to `ad-spec` for each `MVP` roadmap item. When the PRD surfaces an architectural commitment, route to `ad-adr`. When a roadmap item is technique-uncertain, route to `ad-spike` (WORKFLOW §14). When the PRD framing is fuzzy, route to `ad-grill` to sharpen and return. Periodic drift check: `ad-drift` flags feature specs whose target user or success metrics contradict the PRD.
 </output_contract>

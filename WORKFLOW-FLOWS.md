@@ -57,7 +57,7 @@ flowchart TD
     Team["team<br>shared product"]
     Mature["mature<br>regulated or gate-heavy product"]
 
-    PocFlow["Use /ad-grill, /ad-ground, /ad-spike, /ad-tdg, /ad-tdd, /ad-diagnose, /ad-audit, /ad-next<br>Do not create PRD/spec/task/ADR unless the project graduates"]
+    PocFlow["Use /ad-grill, /ad-ground, /ad-spike, /ad-tdg, /ad-tdd, /ad-diagnose, /ad-drift, /ad-next<br>Do not create PRD/spec/task/ADR unless the project graduates"]
     SoloFlow["Available beyond poc: /ad-prd, /ad-bootstrap, /ad-guidelines, /ad-spec, /ad-task, /ad-review, /ad-commit, /ad-pr, /ad-merge<br>/ad-architecture and /ad-adr are opt-in"]
     TeamFlow["Use the full artifact stack after product framing<br>/ad-architecture, /ad-adr, and /ad-deepen are in the normal path"]
     MatureFlow["Team flow plus /ad-hooks as an expected gate-wiring step"]
@@ -146,7 +146,7 @@ flowchart TD
     NeedArchitecture{"Architecture/pattern docs missing or contradicted?"}
     Architecture["/ad-architecture<br>audit existing code or write patterns"]
     NeedDrift{"Suspect docs/code drift?"}
-    Audit["/ad-audit<br>read-only drift list"]
+    Audit["/ad-drift<br>read-only drift list"]
     WorkKind{"What are you doing now?"}
     QuickFix["Small fix<br>implement, verify, maybe /ad-review"]
     Feature["Feature work<br>/ad-grill -> /ad-prd or /ad-spec -> /ad-task"]
@@ -343,7 +343,7 @@ flowchart TD
     Commit["/ad-commit<br>atomic Conventional Commit with DCO"]
     Pr["/ad-pr<br>open PR"]
     Merge["/ad-merge<br>evaluate CI, comments, mergeability"]
-    Audit["/ad-audit<br>periodic drift check after larger work"]
+    Audit["/ad-drift<br>periodic drift check after larger work"]
 
     Diff --> LongSession
     LongSession -->|yes| Handoff

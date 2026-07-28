@@ -120,4 +120,4 @@ Never rewrite existing prose — append rationale to **Open Questions** as a res
 - When the PRD surfaces an architectural commitment (technology choice, deployment model, data-residency constraint): `/ad-adr` per the three-criteria rule (hard to reverse, surprising without context, real trade-off).
 - When a roadmap item is technique-uncertain: `/ad-spike` (WORKFLOW §14).
 - When the PRD framing is fuzzy and the user is still resolving target user / problem boundaries: `/ad-grill` to sharpen, then return here.
-- Periodic drift check: `/ad-audit` flags feature specs whose target user or success metrics contradict the PRD.
+- Periodic drift check: `/ad-drift` flags feature specs whose target user or success metrics contradict the PRD.

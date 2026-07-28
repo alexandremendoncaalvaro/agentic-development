@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Glob, Grep, Bash
 
 Layer 1 Constitution trinity member. Lazy lifecycle owner of `GUIDELINES.md` at the repo root. Companion to `WORKFLOW.md` (universal engineering philosophy, kit-shipped) and `AGENTS.md` (distilled non-negotiable rules read every session).
 
-`GUIDELINES.md` is the **full reference**; `AGENTS.md` is the **distilled summary**. Each AGENTS.md section that has detail points to the corresponding GUIDELINES.md section. The two never duplicate — `ad-audit` flags duplication as drift.
+`GUIDELINES.md` is the **full reference**; `AGENTS.md` is the **distilled summary**. Each AGENTS.md section that has detail points to the corresponding GUIDELINES.md section. The two never duplicate — `ad-drift` flags duplication as drift.
 
 ## Step 0 — Confirm regime
 
@@ -207,4 +207,4 @@ Never rewrite existing prose — append rationale paragraphs where decisions evo
 - After writing `GUIDELINES.md`: invoke `/ad-hooks` to wire the quality gates this file describes (`team` and `mature` profiles).
 - After writing `GUIDELINES.md`: invoke `/ad-bootstrap` to refresh `AGENTS.md` with pointer-style sections.
 - When a binding decision arises that the guidelines do not yet cover (e.g., picking a specific error-handling library, naming an exception hierarchy): `/ad-adr`.
-- Periodic drift check: `/ad-audit` flags AGENTS sections that duplicate GUIDELINES sections, and GUIDELINES sections whose claims do not match the code (e.g., naming convention says snake_case but half the codebase is camelCase).
+- Periodic drift check: `/ad-drift` flags AGENTS sections that duplicate GUIDELINES sections, and GUIDELINES sections whose claims do not match the code (e.g., naming convention says snake_case but half the codebase is camelCase).

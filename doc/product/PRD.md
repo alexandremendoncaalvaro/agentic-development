@@ -48,7 +48,7 @@ Definitional. Product-level KPIs that count, and the measurement source for each
 
 - **Idempotent install across all four profiles.** Source: `npm test` integration suite + `.github/workflows/test.yml` matrix (Node 20 / 22).
 - **Cross-host parity.** Source: `test/skills.test.js` frontmatter + manifest validation; every shipped skill installs identically for Claude Code and Codex.
-- **Documentation discipline holds in the kit itself.** Source: `/ad-audit` runs at release boundaries; zero rule-1 / rule-2 / rule-5 / rule-9 / rule-10 violations.
+- **Documentation discipline holds in the kit itself.** Source: `/ad-drift` runs at release boundaries; zero rule-1 / rule-2 / rule-5 / rule-9 / rule-10 violations.
 - **External adoption signal.** Source: `npm view @alexandrealvaro/agentic` + GitHub Insights. No internal target before 1.0 — pre-1.0 is dogfood-mode.
 - **Industry-canon coverage breadth.** Source: ADR review (manual); every new layer or skill cites the canonical source(s) in its ADR's References section.
 
@@ -61,8 +61,8 @@ Multi-feature scope tiers. No status annotations — implementation tracking liv
 - **MVP tier — Layer 3 Product.** `ad-prd` lazy `doc/product/PRD.md` lifecycle.
 - **MVP tier — Layer 4 Spec.** `ad-spec` feature-level specs at `doc/specs/`.
 - **MVP tier — Layer 5 Plan/Decisions.** `ad-architecture`, `ad-adr`, `ad-task` — ARCHITECTURE, ADRs, tasks.
-- **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-next`, `ad-audit`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-hooks`.
-- **Next tier — AGENTS ↔ GUIDELINES reciprocity automation.** `ad-bootstrap` writes pointer stubs (instead of inline rules) when `GUIDELINES.md` exists; `ad-audit` flags duplication.
+- **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-next`, `ad-drift`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-hooks`.
+- **Next tier — AGENTS ↔ GUIDELINES reciprocity automation.** `ad-bootstrap` writes pointer stubs (instead of inline rules) when `GUIDELINES.md` exists; `ad-drift` flags duplication.
 - **Next tier — Release skill (`ad-release`).** Version-bump, changelog, npm publish, GitHub release. Replaces the current manual flow.
 - **Next tier — Community-facing docs (`CONTRIBUTING.md` / `SECURITY.md`) scaffolds.** GitHub-conventional companion to `AGENTS.md`.
 - **Later tier — Per-language guideline presets.** `ad-guidelines` ships canned templates for Rust / Python / Go / TypeScript / C++ beyond the current per-language detection.

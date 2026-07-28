@@ -119,4 +119,4 @@ The output is one or more atomic commits on the current branch. Each commit:
 
 - After commits land: `ad-pr` to open the PR.
 - After PR open and CI green: `ad-merge` to evaluate and merge.
-- If a hook failure exposed recurring drift: `ad-audit`.
+- If a hook failure exposed recurring drift: `ad-drift`.
