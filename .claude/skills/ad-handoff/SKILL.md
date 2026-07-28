@@ -1,7 +1,7 @@
 ---
 name: ad-handoff
 description: Compact the current session into a handoff document a fresh agent can pick up from. Saves to the OS temp dir (never the repo). Captures live state — current branch, open artifacts, unresolved decisions, in-progress diff, recent errors — references existing artifacts (PRD / spec / task / ADR) by path instead of duplicating them, and lists suggested next skills. Redacts secrets before writing. Triggers on "handoff", "hand off this session", "compact this conversation", "save context for next session", "pass to another agent", "wrap up the session", "context exhausted", "/clear", "/ad-handoff".
-summary: Compact current session into a handoff doc in the OS temp dir. Captures live state, references artifacts by path (no duplication), suggests next skills, redacts secrets. Ephemeral by design — never commits to the repo.
+summary: Compact current session into a handoff doc in the OS temp dir. Captures live state, references artifacts by path (no duplication), suggests next skills, redacts secrets, offers a one-click resume chip on hosts with a chip primitive. Ephemeral by design — never commits to the repo.
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
@@ -138,6 +138,8 @@ Tell the user:
 2. The single recommended first action for the next session (mirrors "What the next agent should do first").
 3. The suggested-skills list, verbatim.
 
+When the host exposes a background-task chip primitive — a tool that renders a suggested task as a one-click chip spawning a fresh session (e.g. `spawn_task` in the Claude Code desktop app) — also offer the handoff as a chip. The chip's prompt must stand alone: the absolute handoff path with the instruction to read it first, the recommended first action, and the instruction to ground in the repo's binding docs (`AGENTS.md` and the artifacts the handoff references) before acting. Title: short imperative naming the work. The chip complements the file — the file stays the durable artifact; on hosts without the primitive (terminal CLI, IDE extensions, Codex) the printed path is the handoff, as above.
+
 Do **not** auto-execute `/clear` or anything destructive. The user decides when to discard the current session.
 
 ## Output contract
@@ -147,7 +149,7 @@ Do **not** auto-execute `/clear` or anything destructive. The user decides when 
 - References artifacts by path; never duplicates their content.
 - Secrets are replaced with `<REDACTED:type>` placeholders.
 - Suggested skills are drawn from the installed `ad-*` set and each line carries a one-clause rationale.
-- The user receives the absolute path of the file and the recommended first action; no destructive session ops are performed.
+- The user receives the absolute path of the file and the recommended first action; on hosts exposing a background-task chip primitive, a one-click resume chip is also offered. No destructive session ops are performed.
 
 ## Next
 
