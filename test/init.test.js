@@ -75,7 +75,7 @@ const UNIVERSAL_SKILLS = [
   'ad-adr',
   'ad-spec',
   'ad-task',
-  'ad-audit',
+  'ad-drift',
   'ad-review',
   'ad-ground',
   'ad-next',

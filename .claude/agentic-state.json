@@ -9,7 +9,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-adr/SKILL.md",
-          "sourceSha": "bed3dd0af6199de434aa40a6177c7b569082d5f11a32b5e847c612b328089fb3"
+          "sourceSha": "214182e5344a5af32c653d9a4d53fb4636b599eb3daabac4f7d41380293c4332"
         }
       ]
     },
@@ -18,7 +18,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-architecture/SKILL.md",
-          "sourceSha": "c1ad4f2bedeece1631f9121fa5815ada7a2765cea0f03a471e948cb1a06da3b8"
+          "sourceSha": "ae3d7bbbd6b1e1922fc14c5c51c8d9ffa1edb53de7486bcba391826ab97e161b"
         }
       ]
     },
@@ -27,16 +27,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-archive/SKILL.md",
-          "sourceSha": "93ef407ed2bf40346ce8c09fb08ec910aa68a475980cfd482b9e2866266b74fd"
-        }
-      ]
-    },
-    "ad-audit": {
-      "version": "0.17.9-beta.1",
-      "files": [
-        {
-          "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "c5f8b2645077e24bcfdfc5e16bca1d3b12e413b683520a23d8d2822c1d2a0c07"
+          "sourceSha": "b68ace3a3726fc52559f2a01a37d16a54163b02eb1304969f3a0cc8932bd1e69"
         }
       ]
     },
@@ -54,7 +45,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-commit/SKILL.md",
-          "sourceSha": "3f8a7dd2e2ac9d1c982bed90f7782919a9a3b11cb3f3bec36da8f0e47339ff40"
+          "sourceSha": "81c7a8dcc4b5c97bfbd2928432e822671fb831941663c9bded2a7db5be8ac0fd"
         }
       ]
     },
@@ -63,7 +54,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-deepen/SKILL.md",
-          "sourceSha": "480680556d6a4891cbfd46e4b2eda16a2b80504b025d53776da731ee8307a557"
+          "sourceSha": "eedeb64cad8f8e3fba04e075c5db6ff500d360f54ff00cb603a84339b6799fea"
         }
       ]
     },
@@ -72,7 +63,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-diagnose/SKILL.md",
-          "sourceSha": "f565609df9a21e9d879da7eeb60c5d31df8857f6ce2d094507399ecc2bd028a1"
+          "sourceSha": "bd7d19e32e969161c2c54590ede888d8e676dd170e74900c99a63c692bb9e15b"
         }
       ]
     },
@@ -81,7 +72,16 @@
       "files": [
         {
           "path": ".claude/skills/ad-domain/SKILL.md",
-          "sourceSha": "434b475d207c18d2edd5100f0e672f4597684cb4bd9cd26353027d2195ef59eb"
+          "sourceSha": "34d8af724a2e06ada1364445fedd3d5660e8cbcc7e959085cd61180e96aaefa9"
+        }
+      ]
+    },
+    "ad-drift": {
+      "version": "0.17.9-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-drift/SKILL.md",
+          "sourceSha": "0d239ae71ae87bbabe2f43f39d315b62fc3456b6acceac602766440fc57b4e0a"
         }
       ]
     },
@@ -108,7 +108,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-guidelines/SKILL.md",
-          "sourceSha": "a60907f30464b100f99ae43207685a66939128ced511ddd90c3ad70adbcae075"
+          "sourceSha": "7895fc4c443f9b108ba462e4f81eac334af20698194d5707064839f6dec22dc1"
         }
       ]
     },
@@ -126,7 +126,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-merge/SKILL.md",
-          "sourceSha": "1791640c531ec0388fea8318625119384d0bba1f9fb4c2160ab4c6d0325d6787"
+          "sourceSha": "2d8f18b59cbac2cf9ebf2f48f16201d40043510a3fbf8eb5918c943a9ad1ce1d"
         }
       ]
     },
@@ -135,7 +135,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "64044bd957a4b79f202c3f551276adbecdc30b3f8441fedc98826c59b806b23f"
+          "sourceSha": "79a037abca039bd7a76336a7633983e1e560afb48b213436fbdff0556b6bb76b"
         }
       ]
     },
@@ -162,7 +162,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-prd/SKILL.md",
-          "sourceSha": "a514afbbb18169279128c6b07d3749c46e180abe8cc6e7dbdf0d9ca4bbd489be"
+          "sourceSha": "4ff4bc2cf8d883765b379ce97213d639f8aaea241029bde2de69215e3f6c0b7f"
         }
       ]
     },
@@ -184,7 +184,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-spec/SKILL.md",
-          "sourceSha": "39eab84ca5940d3696708043503f343050b000ec9922b903ea02142143788e2f"
+          "sourceSha": "90c34bb949cab3f2453341b609994bf5c2dea0cc65e781cd073c539f04bfe0da"
         }
       ]
     },

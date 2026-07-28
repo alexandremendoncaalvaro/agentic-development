@@ -350,7 +350,7 @@ Every document in this repo follows these rules:
 
 ### 11.2 AGENTS ↔ GUIDELINES reciprocity
 
-`AGENTS.md` engineering sections (Code Style, Architectural Principles, Quality Gates, Security & Privacy) **point to** the corresponding GUIDELINES section rather than duplicating rules. The kit's `ad-audit` flags duplicated content as drift.
+`AGENTS.md` engineering sections (Code Style, Architectural Principles, Quality Gates, Security & Privacy) **point to** the corresponding GUIDELINES section rather than duplicating rules. The kit's `ad-drift` flags duplicated content as drift.
 
 ---
 

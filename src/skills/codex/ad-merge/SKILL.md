@@ -97,6 +97,6 @@ The output is a merged PR. The skill returns:
 ## Next
 
 - After merge: pull the latest base locally (`git checkout <base> && git pull`).
-- If the merge surfaced a recurring drift: `ad-audit` for systemic gaps, or update `WORKFLOW.md` §10 / §11.
+- If the merge surfaced a recurring drift: `ad-drift` for systemic gaps, or update `WORKFLOW.md` §10 / §11.
 - If the merge closed a task: confirm the task file's Status is `done` and the Notes log captures the merge commit URL.
 - If the merge shipped a binding decision worth recording: `ad-adr` (three-criteria rule).
