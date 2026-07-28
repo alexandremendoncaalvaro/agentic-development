@@ -90,7 +90,7 @@ Inline text questions are an acceptable fallback only when the host lacks the pr
 
 ## Step 5 — Write the file
 
-Path: `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` (multi-product). Use the template at [`templates/prd.md`](../../templates/prd.md).
+Path: `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` (multi-product). Use the template at [`templates/prd.md`](../../../../templates/prd.md).
 
 Stop after writing. Do **not** flip status to `accepted` — that requires user review.
 

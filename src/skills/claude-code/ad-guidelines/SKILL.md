@@ -179,7 +179,7 @@ The user confirms before the AGENTS.md rewrite. The skill never modifies AGENTS.
 
 ## Step 5 — Write the file
 
-Path: `GUIDELINES.md` at repo root. Use the template at [`templates/guidelines.md`](../../templates/guidelines.md).
+Path: `GUIDELINES.md` at repo root. Use the template at [`templates/guidelines.md`](../../../../templates/guidelines.md).
 
 Sections the user skipped do not land in the file. Sections that were fully pre-filled land verbatim. Sections requiring user preference land with the user's answer.
 
@@ -200,7 +200,7 @@ Never rewrite existing prose — append rationale paragraphs where decisions evo
 
 - Primary output: `GUIDELINES.md` at the repo root.
 - Side-effect (optional, user-confirmed): `AGENTS.md` engineering sections rewritten as pointer stubs to `GUIDELINES.md`.
-- No dates inside narrative prose; the file is project-state, not a decision-record artifact (per [WORKFLOW §2](../../WORKFLOW.md) rule #2).
+- No dates inside narrative prose; the file is project-state, not a decision-record artifact (per [WORKFLOW §2](../../../../WORKFLOW.md) rule #2).
 
 ## Next
 
