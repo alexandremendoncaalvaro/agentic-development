@@ -7,4 +7,5 @@ node_modules/
 .agentic/reviews/
 .agentic/leak-denylist.txt
 /rules/
+.agentic/rules/
 .claude/settings.local.json

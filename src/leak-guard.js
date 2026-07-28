@@ -129,6 +129,12 @@ export function findViolations({
     if (path === 'rules' || path.startsWith('rules/')) {
       violations.push({ kind: 'rules-path', path, detail: 'adds a path under rules/' });
     }
+    // ADR-0043: the per-project curated layer lives at .agentic/rules/; in this
+    // public kit repo, machine-local is the only allowed mode — committed project
+    // rules here would be exactly the leak this guard exists to prevent.
+    if (path === '.agentic/rules' || path.startsWith('.agentic/rules/')) {
+      violations.push({ kind: 'rules-path', path, detail: 'adds a path under .agentic/rules/' });
+    }
   }
 
   for (const entry of introduced) {

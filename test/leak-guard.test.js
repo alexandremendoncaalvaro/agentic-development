@@ -122,6 +122,19 @@ test('findViolations flags any added path under rules/, independent of denylist'
   assert.equal(violations[0].kind, 'rules-path');
 });
 
+test('regression: ADR-0043 findViolations flags an added path under .agentic/rules/ (per-project layer must stay machine-local in this repo)', () => {
+  const violations = findViolations({
+    entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path: '.agentic/rules/project-conventions.md' }],
+    addedLines: [],
+    denylistPatterns: [],
+    repoRoot: '/repo',
+    readSymlinkTarget: noSymlink,
+  });
+  assert.equal(violations.length, 1);
+  assert.equal(violations[0].kind, 'rules-path');
+  assert.equal(violations[0].path, '.agentic/rules/project-conventions.md');
+});
+
 test('findViolations flags a non-ASCII path under rules/ (quotepath false-negative regression)', () => {
   const violations = findViolations({
     entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path: 'rules/内部规则.md' }],
