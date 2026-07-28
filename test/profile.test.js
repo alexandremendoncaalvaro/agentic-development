@@ -142,12 +142,12 @@ test('ad-domain is universal in every profile (Layer 2 ubiquitous language appli
   }
 });
 
-test('ad-grill is universal in every profile (interview-before-research applies at every maturity per ADR-0022)', () => {
+test('ad-grill-me is universal in every profile (interview-before-research applies at every maturity per ADR-0022)', () => {
   for (const name of PROFILE_NAMES) {
     const universal = new Set(PROFILES[name].universal);
     assert.ok(
-      universal.has('ad-grill'),
-      `profile ${name} must include ad-grill in its universal set per ADR-0022`
+      universal.has('ad-grill-me'),
+      `profile ${name} must include ad-grill-me in its universal set per ADR-0022`
     );
   }
 });

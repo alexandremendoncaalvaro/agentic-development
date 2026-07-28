@@ -82,7 +82,7 @@ const UNIVERSAL_SKILLS = [
   'ad-spike',
   'ad-tdg',
   'ad-domain',
-  'ad-grill',
+  'ad-grill-me',
   'ad-deepen',
   'ad-diagnose',
   'ad-commit',

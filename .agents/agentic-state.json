@@ -95,7 +95,7 @@
         },
         {
           "path": ".agents/skills/ad-deepen/SKILL.md",
-          "sourceSha": "d945dabaa8d5048818bbfa8565eaebeb9989729e698e270384be9d70d72394bd"
+          "sourceSha": "b7f52625b69f525abefad7a76699311ac55b1a118f7f01603acb9bfbd8118628"
         }
       ]
     },
@@ -108,7 +108,7 @@
         },
         {
           "path": ".agents/skills/ad-diagnose/SKILL.md",
-          "sourceSha": "fa19ef49cafd7d985186c6509620892877a39aa69b4fe219e6cf0c78dababd7a"
+          "sourceSha": "ac40f0cd79dc11c53b4be942be6a0dddf13abb23569f028318db3143339febcd"
         }
       ]
     },
@@ -121,7 +121,7 @@
         },
         {
           "path": ".agents/skills/ad-domain/SKILL.md",
-          "sourceSha": "80a0908326e154488c1f99857a57f47b3701f6b92a7f8278dd1a2d22c54c6123"
+          "sourceSha": "318a0f4e0db230ab4e0544bc1253b5f5fe9624718546b40f4c87f7da17655cc3"
         }
       ]
     },
@@ -138,16 +138,16 @@
         }
       ]
     },
-    "ad-grill": {
+    "ad-grill-me": {
       "version": "0.17.9-beta.1",
       "files": [
         {
-          "path": ".agents/skills/ad-grill/agents/openai.yaml",
-          "sourceSha": "cff51605a057a12be162116d2b8a7c885e72e407df642f807d6b6b38e2f1824d"
+          "path": ".agents/skills/ad-grill-me/agents/openai.yaml",
+          "sourceSha": "08f6a2f2e17fcd8f079bf427d73744e1ce74bb16176d194e59b7f6976416c0d8"
         },
         {
-          "path": ".agents/skills/ad-grill/SKILL.md",
-          "sourceSha": "7bb9a87fae699f1e7f5e468f5419027560f84587a7bfefea8df7822438b8ca79"
+          "path": ".agents/skills/ad-grill-me/SKILL.md",
+          "sourceSha": "ab40522570d68f8f13bed123e4300f139d02fee5c5ef5381571f1a2809f3e2e9"
         }
       ]
     },
@@ -186,7 +186,7 @@
         },
         {
           "path": ".agents/skills/ad-handoff/SKILL.md",
-          "sourceSha": "01114b2e44742c9e3fc2d46b9856dc9b5ffd1ff38efdab202938c649019a2c9d"
+          "sourceSha": "2026f4f3c0964f595743a6b2ffeaf8d32ef8bdd7903af79b5b0d60ecc103ce3e"
         }
       ]
     },
@@ -229,7 +229,7 @@
         },
         {
           "path": ".agents/skills/ad-next/SKILL.md",
-          "sourceSha": "eb488b46f31c7049b86f6bb1b544c756e94b397438a5b09f2ca316608b1c1f50"
+          "sourceSha": "236f544ed8eecc1fd647a73e8a81407e5cfcca926d7ac7fb2dfb58b560d529fe"
         }
       ]
     },
@@ -242,7 +242,7 @@
         },
         {
           "path": ".agents/skills/ad-philosophy/SKILL.md",
-          "sourceSha": "87ca5b61a8f598ea06384962b629ce00334624a0e3bf97ed3e17d6881b3d21d3"
+          "sourceSha": "3768bd4b7b5da61435b84445379d41dd3ea1f9486a4f77a2385ef36ec5d51676"
         }
       ]
     },
@@ -268,7 +268,7 @@
         },
         {
           "path": ".agents/skills/ad-prd/SKILL.md",
-          "sourceSha": "90e101bc50e16ff85802f898bcb7785d6b5c05dc5945ed4cf8d7a170e4d24c0e"
+          "sourceSha": "1690b5d57f6651aad62432f4b0eae0e61e592a22e834ad1d2843be770736d812"
         }
       ]
     },

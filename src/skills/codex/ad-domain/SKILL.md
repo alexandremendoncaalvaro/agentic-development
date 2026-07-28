@@ -8,7 +8,7 @@ summary: Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language p
 Implements ADR-0019 (`doc/adr/0019-domain-language-layer.md`) — Layer 2 of the artifact stack. Lazy lifecycle owner of `CONTEXT.md`. Process scaffold for capturing the project's ubiquitous language.
 
 The skill owns *capture* of vocabulary. The *trigger* for most updates lives in adjacent skills:
-- `ad-grill` resolves a term during interview → routes here.
+- `ad-grill-me` resolves a term during interview → routes here.
 - `ad-spec` introduces a new noun while drafting a spec → routes here.
 - `ad-architecture` names a domain-bound concept → routes here.
 - `ad-drift` detects code/glossary drift → routes here.
@@ -129,7 +129,7 @@ Then reports the change as a one-liner: file, term, section. No slash-command sp
 
 ## Next
 
-- After capture: route back to the calling skill (`ad-grill`, `ad-spec`, `ad-architecture`) to resume the original turn.
+- After capture: route back to the calling skill (`ad-grill-me`, `ad-spec`, `ad-architecture`) to resume the original turn.
 - If the resolution surfaced a binding decision (hard to reverse, surprising without context, real trade-off): `/ad-adr` to record it.
-- If the term is one of several pending resolutions: stay in `/ad-grill` to walk the next branch of the design tree.
+- If the term is one of several pending resolutions: stay in `/ad-grill-me` to walk the next branch of the design tree.
 - For periodic drift sweeps: `/ad-drift` checks `CONTEXT.md` against current code.
