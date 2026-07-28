@@ -374,7 +374,7 @@ export async function initCommand(opts) {
       '/ad-spike (WORKFLOW §14 — staged spike with golden fixtures)',
       '/ad-tdg (WORKFLOW §9 — outcome-based prompting + TDM)',
       '/ad-domain (CONTEXT.md — Layer 2 ubiquitous language)',
-      '/ad-grill (interview-before-research)',
+      '/ad-grill-me (interview-before-research)',
       '/ad-deepen (WORKFLOW §8 — deepening opportunities)',
       '/ad-diagnose (WORKFLOW §15 — five-phase diagnosis)',
       '/ad-commit (Conventional Commits + DCO sign-off)',

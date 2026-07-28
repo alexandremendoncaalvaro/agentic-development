@@ -67,7 +67,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-deepen/SKILL.md",
-          "sourceSha": "29c91284e2e1d0ee43ee9e2d96e905a6aa1eafee590ab06a64ae44b04a6ca195"
+          "sourceSha": "7456595a12f8d91c81e8c91f862e1a8359a144567ae7bfa7fa38b4a45567eb38"
         }
       ]
     },
@@ -76,7 +76,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-diagnose/SKILL.md",
-          "sourceSha": "f05c526eeac808e5954e88624feb4cc22c5acf9d25df3dc8182d201b0a937902"
+          "sourceSha": "a3888227534190a666bdd652322476c0d8fa3900731b8d689a8439650d150952"
         }
       ]
     },
@@ -85,7 +85,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-domain/SKILL.md",
-          "sourceSha": "10970584d7f635e99ebce9d08b0529e88350de41adba46d2f6b36b7e49b66b25"
+          "sourceSha": "e69fcc3758ace11c2d2fe0da864f5dea4c2e701b9a3894202dc00b640081975c"
         }
       ]
     },
@@ -98,12 +98,12 @@
         }
       ]
     },
-    "ad-grill": {
+    "ad-grill-me": {
       "version": "0.17.9-beta.1",
       "files": [
         {
-          "path": ".claude/skills/ad-grill/SKILL.md",
-          "sourceSha": "0df4dcd35113f75ff82e76ea2dc63f341256977ef12a09e51b756bf09b1f3e2e"
+          "path": ".claude/skills/ad-grill-me/SKILL.md",
+          "sourceSha": "c98071194d9cd22827e5fada165a8cc9be83f215f751fe855d3aa9f6e065fb51"
         }
       ]
     },
@@ -130,7 +130,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-handoff/SKILL.md",
-          "sourceSha": "5c16294bae5af25b45d28f216cd4c76344a48e3ecede9718a01afba4f03f371f"
+          "sourceSha": "d3831b69d7b7981f322ee90fd068294e651838d778314d54b5491030cd958565"
         }
       ]
     },
@@ -161,7 +161,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "79a037abca039bd7a76336a7633983e1e560afb48b213436fbdff0556b6bb76b"
+          "sourceSha": "3baee92498c84b067385949fbac8b45a5e04c967eb59969787629ca2548ca4a7"
         }
       ]
     },
@@ -170,7 +170,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-philosophy/SKILL.md",
-          "sourceSha": "ae87bb756fed05b164c75001185d5172a57c904bb761a6d4237580cecd145173"
+          "sourceSha": "ccfe37947e434632dfb1ead67dd72a78941bf5af6c55bf00151b6ab8dad94cb9"
         }
       ]
     },
@@ -188,7 +188,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-prd/SKILL.md",
-          "sourceSha": "9226cfe0d54bd0509536ab2f183962ff8c3d884787f29a17ef6ec7d802c86baa"
+          "sourceSha": "b93cc306bb5cc47d08039c67b2b6fd2eb48d268a4339929b34758909f8099320"
         }
       ]
     },

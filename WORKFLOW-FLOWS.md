@@ -57,7 +57,7 @@ flowchart TD
     Team["team<br>shared product"]
     Mature["mature<br>regulated or gate-heavy product"]
 
-    PocFlow["Use /ad-grill, /ad-ground, /ad-spike, /ad-tdg, /ad-tdd, /ad-diagnose, /ad-drift, /ad-next<br>Do not create PRD/spec/task/ADR unless the project graduates"]
+    PocFlow["Use /ad-grill-me, /ad-ground, /ad-spike, /ad-tdg, /ad-tdd, /ad-diagnose, /ad-drift, /ad-next<br>Do not create PRD/spec/task/ADR unless the project graduates"]
     SoloFlow["Available beyond poc: /ad-prd, /ad-bootstrap, /ad-guidelines, /ad-spec, /ad-task, /ad-review, /ad-commit, /ad-pr, /ad-merge<br>/ad-architecture and /ad-adr are opt-in"]
     TeamFlow["Use the full artifact stack after product framing<br>/ad-architecture, /ad-adr, and /ad-deepen are in the normal path"]
     MatureFlow["Team flow plus /ad-hooks as an expected gate-wiring step"]
@@ -82,7 +82,7 @@ Use this when the project has no durable product framing yet, or when a greenfie
 flowchart TD
     Init["agentic init<br>install skills only"]
     ProductFuzzy{"Product ask fuzzy?"}
-    Grill["/ad-grill<br>interview before research"]
+    Grill["/ad-grill-me<br>interview before research"]
     Domain["/ad-domain<br>capture resolved vocabulary in CONTEXT.md"]
     Prd["/ad-prd<br>product scope, target user, metrics, roadmap"]
     Bootstrap["/ad-bootstrap<br>AGENTS.md session-load rules derived from context"]
@@ -149,7 +149,7 @@ flowchart TD
     Audit["/ad-drift<br>read-only drift list"]
     WorkKind{"What are you doing now?"}
     QuickFix["Small fix<br>implement, verify, maybe /ad-review"]
-    Feature["Feature work<br>/ad-grill -> /ad-prd or /ad-spec -> /ad-task"]
+    Feature["Feature work<br>/ad-grill-me -> /ad-prd or /ad-spec -> /ad-task"]
     Research["Research only<br>/ad-ground"]
 
     Open --> Installed
@@ -185,7 +185,7 @@ Use this when the request is not sharp enough to research or implement.
 ```mermaid
 flowchart TD
     Ask["Vague ask<br>ambiguous user, problem, term, or success condition"]
-    Grill["/ad-grill<br>one question at a time"]
+    Grill["/ad-grill-me<br>one question at a time"]
     Term{"Vocabulary resolved?"}
     Domain["/ad-domain<br>CONTEXT.md"]
     Scope{"Scope level?"}
@@ -213,7 +213,7 @@ flowchart TD
     Ground --> Implement
 ```
 
-Source: `WORKFLOW.md` sections 1, 4-6; `ad-grill`, `ad-domain`, `ad-prd`, `ad-spec`, `ad-task` skill contracts.
+Source: `WORKFLOW.md` sections 1, 4-6; `ad-grill-me`, `ad-domain`, `ad-prd`, `ad-spec`, `ad-task` skill contracts.
 
 ## Research And Technique Choice
 

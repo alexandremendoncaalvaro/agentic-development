@@ -111,7 +111,7 @@ Step 4 — write the handoff. File shape:
 Suggested-skills picks from the installed `ad-*` set. Common patterns:
 - Mid-implementation, behavior expressible as test → `ad-tdd`.
 - Stuck on a bug → `ad-diagnose`.
-- Spec unclear → `ad-grill`.
+- Spec unclear → `ad-grill-me`.
 - About to land work → `ad-commit` → `ad-pr` → `ad-merge`.
 - Ready for fresh-context review → `ad-review main..HEAD` (Codex writes an audit-trail handoff, then can explicitly spawn the bundled reviewer subagent against that file when the user asks).
 
