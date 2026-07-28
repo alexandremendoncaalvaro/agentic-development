@@ -65,7 +65,7 @@ Number candidates 1, 2, 3, ... Order by leverage × locality (largest impact fir
 
 Step 3 — grilling loop on the chosen candidate. The user picks one candidate by number. Drop into a grilling loop on that one:
 
-1. Walk the design tree of the proposal branch by branch (one question per turn, recommendation included). Reuse the `ad-grill-me` discipline.
+1. Walk the decision tree of the proposal branch by branch (one question per turn, recommendation included). Reuse the `ad-grill-me` discipline.
 2. Add new domain terms to `CONTEXT.md` lazily via `ad-domain` as the proposal surfaces them.
 3. Offer an ADR only when the three criteria pass (hard to reverse, surprising without context, real trade-off —' ' Most refactors do not need an ADR.
 4. When the proposal stabilizes: route to `ad-tdg` (WORKFLOW §9) for the implementation pass with ground-truth pair + TDM + criterion-based selection.

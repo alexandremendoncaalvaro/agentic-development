@@ -67,7 +67,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-deepen/SKILL.md",
-          "sourceSha": "7456595a12f8d91c81e8c91f862e1a8359a144567ae7bfa7fa38b4a45567eb38"
+          "sourceSha": "71267d9cbdd583692a69673e569aa7b6d2d8a4c48177df68893eb6d9c10677df"
         }
       ]
     },
@@ -85,7 +85,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-domain/SKILL.md",
-          "sourceSha": "e69fcc3758ace11c2d2fe0da864f5dea4c2e701b9a3894202dc00b640081975c"
+          "sourceSha": "a96f9023dda07a2bf9e5ce84f3dd65b2c62947d28a9800e7dc89052ace2deeeb"
         }
       ]
     },
@@ -103,7 +103,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-grill-me/SKILL.md",
-          "sourceSha": "c98071194d9cd22827e5fada165a8cc9be83f215f751fe855d3aa9f6e065fb51"
+          "sourceSha": "4502d7dc9ac146780da429b580393419bbafe0f5c0b346bbb5e575675b29863e"
         }
       ]
     },
