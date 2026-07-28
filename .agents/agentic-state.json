@@ -43,6 +43,23 @@
         }
       ]
     },
+    "ad-audit": {
+      "version": "0.17.9-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-audit/agents/openai.yaml",
+          "sourceSha": "c6397d113b8b485635475589e536041cd56c0e3bdac08026c41d5e933fcd6ba8"
+        },
+        {
+          "path": ".agents/skills/ad-audit/SKILL.md",
+          "sourceSha": "0c68c69eac0c3763356a961e2d01d959a0f345c54143e5f307d0fa346c471e04"
+        },
+        {
+          "path": ".codex/agents/audit-group-reviewer.toml",
+          "sourceSha": "a2d7dfa24a622a7d16ff9287091c3d969b0c0c40f3aecada7c2e11d72374ed8d"
+        }
+      ]
+    },
     "ad-bootstrap": {
       "version": "0.17.9-beta.1",
       "files": [
