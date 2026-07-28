@@ -1,7 +1,7 @@
 ---
 name: ad-level-up
 description: Curate the project's rule-set — add, refine, merge, or retire a convention. The companion to `ad-audit` — where ad-audit audits against the rules, this evolves them, leanly. Every candidate must clear four anti-overfitting gates (recurrence-or-deliberate-decision, generalisation, load-bearing root cause, proportionate cost) plus an effectiveness pass (is it a genuine improvement, does it duplicate an existing rule, does it catch real observed behaviour) or it is rejected out loud. Every drafted candidate then passes an adversarial multi-lens review — is it already covered? does it hold up? is it placed right? — and only survivors reach you. HARD human-in-the-loop — it NEVER writes without explicit approval; it presents a proposal with a plain-language rationale and applies only on your OK, one item at a time. Use on "add a convention", "update the rules", "new rule", "merge these rules", "we keep hitting X, make it a rule", "retire this rule", "/ad-level-up", or a rule-gap handoff from `ad-audit`.
-summary: Human-gated rule-set curation, companion to ad-audit. Four anti-overfitting gates + effectiveness pass + adversarial multi-lens review of each candidate, then a HARD human-approval gate — never writes unprompted, one item at a time. Writes to the curated rule-set at the ADR-0035 location.
+summary: Human-gated rule-set curation, companion to ad-audit. Four anti-overfitting gates + effectiveness pass + adversarial multi-lens review of each candidate, then a HARD human-approval gate — never writes unprompted, one item at a time. Writes to the ADR-0035 machine store or the ADR-0043 project layer (.agentic/rules/).
 allowed-tools: Read, Glob, Grep, Bash, Task, Edit, Write
 ---
 
@@ -15,7 +15,12 @@ A full or drifting context, or a model having an off moment, must never edit the
 
 ## Rules target
 
-The curated rule-set lives at the machine location from [ADR-0035](../../../../doc/adr/0035-rules-location-convention.md): `$AGENTIC_RULES_DIR` if set, else `~/.agentic/rules/`. Read it before proposing (the edit needs a prior read; voice-matching needs the current text). If no curated store exists, say so — offer to create it at that location on approval, rather than inventing a path. A convention that belongs in a repo binding doc (`AGENTS.md`, `GUIDELINES.md`) or is bigger than a rule line routes to `/ad-adr` or `/ad-guidelines` instead — this skill owns the terse rule-set.
+Two curated layers exist ([ADR-0035](../../../../doc/adr/0035-rules-location-convention.md) + [ADR-0043](../../../../doc/adr/0043-per-project-rules-layer.md)); every accepted candidate targets exactly one:
+
+- **Machine store** — a you-everywhere convention: `$AGENTIC_RULES_DIR` if set, else `~/.agentic/rules/`.
+- **Project rules** — a this-project convention: `.agentic/rules/` at the repo root. On genuine conflict, a project rule shadows a machine-store rule (the audit reports the shadowing), so curate a project rule when the project deliberately deviates from the practitioner's global set.
+
+Recommend the layer from the rule's own content (does it generalize beyond this repo?); the user confirms. Read the target layer before proposing (the edit needs a prior read; voice-matching needs the current text). If the target layer does not exist yet, say so — offer to create it on approval, rather than inventing a path. **First project-rule creation:** ask whether `.agentic/rules/` is **committed** (versions with the repo; the team inherits it) or **machine-local**; in machine-local mode, on approval, write the `.agentic/rules/` entry into `.git/info/exclude` yourself — never `.gitignore`, which is committed and team-visible. When you find an `.agentic/rules/` that is neither committed nor excluded (e.g. a fresh clone), re-offer the choice. A convention that belongs in a repo binding doc (`AGENTS.md`, `GUIDELINES.md`) or is bigger than a rule line routes to `/ad-adr` or `/ad-guidelines` instead — this skill owns the terse rule-set.
 
 ## Step 1 — State candidate + evidence
 

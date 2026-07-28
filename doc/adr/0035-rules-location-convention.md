@@ -3,6 +3,7 @@
 **Status:** proposed
 **Date:** 2026-07-27
 **Deciders:** Alexandre Alvaro
+**Amended by:** [ADR-0043](0043-per-project-rules-layer.md) — adds a per-project `.agentic/rules/` layer, superseding this ADR's rejection of that alternative for the project scope.
 
 ## Context
 
@@ -45,7 +46,7 @@ Negative / trade-offs:
 
 ## Alternatives Considered
 
-* **Per-repo `.agentic/rules/`** — rejected. Not portable (re-curate per repo), mixes with the ephemeral `.agentic/reviews/` working state, and is blocked by the leak-guard inside this kit's own repo.
+* **Per-repo `.agentic/rules/`** — rejected. **(Superseded for the project layer by [ADR-0043](0043-per-project-rules-layer.md) — these rejection reasons do not apply to project-scoped rules; the machine store this ADR defines is unchanged.)** Not portable (re-curate per repo), mixes with the ephemeral `.agentic/reviews/` working state, and is blocked by the leak-guard inside this kit's own repo.
 * **Config-key only, no default path** — rejected. `ad-audit` would be unusable until configured; the zero-config base-layer path is the happy path.
 * **XDG base directory (`~/.config/agentic/rules/`)** — rejected. More "correct" for Linux purists, but inconsistent with the `.agentic/` directory the kit already uses in-repo; internal consistency wins here.
 * **Ship a starter rule-set in the kit** — rejected. The kit is public and generic; shipping rules would either leak house-specific content or impose opinions the kit deliberately avoids. Rules are the user's.

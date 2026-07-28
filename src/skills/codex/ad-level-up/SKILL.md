@@ -2,8 +2,8 @@
 name: ad-level-up
 description: |
   Run this skill when the user explicitly invokes `/ad-level-up` or names it, or asks to evolve the project's rule-set — "add a convention", "update the rules", "new rule", "merge these rules", "we keep hitting X, make it a rule", "retire this rule" — or hands over a rule gap surfaced by `ad-audit`. Companion to `ad-audit`: where ad-audit audits against the rules, this evolves them, leanly. This skill is user-invoked (`allow_implicit_invocation: false`) because it can write to the rule-set — invoke it explicitly with `/ad-level-up` or by naming it, not from inferred conversation.
-  Mechanical shape: ONE pass in the current session. Every candidate clears four anti-overfitting gates plus an effectiveness pass or is rejected out loud; the drafted candidate then passes an adversarial multi-lens review; and NOTHING is written without the user's explicit approval, one item at a time. It presents a proposal with a plain-language rationale and applies only on your OK. Writes land in the curated rule-set at the ADR-0035 location.
-summary: Human-gated rule-set curation, companion to ad-audit. Four anti-overfitting gates + effectiveness pass + adversarial multi-lens review of each candidate, then a HARD human-approval gate — never writes unprompted, one item at a time. Ships a rule-candidate-reviewer subagent for user-initiated lens escalation.
+  Mechanical shape: ONE pass in the current session. Every candidate clears four anti-overfitting gates plus an effectiveness pass or is rejected out loud; the drafted candidate then passes an adversarial multi-lens review; and NOTHING is written without the user's explicit approval, one item at a time. It presents a proposal with a plain-language rationale and applies only on your OK. Writes land in the curated rule-set — the ADR-0035 machine store for you-everywhere conventions, or the ADR-0043 project layer (`.agentic/rules/`) for this-project conventions.
+summary: Human-gated rule-set curation, companion to ad-audit. Four anti-overfitting gates + effectiveness pass + adversarial multi-lens review per candidate, then a HARD human gate — never writes unprompted. Targets the ADR-0035 machine store or ADR-0043 project layer. Ships a rule-candidate-reviewer subagent.
 ---
 
 <how-this-runs-on-codex>
@@ -32,13 +32,14 @@ HARD human gate: NEVER write to the rule-set without explicit human approval. Al
 - Do NOT write, edit, or create any rule file before the user explicitly approves that specific item.
 - Do NOT add a rule that an existing rule (or a repo binding doc) already covers — merge or sharpen instead.
 - Do NOT add a rule for a lone, uncited, cheaply-caught slip — that is a note, not a rule (each extra rule lowers adherence to all the others).
-- Do NOT invent a rule-set location — resolve `$AGENTIC_RULES_DIR` / `~/.agentic/rules/`; if absent, offer to create it on approval.
+- Do NOT invent a rule-set location — machine store resolves `$AGENTIC_RULES_DIR` / `~/.agentic/rules/`; project layer is `.agentic/rules/` at the repo root; if the target layer is absent, offer to create it on approval.
+- Do NOT put the project layer in `.gitignore` when the user picks machine-local visibility — the exclusion goes in `.git/info/exclude` (per-clone, never committed).
 - Do NOT route an architectural decision or an engineering standard here — send it to `/ad-adr` or `/ad-guidelines`.
 - Do NOT begin any file I/O before printing the Step 0 announce line.
 </anti-patterns>
 
 <background_information>
-The companion that evolves the rule-set `ad-audit` audits against. Curation is a WRITE operation behind a human gate — distinct from the read-only `ad-audit`. The mechanism (four anti-overfitting gates, effectiveness pass, deterministic placement, adversarial multi-lens review, hard human gate) and the rule-set location convention are ADR-0037 and ADR-0035. On Claude Code the multi-lens review fans out `Task` subagents; on Codex it runs inline with an optional user-initiated `rule-candidate-reviewer` escalation. The skill owns the terse rule-set only — bigger decisions route to `ad-adr` / `ad-guidelines`.
+The companion that evolves the rule-set `ad-audit` audits against. Curation is a WRITE operation behind a human gate — distinct from the read-only `ad-audit`. The mechanism (four anti-overfitting gates, effectiveness pass, deterministic placement, adversarial multi-lens review, hard human gate) is ADR-0037; the rule-set locations are ADR-0035 (machine store) and ADR-0043 (project layer at `.agentic/rules/`, committed or machine-local via `.git/info/exclude` — a project rule shadows a conflicting machine-store rule, and the audit reports the shadowing). On Claude Code the multi-lens review fans out `Task` subagents; on Codex it runs inline with an optional user-initiated `rule-candidate-reviewer` escalation. The skill owns the terse rule-set only — bigger decisions route to `ad-adr` / `ad-guidelines`.
 </background_information>
 
 <instructions>
@@ -58,7 +59,7 @@ Step 4 — effectiveness pass. Classify (improvement / correction / increment / 
 
 Step 5 — deterministic placement. Assign to the group whose grounding-target it matches; keep the group set minimal (new group only when a defect class is uncovered by every existing group; split only when a group grows too large); next stable id.
 
-Step 6 — draft the minimal edit. Resolve the rule-set path (`$AGENTIC_RULES_DIR` else `~/.agentic/rules/`); read the target file(s) first. Draft the terse imperative rule (and its rationale when worth keeping). Do NOT write to disk.
+Step 6 — draft the minimal edit. Pick the layer from the rule's own content (generalizes beyond this repo → machine store at `$AGENTIC_RULES_DIR` else `~/.agentic/rules/`; this-project convention → `.agentic/rules/` at the repo root), stating the recommendation for the user to confirm; read the target file(s) first. On first project-rule creation ask committed vs machine-local; machine-local wires `.agentic/rules/` into `.git/info/exclude` (on approval, never `.gitignore`). When you find an `.agentic/rules/` that is neither committed nor excluded (e.g. a fresh clone of a machine-local repo), re-offer the committed-vs-machine-local choice. Draft the terse imperative rule (and its rationale when worth keeping). Do NOT write to disk.
 
 Step 7 — adversarial multi-lens review. Refute the candidate against the actual current rule files along three lenses: (a) already-covered (cite the covering rule → reject/merge), (b) coherence + necessity (minimal change? clears the gates?), (c) placement. Run inline; for a substantive rule, recommend the user spawn the bundled `rule-candidate-reviewer` subagent once per lens for true isolation. Filter and reclassify; do not write.
 

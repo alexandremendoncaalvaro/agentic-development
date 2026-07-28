@@ -40,7 +40,7 @@
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "8ea87266c9b76fdd73c8319b9a5b7b1f57c1354d57bba4125242c5cf4279ca26"
+          "sourceSha": "0a65adb98484daa8dbc21d42ca2a61dc077447aa173b9fe03240ce6eca8bff60"
         }
       ]
     },
@@ -143,7 +143,7 @@
         },
         {
           "path": ".claude/skills/ad-level-up/SKILL.md",
-          "sourceSha": "9517b0ba3b371da27b57efbaa2c91431233bbfb61ba290d99f0612daa8b86ab4"
+          "sourceSha": "f3cbdda9320246160342593262b751ca68e45116a4dca819389af661903828a8"
         }
       ]
     },

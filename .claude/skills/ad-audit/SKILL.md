@@ -1,6 +1,6 @@
 ---
 name: ad-audit
-description: Maximum-gate, rules-anchored adversarial audit — the strongest quality gate before work reaches the team. Audits a target (diff, branch, PR, or drafted claims/artifacts about to be posted) against the project's rule-set (repo binding docs plus an optional curated machine store), fanning out one isolated fresh-context reviewer per rule-group. Every rule gets an explicit verdict (pass / violation / judgement-call / n-a — none skipped, so coverage is a matrix, not a hope), every finding is grounded on the actual code/output and cites the exact rule, and every teammate-visible claim needs a real evidence artifact or it is a blocker. Rule-groups the rule-set marks critical get a second, cross-model pass via the kit's dual-host split. Findings combine by union then filter; never emits an "approve" verdict. Use before posting to the team, opening a PR, or handing off, or on "audit against the rules", "adversarial audit", "maximum gate", "rules audit", "verify before I post", "exhaustive review", "/ad-audit". Heavier and more exhaustive than `ad-review` (light two-axis diff review); distinct from `ad-drift` (documentation-drift only).
+description: Maximum-gate, rules-anchored adversarial audit — the strongest quality gate before work reaches the team. Audits a target (diff, branch, PR, or drafted claims/artifacts about to be posted) against the project's rule-set (repo binding docs plus optional curated machine and project rule layers), fanning out one isolated fresh-context reviewer per rule-group. Every rule gets an explicit verdict (pass / violation / judgement-call / n-a — none skipped, so coverage is a matrix, not a hope), every finding is grounded on the actual code/output and cites the exact rule, and every teammate-visible claim needs a real evidence artifact or it is a blocker. Rule-groups the rule-set marks critical get a second, cross-model pass via the kit's dual-host split. Findings combine by union then filter; never emits an "approve" verdict. Use before posting to the team, opening a PR, or handing off, or on "audit against the rules", "adversarial audit", "maximum gate", "rules audit", "verify before I post", "exhaustive review", "/ad-audit". Heavier and more exhaustive than `ad-review` (light two-axis diff review); distinct from `ad-drift` (documentation-drift only).
 summary: Maximum-gate rules-anchored audit. Fans out one fresh-context reviewer per rule-group, exhaustive per-rule verdicts (coverage matrix), cross-model on critical groups via the dual-host split, evidence-gated, never approves. Heavier than ad-review; hands rule gaps to ad-level-up.
 allowed-tools: Read, Glob, Grep, Bash, Task
 ---
@@ -20,12 +20,15 @@ State exactly what is under review and which tree it rests on — the tree is pa
 
 When the host exposes `AskUserQuestion`, confirm the target as a multi-choice card.
 
-## Step 1 — Resolve the rule-set (two layers)
+## Step 1 — Resolve the rule-set (three layers)
 
-Per [ADR-0035](../../../../doc/adr/0035-rules-location-convention.md), the rule-set is the union of:
+Per [ADR-0035](../../../../doc/adr/0035-rules-location-convention.md) and [ADR-0043](../../../../doc/adr/0043-per-project-rules-layer.md), the rule-set is the union of:
 
 1. **Repo binding docs (always).** `AGENTS.md`, `ARCHITECTURE.md`, `GUIDELINES.md`, `CONTEXT.md` / `CONTEXT-MAP.md`, and accepted ADRs under `doc/adr/` whose subject the target touches. Read what exists; never fabricate.
 2. **Curated machine store (optional).** Resolve the path: use `$AGENTIC_RULES_DIR` if set; else `~/.agentic/rules/` if it exists; else skip this layer. Read every rule file it contains.
+3. **Project rules (optional).** `.agentic/rules/` at the repo root, if present — same file format as the machine store. It may be committed or machine-local (excluded via `.git/info/exclude`); resolution does not care which.
+
+**Precedence:** union across layers, except on genuine conflict, where a project rule wins over a machine-store rule. Shadowing is never silent — apply the project rule and report the shadowed machine-store rule as a line in the audit output.
 
 The rule-set — not this skill — defines the **groups** and any **critical** tag. Do not invent, resize, or hardcode groups or rule content. If the curated store defines groups explicitly, use them; if only the repo docs exist, treat each binding doc (and each accepted ADR) as a group. If no rule-set resolves at all, stop and tell the user there is nothing to audit against.
 
