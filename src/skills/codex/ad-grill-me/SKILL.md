@@ -1,6 +1,6 @@
 ---
-name: ad-grill
-description: Interview-before-research grilling session that challenges a fuzzy ask against the existing codebase, sharpens vocabulary against `CONTEXT.md`, and resolves the design tree branch by branch. One question at a time, codebase-first when an answer is in code, with each question carrying a recommended answer. Triggers on "grill me", "interview me", "stress test the plan", "challenge my assumptions", "before implementing", "ask me questions", "fuzzy ask", "sharpen the question", "what should I clarify", "/ad-grill". Routes to `ad-ground` once the question is research-ready, `ad-tdg` once the technique is settled, `ad-spike` for technique discovery, `ad-diagnose` for debugging.
+name: ad-grill-me
+description: Interview-before-research grilling session that challenges a fuzzy ask against the existing codebase, sharpens vocabulary against `CONTEXT.md`, and resolves the design tree branch by branch. One question at a time, codebase-first when an answer is in code, with each question carrying a recommended answer. Triggers on "grill me", "interview me", "stress test the plan", "challenge my assumptions", "before implementing", "ask me questions", "fuzzy ask", "sharpen the question", "what should I clarify", "/ad-grill-me". Routes to `ad-ground` once the question is research-ready, `ad-tdg` once the technique is settled, `ad-spike` for technique discovery, `ad-diagnose` for debugging.
 summary: Interview-before-research grilling session — one question at a time with recommendation, codebase-first, sharpens vocabulary against `CONTEXT.md`, captures terms via `ad-domain` and decisions via `ad-adr` (three-criteria rule). Upstream of `ad-ground`.
 ---
 
@@ -102,5 +102,5 @@ Each turn:
 - When the technique is known and the ask is implementation-strategy choice: `/ad-tdg` (WORKFLOW §9).
 - When the technique itself is uncertain: `/ad-spike` (WORKFLOW §14).
 - When the ask turned out to be "fix this bug": `/ad-diagnose` (WORKFLOW §15).
-- After capture: stay in `/ad-grill` to walk the next branch of the design tree, or route out per above.
+- After capture: stay in `/ad-grill-me` to walk the next branch of the design tree, or route out per above.
 - If the session spans multiple working days: `/ad-task` to capture the open branches as a tracked task.

@@ -172,7 +172,7 @@ Ask only when:
 - **Design or taste.** UX shape, product tradeoff, naming that carries brand — outputs a human has to look at and form an opinion about.
 - **Irreversible or high blast radius.** Destructive git ops, shared-state mutations, published artifacts, force-pushes. Match the confirmation to the blast radius of the action, not to the size of the diff.
 - **Genuinely close calls.** Two options tied on the picked criterion; the tie-break is a preference the agent cannot ground.
-- **Fuzzy spec.** The ask itself is under-specified — route to `/ad-grill`, not a raw open question.
+- **Fuzzy spec.** The ask itself is under-specified — route to `/ad-grill-me`, not a raw open question.
 
 Shape of the ask when it is warranted: one question, recommended answer first, why the alternatives are weaker. Not a survey of every option the agent considered; that pushes the synthesis work back onto the boss.
 

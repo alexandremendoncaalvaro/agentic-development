@@ -1,6 +1,6 @@
 ---
 name: ad-diagnose
-description: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop, reproduce, hypothesise (3-5 ranked falsifiable), instrument, fix + regression-test. The feedback loop is the skill; everything else is mechanical. Triggers on "diagnose this", "debug this", "this is broken", "this is throwing", "performance regression", "find the bug", "build a repro", "feedback loop", "ranked hypotheses", "falsifiable", "/ad-diagnose". Routes to `ad-spike` when the technique is uncertain across approaches, `ad-grill` when the spec is unclear, `ad-tdg` when the bug is a clean ground-truth-pair regression.
+description: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop, reproduce, hypothesise (3-5 ranked falsifiable), instrument, fix + regression-test. The feedback loop is the skill; everything else is mechanical. Triggers on "diagnose this", "debug this", "this is broken", "this is throwing", "performance regression", "find the bug", "build a repro", "feedback loop", "ranked hypotheses", "falsifiable", "/ad-diagnose". Routes to `ad-spike` when the technique is uncertain across approaches, `ad-grill-me` when the spec is unclear, `ad-tdg` when the bug is a clean ground-truth-pair regression.
 summary: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.
 allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 ---
@@ -25,7 +25,7 @@ Route elsewhere when:
 - The bug is one-line obvious (typo, off-by-one) — fix it directly; the skill is overkill.
 - The bug is a clean ground-truth-pair regression (test was passing, output unchanged, now failing) → `/ad-tdg` (WORKFLOW §9). TDG handles it with the existing pair as the verification surface.
 - The technique itself is uncertain across multiple plausible approaches → `/ad-spike` (WORKFLOW §14).
-- The spec or expected behavior is unclear → `/ad-grill`. Sharpen the question before diagnosing.
+- The spec or expected behavior is unclear → `/ad-grill-me`. Sharpen the question before diagnosing.
 
 ## Phase 1 — Build a feedback loop
 

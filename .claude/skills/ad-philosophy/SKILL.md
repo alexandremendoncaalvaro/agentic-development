@@ -14,10 +14,10 @@ Seven behaviors apply to every non-trivial change. Bias toward caution over spee
 
 Before implementing:
 
-- State your assumptions explicitly. Then apply *Decide When Grounded* below — if grounding resolves the uncertainty, decide; if it does not and the spec itself is fuzzy, route to `/ad-grill` instead of a raw open question.
+- State your assumptions explicitly. Then apply *Decide When Grounded* below — if grounding resolves the uncertainty, decide; if it does not and the spec itself is fuzzy, route to `/ad-grill-me` instead of a raw open question.
 - If multiple interpretations remain after grounding, present them — don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear *and grounding cannot resolve it*, stop. Name what's confusing. Ask through `/ad-grill` when the ambiguity is spec-level; otherwise a single focused question with a recommended answer.
+- If something is unclear *and grounding cannot resolve it*, stop. Name what's confusing. Ask through `/ad-grill-me` when the ambiguity is spec-level; otherwise a single focused question with a recommended answer.
 
 ## Ground Before Coding
 
@@ -43,7 +43,7 @@ Ask only when:
 - **Design or taste.** UX shape, product tradeoff, naming that carries brand.
 - **Irreversible / high blast radius.** Destructive git ops, shared-state mutations, force-pushes, deletions. Match the confirmation to the blast radius, not to the diff size.
 - **Genuinely close calls.** Two options tie on the picked criterion; the tie-break is a preference the agent cannot ground.
-- **Fuzzy spec.** Route to `/ad-grill`, not a raw open question.
+- **Fuzzy spec.** Route to `/ad-grill-me`, not a raw open question.
 
 Shape of the ask: one question, recommended answer first, why the alternatives are weaker. Not a survey of every option the agent considered — that pushes synthesis work back onto the boss.
 
