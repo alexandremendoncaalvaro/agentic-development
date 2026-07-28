@@ -1,0 +1,22 @@
+# leak-guard denylist (EXAMPLE) — copy to `.agentic/leak-denylist.txt` and fill in.
+#
+# The pre-commit leak-guard (ADR-0033) blocks any commit whose staged content
+# introduces one of these markers, in either an added line or an added file path.
+# The real `.agentic/leak-denylist.txt` is gitignored and lives on your machine
+# only — shipping the real markers would disclose exactly what they protect.
+#
+# Format:
+#   - One pattern per line.
+#   - Matching is case-insensitive literal substring, applied per added line and
+#     per added file path. A marker split across lines, or inside a binary file,
+#     is not caught by content scanning — this is a backstop, not a full DLP tool.
+#   - Blank lines and lines starting with `#` are ignored.
+#
+# Put here the private tokens that must never reach this public repo: internal
+# project codenames, product/service names, private tooling names, internal
+# host or path fragments. The entries below are illustrative placeholders —
+# replace them.
+
+INTERNAL-PROJECT-CODENAME
+private-tooling-name
+internal.example.com
