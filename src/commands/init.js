@@ -366,7 +366,7 @@ export async function initCommand(opts) {
       '/ad-adr',
       '/ad-spec (doc/specs/)',
       '/ad-task',
-      '/ad-audit',
+      '/ad-drift',
       '/ad-review (WORKFLOW §10)',
       '/ad-ground (WORKFLOW §4 + §5)',
       '/ad-next (state survey + recommendations)',
@@ -396,7 +396,7 @@ export async function initCommand(opts) {
           'ad-adr': '/ad-adr',
           'ad-spec': '/ad-spec (doc/specs/)',
           'ad-task': '/ad-task',
-          'ad-audit': '/ad-audit',
+          'ad-drift': '/ad-drift',
           'ad-archive':
             '/ad-archive (sweep done tasks / shipped specs / superseded ADRs into git history)',
           'ad-review': '/ad-review (WORKFLOW §10)',

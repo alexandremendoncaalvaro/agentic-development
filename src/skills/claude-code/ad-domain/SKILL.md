@@ -14,7 +14,7 @@ The skill owns *capture* of vocabulary. The *trigger* for most updates lives in 
 - `ad-grill` resolves a term during interview → routes here.
 - `ad-spec` introduces a new noun while drafting a spec → routes here.
 - `ad-architecture` names a domain-bound concept → routes here.
-- `ad-audit` detects code/glossary drift → routes here.
+- `ad-drift` detects code/glossary drift → routes here.
 - Direct `/ad-domain` invocation when the user wants to add a term explicitly.
 
 ## Step 0 — Detect existing structure
@@ -122,7 +122,7 @@ Per ADR-0019 §6 reciprocity rules, the following side-effects matter:
 - **Spec → Domain.** If a spec under `doc/specs/` introduced this term without resolving it, the spec is now the term's first reference; consider updating the spec's prose to use the canonical noun.
 - **ADR → Domain.** If an ADR named the term (e.g., the cross-pollination ADR-0019 cited "Triage role" from Pocock's example), cite the ADR by number in the entry's prose.
 
-These cross-references are *suggestions*, not file edits — the skill does not modify specs or ADRs to chase drift. That work is `ad-audit`'s.
+These cross-references are *suggestions*, not file edits — the skill does not modify specs or ADRs to chase drift. That work is `ad-drift`'s.
 
 ## Step 5 — `AGENTS.md` pointer (one-time)
 
@@ -145,4 +145,4 @@ Then reports the change as a one-liner: file, term, section. No `## Next` slash-
 - After capture: route back to the calling skill (`ad-grill`, `ad-spec`, `ad-architecture`) to resume the original turn.
 - If the resolution surfaced a binding decision (hard to reverse, surprising without context, real trade-off): `/ad-adr` to record it.
 - If the term is one of several pending resolutions: stay in `/ad-grill` to walk the next branch of the design tree.
-- For periodic drift sweeps: `/ad-audit` checks `CONTEXT.md` against current code.
+- For periodic drift sweeps: `/ad-drift` checks `CONTEXT.md` against current code.
