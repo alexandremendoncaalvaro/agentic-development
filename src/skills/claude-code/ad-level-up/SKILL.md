@@ -15,7 +15,7 @@ A full or drifting context, or a model having an off moment, must never edit the
 
 ## Rules target
 
-The curated rule-set lives at the machine location from [ADR-0035](../../doc/adr/0035-rules-location-convention.md): `$AGENTIC_RULES_DIR` if set, else `~/.agentic/rules/`. Read it before proposing (the edit needs a prior read; voice-matching needs the current text). If no curated store exists, say so — offer to create it at that location on approval, rather than inventing a path. A convention that belongs in a repo binding doc (`AGENTS.md`, `GUIDELINES.md`) or is bigger than a rule line routes to `/ad-adr` or `/ad-guidelines` instead — this skill owns the terse rule-set.
+The curated rule-set lives at the machine location from [ADR-0035](../../../../doc/adr/0035-rules-location-convention.md): `$AGENTIC_RULES_DIR` if set, else `~/.agentic/rules/`. Read it before proposing (the edit needs a prior read; voice-matching needs the current text). If no curated store exists, say so — offer to create it at that location on approval, rather than inventing a path. A convention that belongs in a repo binding doc (`AGENTS.md`, `GUIDELINES.md`) or is bigger than a rule line routes to `/ad-adr` or `/ad-guidelines` instead — this skill owns the terse rule-set.
 
 ## Step 1 — State candidate + evidence
 

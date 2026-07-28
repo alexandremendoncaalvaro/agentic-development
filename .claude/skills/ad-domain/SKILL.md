@@ -47,7 +47,7 @@ Resolution discipline:
 
 - **Be opinionated.** One canonical name. Others become `_Avoid_` aliases with a one-line reason.
 - **One-sentence definitions.** If it takes a paragraph, the term is not yet sharp.
-- **Project-specific only.** "Customer", "Triage role", "Materialization cascade" qualify. "Service", "Handler", "Controller" do not (those belong to architectural vocabulary per [ADR-0020](../../doc/adr/0020-deep-modules-vocabulary.md), not domain).
+- **Project-specific only.** "Customer", "Triage role", "Materialization cascade" qualify. "Service", "Handler", "Controller" do not (those belong to architectural vocabulary per [ADR-0020](../../../../doc/adr/0020-deep-modules-vocabulary.md), not domain).
 - **Flag conflicts.** If two terms could mean the same thing, add the conflict to the **Flagged ambiguities** section instead of forcing a premature resolution.
 
 ## Step 2 — Locate the insertion point
