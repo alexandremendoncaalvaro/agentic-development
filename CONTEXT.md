@@ -61,9 +61,9 @@ _Avoid_: "dual review" (ambiguous — could mean two reviewers of the same axis)
 
 ### Handoff
 
-**Definition:** a structured markdown file the kit writes to carry context from one session to another. The kit ships **two** disjoint handoff flavours that share the noun — see **Session handoff** and **Review handoff** for the disambiguated definitions. Bare "handoff" is ambiguous; in prose, always qualify.
+**Definition:** a structured markdown file the kit writes to carry context from one session to another. The kit ships **three** disjoint handoff flavours that share the noun — see **Session handoff**, **Review handoff**, and **Audit handoff** for the disambiguated definitions. Bare "handoff" is ambiguous; in prose, always qualify.
 
-_Avoid_: using "handoff" without a qualifier (`session` / `review`) — the two flavours go to different paths and serve different purposes.
+_Avoid_: using "handoff" without a qualifier (`session` / `review` / `audit`) — the flavours differ in producer, path, and purpose (Review and Audit share the `.agentic/reviews/` directory but not the producer or shape).
 
 **Related code:** see the two disambiguated entries.
 
@@ -83,6 +83,14 @@ _Avoid_: "review snapshot" (snapshot implies frozen-in-time database state); "re
 
 **Related code:** [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md), [`.agentic/reviews/`](.agentic/reviews/).
 
+### Audit handoff
+
+**Definition:** the markdown file `ad-audit` writes to `.agentic/reviews/<ISO>-audit-<scope>.md` (Claude Code: one per dispatched rule-group; Codex: one combined audit trail). Carries the target plus the resolved rule-set slice each `audit-group-reviewer` receives — one rule-group's rules, the tree/SHA, and the critical tag. Serves as the audit trail for the maximum-gate audit and the context packet for a user-spawned reviewer escalation. Ephemeral per-audit artifact; shares the `.agentic/reviews/` directory (and its `.gitignore` entry) with the Review handoff.
+
+_Avoid_: conflating it with the **Review handoff** — same directory, different producer (`ad-audit` vs `ad-review`) and shape (per-rule-group vs per-axis).
+
+**Related code:** [`src/skills/claude-code/ad-audit/SKILL.md`](src/skills/claude-code/ad-audit/SKILL.md), [`src/skills/codex/ad-audit/SKILL.md`](src/skills/codex/ad-audit/SKILL.md), [`.agentic/reviews/`](.agentic/reviews/).
+
 ## Relationships
 
 - A **Kit** install bounds itself by a single **Profile** per agent surface (`.claude/skills/` and `.agents/skills/` each carry their own profile state).
@@ -90,6 +98,7 @@ _Avoid_: "review snapshot" (snapshot implies frozen-in-time database state); "re
 - A **Fresh-context review** is implemented as a **Two-axis review** on every kit-supported host; the implementation differs per host but the noun does not.
 - A **Two-axis review** produces one or more **Review handoffs** as its audit trail.
 - A **Session handoff** and a **Review handoff** are sibling flavours of **Handoff**; they share neither path nor lifecycle. Each is owned by exactly one skill (`ad-handoff` and `ad-review` respectively).
+- An **Audit handoff** is the maximum-gate sibling flavour, owned by `ad-audit`. It shares the `.agentic/reviews/` directory with the **Review handoff** but differs in producer and shape (per rule-group, not per axis).
 
 ## Flagged ambiguities
 

@@ -31,6 +31,19 @@
         }
       ]
     },
+    "ad-audit": {
+      "version": "0.17.9-beta.1",
+      "files": [
+        {
+          "path": ".claude/agents/audit-group-reviewer.md",
+          "sourceSha": "646ee148b70ee0594048609ba11e7b0a35a749a5fecd76c3a0710e10f381a7a0"
+        },
+        {
+          "path": ".claude/skills/ad-audit/SKILL.md",
+          "sourceSha": "edc5cb9073f87641299c9619c1f282f016f53ee21b11411e129fd32448bc6ca8"
+        }
+      ]
+    },
     "ad-bootstrap": {
       "version": "0.17.9-beta.1",
       "files": [
