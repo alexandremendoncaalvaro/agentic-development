@@ -48,6 +48,7 @@ bin/agentic.js                       npm bin entry (#!/usr/bin/env node)
 src/index.js                         commander program wiring
 src/commands/<verb>.js               one file per CLI command (today: init.js)
 src/lib/                             pure helpers (detect.js, install.js)
+src/leak-guard.js                    pre-commit house-IP leak-guard (ADR-0033), wired in lefthook.yml
 src/skills/<agent>/<skill>/          skill source — copied into target's
                                      .claude/skills/ or .agents/skills/ at install
 templates/                           manual templates shipped to npm
