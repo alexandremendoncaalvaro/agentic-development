@@ -43,6 +43,7 @@ Ask only when:
 - **Design or taste.** UX shape, product tradeoff, naming that carries brand.
 - **Irreversible / high blast radius.** Destructive git ops, shared-state mutations, force-pushes, deletions. Match the confirmation to the blast radius, not to the diff size.
 - **Genuinely close calls.** Two options tie on the picked criterion; the tie-break is a preference the agent cannot ground.
+- **Insufficient evidence.** A single unreproduced observation does not license autonomous follow-up creation (tasks, issues) — mention it in the report; file it only once it reproduces or the user explicitly asks.
 - **Fuzzy spec.** Route to `/ad-grill-me`, not a raw open question.
 
 Shape of the ask: one question, recommended answer first, why the alternatives are weaker. Not a survey of every option the agent considered — that pushes synthesis work back onto the boss.
@@ -87,6 +88,7 @@ Transform tasks into verifiable goals:
 - "Add validation" → "Write tests for invalid inputs, then make them pass"
 - "Fix the bug" → "Write a test that reproduces it, then make it pass"
 - "Refactor X" → "Ensure tests pass before and after"
+- "Gate/reviewer flagged a violation" → "Enumerate every instance of that violation class across the change, then fix and verify all of them together" — never just the named instances
 
 Before modifying a file, list which tests cover it. Run. Modify. Run. If none, write one first.
 
@@ -104,7 +106,8 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 - Type-check and tests verify *code*, not *feature*.
 - For UI/runtime changes, exercise the feature in a browser.
-- Can't verify it? Say so. Don't claim success.
+- Can't verify it? Say so. Don't claim success — including a status claim relayed from another session, agent, or handoff: re-run the check yourself and state what you observed; if you cannot, say UNVERIFIED explicitly.
+- Flakiness claims need distribution evidence: one green run — or five — does not prove a fix. Run the suspect check N times (N ≥ 10) and report the pass/fail distribution. One unreproduced failure does not prove flakiness either.
 - Never bypass gates (`--no-verify`, skipped hooks, deleted failing tests).
 
 ## Report for a Decision-Maker
