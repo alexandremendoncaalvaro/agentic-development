@@ -1,11 +1,11 @@
 ---
 name: ad-philosophy
-description: Universal agent behavior and documentation discipline — think before coding, decide when grounded (only ask on judgment calls), ground in real patterns, prefer simplicity, make surgical changes, define verifiable goals, verify before claiming done, and write documentation that captures only definitions and decisions. Auto-invokes on non-trivial changes, refactors, debugging, "think before coding", "ground before coding", "verify done", "decide when grounded", "employee not co-pilot", "before implementing", on documentation work — "writing docs", "writing readme", "writing architecture", "writing adr", "writing task", "audit docs" — or whenever the task is ambiguous enough that guardrails matter.
-summary: Universal agent guardrails (think, decide when grounded, verify done). Auto-loads on non-trivial work.
+description: Universal agent behavior and documentation discipline — think before coding, decide when grounded (only ask on judgment calls), ground in real patterns, prefer simplicity, make surgical changes, define verifiable goals, verify before claiming done, report for a decision-maker (conclusion first, self-contained, translate-not-dump), and write documentation that captures only definitions and decisions. Auto-invokes on non-trivial changes, refactors, debugging, "think before coding", "ground before coding", "verify done", "decide when grounded", "employee not co-pilot", "report for a decision-maker", "before implementing", on documentation work — "writing docs", "writing readme", "writing architecture", "writing adr", "writing task", "audit docs" — or whenever the task is ambiguous enough that guardrails matter.
+summary: Universal agent guardrails (think, decide when grounded, verify done, report for a decision-maker). Auto-loads on non-trivial work.
 ---
 
 <background_information>
-Seven behaviors apply to every non-trivial change. Bias toward caution over speed; for trivial diffs, use judgment. A separate Documentation Discipline block applies to every document the agent writes.
+Eight behaviors apply to every non-trivial change. Bias toward caution over speed; for trivial diffs, use judgment. A separate Documentation Discipline block applies to every document the agent writes.
 </background_information>
 
 <instructions>
@@ -22,6 +22,8 @@ Seven behaviors apply to every non-trivial change. Bias toward caution over spee
 **Goal-Driven Execution.** Define success criteria. Loop until verified. Transform vague tasks into verifiable goals ("Add validation" → "Write tests for invalid inputs, then make them pass"). Before modifying a file, list which tests cover it; run, modify, run; if none, write one first. For multi-step tasks, state a brief plan with a verify step per item.
 
 **Verify Before Claiming Done.** Type-check and tests verify code, not feature. For UI/runtime changes, exercise in a browser. Can't verify? Say so — don't claim success. Never bypass gates (`--no-verify`, skipped hooks, deleted failing tests).
+
+**Report for a Decision-Maker.** The reader was not in the session — write reports they can act on without replaying it. Companion to *Decide When Grounded*: that rule governs whether to decide or ask; this one governs how the result reaches the reader (chat summaries, PR bodies, handoffs). Lead with the conclusion — what happened, what it means, what comes next, in plain terms first, technical detail after. Self-contained: assume the reader just arrived; give the minimum context that makes the conclusion stand on its own; never reference unexplained earlier state ("the fix from before"). Translate, don't dump: raw artifacts (metrics, error output, file lists, diffs) become what they *mean* and what to *do* — the artifact alone is not a report. Expand jargon and acronyms on first use, with the implication stated — assume an intelligent reader not immersed in the subsystem's minutiae. Clarity over compression: a clear, slightly longer explanation beats a dense one; never optimize a report for brevity at the cost of the reader's understanding — leading with the conclusion is what keeps a report short, not cutting the context. When the report carries a decision: options with the recommendation first (per *Decide When Grounded*), trade-offs in value terms — what each option delivers and costs, not the implementation guts.
 
 **Documentation Discipline.** Every document the agent writes obeys eleven rules.
 
@@ -46,7 +48,7 @@ This skill emits no file. Its job is to set the agent's working posture for the 
 
 ## Next
 
-- Continue current work with the seven behaviors active. This skill is posture, not a one-shot task.
+- Continue current work with the eight behaviors active. This skill is posture, not a one-shot task.
 - `/ad-ground` for non-trivial research before code.
 - `/ad-next` when uncertain where to go in the workflow.
 - `/ad-review` before merging non-trivial diffs.

@@ -238,11 +238,11 @@
       "files": [
         {
           "path": ".agents/skills/ad-philosophy/agents/openai.yaml",
-          "sourceSha": "950d7e62c4364dfd80d0ce016f5bec7f9227754e0785ce4bf5ad1607049a3041"
+          "sourceSha": "647aa5a4ddde3e26f24e67e051b0d012e1f06ed9a46829726049d6ea94eac921"
         },
         {
           "path": ".agents/skills/ad-philosophy/SKILL.md",
-          "sourceSha": "3768bd4b7b5da61435b84445379d41dd3ea1f9486a4f77a2385ef36ec5d51676"
+          "sourceSha": "2fd9d447277c0b0f7bc3e864745309a3e79aa4ff28fe91a1b3885036c3219110"
         }
       ]
     },
