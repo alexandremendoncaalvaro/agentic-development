@@ -91,6 +91,14 @@ _Avoid_: conflating it with the **Review handoff** — same directory, different
 
 **Related code:** [`src/skills/claude-code/ad-audit/SKILL.md`](src/skills/claude-code/ad-audit/SKILL.md), [`src/skills/codex/ad-audit/SKILL.md`](src/skills/codex/ad-audit/SKILL.md), [`.agentic/reviews/`](.agentic/reviews/).
 
+### Rule-set layer
+
+**Definition:** one of the three sources `ad-audit` unions into the rule-set it audits against ([ADR-0035](doc/adr/0035-rules-location-convention.md), [ADR-0043](doc/adr/0043-per-project-rules-layer.md)): **binding docs** (the repo's `AGENTS.md` / `ARCHITECTURE.md` / `GUIDELINES.md` / accepted ADRs — always in scope), the **machine store** (`$AGENTIC_RULES_DIR`, else `~/.agentic/rules/` — the practitioner's portable, you-everywhere conventions), and **project rules** (`.agentic/rules/` at the repo root — this-project conventions, committed or machine-local via `.git/info/exclude`). On genuine conflict a project rule shadows a machine-store rule, and the audit reports the shadowing.
+
+_Avoid_: "global rules" for the machine store (ambiguous with the binding docs, which are also always-on); "local rules" (ambiguous between machine-local visibility and the project layer itself); "rule level" (levels imply severity — the layers are scopes, not severities).
+
+**Related code:** [`src/skills/claude-code/ad-audit/SKILL.md`](src/skills/claude-code/ad-audit/SKILL.md), [`src/skills/codex/ad-audit/SKILL.md`](src/skills/codex/ad-audit/SKILL.md), [`src/skills/claude-code/ad-level-up/SKILL.md`](src/skills/claude-code/ad-level-up/SKILL.md), [`src/skills/codex/ad-level-up/SKILL.md`](src/skills/codex/ad-level-up/SKILL.md).
+
 ## Relationships
 
 - A **Kit** install bounds itself by a single **Profile** per agent surface (`.claude/skills/` and `.agents/skills/` each carry their own profile state).
@@ -99,6 +107,7 @@ _Avoid_: conflating it with the **Review handoff** — same directory, different
 - A **Two-axis review** produces one or more **Review handoffs** as its audit trail.
 - A **Session handoff** and a **Review handoff** are sibling flavours of **Handoff**; they share neither path nor lifecycle. Each is owned by exactly one skill (`ad-handoff` and `ad-review` respectively).
 - An **Audit handoff** is the maximum-gate sibling flavour, owned by `ad-audit`. It shares the `.agentic/reviews/` directory with the **Review handoff** but differs in producer and shape (per rule-group, not per axis).
+- An `ad-audit` run resolves its rule-set as the union of the three **Rule-set layers**; `ad-level-up` writes to exactly one curated layer per accepted rule (machine store or project rules — binding docs belong to their own skills).
 
 ## Flagged ambiguities
 

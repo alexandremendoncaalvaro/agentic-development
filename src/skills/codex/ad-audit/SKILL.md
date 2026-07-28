@@ -2,7 +2,7 @@
 name: ad-audit
 description: |
   Run this skill when the user explicitly invokes `/ad-audit` or names it ("run ad-audit", "audit against the rules"), or asks for the maximum quality gate before work reaches the team ("adversarial audit", "rules audit", "maximum gate", "verify before I post", "exhaustive review"). Heavier and more exhaustive than `ad-review` (light two-axis diff review); distinct from `ad-drift` (documentation-drift only). Auto-trigger note: `allow_implicit_invocation: true` is set, so audit-language can fire the skill; if a request is ambiguous, confirm scope before invoking.
-  Mechanical shape: ONE pass in the current session. The skill resolves the project's rule-set (repo binding docs plus an optional curated machine store), walks every rule-group as a checklist with structural separation, emits an explicit verdict for every rule (pass / violation / judgement-call / n-a — none skipped, so coverage is a matrix), grounds every finding on the actual code/output, and gates every teammate-visible claim on a real evidence artifact. Never emits an "approve" verdict. Rule gaps route to `/ad-level-up`.
+  Mechanical shape: ONE pass in the current session. The skill resolves the project's rule-set (repo binding docs plus optional curated machine and project rule layers), walks every rule-group as a checklist with structural separation, emits an explicit verdict for every rule (pass / violation / judgement-call / n-a — none skipped, so coverage is a matrix), grounds every finding on the actual code/output, and gates every teammate-visible claim on a real evidence artifact. Never emits an "approve" verdict. Rule gaps route to `/ad-level-up`.
 summary: Maximum-gate rules-anchored audit. Walks every rule-group as a checklist with structural separation, exhaustive per-rule verdicts (coverage matrix), evidence-gated, never approves. Codex reviews inline; ships an audit-group-reviewer subagent for user-initiated isolated + cross-model escalation. Heavier than ad-review.
 ---
 
@@ -15,8 +15,9 @@ Mechanical shape:
 THIS SESSION:
   1. Target + tree (what is under audit, and on which tree/SHA?).
   2. Resolve the rule-set: repo binding docs (always) + curated store at
-     $AGENTIC_RULES_DIR or ~/.agentic/rules/ (optional). The rule-set defines
-     the groups and any CRITICAL tag — never hardcode them.
+     $AGENTIC_RULES_DIR or ~/.agentic/rules/ (optional) + project rules at
+     .agentic/rules/ (optional). The rule-set defines the groups and any
+     CRITICAL tag — never hardcode them.
   3. Enumerate every group. For each: review it, or record explicit N/A + reason.
   4. Write the assembled context to .agentic/reviews/<ISO>-audit-<scope>.md (audit trail).
   5. Review each dispatched group in this session, as a checklist. Output one
@@ -45,16 +46,18 @@ The maximum quality gate. Where `ad-review` runs a light two-axis pass over a di
 Step 0 — announce. Print the shape before any work:
 
 ```
-Running ad-audit (Codex single-pass, per-group checklist). I will resolve the rule-set (repo binding docs + optional ~/.agentic/rules/), enumerate every group, write an audit trail to .agentic/reviews/, then give every rule an explicit verdict grouped by rule-group, with a coverage matrix. I never emit "approve".
+Running ad-audit (Codex single-pass, per-group checklist). I will resolve the rule-set (repo binding docs + optional ~/.agentic/rules/ + optional .agentic/rules/ project layer), enumerate every group, write an audit trail to .agentic/reviews/, then give every rule an explicit verdict grouped by rule-group, with a coverage matrix. I never emit "approve".
 
 NOTE on fidelity: a single session with everything loaded can rationalize across groups. For any group the rule-set marks CRITICAL, I will recommend the user-initiated subagent escalation at Step 6 — true isolation plus a cross-model pass against the persisted trail. The escalation TOML schema is at the bottom of this skill.
 ```
 
 Step 1 — target + tree. State what is under audit (a diff / branch / PR, or drafted claims/artifacts about to be posted) and which tree/SHA it rests on (`git fetch origin main`; name the SHA). If ambiguous which target, ask.
 
-Step 2 — resolve the rule-set (two layers, ADR-0035):
+Step 2 — resolve the rule-set (three layers, ADR-0035 + ADR-0043):
 - Repo binding docs (always): AGENTS.md, ARCHITECTURE.md, GUIDELINES.md, CONTEXT.md / CONTEXT-MAP.md, accepted ADRs under `doc/adr/` the target touches. Read what exists; never fabricate.
 - Curated store (optional): `$AGENTIC_RULES_DIR` if set, else `~/.agentic/rules/` if it exists; read its rule files. The rule-set defines the groups and any CRITICAL tag. If only repo docs exist, treat each binding doc / accepted ADR as a group. If no rule-set resolves, stop — nothing to audit against.
+- Project rules (optional): `.agentic/rules/` at the repo root, if present — same format as the machine store; committed or machine-local (`.git/info/exclude`), resolution does not care which.
+- Precedence: union across layers, except on genuine conflict, where a project rule wins over a machine-store rule — apply the project rule and report the shadowed store rule as a line in the audit output (never silent).
 
 Step 3 — enumerate all groups; dispatch or N/A. Enumerate EVERY group. Review each group the target touches; record explicit `N/A` + one-line reason for each it does not (including CRITICAL groups genuinely untouched). Cherry-picking invalidates the audit.
 
