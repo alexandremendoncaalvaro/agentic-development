@@ -144,5 +144,5 @@ Then reports the change as a one-liner: file, term, section. No `## Next` slash-
 
 - After capture: route back to the calling skill (`ad-grill-me`, `ad-spec`, `ad-architecture`) to resume the original turn.
 - If the resolution surfaced a binding decision (hard to reverse, surprising without context, real trade-off): `/ad-adr` to record it.
-- If the term is one of several pending resolutions: stay in `/ad-grill-me` to walk the next branch of the design tree.
+- If the term is one of several pending resolutions: stay in `/ad-grill-me` to walk the next branch of the decision tree.
 - For periodic drift sweeps: `/ad-drift` checks `CONTEXT.md` against current code.
