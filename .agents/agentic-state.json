@@ -190,6 +190,23 @@
         }
       ]
     },
+    "ad-level-up": {
+      "version": "0.17.9-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-level-up/agents/openai.yaml",
+          "sourceSha": "3e12c4388f3d6e5d99f4658d7799bd17b21b34b1ad43ae7abd4a9bdedd52adce"
+        },
+        {
+          "path": ".agents/skills/ad-level-up/SKILL.md",
+          "sourceSha": "664a277a9cd2ae84b112bd55b3431b24df9f8a089b37fc1f046a042369e12663"
+        },
+        {
+          "path": ".codex/agents/rule-candidate-reviewer.toml",
+          "sourceSha": "884c0ac3e2ee4b216cc9528406fb20f32052ab155903d652eadda9aacca9ed78"
+        }
+      ]
+    },
     "ad-merge": {
       "version": "0.17.9-beta.1",
       "files": [

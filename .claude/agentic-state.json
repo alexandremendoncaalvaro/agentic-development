@@ -134,6 +134,19 @@
         }
       ]
     },
+    "ad-level-up": {
+      "version": "0.17.9-beta.1",
+      "files": [
+        {
+          "path": ".claude/agents/rule-candidate-reviewer.md",
+          "sourceSha": "c527ab1b30a148a6d0dc2ee09c8cc8b0f2108edf7f14134508b37da693f31a3b"
+        },
+        {
+          "path": ".claude/skills/ad-level-up/SKILL.md",
+          "sourceSha": "67febe018b92718914f9c641867fbb07dd9fac0d303e017baf553ae17093d176"
+        }
+      ]
+    },
     "ad-merge": {
       "version": "0.17.9-beta.1",
       "files": [
