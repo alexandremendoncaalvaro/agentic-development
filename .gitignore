@@ -5,4 +5,6 @@ node_modules/
 .env.local
 .npmrc
 .agentic/reviews/
+.agentic/leak-denylist.txt
+/rules/
 .claude/settings.local.json

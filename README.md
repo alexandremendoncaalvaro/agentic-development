@@ -264,10 +264,21 @@ git clone https://github.com/alexandremendoncaalvaro/agentic-development.git
 cd agentic-development
 npm install
 node bin/agentic.js init
+lefthook install                 # wire the local git hooks (one-time)
 ```
 
 Branch layout:
 - `main` — single source of truth. Kit + CLI live together; npm beta releases are published from here.
+
+### House-IP leak-guard (contributors)
+
+This repository is public. A fail-closed pre-commit gate (`src/leak-guard.js`, [ADR-0033](doc/adr/0033-house-ip-leak-guard.md)) blocks any commit whose staged content adds a path under `rules/`, adds a symlink pointing outside the repo, or matches a marker in your local denylist. One-time setup:
+
+```bash
+cp .agentic/leak-denylist.example.txt .agentic/leak-denylist.txt
+```
+
+Then edit `.agentic/leak-denylist.txt` (gitignored) to list the private markers that must never reach this public repo — internal codenames, private tooling names, internal host/path fragments. The `rules/` and symlink checks fire even without a denylist. The gate honors the no-bypass rule (WORKFLOW.md §11): do not commit with `--no-verify`.
 
 ## License
 
