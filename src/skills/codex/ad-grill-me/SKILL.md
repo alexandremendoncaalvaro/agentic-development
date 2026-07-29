@@ -5,7 +5,7 @@ summary: Interview-before-research grilling session — one question at a time w
 ---
 
 <background_information>
-Implements ADR-0022 (`doc/adr/0022-agentic-grill-skill.md`) — the upstream-of-research phase. Process scaffold for sharpening fuzzy asks before any code, research, or spec work begins. Sits upstream of `ad-ground`; routes to it (and the other implementation-phase skills) when the question is sharp enough to act on.
+Implements ADR-0022 — the upstream-of-research phase. Process scaffold for sharpening fuzzy asks before any code, research, or spec work begins. Sits upstream of `ad-ground`; routes to it (and the other implementation-phase skills) when the question is sharp enough to act on.
 
 No primary file output. Side-effects land in `CONTEXT.md` (via `ad-domain`) and ADRs (via `ad-adr`) — both lazy, both belonging to other skills.
 

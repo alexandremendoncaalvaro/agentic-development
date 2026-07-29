@@ -5,7 +5,7 @@ summary: Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language p
 ---
 
 <background_information>
-Implements ADR-0019 (`doc/adr/0019-domain-language-layer.md`) — Layer 2 of the artifact stack. Lazy lifecycle owner of `CONTEXT.md`. Process scaffold for capturing the project's ubiquitous language.
+Implements ADR-0019 — Layer 2 of the artifact stack. Lazy lifecycle owner of `CONTEXT.md`. Process scaffold for capturing the project's ubiquitous language.
 
 The skill owns *capture* of vocabulary. The *trigger* for most updates lives in adjacent skills:
 - `ad-grill-me` resolves a term during interview → routes here.
