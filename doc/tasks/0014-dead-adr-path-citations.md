@@ -1,6 +1,6 @@
 # Task `0014`: Drop dead ADR path citations from Codex skill bodies
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-29
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -27,8 +27,8 @@ This was previously logged twice as a single dangling `ADR-0022` reference in `a
 - [x] Add the regression test to `test/skills.test.js`; prove it red against the unfixed tree.
 - [x] `node bin/agentic.js update --yes --force`; `npm test`.
 - [x] Fresh-context review.
-- [ ] PR opened.
-- [ ] Merged on CI green.
+- [x] PR opened.
+- [x] Merged on CI green.
 
 ## Notes
 
@@ -41,6 +41,10 @@ No ADR: this enforces a convention `576bb9d` already established rather than dec
 `ad-pr` keeps its live `doc/adr/0032-...` path, and `ad-archive`'s dead-looking paths sit inside a fenced block illustrating the skill's own report output — the test skips fenced blocks for exactly that reason. Live ADRs keep their paths on the Codex host, which is that host's existing convention; only the archived ones lose them.
 
 Standards review raised three concerns, all accepted and fixed here: the Plan checkboxes lagged the diff; the fence detector could be flipped permanently by an unterminated fence, silently disabling the guard for the rest of a file (it now asserts a balanced count); and the guard read only `SKILL.md`, missing subagent manifests that install just as widely (it now covers every installed file in the skill directory). The reviewer independently re-derived the archived-ADR set from `576bb9d` and found no missed instance of the class.
+
+### 2026-07-29 — closed
+
+Shipped in PR #53 (`deeb25e`), merged to `main` with CI green on Node 20 and 22.
 
 ## Definition of Done
 
