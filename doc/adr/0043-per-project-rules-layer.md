@@ -1,6 +1,6 @@
 # ADR-0043: Per-project rules layer with commit-or-exclude visibility
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-28
 **Deciders:** Alexandre Alvaro
 

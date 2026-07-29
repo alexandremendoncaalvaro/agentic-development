@@ -1,6 +1,6 @@
 # ADR-0038: Rename `ad-grill` to `ad-grill-me`
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-28
 **Deciders:** Alexandre Alvaro
 
