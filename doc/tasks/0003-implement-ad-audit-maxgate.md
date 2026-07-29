@@ -20,7 +20,7 @@
 - [x] The contract implements ADR-0036: exhaustive per-rule verdicts with a coverage matrix, one isolated reviewer per group, cross-model second pass on rule-set-declared CRITICAL groups via the dual-host split, union-then-filter aggregation, evidence-artifact hard gate, and never an "approve" verdict.
 - [x] `ad-audit` registered in `src/lib/profiles.js` for `team` + `mature` only; managed AGENTS.md table shows its row.
 - [x] `npm test` green — 221/221 on Node 24 locally (Node 20 / 22 confirmed by CI on the PR; not installed in the dev env).
-- [x] No house IP, no private-platform / `the private rule-groups` / private-store references anywhere.
+- [x] No house IP: no private tool or platform names, internal group-id schemes, or note-vault references anywhere.
 
 ## Plan
 

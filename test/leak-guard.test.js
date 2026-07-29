@@ -112,7 +112,7 @@ test('findViolations flags a denylist match in an added path', () => {
 
 test('findViolations flags any added path under rules/, independent of denylist', () => {
   const violations = findViolations({
-    entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path: 'rules/house-conventions.md' }],
+    entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path: 'rules/example-conventions.md' }],
     addedLines: [],
     denylistPatterns: [],
     repoRoot: '/repo',
