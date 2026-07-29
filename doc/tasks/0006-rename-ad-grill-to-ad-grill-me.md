@@ -1,6 +1,6 @@
 # Task `0006`: Rename `ad-grill` to `ad-grill-me`
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-28
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -40,6 +40,10 @@ Rename executed via `git mv` of both source skill dirs + a single-pass `sed` on 
 
 Two-axis fresh-context §10 review (Standards + Spec) surfaced two real findings, both fixed: (1) the task file initially landed unchecked, Notes-empty, and missing the mandatory `## Definition of Done` section that every other merged task carries — corrected here. (2) The first draft **edited** accepted ADR-0031's `/ad-grill` routing pointer in place. Reverted: that has no precedent (the one in-repo ADR-amend, `83b0c7a`, uses annotate + dated-addendum for a *substantive* supersede, not a rename), it contradicts decision-record immutability, and it would be inconsistent with `doc/adr/0021` already referencing this same skill as `agentic-grill` untouched. Accepted ADRs are now left as historical records. Also discovered a pre-existing dangling `ADR-0022` reference (the planned grill ADR was never created) — logged as out-of-scope for this rename.
 
+### 2026-07-29 — closed
+
+Shipped in PR #41 (`8f193e5`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -47,4 +51,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

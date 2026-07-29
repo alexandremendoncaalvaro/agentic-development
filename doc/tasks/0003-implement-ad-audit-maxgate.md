@@ -1,6 +1,6 @@
 # Task `0003`: Implement the new `ad-audit` maximum-gate skill
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-27
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -38,6 +38,10 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 Authored both hosts modeled on the kit's reference example for a fan-out review skill (`ad-review`): numbered steps, `Task` fan-out on Claude Code, single-session structural separation + user-initiated escalation on Codex, bundled reviewer subagent via `manifest.json`. Generic mechanism extracted from a private maximum-gate audit skill (per-rule coverage, cross-model on critical, union-then-filter, evidence gate) and re-authored from scratch with zero house IP. Rule content lives in the resolved rule-set only (ADR-0035), never in the skill. 221/221 green; subagents routed to both host agent dirs; managed table row present.
 
+### 2026-07-29 — closed
+
+Shipped in PR #38 (`70b6fef`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -45,4 +49,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

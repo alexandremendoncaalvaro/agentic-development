@@ -1,6 +1,6 @@
 # Task `0013`: Recommitment mode on explicit `ad-philosophy` invocation
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-29
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -27,8 +27,8 @@
 - [x] Fix the `_(implicit)_` hardcode in `src/lib/rootdoc.js` and cover it in `test/lib.test.js`.
 - [x] `node bin/agentic.js update --yes --force`; `npm test`.
 - [x] Fresh-context review, both axes.
-- [ ] PR opened.
-- [ ] Merged on CI green.
+- [x] PR opened.
+- [x] Merged on CI green.
 
 ## Notes
 
@@ -43,6 +43,10 @@ Documentation Discipline is not one of the eight behaviors and is bound only whe
 Correcting the entry above: `summary` **was** changed on both hosts, and the "left unchanged" note no longer holds. The Spec-axis reviewer found that `src/lib/rootdoc.js` hardcoded `_(implicit)_` as this skill's Invoke cell — accurate while auto-load was the only mode, and the exact opposite of what a user needs once an explicit invocation carries a protocol. Fixing the cell made the summary stale too, since the summary is the Notes cell the same table renders. Both now describe the two modes.
 
 Review findings, both axes, with disposition. Accepted and fixed: the `rootdoc.js` contradiction plus its missing regression test; a dropped "read the behaviors" clause on the Codex side (the program's recurring cross-host compression failure); `applied-binding statement` vs `binding statement` terminology drift between ADR and skills; "named it in their message" not distinguishing an invocation from an incidental mention; concreteness carried by a single example rather than a structural test, which let a rule-restatement pass as a binding; and a closing line that could nullify the whole statement. Rejected with evidence: the Standards reviewer read the violation count as unsupported because the record lives in the maintainer's session notes outside this repository — the count stands, and the ADR now attributes it rather than implying a repo-checkable citation. Partially rejected: the Spec reviewer graded "advisory text cannot fix a decision-time reflex" a blocker; the limitation is real and the ADR states it, but the deterministic layer is deliberately outside the kit's dual-host scope, so it is a recorded trade-off, not an unmet requirement. The wording gaps that same finding surfaced were accepted and fixed above.
+
+### 2026-07-29 — closed
+
+Shipped in PR #51 (`7e456ae`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
 
 ## Definition of Done
 

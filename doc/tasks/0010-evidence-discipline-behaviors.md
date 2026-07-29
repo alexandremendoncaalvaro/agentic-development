@@ -1,6 +1,6 @@
 # Task `0010`: Evidence-discipline additions to `ad-philosophy` and WORKFLOW §7
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-28
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -35,6 +35,10 @@ Candidates vetted BEFORE authoring via a 12-verdict adversarial pass (one isolat
 
 Two-axis §10 review, findings treated adversarially. Spec axis: all ACs MET; one real Concern — the claude-code Goal-Driven transform carried a rationale clause ("each miss buys a full extra review cycle") absent from the ADR Decision and the codex host — fixed by dropping it (ADR-decided sentence now verbatim in both hosts). Standards axis: (a) ACCEPTED — "chips" in the landed rule text was host-specific jargon leaking into the npm-shipped universal WORKFLOW.md (only defined in kit-internal ADR-0039); generalized to "(tasks, issues)" across all surfaces plus the ADR Decision text (same-commit mutable); the ADR Context keeps "chips" naming the actual incident. (b) REJECTED with evidence — relocating the Insufficient-evidence case to the "Default is decide" list: the "Ask only when" list already carries a non-question member (Fuzzy spec → route to /ad-grill-me), so its semantic is "don't act unilaterally", the vetting placement lens chose it deliberately, and the text prescribes "mention it in the report", contradicting the speculated ask-noise failure mode. (c) SUPERSEDED — codex parity on the rationale clause: the Spec-axis fix (drop from claude-code) already restored parity the ADR-faithful way. (d) NOTED — Plan-checkbox-before-PR is established task-file convention (0002/0007); candidate for a future task-semantics cleanup, out of scope here.
 
+### 2026-07-29 — closed
+
+Shipped in PR #46 (`8895e7f`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -42,4 +46,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
