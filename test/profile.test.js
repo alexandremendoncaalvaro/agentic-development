@@ -488,9 +488,14 @@ for (const name of PROFILE_NAMES) {
 }
 
 test('README skill table carries a row for every skill the kit ships', () => {
-  const shipped = readdirSync(
-    join(__dirname, '..', 'src', 'skills', 'claude-code')
-  ).sort();
+  // Union both host trees: a skill shipped for only one host still needs a row.
+  const shipped = [
+    ...new Set(
+      ['claude-code', 'codex'].flatMap((agent) =>
+        readdirSync(join(__dirname, '..', 'src', 'skills', agent))
+      )
+    ),
+  ].sort();
   // A table row, not a prose mention: ad-audit and ad-level-up were both
   // referenced in prose while missing from the table, which is how they
   // shipped undocumented.
