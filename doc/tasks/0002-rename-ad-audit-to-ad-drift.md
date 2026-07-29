@@ -1,6 +1,6 @@
 # Task `0002`: Rename `ad-audit` (doc-drift) to `ad-drift`
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-27
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -36,6 +36,10 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 Rename executed via an orchestrated source sweep (identifier-only; drift-audit behavior unchanged), then verified: source clean, frontmatter `name: ad-drift`, excluded files (`doc/adr/0033`, `doc/tasks/0001`) untouched. Discovered `update --yes` alone keeps the managed AGENTS.md section stale in non-interactive mode (`confirmRootDocReplace` returns false without `--force`, by design to protect user edits); `--force` regenerates it. Also had to `git rm` the orphaned `ad-audit` install dirs — `update` adds the new skill but does not prune a renamed one. Final: no stray `ad-audit` in the renamed skill or its references — the only remaining occurrences are the intentional prose mentions of the incoming new skill in `doc/adr/0033`, `doc/tasks/0001`, and this rename's own `doc/adr/0034` + `doc/tasks/0002`. Table shows `ad-drift`; 216/216 green.
 
+### 2026-07-29 — closed
+
+Shipped in PR #37 (`c10cc2b`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -43,4 +47,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

@@ -1,6 +1,6 @@
 # Task `0005`: Fix wrong-depth kit cross-reference links in skill bodies
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-27
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -44,6 +44,10 @@ Followed up the chip spawned during W1b's review. The chip framed this as "fix a
 
 A three-agent adversarial §10 review (independent re-audit + Standards + Spec, run as a workflow) confirmed the re-audit clean (no miss, over-reach, or prose change) and surfaced one real Spec finding: the `ad-diagnose` `CONTEXT.md` link had been mis-bucketed as a kit cross-ref and depth-corrected to point at the kit's own `CONTEXT.md`, when `CONTEXT.md` is a per-consumer generated artifact and should be a bare target-project path (as `ad-domain` links it). Recategorized it to bare; the design-note reasoning was tightened to justify source-correct depth per doc type (ADR vs WORKFLOW/templates vs CONTEXT.md) rather than by blanket analogy, and folded into Context to match the task template. 226/226 green; re-audit clean.
 
+### 2026-07-29 — closed
+
+Shipped in PR #40 (`dbbe42f`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -51,4 +55,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

@@ -1,6 +1,6 @@
 # Task `0011`: Per-project rules layer in `ad-audit` / `ad-level-up`
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-28
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -38,6 +38,10 @@ Two-axis §10 review (rerun after the first attempt was killed mid-run by a sess
 
 Standards axis: one real Blocker, verified-by-execution by the reviewer — `src/leak-guard.js` only matched top-level `rules/`, so nothing actually blocked committing `.agentic/rules/` in this public repo, contradicting ADR-0043's "machine-local is the only mode here, by design". Fixed by extending the guard to `.agentic/rules/` + a regression test (suite now 227/227) + a `.gitignore` line — the ADR claim is true as of this same commit. Concerns accepted: commit subject trimmed to ≤72; ADR-0035's rejected-alternative bullet gained an inline Superseded marker (83b0c7a precedent — the Consequences stanza needed none, its leak-guard claim is true again post-fix); CONTEXT.md Related-code now cites both hosts per the file's dual-host convention. Note on all-ADRs-proposed vs AGENTS.md "all accepted": pre-existing drift, pending the user's ratification pass.
 
+### 2026-07-29 — closed
+
+Shipped in PR #47 (`7b0d458`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -45,4 +49,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

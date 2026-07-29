@@ -1,6 +1,6 @@
 # Task `0008`: Add the report-for-a-decision-maker behavior to `ad-philosophy`
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-28
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -36,6 +36,10 @@ Authored the eighth behavior in both host styles (claude-code sectioned bullets;
 
 Two-axis §10 review outcome: Standards ship-as-is; Spec found one real blocker and three real concerns, all fixed. Blocker: ADR-0040's "No other file changes" sentence contradicted the same commit's openai.yaml edit — amended in the ADR (still `proposed`, same-change mutable; distinct from the accepted-ADR immutability rule). Concerns: the codex host's compression dropped the "never optimize a report for brevity" prohibition, the jargon audience-calibration sentence, and the *(per Decide When Grounded)* cross-reference — all three restored; and the frontmatter trigger list had reintroduced the un-generalized "BLUF" acronym the ADR body deliberately generalized away — dropped from both hosts.
 
+### 2026-07-29 — closed
+
+Shipped in PR #43 (`a303652`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -43,4 +47,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
