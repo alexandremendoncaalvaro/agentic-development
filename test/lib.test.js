@@ -595,6 +595,41 @@ test('updateRootDoc: malformed markers (start without end) → treated as no sec
 // `summary:`) lives in test/skills.test.js alongside the other frontmatter
 // invariants.
 
+// Per ADR-0044, ad-philosophy has two modes: it auto-loads as posture AND
+// takes an explicit `/ad-philosophy` that triggers the recommitment protocol.
+// The table advertised only the implicit surface before that decision, which
+// would now hide the very gesture the mode exists to serve.
+test('updateRootDoc: ad-philosophy advertises both the slash command and the implicit load', async () => {
+  const dir = mkScratch();
+  try {
+    seedInstalledSkill(dir, 'ad-bootstrap');
+    seedInstalledSkill(dir, 'ad-philosophy');
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
+    await updateRootDoc({
+      cwd: dir,
+      skills: ['ad-bootstrap', 'ad-philosophy'],
+      confirmAppend: async () => true,
+    });
+    const updated = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    const row = updated
+      .split('\n')
+      .find((line) => line.startsWith('| `ad-philosophy` |'));
+    assert.ok(row, 'ad-philosophy row must exist in the managed table');
+    assert.match(row, /`\/ad-philosophy`/, 'slash command must be advertised');
+    assert.match(row, /implicit/, 'implicit auto-load must still be signalled');
+    const otherRow = updated
+      .split('\n')
+      .find((line) => line.startsWith('| `ad-bootstrap` |'));
+    assert.doesNotMatch(
+      otherRow,
+      /implicit/,
+      'the dual-surface note is specific to ad-philosophy'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('updateRootDoc: confirmAppend defaults to false (non-interactive safe)', async () => {
   const dir = mkScratch();
   try {

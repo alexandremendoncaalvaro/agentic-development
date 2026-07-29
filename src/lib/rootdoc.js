@@ -84,8 +84,12 @@ function buildSection(cwd, skills) {
   lines.push('| --- | --- | --- |');
   for (const skill of skills) {
     const note = readSkillSummary(cwd, skill);
+    // ad-philosophy auto-loads as posture, but an explicit `/ad-philosophy`
+    // is a distinct mode (ADR-0044), so the table must advertise both.
     const invoke =
-      skill === 'ad-philosophy' ? '_(implicit)_' : `\`/${skill}\``;
+      skill === 'ad-philosophy'
+        ? `\`/${skill}\` _(also implicit)_`
+        : `\`/${skill}\``;
     lines.push(`| \`${skill}\` | ${invoke} | ${note} |`);
   }
   lines.push('');
