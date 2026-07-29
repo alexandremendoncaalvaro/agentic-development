@@ -38,8 +38,11 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `ad-spec` | spec-driven | universal | Drafts `doc/specs/NNNN-<slug>.md` — feature-level spec (User Scenarios, Requirements, Success Criteria) Layer 4 of the six-layer stack; references parent PRD for product-scope inheritance | `/ad-spec` |
 | `ad-task` | spec-driven | universal | Drafts `doc/tasks/NNNN-<slug>.md` (checkbox + Notes format; carries `Spec ref` to link the implementing spec) | `/ad-task` |
 | `ad-drift` | spec-driven | universal | Read-only drift report (AGENTS.md / ARCHITECTURE.md / ADRs) | `/ad-drift` |
-| `ad-philosophy` | workflow-operational | universal | Universal agent guardrails — auto-loads on non-trivial work | implicit |
+| `ad-archive` | spec-driven | universal | Hard-deletes finished plan files (tasks `done`, specs `shipped`, PRDs / ADRs `superseded`) via `git rm`, leaving git history as the only ledger. No `CHANGELOG`, no `archive/` subdir. Accepted ADRs only on explicit request and only when an absorption check finds their substance in a binding doc | `/ad-archive` |
+| `ad-philosophy` | workflow-operational | universal | Universal agent guardrails — auto-loads as posture on non-trivial work. An explicit `/ad-philosophy` is a recommitment rather than a reload: the agent must bind all eight behaviors to the current task, one line each, before continuing | `/ad-philosophy` or implicit |
 | `ad-review` | workflow-operational | universal | Two-axis code review per WORKFLOW §10. Standards axis (binding docs — AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs) and Spec axis (originating task / spec / PRD). Claude Code spawns two parallel `Task` sub-agents with fresh context; Codex runs a single-session pass by default, writes an audit-trail handoff, and ships a `fresh-context-reviewer` subagent for explicit escalation against that file. Reports side-by-side, no cross-axis re-ranking, no "approve" verdict | `/ad-review <range>` |
+| `ad-audit` | workflow-operational | universal in `team` + `mature` only | Maximum-gate, rules-anchored adversarial audit — the strongest gate before work reaches the team. Fans out one isolated fresh-context reviewer per rule-group of the project's rule-set, emits an explicit verdict for *every* rule (pass / violation / judgement-call / n-a — none skipped, so coverage is a matrix), gives rule-groups marked critical a second cross-model pass via the dual-host split, and treats any teammate-visible claim without an evidence artifact as a blocker. Unions findings, never emits an "approve" verdict. Heavier than `ad-review`; hands rule gaps to `ad-level-up` | `/ad-audit` |
+| `ad-level-up` | workflow-operational | universal in `team` + `mature` only | Curates the project's rule-set — add / refine / merge / retire a convention. Companion to `ad-audit`: that audits against the rules, this evolves them. Every candidate clears four anti-overfitting gates plus an effectiveness pass, then an adversarial multi-lens review (already-covered? holds up? placed right?), and only survivors reach you. Hard human gate — never writes unprompted, one item at a time | `/ad-level-up` |
 | `ad-ground` | workflow-operational | universal | Four-source pre-implementation research (docs / impl-refs / in-repo / git history) + happy-path synthesis + deviation gate per WORKFLOW §4 + §5 | `/ad-ground` |
 | `ad-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the six-layer artifact stack and recommends prioritized next actions; complements `ad-drift` (drift) | `/ad-next` |
 | `ad-spike` | workflow-operational | universal | Staged spike with golden fixtures per WORKFLOW §14, for cases where the *technique* is uncertain across multiple plausible approaches; produces `spikes/NNNN-<slug>/` with discovery + fixture + pipeline-with-gates + two-layer evaluation | `/ad-spike` |
@@ -68,10 +71,10 @@ The kit ships four profiles that select which skills auto-install. Same WORKFLOW
 
 | Profile | Universal install set | Conditional posture | Recommended for |
 | --- | --- | --- | --- |
-| `poc` | 12 — philosophy, ground, audit, next, archive, spike, tdg, tdd, domain, grill, diagnose, handoff | all blocked; `ad-prd` + `ad-guidelines` blocked | spike, hackathon, exploration |
+| `poc` | 12 — philosophy, ground, drift, next, archive, spike, tdg, tdd, domain, grill-me, diagnose, handoff | all blocked; `ad-prd` + `ad-guidelines` blocked | spike, hackathon, exploration |
 | `solo` | 21 — + bootstrap, prd, guidelines, spec, task, review, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code or Codex | solo developer shipping a real product |
-| `team` (default) | 24 — + architecture, adr, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
-| `mature` | 24 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
+| `team` (default) | 26 — + architecture, adr, audit, level-up, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
+| `mature` | 26 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
 
 Select at init time:
 
