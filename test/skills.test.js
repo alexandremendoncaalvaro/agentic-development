@@ -55,6 +55,73 @@ for (const agent of ['claude-code', 'codex']) {
   }
 }
 
+// Archiving an ADR hard-deletes the file and leaves the plain-text `ADR-NNNN`
+// mention as a breadcrumb resolvable via git log (576bb9d). A cited *path*
+// does not survive that: it ships to every consuming project pointing at a
+// file the kit no longer has. Paths inside fenced blocks are illustrative
+// output, not citations, so they are skipped.
+const REPO_ROOT = join(__dirname, '..');
+
+function citedAdrPaths(filePath) {
+  const cited = [];
+  let inFence = false;
+  let fenceCount = 0;
+  const lines = readFileSync(filePath, 'utf8').split('\n');
+  lines.forEach((line, index) => {
+    if (line.trimStart().startsWith('```')) {
+      inFence = !inFence;
+      fenceCount += 1;
+      return;
+    }
+    if (inFence) return;
+    for (const match of line.matchAll(/doc\/adr\/\d{4}-[a-z0-9-]+\.md/g)) {
+      cited.push({ path: match[0], line: index + 1 });
+    }
+  });
+  // An unterminated fence would silently swallow every citation after it,
+  // turning this guard into a no-op exactly where it is needed.
+  assert.equal(
+    fenceCount % 2,
+    0,
+    `${filePath}: unterminated code fence (${fenceCount} markers) — ` +
+      `the dead-ADR-path guard cannot read past it`
+  );
+  return cited;
+}
+
+// A dead path in a subagent manifest ships just as widely as one in the
+// skill body, so the guard covers every installed file, not only SKILL.md.
+function installedFiles(dir) {
+  const files = [join(dir, 'SKILL.md')];
+  const agentsDir = join(dir, 'agents');
+  if (existsSync(agentsDir)) {
+    for (const entry of readdirSync(agentsDir)) {
+      if (statSync(join(agentsDir, entry)).isFile()) {
+        files.push(join(agentsDir, entry));
+      }
+    }
+  }
+  return files;
+}
+
+for (const agent of ['claude-code', 'codex']) {
+  for (const { name, dir } of listSkills(agent)) {
+    test(`skill ${agent}/${name}: every cited ADR path resolves to a real file`, () => {
+      for (const filePath of installedFiles(dir)) {
+        for (const { path, line } of citedAdrPaths(filePath)) {
+          assert.ok(
+            existsSync(join(REPO_ROOT, path)),
+            `${filePath.slice(REPO_ROOT.length + 1)}:${line} cites ${path}, ` +
+              `which does not exist. If the ADR was archived, keep the ` +
+              `plain-text ADR-NNNN breadcrumb and drop the path — a dead ` +
+              `path ships to every consuming project.`
+          );
+        }
+      }
+    });
+  }
+}
+
 for (const { name, dir } of listSkills('codex')) {
   test(`skill codex/${name}: agents/openai.yaml parses with required fields`, () => {
     const yamlPath = join(dir, 'agents', 'openai.yaml');

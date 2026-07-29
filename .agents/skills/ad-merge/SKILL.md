@@ -5,7 +5,7 @@ summary: Evaluate and merge a GitHub pull request. Four phases — preflight, ev
 ---
 
 <background_information>
-Implements ADR-0025 (`doc/adr/0025-agentic-merge-skill.md`). Evaluates a PR's mergeability and performs the merge via `gh pr merge`. CI green is the only hard gate; everything else surfaces as a warning the senior engineer decides on.
+Implements ADR-0025. Evaluates a PR's mergeability and performs the merge via `gh pr merge`. CI green is the only hard gate; everything else surfaces as a warning the senior engineer decides on.
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions merging a PR or evaluating mergeability, invoke this skill manually.
 </background_information>
