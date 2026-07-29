@@ -1,6 +1,6 @@
 # ADR-0037: `ad-level-up` — human-gated rule-set curation
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-27
 **Deciders:** Alexandre Alvaro
 

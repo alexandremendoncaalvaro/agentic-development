@@ -1,6 +1,6 @@
 # ADR-0039: `ad-handoff` offers a background-task chip on chip-capable hosts
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-28
 **Deciders:** Alexandre Alvaro
 
