@@ -1,6 +1,6 @@
 # Task `0009`: Align "design tree" wording to "decision tree"
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-28
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -31,6 +31,10 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 Grounded against the upstream repo before renaming: `skills/productivity/grilling/SKILL.md` says "Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one"; "design tree" appears nowhere upstream. The same research pass confirmed two adjacent items need no change: the kit's per-skill `agents/openai.yaml` schema (`interface.display_name` / `interface.short_description` / `policy.allow_implicit_invocation`) matches upstream exactly; and upstream's invocation taxonomy (`disable-model-invocation` + human-facing descriptions for user-invoked skills) was considered and not adopted — the kit deliberately keeps trigger-rich descriptions with auto-invocation and gates writes inside each skill's flow, whereas adopting the upstream axis would disable the auto-loading the kit's skills are designed around. `npm test` 226/226 green.
 
+### 2026-07-29 — closed
+
+Shipped in PR #44 (`c69354d`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -38,4 +42,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

@@ -1,6 +1,6 @@
 # Task `0001`: Implement the pre-commit house-IP leak-guard
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-27
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -18,7 +18,7 @@ The kit repo is public, and the upcoming `ad-audit` / `ad-level-up` port is auth
 - [x] Committing a staged symlink whose resolved target escapes the repo root is blocked.
 - [x] A clean staged change commits without interference.
 - [x] With no `.agentic/leak-denylist.txt` present, the denylist check is a silent no-op while the `rules/` and symlink checks still fire.
-- [ ] `npm test` passes on Node 20 and 22, including the new `test/leak-guard.test.js`. (Green locally on Node 24; 20/22 confirmed by CI on the PR — not installed in the dev env.)
+- [x] `npm test` passes on Node 20 and 22, including the new `test/leak-guard.test.js`. (Green locally on Node 24; 20/22 confirmed by CI on the PR — not installed in the dev env.)
 - [x] The guard adds no skill surface and no `src/lib/profiles.js` entry.
 
 ## Plan
@@ -41,6 +41,10 @@ Task drafted from ADR-0033. First workstream (W2) of the AD-kit-improvements pro
 
 Implemented via TDD (red then green): `src/leak-guard.js` with a pure policy core (`parseRawDiff`, `extractAddedLines`, `loadDenylist`, `findViolations`) plus a thin git-calling `main()`; `test/leak-guard.test.js` covers every branch. Two-axis fresh-context review (WORKFLOW §10, Standards + Spec) ran adversarially. Both axes found the same blocker: git's default `core.quotepath=true` C-quotes non-ASCII paths in `--raw`, so a `rules/` path with an accented character slipped the guard (false-negative). Fixed by switching the raw diff to `--raw -z` (verbatim NUL-delimited paths) plus `-c core.quotepath=false` on the content diff; added a non-ASCII regression test and re-verified end-to-end (the non-ASCII `rules/` case now blocks). Also applied: `lefthook.yml` comment scoped to the real CI mirror; `.gitignore` `rules/` root-anchored to `/rules/`; `main()` wrapped in fail-closed try/catch; `src/leak-guard.js` documented in AGENTS.md layout; known-limitation note (per-line literal substring) added to the example and ADR. Rejected the reviewer suggestion to move the script out of `src/` — ADR-0033 chose `src/` deliberately and the reusability goal wants it shipped. Full suite green: 216/216 on Node 24 (20/22 pending CI).
 
+### 2026-07-29 — closed
+
+Shipped in PR #36 (`d27c2fb`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -48,4 +52,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

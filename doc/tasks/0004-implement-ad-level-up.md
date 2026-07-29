@@ -1,6 +1,6 @@
 # Task `0004`: Implement the `ad-level-up` rule-set curation skill
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-27
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -40,6 +40,10 @@ Authored both hosts modeled on `ad-audit` (fan-out review skill shape) + the ext
 
 Two-axis §10 review (Standards + Spec) ran adversarially and found a real Standards blocker plus several concerns, all fixed: added `Write` to `allowed-tools` (the skill offers to create the rule-set if absent, which `Edit` cannot do); set Codex `allow_implicit_invocation: false` to match the write-skill convention (a human-gated write skill must be explicitly invoked, not auto-fired); clarified the Codex escalation passes its handoff inline (no persisted trail, unlike `ad-audit`); fixed the Step 8 report to surface the dead-rule-sweep result rather than duplicating placement; removed a Claude-only lens-scaling clause for host symmetry and ADR fidelity.
 
+### 2026-07-29 — closed
+
+Shipped in PR #39 (`6285f72`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -47,4 +51,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

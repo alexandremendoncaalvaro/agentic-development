@@ -1,6 +1,6 @@
 # Task `0007`: `ad-handoff` background-task chip on chip-capable hosts
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-28
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -36,6 +36,10 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 Grounded before writing: the chip primitive is real but undocumented and app-specific (`spawn_task`, Claude Code desktop app; observed contract: title / self-contained prompt / tldr / cwd → one-click chip → fresh session), and a skill cannot detect its surface by name (host env vars are subprocess-visible only). Adopted the kit's existing host-aware-primitive convention (`AskUserQuestion` pattern, WORKFLOW §3): capability-gated wording with `spawn_task` named as the current example, graceful degradation elsewhere. Kept deliberately small per review of scope: one paragraph in Step 5, one output-contract line, `summary:` refresh; Codex host file untouched (no primitive). `npm test` green.
 
+### 2026-07-29 — closed
+
+Shipped in PR #42 (`c83818f`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -43,4 +47,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

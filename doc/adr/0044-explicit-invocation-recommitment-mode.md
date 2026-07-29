@@ -1,6 +1,6 @@
 # ADR-0044: Explicit invocation of `ad-philosophy` is a recommitment, not a reload
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-29
 **Deciders:** Alexandre Alvaro
 

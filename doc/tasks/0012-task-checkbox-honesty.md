@@ -1,6 +1,6 @@
 # Task `0012`: Checkbox honesty rule in `ad-task`
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-29
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -20,8 +20,8 @@ A fresh-context reviewer observed that task files inherit a convention of checki
 
 - [x] Edit both host SKILL.md files.
 - [x] `node bin/agentic.js update --yes --force`; `npm test`; fresh-context review.
-- [ ] PR opened.
-- [ ] Merged on CI green.
+- [x] PR opened.
+- [x] Merged on CI green.
 
 ## Notes
 
@@ -31,6 +31,10 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 Applied per the reviewer's observation and the owner's direction to stop treating ground-resolved fixes as open decisions. The Plan section above practices the rule it lands: PR/merge items unchecked until they happen.
 
+### 2026-07-29 — closed
+
+Shipped in PR #49 (`d238ff5`), merged to `main` with CI green. Every acceptance criterion and Definition-of-Done item above is checked against work that actually landed, not against intent.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -38,4 +42,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
