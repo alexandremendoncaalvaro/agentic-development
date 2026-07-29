@@ -42,7 +42,7 @@ export const PROFILES = {
       'ad-prd': 'blocked',
       'ad-guidelines': 'blocked',
     },
-    note: 'PoC / spike / experiment. Twelve universals — posture (philosophy), research (ground), drift detection, navigation (next), archiving, spike + tdg + tdd + grill + domain + diagnose process scaffolds. No mandatory artifact-producing skills (no bootstrap / spec / task / adr / architecture / prd / guidelines). Adds discipline you can grow into; never pre-imposes ceremony.',
+    note: 'PoC / spike / experiment. Twelve universals — posture (philosophy), research (ground), drift detection, navigation (next), archiving, session compaction (handoff), spike + tdg + tdd + grill + domain + diagnose process scaffolds. No mandatory artifact-producing skills (no bootstrap / spec / task / adr / architecture / prd / guidelines). Adds discipline you can grow into; never pre-imposes ceremony.',
   },
   solo: {
     universal: [
