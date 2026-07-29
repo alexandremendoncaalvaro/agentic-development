@@ -1,12 +1,35 @@
 ---
 name: ad-philosophy
 description: Universal agent behavior and documentation discipline — think before coding, decide when grounded (only ask on judgment calls), ground in real patterns, prefer simplicity, make surgical changes, define verifiable goals, verify before claiming done, report for a decision-maker (conclusion first, self-contained, translate-not-dump), and write documentation that captures only definitions and decisions. Auto-invokes on non-trivial changes, refactors, debugging, "think before coding", "ground before coding", "verify done", "decide when grounded", "employee not co-pilot", "report for a decision-maker", "before implementing", on documentation work — "writing docs", "writing readme", "writing architecture", "writing adr", "writing task", "audit docs" — or whenever the task is ambiguous enough that guardrails matter.
-summary: Universal agent guardrails (think, decide when grounded, verify done, report for a decision-maker). Auto-loads on non-trivial work.
+summary: Universal agent guardrails (think, decide when grounded, verify done, report for a decision-maker). Auto-loads as posture on non-trivial work; an explicit `/ad-philosophy` additionally forces a binding statement applying all eight behaviors to the current task.
 ---
 
 # /ad-philosophy
 
 Eight behaviors apply to every non-trivial change. Bias toward caution over speed; for trivial diffs, use judgment. A separate Documentation Discipline section at the end applies to every document the agent writes.
+
+## Explicit Invocation Is a Recommitment
+
+**Applies only when the user invoked this skill as a request** — they typed `/ad-philosophy`, or asked for it by name. It does not fire on an incidental mention (discussing the skill, asking how it works). When the skill auto-loaded as posture, skip this section: read the behaviors and continue the task silently.
+
+An explicit invocation is a correction, not a request for the text. The text never left — the behaviors were already in context, which is exactly why reloading them changes nothing. What is being asked for is application: bind each behavior to the task actually in front of you, out loud, before doing anything else.
+
+Emit the applied-binding statement first:
+
+- **All eight behaviors, in order, one line each.** Name the behavior, then state what it changes about your *immediate next actions on this task*.
+- **Behaviors that do not bind are listed as `n/a` with a reason.** Coverage, not cherry-picking — a silently omitted behavior is how a recitation passes for an application, and the omitted one tends to be the one currently being violated.
+- **Every line names a referent from this task** — a file, a command, an artifact, or a specific next action. A line with no task-specific referent is a restatement of the rule and does not count, whatever label it carries: "Verify Before Claiming Done — re-run the suite and paste the output before calling it green" binds; "Verify Before Claiming Done — I will verify my work" does not.
+- **Add a ninth line for Documentation Discipline** when the task writes or edits any document.
+- **A binding that contradicts the current plan forces the correction in the same pass** — state what changes, then continue with the corrected plan.
+
+Shape:
+
+```
+<Behavior> — bind: <what changes in my next actions>
+<Behavior> — n/a: <why this task does not touch it>
+```
+
+Close with one line naming the first action that changes because of the statement. Concluding that nothing changes requires saying what you checked to reach that conclusion — and it contradicts any behavior you just bound, so resolve the contradiction before continuing.
 
 ## Think Before Coding
 
