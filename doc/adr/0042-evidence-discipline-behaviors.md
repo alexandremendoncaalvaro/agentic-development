@@ -1,6 +1,6 @@
 # ADR-0042: Evidence-discipline additions to the posture behaviors
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-28
 **Deciders:** Alexandre Alvaro
 

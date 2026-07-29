@@ -1,6 +1,6 @@
 # ADR-0040: Report-for-a-decision-maker as an eighth `ad-philosophy` behavior
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-28
 **Deciders:** Alexandre Alvaro
 

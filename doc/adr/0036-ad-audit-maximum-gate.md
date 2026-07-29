@@ -1,6 +1,6 @@
 # ADR-0036: `ad-audit` — the maximum-gate rules-anchored audit
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-27
 **Deciders:** Alexandre Alvaro
 

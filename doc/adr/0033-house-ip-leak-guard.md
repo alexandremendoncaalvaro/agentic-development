@@ -1,6 +1,6 @@
 # ADR-0033: Pre-commit house-IP leak-guard
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-27
 **Deciders:** Alexandre Alvaro
 

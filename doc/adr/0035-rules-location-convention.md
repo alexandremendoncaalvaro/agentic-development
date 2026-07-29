@@ -1,6 +1,6 @@
 # ADR-0035: Curated rule-set location convention
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-27
 **Deciders:** Alexandre Alvaro
 **Amended by:** [ADR-0043](0043-per-project-rules-layer.md) — adds a per-project `.agentic/rules/` layer, superseding this ADR's rejection of that alternative for the project scope.

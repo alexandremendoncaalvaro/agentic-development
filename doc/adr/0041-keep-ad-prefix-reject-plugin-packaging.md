@@ -1,6 +1,6 @@
 # ADR-0041: Keep the `ad-` skill prefix; reject Claude Code plugin packaging
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-07-28
 **Deciders:** Alexandre Alvaro
 
