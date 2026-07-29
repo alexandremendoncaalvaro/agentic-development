@@ -6,6 +6,7 @@ import {
   rmSync,
   writeFileSync,
   readFileSync,
+  readdirSync,
   existsSync,
   mkdirSync,
 } from 'node:fs';
@@ -459,4 +460,50 @@ test('agentic profile set <name> two-positional form sets the profile end-to-end
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// README.md is the kit's public face on npm and GitHub. Its profile table has
+// drifted from profiles.js twice: once when ad-audit was renamed to ad-drift
+// (the poc row kept the old name) and once when ad-audit + ad-level-up joined
+// team/mature (the counts stayed at 24). Both shipped. Pin the claims to the
+// source so the next drift fails here instead of on the registry.
+const README = readFileSync(join(__dirname, '..', 'README.md'), 'utf8');
+
+for (const name of PROFILE_NAMES) {
+  test(`README profile table states the real universal count for ${name}`, () => {
+    const expected = PROFILES[name].universal.length;
+    const row = README.split('\n').find((line) =>
+      line.startsWith(`| \`${name}\``)
+    );
+    assert.ok(row, `README must carry a profile-table row for ${name}`);
+    const claimed = row.match(/\|\s*(\d+)\s*—/);
+    assert.ok(claimed, `${name} row must state a count before its skill list`);
+    assert.equal(
+      Number(claimed[1]),
+      expected,
+      `README claims ${claimed[1]} universal skills for ${name}; ` +
+        `profiles.js has ${expected}`
+    );
+  });
+}
+
+test('README skill table carries a row for every skill the kit ships', () => {
+  const shipped = readdirSync(
+    join(__dirname, '..', 'src', 'skills', 'claude-code')
+  ).sort();
+  // A table row, not a prose mention: ad-audit and ad-level-up were both
+  // referenced in prose while missing from the table, which is how they
+  // shipped undocumented.
+  const rows = new Set(
+    README.split('\n')
+      .map((line) => line.match(/^\| `(ad-[a-z-]+)` \|/))
+      .filter(Boolean)
+      .map((match) => match[1])
+  );
+  const missing = shipped.filter((skill) => !rows.has(skill));
+  assert.deepEqual(
+    missing,
+    [],
+    `every shipped skill needs a README table row; missing: ${missing.join(', ')}`
+  );
 });
