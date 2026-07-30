@@ -45,7 +45,8 @@
   },
   "homepage": "https://github.com/alexandremendoncaalvaro/agentic-development#readme",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "beta"
   },
   "dependencies": {
     "@clack/prompts": "^1.3.0",
