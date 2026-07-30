@@ -7,7 +7,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 
 # /ad-diagnose
 
-Implements [WORKFLOW.md §15](../../../../WORKFLOW.md) per [ADR-0021](../../../../doc/adr/0021-diagnose-discipline.md). Disciplined diagnosis for hard bugs and performance regressions. Process scaffold; the output is the verified fix + regression test landing through normal commits.
+Implements WORKFLOW.md §15 per ADR-0021. Disciplined diagnosis for hard bugs and performance regressions. Process scaffold; the output is the verified fix + regression test landing through normal commits.
 
 The shape is grounded in Kernighan & Pike, *The Practice of Programming* (1999, ch. 5–6) and Karl Popper's falsifiability framing. The Phase-1 framing ("the loop is the skill — everything else is mechanical") is borrowed from [`mattpocock/skills`](https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnose/SKILL.md) with attribution.
 
@@ -118,7 +118,7 @@ A correct seam is one where the test exercises the **real bug pattern** as it oc
 
 To pick the right routing branch below, determine the current profile: `Read .claude/agentic-state.json` (or `.agents/agentic-state.json` for Codex installs) and inspect the `profile` field. Default to `team` if the file is absent.
 
-- If the project profile is `team` or `mature`: hand off to `/ad-deepen` ([ADR-0020](../../../../doc/adr/0020-deep-modules-vocabulary.md)) with the specifics — the "test surface impact" line in the candidate template was made for this case.
+- If the project profile is `team` or `mature`: hand off to `/ad-deepen` (ADR-0020) with the specifics — the "test surface impact" line in the candidate template was made for this case.
 - If the project profile is `poc` or `solo`: `ad-deepen` is not installed (premature for these maturities per ADR-0020 §4). Capture the seam gap in the commit message body and the task `Notes` log as a finding for a future deepening pass; if the project is graduating to `team`, re-init at the higher profile to enable `/ad-deepen` then.
 
 If a correct seam exists:

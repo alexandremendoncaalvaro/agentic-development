@@ -50,7 +50,7 @@ For non-trivial changes, invoke `/ad-ground` — the workflow-operational skill 
 
 ## Decide When Grounded, Ask When Judgment
 
-Universal rule; [WORKFLOW.md §7](../../../../WORKFLOW.md) subsection *Decide when grounded, ask when judgment* is the canonical source.
+Universal rule; WORKFLOW.md §7 subsection *Decide when grounded, ask when judgment* is the canonical source.
 
 **The engineer is the boss, not the co-pilot.** They are not reading every file, doc, or line the agent read to arrive at a recommendation. Bring decisions with a recommendation — do not punt every fork back to them.
 
