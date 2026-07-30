@@ -167,7 +167,7 @@ Tier is editable as the project matures (append a rationale paragraph; do not de
 ### 6.1 Toolchain
 
 - **Language:** JavaScript, ESM (`"type": "module"`).
-- **Node:** ≥20 (Node 18 EOL; `@clack/prompts` 1.x requires `node:util` `styleText` from Node 20+).
+- **Node:** ≥20.12.0 (Node 18 EOL; `@clack/prompts` 1.x requires `node:util` `styleText`, which shipped in 20.12.0 — not anywhere earlier in the 20.x line).
 - **Build step:** **none.** Source is what ships; no transpilation, no bundling.
 - **Source of truth for scripts:** `package.json` `scripts` field.
 

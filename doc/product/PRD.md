@@ -61,7 +61,7 @@ Multi-feature scope tiers. No status annotations — implementation tracking liv
 - **MVP tier — Layer 3 Product.** `ad-prd` lazy `doc/product/PRD.md` lifecycle.
 - **MVP tier — Layer 4 Spec.** `ad-spec` feature-level specs at `doc/specs/`.
 - **MVP tier — Layer 5 Plan/Decisions.** `ad-architecture`, `ad-adr`, `ad-task` — ARCHITECTURE, ADRs, tasks.
-- **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill-me`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-next`, `ad-drift`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-hooks`.
+- **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill-me`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-audit`, `ad-level-up`, `ad-next`, `ad-drift`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-hooks`.
 - **Next tier — AGENTS ↔ GUIDELINES reciprocity automation.** `ad-bootstrap` writes pointer stubs (instead of inline rules) when `GUIDELINES.md` exists; `ad-drift` flags duplication.
 - **Next tier — Release skill (`ad-release`).** Version-bump, changelog, npm publish, GitHub release. Replaces the current manual flow.
 - **Next tier — Community-facing docs (`CONTRIBUTING.md` / `SECURITY.md`) scaffolds.** GitHub-conventional companion to `AGENTS.md`.
