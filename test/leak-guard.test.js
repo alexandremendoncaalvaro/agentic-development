@@ -147,6 +147,21 @@ test('findViolations flags a non-ASCII path under rules/ (quotepath false-negati
   assert.equal(violations[0].kind, 'rules-path');
 });
 
+test('regression: findViolations flags case-variant rules/ paths (fail-closed; case is not an ADR-0033 accepted limitation)', () => {
+  for (const path of ['Rules/x.md', 'RULES/x.md', '.agentic/Rules/x.md', '.Agentic/rules/x.md']) {
+    const violations = findViolations({
+      entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path }],
+      addedLines: [],
+      denylistPatterns: [],
+      repoRoot: '/repo',
+      readSymlinkTarget: noSymlink,
+    });
+    assert.equal(violations.length, 1, `expected ${path} to be flagged`);
+    assert.equal(violations[0].kind, 'rules-path');
+    assert.equal(violations[0].path, path, 'the reported path keeps its original casing');
+  }
+});
+
 test('findViolations does not flag a deletion under rules/', () => {
   const violations = findViolations({
     entries: [{ status: 'D', dstMode: '000000', dstSha: '0', path: 'rules/old.md' }],

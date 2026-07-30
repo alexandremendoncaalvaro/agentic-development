@@ -126,13 +126,17 @@ export function findViolations({
   }
 
   for (const { path } of introduced) {
-    if (path === 'rules' || path.startsWith('rules/')) {
+    // Case-folded like the denylist checks above: the guard is fail-closed, and
+    // ADR-0033's accepted-limitations list does not include case. `Rules/` from a
+    // case-insensitive filesystem habit or a plain typo is the same leak.
+    const probe = path.toLowerCase();
+    if (probe === 'rules' || probe.startsWith('rules/')) {
       violations.push({ kind: 'rules-path', path, detail: 'adds a path under rules/' });
     }
     // ADR-0043: the per-project curated layer lives at .agentic/rules/; in this
     // public kit repo, machine-local is the only allowed mode — committed project
     // rules here would be exactly the leak this guard exists to prevent.
-    if (path === '.agentic/rules' || path.startsWith('.agentic/rules/')) {
+    if (probe === '.agentic/rules' || probe.startsWith('.agentic/rules/')) {
       violations.push({ kind: 'rules-path', path, detail: 'adds a path under .agentic/rules/' });
     }
   }
