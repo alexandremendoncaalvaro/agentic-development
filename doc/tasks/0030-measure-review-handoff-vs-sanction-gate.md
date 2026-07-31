@@ -32,14 +32,6 @@ External grounding (four-source pass, `/ad-ground`):
 - [x] Golden-set corrections recorded where the arms out-argued the manual labelling.
 - [x] Observations below the repo's evidence bar recorded as such, for future re-grading, rather than legislated.
 
-## Definition of Done
-
-All Acceptance Criteria checked, plus:
-
-- [x] Local tests pass (or N/A documented in Notes) — 294/294.
-- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10) — two-axis `/ad-review` over the fix range plus two re-review passes; findings and retractions in Notes.
-- [x] No orphan `TODO`/`FIXME` introduced.
-
 ## Plan
 
 - [x] Label the golden set by manual revalidation of the ad-hoc pass (2 real Blockers, 6 real minor, 8 inflated).
@@ -120,9 +112,25 @@ What remains for `/ad-level-up` is narrower and is a real gap: `ad-task` Step 1'
 
 Four false or unfalsifiable claims now trace to the same undisciplined sampling, in a task whose entire subject is review calibration. The recurrence is the finding: the corrective rule the corpus needs is not about reviewers at all, but about the author's own counting — **a claim of the form "N of M" is only admissible when the population M is stated and the enumeration is reproducible**. Two counted classes (this, plus the unrecognised-identifier asymmetry above) now have real evidence, so both go to `/ad-level-up` together.
 
+**2026-07-31 — Final review pass; two corrections to entries above.** Spec axis of `/ad-review 2aa8cb1..HEAD`, 0 Blockers.
+
+- **The leak-guard installation item below is now closed, not open.** The same range that recorded it added `lefthook` to `devDependencies`, wired `.git/hooks/pre-commit` and `pre-push`, and created the machine-local denylist; staging a denylisted marker now exits 1, and the `lefthook` commit itself was the first in this repo's history to pass through the gate. What remains open is only the per-contributor denylist copy, which ADR-0033 makes machine-local by design.
+- **The numbering entry above undercounts the recurrence.** It calls the 2026-07 restart at `0001` "the drift". There were in fact **three** generations of task `0001` — 2026-05-08, 2026-05-24 and 2026-07-27 — so the restart-after-archive-sweep pattern had already happened twice before. The numeric conclusion is unaffected (0029 remains the ledger maximum, so 0030/0031 stand), but the claim that "nothing in the corpus disambiguates" `ad-task` Step 1 is wrong in the direction that matters: the corpus disambiguates it three times over, always toward restart. That makes the rule-text ambiguity a **counted, thrice-recurring** class rather than a one-off observation, which clears the ADR-0042 bar on its own and strengthens the `/ad-level-up` candidate rather than weakening it.
+
+Ironic in the same direction as everything else in this task: an entry correcting undercounted claims was itself undercounted. That is now the fifth instance of the same author-side sampling failure, and it is the strongest evidence in this file for the "N of M" rule.
+
 **2026-07-30 — Open, not closed by this task.**
 
 - `extractAddedLines` treats a content line beginning with `++ ` as a diff file header, disabling the content scan for the rest of that file (reproduced: exit 0 with the marker committed). Not an ADR-0033 named limitation. Needs its own fix + pure-function test.
 - `main()` has no integration test against a real git repo — flagged independently by three of the four arms.
 - Pre-redaction identifiers remain reachable in public history from `origin/main`. Whether a private-source identifier is genuinely sensitive is the owner's call; history rewrite on a public repo is irreversible and was deliberately not performed.
 - The leak-guard is not actually installed on the maintainer's machine (no `lefthook` binary, not in `devDependencies`, no local denylist), so none of this range's commits — including the release commit and the fixes above — were scanned. ADR-0033 names unset hooks as an accepted bypass, so this is setup debt rather than a defect, but it means the guard has never executed.
+
+## Definition of Done
+
+All Acceptance Criteria checked, plus:
+
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
