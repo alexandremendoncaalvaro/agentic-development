@@ -3,6 +3,7 @@
 **Status:** done
 **Created:** 2026-07-30
 **Owner:** Alexandre Alvaro
+**Spec ref:**
 **Board ref:**
 
 ## Context
@@ -60,10 +61,23 @@ External grounding (four-source pass, `/ad-ground`):
 
 **2026-07-30 — Golden-set corrections.** The arms out-argued the manual labelling in five places:
 
-- **`rules/` case-sensitivity moved INFLATED → REAL.** Both Spec-axis arms reproduced the bypass and rebutted the manual downgrade correctly: ADR-0033's Consequences section *enumerates* its accepted gaps (`--no-verify`, denylist false positives, per-line substring, latency) and case is not among them, while the Decision frames the guard as fail-closed. Fixed in [`7133c18`](../../src/leak-guard.js) with a four-variant regression test.
+- **`rules/` case-sensitivity moved INFLATED → REAL.** Both Spec-axis arms reproduced the bypass and rebutted the manual downgrade correctly: ADR-0033's Consequences section *enumerates* its accepted gaps (`--no-verify`, denylist false positives, per-line substring, latency) and case is not among them, while the Decision frames the guard as fail-closed. Fixed in this range by case-folding the path probe in [`src/leak-guard.js`](../../src/leak-guard.js) `findViolations`, with the four-variant regression test in [`test/leak-guard.test.js`](../../test/leak-guard.test.js) (`regression: findViolations flags case-variant rules/ paths`). Cited by artifact rather than commit SHA deliberately: a same-branch SHA does not survive a rebase or a squash-merge, and this repo does both (PRs #29–#33 landed as merge commits, PR #35 was squashed and killed its pre-squash SHA).
 - **Four real findings the ad-hoc pass missed entirely**, all verified before acceptance: [`ARCHITECTURE.md`](../../ARCHITECTURE.md) claiming Codex has no `agentsDir` (contradicted by `install.js` and the shipped `.codex/agents/*.toml`); `ARCHITECTURE.md` stating `engines.node = ">=18"`; [`doc/product/PRD.md`](../product/PRD.md) roadmap omitting `ad-audit` / `ad-level-up`; [`src/commands/init.js`](../../src/commands/init.js) printing no outro line for either new skill.
 
 The properly-handed-off review found **more** and inflated **less** than the ad-hoc adversarial fan-out.
+
+**2026-07-31 — The fix range was itself reviewed, dogfooding the finding above.** `/ad-review 1e25d9a..HEAD`, two axes, handoffs persisted under `.agentic/reviews/`. Result: **0 Blockers on both axes**, 1 Concern each.
+
+The Step 0 handoff-integrity gate earned its place before any reviewer was dispatched — it exposed that `workflow-first-version.md`, an unrelated untracked draft, had been swept into the link-fix commit by a `git add -A`. The branch was rebuilt by cherry-pick without it (40 files, not 41), which is what invalidated the SHA citation the Spec axis then caught.
+
+Two review findings applied:
+
+- Spec Concern — the Notes cited a commit SHA that the rebase had orphaned. Re-cited by artifact (file + named test) rather than SHA. Grounding checked before choosing the remedy: all six historical SHA citations in this repo's task files survive, but four of them reference prior-art commits already on `main`, where survival is trivial. Only one (`83b0c7a`, task 0006) cited a same-branch commit like this one did, and it survived only because that PR landed as a merge commit. Same-branch SHA survival is therefore non-deterministic here; an artifact reference is not.
+- Standards Note — the task header dropped template fields. `**Spec ref:**` added blank (4 of 5 historical tasks carry it). `**Execution:**` deliberately **not** added: `templates/task.md` specifies it but only 1 of 5 historical tasks (0014) actually carries it, and nothing enforces it. The real finding is template-vs-practice drift across the task corpus, not this file — recorded here rather than silently complied with.
+
+The reviewer's supporting claim that task 0029 "kept blank labels rather than dropping the fields" was checked and is false — 0029 has no `**Execution:**` line at all. Relayed reviewer detail re-verified per ADR-0042 rather than repeated.
+
+Remaining Standards Concern (`extractAddedLines` `++ ` header bypass) was **not** fixed here — it is listed as open below, and fixing it would be exactly the scope creep the Spec axis confirmed this range is free of. Tracked as its own task.
 
 **2026-07-30 — Open, not closed by this task.**
 
