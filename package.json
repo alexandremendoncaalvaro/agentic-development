@@ -53,6 +53,7 @@
     "commander": "^12.1.0"
   },
   "devDependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "lefthook": "^2.1.10"
   }
 }
