@@ -22,7 +22,7 @@ This is **not** one of [ADR-0033](../adr/0033-house-ip-leak-guard.md)'s accepted
 
 The trigger is realistic in this repo specifically: any document containing a pasted diff hunk header inside a fenced block (`+++ b/foo` renders as `++++ b/foo` in the diff of that document) hits the same branch. Skill bodies, ADRs and review artefacts here quote diffs routinely.
 
-Surfaced by the Standards axis of the `/ad-review` pass on `1e25d9a..HEAD` and deliberately deferred from that range to avoid scope creep — see [task 0030](0030-measure-review-handoff-vs-sanction-gate.md) Notes.
+Surfaced by the Standards axis of the `/ad-review` pass on `v0.18.0-beta.1..HEAD` and deliberately deferred from that range to avoid scope creep — see [task 0030](0030-measure-review-handoff-vs-sanction-gate.md) Notes.
 
 ## Acceptance Criteria
 
@@ -46,7 +46,7 @@ Surfaced by the Standards axis of the `/ad-review` pass on `1e25d9a..HEAD` and d
 
 **2026-07-31 — Opened.** Two sibling gaps in the same file are tracked but explicitly *not* in this task's scope, so each keeps its own evidence trail:
 
-- `main()` has no integration test against a real git repo — the git-plumbing wrapper (`rev-parse`, `--raw -z` parsing, `cat-file blob`, exit codes, the fail-closed catch) that `lefthook.yml` actually invokes is untested. Flagged by several independent reviewers across the task-0030 measurement and the `1e25d9a..HEAD` review. Note that those reviewer verdicts live only in session transcripts — `.agentic/reviews/` is gitignored and holds review *inputs*, not outputs — so this attribution is not reproducible from the repo. The defect itself is, via the Context repro above; treat that as the evidence, not the count. Fixing it would likely subsume the end-to-end criterion here, so sequence it after this task rather than merging the two.
+- `main()` has no integration test against a real git repo — the git-plumbing wrapper (`rev-parse`, `--raw -z` parsing, `cat-file blob`, exit codes, the fail-closed catch) that `lefthook.yml` actually invokes is untested. Flagged by several independent reviewers across the task-0030 measurement and the `v0.18.0-beta.1..HEAD` review. Note that those reviewer verdicts live only in session transcripts — `.agentic/reviews/` is gitignored and holds review *inputs*, not outputs — so this attribution is not reproducible from the repo. The defect itself is, via the Context repro above; treat that as the evidence, not the count. Fixing it would likely subsume the end-to-end criterion here, so sequence it after this task rather than merging the two.
 - The guard had never actually executed: no `lefthook` binary, `lefthook` absent from `devDependencies`, and no local `.agentic/leak-denylist.txt`. ADR-0033 names unset hooks as an accepted bypass, so this was setup debt rather than a defect — but it meant every fix to this file shipped unscanned. **Closed in the same range that opened this task:** `lefthook` is now a devDependency, the hooks are wired, and staging a denylisted marker exits 1. What remains open is only the per-contributor step — the denylist is machine-local by design (ADR-0033), so a fresh clone still needs `cp .agentic/leak-denylist.example.txt .agentic/leak-denylist.txt` before the content scan does anything.
 
 ## Definition of Done

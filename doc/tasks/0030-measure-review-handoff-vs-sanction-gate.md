@@ -15,7 +15,7 @@ The proximate cause was visible immediately: no handoff carried any ADR, because
 
 That left a real question the kit could not answer from posture alone: **is the existing handoff rule sufficient, or does the reviewer also need an explicit instruction on what to do when the spec already sanctions the behaviour it is about to flag?** Task 0002 established the repo's methodology for exactly this class of question (multi-arm review comparison over a fixed range), and [ADR-0042](../adr/0042-evidence-discipline-behaviors.md) established the evidence bar (class-level recurrence, counted).
 
-Prior art on the same failure family: [`4fd46f6`](../../src/skills/claude-code/ad-review/agents/fresh-context-reviewer.md) (task 0005) codified a downgrade rule after two reviewers confidently flagged a real platform identifier as fabricated.
+Prior art on the same failure family: task 0005's *Platform-identifier verification* section in [`fresh-context-reviewer.md`](../../src/skills/claude-code/ad-review/agents/fresh-context-reviewer.md) codified a downgrade rule after two reviewers confidently flagged a real platform identifier as fabricated.
 
 External grounding (four-source pass, `/ad-ground`):
 - **LLM Critics Help Catch LLM Bugs** (arXiv:2407.00215) — critics beat paid human reviewers on recall but hallucinate bugs; human-machine teams catch a similar number while hallucinating less than the critic alone. There is an explicit precision/recall knob.
@@ -43,7 +43,7 @@ External grounding (four-source pass, `/ad-ground`):
 
 ## Notes
 
-**2026-07-30 — Result.** Range `e473882..1e25d9a`, fixed across all arms.
+**2026-07-30 — Result.** Range `v0.17.9-beta.1..v0.18.0-beta.1` (24 commits), fixed across all arms. Anchored on tags, not SHAs — the tags survived the 2026-07-31 history rewrite; the SHAs did not.
 
 | Arm | Handoff | Findings | Inflated | Rate |
 |-----|---------|----------|----------|------|
@@ -67,7 +67,7 @@ External grounding (four-source pass, `/ad-ground`):
 
 The properly-handed-off review found **more** and inflated **less** than the ad-hoc adversarial fan-out.
 
-**2026-07-31 — The fix range was itself reviewed, dogfooding the finding above.** `/ad-review 1e25d9a..HEAD`, two axes, handoffs persisted under `.agentic/reviews/`. Result: **0 Blockers on both axes**, 1 Concern each.
+**2026-07-31 — The fix range was itself reviewed, dogfooding the finding above.** `/ad-review v0.18.0-beta.1..HEAD`, two axes, handoffs persisted under `.agentic/reviews/`. Result: **0 Blockers on both axes**, 1 Concern each.
 
 The Step 0 handoff-integrity gate earned its place before any reviewer was dispatched — it exposed that `workflow-first-version.md`, an unrelated untracked draft, had been swept into the link-fix commit by a `git add -A`. The branch was rebuilt by cherry-pick without it (40 files, not 41), which is what invalidated the SHA citation the Spec axis then caught.
 
@@ -112,12 +112,46 @@ What remains for `/ad-level-up` is narrower and is a real gap: `ad-task` Step 1'
 
 Four false or unfalsifiable claims now trace to the same undisciplined sampling, in a task whose entire subject is review calibration. The recurrence is the finding: the corrective rule the corpus needs is not about reviewers at all, but about the author's own counting — **a claim of the form "N of M" is only admissible when the population M is stated and the enumeration is reproducible**. Two counted classes (this, plus the unrecognised-identifier asymmetry above) now have real evidence, so both go to `/ad-level-up` together.
 
-**2026-07-31 — Final review pass; two corrections to entries above.** Spec axis of `/ad-review 2aa8cb1..HEAD`, 0 Blockers.
+**2026-07-31 — Final review pass; two corrections to entries above.** Spec axis of `/ad-review` over the final unreviewed tail, 0 Blockers.
 
 - **The leak-guard installation item below is now closed, not open.** The same range that recorded it added `lefthook` to `devDependencies`, wired `.git/hooks/pre-commit` and `pre-push`, and created the machine-local denylist; staging a denylisted marker now exits 1, and the `lefthook` commit itself was the first in this repo's history to pass through the gate. What remains open is only the per-contributor denylist copy, which ADR-0033 makes machine-local by design.
 - **The numbering entry above undercounts the recurrence.** It calls the 2026-07 restart at `0001` "the drift". There were in fact **three** generations of task `0001` — 2026-05-08, 2026-05-24 and 2026-07-27 — so the restart-after-archive-sweep pattern had already happened twice before. The numeric conclusion is unaffected (0029 remains the ledger maximum, so 0030/0031 stand), but the claim that "nothing in the corpus disambiguates" `ad-task` Step 1 is wrong in the direction that matters: the corpus disambiguates it three times over, always toward restart. That makes the rule-text ambiguity a **counted, thrice-recurring** class rather than a one-off observation, which clears the ADR-0042 bar on its own and strengthens the `/ad-level-up` candidate rather than weakening it.
 
 Ironic in the same direction as everything else in this task: an entry correcting undercounted claims was itself undercounted. That is now the fifth instance of the same author-side sampling failure, and it is the strongest evidence in this file for the "N of M" rule.
+
+**2026-07-31 — The history rewrite orphaned every pre-scrub SHA in the repo.** Scrubbing the private identifier rewrote the history, so every commit hash cited anywhere in the repo before 2026-07-31 is now unreachable. **No count is given here on purpose** — see the closing entry below. To enumerate the current set yourself:
+
+```bash
+git grep -oh -E '\b[0-9a-f]{7,40}\b' -- '*.md' | sort -u | while read s; do
+  git merge-base --is-ancestor "$s" HEAD 2>/dev/null || echo "$s  $(git grep -l "$s" -- '*.md' | tr '\n' ' ')"
+done
+```
+
+Read its output with care: a naive hex match also catches English words (`feedbac`k) and deliberate placeholders (`abc1234`, `92d8b47`) that were never commit hashes. Those are not orphans.
+
+The citations were handled by three different rules rather than one blanket edit:
+
+- **Replaced with durable anchors** where the citation was load-bearing and a stable equivalent existed. The measurement range is now `v0.17.9-beta.1..v0.18.0-beta.1` — **tags survived the rewrite, SHAs did not**, which makes a tag the correct anchor for any range a document needs to name. Same for the review ranges in this file and in 0031.
+- **Dropped** where the reference was decoration, per Documentation Discipline rule 11 ("if you can delete the reference and the surrounding statement still stands, it was decoration"). `doc/product/PRD.md`'s branch-consolidation note keeps its README pointer and loses the dead hash.
+- **Left in place, knowingly**, in two cases. [ADR-0007](../adr/0007-workflow-operational-skills.md) cites a commit whose behaviour the surrounding paragraph describes in detail — the reference is load-bearing, and rule 9 makes accepted ADRs mostly immutable, so it stays dangling rather than being retroactively edited. The three hashes in the retraction entries above are load-bearing to entries that are *about* those specific commits, and Notes are append-only; rewriting them would destroy the record this task exists to keep.
+
+The hashes that remain dangling do so **by decision, not oversight**. A reader who cannot resolve one is not looking at a mistake — they are looking at the cost of the scrub, recorded here once rather than papered over at each site.
+
+One correction to the rule attribution above, raised by the Standards axis and correct: leaving [ADR-0007](../adr/0007-workflow-operational-skills.md) untouched rests on **rule 9** (accepted ADRs are mostly immutable), *not* on rule 11. Under rule 11's own test the hash there is decoration — delete it and the date-anchored sentence still stands. Right outcome, wrong rule cited; fixed here so it is not quoted later as rule-11 precedent.
+
+**This is a permanent, unrecoverable cost.** The pre-scrub objects exist only in a local bundle on the maintainer's machine; no one else can resolve those hashes ever again. Worth stating plainly because the earlier entries in this file treat SHA citation as a stylistic choice — after a history rewrite it is not, and the correct default going forward is: **anchor on tags or artifacts, never on commit hashes**, in any document meant to outlive the branch.
+
+**2026-07-31 — Closing entry: the counting failure is the finding, and it stops here.** Six times in this task an author-side count was wrong: `Execution:` fields, `Spec ref:` fields, the SHA-survival narrative, the numbering-restart generations, the dangling-hash sweep, and the tally inside the very entry that named the defect. Each was caught by a reviewer, corrected, and then recurred in the correction.
+
+The last one exposed the mechanism. The sweep used `[0-9a-f]{7}` against markdown, which matches the word `feedbac`(k), the documented placeholder `abc1234` in `ad-review`'s own body, and stray digit runs. **The counts were not sloppy readings of good data; the enumeration method was broken and never validated against its own output.**
+
+So the correction is not a seventh count. It is to stop emitting counts that a reader cannot reproduce. This entry and the one above now carry the command instead of the number, and the standing rule going to `/ad-level-up` is stated in its strong form:
+
+> An "N of M" claim is inadmissible unless the document carries the command that reproduces the enumeration, and the author has read that command's output for false positives.
+
+The weaker version drafted earlier — "state the population" — would not have caught a single one of these six, because the population was usually stated and the *enumeration* was what failed. That distinction is the whole value of the six instances, and it is why this class now has evidence far past the ADR-0042 bar.
+
+Recorded with the irony intact: a task whose subject is review calibration produced its own strongest finding by failing, repeatedly, at exactly the discipline it was measuring.
 
 **2026-07-30 — Open, not closed by this task.**
 
