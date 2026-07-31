@@ -3,6 +3,7 @@
 **Status:** proposed
 **Created:** 2026-07-31
 **Owner:** Alexandre Alvaro
+**Execution:** AFK
 **Spec ref:**
 **Board ref:**
 

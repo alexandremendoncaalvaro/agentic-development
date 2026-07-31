@@ -3,6 +3,7 @@
 **Status:** done
 **Created:** 2026-07-30
 **Owner:** Alexandre Alvaro
+**Execution:** HITL
 **Spec ref:**
 **Board ref:**
 
@@ -78,6 +79,17 @@ Two review findings applied:
 The reviewer's supporting claim that task 0029 "kept blank labels rather than dropping the fields" was checked and is false — 0029 has no `**Execution:**` line at all. Relayed reviewer detail re-verified per ADR-0042 rather than repeated.
 
 Remaining Standards Concern (`extractAddedLines` `++ ` header bypass) was **not** fixed here — it is listed as open below, and fixing it would be exactly the scope creep the Spec axis confirmed this range is free of. Tracked as its own task.
+
+**2026-07-31 — Retraction: two claims in the entry above were false.** The re-review pass (`/ad-review e7a4da0..HEAD`, Spec axis) raised a Blocker against this task's own Notes, and it was right on both counts. Both errors trace to one broken sampling method: `doc/tasks/` has **two generations of numbering**, and the check globbed `doc/tasks/NNNN-*` with `head -1`, so it silently mixed files from both. `0006-bootstrap-flow-and-agents-md-bloat-fix.md` (old) and `0006-rename-ad-grill-to-ad-grill-me.md` (current) both exist in history under the same number.
+
+- **"only 1 of 5 historical tasks (0014) carries `**Execution:**`" — false.** Sampled correctly over the current generation (every task file added in 2026-07): **14 of 14** carry `**Execution:** AFK`. The only two files lacking it were this task and 0031. Both now carry it — `HITL` here, since this task's measurement ran with the user deciding scope at each gate; `AFK` on 0031, matching the corpus default. The declared rationale for omitting the field was the exact inverse of what the repo shows.
+- **"only `83b0c7a` (task 0006) cited a same-branch commit, and it survived because that PR landed as a merge commit" — false.** `83b0c7a` is dated 2026-05-24 and is already an ancestor of the commit that created the current-generation task 0006 (`8f193e5`, 2026-07-28), so it is prior-art like the other four, not a same-branch citation. The same-branch citation in task 0006 is `8f193e5` itself, which has a single parent — not a merge commit — so the stated survival mechanism does not hold for the citation it actually applies to.
+
+**The chosen remedy still stands; only its supporting narrative was wrong.** Citing the artifact (file + named test) instead of a SHA remains correct, and for a reason that survives the correction: this branch's own SHAs were orphaned by a cherry-pick within the hour, and PR #35 demonstrates squash-merge killing a pre-squash SHA in this repo. What collapsed is the claim to have *measured* the pattern's failure rate across the corpus — the sample was invalid, so the honest status is that same-branch SHA survival here is **unmeasured**, not "a coin flip".
+
+This is the second time in this task's own history that a confidently-stated claim failed verification — the first being the reviewer's false assertion about task 0029, correctly caught above. The symmetry is the point: ADR-0042 rule 1 is not a rule about *other* agents' claims.
+
+**2026-07-31 — Numbering collision, surfaced by the above and not yet decided.** `ad-task` Step 1 says NNNN is "next available 4-digit number after the highest existing" in `doc/tasks/`, and `ad-archive` hard-deletes finished tasks. After the 0.18.0 archive sweep the directory was empty (`doc/tasks/` does not exist in `e473882`), so the rule points at `0001` — which is how the current generation restarted and collided with the archived 0001–0029. This task chose `0030` from the git-history maximum instead, which avoids collision but is **not** what the rule says. Neither option is clean: following the rule reuses numbers and makes every historical task citation ambiguous (the precise failure that produced the two retracted claims above); deviating from it makes the skill's own instruction wrong. Left undecided deliberately — this is rule-set design, so it belongs to `/ad-level-up` with the user in the loop, not to a silent fix here.
 
 **2026-07-30 — Open, not closed by this task.**
 
