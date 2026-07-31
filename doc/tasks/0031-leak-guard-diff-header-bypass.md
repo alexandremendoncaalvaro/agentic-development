@@ -34,6 +34,14 @@ Surfaced by the Standards axis of the `/ad-review` pass on `1e25d9a..HEAD` and d
 - [ ] `npm test` passes.
 - [ ] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
 
+## Definition of Done
+
+All Acceptance Criteria checked, plus:
+
+- [ ] Local tests pass (or N/A documented in Notes)
+- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [ ] No orphan `TODO`/`FIXME` introduced
+
 ## Plan
 
 - [ ] Decide the parser approach. `git diff --cached --numstat` or `--raw -z` (already parsed by `parseRawDiff`) gives an authoritative file list; reconciling the content scan against that list is likely more robust than tightening the textual `+++ ` match, since hunk structure — not line prefix — is what actually delimits a file.
@@ -46,5 +54,5 @@ Surfaced by the Standards axis of the `/ad-review` pass on `1e25d9a..HEAD` and d
 
 **2026-07-31 — Opened.** Two sibling gaps in the same file are tracked but explicitly *not* in this task's scope, so each keeps its own evidence trail:
 
-- `main()` has no integration test against a real git repo — the git-plumbing wrapper (`rev-parse`, `--raw -z` parsing, `cat-file blob`, exit codes, the fail-closed catch) that `lefthook.yml` actually invokes is untested. Flagged independently by three of the four review arms in task 0030 and by both axes of the `1e25d9a..HEAD` review. Fixing it would likely subsume the end-to-end criterion here, so sequence it after this task rather than merging the two.
+- `main()` has no integration test against a real git repo — the git-plumbing wrapper (`rev-parse`, `--raw -z` parsing, `cat-file blob`, exit codes, the fail-closed catch) that `lefthook.yml` actually invokes is untested. Flagged by several independent reviewers across the task-0030 measurement and the `1e25d9a..HEAD` review. Note that those reviewer verdicts live only in session transcripts — `.agentic/reviews/` is gitignored and holds review *inputs*, not outputs — so this attribution is not reproducible from the repo. The defect itself is, via the Context repro above; treat that as the evidence, not the count. Fixing it would likely subsume the end-to-end criterion here, so sequence it after this task rather than merging the two.
 - The guard has never actually executed on this machine: no `lefthook` binary, `lefthook` absent from `devDependencies`, and no local `.agentic/leak-denylist.txt`. ADR-0033 names unset hooks as an accepted bypass, so this is setup debt rather than a defect — but it means every fix to this file has shipped unscanned, including this one when it lands.

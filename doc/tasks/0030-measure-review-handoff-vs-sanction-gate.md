@@ -32,6 +32,14 @@ External grounding (four-source pass, `/ad-ground`):
 - [x] Golden-set corrections recorded where the arms out-argued the manual labelling.
 - [x] Observations below the repo's evidence bar recorded as such, for future re-grading, rather than legislated.
 
+## Definition of Done
+
+All Acceptance Criteria checked, plus:
+
+- [x] Local tests pass (or N/A documented in Notes) — 294/294.
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10) — two-axis `/ad-review` over the fix range plus two re-review passes; findings and retractions in Notes.
+- [x] No orphan `TODO`/`FIXME` introduced.
+
 ## Plan
 
 - [x] Label the golden set by manual revalidation of the ad-hoc pass (2 real Blockers, 6 real minor, 8 inflated).
@@ -104,6 +112,13 @@ This is the mirror image of the `gpt-5.4` false positive that produced the task-
 **Task numbering continues from the ledger, not the directory.** `ad-archive` hard-deletes finished tasks and declares git history the sole ledger. "Highest existing" in `ad-task` Step 1 therefore has to be read against that ledger, because the alternative reading lets the archive sweep destroy the numbering invariant it depends on. Highest NNNN ever used, excluding this task and 0031, is **0029** — so 0030 and 0031 are correct and stay. The 2026-07 cycle's restart at 0001 was the drift, and it is what produced the colliding corpus behind all three retractions above.
 
 What remains for `/ad-level-up` is narrower and is a real gap: `ad-task` Step 1's wording is ambiguous between the two readings, and nothing in the corpus disambiguates it. That is a rule-text fix with human-in-the-loop, not a numbering question.
+
+**2026-07-31 — Fourth claim struck; template drift closed.** The Standards axis of the second re-review raised two more, both correct.
+
+- **"all six historical SHA citations in this repo's task files survive" — struck, not corrected.** The reviewer's substantive point is that the population was never defined precisely enough to be falsifiable, and a re-count bears that out: restricted to the current generation it yields five unique backticked SHAs, while counting both generations and `Shipped in PR #N` self-citations yields many more. Replacing one undefined number with another would repeat the error. The claim is withdrawn rather than restated. **The remedy it was used to support is unaffected and independently grounded** — cite-by-artifact stands on the PR #29–#33 merge vs. PR #35 squash evidence, which the reviewer confirmed directly.
+- **Both this task and 0031 omitted `## Definition of Done`**, which `templates/task.md` specifies and which this repo's own archived task 0006 calls mandatory. Added to both. This is the structural omission the earlier fuss over `Execution:` and `Spec ref:` walked straight past — a sharper illustration of the same drift than either field was.
+
+Four false or unfalsifiable claims now trace to the same undisciplined sampling, in a task whose entire subject is review calibration. The recurrence is the finding: the corrective rule the corpus needs is not about reviewers at all, but about the author's own counting — **a claim of the form "N of M" is only admissible when the population M is stated and the enumeration is reproducible**. Two counted classes (this, plus the unrecognised-identifier asymmetry above) now have real evidence, so both go to `/ad-level-up` together.
 
 **2026-07-30 — Open, not closed by this task.**
 
