@@ -130,7 +130,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-handoff/SKILL.md",
-          "sourceSha": "b54e2210fc07c7488648dc535563bb46d367cb70c21a63428bf292e4c40ce5d5"
+          "sourceSha": "2a7fd557c3e218f01c9ce341ead3cda920ce88217529db454e7aefa31fdfb079"
         }
       ]
     },
@@ -210,7 +210,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-rules/SKILL.md",
-          "sourceSha": "9dca51039aa395a1eb53bf8f62f2ca5999a5aca46914196fe7ddcdc5ce91c460"
+          "sourceSha": "8f71784d2cd21b34316dad24f15c3e616ea15ba064e370b5854c6d361b299299"
         }
       ]
     },

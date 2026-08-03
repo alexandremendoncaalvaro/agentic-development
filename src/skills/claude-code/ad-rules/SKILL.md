@@ -1,15 +1,15 @@
 ---
 name: ad-rules
-description: Resolve and surface the rule-set that binds the current work — repo binding docs, the curated machine store, and project rules — as a topic list, without auditing anything against it. Discovers the practitioner's global rules file when it lives outside the documented locations, and reports the one-line fix so the next session resolves it without being told. Use when the user wants to load, see, list, or refresh the rules, conventions, or standards in force; asks "what are my rules", "bring the topics", "read my global AGENTS"; or starts work in an unfamiliar repo and needs the binding set on the table first. Read-only — never edits a rule, never audits, never approves.
-summary: Resolve the rule-set in force (repo binding docs + machine store + project rules per ADR-0035/0043) and surface it as a topic list. Discovers a practitioner global rules file at a non-standard path and prints the one-line fix to make it resolve automatically. Read-only; audits nothing.
+description: Load the practitioner's global rules — the host's `CLAUDE.md` or `AGENTS.md`, symlinks resolved — and reinforce them by listing their topics in the conversation, alongside whatever the repo and the kit's rule-set layers add. Use when the user says "read my global CLAUDE.md / AGENTS.md and bring the topics", asks what rules or conventions are in force, wants the rules refreshed mid-session, or starts in a repo whose conventions they have not read. Read-only — never edits a rule, never audits, never approves.
+summary: Load the host's global rules file (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, symlinks resolved) and reinforce it by listing topics in the conversation, plus the repo's binding docs and the kit's rule-set layers by reference. Read-only; audits nothing.
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
 # /ad-rules
 
-Loads the rules that bind the current work and puts their topics on the table. Nothing else — this skill does not check the work against them (`/ad-audit`), does not change them (`/ad-level-up`), and does not write files.
+Loads the rules in force and reinforces them by listing their topics in the conversation. Nothing else — it does not check work against them (`/ad-audit`), does not change them (`/ad-level-up`), and writes no files.
 
-It exists because the practitioner's own cross-project rules live at a path the kit cannot guess, so every session started with the same manual instruction: read this file, list the topics. That is setup, not thinking, and it should happen once per machine rather than once per session.
+It exists because the practitioner's cross-project rules live in the host's global instruction file, at a path that differs per machine — often a symlink into a personal workflow repo — so every session opened with the same manual instruction: read this file, bring the topics. Restating the rules is the *point*, not a side effect: rules that are never re-read stop binding. What should not repeat is the path archaeology.
 
 ## Step 0 — Confirm regime
 
@@ -22,38 +22,41 @@ Route elsewhere when:
 - The user wants documentation-vs-code drift → `/ad-drift`.
 - The user wants to know what to do next → `/ad-next`.
 
-## Step 1 — Resolve the layers
+## Step 1 — Resolve the host's global rules
 
-Per ADR-0035 and ADR-0043, the rule-set is the union of three layers. Resolve each and record whether it was found, so the report distinguishes *absent* from *empty*.
+This is the primary target and the reason the skill exists: the practitioner keeps cross-project rules in their agent host's global instruction file, and every session began by pasting its path by hand.
 
-1. **Repo binding docs (always).** `AGENTS.md`, `ARCHITECTURE.md`, `GUIDELINES.md`, `CONTEXT.md` / `CONTEXT-MAP.md` at the repo root, plus accepted ADRs under `doc/adr/`. Read what exists; never fabricate a reference.
-2. **Curated machine store (optional).** `$AGENTIC_RULES_DIR` if set; else `~/.agentic/rules/` if it exists; else fall to Step 2.
-3. **Project rules (optional).** `.agentic/rules/` at the repo root. It may be committed or machine-local; resolution does not care which.
-
-**Precedence:** union, except on genuine conflict, where a project rule wins over a machine-store rule. Shadowing is never silent — report which machine-store rule a project rule shadowed.
-
-## Step 2 — Discover a practitioner rules file
-
-Only when layer 2 did not resolve. The practitioner's global rules commonly predate the machine store and sit in a personal repo under a name the kit does not own — `AGENTS.<initials>.md`, `AGENTS.global.md`, `rules.md`, or similar.
-
-Search, cheapest first, and stop at the first hit:
+Check the canonical per-host locations. **Resolve symlinks and report both ends** — a global `CLAUDE.md` is very often a symlink into a personal workflow repo, and the real path is the one the user edits:
 
 ```bash
-for p in "$AGENTIC_RULES_DIR" "$HOME/.agentic/rules" "$HOME/.config/agentic/rules"; do
-  [ -n "$p" ] && [ -e "$p" ] && echo "FOUND $p" && break
+for p in ~/.claude/CLAUDE.md ~/.claude/AGENTS.md ~/.codex/AGENTS.md ~/.codex/instructions.md; do
+  [ -e "$p" ] || continue
+  if [ -L "$p" ]; then echo "$p -> $(readlink "$p")"; else echo "$p"; fi
 done
-find "$HOME" -maxdepth 4 -iname 'AGENTS*.md' -not -path '*/node_modules/*' -not -path '*/.git/*' 2>/dev/null | head -20
 ```
 
-Present what the search returned and let the user pick — do not assume the first result is theirs, and do not read a file outside the repo without saying which one you are opening. If the search returns nothing, say so plainly; an absent practitioner layer is a valid state, not an error.
-
-**When a file is chosen, report the one-line fix rather than remembering it yourself:**
+If none resolves, search for a practitioner file under the names these carry in the wild — `AGENTS.<initials>.md`, `AGENTS.global.md`, `CLAUDE.md`, `rules.md` — and present what you found for the user to pick. Never assume the first hit is theirs; always name a file outside the repo before opening it:
 
 ```bash
-export AGENTIC_RULES_DIR="<directory containing the chosen file>"
+find "$HOME" -maxdepth 4 \( -iname 'AGENTS*.md' -o -iname 'CLAUDE.md' \) \
+  -not -path '*/node_modules/*' -not -path '*/.git/*' 2>/dev/null | head -20
 ```
 
-Say that adding it to their shell profile makes layer 2 resolve on every future session in every repo, which is the whole point — this skill should be needed once per machine, not once per session. Do not write to their shell profile; that is theirs.
+An absent global layer is a valid state, not an error. Say so plainly rather than manufacturing a source.
+
+**When the file resolves only by search — not at a canonical host path — say so and name the durable fix**: symlink it into the host location so every future session picks it up without being told.
+
+```bash
+ln -s "<real path>" ~/.claude/CLAUDE.md
+```
+
+Print the command; never run it. Creating symlinks in the user's home is theirs to approve.
+
+## Step 2 — Resolve the kit's rule-set layers
+
+Secondary, and by reference: the three-layer union and its precedence are defined by ADR-0035 and ADR-0043, restated canonically in `CONTEXT.md`'s **rule-set** glossary entry, and implemented by `/ad-audit` Step 1. Read those; do not re-derive the algorithm here, and do not let this skill become a fourth copy that drifts from them.
+
+Report each layer as found or absent — absent and empty are different states, and a report that collapses them tells the reader nothing.
 
 ## Step 3 — Surface the topics
 
@@ -61,7 +64,7 @@ For each resolved source, extract its **topics**, not its contents. A topic is a
 
 Keep the source visible per topic — a rule the user forgot they wrote lands differently when they can see which file it came from.
 
-Order by binding force: repo binding docs first (they govern this codebase), then project rules, then the machine store (it governs the practitioner across repos). Within a source, preserve the source's own order; do not re-rank by your judgement of importance.
+Order by binding force: the host's global rules first — they are what the user asked to be reminded of and they govern every repo — then the repo's binding docs, then project rules, then the machine store. Within a source, preserve the source's own order; do not re-rank by your judgement of importance.
 
 Flag two things inline:
 
@@ -73,6 +76,10 @@ Flag two things inline:
 ```
 ## Rules in force — <repo name>
 
+### Global — <resolved path><, symlinked from <link> if applicable>
+- <topic> — <what it governs>
+(or "absent — no CLAUDE.md or AGENTS.md at a canonical host path")
+
 ### Repo binding docs
 - `AGENTS.md` — <n> topics: <topic>, <topic>, …
 - `GUIDELINES.md` — <n> topics: …
@@ -82,9 +89,9 @@ Flag two things inline:
 - <group> — <what it governs>
 (or "absent")
 
-### Machine store — <resolved path>
-- <group> — <what it governs>
-(or "absent — no $AGENTIC_RULES_DIR, no ~/.agentic/rules/")
+### Kit rule-set layers (per ADR-0035 / ADR-0043)
+- Machine store — <resolved path, or "absent">
+- Project rules — <`.agentic/rules/`, or "absent">
 
 ### Conflicts
 <project rule shadowing a machine-store rule, both quoted — or "none">
@@ -93,15 +100,17 @@ Flag two things inline:
 <rules citing files/flags that no longer exist — or "none">
 ```
 
-Close with one line naming what the user most likely wanted: the single topic most relevant to the work in progress, or the setup fix if layer 2 did not resolve.
+Close with one line naming what the user most likely wanted: the single topic most relevant to the work in progress, or the symlink fix when the global file resolved only by search.
 
 ## Output contract
 
 - Writes nothing. Reads only.
-- Every layer is reported, including absent ones — absent and empty are distinguishable.
+- Every source is reported, including absent ones — absent and empty are distinguishable.
+- The global file's real path is reported, with the symlink it was reached through when there was one.
 - Topics carry their source file; contents are not dumped.
 - Conflicts and staleness are reported, never resolved.
-- When layer 2 is unresolved and a practitioner file is found, the `export AGENTIC_RULES_DIR=` line is printed; the shell profile is never edited.
+- The kit's three-layer resolution is referenced (ADR-0035 / ADR-0043 / `CONTEXT.md` / `/ad-audit` Step 1), never re-derived here.
+- When the global file resolves only by search, the `ln -s` command is printed and never run.
 - No audit verdict, no approval, no rule text changed.
 
 ## Next

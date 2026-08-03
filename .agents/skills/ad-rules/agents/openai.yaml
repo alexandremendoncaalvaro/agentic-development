@@ -1,5 +1,5 @@
 interface:
   display_name: ad-rules
-  short_description: Resolve the rule-set in force (repo binding docs + machine store + project rules) and surface it as a topic list. Discovers a practitioner global rules file at a non-standard path. Read-only.
+  short_description: Load the host's global rules file (CLAUDE.md / AGENTS.md, symlinks resolved) and reinforce it by listing topics in the conversation, plus repo binding docs and kit rule-set layers by reference. Read-only.
 policy:
   allow_implicit_invocation: false

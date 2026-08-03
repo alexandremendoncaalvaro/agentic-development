@@ -186,7 +186,7 @@
         },
         {
           "path": ".agents/skills/ad-handoff/SKILL.md",
-          "sourceSha": "1917e3c98bfb91e0691c60b3e18894b0105431e478d467bda6c2666381d35678"
+          "sourceSha": "eba7874f159df16963147f670adf5df313091664e8cf3aa923f9847f05941353"
         }
       ]
     },
@@ -294,11 +294,11 @@
       "files": [
         {
           "path": ".agents/skills/ad-rules/agents/openai.yaml",
-          "sourceSha": "1f9c06b48c38ab91ba2e9b15f81581304f40828818c0d2905191062a8568ab86"
+          "sourceSha": "cc65316c26fb5a41ed5e6b5a1847dab62483d83b4161787783460835c31ce12d"
         },
         {
           "path": ".agents/skills/ad-rules/SKILL.md",
-          "sourceSha": "9371f511c9d36add4cd3a8bc7ff1a1063243624c1f8cc3ecc69155126bed418c"
+          "sourceSha": "1f9181c09906b86b59c7be1fd156673ada54c8e492c7b951e71e12ceabec82c3"
         }
       ]
     },

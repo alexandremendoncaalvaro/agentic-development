@@ -36,7 +36,7 @@ Capture:
 - **Open artifacts** — list of files touched but not yet committed; the task file under `doc/tasks/` driving the work (if any); the spec under `doc/specs/` it implements (if any); any ADR being drafted under `doc/adr/`.
 - **Unresolved decisions** — questions the user posed that you have not answered; questions you posed that the user has not answered. One bullet per open question, with the recommended-answer line where you have one.
 - **Recent errors / hook failures** — verbatim, last error message + which command produced it.
-- **Repo hygiene** — `git worktree list`, `git branch` (flag branches already merged into the default branch, and any scratch/backup branches this session created), stray untracked files at the repo root. Report them; do not delete anything. Branch and worktree removal is destructive and is the user's call — the handoff names the debt so the next session does not inherit it silently.
+- **Repo hygiene** — `git worktree list`, `git branch` (flag branches already merged into the default branch, and any scratch/backup branches this session created), stray untracked files at the repo root. For each item, write the exact removal command next to it (`git branch -d <name>`, `git worktree remove <path>`) so acting on it is one paste rather than a composition exercise. Do not run them: per WORKFLOW §7 the confirmation is matched to the blast radius, and deleting a branch that turns out to hold the only copy of something is not recoverable from a handoff. Report, hand over the command, let the user say go.
 - **What the next agent should do first** — one sentence, imperative.
 
 References, not copies. `Spec: doc/specs/0007-foo.md` beats pasting the spec. `Task: doc/tasks/0042-bar.md` beats pasting the task. The next agent will read those files fresh.
@@ -106,7 +106,11 @@ File shape:
 
 Invoke `/ad-philosophy` explicitly, then <one imperative sentence naming the concrete next move>.
 
-The explicit invocation is not ceremony: per ADR-0044 it forces an applied-binding statement — every behavior named against *this* task's files and commands before any work starts. A fresh agent inheriting a mid-flight session is exactly the case where posture is assumed and then quietly dropped.
+The explicit invocation is not ceremony: per ADR-0044 it forces an applied-binding statement — each of `ad-philosophy`'s behaviors named against *this* task's files and commands before any work starts. A fresh agent inheriting a mid-flight session is exactly the case where posture is assumed and then quietly dropped.
+
+It binds posture, not method. Grounding, hypothesis discipline, test-first discipline and fresh-context review live in their own skills and are **not** carried by that statement — name the ones this work actually needs, here, so the next agent does not mistake posture for coverage:
+
+<`/ad-ground` before non-trivial change · `/ad-diagnose` when a bug needs ranked falsifiable hypotheses · `/ad-tdd` or `/ad-tdg` when behaviour is expressible as a test · `/ad-review` before anything lands — list only what applies, and say why>
 
 ## Roadmap
 
@@ -125,9 +129,11 @@ The explicit invocation is not ceremony: per ADR-0044 it forces an applied-bindi
 
 ## Repo hygiene
 
-- **Worktrees:** <list, or "one, clean">
-- **Stale branches:** <merged or scratch branches to consider deleting — the user decides>
-- **Stray files at root:** <untracked files that risk being swept into a commit, or "none">
+Each line carries its removal command; none were run.
+
+- **Worktrees:** <path> — `git worktree remove <path>` (or "one, clean")
+- **Stale branches:** <name> (<merged | scratch from this session>) — `git branch -d <name>` (or "none")
+- **Stray files at root:** <path> — <gitignore it, or move it out> (or "none")
 
 ## Open artifacts
 
@@ -179,7 +185,7 @@ Tell the user:
 
 1. The handoff path.
 2. The roadmap, rendered inline in the reply — the user reads the plan here, not by opening a file. Comprehension in thirty seconds is the bar: done and open in one list, no preamble.
-3. Anything the hygiene scan flagged, as a decision for them: stale branches and worktrees are theirs to delete, not yours.
+3. Anything the hygiene scan flagged, each with its removal command ready to paste — theirs to run, not yours.
 4. Any ask the sweep found unlanded — surface these even when they are inconvenient; a handoff that quietly drops a request is worse than no handoff, because it looks complete.
 5. The single recommended first action, and the suggested-skills list verbatim.
 
@@ -192,7 +198,8 @@ Do **not** auto-execute `/clear` or anything destructive. The user decides when 
 - A single markdown file at `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md`.
 - File contains only the sections above, in that order. Omitted sections are removed entirely (not left as `## Heading\n\nN/A`). `Roadmap` and `Asks that never landed` are never omitted — an empty sweep is written as "none", because silence and emptiness are indistinguishable to the next agent.
 - The roadmap is a single checklist covering done and open work in dependency order, each line self-sufficient, with an explicit priority-alignment line.
-- Repo hygiene is reported, never acted on: no branch deletion, no worktree removal, no file cleanup.
+- Repo hygiene is reported with a ready-to-paste removal command per item, and never executed — the confirmation is matched to blast radius (WORKFLOW §7), not waived by a handoff.
+- The first action names the method skills the work needs; `/ad-philosophy` binds posture and is never presented as covering grounding, hypothesis, test or review discipline.
 - References artifacts by path; never duplicates their content.
 - Secrets are replaced with `<REDACTED:type>` placeholders.
 - Suggested skills are drawn from the installed `ad-*` set and each line carries a one-clause rationale.
