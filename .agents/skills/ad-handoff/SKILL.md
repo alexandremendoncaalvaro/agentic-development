@@ -31,7 +31,7 @@ Capture:
 - Open artifacts — files touched but uncommitted; task file under `doc/tasks/` driving the work (if any); spec under `doc/specs/` it implements (if any); ADR being drafted under `doc/adr/` (if any).
 - Unresolved decisions — questions the user posed that you have not answered; questions you posed that the user has not answered. One bullet per open question, with a recommended-answer line where you have one.
 - Recent errors / hook failures — verbatim, last error message + which command produced it.
-- Repo hygiene — `git worktree list`, `git branch --merged <default>`, `git branch --no-merged <default>`, stray untracked files at the repo root. Delete the merged branches: `git branch -d <name>` refuses anything not fully merged, so git itself is the guard, and a merged branch's commits survive on the default branch and in the reflog — the blast radius WORKFLOW §7 asks you to match is near zero. Run it and report what was deleted. Everything else is reported with its command and never run: unmerged branches (including squash-merged ones, which git cannot distinguish from genuinely unmerged), worktrees, and stray files get `git branch -D <name>` / `git worktree remove <path>` written next to them. Those are the destructive cases — `-D` discards commits.
+- Repo hygiene — `git worktree list`, `git branch --merged <default>`, `git branch --no-merged <default>`, stray untracked files at the repo root. Delete the merged branches: `git branch -d <name>` refuses anything not fully merged, so git itself is the guard, and a merged branch's commits survive on the default branch and in the reflog — the blast radius WORKFLOW §7 asks you to match is near zero. Run it and report what was deleted. Everything else is reported with its command and never run: unmerged branches (including squash-merged ones, which git cannot distinguish from genuinely unmerged), worktrees, and stray files get `git branch -D <name>` / `git worktree remove <path>` written next to them. Those are the destructive cases — `-D` discards commits. Known limit, tested rather than assumed: squash-merged branches cannot be detected — `git branch --merged`, `git cherry` and a three-dot diff all miss them, because squashing rewrites the patch-id. Report as ambiguous; a heuristic that guesses here would authorise deleting real work.
 - What the next agent should do first — one sentence, imperative.
 
 References, not copies. `Spec: doc/specs/0007-foo.md` beats pasting the spec. The next agent will read those files fresh.
@@ -81,7 +81,7 @@ Step 6 — write the handoff. File shape:
 
 ## First action
 
-Invoke `ad-philosophy` explicitly, then <one imperative sentence naming the concrete next move>. Per ADR-0044 the explicit invocation forces an applied-binding statement — each of `ad-philosophy`'s behaviors named against this task's files and commands before work starts. A fresh agent inheriting a mid-flight session is exactly where posture is assumed and then quietly dropped.
+Invoke `ad-philosophy` explicitly, then <one imperative sentence naming the concrete next move>. Per ADR-0044 the explicit invocation forces an applied-binding statement — each of `ad-philosophy`'s behaviors named against this task's files and commands before work starts. A fresh agent inheriting a mid-flight session is exactly where posture is assumed and then quietly dropped. This instruction stands in for the user's: treat it as an explicit invocation and produce the applied-binding statement, not as the auto-load path that skips it.
 
 It binds posture, not method — grounding, hypothesis discipline, test-first discipline and fresh-context review live in their own skills and are not carried by that statement. The next section states them outright.
 
@@ -89,7 +89,7 @@ It binds posture, not method — grounding, hypothesis discipline, test-first di
 
 **These are restated, not referenced, and that is deliberate.** A handoff is an ephemeral `$TMPDIR` artifact read once by an agent with no history; a pointer it may not follow is worth less than four lines it cannot miss. The anti-duplication rule protects versioned documents from drifting copies — this file is deleted after it is read.
 
-**Reporting to the engineer.** They are the boss, not the co-pilot, and did not read the files you read. Lead with the conclusion, plain terms, comprehensible in thirty seconds; detail after. Translate artifacts into what they mean and what to do — a pasted diff or metric is not a report.
+**Reporting to the engineer.** They are the boss, not the co-pilot, and did not read the files you read. Lead with the conclusion — what happened, what it means, what comes next — in plain terms first, technical detail after. Translate artifacts into what they mean and what to do — a pasted diff or metric is not a report.
 
 **Deciding vs asking.** Default is decide. A grounded happy path, a single-criterion winner, an established pattern, a green deterministic gate: take it. Ask only for design and taste, irreversible or high-blast-radius actions, genuine ties, insufficient evidence, or a fuzzy spec — and bring one question with the recommended answer first and why the alternatives are weaker. Never a survey.
 
@@ -97,7 +97,9 @@ It binds posture, not method — grounding, hypothesis discipline, test-first di
 
 **Hypotheses before fixes.** A bug gets 3–5 ranked falsifiable hypotheses before any is tested, each naming the prediction that would kill it. Single-hypothesis debugging anchors on the first plausible idea and is the most common failure mode after having no feedback loop. `ad-diagnose` carries the loop.
 
-**Validate before correcting.** Never fix on a claim you have not reproduced — including one from a reviewer, a prior session, or this handoff. Re-run it and state what you observed, or say UNVERIFIED. An "N of M" claim needs the command that reproduces the enumeration.
+**Validate before correcting.** Never fix on a claim you have not reproduced — including one from a reviewer, a prior session, or this handoff. Re-run it and state what you observed, or say UNVERIFIED. An "N of M" claim needs the command that reproduces the enumeration **and** the false positives in its output named — or a statement that none were found and how that was checked.
+
+**Tests before the fix is trusted.** When the behaviour is expressible as a test, write the failing test first and let it drive the change — one test at a time, verifying behaviour through public interfaces, never bulk-writing tests after the fact. Every bug that gets fixed gets a regression test that fails without the fix.
 
 **Review before landing.** `ad-review` on the range before anything merges, two axes, fresh context. The agent that wrote the code is biased about it.
 
@@ -166,7 +168,7 @@ Write the file. Print the absolute path so the user can paste it into the next s
 
 Step 7 — hand off. Tell the user:
 1. The handoff path.
-2. The roadmap, rendered inline in the reply — the user reads the plan here, not by opening a file. Comprehension in thirty seconds is the bar: done and open in one list, no preamble.
+2. The roadmap, rendered inline in the reply — the user reads the plan here, not by opening a file. Conclusion first, no preamble: done and open in one list, so the plan is readable without opening the file.
 3. What hygiene deleted (merged branches only) and what it left for them, each with its command.
 4. Any ask the sweep found unlanded — surface these even when inconvenient. A handoff that quietly drops a request is worse than none, because it looks complete.
 5. The single recommended first action, and the suggested-skills list verbatim.

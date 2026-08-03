@@ -186,7 +186,7 @@
         },
         {
           "path": ".agents/skills/ad-handoff/SKILL.md",
-          "sourceSha": "2bcaef35b7244a91b60d575139cec43fc75f4604162650ccef905d41a0fb27f0"
+          "sourceSha": "77c82f9cb11f6dc88d3835d8e643a107dffb6285e6945871a2ff09154e56d5ee"
         }
       ]
     },
@@ -298,7 +298,7 @@
         },
         {
           "path": ".agents/skills/ad-rules/SKILL.md",
-          "sourceSha": "24d4cf48cba112814953fca90d7f014a50dcf146779603eb5f9827787000e704"
+          "sourceSha": "c0ca9a82450ae11290e109a46766c237cb5a879b4cd403195aec16c8ab9dfb3f"
         }
       ]
     },
