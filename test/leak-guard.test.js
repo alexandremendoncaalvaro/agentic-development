@@ -1,10 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   loadDenylist,
   parseRawDiff,
   extractAddedLines,
   findViolations,
+  main,
 } from '../src/leak-guard.js';
 
 // --- loadDenylist: parse a denylist file's text into normalized patterns ---
@@ -302,4 +307,109 @@ test('findViolations with no denylist patterns still enforces rules/ and symlink
   });
   const kinds = violations.map((v) => v.kind).sort();
   assert.deepEqual(kinds, ['rules-path', 'symlink-escape']);
+});
+
+// --- main(): the git-invoking wrapper lefthook actually runs (task 0031) ---
+//
+// Everything above tests pure functions against hand-built fixtures. `main()` is
+// the half that talks to git — `rev-parse`, `diff --cached --raw -z`, `cat-file`,
+// the exit codes lefthook reads, and the fail-closed catch. It shipped untested
+// through every fix to this file; three separate reviews said so before this
+// landed. These run against a real repo and real `git diff` output, so a change
+// in git's diff shape breaks the test rather than silently opening the gate.
+
+const MARKER = 'ACME-INTERNAL-CODENAME';
+
+function scratchRepo({ denylist = MARKER } = {}) {
+  const dir = mkdtempSync(join(tmpdir(), 'leak-guard-'));
+  const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'pipe' });
+  git('init', '-q');
+  git('config', 'user.email', 'test@example.invalid');
+  git('config', 'user.name', 'Test');
+  if (denylist !== null) {
+    mkdirSync(join(dir, '.agentic'), { recursive: true });
+    writeFileSync(join(dir, '.agentic', 'leak-denylist.txt'), `${denylist}\n`);
+  }
+  return { dir, git };
+}
+
+/** Run main() with cwd pointed at the scratch repo, swallowing its stderr. */
+function runGuard(dir) {
+  const cwd = process.cwd();
+  const write = process.stderr.write;
+  process.stderr.write = () => true;
+  try {
+    process.chdir(dir);
+    return main();
+  } finally {
+    process.stderr.write = write;
+    process.chdir(cwd);
+  }
+}
+
+function stage({ dir, git }, path, content) {
+  const full = join(dir, path);
+  mkdirSync(join(full, '..'), { recursive: true });
+  writeFileSync(full, content);
+  git('add', '-f', path);
+}
+
+test('main: clean staged content exits 0', (t) => {
+  const repo = scratchRepo();
+  t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
+  stage(repo, 'ok.md', 'nothing sensitive here\n');
+  assert.equal(runGuard(repo.dir), 0);
+});
+
+test('main: a denylisted marker in staged content exits 1', (t) => {
+  const repo = scratchRepo();
+  t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
+  stage(repo, 'leak.md', `prose mentioning ${MARKER} inline\n`);
+  assert.equal(runGuard(repo.dir), 1);
+});
+
+test('main: the ++ diff-header bypass does not disable the scan end-to-end (task 0031)', (t) => {
+  const repo = scratchRepo();
+  t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
+  // First line renders as `+++ /dev/null` in the diff; the old parser read that
+  // as a file header and dropped every line after it.
+  stage(repo, 'poison.md', `++ /dev/null\n${MARKER}\n`);
+  assert.equal(runGuard(repo.dir), 1);
+});
+
+test('main: a staged path under rules/ exits 1 regardless of case', (t) => {
+  for (const path of ['rules/a.md', 'Rules/a.md']) {
+    const repo = scratchRepo();
+    stage(repo, path, 'curated rule content\n');
+    assert.equal(runGuard(repo.dir), 1, `${path} should be blocked`);
+    rmSync(repo.dir, { recursive: true, force: true });
+  }
+});
+
+test('main: a deletion under rules/ is not a violation', (t) => {
+  const repo = scratchRepo();
+  t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
+  stage(repo, 'rules/gone.md', 'x\n');
+  repo.git('-c', 'core.hooksPath=/dev/null', 'commit', '-q', '-m', 'seed', '--no-verify');
+  repo.git('rm', '-q', 'rules/gone.md');
+  assert.equal(runGuard(repo.dir), 0);
+});
+
+test('main: outside a git repository it fails closed', (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'leak-guard-nogit-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  // A bare temp dir under $TMPDIR is not inside any repo.
+  const result = runGuard(dir);
+  assert.equal(result, 1, 'no repo must block, not pass');
+});
+
+test('main: a missing denylist skips the content scan but still blocks rules/ paths', (t) => {
+  const repo = scratchRepo({ denylist: null });
+  t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
+  // ADR-0033 accepts this: absent the local file the denylist check is a no-op.
+  stage(repo, 'leak.md', `${MARKER}\n`);
+  assert.equal(runGuard(repo.dir), 0, 'documented fail-open for the content scan');
+  repo.git('reset', '-q');
+  stage(repo, 'rules/a.md', 'x\n');
+  assert.equal(runGuard(repo.dir), 1, 'the path check does not depend on the denylist');
 });

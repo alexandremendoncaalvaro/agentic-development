@@ -163,3 +163,57 @@ for (const agent of ['claude-code', 'codex']) {
     }
   }
 }
+
+// --- Cross-host parity: the platform-identifier guard (tasks 0005, 0032) ---
+
+// Briefs that read a code diff can meet an identifier they cannot verify, and
+// task 0005 recorded what happens without a guard: two reviewers independently
+// called a real model name fabricated. `rule-candidate-reviewer` is excluded on
+// purpose — it reviews proposed rule text against rule files and never sees a
+// diff, so the guard would be dead weight there (task 0032 scope decision).
+const DIFF_READING_BRIEFS = [
+  'claude-code/ad-review/agents/fresh-context-reviewer.md',
+  'claude-code/ad-audit/agents/audit-group-reviewer.md',
+  'codex/ad-review/agents/fresh-context-reviewer.toml',
+  'codex/ad-audit/agents/audit-group-reviewer.toml',
+];
+
+test('every diff-reading reviewer brief carries the platform-identifier guard, on both hosts', () => {
+  for (const rel of DIFF_READING_BRIEFS) {
+    const path = join(SKILLS_ROOT, rel);
+    assert.ok(existsSync(path), `${rel} is missing`);
+    const body = readFileSync(path, 'utf8').toLowerCase();
+    assert.ok(
+      body.includes('fabricated'),
+      `${rel} does not forbid the "fabricated identifier" claim — see tasks 0005 and 0032`
+    );
+    assert.ok(
+      body.includes('unfamiliarity') || body.includes('absence of recognition'),
+      `${rel} forbids the claim but not the reasoning that produces it (unfamiliarity)`
+    );
+  }
+});
+
+test('the guard list covers every brief that exists, so a new brief cannot be forgotten', () => {
+  const found = [];
+  for (const agent of ['claude-code', 'codex']) {
+    for (const { name, dir } of listSkills(agent)) {
+      const agentsDir = join(dir, 'agents');
+      if (!existsSync(agentsDir)) continue;
+      for (const file of readdirSync(agentsDir)) {
+        if (file.endsWith('.md') || file.endsWith('.toml')) {
+          found.push(`${agent}/${name}/agents/${file}`);
+        }
+      }
+    }
+  }
+  // Every brief is either guarded or explicitly excluded — nothing unaccounted for.
+  const EXCLUDED = found.filter((p) => p.includes('rule-candidate-reviewer'));
+  const accounted = new Set([...DIFF_READING_BRIEFS, ...EXCLUDED]);
+  const unaccounted = found.filter((p) => !accounted.has(p) && !p.endsWith('openai.yaml'));
+  assert.deepEqual(
+    unaccounted,
+    [],
+    `new reviewer brief(s) not classified as guarded or excluded: ${unaccounted.join(', ')}`
+  );
+});

@@ -1,6 +1,6 @@
 # Task `0031`: Close the `++ ` diff-header bypass in the leak-guard content scan
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-31
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -32,7 +32,7 @@ Surfaced by the Standards axis of the `/ad-review` pass on `v0.18.0-beta.1..HEAD
 - [x] End-to-end repro from the Context section is re-run and now exits 1.
 - [x] The fix does not regress the existing `parseRawDiff` / `extractAddedLines` cases — non-ASCII paths, deletions, `/dev/null` headers, multi-file diffs.
 - [x] `npm test` passes.
-- [ ] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
+- [x] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
 
 ## Plan
 
@@ -40,7 +40,7 @@ Surfaced by the Standards axis of the `/ad-review` pass on `v0.18.0-beta.1..HEAD
 - [x] Implement in [`src/leak-guard.js`](../../src/leak-guard.js). Keep the pure/wrapper split: parsing stays a pure exported function, `main()` stays the only git-invoking surface.
 - [x] Add the regression tests above to [`test/leak-guard.test.js`](../../test/leak-guard.test.js).
 - [x] Re-run the end-to-end repro in a scratch git repo.
-- [ ] `/ad-review` the range.
+- [x] `/ad-review` the range.
 
 ## Notes
 
@@ -72,6 +72,10 @@ Still open, unchanged by this task: `main()` has no integration test against a r
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
+
+**2026-08-03 — Closed.** The review gate is satisfied: the pre-publish two-axis pass reviewed this range and the Spec axis verified every Acceptance Criterion by reproduction rather than by reading the claim — it rebuilt the scratch repo, ran `poison.md` against the pre-fix parser to confirm the original exit 0, then against the fixed one for exit 1. Zero Blockers, zero Concerns. The fix shipped in `0.18.0-beta.2`.
+
+The sibling gap this task deliberately deferred — `main()` having no integration test — is now closed too, in the same range as task 0032. `test/leak-guard.test.js` gained seven tests that drive `main()` against real scratch repositories and real `git diff` output: clean pass, denylist hit, the `++` bypass end-to-end, case-variant `rules/` paths, a deletion under `rules/`, the fail-closed path outside a repository, and the documented fail-open when no denylist exists. That last one pins a behaviour ADR-0033 accepts on purpose, so a future change cannot quietly turn the accepted no-op into an unnoticed one.
