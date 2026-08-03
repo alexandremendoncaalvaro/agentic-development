@@ -89,7 +89,7 @@ It binds posture, not method — grounding, hypothesis discipline, test-first di
 
 **These are restated, not referenced, and that is deliberate.** A handoff is an ephemeral `$TMPDIR` artifact read once by an agent with no history; a pointer it may not follow is worth less than four lines it cannot miss. The anti-duplication rule protects versioned documents from drifting copies — this file is deleted after it is read.
 
-**Reporting to the engineer.** They are the boss, not the co-pilot, and did not read the files you read. Lead with the conclusion — what happened, what it means, what comes next — in plain terms first, technical detail after. Translate artifacts into what they mean and what to do — a pasted diff or metric is not a report.
+**Reporting to the engineer.** They are the boss, not the co-pilot, and did not read the files you read. Lead with the conclusion — what happened, what it means, what comes next — in plain terms first, technical detail after. Write so they grasp it in about thirty seconds; that is a target for how the report lands, not a length limit, and clarity beats compression when the two pull apart. Translate artifacts into what they mean and what to do — a pasted diff or metric is not a report.
 
 **Deciding vs asking.** Default is decide. A grounded happy path, a single-criterion winner, an established pattern, a green deterministic gate: take it. Ask only for design and taste, irreversible or high-blast-radius actions, genuine ties, insufficient evidence, or a fuzzy spec — and bring one question with the recommended answer first and why the alternatives are weaker. Never a survey.
 
@@ -100,6 +100,8 @@ It binds posture, not method — grounding, hypothesis discipline, test-first di
 **Validate before correcting.** Never fix on a claim you have not reproduced — including one from a reviewer, a prior session, or this handoff. Re-run it and state what you observed, or say UNVERIFIED. An "N of M" claim needs the command that reproduces the enumeration **and** the false positives in its output named — or a statement that none were found and how that was checked.
 
 **Tests before the fix is trusted.** When the behaviour is expressible as a test, write the failing test first and let it drive the change — one test at a time, verifying behaviour through public interfaces, never bulk-writing tests after the fact. Every bug that gets fixed gets a regression test that fails without the fix.
+
+**Spike when the technique is the unknown.** If the uncertainty is *how* rather than *what* — several plausible approaches and no way to pick from reading — prove it with a staged spike and a golden fixture (`ad-spike`) before correcting anything. Only when that is genuinely the situation; a spike for a problem whose technique is already settled is wasted motion.
 
 **Review before landing.** `ad-review` on the range before anything merges, two axes, fresh context. The agent that wrote the code is biased about it.
 
@@ -168,7 +170,7 @@ Write the file. Print the absolute path so the user can paste it into the next s
 
 Step 7 — hand off. Tell the user:
 1. The handoff path.
-2. The roadmap, rendered inline in the reply — the user reads the plan here, not by opening a file. Conclusion first, no preamble: done and open in one list, so the plan is readable without opening the file.
+2. The roadmap, rendered inline in the reply — the user reads the plan here, not by opening a file. Conclusion first, no preamble: done and open in one list, graspable in about thirty seconds without opening the file.
 3. What hygiene deleted (merged branches only) and what it left for them, each with its command.
 4. Any ask the sweep found unlanded — surface these even when inconvenient. A handoff that quietly drops a request is worse than none, because it looks complete.
 5. The single recommended first action, and the suggested-skills list verbatim.
