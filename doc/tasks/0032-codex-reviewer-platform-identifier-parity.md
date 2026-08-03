@@ -1,6 +1,6 @@
 # Task `0032`: Restore platform-identifier guard parity in the Codex reviewer brief
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-08-03
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -47,7 +47,7 @@ The gap is pre-existing drift, not a regression from any recent change. It surfa
 - [x] A test or check exists that would catch this class of cross-host drift in the reviewer briefs, or the absence of one is recorded here with rationale.
 - [x] Dogfood mirrors resynced via `node bin/agentic.js update --yes --force`.
 - [x] `npm test` passes.
-- [ ] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
+- [x] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
 
 ## Plan
 
@@ -74,11 +74,13 @@ Reproduce the current state with the `find` pipeline in Context. Suite: `npm tes
 
 One reported Blocker was **rejected on evidence**: the Spec axis reported an intermittent suite failure in the two case-fold tests. Reverting the case-fold reproduces exactly those two test names, and the unmutated tree passed 40 consecutive full-suite runs. The failure the reviewer observed was its own mutation experiment — run deliberately, at the caller's request, to confirm the tests detect a broken guard — misread as flakiness. The tests are not flaky; they are the guard working.
 
+**2026-08-03 — Gate closed.** A two-axis fresh-context pass ran against the corrected diff and returned **0 Blockers** on both axes. Both reviewers independently reproduced the `find` population enumeration in Context and confirmed the table, verified the new guard is byte-identical to its dogfood mirror, and checked that the parity assertions are not false-positive string matches. Concerns raised were applied before closing.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

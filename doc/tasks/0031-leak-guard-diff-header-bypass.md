@@ -1,6 +1,6 @@
 # Task `0031`: Close the `++ ` diff-header bypass in the leak-guard content scan
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-07-31
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -33,7 +33,7 @@ Surfaced by the Standards axis of the `/ad-review` pass on `v0.18.0-beta.1..HEAD
 - [x] The fix does not regress the existing `parseRawDiff` / `extractAddedLines` cases — non-ASCII paths, deletions, `/dev/null` headers, multi-file diffs.
 - [x] `npm test` passes.
 - [x] `main()` has integration coverage against a real git repository — added retroactively, see the 2026-08-03 scope note.
-- [ ] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
+- [x] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
 
 ## Plan
 
@@ -41,7 +41,7 @@ Surfaced by the Standards axis of the `/ad-review` pass on `v0.18.0-beta.1..HEAD
 - [x] Implement in [`src/leak-guard.js`](../../src/leak-guard.js). Keep the pure/wrapper split: parsing stays a pure exported function, `main()` stays the only git-invoking surface.
 - [x] Add the regression tests above to [`test/leak-guard.test.js`](../../test/leak-guard.test.js).
 - [x] Re-run the end-to-end repro in a scratch git repo.
-- [ ] `/ad-review` the range.
+- [x] `/ad-review` the range.
 
 ## Notes
 
@@ -72,14 +72,16 @@ Still open, unchanged by this task: `main()` has no integration test against a r
 
 The `main()` coverage also landed with no Acceptance Criterion naming it — appended as prose after every box was already ticked. Recorded as the scope-creep it is: the work is sound, but the checklist never tracked it. Disclosing that in prose is not the same as fixing it — a reader who trusts the checkboxes would still miss it — so an Acceptance Criterion naming the `main()` coverage is added above, retroactively and marked as such. The alternative this task's own earlier Notes promised (sequence it into a follow-on task) was not taken; the work had already landed by the time the drift was noticed, and opening a task for completed work would be theatre.
 
+**2026-08-03 — Gate closed.** A two-axis fresh-context pass ran against this diff and returned **0 Blockers** on both axes. It verified by mutation, not by reading: both reviewers reverted the case-fold in `src/leak-guard.js`, confirmed exactly the two named case-fold tests fail, restored, and re-ran clean. The Standards axis additionally added a throwaway brief to confirm the parity test catches an unclassified one. Concerns raised were applied before closing.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
 
 **2026-08-03 — Implementation complete; gate still open.** The pre-publish two-axis pass reviewed this range and the Spec axis verified every Acceptance Criterion by reproduction rather than by reading the claim — it rebuilt the scratch repo, ran `poison.md` against the pre-fix parser to confirm the original exit 0, then against the fixed one for exit 1. Zero Blockers, zero Concerns. The fix shipped in `0.18.0-beta.2`.
 
