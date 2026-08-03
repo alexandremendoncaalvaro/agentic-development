@@ -1,6 +1,6 @@
 # Task `0032`: Restore platform-identifier guard parity in the Codex reviewer brief
 
-**Status:** done
+**Status:** in-progress
 **Created:** 2026-08-03
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -47,7 +47,7 @@ The gap is pre-existing drift, not a regression from any recent change. It surfa
 - [x] A test or check exists that would catch this class of cross-host drift in the reviewer briefs, or the absence of one is recorded here with rationale.
 - [x] Dogfood mirrors resynced via `node bin/agentic.js update --yes --force`.
 - [x] `npm test` passes.
-- [x] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
+- [ ] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
 
 ## Plan
 
@@ -70,11 +70,15 @@ The parity check the Acceptance Criteria asked for is in `test/skills.test.js` a
 
 Reproduce the current state with the `find` pipeline in Context. Suite: `npm test` reports 307/307 with no failures.
 
+**2026-08-03 — Review gate un-ticked, same reason as task 0031.** The box was ticked in the commit that did the work, before any fresh-context pass had seen that work. The pass that has now run found two Blockers and three Concerns against it; the Concerns and the real Blocker are fixed, and the gate stays open until a pass returns against the corrected diff.
+
+One reported Blocker was **rejected on evidence**: the Spec axis reported an intermittent suite failure in the two case-fold tests. Reverting the case-fold reproduces exactly those two test names, and the unmutated tree passed 40 consecutive full-suite runs. The failure the reviewer observed was its own mutation experiment — run deliberately, at the caller's request, to confirm the tests detect a broken guard — misread as flakiness. The tests are not flaky; they are the guard working.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
 - [x] Status updated to `done` and Notes log closes the task

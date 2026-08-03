@@ -1,6 +1,6 @@
 # Task `0031`: Close the `++ ` diff-header bypass in the leak-guard content scan
 
-**Status:** done
+**Status:** in-progress
 **Created:** 2026-07-31
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -32,7 +32,7 @@ Surfaced by the Standards axis of the `/ad-review` pass on `v0.18.0-beta.1..HEAD
 - [x] End-to-end repro from the Context section is re-run and now exits 1.
 - [x] The fix does not regress the existing `parseRawDiff` / `extractAddedLines` cases — non-ASCII paths, deletions, `/dev/null` headers, multi-file diffs.
 - [x] `npm test` passes.
-- [x] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
+- [ ] Reviewed via `/ad-review` before merge, per WORKFLOW §10.
 
 ## Plan
 
@@ -40,7 +40,7 @@ Surfaced by the Standards axis of the `/ad-review` pass on `v0.18.0-beta.1..HEAD
 - [x] Implement in [`src/leak-guard.js`](../../src/leak-guard.js). Keep the pure/wrapper split: parsing stays a pure exported function, `main()` stays the only git-invoking surface.
 - [x] Add the regression tests above to [`test/leak-guard.test.js`](../../test/leak-guard.test.js).
 - [x] Re-run the end-to-end repro in a scratch git repo.
-- [x] `/ad-review` the range.
+- [ ] `/ad-review` the range.
 
 ## Notes
 
@@ -67,12 +67,16 @@ The parser approach is the one this task's Plan preferred — hunk structure del
 
 Still open, unchanged by this task: `main()` has no integration test against a real git repo. The end-to-end verification above was run by hand, not by the suite.
 
+**2026-08-03 — Review gate un-ticked; it was ticked on the wrong basis.** The Spec axis of the review covering this commit raised it as a Blocker and was right. The box cited the pre-publish pass, which reviewed the `extractAddedLines` fix as it shipped in `0.18.0-beta.2` — real, and it did verify these Acceptance Criteria by reproduction. But it predates the `main()` integration tests added here, so it cannot clear them. Citing a review of an earlier, narrower diff as clearance for later content is the self-attestation WORKFLOW §10 exists to prevent, and doing it in the same commit as the work is the worst version of it.
+
+The `main()` coverage also landed with no Acceptance Criterion naming it — appended as prose after every box was already ticked. Recorded as the scope-creep it is: the work is sound and reviewed, the checklist never tracked it.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
 - [x] Status updated to `done` and Notes log closes the task
 

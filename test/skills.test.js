@@ -210,7 +210,7 @@ test('the guard list covers every brief that exists, so a new brief cannot be fo
   // Every brief is either guarded or explicitly excluded — nothing unaccounted for.
   const EXCLUDED = found.filter((p) => p.includes('rule-candidate-reviewer'));
   const accounted = new Set([...DIFF_READING_BRIEFS, ...EXCLUDED]);
-  const unaccounted = found.filter((p) => !accounted.has(p) && !p.endsWith('openai.yaml'));
+  const unaccounted = found.filter((p) => !accounted.has(p));
   assert.deepEqual(
     unaccounted,
     [],

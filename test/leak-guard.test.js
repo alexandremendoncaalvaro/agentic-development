@@ -368,7 +368,7 @@ test('main: a denylisted marker in staged content exits 1', (t) => {
   assert.equal(runGuard(repo.dir), 1);
 });
 
-test('main: the ++ diff-header bypass does not disable the scan end-to-end (task 0031)', (t) => {
+test('regression: task 0031 — main() blocks the ++ diff-header bypass end-to-end', (t) => {
   const repo = scratchRepo();
   t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
   // First line renders as `+++ /dev/null` in the diff; the old parser read that
@@ -377,12 +377,12 @@ test('main: the ++ diff-header bypass does not disable the scan end-to-end (task
   assert.equal(runGuard(repo.dir), 1);
 });
 
-test('main: a staged path under rules/ exits 1 regardless of case', (t) => {
+test('regression: task 0030 — main() blocks case-variant rules/ paths', (t) => {
   for (const path of ['rules/a.md', 'Rules/a.md']) {
     const repo = scratchRepo();
+    t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
     stage(repo, path, 'curated rule content\n');
     assert.equal(runGuard(repo.dir), 1, `${path} should be blocked`);
-    rmSync(repo.dir, { recursive: true, force: true });
   }
 });
 
