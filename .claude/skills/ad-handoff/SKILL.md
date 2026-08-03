@@ -36,7 +36,11 @@ Capture:
 - **Open artifacts** — list of files touched but not yet committed; the task file under `doc/tasks/` driving the work (if any); the spec under `doc/specs/` it implements (if any); any ADR being drafted under `doc/adr/`.
 - **Unresolved decisions** — questions the user posed that you have not answered; questions you posed that the user has not answered. One bullet per open question, with the recommended-answer line where you have one.
 - **Recent errors / hook failures** — verbatim, last error message + which command produced it.
-- **Repo hygiene** — `git worktree list`, `git branch` (flag branches already merged into the default branch, and any scratch/backup branches this session created), stray untracked files at the repo root. For each item, write the exact removal command next to it (`git branch -d <name>`, `git worktree remove <path>`) so acting on it is one paste rather than a composition exercise. Do not run them: per WORKFLOW §7 the confirmation is matched to the blast radius, and deleting a branch that turns out to hold the only copy of something is not recoverable from a handoff. Report, hand over the command, let the user say go.
+- **Repo hygiene** — `git worktree list`, `git branch --merged <default>`, `git branch --no-merged <default>`, stray untracked files at the repo root.
+
+  **Delete the merged branches.** `git branch -d <name>` refuses any branch not fully merged, so git itself is the guard, and a merged branch's commits survive on the default branch and in the reflog — the blast radius WORKFLOW §7 asks you to match is near zero. Run it, and report what was deleted.
+
+  **Everything else is reported with its command, never run.** Unmerged branches (including squash-merged ones, which git cannot tell from genuinely unmerged), worktrees, and stray files get `git branch -D <name>` / `git worktree remove <path>` written next to them for the user to run. Those are the destructive cases: `-D` discards commits, and a squash-merged branch looks identical to work nobody landed.
 - **What the next agent should do first** — one sentence, imperative.
 
 References, not copies. `Spec: doc/specs/0007-foo.md` beats pasting the spec. `Task: doc/tasks/0042-bar.md` beats pasting the task. The next agent will read those files fresh.
@@ -108,9 +112,23 @@ Invoke `/ad-philosophy` explicitly, then <one imperative sentence naming the con
 
 The explicit invocation is not ceremony: per ADR-0044 it forces an applied-binding statement — each of `ad-philosophy`'s behaviors named against *this* task's files and commands before any work starts. A fresh agent inheriting a mid-flight session is exactly the case where posture is assumed and then quietly dropped.
 
-It binds posture, not method. Grounding, hypothesis discipline, test-first discipline and fresh-context review live in their own skills and are **not** carried by that statement — name the ones this work actually needs, here, so the next agent does not mistake posture for coverage:
+It binds posture, not method — grounding, hypothesis discipline, test-first discipline and fresh-context review live in their own skills and are not carried by that statement. The next section states them outright.
 
-<`/ad-ground` before non-trivial change · `/ad-diagnose` when a bug needs ranked falsifiable hypotheses · `/ad-tdd` or `/ad-tdg` when behaviour is expressible as a test · `/ad-review` before anything lands — list only what applies, and say why>
+## Working rules
+
+**These are restated, not referenced, and that is deliberate.** A handoff is an ephemeral `$TMPDIR` artifact read once by an agent with no history; a pointer it may not follow is worth less than four lines it cannot miss. The anti-duplication rule protects versioned documents from drifting copies — this file is deleted after it is read.
+
+**Reporting to the engineer.** They are the boss, not the co-pilot, and they did not read the files you read. Lead with the conclusion, in plain terms, comprehensible in thirty seconds; detail after. Translate artifacts into what they mean and what to do — a pasted diff or metric is not a report.
+
+**Deciding vs asking.** Default is decide. A grounded happy path, a single-criterion winner, an established pattern, a green deterministic gate: take it, do not ask. Ask only for design and taste, irreversible or high-blast-radius actions, genuine ties, insufficient evidence, or a fuzzy spec — and when you ask, bring one question with the recommended answer first and why the alternatives are weaker. Never a survey.
+
+**Grounding before building.** Non-trivial change gets `/ad-ground` first — official docs, validated implementation references, in-repo patterns, git history — then a stated happy path. Deviating from it needs an irrefutable reason, stated.
+
+**Hypotheses before fixes.** A bug gets 3–5 ranked falsifiable hypotheses before any of them is tested, each naming the prediction that would kill it. Single-hypothesis debugging anchors on the first plausible idea and is the most common failure mode after having no feedback loop. `/ad-diagnose` carries the loop.
+
+**Validate before correcting.** Never fix on a claim you have not reproduced — including a claim from a reviewer, a prior session, or this handoff. Re-run it and state what you observed, or say UNVERIFIED. An "N of M" claim needs the command that reproduces the enumeration.
+
+**Review before landing.** `/ad-review` on the range before anything merges, two axes, fresh context. The agent that wrote the code is biased about it.
 
 ## Roadmap
 
@@ -129,10 +147,9 @@ It binds posture, not method. Grounding, hypothesis discipline, test-first disci
 
 ## Repo hygiene
 
-Each line carries its removal command; none were run.
-
+- **Deleted (merged, safe):** <name>, <name> — removed with `git branch -d`; commits live on <default> and in the reflog. (or "none")
+- **Left for you:** <name> (<unmerged | squash-merged — git cannot distinguish>) — `git branch -D <name>` (or "none")
 - **Worktrees:** <path> — `git worktree remove <path>` (or "one, clean")
-- **Stale branches:** <name> (<merged | scratch from this session>) — `git branch -d <name>` (or "none")
 - **Stray files at root:** <path> — <gitignore it, or move it out> (or "none")
 
 ## Open artifacts
@@ -185,7 +202,7 @@ Tell the user:
 
 1. The handoff path.
 2. The roadmap, rendered inline in the reply — the user reads the plan here, not by opening a file. Comprehension in thirty seconds is the bar: done and open in one list, no preamble.
-3. Anything the hygiene scan flagged, each with its removal command ready to paste — theirs to run, not yours.
+3. What hygiene deleted (merged branches only) and what it left for them, each with its command.
 4. Any ask the sweep found unlanded — surface these even when they are inconvenient; a handoff that quietly drops a request is worse than no handoff, because it looks complete.
 5. The single recommended first action, and the suggested-skills list verbatim.
 
@@ -198,8 +215,8 @@ Do **not** auto-execute `/clear` or anything destructive. The user decides when 
 - A single markdown file at `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md`.
 - File contains only the sections above, in that order. Omitted sections are removed entirely (not left as `## Heading\n\nN/A`). `Roadmap` and `Asks that never landed` are never omitted — an empty sweep is written as "none", because silence and emptiness are indistinguishable to the next agent.
 - The roadmap is a single checklist covering done and open work in dependency order, each line self-sufficient, with an explicit priority-alignment line.
-- Repo hygiene is reported with a ready-to-paste removal command per item, and never executed — the confirmation is matched to blast radius (WORKFLOW §7), not waived by a handoff.
-- The first action names the method skills the work needs; `/ad-philosophy` binds posture and is never presented as covering grounding, hypothesis, test or review discipline.
+- Repo hygiene deletes fully-merged branches with `git branch -d` and reports them; everything destructive (`-D`, worktree removal, file deletion) is reported with its command and never run. Confirmation is matched to blast radius (WORKFLOW §7), not waived and not inflated.
+- The `Working rules` section states the rules outright rather than pointing at them; `/ad-philosophy` binds posture and is never presented as covering grounding, hypothesis, test or review discipline.
 - References artifacts by path; never duplicates their content.
 - Secrets are replaced with `<REDACTED:type>` placeholders.
 - Suggested skills are drawn from the installed `ad-*` set and each line carries a one-clause rationale.
