@@ -1,7 +1,7 @@
 ---
 name: ad-handoff
 description: Compact the current session into a handoff document a fresh agent can pick up from. Saves to the OS temp dir (never the repo). Captures live state — current branch, open artifacts, unresolved decisions, in-progress diff, recent errors — references existing artifacts (PRD / spec / task / ADR) by path instead of duplicating them, and lists suggested next skills. Redacts secrets before writing. Triggers on "handoff", "hand off this session", "compact this conversation", "save context for next session", "pass to another agent", "wrap up the session", "context exhausted", "/clear", "/ad-handoff".
-summary: Compact current session into a handoff doc in the OS temp dir. Captures live state, references artifacts by path (no duplication), suggests next skills, redacts secrets, offers a one-click resume chip on hosts with a chip primitive. Ephemeral by design — never commits to the repo.
+summary: Compact current session into a handoff doc in the OS temp dir. Rebuilds the work as a done/open roadmap checklist, sweeps for asks that never landed, reports repo hygiene without acting on it, binds the next agent to ad-philosophy, references artifacts by path, redacts secrets. Never commits.
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
@@ -36,11 +36,31 @@ Capture:
 - **Open artifacts** — list of files touched but not yet committed; the task file under `doc/tasks/` driving the work (if any); the spec under `doc/specs/` it implements (if any); any ADR being drafted under `doc/adr/`.
 - **Unresolved decisions** — questions the user posed that you have not answered; questions you posed that the user has not answered. One bullet per open question, with the recommended-answer line where you have one.
 - **Recent errors / hook failures** — verbatim, last error message + which command produced it.
+- **Repo hygiene** — `git worktree list`, `git branch` (flag branches already merged into the default branch, and any scratch/backup branches this session created), stray untracked files at the repo root. Report them; do not delete anything. Branch and worktree removal is destructive and is the user's call — the handoff names the debt so the next session does not inherit it silently.
 - **What the next agent should do first** — one sentence, imperative.
 
 References, not copies. `Spec: doc/specs/0007-foo.md` beats pasting the spec. `Task: doc/tasks/0042-bar.md` beats pasting the task. The next agent will read those files fresh.
 
-## Step 2 — Redact
+## Step 2 — Reconstruct the roadmap
+
+State is not a plan. A snapshot tells the next agent where the files are; it does not tell them what arc they are in the middle of, and an agent that cannot see the arc re-derives it — badly, and at cost.
+
+Walk the session start to finish and rebuild the work as a **checklist**, done and not-done in one list, in dependency order. Every line carries enough context to stand alone: a reader who has never seen this session must understand what the item is and why it exists without opening another file.
+
+- `- [x]` for landed work — name the artifact that proves it (a commit subject, a test name, a published version), not just the claim.
+- `- [ ]` for open work — name the blocking condition if there is one, and who owns it (you or the user).
+
+Then check the roadmap against the session's stated priorities. If the user corrected course, ranked items, or rejected an approach, the roadmap must reflect the *corrected* order — a handoff that replays the original plan re-introduces the mistake the correction fixed. State the alignment explicitly; if some open item no longer matches a stated priority, say so rather than carrying it silently.
+
+## Step 3 — Sweep for asks that never landed
+
+Re-read the session for requests the user made that did not turn into work, an artifact, or an explicit decision to skip. These are the highest-loss items in any handoff: they were important enough to say out loud and are invisible in `git status`.
+
+Look for asks that were deferred mid-turn ("park that", "later"), superseded by a more urgent thread, answered partially, or acknowledged and then buried under subsequent work. For each, record the ask in the user's own framing and its current disposition — not started, partially done and where it stopped, or dropped deliberately with the reason.
+
+An empty result is a real outcome; write "none" rather than manufacturing entries.
+
+## Step 4 — Redact
 
 Before writing, scrub anything that should not land in `$TMPDIR`:
 
@@ -51,7 +71,7 @@ Before writing, scrub anything that should not land in `$TMPDIR`:
 
 If a value is needed by the next session but is sensitive, write a placeholder + a one-line note on where to fetch it (`pull from 1Password vault "X"`, `re-export from env`).
 
-## Step 3 — Resolve handoff path
+## Step 5 — Resolve handoff path
 
 Compute the target path:
 
@@ -71,7 +91,7 @@ Slug derivation, in priority order:
 
 Never write inside the repo. Never add `.agentic/handoffs/` to the repo's `.gitignore`. Handoffs are per-session OS artifacts, not per-repo audit trail.
 
-## Step 4 — Write the handoff
+## Step 6 — Write the handoff
 
 File shape:
 
@@ -82,15 +102,32 @@ File shape:
 **Branch:** <current branch>
 **Started from:** <PR # / task # / spec # if known, else "ad-hoc work">
 
-## What the next agent should do first
+## First action
 
-<one imperative sentence>
+Invoke `/ad-philosophy` explicitly, then <one imperative sentence naming the concrete next move>.
+
+The explicit invocation is not ceremony: per ADR-0044 it forces an applied-binding statement — every behavior named against *this* task's files and commands before any work starts. A fresh agent inheriting a mid-flight session is exactly the case where posture is assumed and then quietly dropped.
+
+## Roadmap
+
+<checklist, done and open in one list, dependency order; every line self-sufficient>
+
+- [x] <landed item> — <the artifact that proves it>
+- [ ] <open item> — <blocking condition, owner>
+
+**Priority alignment:** <how this order reflects the user's stated priorities and any course correction they made, or "no correction stated this session">
 
 ## State
 
 - **Working tree:** <git status one-line summary>
 - **Divergence:** <commits ahead/behind upstream, or "no remote tracked">
 - **In-progress diff:** <line count + file count, or inline if small>
+
+## Repo hygiene
+
+- **Worktrees:** <list, or "one, clean">
+- **Stale branches:** <merged or scratch branches to consider deleting — the user decides>
+- **Stray files at root:** <untracked files that risk being swept into a commit, or "none">
 
 ## Open artifacts
 
@@ -105,6 +142,12 @@ File shape:
 
 - <question> — recommended: <answer>
 - <question from user> — not yet answered
+
+## Asks that never landed
+
+- <the user's request, in their framing> — <not started | stopped at X | dropped deliberately because Y>
+
+(Write "none" when the sweep is genuinely empty.)
 
 ## Recent errors
 
@@ -130,22 +173,26 @@ Suggested-skills picks from the installed `ad-*` set. Common patterns:
 
 Write the file with `Write`. Print the absolute path to the user so they can paste it into the next session.
 
-## Step 5 — Hand off
+## Step 7 — Hand off
 
 Tell the user:
 
 1. The handoff path.
-2. The single recommended first action for the next session (mirrors "What the next agent should do first").
-3. The suggested-skills list, verbatim.
+2. The roadmap, rendered inline in the reply — the user reads the plan here, not by opening a file. Comprehension in thirty seconds is the bar: done and open in one list, no preamble.
+3. Anything the hygiene scan flagged, as a decision for them: stale branches and worktrees are theirs to delete, not yours.
+4. Any ask the sweep found unlanded — surface these even when they are inconvenient; a handoff that quietly drops a request is worse than no handoff, because it looks complete.
+5. The single recommended first action, and the suggested-skills list verbatim.
 
-When the host exposes a background-task chip primitive — a tool that renders a suggested task as a one-click chip spawning a fresh session (e.g. `spawn_task` in the Claude Code desktop app) — also offer the handoff as a chip. The chip's prompt must stand alone: the absolute handoff path with the instruction to read it first, the recommended first action, and the instruction to ground in the repo's binding docs (`AGENTS.md` and the artifacts the handoff references) before acting. Title: short imperative naming the work. The chip complements the file — the file stays the durable artifact; on hosts without the primitive (terminal CLI, IDE extensions, Codex) the printed path is the handoff, as above.
+When the host exposes a background-task chip primitive — a tool that renders a suggested task as a one-click chip spawning a fresh session (e.g. `spawn_task` in the Claude Code desktop app) — also offer the handoff as a chip. The chip's prompt must stand alone: the absolute handoff path with the instruction to read it first, the instruction to invoke `/ad-philosophy` explicitly before any work, the recommended first action, and the instruction to ground in the repo's binding docs (`AGENTS.md` and the artifacts the handoff references) before acting. Prefer the chip over a pasted prompt where the host offers one — it survives the clipboard and carries the path verbatim. Title: short imperative naming the work. The chip complements the file — the file stays the durable artifact; on hosts without the primitive (terminal CLI, IDE extensions, Codex) the printed path is the handoff, as above.
 
 Do **not** auto-execute `/clear` or anything destructive. The user decides when to discard the current session.
 
 ## Output contract
 
 - A single markdown file at `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md`.
-- File contains only the sections above, in that order. Omitted sections are removed entirely (not left as `## Heading\n\nN/A`).
+- File contains only the sections above, in that order. Omitted sections are removed entirely (not left as `## Heading\n\nN/A`). `Roadmap` and `Asks that never landed` are never omitted — an empty sweep is written as "none", because silence and emptiness are indistinguishable to the next agent.
+- The roadmap is a single checklist covering done and open work in dependency order, each line self-sufficient, with an explicit priority-alignment line.
+- Repo hygiene is reported, never acted on: no branch deletion, no worktree removal, no file cleanup.
 - References artifacts by path; never duplicates their content.
 - Secrets are replaced with `<REDACTED:type>` placeholders.
 - Suggested skills are drawn from the installed `ad-*` set and each line carries a one-clause rationale.
