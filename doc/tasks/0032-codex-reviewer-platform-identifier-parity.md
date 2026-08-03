@@ -81,4 +81,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [x] Status updated to `done` and Notes log closes the task
+- [ ] Status updated to `done` and Notes log closes the task
