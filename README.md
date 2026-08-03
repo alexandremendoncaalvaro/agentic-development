@@ -45,6 +45,7 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `ad-level-up` | workflow-operational | universal in `team` + `mature` only | Curates the project's rule-set — add / refine / merge / retire a convention. Companion to `ad-audit`: that audits against the rules, this evolves them. Every candidate clears four anti-overfitting gates plus an effectiveness pass, then an adversarial multi-lens review (already-covered? holds up? placed right?), and only survivors reach you. Hard human gate — never writes unprompted, one item at a time | `/ad-level-up` |
 | `ad-ground` | workflow-operational | universal | Four-source pre-implementation research (docs / impl-refs / in-repo / git history) + happy-path synthesis + deviation gate per WORKFLOW §4 + §5 | `/ad-ground` |
 | `ad-next` | workflow-operational | universal | State-aware navigation aid (`flutter doctor` pattern) — surveys the six-layer artifact stack and recommends prioritized next actions; complements `ad-drift` (drift) | `/ad-next` |
+| `ad-rules` | workflow-operational | universal | Resolves the rule-set in force (repo binding docs + machine store + project rules per ADR-0035/0043) and surfaces it as a topic list; discovers a practitioner global rules file at a non-standard path and prints the one-line fix. Read-only — audits nothing | `/ad-rules` |
 | `ad-spike` | workflow-operational | universal | Staged spike with golden fixtures per WORKFLOW §14, for cases where the *technique* is uncertain across multiple plausible approaches; produces `spikes/NNNN-<slug>/` with discovery + fixture + pipeline-with-gates + two-layer evaluation | `/ad-spike` |
 | `ad-tdg` | workflow-operational | universal | Outcome-based prompting per WORKFLOW §9 — ground truth pair + Test Dependency Map + three approaches + single-criterion selection, for cases where the technique is known but the implementation strategy is uncertain | `/ad-tdg` |
 | `ad-tdd` | workflow-operational | universal | Test-Driven Development per WORKFLOW §16 — red-green-refactor as deterministic LLM guardrail. Five phases — confirm regime, plan vertically, tracer bullet, incremental loop, refactor while green. Distinct from `ad-tdg`; routes to it for strategy selection inside the GREEN phase | `/ad-tdd` |
@@ -71,10 +72,10 @@ The kit ships four profiles that select which skills auto-install. Same WORKFLOW
 
 | Profile | Universal install set | Conditional posture | Recommended for |
 | --- | --- | --- | --- |
-| `poc` | 12 — philosophy, ground, drift, next, archive, spike, tdg, tdd, domain, grill-me, diagnose, handoff | all blocked; `ad-prd` + `ad-guidelines` blocked | spike, hackathon, exploration |
-| `solo` | 21 — + bootstrap, prd, guidelines, spec, task, review, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code or Codex | solo developer shipping a real product |
-| `team` (default) | 26 — + architecture, adr, audit, level-up, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
-| `mature` | 26 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
+| `poc` | 13 — philosophy, ground, drift, next, rules, archive, spike, tdg, tdd, domain, grill-me, diagnose, handoff | all blocked; `ad-prd` + `ad-guidelines` blocked | spike, hackathon, exploration |
+| `solo` | 22 — + bootstrap, prd, guidelines, spec, task, review, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code or Codex | solo developer shipping a real product |
+| `team` (default) | 27 — + architecture, adr, audit, level-up, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
+| `mature` | 27 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
 
 Select at init time:
 

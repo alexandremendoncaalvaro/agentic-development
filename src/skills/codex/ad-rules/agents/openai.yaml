@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-rules
+  short_description: Resolve the rule-set in force (repo binding docs + machine store + project rules) and surface it as a topic list. Discovers a practitioner global rules file at a non-standard path. Read-only.
+policy:
+  allow_implicit_invocation: false

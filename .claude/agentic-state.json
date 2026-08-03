@@ -205,6 +205,15 @@
         }
       ]
     },
+    "ad-rules": {
+      "version": "0.18.0-beta.3",
+      "files": [
+        {
+          "path": ".claude/skills/ad-rules/SKILL.md",
+          "sourceSha": "9dca51039aa395a1eb53bf8f62f2ca5999a5aca46914196fe7ddcdc5ce91c460"
+        }
+      ]
+    },
     "ad-spec": {
       "version": "0.18.0-beta.3",
       "files": [

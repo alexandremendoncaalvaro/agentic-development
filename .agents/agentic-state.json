@@ -289,6 +289,19 @@
         }
       ]
     },
+    "ad-rules": {
+      "version": "0.18.0-beta.3",
+      "files": [
+        {
+          "path": ".agents/skills/ad-rules/agents/openai.yaml",
+          "sourceSha": "1f9c06b48c38ab91ba2e9b15f81581304f40828818c0d2905191062a8568ab86"
+        },
+        {
+          "path": ".agents/skills/ad-rules/SKILL.md",
+          "sourceSha": "9371f511c9d36add4cd3a8bc7ff1a1063243624c1f8cc3ecc69155126bed418c"
+        }
+      ]
+    },
     "ad-spec": {
       "version": "0.18.0-beta.3",
       "files": [
