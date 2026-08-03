@@ -10,3 +10,7 @@ node_modules/
 .agentic/rules/
 .claude/settings.local.json
 .slim/
+
+# Untracked working drafts. Swept into a commit twice by `git add -A`
+# (task 0030 Notes); ignored so it takes a deliberate `-f` to land.
+workflow-first-version.md
