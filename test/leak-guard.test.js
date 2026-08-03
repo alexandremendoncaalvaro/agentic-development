@@ -79,6 +79,75 @@ test('extractAddedLines collects + lines with their file, skipping ++ headers an
   ]);
 });
 
+test('regression: a content line reading "++ /dev/null" does not switch off the scan (task 0031)', () => {
+  // The content line `++ /dev/null` arrives in the diff as `+++ /dev/null`. A
+  // prefix-only parser reads it as a file header, nulls the current path, and
+  // drops every later line in the file — the marker below would ship unscanned.
+  const diff = [
+    'diff --git a/poison.md b/poison.md',
+    '--- /dev/null',
+    '+++ b/poison.md',
+    '@@ -0,0 +1,2 @@',
+    '++ /dev/null',
+    '+INTERNAL-PROJECT-CODENAME',
+  ].join('\n');
+  assert.deepEqual(extractAddedLines(diff), [
+    { path: 'poison.md', content: '+ /dev/null' },
+    { path: 'poison.md', content: 'INTERNAL-PROJECT-CODENAME' },
+  ]);
+});
+
+test('regression: a content line reading "++ b/other.md" does not re-attribute later lines (task 0031)', () => {
+  const diff = [
+    'diff --git a/reattr.md b/reattr.md',
+    '--- /dev/null',
+    '+++ b/reattr.md',
+    '@@ -0,0 +1,2 @@',
+    '++ b/harmless.md',
+    '+INTERNAL-PROJECT-CODENAME',
+  ].join('\n');
+  const added = extractAddedLines(diff);
+  assert.deepEqual(
+    added.map((a) => a.path),
+    ['reattr.md', 'reattr.md'],
+    'both lines stay attributed to the file that actually changed'
+  );
+});
+
+test('extractAddedLines consumes hunk bodies by their declared counts, so a following file header still registers', () => {
+  const diff = [
+    'diff --git a/a.md b/a.md',
+    '+++ b/a.md',
+    '@@ -0,0 +1 @@', // count omitted on the new side => defaults to 1
+    '+first',
+    'diff --git a/b.md b/b.md',
+    '+++ b/b.md',
+    '@@ -1,2 +1,2 @@',
+    ' context',
+    '-removed',
+    '+added',
+  ].join('\n');
+  assert.deepEqual(extractAddedLines(diff), [
+    { path: 'a.md', content: 'first' },
+    { path: 'b.md', content: 'added' },
+  ]);
+});
+
+test('extractAddedLines ignores the no-newline marker without consuming a hunk line', () => {
+  const diff = [
+    'diff --git a/n.md b/n.md',
+    '+++ b/n.md',
+    '@@ -0,0 +1,2 @@',
+    '+one',
+    '\\ No newline at end of file',
+    '+two',
+  ].join('\n');
+  assert.deepEqual(extractAddedLines(diff), [
+    { path: 'n.md', content: 'one' },
+    { path: 'n.md', content: 'two' },
+  ]);
+});
+
 // --- findViolations: the pure policy core ---
 
 const noSymlink = () => {
@@ -145,6 +214,21 @@ test('findViolations flags a non-ASCII path under rules/ (quotepath false-negati
   });
   assert.equal(violations.length, 1);
   assert.equal(violations[0].kind, 'rules-path');
+});
+
+test('regression: findViolations flags case-variant rules/ paths (fail-closed; case is not an ADR-0033 accepted limitation)', () => {
+  for (const path of ['Rules/x.md', 'RULES/x.md', '.agentic/Rules/x.md', '.Agentic/rules/x.md']) {
+    const violations = findViolations({
+      entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path }],
+      addedLines: [],
+      denylistPatterns: [],
+      repoRoot: '/repo',
+      readSymlinkTarget: noSymlink,
+    });
+    assert.equal(violations.length, 1, `expected ${path} to be flagged`);
+    assert.equal(violations[0].kind, 'rules-path');
+    assert.equal(violations[0].path, path, 'the reported path keeps its original casing');
+  }
 });
 
 test('findViolations does not flag a deletion under rules/', () => {

@@ -22,7 +22,7 @@ When the host exposes `AskUserQuestion`, confirm the target as a multi-choice ca
 
 ## Step 1 — Resolve the rule-set (three layers)
 
-Per [ADR-0035](../../../../doc/adr/0035-rules-location-convention.md) and [ADR-0043](../../../../doc/adr/0043-per-project-rules-layer.md), the rule-set is the union of:
+Per ADR-0035 and ADR-0043, the rule-set is the union of:
 
 1. **Repo binding docs (always).** `AGENTS.md`, `ARCHITECTURE.md`, `GUIDELINES.md`, `CONTEXT.md` / `CONTEXT-MAP.md`, and accepted ADRs under `doc/adr/` whose subject the target touches. Read what exists; never fabricate.
 2. **Curated machine store (optional).** Resolve the path: use `$AGENTIC_RULES_DIR` if set; else `~/.agentic/rules/` if it exists; else skip this layer. Read every rule file it contains.

@@ -368,6 +368,8 @@ export async function initCommand(opts) {
       '/ad-task',
       '/ad-drift',
       '/ad-review (WORKFLOW §10)',
+      '/ad-audit (maximum-gate rules-anchored audit)',
+      '/ad-level-up (curate the project rule-set)',
       '/ad-ground (WORKFLOW §4 + §5)',
       '/ad-next (state survey + recommendations)',
       '/ad-archive (sweep done tasks / shipped specs / superseded ADRs into git history)',
@@ -400,6 +402,8 @@ export async function initCommand(opts) {
           'ad-archive':
             '/ad-archive (sweep done tasks / shipped specs / superseded ADRs into git history)',
           'ad-review': '/ad-review (WORKFLOW §10)',
+          'ad-audit': '/ad-audit (maximum-gate rules-anchored audit)',
+          'ad-level-up': '/ad-level-up (curate the project rule-set)',
           'ad-ground': '/ad-ground (WORKFLOW §4 + §5)',
           'ad-deepen': '/ad-deepen (WORKFLOW §8 — deepening opportunities)',
           'ad-commit': '/ad-commit (Conventional Commits + DCO sign-off)',

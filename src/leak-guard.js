@@ -67,19 +67,48 @@ export function parseRawDiff(text) {
   return entries;
 }
 
-/** Pull introduced (`+`) content lines out of `git diff --cached`, tagged with their file. */
+const HUNK_HEADER = /^@@ -\d+(?:,(\d+))? \+\d+(?:,(\d+))? @@/;
+
+/**
+ * Pull introduced (`+`) content lines out of `git diff --cached`, tagged with their file.
+ *
+ * Hunk headers declare how many old/new lines their body contains, and the body is
+ * consumed by those counts rather than by line prefix. That distinction is the whole
+ * point: a *content* line reading `++ foo` arrives in the diff as `+++ foo`, so a
+ * prefix-only parser mistakes it for a file header and silently stops scanning the
+ * rest of the file — the content scan turns itself off on attacker- or
+ * accident-supplied text. Inside a counted body no line can be read as a header.
+ */
 export function extractAddedLines(text) {
   const added = [];
   let currentPath = null;
+  let oldLeft = 0;
+  let newLeft = 0;
+
   for (const line of text.split('\n')) {
+    if (oldLeft > 0 || newLeft > 0) {
+      if (line.startsWith('\\')) continue; // "\ No newline at end of file" — counts for nothing
+      if (line.startsWith('+')) {
+        newLeft -= 1;
+        if (currentPath) added.push({ path: currentPath, content: line.slice(1) });
+      } else if (line.startsWith('-')) {
+        oldLeft -= 1;
+      } else {
+        oldLeft -= 1;
+        newLeft -= 1;
+      }
+      continue;
+    }
+
+    const hunk = HUNK_HEADER.exec(line);
+    if (hunk) {
+      oldLeft = hunk[1] === undefined ? 1 : Number(hunk[1]);
+      newLeft = hunk[2] === undefined ? 1 : Number(hunk[2]);
+      continue;
+    }
     if (line.startsWith('+++ ')) {
       const target = line.slice(4).trim();
       currentPath = target === '/dev/null' ? null : target.replace(/^b\//, '');
-      continue;
-    }
-    if (line.startsWith('---')) continue;
-    if (line.startsWith('+') && currentPath) {
-      added.push({ path: currentPath, content: line.slice(1) });
     }
   }
   return added;
@@ -126,13 +155,17 @@ export function findViolations({
   }
 
   for (const { path } of introduced) {
-    if (path === 'rules' || path.startsWith('rules/')) {
+    // Case-folded like the denylist checks above: the guard is fail-closed, and
+    // ADR-0033's accepted-limitations list does not include case. `Rules/` from a
+    // case-insensitive filesystem habit or a plain typo is the same leak.
+    const probe = path.toLowerCase();
+    if (probe === 'rules' || probe.startsWith('rules/')) {
       violations.push({ kind: 'rules-path', path, detail: 'adds a path under rules/' });
     }
     // ADR-0043: the per-project curated layer lives at .agentic/rules/; in this
     // public kit repo, machine-local is the only allowed mode — committed project
     // rules here would be exactly the leak this guard exists to prevent.
-    if (path === '.agentic/rules' || path.startsWith('.agentic/rules/')) {
+    if (probe === '.agentic/rules' || probe.startsWith('.agentic/rules/')) {
       violations.push({ kind: 'rules-path', path, detail: 'adds a path under .agentic/rules/' });
     }
   }

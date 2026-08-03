@@ -59,7 +59,7 @@ flowchart TD
 
     PocFlow["Use /ad-grill-me, /ad-ground, /ad-spike, /ad-tdg, /ad-tdd, /ad-diagnose, /ad-drift, /ad-next<br>Do not create PRD/spec/task/ADR unless the project graduates"]
     SoloFlow["Available beyond poc: /ad-prd, /ad-bootstrap, /ad-guidelines, /ad-spec, /ad-task, /ad-review, /ad-commit, /ad-pr, /ad-merge<br>/ad-architecture and /ad-adr are opt-in"]
-    TeamFlow["Use the full artifact stack after product framing<br>/ad-architecture, /ad-adr, and /ad-deepen are in the normal path"]
+    TeamFlow["Use the full artifact stack after product framing<br>/ad-architecture, /ad-adr, /ad-deepen, /ad-audit and /ad-level-up are in the normal path"]
     MatureFlow["Team flow plus /ad-hooks as an expected gate-wiring step"]
 
     Work --> Poc
@@ -338,8 +338,11 @@ flowchart TD
     Verify["Run tests and quality gates"]
     ReviewNeeded{"Non-trivial behavior or standards risk?"}
     Review["/ad-review main..HEAD"]
+    HighStakes{"Going to the team, a PR, or a handoff?<br>(team / mature profiles)"}
+    MaxGate["/ad-audit<br>maximum gate, rules-anchored, evidence per claim"]
     Findings{"Actionable findings?"}
     Fix["Fix, verify again"]
+    RuleGap["/ad-level-up<br>when a finding is a rule gap, not a code defect"]
     Commit["/ad-commit<br>atomic Conventional Commit with DCO"]
     Pr["/ad-pr<br>open PR"]
     Merge["/ad-merge<br>evaluate CI, comments, mergeability"]
@@ -352,8 +355,13 @@ flowchart TD
     Verify --> ReviewNeeded
     ReviewNeeded -->|yes| Review
     ReviewNeeded -->|no| Commit
-    Review --> Findings
+    Review --> HighStakes
+    HighStakes -->|yes| MaxGate
+    HighStakes -->|no| Findings
+    MaxGate --> Findings
     Findings -->|yes| Fix
+    Findings -->|rule gap| RuleGap
+    RuleGap --> Fix
     Fix --> Verify
     Findings -->|no| Commit
     Commit --> Pr

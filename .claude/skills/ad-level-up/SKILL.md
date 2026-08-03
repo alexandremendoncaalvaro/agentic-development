@@ -15,7 +15,7 @@ A full or drifting context, or a model having an off moment, must never edit the
 
 ## Rules target
 
-Two curated layers exist ([ADR-0035](../../../../doc/adr/0035-rules-location-convention.md) + [ADR-0043](../../../../doc/adr/0043-per-project-rules-layer.md)); every accepted candidate targets exactly one:
+Two curated layers exist (ADR-0035 + ADR-0043); every accepted candidate targets exactly one:
 
 - **Machine store** — a you-everywhere convention: `$AGENTIC_RULES_DIR` if set, else `~/.agentic/rules/`.
 - **Project rules** — a this-project convention: `.agentic/rules/` at the repo root. On genuine conflict, a project rule shadows a machine-store rule (the audit reports the shadowing), so curate a project rule when the project deliberately deviates from the practitioner's global set.

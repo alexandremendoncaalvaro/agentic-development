@@ -7,7 +7,7 @@ allowed-tools: Read, Glob, Grep, Bash
 
 # /ad-deepen
 
-Implements [ADR-0020](../../../../doc/adr/0020-deep-modules-vocabulary.md) — the operational counterpart to the WORKFLOW §8 architectural vocabulary. Surfaces deepening opportunities and walks the user through them. Process scaffold; no primary file output.
+Implements ADR-0020 — the operational counterpart to the WORKFLOW §8 architectural vocabulary. Surfaces deepening opportunities and walks the user through them. Process scaffold; no primary file output.
 
 Profile scope: **`team` and `mature` only.** Architectural deepening is premature for ≤200-line experiments. `poc` and `solo` users do not have this skill installed; to enable deepening, re-init the project at `team` profile (`agentic profile set team`) once the codebase has stabilized enough to warrant it. Per ADR-0020 §4.
 
@@ -82,7 +82,7 @@ Reject candidates the grilling loop reveals as wrong-shaped. Better to discard a
 
 ## Vocabulary discipline (always on)
 
-Per [ADR-0020](../../../../doc/adr/0020-deep-modules-vocabulary.md), use the canonical vocabulary verbatim throughout the skill's output:
+Per ADR-0020, use the canonical vocabulary verbatim throughout the skill's output:
 
 - **Module** — any unit with an interface and an implementation.
 - **Interface** — what callers see.

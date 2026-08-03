@@ -61,7 +61,7 @@ Multi-feature scope tiers. No status annotations — implementation tracking liv
 - **MVP tier — Layer 3 Product.** `ad-prd` lazy `doc/product/PRD.md` lifecycle.
 - **MVP tier — Layer 4 Spec.** `ad-spec` feature-level specs at `doc/specs/`.
 - **MVP tier — Layer 5 Plan/Decisions.** `ad-architecture`, `ad-adr`, `ad-task` — ARCHITECTURE, ADRs, tasks.
-- **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill-me`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-next`, `ad-drift`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-hooks`.
+- **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill-me`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-audit`, `ad-level-up`, `ad-next`, `ad-drift`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-hooks`.
 - **Next tier — AGENTS ↔ GUIDELINES reciprocity automation.** `ad-bootstrap` writes pointer stubs (instead of inline rules) when `GUIDELINES.md` exists; `ad-drift` flags duplication.
 - **Next tier — Release skill (`ad-release`).** Version-bump, changelog, npm publish, GitHub release. Replaces the current manual flow.
 - **Next tier — Community-facing docs (`CONTRIBUTING.md` / `SECURITY.md`) scaffolds.** GitHub-conventional companion to `AGENTS.md`.
@@ -83,7 +83,7 @@ What binds across the entire product. Skip the section if none.
 Deferred decisions. Each becomes a future ADR, a spec-time decision, or an explicit punt with rationale. Never delete a question — append a resolution paragraph.
 
 - **When does `cli` promote to `main` and tag 1.0?** Criteria not yet locked. Candidates: (a) all MVP roadmap items shipped + own-dogfood audit clean; (b) external adoption threshold reached. Decision needs ADR.
-  - **Partial resolution (2026-05-24):** the `cli` branch was consolidated into `main` — `main` is now the single source of truth for kit + CLI; npm beta publishes from `main`. The 1.0-tag criterion remains open; this only collapses the prior two-branch model. See README.md "Branch layout" and the consolidation commit `b69056e`.
+  - **Partial resolution (2026-05-24):** the `cli` branch was consolidated into `main` — `main` is now the single source of truth for kit + CLI; npm beta publishes from `main`. The 1.0-tag criterion remains open; this only collapses the prior two-branch model. See README.md "Branch layout".
 - **Should the kit ship IDE-native integrations** (VS Code extension, JetBrains plugin) or stay agents.md-based? Current posture is the latter — keep the kit small, let host integrations be community contributions. Reconsider if adoption stalls on host-onboarding friction.
 - **Telemetry policy when going hosted.** If a hosted variant ships, opt-in telemetry vs strict offline. Decision deferred until a hosted variant is on the roadmap (not currently).
 - **How to measure "kit landed correctly" without telemetry.** Indirect signals (test green at install, audit clean) cover *correctness*; do not cover *fit*. Survey or community-channel signal is the open question.
