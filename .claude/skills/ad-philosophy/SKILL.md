@@ -131,6 +131,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - For UI/runtime changes, exercise the feature in a browser.
 - Can't verify it? Say so. Don't claim success — including a status claim relayed from another session, agent, or handoff: re-run the check yourself and state what you observed; if you cannot, say UNVERIFIED explicitly.
 - Flakiness claims need distribution evidence: one green run — or five — does not prove a fix. Run the suspect check N times (N ≥ 10) and report the pass/fail distribution. One unreproduced failure does not prove flakiness either.
+- An "N of M" claim needs a reproducible enumeration: state the exact command that produces the count, and name the false positives in its output — or say none were found and how that was checked. Stating the population is not enough; the enumeration itself is what fails.
 - Never bypass gates (`--no-verify`, skipped hooks, deleted failing tests).
 
 ## Report for a Decision-Maker

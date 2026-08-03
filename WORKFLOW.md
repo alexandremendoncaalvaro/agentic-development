@@ -106,6 +106,7 @@ The rules below are canonical.
 10. **Each layer owns its directory index. No duplication across docs.** `doc/adr/` is the canonical ADR index; `doc/tasks/`, `doc/specs/`, `doc/product/` likewise own their layers. Other documents do not list / digest / re-state these indices.
 11. **Cross-references must be load-bearing.** If you can delete the reference and the surrounding statement still stands, the reference was decoration — drop it.
 12. **Universal-vs-kit-state separation.** `WORKFLOW.md` ships to downstream projects and carries universal principles only — it does not cite kit-specific ADR numbers. The kit's adoption of each principle is recorded in `doc/adr/` (kit-internal). Literature citations remain (they are universal load-bearing references).
+13. **Cite a commit range by tag, not by SHA.** Rebase, squash-merge and history rewrite all change hashes; tags survive them. Single-commit citations stay governed by rules 9 and 11.
 
 The twelve rules above are the authoritative Documentation Discipline contract. They counter recurring failure modes: session-load files bloated past relevance, README pages drifting into changelogs, decision artifacts diluted by speculation, definition documents accumulating per-item tracking UI, and pillar documents duplicating adjacent layers' indices.
 
