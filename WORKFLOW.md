@@ -108,7 +108,7 @@ The rules below are canonical.
 12. **Universal-vs-kit-state separation.** `WORKFLOW.md` ships to downstream projects and carries universal principles only — it does not cite kit-specific ADR numbers. The kit's adoption of each principle is recorded in `doc/adr/` (kit-internal). Literature citations remain (they are universal load-bearing references).
 13. **Cite a commit range by tag, not by SHA.** Rebase, squash-merge and history rewrite all change hashes; tags survive them. Single-commit citations stay governed by rules 9 and 11.
 
-The twelve rules above are the authoritative Documentation Discipline contract. They counter recurring failure modes: session-load files bloated past relevance, README pages drifting into changelogs, decision artifacts diluted by speculation, definition documents accumulating per-item tracking UI, and pillar documents duplicating adjacent layers' indices.
+The thirteen rules above are the authoritative Documentation Discipline contract. They counter recurring failure modes: session-load files bloated past relevance, README pages drifting into changelogs, decision artifacts diluted by speculation, definition documents accumulating per-item tracking UI, and pillar documents duplicating adjacent layers' indices.
 
 ## 3. Format by Evidence
 

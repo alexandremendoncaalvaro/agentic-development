@@ -139,9 +139,11 @@ The hashes that remain dangling do so **by decision, not oversight**. A reader w
 
 One correction to the rule attribution above, raised by the Standards axis and correct: leaving [ADR-0007](../adr/0007-workflow-operational-skills.md) untouched rests on **rule 9** (accepted ADRs are mostly immutable), *not* on rule 11. Under rule 11's own test the hash there is decoration — delete it and the date-anchored sentence still stands. Right outcome, wrong rule cited; fixed here so it is not quoted later as rule-11 precedent.
 
-**This is a permanent, unrecoverable cost.** The pre-scrub objects exist only in a local bundle on the maintainer's machine; no one else can resolve those hashes ever again. Worth stating plainly because the earlier entries in this file treat SHA citation as a stylistic choice — after a history rewrite it is not.
+**This is a permanent, unrecoverable cost.** The pre-scrub objects exist only in a local bundle on the maintainer's machine; no one else can resolve those hashes ever again. Worth stating plainly because the earlier entries in this file treat SHA citation as a stylistic choice — after a history rewrite it is not, and the correct default going forward is: **anchor on tags or artifacts, never on commit hashes**, in any document meant to outlive the branch.
 
-The general rule that follows from this — anchor on tags or artifacts, never on commit hashes — is a **third `/ad-level-up` candidate**, not a policy this file may assert. A Task is a tracking document (WORKFLOW §2 rule 9) and `ad-archive` hard-deletes it, so a rule stated only here has no durable home.
+**2026-08-03 — Correction to the paragraph immediately above, and to how it was corrected.** That closing clause overreaches: a Task is a tracking document (WORKFLOW §2 rule 9) and `ad-archive` hard-deletes it, so this file may not assert a standing policy — the general rule belongs to `/ad-level-up`, which is where it went and where it landed, narrowed, as WORKFLOW §2 rule 13.
+
+The clause was originally *deleted in place* to make that correction. That was itself a rule 9 violation — Notes are append-only — caught by the Standards axis and reverted: the original sentence is restored above, intact, and the correction lives here instead. Two errors, one lesson: a correction that violates the rule it is correcting under is not a correction.
 
 **2026-07-31 — Closing entry: the counting failure is the finding, and it stops here.** Six times in this task an author-side count was wrong: `Execution:` fields, `Spec ref:` fields, the SHA-survival narrative, the numbering-restart generations, the dangling-hash sweep, and the tally inside the very entry that named the defect. Each was caught by a reviewer, corrected, and then recurred in the correction.
 
