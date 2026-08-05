@@ -1,6 +1,6 @@
 # ADR-0046: ad-audit gains a file-coverage axis, a severity scale, and the prose-vs-code posture
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-08-05
 **Deciders:** Alexandre Alvaro
 

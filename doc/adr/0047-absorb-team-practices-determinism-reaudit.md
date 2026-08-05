@@ -1,6 +1,6 @@
 # ADR-0047: Absorb four team practices — deterministic resolution probe, re-audit mode, opt-in commit gate, PR-history harvest
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-08-05
 **Deciders:** Alexandre Alvaro
 
