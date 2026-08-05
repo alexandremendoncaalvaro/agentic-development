@@ -14,7 +14,7 @@
 
 import { readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { resolve, dirname, join, sep } from 'node:path';
+import { resolve, dirname, join, relative, isAbsolute, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const DENYLIST_REL = join('.agentic', 'leak-denylist.txt');
@@ -114,10 +114,30 @@ export function extractAddedLines(text) {
   return added;
 }
 
-/** True when a symlink's resolved target stays within the repository root. */
+/**
+ * True when a symlink's resolved target stays within the repository root.
+ *
+ * Both sides must go through `resolve` before they are compared. `resolve`
+ * returns a platform-native absolute path, so on Windows a POSIX-shaped
+ * `repoRoot` like `/repo` came back as `C:\repo\...` and the prefix test could
+ * never succeed: every in-repo symlink was reported as an escape, and the guard
+ * blocked pushes it should have allowed.
+ *
+ * The containment test itself is `relative`, so a sibling directory sharing a
+ * name prefix (`/repo-backup` against `/repo`) is not mistaken for something
+ * inside the root. The `..` check is separator-aware on purpose: a bare
+ * `startsWith('..')` would reject a legitimate in-repo entry whose own name
+ * begins with dots, such as `..foo`.
+ */
 function targetStaysInside(repoRoot, symlinkPath, target) {
-  const resolved = resolve(repoRoot, dirname(symlinkPath), target);
-  return resolved === repoRoot || resolved.startsWith(repoRoot + sep);
+  const root = resolve(repoRoot);
+  const resolved = resolve(root, dirname(symlinkPath), target);
+  if (resolved === root) return true;
+  const rel = relative(root, resolved);
+  // A different Windows drive has no relative path; `relative` returns an
+  // absolute one, which is an escape by definition.
+  if (isAbsolute(rel)) return false;
+  return rel !== '..' && !rel.startsWith('..' + sep);
 }
 
 /**
