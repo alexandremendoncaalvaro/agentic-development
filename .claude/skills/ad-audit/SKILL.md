@@ -19,6 +19,8 @@ State exactly what is under review and which tree it rests on — the tree is pa
 - **Tree/SHA:** working-tree vs `origin/main` vs a deployed env. `git fetch origin main` and name the SHA under audit.
 - **Changed files (diff/branch/PR targets):** enumerate them (`git diff --name-only <range>`) — this list is the file-coverage axis Step 6 checks (ADR-0046). Bulk assets (fixtures, vendored, generated) may be bucketed as a named class rather than listed one by one — but a bucket clears N/A only after a spot-check of representative samples or a mechanical verification of the class, never on the label alone.
 
+**Re-audit (prior trail exists — ADR-0047).** Check `.agentic/reviews/` for a prior trail on this same target. If one exists, this run is a RE-AUDIT: load the latest trail and carry every prior finding into Step 6 with a mandatory disposition — **resolved** (evidence of the fix) · **refuted** (evidence it was wrong) · **still-open**. A prior finding that silently disappears invalidates the re-audit; findings are threads, not snapshots.
+
 When the host exposes `AskUserQuestion`, confirm the target as a multi-choice card.
 
 ## Step 1 — Resolve the rule-set (three layers)
@@ -32,6 +34,18 @@ Per ADR-0035 and ADR-0043, the rule-set is the union of:
 **Precedence:** union across layers, except on genuine conflict, where a project rule wins over a machine-store rule. Shadowing is never silent — apply the project rule and report the shadowed machine-store rule as a line in the audit output.
 
 The rule-set — not this skill — defines the **groups** and any **critical** tag. Do not invent, resize, or hardcode groups or rule content. If the curated store defines groups explicitly, use them; if only the repo docs exist, treat each binding doc (and each accepted ADR) as a group. If no rule-set resolves at all, stop and tell the user there is nothing to audit against.
+
+**Deterministic resolution probe (ADR-0047).** Run this verbatim from the repo root and paste its output into the audit trail — layer resolution is read from observed output, never from memory, because this step's failure-mode is silent (a layer that exists but goes unread):
+
+```bash
+if [ -n "$AGENTIC_RULES_DIR" ]; then MS="$AGENTIC_RULES_DIR"; else MS="$HOME/.agentic/rules"; fi
+{ [ -d "$MS" ] && echo "MACHINE-STORE: $MS" && ls "$MS"; } || echo "MACHINE-STORE: absent"
+{ [ -d .agentic/rules ] && echo "PROJECT: .agentic/rules" && ls .agentic/rules; } || echo "PROJECT: absent"
+echo "BINDING DOCS:"; ls AGENTS.md ARCHITECTURE.md GUIDELINES.md CONTEXT.md CONTEXT-MAP.md 2>/dev/null
+for d in doc/adr docs/ADRs docs/adr; do [ -d "$d" ] && echo "ADRS: $d ($(ls "$d" | wc -l | tr -d ' ') files)"; done
+```
+
+A deterministic value inside a non-deterministic flow: the probe pins what can be pinned; the model reads only the rules the probe proved exist.
 
 ## Step 2 — Enumerate all groups; dispatch or record N/A
 

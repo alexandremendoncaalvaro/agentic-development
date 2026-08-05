@@ -49,7 +49,7 @@ Step 0 — announce. Print the shape before any work:
 Running ad-level-up (Codex single-pass, human-gated). I will state the candidate + evidence, trace its root cause, run the four anti-overfitting gates + effectiveness pass, place it, draft the minimal edit, run an adversarial multi-lens review, then PRESENT a proposal. I will NOT write anything to the rule-set until you explicitly approve — one item at a time.
 ```
 
-Step 1 — state candidate + evidence. One sentence + the citation (finding / PR / transcript / file:line, or the `ad-audit` handoff). If it cannot be cited, stop — not grounded.
+Step 1 — state candidate + evidence. One sentence + the citation (finding / PR / transcript / file:line, or the `ad-audit` handoff). If it cannot be cited, stop — not grounded. A periodic PR-history harvest (scan recent merged PRs for missed defects and repeating review comments; monthly-ish cadence) is a first-class candidate source (ADR-0047) — each gap arrives with citations built in; harvested candidates still clear every gate.
 
 Step 2 — trace to root cause. Attach the candidate to the upstream cause (investigation / grounding / verification gap), not the surface symptom.
 

@@ -51,13 +51,22 @@ Running ad-audit (Codex single-pass, per-group checklist). I will resolve the ru
 NOTE on fidelity: a single session with everything loaded can rationalize across groups. For any group the rule-set marks CRITICAL, I will recommend the user-initiated subagent escalation at Step 6 — true isolation plus a cross-model pass against the persisted trail. The escalation TOML schema is at the bottom of this skill.
 ```
 
-Step 1 — target + tree. State what is under audit (a diff / branch / PR, or drafted claims/artifacts about to be posted) and which tree/SHA it rests on (`git fetch origin main`; name the SHA). For diff/branch/PR targets, enumerate the changed files (`git diff --name-only <range>`) — this list is the file-coverage axis Step 7 checks (ADR-0046); bulk assets (fixtures, vendored, generated) may be bucketed as a named class, but a bucket clears N/A only after a spot-check of representative samples, never on the label alone. If the target spans >50 files, ask the user to narrow scope before proceeding — cost compounds across groups. If ambiguous which target, ask.
+Step 1 — target + tree. State what is under audit (a diff / branch / PR, or drafted claims/artifacts about to be posted) and which tree/SHA it rests on (`git fetch origin main`; name the SHA). For diff/branch/PR targets, enumerate the changed files (`git diff --name-only <range>`) — this list is the file-coverage axis Step 7 checks (ADR-0046); bulk assets (fixtures, vendored, generated) may be bucketed as a named class, but a bucket clears N/A only after a spot-check of representative samples, never on the label alone. If the target spans >50 files, ask the user to narrow scope before proceeding — cost compounds across groups. Also check `.agentic/reviews/` for a prior trail on this same target — if one exists, this is a RE-AUDIT (ADR-0047): carry every prior finding into Step 7 with a mandatory disposition (resolved with evidence · refuted with evidence · still-open); a prior finding that silently disappears invalidates the re-audit. If ambiguous which target, ask.
 
 Step 2 — resolve the rule-set (three layers, ADR-0035 + ADR-0043):
 - Repo binding docs (always): AGENTS.md, ARCHITECTURE.md, GUIDELINES.md, CONTEXT.md / CONTEXT-MAP.md, accepted ADRs under `doc/adr/` the target touches. Read what exists; never fabricate.
 - Curated store (optional): `$AGENTIC_RULES_DIR` if set, else `~/.agentic/rules/` if it exists; read its rule files. The rule-set defines the groups and any CRITICAL tag. If only repo docs exist, treat each binding doc / accepted ADR as a group. If no rule-set resolves, stop — nothing to audit against.
 - Project rules (optional): `.agentic/rules/` at the repo root, if present — same format as the machine store; committed or machine-local (`.git/info/exclude`), resolution does not care which.
 - Precedence: union across layers, except on genuine conflict, where a project rule wins over a machine-store rule — apply the project rule and report the shadowed store rule as a line in the audit output (never silent).
+- Deterministic resolution probe (ADR-0047) — run verbatim from the repo root and paste the output into the audit trail; layer resolution is read from observed output, never from memory (the failure-mode is silent: a layer that exists but goes unread):
+
+```bash
+if [ -n "$AGENTIC_RULES_DIR" ]; then MS="$AGENTIC_RULES_DIR"; else MS="$HOME/.agentic/rules"; fi
+{ [ -d "$MS" ] && echo "MACHINE-STORE: $MS" && ls "$MS"; } || echo "MACHINE-STORE: absent"
+{ [ -d .agentic/rules ] && echo "PROJECT: .agentic/rules" && ls .agentic/rules; } || echo "PROJECT: absent"
+echo "BINDING DOCS:"; ls AGENTS.md ARCHITECTURE.md GUIDELINES.md CONTEXT.md CONTEXT-MAP.md 2>/dev/null
+for d in doc/adr docs/ADRs docs/adr; do [ -d "$d" ] && echo "ADRS: $d ($(ls "$d" | wc -l | tr -d ' ') files)"; done
+```
 
 Step 3 — enumerate all groups; dispatch or N/A. Enumerate EVERY group. Review each group the target touches; record explicit `N/A` + one-line reason for each it does not (including CRITICAL groups genuinely untouched). Cherry-picking invalidates the audit.
 
