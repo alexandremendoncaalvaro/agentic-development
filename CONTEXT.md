@@ -99,6 +99,30 @@ _Avoid_: "global rules" for the machine store (ambiguous with the binding docs, 
 
 **Related code:** [`src/skills/claude-code/ad-audit/SKILL.md`](src/skills/claude-code/ad-audit/SKILL.md), [`src/skills/codex/ad-audit/SKILL.md`](src/skills/codex/ad-audit/SKILL.md), [`src/skills/claude-code/ad-level-up/SKILL.md`](src/skills/claude-code/ad-level-up/SKILL.md), [`src/skills/codex/ad-level-up/SKILL.md`](src/skills/codex/ad-level-up/SKILL.md).
 
+### File-coverage axis
+
+**Definition:** the second dimension of `ad-audit`'s coverage matrix ([ADR-0046](doc/adr/0046-ad-audit-file-coverage-severity-prose.md)): beyond every rule-group being accounted for, every changed file in a diff target must appear in at least one reviewer's `Files grounded:` line or carry an explicit N/A-with-reason (bulk assets bucketable as a named class, cleared only after a spot-check). A gap on either axis makes the audit INCOMPLETE.
+
+_Avoid_: "file coverage" bare (collides with test-coverage tooling vocabulary); "second matrix" (it is one matrix, two axes).
+
+**Related code:** [`src/skills/claude-code/ad-audit/SKILL.md`](src/skills/claude-code/ad-audit/SKILL.md), [`src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md`](src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md).
+
+### Severity scale
+
+**Definition:** the four-tier ranking `critical · major · minor · nit` that `ad-audit` reviewers assign to violations and judgement-calls ([ADR-0046](doc/adr/0046-ad-audit-file-coverage-severity-prose.md)). Severity ranks a *confirmed* finding for triage; it never substitutes for evidence and never gates (the evidence bar gates). The severity value `critical` is unrelated to the rule-set's CRITICAL tag on a *group*, which triggers cross-model hardening.
+
+_Avoid_: using "critical" bare where group-tag vs finding-severity is ambiguous — qualify ("a critical finding" / "a CRITICAL group"); "blocker" as a severity (a blocker is an evidence-gate state, not a rank).
+
+**Related code:** [`src/skills/claude-code/ad-audit/SKILL.md`](src/skills/claude-code/ad-audit/SKILL.md), [`src/skills/codex/ad-audit/agents/audit-group-reviewer.toml`](src/skills/codex/ad-audit/agents/audit-group-reviewer.toml).
+
+### Prose-vs-code posture
+
+**Definition:** the reviewer-contract rule that the target's own prose — PR description, commit messages, comments, doc claims — is a set of claims to verify against the code, never context to trust; a prose-vs-code discrepancy is itself a finding ("the diff is what ships", [ADR-0046](doc/adr/0046-ad-audit-file-coverage-severity-prose.md)). Generalises the machine-store CV group's "a code comment is not evidence" to the whole metadata surface. Ships unmeasured with an explicit ADR-0045-shaped revisit trigger.
+
+_Avoid_: "prose check" (sounds like style/grammar review); "distrust the author" (the posture targets artifacts, not people).
+
+**Related code:** [`src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md`](src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md), [`doc/adr/0046-ad-audit-file-coverage-severity-prose.md`](doc/adr/0046-ad-audit-file-coverage-severity-prose.md).
+
 ## Relationships
 
 - A **Kit** install bounds itself by a single **Profile** per agent surface (`.claude/skills/` and `.agents/skills/` each carry their own profile state).

@@ -14,6 +14,7 @@ Codex auto-trigger on description keywords is less mature than Claude Code's. If
 Step 0 — confirm the gates the user wants. WORKFLOW §11 names two tiers:
 - Pre-commit (fast): lint, format, secret-scan. Runs on every commit. Keep under ~5s; slow pre-commits push devs to `--no-verify`.
 - Pre-push (thorough): build, unit tests, integration tests. Runs on every push. Acceptable to be slow.
+- Pre-commit review gate (opt-in third tier — ADR-0047): wire `/ad-review` — or `/ad-audit` for team-bound work — over the staged work before it commits, confirmed findings blocking the commit. Trade-off belongs to the user: front-loads fixing (fits parallel workflows) but bottlenecks a frequent committer. Offer it; never scaffold unasked, never as a default.
 
 Confirm both tiers are in scope. If the user wants only one, scaffold only that tier.
 

@@ -15,6 +15,7 @@ Scaffolds the deterministic gates `WORKFLOW.md` §11 names. The skill writes con
 
 * **Pre-commit (fast):** lint, format, secret-scan. Runs on every commit. Slow pre-commits push devs to `--no-verify`; keep it under ~5s.
 * **Pre-push (thorough):** build, unit tests, integration tests. Runs on every push. Acceptable to be slow; the cost is paid less often than commit.
+* **Pre-commit review gate (opt-in third tier — ADR-0047):** wire `/ad-review` — or `/ad-audit` for team-bound work — to run over the staged work before it commits, confirmed findings blocking the commit. The trade-off is real and belongs to the user: it front-loads the fixing (fits parallel, queue-several-agents workflows) but bottlenecks a frequent committer. Offer it; never scaffold it unasked, never as a default.
 
 Confirm both tiers are in scope for this project. If the user wants only one tier, scaffold only that tier — do not add gates the user did not ask for.
 

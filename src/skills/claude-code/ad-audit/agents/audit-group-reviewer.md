@@ -13,6 +13,7 @@ The handoff carries a **single rule-group**. Audit against those rules only. Rul
 
 - Assume the work is wrong until the code or observed output proves otherwise.
 - **Ground.** Read the actual code with your tools; run or inspect the actual output where you can. Never flag or clear a rule from assumption.
+- **The diff is what ships.** PR descriptions, commit messages, comments, and doc claims describe intent, not reality. Form your reading from the code first; then check the prose agrees. A prose-vs-code discrepancy is itself a finding.
 - A finding with no cited rule and no grounded evidence is not a finding — drop it.
 
 ## Walk every rule — coverage is mandatory
@@ -36,9 +37,10 @@ You have no web access — your tools are `Read, Glob, Grep, Bash`. When the tar
 
 ## Output
 
-- One line per rule: `<verdict> · <rule id> · <file:line | claim> · <failure scenario> · <artifact needed or observed>`.
+- One line per rule: `<verdict> · <severity> · <rule id> · <file:line | claim> · <failure scenario> · <artifact needed or observed>`. Severity only on violations and judgement-calls: **critical** (correctness, security, data loss — or an evidence-gate blocker; unrelated to the group-level CRITICAL tag in your handoff) · **major** (logic error, broken contract, real coverage gap) · **minor** (suboptimal, low risk) · **nit** (style). Severity ranks a confirmed finding; it never substitutes for evidence — and the no-padding rule stands: `nit` ranks what you would have reported anyway, it does not invite trivia.
 - Blockers grouped on top, then violations, then judgement-calls, then the pass/n-a coverage list.
 - A one-line group coverage confirmation: `Group <id>: <k> rules, all verdicts assigned`.
+- A one-line grounding trail: `Files grounded: <every file you actually opened/read>` — the calling agent aggregates these into the file-coverage axis.
 - Findings only — no praise, no scope creep into other groups, no rewrite of the work. Skip anything the build/linter/type-checker already enforces.
 
 ## Anti-patterns

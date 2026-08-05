@@ -52,11 +52,11 @@
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "6e0527d0fd0a338377730445cf1070b57d98b944ff68dfc07670a985f9521394"
+          "sourceSha": "fec1e738d010b2b0eb3e8fc0628d163753059449f85865de246d9d2c9a839b86"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
-          "sourceSha": "a2d7dfa24a622a7d16ff9287091c3d969b0c0c40f3aecada7c2e11d72374ed8d"
+          "sourceSha": "1a7e70e970753707ea444ec20b14585c4763317f579aeb4a97e2824de932ced9"
         }
       ]
     },
@@ -199,7 +199,7 @@
         },
         {
           "path": ".agents/skills/ad-level-up/SKILL.md",
-          "sourceSha": "e2589848164859f1cf269ddeb2cbe2aa757f9d56b3c625deb3d4ca376c7e03aa"
+          "sourceSha": "eaced655b55df722e5fed7f3e4cead30cb8173381d4f16187f3b8174bf6a1a77"
         },
         {
           "path": ".codex/agents/rule-candidate-reviewer.toml",

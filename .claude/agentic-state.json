@@ -36,11 +36,11 @@
       "files": [
         {
           "path": ".claude/agents/audit-group-reviewer.md",
-          "sourceSha": "646ee148b70ee0594048609ba11e7b0a35a749a5fecd76c3a0710e10f381a7a0"
+          "sourceSha": "23484492c180890c66f07ecbc8adade9dcf469d36fc7dcfd24a132808288780d"
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "7fbab78b6f551c1e96635775e5105b4004763335f83ed43b9a5f38e083ed9a58"
+          "sourceSha": "b8d56753f6b5135ea0e62708f0167d9a1472ba3caa3d2c0bcf5b59771a5dacae"
         }
       ]
     },
@@ -143,7 +143,7 @@
         },
         {
           "path": ".claude/skills/ad-level-up/SKILL.md",
-          "sourceSha": "f525edf2afde93945e2fc922daca29822b5483703d8d437b4f7722f4ff8b123e"
+          "sourceSha": "d3f2333751100a5993365a8df6642d5ab4b3129263799045657793c1d77f6da1"
         }
       ]
     },
