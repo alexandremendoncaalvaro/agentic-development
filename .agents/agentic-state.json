@@ -52,11 +52,11 @@
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "6e0527d0fd0a338377730445cf1070b57d98b944ff68dfc07670a985f9521394"
+          "sourceSha": "a99a212fb1cb2c844b2cf1a4a6887c854f6f3a3b49b847035defc187ca04df2c"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
-          "sourceSha": "a2d7dfa24a622a7d16ff9287091c3d969b0c0c40f3aecada7c2e11d72374ed8d"
+          "sourceSha": "1a7e70e970753707ea444ec20b14585c4763317f579aeb4a97e2824de932ced9"
         }
       ]
     },

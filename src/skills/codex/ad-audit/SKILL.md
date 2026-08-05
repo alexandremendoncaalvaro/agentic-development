@@ -51,7 +51,7 @@ Running ad-audit (Codex single-pass, per-group checklist). I will resolve the ru
 NOTE on fidelity: a single session with everything loaded can rationalize across groups. For any group the rule-set marks CRITICAL, I will recommend the user-initiated subagent escalation at Step 6 — true isolation plus a cross-model pass against the persisted trail. The escalation TOML schema is at the bottom of this skill.
 ```
 
-Step 1 — target + tree. State what is under audit (a diff / branch / PR, or drafted claims/artifacts about to be posted) and which tree/SHA it rests on (`git fetch origin main`; name the SHA). If ambiguous which target, ask.
+Step 1 — target + tree. State what is under audit (a diff / branch / PR, or drafted claims/artifacts about to be posted) and which tree/SHA it rests on (`git fetch origin main`; name the SHA). For diff/branch/PR targets, enumerate the changed files (`git diff --name-only <range>`) — this list is the file-coverage axis Step 7 checks (ADR-0046); bulk assets (fixtures, vendored, generated) may be bucketed as a named class, but a bucket clears N/A only after a spot-check of representative samples, never on the label alone. If the target spans >50 files, ask the user to narrow scope before proceeding — cost compounds across groups. If ambiguous which target, ask.
 
 Step 2 — resolve the rule-set (three layers, ADR-0035 + ADR-0043):
 - Repo binding docs (always): AGENTS.md, ARCHITECTURE.md, GUIDELINES.md, CONTEXT.md / CONTEXT-MAP.md, accepted ADRs under `doc/adr/` the target touches. Read what exists; never fabricate.
@@ -65,19 +65,19 @@ Step 4 — write the audit-trail handoff. Persist the assembled context (target,
 
 Step 5 — review, group by group. For each dispatched group, in its own `## Group: <id>` section, walk its rules as a checklist in order. Give EVERY rule a verdict:
 - **pass** (grounded) · **violation** (cite the exact rule + `file:line`/claim) · **judgement-call** (cite the named baseline) · **n-a** (subject untouched, one-line reason).
-Ground on the actual code/output — read files, run/inspect output; never assume. Each finding states the concrete failure scenario AND the specific evidence artifact missing or contradicting the claim. Hard gate: a teammate-visible claim with no run/observed artifact is a BLOCKER. Re-read the group's rules before closing the section and confirm every rule has a verdict.
+Ground on the actual code/output — read files, run/inspect output; never assume. The diff is what ships: treat the target's prose — PR description, commit messages, comments, doc claims — as claims to check against the code, never as context to trust; a prose-vs-code discrepancy is itself a finding. Each finding states the concrete failure scenario AND the specific evidence artifact missing or contradicting the claim. On violations and judgement-calls, assign a severity — critical (correctness, security, data loss — or an evidence-gate blocker; unrelated to the rule-set's CRITICAL tag on a group) · major (logic error, broken contract, real coverage gap) · minor (suboptimal, low risk) · nit (style — ranks what you would have reported anyway; the no-padding rule stands); severity ranks a confirmed finding, never substitutes for evidence. Close each group section with `Files grounded: <files actually opened>`. Hard gate: a teammate-visible claim with no run/observed artifact is a BLOCKER. Re-read the group's rules before closing the section and confirm every rule has a verdict.
 
 Step 6 — harden CRITICAL groups (recommend escalation). For every group the rule-set marks CRITICAL, recommend the user run the bundled `audit-group-reviewer` subagent against the audit-trail file. The cross-model pass is realized primarily via the kit's **dual-host split** — re-check the critical group under the other provider (Codex flavor ⇄ Claude flavor); where a single host can vary the model per call, that override is an in-host proxy. Run the cross-model pass **twice**, reordering the rules and the target's hunks between the two runs (swap-and-agree: accept a `pass` only if it holds both ways). Honest ceiling: an in-host override is intra-family and only partially decorrelates blind spots; the cross-provider path is stronger, and true cross-vendor diversity is adopted when routing allows. Union the escalation's findings in.
 
-Step 7 — aggregate + verdict. Union all findings (never drop a lone one); confirm real ones against the code/output and reject wrong ones with evidence. Coverage check: every group accounted for by verdicts or N/A-with-reason, or the audit is INCOMPLETE. Then the verdict — NEVER "approve": list each blocker with the evidence artifact it needs; state everything unverified as an OPEN QUESTION.
+Step 7 — aggregate + verdict. Union all findings (never drop a lone one); confirm real ones against the code/output and reject wrong ones with evidence. Coverage check — two axes: (a) every group accounted for by verdicts or N/A-with-reason; (b) for diff targets, every changed file accounted for — in a group section's `Files grounded` line, or explicitly N/A-with-reason (fixture, vendored, generated). A gap on either axis makes the audit INCOMPLETE. Then the verdict — NEVER "approve", findings ordered by severity: list each blocker with the evidence artifact it needs; state everything unverified as an OPEN QUESTION.
 
 Step 8 — close the loop. Hand any rule gap (a defect pattern no rule covers, or a rule that misled) to `/ad-level-up` as a candidate.
 </instructions>
 
 <output_contract>
 - Audit-trail file at `.agentic/reviews/<ISO>-audit-<scope>.md`.
-- One `## Group: <id>` section per dispatched group; one line per rule: `<verdict> · <rule id> · <file:line | claim> · <failure scenario> · <artifact needed or observed>`.
-- A coverage matrix: every group accounted for (verdicts or N/A-with-reason).
+- One `## Group: <id>` section per dispatched group; one line per rule: `<verdict> · <severity, on violations/judgement-calls> · <rule id> · <file:line | claim> · <failure scenario> · <artifact needed or observed>`; each section closes with its `Files grounded:` line.
+- A coverage matrix: every group accounted for (verdicts or N/A-with-reason) — and, for diff targets, every changed file (grounded by a section, or N/A-with-reason).
 - Blockers on top; then open questions; then any proposed rule delta for `/ad-level-up`.
 - No "approve" verdict, no defending the work, no rewrite. Empty result reported explicitly.
 </output_contract>

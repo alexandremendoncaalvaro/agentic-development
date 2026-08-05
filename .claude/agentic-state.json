@@ -36,11 +36,11 @@
       "files": [
         {
           "path": ".claude/agents/audit-group-reviewer.md",
-          "sourceSha": "646ee148b70ee0594048609ba11e7b0a35a749a5fecd76c3a0710e10f381a7a0"
+          "sourceSha": "23484492c180890c66f07ecbc8adade9dcf469d36fc7dcfd24a132808288780d"
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "7fbab78b6f551c1e96635775e5105b4004763335f83ed43b9a5f38e083ed9a58"
+          "sourceSha": "6d7cdc0092e9c0caca683a1219af744fe25350ffc1166afb10d4975b8426d48d"
         }
       ]
     },
