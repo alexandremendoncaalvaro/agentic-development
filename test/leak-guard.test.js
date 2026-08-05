@@ -260,6 +260,34 @@ test('findViolations flags a symlink whose target escapes the repo root', () => 
   assert.equal(violations[0].path, 'sub/link');
 });
 
+// A containment check written as `startsWith('..')` rejects this: `relative()`
+// yields `..foo`, which merely begins with the same two characters as a parent
+// traversal. The entry is squarely inside the repo.
+test('findViolations allows an in-repo target whose name begins with dots', () => {
+  const violations = findViolations({
+    entries: [{ status: 'A', dstMode: '120000', dstSha: 'x', path: 'link' }],
+    addedLines: [],
+    denylistPatterns: [],
+    repoRoot: '/repo',
+    readSymlinkTarget: () => '..foo',
+  });
+  assert.deepEqual(violations, []);
+});
+
+// The prefix form this replaced relied on a trailing separator to keep a
+// sibling root out; `relative()` must not lose that.
+test('findViolations flags a sibling root sharing a name prefix as an escape', () => {
+  const violations = findViolations({
+    entries: [{ status: 'A', dstMode: '120000', dstSha: 'x', path: 'link' }],
+    addedLines: [],
+    denylistPatterns: [],
+    repoRoot: '/repo',
+    readSymlinkTarget: () => '../repo-backup/secrets',
+  });
+  assert.equal(violations.length, 1);
+  assert.equal(violations[0].kind, 'symlink-escape');
+});
+
 test('findViolations flags an absolute-target symlink as an escape', () => {
   const violations = findViolations({
     entries: [{ status: 'A', dstMode: '120000', dstSha: 'x', path: 'link' }],

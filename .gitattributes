@@ -1,0 +1,16 @@
+# Normalize every text file to LF in the repository and check it out as LF on
+# every platform. Without this, a Windows clone with `core.autocrlf=true` (git's
+# default there) rewrites the working tree to CRLF, and the frontmatter parsing
+# in test/skills.test.js fails for every skill: 65 red tests that say nothing
+# about the code. Every file tracked here is already LF in the index, so this
+# changes no committed content, only how it lands on disk.
+* text=auto eol=lf
+
+# Binary assets must never be line-ending converted.
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
