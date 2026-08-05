@@ -8,8 +8,14 @@ const SECTION_END = '<!-- agentic-managed-skills:end -->';
 // a blank line and the canonical managed-section heading. This prevents a
 // false match if the user has the literal marker strings in their own
 // content (e.g., quoting the kit's README inside a fenced code block).
-const SECTION_START_RE = /^<!-- agentic-managed-skills:start -->\n\n## Skills installed by `agentic`/m;
-const SECTION_END_RE = /^<!-- agentic-managed-skills:end -->$/m;
+// The `\r?` allowances are load-bearing, not defensive noise. Git checks the
+// root doc out CRLF-terminated on Windows whenever `core.autocrlf=true` (its
+// default there) and no .gitattributes overrides it. Anchored on bare \n,
+// these patterns failed to recognize a section the installer had written
+// itself, so it appended a second one instead of replacing the first and the
+// file ended up with two contradictory skill tables.
+const SECTION_START_RE = /^<!-- agentic-managed-skills:start -->\r?\n\r?\n## Skills installed by `agentic`/m;
+const SECTION_END_RE = /^<!-- agentic-managed-skills:end -->\r?$/m;
 
 // Where installed SKILL.md files live per agent. Mirrors the install layout
 // (see ADR-0001). updateRootDoc is called per-target-project after install,
