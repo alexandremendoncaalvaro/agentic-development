@@ -26,6 +26,10 @@ export async function run(argv) {
     .option('-a, --agent <agent>', 'install for a specific agent: claude-code | codex | both')
     .option('-p, --profile <profile>', 'project maturity profile: poc | solo | team | mature (default: team)')
     .option('-y, --yes', 'skip confirmation prompts (non-interactive)')
+    .option(
+      '--force-root-doc',
+      'write the managed skills section even when the root doc is tracked by git (non-interactive default: skip)'
+    )
     .action(initCommand);
 
   program

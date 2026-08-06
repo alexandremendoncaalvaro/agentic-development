@@ -309,6 +309,25 @@ test('init -y leaves a git-tracked root doc unmodified (ADR-0049)', () => {
   }
 });
 
+test('init -y --force-root-doc writes into a tracked root doc (ADR-0049)', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'team baseline');
+
+    runInit(dir, ['--agent', 'claude-code', '-y', '--force-root-doc']);
+
+    assert.match(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      /agentic-managed-skills:start/,
+      'the override must reach the tracked root doc the refusal skips'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 // The tracked check must not degrade into "refuse inside any repository".
 // Untracked and unknown are distinct states from tracked, and both still
 // authorise the append; only the other tests' non-repo scratch dirs cover

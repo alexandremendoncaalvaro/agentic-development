@@ -350,11 +350,12 @@ export async function initCommand(opts) {
       // team: a tracked root doc is shared with everyone who clones the repo
       // (ADR-0049). Unknown tracking state keeps the prior append behaviour.
       async (path) => {
+        if (opts.forceRootDoc) return true;
         if (trackedState(cwd, path) !== 'tracked') return true;
         process.stderr.write(
           `skipped ${path}: tracked by git, so the managed section would be ` +
             `visible to everyone sharing this repository. Re-run interactively ` +
-            `to decide.\n`
+            `to decide, or pass --force-root-doc.\n`
         );
         return false;
       };

@@ -15,7 +15,8 @@ Implement [ADR-0049](../adr/0049-installer-shared-write-target-detection.md). To
 - [x] `init.js` non-interactive `confirmAppend` refuses a tracked root doc: skips that write, states the reason on stderr, completes the rest of the install.
 - [ ] `init.js` non-interactive `confirmReplace`: today `init.js` never passes `confirmReplace` to `updateRootDoc`, so the library default silently replaces an existing stale managed section even unattended.
 - [ ] `update.js` equivalents for both callbacks.
-- [ ] Force flag on `init` and `update` permitting the tracked-root-doc write; enum-guarded in the same shape as `--agent`, surfaced in `--help`. **Release-blocking:** the refusal shipped first, so publishing before the flag exists would leave an unattended consumer with no override. Must land before `scripts/release.sh` rotates `[Unreleased]`.
+- [x] Override flag on `init` — `--force-root-doc`, boolean, surfaced in `--help`, named separately from `update`'s existing `--force` because that one means "overwrite user-edited files on conflict". The release-blocking gap is closed for `init`.
+- [ ] Same override on `update`, to land together with `update.js`'s refusal — the flag would be inert there today, so `--help` would be advertising a no-op.
 - [ ] `.git/info/exclude` writer, offered when kit files land untracked in a repository: entries enumerate installed files by path, a directory-level entry is never emitted, existing entries are not duplicated, `.gitignore` is never touched.
 - [ ] Install summary reports when a user-level install already covers the skills being written locally, at the point the operator can still decline them.
 - [x] Tests for the first slice: non-interactive refusal on a tracked root doc, and `untracked`-inside-a-repository still appends. The pre-existing suite covers `unknown` incidentally, since its scratch directories are not repositories.
