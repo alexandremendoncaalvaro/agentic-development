@@ -21,10 +21,12 @@ Implement [ADR-0049](../adr/0049-installer-shared-write-target-detection.md). To
 - [ ] `.git/info/exclude` writer, offered when kit files land untracked in a repository: entries enumerate installed files by path, a directory-level entry is never emitted, existing entries are not duplicated, `.gitignore` is never touched.
 - [ ] Install summary reports when a user-level install already covers the skills being written locally, at the point the operator can still decline them.
 - [x] Tests for the first slice: non-interactive refusal on a tracked root doc, and `untracked`-inside-a-repository still appends. The pre-existing suite covers `unknown` incidentally, since its scratch directories are not repositories.
-- [ ] Remaining tests: force flag overrides the refusal; exclude writer emits filenames rather than directories and is idempotent across re-runs; a mixed-ownership agent directory keeps its tracked file visible to git.
-- [ ] Regression pin for the originating incident: a fixture repository with a tracked `AGENTS.md` where `init -y` leaves that file unmodified.
-- [ ] `AGENTS.md` Gotchas and `ARCHITECTURE.md` patterns updated for the new installer behavior; `CHANGELOG.md` `[Unreleased]` entry per the ADR-0048 changelog gate.
-- [ ] `npm test` green; `node bin/agentic.js update --yes` to refresh the dogfood install; `/ad-review main..HEAD` before the PR.
+- [x] Test that the override flag reaches the write the refusal skips, driven through both failure modes (absent flag, then wrong behaviour).
+- [ ] Remaining tests: exclude writer emits filenames rather than directories and is idempotent across re-runs; a mixed-ownership agent directory keeps its tracked file visible to git.
+- [x] Regression pin for the originating incident: a fixture repository with a tracked `AGENTS.md` where `init -y` leaves that file unmodified. This is the same test as the first-slice refusal above — the incident and the acceptance criterion are one assertion, not two.
+- [x] `CHANGELOG.md` `[Unreleased]` entry per the ADR-0048 changelog gate, kept current on each slice rather than written once at the end.
+- [ ] `AGENTS.md` Gotchas and `ARCHITECTURE.md` patterns updated for the new installer behaviour.
+- [ ] `npm test` green at the end of the task; `node bin/agentic.js update --yes` only if skill source changed (it has not — this task is installer code); `/ad-review main..HEAD` before the PR.
 
 ## Notes
 
