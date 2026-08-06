@@ -95,6 +95,27 @@ test('resolve-rules.mjs: absent layers say absent instead of failing', () => {
   }
 });
 
+test('resolve-rules.mjs: listings sort in locale-independent code-unit order', () => {
+  // Deliberate: uppercase before lowercase (C collation), regardless of the
+  // host locale, so audit trails are reproducible across machines.
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-probe-sort-'));
+  try {
+    const machineStore = join(dir, 'rules');
+    mkdirSync(machineStore);
+    for (const name of ['apple.md', 'Zebra.md', 'Banana.md']) {
+      writeFileSync(join(machineStore, name), '# rules');
+    }
+    const out = runProbe(dir, { AGENTIC_RULES_DIR: machineStore });
+    assert.ok(
+      out.indexOf('Banana.md') < out.indexOf('Zebra.md') &&
+        out.indexOf('Zebra.md') < out.indexOf('apple.md'),
+      'code-unit order: uppercase names sort before lowercase'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('resolve-rules.mjs: dotfiles in a rules dir are ignored (ls parity)', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-probe-dot-'));
   try {

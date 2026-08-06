@@ -10,8 +10,10 @@
  * the project rules, and the repo binding docs (whose scope includes the ADR
  * directory) — so layer resolution is read from observed output, never from
  * memory. Node instead of shell so no POSIX shell is assumed; zero
- * dependencies. Listings are sorted and dotfiles ignored for parity with the
- * `ls` output of the shell block this replaces. A layer path that exists but
+ * dependencies. Listings are sorted in code-unit order with dotfiles ignored
+ * — matching the replaced shell block's `ls` under the C locale, and
+ * deliberately locale-independent so the same tree prints the same trail on
+ * every machine. A layer path that exists but
  * is not a directory is reported absent, never crashed on — zero output is
  * the silent failure this probe exists to stop.
  */

@@ -8,7 +8,7 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
-- Skills can ship executable skill scripts (`scripts/` beside `SKILL.md`), installed with the skill and SHA-tracked like any skill file (ADR-0047 Decision 1, task-0031). First consumer: `ad-audit`'s deterministic rules-resolution probe now runs as `scripts/resolve-rules.mjs` (Node, zero dependencies, no shell assumed; output matches the replaced shell block byte-for-byte) on both hosts; host copies are byte-parity-tested.
+- Skills can ship executable skill scripts (`scripts/` beside `SKILL.md`), installed with the skill and SHA-tracked like any skill file (ADR-0047 Decision 1, task-0031). First consumer: `ad-audit`'s deterministic rules-resolution probe now runs as `scripts/resolve-rules.mjs` (Node, zero dependencies, no shell assumed; deterministic locale-independent listings — matching the replaced shell block under C-locale collation) on both hosts; host copies are byte-parity-tested.
 
 - `ad-hooks` (both hosts): advisory-first debut rule — deterministic toolchain gates may block from day one; heuristic or novel gates debut warn-only with an explicit flip-to-block criterion.
 - Release discipline for the kit repo (task-0032, ADR-0048): `scripts/release.sh` (version bump + changelog rotation + release commit with DCO sign-off + annotated tag, stopping before push and publish), and three `lefthook.yml` gates — an advisory changelog reminder on npm-shipped content, a blocking over-72-char commit-subject check, and a blocking pre-push guard for `main`/`cli` — plus this changelog.
