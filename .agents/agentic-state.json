@@ -52,15 +52,15 @@
         },
         {
           "path": ".agents/skills/ad-audit/scripts/resolve-rules.mjs",
-          "sourceSha": "c9afcab772e101074eb1fc9d53d4cfb210072b1f8429a3eedf2d2da767827862"
+          "sourceSha": "cf9fb96be802aaae57ec4a801b27508a3812d2a0a72e2473c489e2f8c099be17"
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "071417ad55ad43ecd93c04e8e07d5eb820277286db1b5fe15674d011fca3eebf"
+          "sourceSha": "d88f3c564a99a16ceb58c611f0525db74c0d4cbe685364a5dfd602207cabb4be"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
-          "sourceSha": "1a7e70e970753707ea444ec20b14585c4763317f579aeb4a97e2824de932ced9"
+          "sourceSha": "d237b3472fe662730b72bc66b4f835effe456180629cf993ebf50a2bb319b979"
         }
       ]
     },
