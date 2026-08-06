@@ -11,6 +11,18 @@
 #   to origin must pass. The unit + integration suite covers state,
 #   install, update, profile, frontmatter, and Windows-path regressions;
 #   running it on every push catches regressions before they reach `cli`.
+# - pre-commit: `changelog-gate` (task-0032) warns — never blocks — when a
+#   commit touches shipped kit content (src/skills/, src/lib/, src/commands/,
+#   bin/) without staging a CHANGELOG.md entry. Advisory-first debut per
+#   ad-hooks' rule (the pairing heuristic is novel); flip-to-block criterion:
+#   two weeks without a false positive.
+# - commit-msg: `subject-check` (task-0032) blocks a subject over 72 chars —
+#   deterministic, so it may block from day one per the same ad-hooks rule —
+#   and warns on imperative-mood heuristics (trailing period, past-tense
+#   opener). Merge/Revert/fixup!/squash! subjects are exempt.
+#
+# After adding or removing a hook stage here, re-run `lefthook install` so
+# the corresponding .git/hooks stub exists.
 #
 # Lint/format pre-commit gates remain unwired — the kit has no eslint or
 # prettier today. Adding them is a separate decision once those tools are
@@ -28,6 +40,14 @@ pre-commit:
     leak-guard:
       run: node src/leak-guard.js
       stage_fixed: false
+    changelog-gate:
+      run: node scripts/changelog-gate.js
+      stage_fixed: false
+
+commit-msg:
+  commands:
+    subject-check:
+      run: node scripts/commit-subject-check.js {1}
 
 pre-push:
   parallel: false
