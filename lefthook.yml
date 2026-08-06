@@ -53,9 +53,12 @@ commit-msg:
     subject-check:
       run: node scripts/commit-subject-check.js {1}
 
+# NOTE: no `piped: true` here — combined with `use_stdin: true` it makes
+# lefthook skip EVERY pre-push command on an empty-diff push ("no matching
+# push files"), silently disabling branch-guard and npm-test. Observed and
+# pinned by test/lefthook-wiring.test.js.
 pre-push:
   parallel: false
-  piped: true
   commands:
     branch-guard:
       run: node scripts/push-branch-guard.js

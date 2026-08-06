@@ -91,6 +91,40 @@ test('release.sh: empty [Unreleased] refuses with a clean error', () => {
   }
 });
 
+test('release.sh: refuses a dirty working tree', () => {
+  const { dir, git, releaseSh } = mkReleaseRepo();
+  try {
+    writeFileSync(join(dir, 'CHANGELOG.md'), '# Changelog\n\n## [Unreleased]\n\n- Dirty edit.\n');
+    assert.throws(
+      () => releaseSh('prerelease'),
+      (error) => {
+        assert.match(error.stderr, /working tree has uncommitted changes/);
+        return true;
+      }
+    );
+    assert.equal(git('tag', '-l'), '', 'no tag created');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('release.sh: refuses when the target tag already exists', () => {
+  const { dir, git, releaseSh } = mkReleaseRepo();
+  try {
+    git('tag', 'v0.1.0-beta.2');
+    assert.throws(
+      () => releaseSh('prerelease'),
+      (error) => {
+        assert.match(error.stderr, /tag v0\.1\.0-beta\.2 already exists/);
+        return true;
+      }
+    );
+    assert.equal(git('status', '--porcelain'), '', 'refusal leaves the tree untouched');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('release.sh: refuses to run on main, suggesting the release branch', () => {
   const { dir, git, releaseSh } = mkReleaseRepo();
   try {
