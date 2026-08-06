@@ -20,6 +20,10 @@
 #   deterministic, so it may block from day one per the same ad-hooks rule —
 #   and warns on imperative-mood heuristics (trailing period, past-tense
 #   opener). Merge/Revert/fixup!/squash! subjects are exempt.
+# - pre-push: `branch-guard` (ADR-0048) blocks a push that updates main or
+#   cli — the audit of task-0032 measured main as having no GitHub-side
+#   protection, so the no-direct-push convention needed a mechanical layer.
+#   Deterministic; blocks from day one.
 #
 # After adding or removing a hook stage here, re-run `lefthook install` so
 # the corresponding .git/hooks stub exists.
@@ -51,7 +55,12 @@ commit-msg:
 
 pre-push:
   parallel: false
+  piped: true
   commands:
+    branch-guard:
+      run: node scripts/push-branch-guard.js
+      use_stdin: true
+      stage_fixed: false
     npm-test:
       run: npm test
       stage_fixed: false

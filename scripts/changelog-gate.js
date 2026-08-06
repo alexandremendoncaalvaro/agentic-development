@@ -18,7 +18,17 @@
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
-const WATCHED_PREFIXES = ['src/skills/', 'src/lib/', 'src/commands/', 'bin/'];
+// Mirrors package.json#files — everything npm ships — minus README.md and
+// LICENSE (meta files, rarely changelog-worthy). src/ is watched whole:
+// src/index.js and src/leak-guard.js are in the tarball too.
+const WATCHED_PREFIXES = [
+  'src/',
+  'bin/',
+  'templates/',
+  'prompts/',
+  'WORKFLOW.md',
+  'WORKFLOW-FLOWS.md',
+];
 
 /**
  * Decide whether a staged file set deserves a changelog reminder.
@@ -52,6 +62,6 @@ function main() {
   process.exit(0);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main();
 }

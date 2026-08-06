@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { changelogWarning } from '../scripts/changelog-gate.js';
 import { checkSubject } from '../scripts/commit-subject-check.js';
+import { pushViolation } from '../scripts/push-branch-guard.js';
 
 // --- changelog-gate (advisory: returns a warning string or null, never blocks) ---
 
@@ -11,8 +12,20 @@ test('changelog-gate: shipped kit content staged without CHANGELOG.md warns', ()
   assert.match(warning, /CHANGELOG\.md/);
 });
 
-test('changelog-gate: each watched prefix triggers the warning', () => {
-  for (const path of ['src/lib/install.js', 'src/commands/init.js', 'bin/agentic.js']) {
+test('changelog-gate: every npm-shipped path triggers the warning', () => {
+  // The watched set mirrors package.json#files minus README/LICENSE —
+  // including src/index.js and src/leak-guard.js, which ship in the tarball.
+  for (const path of [
+    'src/lib/install.js',
+    'src/commands/init.js',
+    'src/index.js',
+    'src/leak-guard.js',
+    'bin/agentic.js',
+    'templates/AGENTS.template.md',
+    'prompts/bootstrap.md',
+    'WORKFLOW.md',
+    'WORKFLOW-FLOWS.md',
+  ]) {
     assert.ok(changelogWarning([path]) !== null, `${path} should warn`);
   }
 });
@@ -21,13 +34,53 @@ test('changelog-gate: kit content plus a staged CHANGELOG.md entry passes', () =
   assert.equal(changelogWarning(['src/lib/install.js', 'CHANGELOG.md']), null);
 });
 
-test('changelog-gate: commits outside shipped kit content pass silently', () => {
-  assert.equal(changelogWarning(['doc/tasks/0032-kit-release-discipline.md', 'README.md']), null);
-  assert.equal(changelogWarning(['src/leak-guard.js', 'test/release.test.js']), null);
+test('changelog-gate: commits outside npm-shipped content pass silently', () => {
+  assert.equal(changelogWarning(['doc/tasks/0032-kit-release-discipline.md', 'lefthook.yml']), null);
+  assert.equal(changelogWarning(['test/release.test.js', 'scripts/release.sh']), null);
+});
+
+test('changelog-gate: README and LICENSE ship but are meta files — no warning', () => {
+  assert.equal(changelogWarning(['README.md', 'LICENSE']), null);
 });
 
 test('changelog-gate: empty staging area passes silently', () => {
   assert.equal(changelogWarning([]), null);
+});
+
+// --- push-branch-guard (blocks pushes that update main or cli) ---
+
+test('push-guard: a push updating refs/heads/main is blocked', () => {
+  const stdin = 'refs/heads/main abc123 refs/heads/main def456\n';
+  const violation = pushViolation(stdin, 'main');
+  assert.ok(violation !== null);
+  assert.match(violation, /main/);
+});
+
+test('push-guard: a push updating refs/heads/cli is blocked', () => {
+  const stdin = 'refs/heads/cli abc123 refs/heads/cli def456\n';
+  assert.ok(pushViolation(stdin, 'cli') !== null);
+});
+
+test('push-guard: a feature-branch push passes', () => {
+  const stdin = 'refs/heads/feat/x abc123 refs/heads/feat/x def456\n';
+  assert.equal(pushViolation(stdin, 'feat/x'), null);
+});
+
+test('push-guard: sneaking main in among feature refs is still blocked', () => {
+  const stdin =
+    'refs/heads/feat/x abc123 refs/heads/feat/x def456\n' +
+    'refs/heads/feat/x abc123 refs/heads/main def456\n';
+  assert.ok(pushViolation(stdin, 'feat/x') !== null);
+});
+
+test('push-guard: empty stdin falls back to the current branch', () => {
+  assert.ok(pushViolation('', 'main') !== null);
+  assert.equal(pushViolation('', 'feat/x'), null);
+});
+
+test('push-guard: tag pushes pass (only branch refs are guarded)', () => {
+  const stdin = 'refs/tags/v1.0.0 abc123 refs/tags/v1.0.0 000000\n';
+  assert.equal(pushViolation(stdin, 'feat/x'), null);
 });
 
 // --- commit-subject-check (length blocks; imperative-mood heuristics warn) ---
