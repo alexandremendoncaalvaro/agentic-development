@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../src/lib/detect.js';
 import { installSkills } from '../src/lib/install.js';
-import { updateRootDoc } from '../src/lib/rootdoc.js';
+import { updateRootDoc, rootDocAppendPrompt } from '../src/lib/rootdoc.js';
 import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from '../src/commands/init.js';
 
 function mkScratch() {
@@ -656,4 +656,32 @@ test('installSkills: missing skill source throws', async () => {
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// The interactive confirmation is the one ADR-0049 surface a TTY-less suite
+// cannot drive, so the decision it encodes lives in a pure function and is
+// asserted here rather than exercised through the TUI.
+test('rootDocAppendPrompt: a tracked root doc names the sharing risk and defaults to no', () => {
+  const { message, initialValue } = rootDocAppendPrompt('AGENTS.md', 'tracked');
+  assert.equal(initialValue, false, 'a shared file must not be pre-answered yes');
+  assert.match(message, /tracked by git/);
+  assert.match(message, /everyone who shares the repository/);
+  assert.match(message, /AGENTS\.md/);
+});
+
+test('rootDocAppendPrompt: an untracked root doc keeps the prior wording and yes default', () => {
+  const { message, initialValue } = rootDocAppendPrompt('AGENTS.md', 'untracked');
+  assert.equal(initialValue, true);
+  assert.match(message, /existing content preserved/);
+  assert.doesNotMatch(message, /tracked by git/);
+});
+
+test('rootDocAppendPrompt: unknown tracking state is treated as not shared', () => {
+  const unknown = rootDocAppendPrompt('CLAUDE.md', 'unknown');
+  const untracked = rootDocAppendPrompt('CLAUDE.md', 'untracked');
+  assert.deepEqual(
+    unknown,
+    untracked,
+    'no evidence of sharing must not become a warning the user cannot act on'
+  );
 });

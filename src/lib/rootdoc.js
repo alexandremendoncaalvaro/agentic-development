@@ -121,6 +121,39 @@ function replaceSection(body, newSection, bounds) {
 }
 
 /**
+ * Message and default answer for the interactive "append the managed section?"
+ * confirmation, given the root doc's name and its git tracking state.
+ *
+ * A tracked root doc is shared with everyone who clones the repository, so the
+ * prompt says exactly that and stops pre-answering yes (ADR-0049). The previous
+ * wording spoke only to content ("existing content preserved"), which reassures
+ * about the wrong risk: the hazard is not losing text, it is publishing a
+ * section into someone else's document.
+ *
+ * `unknown` is treated as `untracked` on purpose — absence of evidence that the
+ * file is shared is not evidence that it is, and a warning the user cannot act
+ * on trains them to dismiss the ones that matter.
+ *
+ * Pure and separate from the TUI so the decision is testable: the suite runs
+ * without a TTY and cannot drive the prompt itself.
+ */
+export function rootDocAppendPrompt(path, tracked) {
+  if (tracked === 'tracked') {
+    return {
+      message:
+        `${path} is tracked by git — this section will be visible to ` +
+        `everyone who shares the repository. Append the managed ` +
+        `"Skills installed by agentic" section anyway?`,
+      initialValue: false,
+    };
+  }
+  return {
+    message: `Append a managed "Skills installed by agentic" section to ${path}? (existing content preserved)`,
+    initialValue: true,
+  };
+}
+
+/**
  * Update or append the agentic-managed skills section in the project's root
  * doc (AGENTS.md preferred, CLAUDE.md as fallback). Never overwrites
  * user-authored content outside the marker block.

@@ -11,7 +11,8 @@ Implement [ADR-0049](../adr/0049-installer-shared-write-target-detection.md). To
 
 - [x] Read-only tracked-path probe (`src/lib/git.js`): returns tracked / untracked / unknown. Unresolvable git — no repository, no binary — yields `unknown` and never throws; detection must not be able to fail an install.
 - [ ] User-level install detection: resolve a user-level kit state file / skills directory and report it to the caller. Read-only.
-- [ ] Interactive root-doc confirmation (`src/commands/init.js`, `src/commands/update.js`) states that the file is version-controlled and that the section will be visible to everyone sharing the repository; default answer is no when the path is tracked.
+- [x] Interactive root-doc confirmation in `init.js` states that the file is version-controlled and that the section will be visible to everyone sharing the repository, and defaults to no when the path is tracked. The decision lives in the pure `rootDocAppendPrompt` in `src/lib/rootdoc.js` and is unit-tested; the suite has no TTY and cannot drive the prompt.
+- [ ] Same interactive confirmation in `update.js`, reusing `rootDocAppendPrompt`.
 - [x] `init.js` non-interactive `confirmAppend` refuses a tracked root doc: skips that write, states the reason on stderr, completes the rest of the install.
 - [x] `init.js` non-interactive `confirmReplace`: `init.js` never passed the callback at all, so `updateRootDoc`'s default — replace — silently rewrote a stale managed section in a tracked root doc. Both write paths now share one decision helper.
 - [ ] `update.js` equivalents for both callbacks.

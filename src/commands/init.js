@@ -13,7 +13,7 @@ import {
   profileOrDefault,
   requiredSkillsForProfile,
 } from '../lib/profiles.js';
-import { updateRootDoc } from '../lib/rootdoc.js';
+import { updateRootDoc, rootDocAppendPrompt } from '../lib/rootdoc.js';
 import { trackedState } from '../lib/git.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -355,10 +355,11 @@ export async function initCommand(opts) {
 
   const confirmAppend = interactive
     ? async (path) => {
-        const answer = await p.confirm({
-          message: `Append a managed "Skills installed by agentic" section to ${path}? (existing content preserved)`,
-          initialValue: true,
-        });
+        // Message and default come from rootDocAppendPrompt so the decision is
+        // unit-tested; a TTY-less suite cannot drive p.confirm itself.
+        const answer = await p.confirm(
+          rootDocAppendPrompt(path, trackedState(cwd, path))
+        );
         if (p.isCancel(answer)) return false;
         return answer;
       }
