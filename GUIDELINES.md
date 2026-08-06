@@ -205,20 +205,25 @@ Deterministic enforcement per [WORKFLOW.md §11](WORKFLOW.md). Wired by `lefthoo
 ```
 Developer commits
         |
-  pre-commit              intentionally absent (no lint/format wired)
+  pre-commit              leak-guard (ADR-0033, blocks) +
+                          changelog-gate (ADR-0048, warn-only)
+        |
+  commit-msg              subject-check (ADR-0048): >72-char subject
+                          blocks; imperative-mood heuristics warn
         |
   Developer pushes
         |
-  pre-push (lefthook)     npm test (full unit + integration suite)
-                          Bootstrap: `lefthook install` after clone.
-                          Config: lefthook.yml
+  pre-push (lefthook)     branch-guard (ADR-0048, blocks pushes updating
+                          main/cli), then npm test (full suite)
+                          Bootstrap: `lefthook install` after clone AND
+                          after any hook-stage change. Config: lefthook.yml
         |
   GitHub Actions CI       npm test across Node 20 / 22
                           .github/workflows/test.yml
 ```
 
-- **Pre-commit hook:** intentionally absent today. Adding lint/format gates is a separate decision (own ADR + Task per [ADR-0007](doc/adr/0007-workflow-operational-skills.md) §6).
-- **Pre-push hook:** `npm test` runs the full suite. Mandatory before push.
+- **Pre-commit / commit-msg hooks:** `leak-guard` ([ADR-0033](doc/adr/0033-house-ip-leak-guard.md)), `changelog-gate` and `subject-check` ([ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)). Lint/format gates remain unwired — adding them stays a separate decision (own ADR + Task per [ADR-0007](doc/adr/0007-workflow-operational-skills.md) §6).
+- **Pre-push hook:** `branch-guard` refuses a push updating `main`/`cli`, then `npm test` runs the full suite. Mandatory before push.
 - **CI:** mirrors pre-push across Node 20 / 22 matrix. Redundant with the local hook; both stay wired so a missing local install does not skip the gate.
 - **Never bypass.** No `--no-verify`, no skipped hooks, no deleted failing tests.
 - **CI failure is a local gate gap** ([WORKFLOW.md §11](WORKFLOW.md), TL;DR #22, [ADR-0032](doc/adr/0032-ci-failure-is-local-gate-gap.md)). Pre-push mirrors what CI runs — same commands, same matrix when it changes the failure surface. If CI catches something pre-push did not, close the gate locally; do not iterate red CI runs. `/ad-pr` refuses to open a PR on local red; `/ad-hooks` diffs pre-push against the CI config and warns on drift.
@@ -323,7 +328,7 @@ No `--no-verify`, no skipped hooks, no deleted failing tests (per [WORKFLOW.md �
 Every document in this repo follows these rules:
 
 1. **Definitions and decisions only.** No speculation, history, or unfounded plans.
-2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are exempt — their lifecycle fields are the auditability primitive.
+2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are exempt — their lifecycle fields are the auditability primitive. `CHANGELOG.md` at the repo root is exempt on the same ground ([ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)): it is the release record, and dated version headings are its auditability primitive.
 3. **No emoji anywhere.** Docs, code, comments, commits, PR bodies.
 4. **Business context first.** Open every document with *why* — the problem, the constraint, the user.
 5. **One scope per document. No duplication.** Canonical location owns the content; cross-references load-bearing only.
@@ -339,6 +344,7 @@ Every document in this repo follows these rules:
 | Document | Scope | Audience |
 |----------|-------|----------|
 | `README.md` | What the kit is, how to install, how to use | Users |
+| `CHANGELOG.md` | Consumer-visible changes per release (Keep a Changelog; rotated only by `scripts/release.sh`, per [ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)) | Users, maintainers |
 | `AGENTS.md` (+ `CLAUDE.md` mirror) | Distilled non-negotiable rules read every session | AI agents, contributors |
 | `WORKFLOW.md` | Universal engineering philosophy (kit-shipped to downstream installs) | Engineers |
 | `GUIDELINES.md` (this document) | Project-specific engineering standards | Engineers |
