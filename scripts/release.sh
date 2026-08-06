@@ -91,10 +91,15 @@ run git commit --signoff -m "chore(release): $NEW_VERSION"
 run git tag -a "v$NEW_VERSION" -F "$TAG_MSG_FILE"
 
 echo
-echo "release $NEW_VERSION committed and tagged locally (nothing pushed, nothing published)."
-echo "next steps:"
-echo "  git push -u origin $BRANCH        # then open the PR: /ad-pr"
-echo "  # after the PR merges:"
-echo "  git push origin v$NEW_VERSION"
-echo "  npm publish                        # npm OTP (2FA); publishConfig tags it beta"
-echo "  npm dist-tag ls @alexandrealvaro/agentic   # verify; see README 'Release and publish'"
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "[dry-run] nothing was written, committed, or tagged."
+  echo "[dry-run] a real run would commit and tag $NEW_VERSION, then stop (no push, no publish)."
+else
+  echo "release $NEW_VERSION committed and tagged locally (nothing pushed, nothing published)."
+  echo "next steps:"
+  echo "  git push -u origin $BRANCH        # then open the PR: /ad-pr"
+  echo "  # after the PR merges:"
+  echo "  git push origin v$NEW_VERSION"
+  echo "  npm publish                        # npm OTP (2FA); publishConfig tags it beta"
+  echo "  npm dist-tag ls @alexandrealvaro/agentic   # verify; see README 'Release and publish'"
+fi
