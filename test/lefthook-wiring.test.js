@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, writeFileSync, cpSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, cpSync, existsSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -42,6 +42,41 @@ function mkWiredRepo() {
   execFileSync(LEFTHOOK_BIN, ['install'], { cwd: work });
   return { dir, work, git };
 }
+
+test('regression: task-0033 the npm-test hook runner strips the git hook environment', () => {
+  // In a linked git worktree the hook-exported GIT_DIR leaks into the
+  // suite's child processes and points their git calls at THIS repo —
+  // observed turning 13 tests red and making pre-push unpassable
+  // (task-0033). The runner must spawn the gate with those vars gone.
+  const out = execFileSync(
+    'node',
+    [
+      join(KIT_ROOT, 'scripts', 'hook-npm-test.js'),
+      'node',
+      '-e',
+      'console.log(process.env.GIT_DIR ?? "unset", process.env.GIT_WORK_TREE ?? "unset", process.env.GIT_INDEX_FILE ?? "unset")',
+    ],
+    {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        GIT_DIR: '/poison',
+        GIT_WORK_TREE: '/poison',
+        GIT_INDEX_FILE: '/poison',
+      },
+    }
+  );
+  assert.match(out, /^unset unset unset$/m);
+});
+
+test('wiring: lefthook.yml routes the pre-push test gate through the env-stripping runner', () => {
+  const yml = readFileSync(join(KIT_ROOT, 'lefthook.yml'), 'utf8');
+  assert.match(
+    yml,
+    /run: node scripts\/hook-npm-test\.js/,
+    'pre-push npm-test must run via scripts/hook-npm-test.js — a bare `npm test` re-opens the worktree env leak'
+  );
+});
 
 test('wiring: an empty-diff push updating main is still blocked by branch-guard', { skip: !existsSync(LEFTHOOK_BIN) && 'lefthook binary not installed' }, () => {
   const { dir, git } = mkWiredRepo();
