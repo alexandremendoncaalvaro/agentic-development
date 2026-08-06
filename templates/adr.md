@@ -3,6 +3,8 @@
 **Status:** `<proposed | accepted | deprecated | superseded by ADR-NNNN>`
 **Date:** `<YYYY-MM-DD>`
 **Deciders:** `<names or roles>`
+**Amends:** `<ADR-NNNN — which part of it this decision changes. Status: covers whole-document supersession; this field covers the partial case it cannot express. Written as a pair: the target declares Amended by: pointing back. Omit the line entirely when none.>`
+**Amended by:** `<ADR-NNNN — which part of this decision it changed. Omit until it happens.>`
 
 ## Context
 

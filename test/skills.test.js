@@ -256,3 +256,212 @@ test('skill scripts: at least the ad-audit resolution probe ships', () => {
     'ad-audit must ship scripts/resolve-rules.mjs (task-0031 first consumer)'
   );
 });
+
+// --- The read contract: rule and delivery must not drift apart ---
+
+// WORKFLOW.md §1 states the three-rung read contract; ad-philosophy delivers it
+// as posture on both hosts. Two failure modes are being pinned. First, a host
+// that carries the rule while the other does not — the copy-drift the dual-host
+// source tree exists to prevent. Second, and the reason this test reads the
+// constitution too: the delivery cites `WORKFLOW.md` §1 *Reading order* by name,
+// so deleting or renaming that subsection would leave 25 installed skills
+// pointing at a section that no longer exists. A reference into a void is the
+// exact defect the read contract was written to reduce.
+
+test('the read contract is delivered on both hosts and its cited section exists', () => {
+  const workflow = readFileSync(join(REPO_ROOT, 'WORKFLOW.md'), 'utf8');
+  assert.ok(
+    workflow.includes('### Reading order'),
+    'WORKFLOW.md lost the `### Reading order` subsection that ad-philosophy cites by name'
+  );
+
+  for (const agent of ['claude-code', 'codex']) {
+    const path = join(SKILLS_ROOT, agent, 'ad-philosophy', 'SKILL.md');
+    const body = readFileSync(path, 'utf8');
+    assert.ok(
+      body.includes('*Reading order*'),
+      `${agent}/ad-philosophy does not deliver the read contract — WORKFLOW.md §1 states it, ` +
+        'so a host missing it reads every layer before every change'
+    );
+    for (const rung of ['definition layer', 'decision records', 'looks wrong']) {
+      assert.ok(
+        body.includes(rung),
+        `${agent}/ad-philosophy cites the read contract but drops the "${rung}" rung`
+      );
+    }
+  }
+});
+
+// --- Every WORKFLOW section a skill cites must exist ---
+
+// Skills cite the constitution by section number (`WORKFLOW §10`,
+// `WORKFLOW.md §4 + §5`). A citation is only worth its token cost if the
+// reader can follow it, and a renumbered or deleted section turns twenty-odd
+// pointers into dead ends silently — nothing else in the suite reads both
+// sides. Section headings carry ranges (`## 4–5.`), so the range is expanded
+// rather than matched literally.
+
+function workflowSectionNumbers(text) {
+  const found = new Set();
+  for (const match of text.matchAll(/^## ([0-9][0-9–—-]*)\./gm)) {
+    const bounds = match[1]
+      .split(/[–—-]/)
+      .map(Number)
+      .filter((n) => Number.isInteger(n));
+    if (bounds.length === 2) {
+      for (let n = bounds[0]; n <= bounds[1]; n += 1) found.add(n);
+    } else if (bounds.length === 1) {
+      found.add(bounds[0]);
+    }
+  }
+  return found;
+}
+
+test('every WORKFLOW.md section cited by a skill exists in WORKFLOW.md', () => {
+  const sections = workflowSectionNumbers(
+    readFileSync(join(REPO_ROOT, 'WORKFLOW.md'), 'utf8')
+  );
+  assert.ok(sections.size > 0, 'no numbered sections parsed out of WORKFLOW.md');
+
+  const dangling = [];
+  for (const agent of ['claude-code', 'codex']) {
+    for (const { name, dir } of listSkills(agent)) {
+      const path = join(dir, 'SKILL.md');
+      if (!existsSync(path)) continue;
+      const lines = readFileSync(path, 'utf8').split('\n');
+      lines.forEach((line, index) => {
+        if (!line.includes('WORKFLOW')) return;
+        for (const cite of line.matchAll(/§\s*([0-9]+)/g)) {
+          const num = Number(cite[1]);
+          if (!sections.has(num)) {
+            dangling.push(`${agent}/${name}/SKILL.md:${index + 1} cites WORKFLOW §${num}`);
+          }
+        }
+      });
+    }
+  }
+
+  assert.deepEqual(
+    dangling,
+    [],
+    `skills cite WORKFLOW sections that do not exist:\n  ${dangling.join('\n  ')}`
+  );
+});
+
+// --- Documentation Discipline: the contract and its delivery carry the same rules ---
+
+// WORKFLOW.md §2 states the rules; ad-philosophy is their operational delivery
+// (ADR-0008) and is what actually loads into an agent's context each session.
+// The two drifted apart unnoticed: the constitution declared thirteen rules
+// authoritative while the skill claimed eleven and listed eleven, so the
+// contract an agent obeyed was two rules short of the contract that bound it —
+// and one of the missing rules had no delivery anywhere in the kit. Nothing
+// read both sides, which is why the gap survived. Numbers are compared rather
+// than text: the delivery compresses each rule's wording on purpose.
+
+function disciplineRuleNumbers(text) {
+  // Anchor on the section's opening line, not on the phrase: both hosts mention
+  // "Documentation Discipline" in prose before the rules begin, and anchoring on
+  // the first mention slices a region that holds none of them. The three sources
+  // open the section three ways — `### `, `## `, and a bold lead-in.
+  const opener = text.match(/^(#{2,3} Documentation Discipline|\*\*Documentation Discipline\.\*\*)/m);
+  assert.ok(opener, 'no Documentation Discipline section opener found');
+  const after = text.slice(opener.index);
+  // WORKFLOW.md carries later numbered lists (§15's loop-construction ladder),
+  // so the slice stops at the next level-2 heading. `\n## ` cannot match
+  // `\n### ` — the third `#` is not the space — so the marker's own heading
+  // level does not matter.
+  const end = after.indexOf('\n## ', 1);
+  const section = end === -1 ? after : after.slice(0, end);
+  return new Set([...section.matchAll(/^(\d{1,2})\. \*\*/gm)].map((m) => Number(m[1])));
+}
+
+test('ad-philosophy delivers every Documentation Discipline rule WORKFLOW.md declares', () => {
+  const declared = disciplineRuleNumbers(
+    readFileSync(join(REPO_ROOT, 'WORKFLOW.md'), 'utf8')
+  );
+  assert.ok(declared.size >= 13, `parsed only ${declared.size} rules out of WORKFLOW.md`);
+
+  for (const agent of ['claude-code', 'codex']) {
+    const delivered = disciplineRuleNumbers(
+      readFileSync(join(SKILLS_ROOT, agent, 'ad-philosophy', 'SKILL.md'), 'utf8')
+    );
+    const missing = [...declared].filter((n) => !delivered.has(n)).sort((a, b) => a - b);
+    const extra = [...delivered].filter((n) => !declared.has(n)).sort((a, b) => a - b);
+    assert.deepEqual(
+      missing,
+      [],
+      `${agent}/ad-philosophy does not deliver WORKFLOW.md rule(s) ${missing.join(', ')}`
+    );
+    assert.deepEqual(
+      extra,
+      [],
+      `${agent}/ad-philosophy delivers rule(s) ${extra.join(', ')} that WORKFLOW.md does not declare`
+    );
+  }
+});
+
+// --- Amendment pairs in this repo's own ADR layer ---
+
+// Partial supersession is declared as a header-field pair (ADR-0049): the
+// amending record carries `Amends:`, the amended one carries `Amended by:`.
+// An unpaired field is invisible to anything but a prose read, which is the
+// cost the pair exists to remove — so the kit gates on its own rule rather
+// than only advising it through `ad-drift`.
+
+test('every ADR amendment declares both sides of the pair', () => {
+  const adrDir = join(REPO_ROOT, 'doc', 'adr');
+  // Relations, not files: one record can amend or be amended by several others,
+  // so each side is a set of `from>to` edges rather than one entry per file.
+  const amends = new Set();
+  const amendedBy = new Set();
+
+  for (const name of readdirSync(adrDir).filter((f) => /^\d{4}-.*\.md$/.test(f))) {
+    const id = name.slice(0, 4);
+    const body = readFileSync(join(adrDir, name), 'utf8');
+    for (const m of body.matchAll(/^\*\*Amends:\*\*\s*\[?ADR-(\d{4})/gm)) {
+      amends.add(`${id}>${m[1]}`);
+    }
+    for (const m of body.matchAll(/^\*\*Amended by:\*\*\s*\[?ADR-(\d{4})/gm)) {
+      amendedBy.add(`${id}>${m[1]}`);
+    }
+  }
+
+  const unpaired = [];
+  for (const edge of amends) {
+    const [from, to] = edge.split('>');
+    if (!amendedBy.has(`${to}>${from}`)) {
+      unpaired.push(`ADR-${from} declares Amends: ADR-${to}, but ADR-${to} has no matching Amended by:`);
+    }
+  }
+  for (const edge of amendedBy) {
+    const [from, to] = edge.split('>');
+    if (!amends.has(`${to}>${from}`)) {
+      unpaired.push(`ADR-${from} declares Amended by: ADR-${to}, but ADR-${to} has no matching Amends:`);
+    }
+  }
+
+  assert.deepEqual(unpaired, [], `unpaired ADR amendment fields:\n  ${unpaired.join('\n  ')}`);
+});
+
+// A projection is only worth reading if it is current, and the same-commit
+// habit that keeps it current is exactly what a hurried commit drops. The
+// record count is the cheapest part to verify mechanically, and it was already
+// wrong once: the ADR that introduced the projection was itself missing from
+// the total. Everything else on that page needs a human; this does not.
+
+test('the ADR projection states the number of records the directory actually holds', () => {
+  const adrDir = join(REPO_ROOT, 'doc', 'adr');
+  const projection = join(adrDir, 'PROJECTION.md');
+  if (!existsSync(projection)) return; // the projection is permitted, not required
+
+  const records = readdirSync(adrDir).filter((f) => /^\d{4}-.*\.md$/.test(f)).length;
+  const claimed = readFileSync(projection, 'utf8').match(/All (\d+) ADRs/);
+  assert.ok(claimed, 'PROJECTION.md no longer states a record total in the form "All N ADRs"');
+  assert.equal(
+    Number(claimed[1]),
+    records,
+    `PROJECTION.md claims ${claimed[1]} ADRs; doc/adr/ holds ${records}. ` +
+      'A decision that changes what binds updates the projection in the same commit.'
+  );
+});

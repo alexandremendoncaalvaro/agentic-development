@@ -13,7 +13,7 @@
         },
         {
           "path": ".agents/skills/ad-adr/SKILL.md",
-          "sourceSha": "02844f0762e7b799e54b010b07d13092092dbf533f5b4b3d98cffea6b6aeee95"
+          "sourceSha": "606ff3052599e71faebf34b666939fecf64693fb65c92152599cfd0efb6468b9"
         }
       ]
     },
@@ -138,7 +138,7 @@
         },
         {
           "path": ".agents/skills/ad-drift/SKILL.md",
-          "sourceSha": "3173ac52d8c893c30e6000e137c2b1acc96338106544ac53f53517ad080c35b9"
+          "sourceSha": "e4fcf0dd00de84648f3eb4f86065eaaf20e32690aacf3d70d921663846bd493b"
         }
       ]
     },
@@ -246,7 +246,7 @@
         },
         {
           "path": ".agents/skills/ad-philosophy/SKILL.md",
-          "sourceSha": "5cb4be1993389a2cfcc05e7f377e61f0163c99896a739771dba12669d2bb0ae0"
+          "sourceSha": "dbb9b9de9a8676e91d3121bd2c218bd5388902793061eb0227a7b99e40a64f8c"
         }
       ]
     },

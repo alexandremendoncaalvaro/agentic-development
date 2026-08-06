@@ -19,7 +19,7 @@ Step 3 — fill from conversation only. Use the template below. Fill Context, De
 `Consequences` lists positive and negative; do not balance for the sake of balance.
 `Alternatives Considered` lists each rejected option with a one-line reason.
 
-Step 4 — write the file. Path: `doc/adr/<NNNN>-<short-slug>.md`. Slug: kebab-case, ≤6 words. Status: proposed. Date: today, ISO format. Deciders: ask the user.
+Step 4 — write the file. Path: `doc/adr/<NNNN>-<short-slug>.md`. Slug: kebab-case, ≤6 words. Status: proposed. Date: today, ISO format. Deciders: ask the user. When this decision changes part of an earlier one, declare it in the header: `Status:` covers whole-document supersession, and the partial case — one stanza, one rejected alternative, one decision's realization — is what `Amends:` and `Amended by:` are for. Write `Amends: ADR-NNNN` here, then offer to add the matching `Amended by:` line to that ADR's header. The pair is the point: either field alone leaves a relation only prose can find, so a reader has to open every record in the directory to learn what still binds. Omit both lines entirely when there is no amendment — an empty field is worse than an absent one.
 
 Stop after writing. Do NOT flip status to accepted — that requires user review.
 </instructions>
@@ -30,6 +30,8 @@ Stop after writing. Do NOT flip status to accepted — that requires user review
 **Status:** `<proposed | accepted | deprecated | superseded by ADR-NNNN>`
 **Date:** `<YYYY-MM-DD>`
 **Deciders:** `<names or roles>`
+**Amends:** `<ADR-NNNN — which part of it this decision changes. Omit the line when none.>`
+**Amended by:** `<ADR-NNNN — which part of this decision it changed. Omit until it happens.>`
 
 ## Context
 
@@ -50,7 +52,7 @@ Stop after writing. Do NOT flip status to accepted — that requires user review
 </template>
 
 <output_contract>
-A single new file at `doc/adr/<NNNN>-<short-slug>.md`. Status proposed. No existing ADRs modified. No invented content.
+A single new file at `doc/adr/<NNNN>-<short-slug>.md`. Status proposed. No invented content. Existing ADRs are otherwise left alone, with one bounded exception: when this ADR declares `Amends: ADR-NNNN`, offer to add the matching `Amended by:` line to that ADR's header, and write it only on explicit confirmation. Header line only — the body stays the immutable record, so this records a new relation rather than retconning an old decision. Declining is a valid answer; `/ad-drift` reports the unpaired relation.
 
 ADRs are decision-record artifacts and are exempt from the no-dates rule (Documentation Discipline §2): `**Status:**` and `**Date:**` are required for Nygard supersession ordering. Remaining Documentation Discipline rules (`WORKFLOW.md` §2) apply at write time:
 - No emoji anywhere in the file.
