@@ -1,11 +1,11 @@
-# task-0034: Installer detects a shared write target (ADR-0049)
+# task-0035: Installer detects a shared write target (ADR-0050)
 
 **Status:** in-progress
 **Date:** 2026-08-06
 
 ## Goal
 
-Implement [ADR-0049](../adr/0049-installer-shared-write-target-detection.md). Today `agentic init` appends a managed section to a project's root `AGENTS.md` and copies the skill tree into the repo without knowing whether either is shared with other people, and without knowing the practitioner already has the kit installed at the user level where it serves every repo. The non-interactive path hard-codes consent for the root-doc write, so the write that reached an employer's tracked `AGENTS.md` printed no prompt at all and the cleanup was manual. This task makes the installer establish both facts before writing and refuse to guess when it cannot ask.
+Implement [ADR-0050](../adr/0050-installer-shared-write-target-detection.md). Today `agentic init` appends a managed section to a project's root `AGENTS.md` and copies the skill tree into the repo without knowing whether either is shared with other people, and without knowing the practitioner already has the kit installed at the user level where it serves every repo. The non-interactive path hard-codes consent for the root-doc write, so the write that reached an employer's tracked `AGENTS.md` printed no prompt at all and the cleanup was manual. This task makes the installer establish both facts before writing and refuse to guess when it cannot ask.
 
 ## Checklist
 
@@ -19,7 +19,7 @@ Implement [ADR-0049](../adr/0049-installer-shared-write-target-detection.md). To
 - [x] Override flag on `init` — `--force-root-doc`, boolean, surfaced in `--help`, named separately from `update`'s existing `--force` because that one means "overwrite user-edited files on conflict". The release-blocking gap is closed for `init`.
 - [x] Same override on `update` — `--force-root-doc`, now non-inert alongside update.js's refusal.
 - [x] `.git/info/exclude` writer (`writeExcludeEntries` + `installedPathsToExclude` in `src/lib/git.js`): anchored by filename, never a directory, idempotent, `.gitignore` never touched, fail-open outside a repo. Offered via `offerKitExclude` (interactive) shared by init and update.
-- [x] Install summary reports a user-level install. Note: it appears in the post-install summary (ADR-0049 Decision 2 names "the install summary"), not the pre-install confirmation, so "still decline" means decline to commit / uninstall rather than abort mid-run.
+- [x] Install summary reports a user-level install. Note: it appears in the post-install summary (ADR-0050 Decision 2 names "the install summary"), not the pre-install confirmation, so "still decline" means decline to commit / uninstall rather than abort mid-run.
 - [x] Tests for the first slice: non-interactive refusal on a tracked root doc, and `untracked`-inside-a-repository still appends. The pre-existing suite covers `unknown` incidentally, since its scratch directories are not repositories.
 - [x] Test that the override flag reaches the write the refusal skips, driven through both failure modes (absent flag, then wrong behaviour).
 - [x] Tests: exclude writer anchored/idempotent/fail-open; `installedPathsToExclude` drops a tracked file in a mixed-ownership dir; `offerKitExclude` non-interactive writes nothing; `userLevelInstallPath` found/absent; update.js append-refusal + `--force-root-doc` append + `--force-root-doc` replace.
@@ -32,7 +32,7 @@ Implement [ADR-0049](../adr/0049-installer-shared-write-target-detection.md). To
 
 ### 2026-08-06
 
-Registered from ADR-0049, whose evidence was re-derived at source rather than inherited. A fixture run of `init --agent claude-code -y` against a tracked `AGENTS.md` wrote the managed section with no prompt and left 33 untracked kit files with no exclusion. Separately, the practitioner's machine already carries the full `ad-*` set at `~/.claude/skills/` with its own state file, so every skill file written into the employer repository duplicated one already in service.
+Registered from ADR-0050, whose evidence was re-derived at source rather than inherited. A fixture run of `init --agent claude-code -y` against a tracked `AGENTS.md` wrote the managed section with no prompt and left 33 untracked kit files with no exclusion. Separately, the practitioner's machine already carries the full `ad-*` set at `~/.claude/skills/` with its own state file, so every skill file written into the employer repository duplicated one already in service.
 
 The obvious rule — never write into a tracked file the installer did not create — is rejected in the ADR: this repository's own managed section is committed deliberately, as a personal project's would be. Consent, not tracked-ness, is the axis.
 

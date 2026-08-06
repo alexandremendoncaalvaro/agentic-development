@@ -15,7 +15,7 @@ function gitOut(args, cwd) {
  *
  * Returns `'tracked' | 'untracked' | 'unknown'`. A tracked path is shared with
  * everyone who clones the repository, which is what decides whether the
- * installer may write to it unattended (ADR-0049).
+ * installer may write to it unattended (ADR-0050).
  *
  * `'unknown'` is the fail-open answer for "not a repository" and for "no git
  * binary on PATH". This is the deliberate opposite of `src/leak-guard.js`,
@@ -49,7 +49,7 @@ export function trackedState(cwd, relPath) {
  * mixed-ownership directory (a team-authored subagent tracked in the same
  * `.claude/agents/` where the kit installs its reviewers) the team file must
  * stay visible to git, which is exactly why exclusion is by filename and never
- * by directory (ADR-0049 Decision 4).
+ * by directory (ADR-0050 Decision 4).
  *
  * @param {string} cwd  Repo working directory.
  * @param {string[]} relPaths  Installed file paths relative to cwd (POSIX).
@@ -74,7 +74,7 @@ export function installedPathsToExclude(cwd, relPaths) {
 
 /**
  * Add per-clone exclude entries for kit files the installer just wrote, so
- * they are never accidentally committed into a shared repo (ADR-0049 Decision
+ * they are never accidentally committed into a shared repo (ADR-0050 Decision
  * 4). Entries go in `.git/info/exclude` — the per-clone, never-committed
  * exclusion — never in `.gitignore`, which is team-visible.
  *

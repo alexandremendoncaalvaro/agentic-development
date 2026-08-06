@@ -682,7 +682,7 @@ test('installSkills: missing skill source throws', async () => {
   }
 });
 
-// The interactive confirmation is the one ADR-0049 surface a TTY-less suite
+// The interactive confirmation is the one ADR-0050 surface a TTY-less suite
 // cannot drive, so the decision it encodes lives in a pure function and is
 // asserted here rather than exercised through the TUI.
 test('rootDocAppendPrompt: a tracked root doc names the sharing risk and defaults to no', () => {

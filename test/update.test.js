@@ -38,7 +38,7 @@ function runUpdate(cwd, args = []) {
   });
 }
 
-// A scratch directory that is a real git repository, for the ADR-0049
+// A scratch directory that is a real git repository, for the ADR-0050
 // tracked-root-doc guard: update must not regenerate a managed section in a
 // file that is shared with the team.
 function mkGitScratch() {
@@ -57,7 +57,7 @@ const STALE_ROOT_DOC =
 
 // The unguarded update.js hole is the APPEND path (confirmAppend was
 // unconditional): a tracked root doc with no managed section yet.
-test('update -y does not append a section into a tracked sectionless root doc (ADR-0049)', () => {
+test('update -y does not append a section into a tracked sectionless root doc (ADR-0050)', () => {
   const { dir, git } = mkGitScratch();
   try {
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');
@@ -81,7 +81,7 @@ test('update -y does not append a section into a tracked sectionless root doc (A
   }
 });
 
-test('update -y --force-root-doc appends into a tracked sectionless root doc (ADR-0049)', () => {
+test('update -y --force-root-doc appends into a tracked sectionless root doc (ADR-0050)', () => {
   const { dir, git } = mkGitScratch();
   try {
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');
@@ -101,7 +101,7 @@ test('update -y --force-root-doc appends into a tracked sectionless root doc (AD
   }
 });
 
-test('update -y leaves a stale section in a TRACKED root doc alone without a flag (ADR-0049)', () => {
+test('update -y leaves a stale section in a TRACKED root doc alone without a flag (ADR-0050)', () => {
   const { dir, git } = mkGitScratch();
   try {
     writeFileSync(join(dir, 'AGENTS.md'), STALE_ROOT_DOC);
@@ -125,7 +125,7 @@ test('update -y leaves a stale section in a TRACKED root doc alone without a fla
 // case. On an UNTRACKED doc it must NOT destroy a hand-edited section — only
 // --force governs that. Before the fix, forceRootDoc short-circuited ahead of
 // the tracked check and wiped the edit.
-test('update -y --force-root-doc preserves a hand-edit in an UNTRACKED root doc (ADR-0049 Blocker B)', () => {
+test('update -y --force-root-doc preserves a hand-edit in an UNTRACKED root doc (ADR-0050 Blocker B)', () => {
   const { dir } = mkGitScratch();
   try {
     runInit(dir, ['--agent', 'claude-code', '-y']); // installs skills + state, no root doc
@@ -170,7 +170,7 @@ test('update -y --force regenerates a hand-edited section in an UNTRACKED root d
 
 // The replace path already refused unattended (its pre-existing --force gate),
 // but --force-root-doc must drive it too, distinct from --force.
-test('update -y --force-root-doc regenerates a stale section in a tracked root doc (ADR-0049)', () => {
+test('update -y --force-root-doc regenerates a stale section in a tracked root doc (ADR-0050)', () => {
   const { dir, git } = mkGitScratch();
   try {
     writeFileSync(join(dir, 'AGENTS.md'), STALE_ROOT_DOC);
