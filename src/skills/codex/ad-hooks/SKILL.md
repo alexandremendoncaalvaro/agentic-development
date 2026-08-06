@@ -15,6 +15,7 @@ Step 0 — confirm the gates the user wants. WORKFLOW §11 names two tiers:
 - Pre-commit (fast): lint, format, secret-scan. Runs on every commit. Keep under ~5s; slow pre-commits push devs to `--no-verify`.
 - Pre-push (thorough): build, unit tests, integration tests. Runs on every push. Acceptable to be slow.
 - Pre-commit review gate (opt-in third tier — ADR-0047): wire `/ad-review` — or `/ad-audit` for team-bound work — over the staged work before it commits, confirmed findings blocking the commit. Trade-off belongs to the user: front-loads fixing (fits parallel workflows) but bottlenecks a frequent committer. Offer it; never scaffold unasked, never as a default.
+- Advisory-first debut for heuristic gates: deterministic toolchain gates (lint, format, build, test) may block from day one — reproducible verdicts. Heuristic or novel gates (secret-scan patterns, the review gate) debut warn-only, with an explicit flip-to-block criterion stated at scaffold time. A gate that blocks before earning trust trains the user to bypass gates in general.
 
 Confirm both tiers are in scope. If the user wants only one, scaffold only that tier.
 

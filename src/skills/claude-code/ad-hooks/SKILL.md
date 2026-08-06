@@ -17,6 +17,8 @@ Scaffolds the deterministic gates `WORKFLOW.md` §11 names. The skill writes con
 * **Pre-push (thorough):** build, unit tests, integration tests. Runs on every push. Acceptable to be slow; the cost is paid less often than commit.
 * **Pre-commit review gate (opt-in third tier — ADR-0047):** wire `/ad-review` — or `/ad-audit` for team-bound work — to run over the staged work before it commits, confirmed findings blocking the commit. The trade-off is real and belongs to the user: it front-loads the fixing (fits parallel, queue-several-agents workflows) but bottlenecks a frequent committer. Offer it; never scaffold it unasked, never as a default.
 
+**Advisory-first debut for heuristic gates.** Deterministic toolchain gates (lint, format, build, test) may block from day one — their verdicts are reproducible. Heuristic or novel gates (secret-scan patterns, the review gate above) debut **warn-only**, with an explicit flip-to-block criterion stated at scaffold time (e.g. "two weeks without a false positive"). A gate that blocks before it has earned trust trains the user to bypass gates in general — the opposite of what it exists for.
+
 Confirm both tiers are in scope for this project. If the user wants only one tier, scaffold only that tier — do not add gates the user did not ask for.
 
 Visual / E2E for UI projects (Cypress, Playwright, Claude in Chrome) are mentioned by §11 but live in CI, not pre-push. Out of scope for this skill.
