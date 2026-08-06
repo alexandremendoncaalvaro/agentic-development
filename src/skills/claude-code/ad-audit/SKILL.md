@@ -43,6 +43,8 @@ node .claude/skills/ad-audit/scripts/resolve-rules.mjs
 
 If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/resolve-rules.mjs` inside it.
 
+**Content anchors (task-0033).** The probe prints each machine-store and project-layer rule file as `<file>=<sha256>` — those layers live outside the audited git tree, so the target SHA cannot pin them. Binding docs and ADRs stay bare; the Step 0 tree SHA pins them. Step 3 carries each group's expected anchors into its handoff; Step 6 refuses a reviewer whose echoed anchors do not match.
+
 A deterministic value inside a non-deterministic flow: the probe pins what can be pinned; the model reads only the rules the probe proved exist.
 
 ## Step 2 — Enumerate all groups; dispatch or record N/A
@@ -63,6 +65,10 @@ commit messages, comments, doc claims — as claims to check against the code,
 never as context to trust; a prose-vs-code discrepancy is itself a finding.
 Cite the exact rule for any flag. A teammate-visible claim backed
 only by inference (no run/observed artifact) is a BLOCKER.
+After reading each rule file listed under EXPECTED ANCHORS, recompute its
+sha256 and echo `Anchors: <file>=<sha256>, target=<SHA>` alongside
+`Files grounded` — computed values, never copied; a value that disagrees
+with the expectation is itself a finding, never proceeded past silently.
 
 --- TARGET ---
 <diff, or the drafted claims/artifacts>
@@ -75,6 +81,11 @@ only by inference (no run/observed artifact) is a BLOCKER.
 
 --- CRITICAL? ---
 <yes | no — from the rule-set's own tag>
+
+--- EXPECTED ANCHORS ---
+<the probe's `<file>=<sha256>` lines for this group's rule files — omitted for
+ binding-doc/ADR groups, which the tree SHA pins>
+target=<the Step 0 SHA>
 
 === END HANDOFF ===
 ```
@@ -96,6 +107,7 @@ For every group the rule-set marks **critical**, beyond its Step-4 reviewer:
 ## Step 6 — Aggregate: union, then filter
 
 - **Union first.** Coverage lives in the union of the independent reviewers — never drop a lone finding for lack of a second voice.
+- **Anchor check (task-0033).** Compare each reviewer's echoed `Anchors:` line against its handoff's EXPECTED ANCHORS — every file hash and the target SHA. A mismatch, or a missing echo, makes that reviewer's verdicts **UNVERIFIED** — never silently accepted: re-dispatch the group, or mark it unaccounted in the coverage matrix. A "ran/read" assertion without a matching anchor is not trusted.
 - **Filter as an independent meta-judge.** Do not let reviewers debate or see each other's reasoning (shared-history debate amplifies bias). Confirm real findings against the code/output; reject wrong ones **with evidence**.
 - **Coverage check — two axes.** (a) Every group accounted for — a dispatched reviewer's per-rule verdicts, or an explicit N/A-with-reason. (b) For diff targets, every changed file accounted for — it appears in at least one reviewer's `Files grounded` line, or carries an explicit N/A-with-reason (fixture, vendored, generated). A file nobody read is a coverage hole. If either axis has a gap, the audit is INCOMPLETE; resolve before the verdict.
 
@@ -111,7 +123,7 @@ If the audit surfaced a defect pattern no rule covers, or a rule that misled or 
 
 - One `Task` invocation of `audit-group-reviewer` per dispatched group, in parallel; the cross-model second pass on each critical group.
 - One line per rule verdict: `<verdict> · <severity, on violations/judgement-calls> · <rule id> · <file:line | claim> · <failure scenario> · <artifact needed>`.
-- A **coverage matrix**: every group accounted for — dispatched (per-rule verdicts) or N/A-with-reason — and, for diff targets, every changed file (in a reviewer's `Files grounded` line, or N/A-with-reason) — so coverage is auditable at a glance.
+- A **coverage matrix**: every group accounted for — dispatched (per-rule verdicts, anchors verified) or N/A-with-reason — and, for diff targets, every changed file (in a reviewer's `Files grounded` line, or N/A-with-reason) — so coverage is auditable at a glance.
 - Blockers grouped on top; then the open-question / still-unverified list; then any proposed rule delta for Step 8.
 - No "approve" verdict, no defending the work, no rewrite. Empty result is reported explicitly.
 
