@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../lib/detect.js';
-import { installSkills } from '../lib/install.js';
+import { installKitDocs, installSkills } from '../lib/install.js';
 import { saveState, loadState } from '../lib/state.js';
 import {
   DEFAULT_PROFILE,
@@ -324,6 +324,10 @@ export async function initCommand(opts) {
     // No post-hoc injection.
     saveState(cwd, agent, nextStates[agent]);
   }
+
+  // Agent-independent: the Constitution lands once at the target root, not per
+  // agent surface, so it sits outside the loop above.
+  allActions.push(...installKitDocs({ cwd }));
 
   // Dedup: ad-architecture and ad-adr are universal at team /
   // mature (in REQUIRED_SKILLS) AND conditional at solo (in

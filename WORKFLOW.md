@@ -82,6 +82,18 @@ Three rules apply across all of the above:
 - **Acceptance criteria must be durable, not procedural.** Describe the behavior and the interfaces — the contracts that survive a rename. Avoid file paths, line numbers, and "open file X and add line Y" wording in the criteria themselves; those rot the moment the implementation moves. Procedural execution steps belong in a separate section of the task file, not in the criteria.
 - **Prune.** If removing a line wouldn't make the agent fail, cut it.
 
+### Reading order
+
+The stack above is a write contract — which artifact owns which decision. This is the read contract, and it exists because volume of reading is not comprehension. An agent that loads every layer before every change spends its context on material that does not bear on the change, and reaches the edit with less precision than one that read three files. Apply a stop criterion (§7) to reading itself.
+
+Three rungs, in order. Climb only as far as the change requires, then stop.
+
+1. **Always, before anything: the definition layer.** Every document whose role is *definition* under §2 rule 9 — enumerating them here would only drift from that rule. By role they describe the present, which makes them the cheapest correct starting point. A change whose shape they already settle stops here.
+2. **When the change touches an area: that area's decision records.** The specific ADR or spec that binds the area, not the layer's whole directory. A layer carrying a state projection (§2 rule 10) is where that lookup lands in one read. If finding the record requires opening every record, that is a defect in the layer — not a license to read them all.
+3. **Only when a decision looks wrong: the evidence behind it.** The task file, the git history, the measurement that produced the number. This rung is mostly meant to be skipped: a decision that reads oddly but holds is the common case, and reading its evidence in order to re-argue it is the cost this order exists to prevent.
+
+The order is one-way. An agent that reaches rung 3 without rung 1 reconstructs from evidence what a definition document already stated, and re-opens what was already settled — the two failure modes this contract is written against.
+
 ## 2. Docs vs. Code
 
 Avoid putting implementation code in docs unless it's executable, generated, or a minimal API/contract surface. Docs define intent, constraints, contracts, and decisions; production logic lives in code.
@@ -103,7 +115,7 @@ The rules below are canonical.
 7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a GitHub Issue or a `doc/tasks/NNNN-*.md` task.
 8. **Tests are living documentation of behavior.**
 9. **Single responsibility per document, named by layer.** Each document plays exactly one role — **definition** (pillar Layers 1, 2, 3 plus `ARCHITECTURE.md`; read-mostly after defined; no per-item tracking UI), **decision-record** (ADRs, Specs; single `Status:` field; mostly immutable after acceptance), or **tracking** (Tasks; full checkbox / append-only-Notes UI is their job). A document does not take on adjacent layers' responsibilities.
-10. **Each layer owns its directory index. No duplication across docs.** `doc/adr/` is the canonical ADR index; `doc/tasks/`, `doc/specs/`, `doc/product/` likewise own their layers. Other documents do not list / digest / re-state these indices.
+10. **Each layer owns its directory index. No duplication across docs.** `doc/adr/` is the canonical ADR index; `doc/tasks/`, `doc/specs/`, `doc/product/` likewise own their layers. Other documents do not list / digest / re-state these indices. One exception, inside the layer only: **a layer whose artifacts are append-only may own a single state projection in its own directory**, named `PROJECTION.md` so tooling can find it without guessing — one screen naming which records still bind and what corrected the rest. A filesystem listing carries names, not state, and a projection with no legal home reappears as a hand-maintained digest inside a definition document, which is the duplication this rule exists to stop. A projection that lists records without saying what still binds is a duplicate index and stays forbidden.
 11. **Cross-references must be load-bearing.** If you can delete the reference and the surrounding statement still stands, the reference was decoration — drop it.
 12. **Universal-vs-kit-state separation.** `WORKFLOW.md` ships to downstream projects and carries universal principles only — it does not cite kit-specific ADR numbers. The kit's adoption of each principle is recorded in `doc/adr/` (kit-internal). Literature citations remain (they are universal load-bearing references).
 13. **Cite a commit range by tag, not by SHA.** Rebase, squash-merge and history rewrite all change hashes; tags survive them. Single-commit citations stay governed by rules 9 and 11.

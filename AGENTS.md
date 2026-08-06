@@ -69,7 +69,7 @@ doc/adr/NNNN-<slug>.md               Layer 5 Plans / Decisions — binding ADRs 
 doc/tasks/NNNN-<slug>.md             Layer 5 Plans / Decisions — task tracking with checkbox AC + append-only Notes
 ```
 
-Binding ADRs: see [`doc/adr/`](doc/adr/) (all accepted). Skill source lives under `src/skills/`; the repo also self-installs the kit into its own `.claude/skills/` and `.agents/skills/` for dogfood, so contributors get the same agent surface (`/ad-bootstrap`, `/ad-spec`, `/ad-task`, `/ad-ground`, `/ad-review`, etc.) when working on the kit itself. Source under `src/skills/` is canonical; the installed copies under `.claude/skills/` and `.agents/skills/` are kept in sync via `node bin/agentic.js update`.
+Binding ADRs: see [`doc/adr/`](doc/adr/); [`doc/adr/PROJECTION.md`](doc/adr/PROJECTION.md) names which parts still bind. Skill source lives under `src/skills/`; the repo also self-installs the kit into its own `.claude/skills/` and `.agents/skills/` for dogfood, so contributors get the same agent surface (`/ad-bootstrap`, `/ad-spec`, `/ad-task`, `/ad-ground`, `/ad-review`, etc.) when working on the kit itself. Source under `src/skills/` is canonical; the installed copies under `.claude/skills/` and `.agents/skills/` are kept in sync via `node bin/agentic.js update`.
 
 ## Commit & PR Conventions
 

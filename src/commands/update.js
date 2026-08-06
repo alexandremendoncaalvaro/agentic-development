@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures } from '../lib/detect.js';
-import { installSkills, removeOrphanSkills } from '../lib/install.js';
+import { installKitDocs, installSkills, removeOrphanSkills } from '../lib/install.js';
 import { loadState, saveState } from '../lib/state.js';
 import {
   DEFAULT_PROFILE,
@@ -291,6 +291,11 @@ export async function updateCommand(opts) {
     nextStates[agent] = result.nextStates[agent];
   }
 
+  // Agent-independent: the Constitution lands once at the target root, not per
+  // agent surface, so it sits outside the loop above. An update refreshes it
+  // because the kit owns the content — see installKitDocs.
+  allActions.push(...installKitDocs({ cwd, dryRun, force }));
+
   if (!dryRun) {
     for (const agent of agents) {
       saveState(cwd, agent, nextStates[agent]);
@@ -340,7 +345,9 @@ export async function updateCommand(opts) {
 
   const lines = allActions.map((a) => {
     const sym = ACTION_SYMBOL[a.type] ?? '?';
-    return `${sym} [${a.agent}] ${a.path}`;
+    // Kit-doc actions are agent-independent and carry no `agent` field; tagging
+    // them would print `[undefined]`.
+    return a.agent ? `${sym} [${a.agent}] ${a.path}` : `${sym} ${a.path}`;
   });
   if (rootDocAction.type !== 'absent') {
     lines.push(`${ROOT_DOC_LABEL[rootDocAction.type]}${rootDocAction.path}`);
