@@ -51,8 +51,12 @@
           "sourceSha": "c6397d113b8b485635475589e536041cd56c0e3bdac08026c41d5e933fcd6ba8"
         },
         {
+          "path": ".agents/skills/ad-audit/scripts/resolve-rules.mjs",
+          "sourceSha": "0bc0ee95cd0502a6a4eabd40bf30c44e09982d34d87dbccb43bbdd8a5dd31281"
+        },
+        {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "fec1e738d010b2b0eb3e8fc0628d163753059449f85865de246d9d2c9a839b86"
+          "sourceSha": "071417ad55ad43ecd93c04e8e07d5eb820277286db1b5fe15674d011fca3eebf"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
