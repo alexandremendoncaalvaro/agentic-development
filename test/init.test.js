@@ -309,6 +309,35 @@ test('init -y leaves a git-tracked root doc unmodified (ADR-0049)', () => {
   }
 });
 
+// The append path is not the only unattended write: a root doc that already
+// carries a stale managed section takes the *replace* path instead, and
+// init.js never passed confirmReplace at all, so the library default (replace)
+// applied. Same hazard, different branch.
+test('init -y leaves a stale managed section in a tracked root doc alone', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# AGENTS.md\n\n<!-- agentic-managed-skills:start -->\n\n' +
+        '## Skills installed by `agentic`\n\nstale table\n\n' +
+        '<!-- agentic-managed-skills:end -->\n'
+    );
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'team baseline with a stale managed section');
+    const before = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+
+    assert.equal(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      before,
+      'a tracked root doc must not be rewritten unattended on the replace path either'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('init -y --force-root-doc writes into a tracked root doc (ADR-0049)', () => {
   const { dir, git } = mkGitScratch();
   try {

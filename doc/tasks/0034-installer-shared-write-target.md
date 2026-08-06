@@ -13,7 +13,7 @@ Implement [ADR-0049](../adr/0049-installer-shared-write-target-detection.md). To
 - [ ] User-level install detection: resolve a user-level kit state file / skills directory and report it to the caller. Read-only.
 - [ ] Interactive root-doc confirmation (`src/commands/init.js`, `src/commands/update.js`) states that the file is version-controlled and that the section will be visible to everyone sharing the repository; default answer is no when the path is tracked.
 - [x] `init.js` non-interactive `confirmAppend` refuses a tracked root doc: skips that write, states the reason on stderr, completes the rest of the install.
-- [ ] `init.js` non-interactive `confirmReplace`: today `init.js` never passes `confirmReplace` to `updateRootDoc`, so the library default silently replaces an existing stale managed section even unattended.
+- [x] `init.js` non-interactive `confirmReplace`: `init.js` never passed the callback at all, so `updateRootDoc`'s default — replace — silently rewrote a stale managed section in a tracked root doc. Both write paths now share one decision helper.
 - [ ] `update.js` equivalents for both callbacks.
 - [x] Override flag on `init` — `--force-root-doc`, boolean, surfaced in `--help`, named separately from `update`'s existing `--force` because that one means "overwrite user-edited files on conflict". The release-blocking gap is closed for `init`.
 - [ ] Same override on `update`, to land together with `update.js`'s refusal — the flag would be inert there today, so `--help` would be advertising a no-op.

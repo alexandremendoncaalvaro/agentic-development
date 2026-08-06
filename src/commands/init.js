@@ -337,6 +337,22 @@ export async function initCommand(opts) {
     ]),
   ].filter((s) => installedSkillSet.has(s));
 
+  // A non-interactive run has nobody to ask, so it must not decide for the
+  // team: a tracked root doc is shared with everyone who clones the repo
+  // (ADR-0049). Unknown tracking state keeps the prior behaviour. Shared by
+  // both root-doc write paths — appending a new section and replacing a stale
+  // one are the same hazard on the same file.
+  const allowUnattendedRootDocWrite = (path) => {
+    if (opts.forceRootDoc) return true;
+    if (trackedState(cwd, path) !== 'tracked') return true;
+    process.stderr.write(
+      `skipped ${path}: tracked by git, so the managed section would be ` +
+        `visible to everyone sharing this repository. Re-run interactively ` +
+        `to decide, or pass --force-root-doc.\n`
+    );
+    return false;
+  };
+
   const confirmAppend = interactive
     ? async (path) => {
         const answer = await p.confirm({
@@ -346,24 +362,21 @@ export async function initCommand(opts) {
         if (p.isCancel(answer)) return false;
         return answer;
       }
-    : // A non-interactive run has nobody to ask, so it must not decide for the
-      // team: a tracked root doc is shared with everyone who clones the repo
-      // (ADR-0049). Unknown tracking state keeps the prior append behaviour.
-      async (path) => {
-        if (opts.forceRootDoc) return true;
-        if (trackedState(cwd, path) !== 'tracked') return true;
-        process.stderr.write(
-          `skipped ${path}: tracked by git, so the managed section would be ` +
-            `visible to everyone sharing this repository. Re-run interactively ` +
-            `to decide, or pass --force-root-doc.\n`
-        );
-        return false;
-      };
+    : async (path) => allowUnattendedRootDocWrite(path);
+
+  // Distinct from the `confirmReplace` passed to installSkills above: that one
+  // resolves a skill-file conflict and receives a question, this one receives
+  // the root doc's name. Named as in update.js, which already separates them.
+  // Interactive refresh of a stale section stays silent, as before.
+  const confirmRootDocReplace = interactive
+    ? async () => true
+    : async (path) => allowUnattendedRootDocWrite(path);
 
   const rootDocAction = await updateRootDoc({
     cwd,
     skills: skillDisplayOrder,
     confirmAppend,
+    confirmReplace: confirmRootDocReplace,
   });
 
   const lines = allActions.map((a) => `${ACTION_SYMBOL[a.type]} ${a.path}`);
