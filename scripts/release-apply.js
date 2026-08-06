@@ -67,4 +67,9 @@ function main() {
   console.log(newVersion);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(`error: ${error.message}`);
+  process.exit(1);
+}

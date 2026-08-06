@@ -88,7 +88,9 @@ fi
 run npm install --package-lock-only
 run git add package.json package-lock.json CHANGELOG.md
 run git commit --signoff -m "chore(release): $NEW_VERSION"
-run git tag -a "v$NEW_VERSION" -F "$TAG_MSG_FILE"
+# --cleanup=whitespace: the tag body is the changelog section, whose markdown
+# headings start with '#' — the default cleanup would strip them as comments.
+run git tag -a --cleanup=whitespace "v$NEW_VERSION" -F "$TAG_MSG_FILE"
 
 echo
 if [ "$DRY_RUN" -eq 1 ]; then
