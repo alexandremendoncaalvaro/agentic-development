@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
+import { chmodSync, mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -156,6 +156,31 @@ test('resolve-rules.mjs: rules files carry sha256 content anchors', () => {
       !/^AGENTS\.md=/m.test(out),
       'binding docs stay bare — the target tree SHA pins them, not a probe anchor'
     );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolve-rules.mjs: an unreadable rules file reports UNREADABLE, not a dead probe', (t) => {
+  // Regression pinned by the task-0033 self-audit: a stat-able but unreadable
+  // rule file made readFileSync throw EACCES mid-report — zero output, the
+  // exact silent failure the probe exists to stop.
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-probe-unreadable-'));
+  try {
+    const machineStore = join(dir, 'rules');
+    mkdirSync(machineStore);
+    writeFileSync(join(machineStore, 'fine.md'), '# rules');
+    const locked = join(machineStore, 'locked.md');
+    writeFileSync(locked, '# locked');
+    chmodSync(locked, 0o000);
+    const out = runProbe(dir, { AGENTIC_RULES_DIR: machineStore });
+    assert.match(out, /^fine\.md=[0-9a-f]{64}$/m);
+    assert.match(out, /^locked\.md=UNREADABLE:EACCES$/m);
+    assert.match(out, /^BINDING DOCS:$/m, 'the probe keeps reporting past the unreadable file');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

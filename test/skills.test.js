@@ -218,6 +218,53 @@ test('the guard list covers every brief that exists, so a new brief cannot be fo
   );
 });
 
+// --- Cross-host parity: the anchor-echo contract (task-0033) ---
+
+// The anchor contract has two carriers: the audit handoff template (in
+// SKILL.md) and the reviewer brief. A machine with a stale installed brief
+// still receives the contract through the handoff, but the shipped source
+// must carry both so installs converge — the task-0033 self-audit observed a
+// live dispatch running a pre-change brief while the handoff carried the
+// contract.
+const ANCHOR_ECHO_BRIEFS = [
+  'claude-code/ad-audit/agents/audit-group-reviewer.md',
+  'codex/ad-audit/agents/audit-group-reviewer.toml',
+];
+
+test('the audit-group-reviewer brief carries the anchor-echo contract, on both hosts', () => {
+  for (const rel of ANCHOR_ECHO_BRIEFS) {
+    const path = join(SKILLS_ROOT, rel);
+    assert.ok(existsSync(path), `${rel} is missing`);
+    const body = readFileSync(path, 'utf8');
+    assert.ok(
+      body.includes('Anchors: <file>=<sha256>, target=<SHA>'),
+      `${rel} lost the anchor-echo line shape (task-0033)`
+    );
+    assert.ok(
+      body.includes('never copied'),
+      `${rel} no longer forbids copying the handoff's expected values`
+    );
+    assert.ok(
+      body.includes('UNVERIFIED'),
+      `${rel} no longer states the UNVERIFIED consequence of a missing echo`
+    );
+  }
+});
+
+test('the ad-audit skill carries the expected-anchors block and the UNVERIFIED rule, on both hosts', () => {
+  for (const rel of ['claude-code/ad-audit/SKILL.md', 'codex/ad-audit/SKILL.md']) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
+    assert.ok(
+      body.includes('EXPECTED ANCHORS'),
+      `${rel} lost the EXPECTED ANCHORS handoff section (task-0033)`
+    );
+    assert.ok(
+      body.includes('UNVERIFIED'),
+      `${rel} lost the anchor-mismatch UNVERIFIED aggregation rule (task-0033)`
+    );
+  }
+});
+
 // --- Skill scripts host parity (task-0031) ---
 // A skill script (scripts/ beside SKILL.md) is host-agnostic executable code:
 // both hosts must ship it, byte-identical, so the copy-drift that motivated

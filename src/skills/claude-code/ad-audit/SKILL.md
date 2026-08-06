@@ -43,7 +43,7 @@ node .claude/skills/ad-audit/scripts/resolve-rules.mjs
 
 If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/resolve-rules.mjs` inside it.
 
-**Content anchors (task-0033).** The probe prints each machine-store and project-layer rule file as `<file>=<sha256>` — those layers live outside the audited git tree, so the target SHA cannot pin them. Binding docs and ADRs stay bare; the Step 0 tree SHA pins them. Step 3 carries each group's expected anchors into its handoff; Step 6 refuses a reviewer whose echoed anchors do not match.
+**Content anchors (task-0033).** The probe prints each machine-store and project-layer rule file as `<file>=<sha256>` — the machine store lives outside the audited git tree and project-layer files may be machine-local (untracked), so the target SHA cannot be assumed to pin them. Binding docs and ADRs stay bare; the Step 0 tree SHA pins them. A file the probe reports `UNREADABLE` is resolved before dispatch, or its groups are marked unaccounted. Step 3 carries each group's expected anchors into its handoff; Step 6 refuses a reviewer whose echoed anchors do not match.
 
 A deterministic value inside a non-deterministic flow: the probe pins what can be pinned; the model reads only the rules the probe proved exist.
 
@@ -83,7 +83,9 @@ with the expectation is itself a finding, never proceeded past silently.
 <yes | no — from the rule-set's own tag>
 
 --- EXPECTED ANCHORS ---
-<the probe's `<file>=<sha256>` lines for this group's rule files — omitted for
+<one line per rule file: the probe's `<file>=<sha256>`, annotated with its
+ resolvable location as `  (file: <absolute path>)` — the reviewer holds only
+ this handoff and must find the file to recompute the hash; omitted for
  binding-doc/ADR groups, which the tree SHA pins>
 target=<the Step 0 SHA>
 
@@ -107,7 +109,7 @@ For every group the rule-set marks **critical**, beyond its Step-4 reviewer:
 ## Step 6 — Aggregate: union, then filter
 
 - **Union first.** Coverage lives in the union of the independent reviewers — never drop a lone finding for lack of a second voice.
-- **Anchor check (task-0033).** Compare each reviewer's echoed `Anchors:` line against its handoff's EXPECTED ANCHORS — every file hash and the target SHA. A mismatch, or a missing echo, makes that reviewer's verdicts **UNVERIFIED** — never silently accepted: re-dispatch the group, or mark it unaccounted in the coverage matrix. A "ran/read" assertion without a matching anchor is not trusted.
+- **Anchor check (task-0033).** Compare each reviewer's echoed `Anchors:` line against its handoff's EXPECTED ANCHORS — every file hash and the target SHA. A mismatch, or a missing echo, makes that reviewer's verdicts **UNVERIFIED** — never silently accepted: re-dispatch the group, or mark it unaccounted in the coverage matrix. A "ran/read" assertion without a matching anchor is not trusted. Honest ceiling: a matching echo is necessary, not sufficient — it cannot prove the reviewer recomputed rather than copied; the expectations persist in the trail file so the comparison outlives the run.
 - **Filter as an independent meta-judge.** Do not let reviewers debate or see each other's reasoning (shared-history debate amplifies bias). Confirm real findings against the code/output; reject wrong ones **with evidence**.
 - **Coverage check — two axes.** (a) Every group accounted for — a dispatched reviewer's per-rule verdicts, or an explicit N/A-with-reason. (b) For diff targets, every changed file accounted for — it appears in at least one reviewer's `Files grounded` line, or carries an explicit N/A-with-reason (fixture, vendored, generated). A file nobody read is a coverage hole. If either axis has a gap, the audit is INCOMPLETE; resolve before the verdict.
 

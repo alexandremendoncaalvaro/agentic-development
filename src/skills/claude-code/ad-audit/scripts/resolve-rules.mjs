@@ -18,10 +18,13 @@
  * the silent failure this probe exists to stop.
  *
  * Machine-store and project-layer rule files print as `<file>=<sha256>`
- * content anchors (task-0033): those layers live outside the audited git
- * tree, so the target SHA cannot pin them — the anchor is what group
+ * content anchors (task-0033): the machine store lives outside the audited
+ * git tree and project-layer files may be machine-local (untracked), so the
+ * target SHA cannot be assumed to pin them — the anchor is what audit
  * handoffs carry as the expectation reviewers must echo. Binding docs and
- * ADRs stay bare; the target tree SHA pins them.
+ * ADRs stay bare; the target tree SHA pins them. A rule file that cannot be
+ * read prints as `<file>=UNREADABLE:<code>` — a visible failure in the
+ * trail, never a dead probe.
  */
 
 import { createHash } from 'node:crypto';
@@ -61,14 +64,19 @@ function isFile(path) {
   }
 }
 
-// A non-file entry (e.g. a nested dir) lists bare instead of crashing the
-// probe — zero output is the silent failure this probe exists to stop.
+// A non-file entry (e.g. a nested dir) lists bare; an unreadable file lists
+// as UNREADABLE with its error code instead of dying mid-report — zero
+// output is the silent failure this probe exists to stop.
 function anchoredEntries(dir) {
   return visibleEntries(dir).map((name) => {
     const abs = join(dir, name);
     if (!isFile(abs)) return name;
-    const sha256 = createHash('sha256').update(readFileSync(abs)).digest('hex');
-    return `${name}=${sha256}`;
+    try {
+      const sha256 = createHash('sha256').update(readFileSync(abs)).digest('hex');
+      return `${name}=${sha256}`;
+    } catch (error) {
+      return `${name}=UNREADABLE:${error.code ?? 'unknown'}`;
+    }
   });
 }
 
