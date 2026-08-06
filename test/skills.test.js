@@ -217,3 +217,42 @@ test('the guard list covers every brief that exists, so a new brief cannot be fo
     `new reviewer brief(s) not classified as guarded or excluded: ${unaccounted.join(', ')}`
   );
 });
+
+// --- Skill scripts host parity (task-0031) ---
+// A skill script (scripts/ beside SKILL.md) is host-agnostic executable code:
+// both hosts must ship it, byte-identical, so the copy-drift that motivated
+// task-0031 (inline probe blocks maintained per host) cannot re-enter through
+// the scripts/ door.
+
+function listSkillScripts(agent) {
+  const out = new Map();
+  for (const { name, dir } of listSkills(agent)) {
+    const scriptsDir = join(dir, 'scripts');
+    if (!existsSync(scriptsDir)) continue;
+    for (const file of readdirSync(scriptsDir)) {
+      out.set(`${name}/scripts/${file}`, join(scriptsDir, file));
+    }
+  }
+  return out;
+}
+
+test('skill scripts: both hosts ship the same script set, byte-identical', () => {
+  const claude = listSkillScripts('claude-code');
+  const codex = listSkillScripts('codex');
+  assert.deepEqual(
+    [...claude.keys()].sort(),
+    [...codex.keys()].sort(),
+    'script sets must match across hosts'
+  );
+  for (const [rel, claudePath] of claude) {
+    const same = readFileSync(claudePath).equals(readFileSync(codex.get(rel)));
+    assert.ok(same, `${rel}: claude-code and codex copies must be byte-identical`);
+  }
+});
+
+test('skill scripts: at least the ad-audit resolution probe ships', () => {
+  assert.ok(
+    listSkillScripts('claude-code').has('ad-audit/scripts/resolve-rules.mjs'),
+    'ad-audit must ship scripts/resolve-rules.mjs (task-0031 first consumer)'
+  );
+});
