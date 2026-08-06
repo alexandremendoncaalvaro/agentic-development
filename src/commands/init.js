@@ -14,6 +14,7 @@ import {
   requiredSkillsForProfile,
 } from '../lib/profiles.js';
 import { updateRootDoc } from '../lib/rootdoc.js';
+import { trackedState } from '../lib/git.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -345,7 +346,18 @@ export async function initCommand(opts) {
         if (p.isCancel(answer)) return false;
         return answer;
       }
-    : async () => true;
+    : // A non-interactive run has nobody to ask, so it must not decide for the
+      // team: a tracked root doc is shared with everyone who clones the repo
+      // (ADR-0049). Unknown tracking state keeps the prior append behaviour.
+      async (path) => {
+        if (trackedState(cwd, path) !== 'tracked') return true;
+        process.stderr.write(
+          `skipped ${path}: tracked by git, so the managed section would be ` +
+            `visible to everyone sharing this repository. Re-run interactively ` +
+            `to decide.\n`
+        );
+        return false;
+      };
 
   const rootDocAction = await updateRootDoc({
     cwd,

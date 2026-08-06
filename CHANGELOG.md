@@ -13,6 +13,10 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 - `ad-hooks` (both hosts): advisory-first debut rule — deterministic toolchain gates may block from day one; heuristic or novel gates debut warn-only with an explicit flip-to-block criterion.
 - Release discipline for the kit repo (task-0032, ADR-0048): `scripts/release.sh` (version bump + changelog rotation + release commit with DCO sign-off + annotated tag, stopping before push and publish), and three `lefthook.yml` gates — an advisory changelog reminder on npm-shipped content, a blocking over-72-char commit-subject check, and a blocking pre-push guard for `main`/`cli` — plus this changelog.
 
+### Changed
+
+- `init` no longer edits a shared root doc unattended (ADR-0049, task-0034). When a run is non-interactive and the project's `AGENTS.md` / `CLAUDE.md` is tracked by git, the managed `Skills installed by agentic` section is not written: the write is skipped, the reason goes to stderr, and the rest of the install proceeds. An interactive run still asks as before, and a root doc that is untracked — or a directory that is not a git repository at all — is unaffected.
+
 ## [0.19.0-beta.1] - 2026-08-05
 
 ### Added

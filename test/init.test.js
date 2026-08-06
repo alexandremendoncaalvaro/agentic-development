@@ -277,3 +277,54 @@ test('init: invalid --agent value rejected', () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// A scratch directory that is a real git repository, so the installer's
+// tracked-path probe (ADR-0049) has something to resolve against.
+function mkGitScratch() {
+  const dir = mkScratch();
+  const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' });
+  git('init', '-q');
+  git('config', 'user.email', 'test@example.com');
+  git('config', 'user.name', 'Test');
+  return { dir, git };
+}
+
+test('init -y leaves a git-tracked root doc unmodified (ADR-0049)', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'team baseline');
+    const before = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+
+    assert.equal(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      before,
+      'a git-tracked root doc must not be rewritten by a non-interactive install'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// The tracked check must not degrade into "refuse inside any repository".
+// Untracked and unknown are distinct states from tracked, and both still
+// authorise the append; only the other tests' non-repo scratch dirs cover
+// `unknown`, so this pins `untracked` inside a real repository.
+test('init -y still appends to an untracked root doc inside a git repo', () => {
+  const { dir } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
+
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+
+    assert.match(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      /agentic-managed-skills:start/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
