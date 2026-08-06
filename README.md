@@ -274,6 +274,33 @@ lefthook install                 # wire the local git hooks (one-time)
 Branch layout:
 - `main` — single source of truth. Kit + CLI live together; npm beta releases are published from here.
 
+### Release and publish (maintainers)
+
+Merged is not released: consumers install the published npm version, not `main`. Cutting a release is a scripted local step plus a human publish tail.
+
+**Scripted step** — on a release branch, never on `main`:
+
+```bash
+git switch -c chore/release-next
+./scripts/release.sh prerelease     # or patch | minor | major; --dry-run previews
+```
+
+The script bumps `package.json` (+ lockfile), rotates `[Unreleased]` in `CHANGELOG.md` into the new version heading (and refuses to release an empty `[Unreleased]`), creates the signed `chore(release): x.y.z` commit and the annotated tag `vx.y.z` — and deliberately stops there: it never pushes and never publishes. Push the branch and open the PR as usual (`/ad-pr`).
+
+**Human publish tail** — after the release PR merges:
+
+```bash
+git push origin vX.Y.Z-beta.N
+npm publish                              # prompts for the npm OTP (2FA)
+npm dist-tag ls @alexandrealvaro/agentic
+```
+
+`npm publish` honors `publishConfig.tag: beta`, so `latest` does not advance on its own — check the `dist-tag ls` output, and if `latest` should point at the new version:
+
+```bash
+npm dist-tag add @alexandrealvaro/agentic@X.Y.Z-beta.N latest
+```
+
 ### House-IP leak-guard (contributors)
 
 This repository is public. A fail-closed pre-commit gate (`src/leak-guard.js`, [ADR-0033](doc/adr/0033-house-ip-leak-guard.md)) blocks any commit whose staged content adds a path under `rules/`, adds a symlink pointing outside the repo, or matches a marker in your local denylist. One-time setup:
