@@ -13,7 +13,11 @@ import {
   profileOrDefault,
   requiredSkillsForProfile,
 } from '../lib/profiles.js';
-import { updateRootDoc, rootDocAppendPrompt } from '../lib/rootdoc.js';
+import {
+  updateRootDoc,
+  rootDocAppendPrompt,
+  trackedRootDocSkipNotice,
+} from '../lib/rootdoc.js';
 import { trackedState } from '../lib/git.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -345,11 +349,7 @@ export async function initCommand(opts) {
   const allowUnattendedRootDocWrite = (path) => {
     if (opts.forceRootDoc) return true;
     if (trackedState(cwd, path) !== 'tracked') return true;
-    process.stderr.write(
-      `skipped ${path}: tracked by git, so the managed section would be ` +
-        `visible to everyone sharing this repository. Re-run interactively ` +
-        `to decide, or pass --force-root-doc.\n`
-    );
+    process.stderr.write(trackedRootDocSkipNotice(path) + '\n');
     return false;
   };
 

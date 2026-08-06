@@ -38,6 +38,89 @@ function runUpdate(cwd, args = []) {
   });
 }
 
+// A scratch directory that is a real git repository, for the ADR-0049
+// tracked-root-doc guard: update must not regenerate a managed section in a
+// file that is shared with the team.
+function mkGitScratch() {
+  const dir = mkScratch();
+  const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' });
+  git('init', '-q');
+  git('config', 'user.email', 'test@example.com');
+  git('config', 'user.name', 'Test');
+  return { dir, git };
+}
+
+const STALE_ROOT_DOC =
+  '# AGENTS.md\n\n<!-- agentic-managed-skills:start -->\n\n' +
+  '## Skills installed by `agentic`\n\nstale table\n\n' +
+  '<!-- agentic-managed-skills:end -->\n';
+
+// The unguarded update.js hole is the APPEND path (confirmAppend was
+// unconditional): a tracked root doc with no managed section yet.
+test('update -y does not append a section into a tracked sectionless root doc (ADR-0049)', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'team baseline, no managed section');
+    // init installs skills + state but, being non-interactive against a tracked
+    // root doc, itself refuses to append — leaving the file sectionless so the
+    // append path is what update exercises.
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+    assert.doesNotMatch(readFileSync(join(dir, 'AGENTS.md'), 'utf8'), /agentic-managed-skills/);
+
+    runUpdate(dir, ['--agent', 'claude-code', '-y']);
+
+    assert.doesNotMatch(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      /agentic-managed-skills/,
+      'update must not append a managed section into a git-tracked root doc unattended'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('update -y --force-root-doc appends into a tracked sectionless root doc (ADR-0049)', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'team baseline, no managed section');
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+
+    runUpdate(dir, ['--agent', 'claude-code', '-y', '--force-root-doc']);
+
+    assert.match(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      /agentic-managed-skills:start/,
+      'the override must reach the tracked root doc the refusal skips'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// The replace path already refused unattended (its pre-existing --force gate),
+// but --force-root-doc must drive it too, distinct from --force.
+test('update -y --force-root-doc regenerates a stale section in a tracked root doc (ADR-0049)', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), STALE_ROOT_DOC);
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'team baseline with a stale managed section');
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+
+    runUpdate(dir, ['--agent', 'claude-code', '-y', '--force-root-doc']);
+
+    const body = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    assert.doesNotMatch(body, /stale table/, 'the override must regenerate the section');
+    assert.match(body, /ad-bootstrap/, 'the regenerated table carries the real skill rows');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('init writes state.json for claude-code', () => {
   const dir = mkScratch();
   try {

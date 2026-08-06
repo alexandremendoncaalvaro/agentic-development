@@ -11,7 +11,12 @@ import {
   profileOrDefault,
   requiredSkillsForProfile,
 } from '../lib/profiles.js';
-import { updateRootDoc } from '../lib/rootdoc.js';
+import {
+  updateRootDoc,
+  rootDocAppendPrompt,
+  trackedRootDocSkipNotice,
+} from '../lib/rootdoc.js';
+import { trackedState } from '../lib/git.js';
 import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from './init.js';
 
 const CONDITIONAL_BY_NAME = Object.fromEntries(
@@ -167,6 +172,7 @@ export async function updateCommand(opts) {
   const interactive = process.stdout.isTTY && !opts.yes;
   const dryRun = Boolean(opts.dryRun);
   const force = Boolean(opts.force);
+  const forceRootDoc = Boolean(opts.forceRootDoc);
 
   const detectedAgents = detectAgents(cwd);
   const features = detectFeatures(cwd);
@@ -308,16 +314,27 @@ export async function updateCommand(opts) {
     ]),
   ].filter((s) => installedSkillSet.has(s));
 
+  // An unattended run must not decide for the team: a tracked root doc is
+  // shared with everyone who clones the repo (ADR-0049). Mirrors init.js;
+  // `--force-root-doc` is the explicit override, distinct from `--force`
+  // (which overwrites user-edited skill files on conflict). Unknown tracking
+  // state keeps the prior behaviour.
+  const allowUnattendedRootDocWrite = (path) => {
+    if (forceRootDoc) return true;
+    if (trackedState(cwd, path) !== 'tracked') return true;
+    process.stderr.write(trackedRootDocSkipNotice(path) + '\n');
+    return false;
+  };
+
   const confirmAppend = interactive
     ? async (path) => {
-        const answer = await p.confirm({
-          message: `Append a managed "Skills installed by agentic" section to ${path}? (existing content preserved)`,
-          initialValue: true,
-        });
+        const answer = await p.confirm(
+          rootDocAppendPrompt(path, trackedState(cwd, path))
+        );
         if (p.isCancel(answer)) return false;
         return answer;
       }
-    : async () => true;
+    : async (path) => allowUnattendedRootDocWrite(path);
 
   const confirmRootDocReplace = interactive
     ? async (path) => {
@@ -328,7 +345,17 @@ export async function updateCommand(opts) {
         if (p.isCancel(answer)) return false;
         return answer;
       }
-    : async () => Boolean(force);
+    : // Non-interactive replace keeps its pre-existing `--force` gate for an
+      // untracked doc, but a tracked doc is refused unless `--force-root-doc`
+      // (ADR-0049 sits in front of the divergence gate).
+      async (path) => {
+        if (forceRootDoc) return true;
+        if (trackedState(cwd, path) === 'tracked') {
+          process.stderr.write(trackedRootDocSkipNotice(path) + '\n');
+          return false;
+        }
+        return Boolean(force);
+      };
 
   const rootDocAction = await updateRootDoc({
     cwd,
