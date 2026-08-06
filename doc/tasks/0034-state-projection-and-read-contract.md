@@ -62,7 +62,7 @@ ADR-0049 amends ADR-0030 and did not declare the pair the same ADR was introduci
 
 The `ad-drift` pair check, as written in prose, compared *file lists* — which are disjoint by design, since the halves of a relation live in different records. It would have reported the one correct pair in this repo as broken: the exact false-positive class the check claims to remove. The test did it right; the skill text did not.
 
-Deferred, recorded rather than dropped: two tests guarding defects fixed in this change do not use the `regression: <ref> <description>` naming GUIDELINES §9.5 requires.
+The review's one deferred item is closed: the two tests guarding defects fixed here now carry the `regression: <ref> <description>` naming GUIDELINES §9.5 requires.
 
 Landed as one commit rather than the four planned. Three files carry more than one concern inside a single hunk, and the environment has no interactive hunk staging, so a per-concern split needed sub-hunk surgery in each. The split was also weaker than it looked: the read contract, the projection, and the constitution install are one decision (ADR-0049 Decision 5 records why), so the intermediate commits would not have stood alone.
 

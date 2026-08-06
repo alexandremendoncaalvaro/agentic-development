@@ -97,7 +97,7 @@ test('regression: task 0034 — update --force replaces a diverged kit doc', () 
 // unconditionally, which surfaced as a literal `[undefined]` beside each
 // Constitution file — the report is the only place a user sees what an update
 // did, so a placeholder there reads as a broken install.
-test('update reports kit docs without an agent tag', () => {
+test('regression: task 0034 — update reports kit docs without a placeholder agent tag', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code']);

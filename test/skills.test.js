@@ -376,7 +376,7 @@ function disciplineRuleNumbers(text) {
   return new Set([...section.matchAll(/^(\d{1,2})\. \*\*/gm)].map((m) => Number(m[1])));
 }
 
-test('ad-philosophy delivers every Documentation Discipline rule WORKFLOW.md declares', () => {
+test('regression: task 0034 — ad-philosophy delivers every rule WORKFLOW.md declares', () => {
   const declared = disciplineRuleNumbers(
     readFileSync(join(REPO_ROOT, 'WORKFLOW.md'), 'utf8')
   );
