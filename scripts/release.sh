@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
-# Local release step for the kit (task-0032). Bumps package.json (+ lockfile),
-# rotates CHANGELOG.md's [Unreleased] into the new version heading, creates
-# the signed release commit and the annotated tag — and deliberately stops
-# there. Pushing the branch/tag and `npm publish` (2FA) stay human steps:
-# see README.md "Release and publish".
+# Local release step for the kit (task-0032, ADR-0048). Bumps package.json
+# (+ lockfile), rotates CHANGELOG.md's [Unreleased] into the new version
+# heading, creates the release commit with DCO sign-off and the annotated
+# tag — and deliberately stops there. Pushing the branch/tag and
+# `npm publish` (2FA) stay human steps: see README.md "Release and publish".
 #
 # Usage: scripts/release.sh <patch|minor|major|prerelease> [--dry-run]
 set -euo pipefail

@@ -285,7 +285,7 @@ git switch -c chore/release-next
 ./scripts/release.sh prerelease     # or patch | minor | major; --dry-run previews
 ```
 
-The script bumps `package.json` (+ lockfile), rotates `[Unreleased]` in `CHANGELOG.md` into the new version heading (and refuses to release an empty `[Unreleased]`), creates the signed `chore(release): x.y.z` commit and the annotated tag `vx.y.z` — and deliberately stops there: it never pushes and never publishes. Push the branch and open the PR as usual (`/ad-pr`).
+The script bumps `package.json` (+ lockfile), rotates `[Unreleased]` in `CHANGELOG.md` into the new version heading (and refuses to release an empty `[Unreleased]`), creates the `chore(release): x.y.z` commit with DCO sign-off and the annotated tag `vx.y.z` — and deliberately stops there: it never pushes and never publishes. Push the branch and open the PR as usual (`/ad-pr`).
 
 **Human publish tail** — after the release PR merges:
 

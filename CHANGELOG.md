@@ -9,13 +9,13 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 ### Added
 
 - `ad-hooks` (both hosts): advisory-first debut rule — deterministic toolchain gates may block from day one; heuristic or novel gates debut warn-only with an explicit flip-to-block criterion.
-- Release discipline for the kit repo (task-0032): `scripts/release.sh` (version bump + changelog rotation + signed release commit + annotated tag, stopping before push and publish), an advisory changelog gate and a commit-subject check wired in `lefthook.yml`, and this changelog.
+- Release discipline for the kit repo (task-0032, ADR-0048): `scripts/release.sh` (version bump + changelog rotation + release commit with DCO sign-off + annotated tag, stopping before push and publish), and three `lefthook.yml` gates — an advisory changelog reminder on npm-shipped content, a blocking over-72-char commit-subject check, and a blocking pre-push guard for `main`/`cli` — plus this changelog.
 
 ## [0.19.0-beta.1] - 2026-08-05
 
 ### Added
 
-- `ad-audit` v2 (ADR-0046, both hosts): per-file coverage axis (`Files grounded:` lines plus two-axis aggregation — a formally complete rule matrix can no longer hide an unread file), a `critical | major | minor | nit` severity scale, and the prose-vs-code posture ("the diff is what ships") in the reviewer contracts.
+- `ad-audit` v2 (ADR-0046, both hosts): the file-coverage axis (`Files grounded:` lines, aggregated so a formally complete rule matrix can no longer hide an unread file), a `critical | major | minor | nit` severity scale, and the prose-vs-code posture ("the diff is what ships") in the reviewer contracts.
 - Team-practice absorptions (ADR-0047, both hosts): deterministic rules-layer resolution probe in `ad-audit` Step 1; re-audit mode against persisted findings under `.agentic/reviews/`; opt-in pre-commit review-gate tier in `ad-hooks`; PR-history harvest as a first-class `ad-level-up` candidate source.
 
 ### Fixed

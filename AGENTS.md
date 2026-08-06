@@ -24,8 +24,9 @@ Lint, formatter: not yet wired. CI runs `npm test` across Node 20 / 22 on every 
 
 See [`GUIDELINES.md`](GUIDELINES.md) §8 for the full reference. Non-negotiable subset:
 
-* Pre-push (`lefthook`) runs `npm test`; CI (`.github/workflows/test.yml`) mirrors across Node 20 / 22.
-* No pre-commit hook today — lint/format not yet wired.
+* Pre-commit (`lefthook`): `leak-guard` (ADR-0033, blocks) and `changelog-gate` (ADR-0048, warn-only changelog reminder). Lint/format still not wired.
+* Commit-msg: `subject-check` (ADR-0048) blocks a subject over 72 chars; imperative-mood heuristics warn only.
+* Pre-push: `branch-guard` (ADR-0048) refuses a push updating `main`/`cli`, then `npm test`; CI (`.github/workflows/test.yml`) mirrors `npm test` across Node 20 / 22.
 * Never bypass: no `--no-verify`, no skipped hooks, no deleted failing tests.
 * CI failure is a local gate gap (WORKFLOW.md §11, TL;DR #22). Pre-push mirrors what CI runs — same commands, same matrix. `/ad-pr` refuses to open a PR when local gates are red; `/ad-hooks` diffs pre-push against `.github/workflows/*.yml` and warns on drift. If CI catches something pre-push did not, close the gate locally, don't iterate red CI runs.
 
@@ -51,9 +52,13 @@ src/lib/                             pure helpers (detect.js, install.js)
 src/leak-guard.js                    pre-commit house-IP leak-guard (ADR-0033), wired in lefthook.yml
 src/skills/<agent>/<skill>/          skill source — copied into target's
                                      .claude/skills/ or .agents/skills/ at install
+scripts/                             repo-only release + hook tooling (ADR-0048);
+                                     never shipped to npm
 templates/                           manual templates shipped to npm
 prompts/                             manual paste-into-agent prompts shipped to npm
 test/*.test.js                       unit + integration suite (node:test)
+CHANGELOG.md                         release record (Keep a Changelog), rotated
+                                     only by scripts/release.sh
 WORKFLOW.md                          Layer 1 Constitution — philosophy doc, shipped to npm
 GUIDELINES.md                        Layer 1 Constitution — full engineering reference
 ARCHITECTURE.md                      Layer 1 — system-level patterns (pairs with ADRs)
@@ -98,6 +103,7 @@ Real traps confirmed in code or ADRs.
 * **Per-(skill, agent) install routing:** `init.js` calls `installSkills` once per agent with the skills that have source under `src/skills/<agent>/`. Don't add a skill to `CONDITIONAL_SKILLS` declaring `agents: ['claude-code', 'codex']` without confirming both source trees exist — `installSkills` throws on missing source by design (catches typos), so the per-agent filter in `init.js` is the safety net.
 * **Full self-install for dogfood.** This repo ships installed copies of every skill at `.claude/skills/<skill>/` and `.agents/skills/<skill>/`, the three bundled review subagents at `.claude/agents/{fresh-context,audit-group,rule-candidate}-reviewer.md` and `.codex/agents/*.toml`, and per-agent state files at `.claude/agentic-state.json` and `.agents/agentic-state.json`. Claude Code dispatches by `subagent_type: 'fresh-context-reviewer'`; Codex uses the `.codex/agents/*.toml` custom-agent surface; slash commands resolve from the installed `SKILL.md` files. Source under `src/skills/` is canonical — installed copies must stay byte-identical. After editing any skill source, run `node bin/agentic.js update --yes` to refresh the dogfood install (or re-run `init`). The state files record the kit version and per-file SHA, so the three-way diff in `installSkills` keeps the dogfood tree honest across edits.
 * **Skill frontmatter carries two description fields.** Anthropic-spec `description:` is trigger-keyword-rich (drives skill-router auto-load); kit-specific `summary:` is the compressed ≤320-char cell that `rootdoc.js` reads at section-build time into the managed `Skills installed by agentic` table in downstream AGENTS.md. Adding a new skill requires both fields in `src/skills/<agent>/<skill>/SKILL.md`; `test/skills.test.js` enforces presence + ≤320-char cap.
+* **A new lefthook stage needs `lefthook install` re-run.** Declaring a stage in `lefthook.yml` (e.g. `commit-msg`) does nothing until its stub exists under `.git/hooks/` — re-run `lefthook install` after adding or removing a stage, or the gate silently never fires.
 * **Historical naming.** The slash-command prefix renamed from `agentic-` to `ad-`. Live skills, dirs, frontmatter, wiring, and narrative docs use `ad-`. ADRs 0001-0025 and tasks 0001-0027 retain pre-rename `agentic-X` references in their bodies as intentional historical records. The `agentic` brand (CLI binary, npm package, repo, state files, managed-doc marker) is preserved.
 
 <!-- agentic-managed-skills:start -->
