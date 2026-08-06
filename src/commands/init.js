@@ -1,6 +1,7 @@
 import * as p from '@clack/prompts';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../lib/detect.js';
 import { installSkills } from '../lib/install.js';
@@ -18,7 +19,11 @@ import {
   rootDocAppendPrompt,
   trackedRootDocSkipNotice,
 } from '../lib/rootdoc.js';
-import { trackedState } from '../lib/git.js';
+import {
+  trackedState,
+  installedPathsToExclude,
+  writeExcludeEntries,
+} from '../lib/git.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -167,6 +172,50 @@ function skillsForAgent(agent, profileName, optedSkills) {
     return def && def.agents.includes(agent);
   });
   return [...universal, ...conditional];
+}
+
+/**
+ * The user-level agentic install's state file, if one exists (ADR-0049
+ * Decision 2). When present, a project install is not the only place the kit
+ * lives, and the operator should see that before accepting local copies.
+ * `home` is injectable for tests.
+ */
+export function userLevelInstallPath(home = homedir()) {
+  for (const rel of ['.claude/agentic-state.json', '.agents/agentic-state.json']) {
+    const path = join(home, rel);
+    if (existsSync(path)) return path;
+  }
+  return null;
+}
+
+/**
+ * Offer to keep freshly-installed kit files out of a shared repo's commits via
+ * `.git/info/exclude` (ADR-0049 Decision 4). Shared by init and update.
+ * Returns the number of entries added. Interactive asks (default yes);
+ * non-interactive declines and notes it, holding the refuse-to-guess posture —
+ * the write is local-only, but a `-y`/CI run shouldn't silently hide files a
+ * user might mean to commit. Tracked files are already dropped by
+ * `installedPathsToExclude`, so a mixed-ownership directory is safe.
+ */
+export async function offerKitExclude({ cwd, paths, interactive }) {
+  const toExclude = installedPathsToExclude(cwd, paths);
+  if (toExclude.length === 0) return 0;
+  if (!interactive) {
+    process.stderr.write(
+      `note: ${toExclude.length} kit file(s) are untracked in this repo; ` +
+        `run interactively to add them to .git/info/exclude so they are not committed.\n`
+    );
+    return 0;
+  }
+  const answer = await p.confirm({
+    message:
+      `Exclude ${toExclude.length} installed kit file(s) from git via ` +
+      `.git/info/exclude, so they are not committed to this repo? ` +
+      `(per-clone, never committed; recommended when the repo is shared)`,
+    initialValue: true,
+  });
+  if (p.isCancel(answer) || !answer) return 0;
+  return writeExcludeEntries(cwd, toExclude).added.length;
 }
 
 export async function initCommand(opts) {
@@ -380,9 +429,31 @@ export async function initCommand(opts) {
     confirmReplace: confirmRootDocReplace,
   });
 
+  // Keep freshly-installed kit files out of a shared repo's commits via
+  // .git/info/exclude — per-clone and never committed, unlike .gitignore
+  // (ADR-0049 Decision 4). Interactive offers; non-interactive leaves them and
+  // says so, holding the refuse-to-guess posture. Files already tracked (the
+  // dogfood self-install, a team-owned subagent) are dropped by filename, so a
+  // mixed-ownership directory never has a team file hidden from git.
+  const excluded = await offerKitExclude({
+    cwd,
+    paths: [...new Set(allActions.map((a) => a.path))],
+    interactive,
+  });
+
   const lines = allActions.map((a) => `${ACTION_SYMBOL[a.type]} ${a.path}`);
   if (rootDocAction.type !== 'absent') {
     lines.push(`${ROOT_DOC_LABEL[rootDocAction.type]}${rootDocAction.path}`);
+  }
+  if (excluded > 0) {
+    lines.push(`! .git/info/exclude (+${excluded})`);
+  }
+  const userInstall = cwd === homedir() ? null : userLevelInstallPath();
+  if (userInstall) {
+    lines.push(
+      `note: agentic is also installed at the user level (${userInstall}); ` +
+        `a project install is only needed to pin a version or share it via the repo.`
+    );
   }
 
   if (interactive) {

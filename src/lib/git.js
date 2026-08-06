@@ -1,7 +1,13 @@
 import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 function git(args, cwd) {
   return execFileSync('git', args, { cwd, stdio: 'ignore' });
+}
+
+function gitOut(args, cwd) {
+  return execFileSync('git', args, { cwd, encoding: 'utf8' });
 }
 
 /**
@@ -35,4 +41,78 @@ export function trackedState(cwd, relPath) {
   } catch {
     return 'untracked';
   }
+}
+
+/**
+ * Of the installer's file paths, the subset that should be excluded: those
+ * present on disk AND untracked. A tracked path is deliberately dropped — in a
+ * mixed-ownership directory (a team-authored subagent tracked in the same
+ * `.claude/agents/` where the kit installs its reviewers) the team file must
+ * stay visible to git, which is exactly why exclusion is by filename and never
+ * by directory (ADR-0049 Decision 4).
+ *
+ * @param {string} cwd  Repo working directory.
+ * @param {string[]} relPaths  Installed file paths relative to cwd (POSIX).
+ * @returns {string[]}  The subset to exclude.
+ */
+export function installedPathsToExclude(cwd, relPaths) {
+  return relPaths.filter(
+    (p) => existsSync(join(cwd, p)) && trackedState(cwd, p) === 'untracked'
+  );
+}
+
+/**
+ * Add per-clone exclude entries for kit files the installer just wrote, so
+ * they are never accidentally committed into a shared repo (ADR-0049 Decision
+ * 4). Entries go in `.git/info/exclude` — the per-clone, never-committed
+ * exclusion — never in `.gitignore`, which is team-visible.
+ *
+ * Each entry is anchored with a leading slash (this exact path from the repo
+ * root, not a same-named file elsewhere) and is a filename, never a directory:
+ * agent directories carry mixed ownership, so a directory entry could hide a
+ * team-owned file from git. The caller passes individual installed files.
+ *
+ * Idempotent — an entry already present is left untouched, and existing
+ * content is preserved verbatim. Fail-open: outside a git repository it writes
+ * nothing and reports `skipped: 'not-a-repo'`, so it can never fail an install.
+ *
+ * @param {string} cwd  Repo working directory.
+ * @param {string[]} relPaths  Installed file paths relative to cwd (POSIX).
+ * @returns {{ added: string[], excludeFile: string|null, skipped?: string }}
+ */
+export function writeExcludeEntries(cwd, relPaths) {
+  let excludeFile;
+  try {
+    excludeFile = gitOut(['rev-parse', '--git-path', 'info/exclude'], cwd).trim();
+  } catch {
+    return { added: [], excludeFile: null, skipped: 'not-a-repo' };
+  }
+  // `--git-path` may return a path relative to cwd; resolve against cwd.
+  if (excludeFile && !excludeFile.startsWith('/')) {
+    excludeFile = `${cwd}/${excludeFile}`;
+  }
+
+  const existing = existsSync(excludeFile)
+    ? readFileSync(excludeFile, 'utf8')
+    : '';
+  const present = new Set(
+    existing.split('\n').map((l) => l.trim()).filter(Boolean)
+  );
+
+  const wanted = relPaths.map((p) => `/${p.replace(/^\/+/, '')}`);
+  const added = wanted.filter((entry) => !present.has(entry));
+  if (added.length === 0) return { added: [], excludeFile };
+
+  const header = '# agentic (@alexandrealvaro/agentic) — local install, never commit';
+  const needsNL = existing.length > 0 && !existing.endsWith('\n');
+  const block =
+    (needsNL ? '\n' : '') +
+    (existing.length > 0 ? '\n' : '') +
+    (present.has(header) ? '' : `${header}\n`) +
+    added.join('\n') +
+    '\n';
+
+  mkdirSync(dirname(excludeFile), { recursive: true });
+  writeFileSync(excludeFile, existing + block);
+  return { added, excludeFile };
 }

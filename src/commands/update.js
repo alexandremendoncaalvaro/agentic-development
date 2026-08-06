@@ -17,7 +17,13 @@ import {
   trackedRootDocSkipNotice,
 } from '../lib/rootdoc.js';
 import { trackedState } from '../lib/git.js';
-import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from './init.js';
+import { homedir } from 'node:os';
+import {
+  CONDITIONAL_SKILLS,
+  REQUIRED_SKILLS,
+  offerKitExclude,
+  userLevelInstallPath,
+} from './init.js';
 
 const CONDITIONAL_BY_NAME = Object.fromEntries(
   CONDITIONAL_SKILLS.map((s) => [s.name, s])
@@ -365,12 +371,32 @@ export async function updateCommand(opts) {
     dryRun,
   });
 
+  // Keep freshly-installed kit files out of a shared repo's commits
+  // (ADR-0049 Decision 4). Skipped on a dry-run, which writes nothing.
+  const excluded = dryRun
+    ? 0
+    : await offerKitExclude({
+        cwd,
+        paths: [...new Set(allActions.map((a) => a.path))],
+        interactive,
+      });
+
   const lines = allActions.map((a) => {
     const sym = ACTION_SYMBOL[a.type] ?? '?';
     return `${sym} [${a.agent}] ${a.path}`;
   });
   if (rootDocAction.type !== 'absent') {
     lines.push(`${ROOT_DOC_LABEL[rootDocAction.type]}${rootDocAction.path}`);
+  }
+  if (excluded > 0) {
+    lines.push(`! .git/info/exclude (+${excluded})`);
+  }
+  const userInstall = cwd === homedir() ? null : userLevelInstallPath();
+  if (userInstall) {
+    lines.push(
+      `note: agentic is also installed at the user level (${userInstall}); ` +
+        `a project install is only needed to pin a version or share it via the repo.`
+    );
   }
 
   if (interactive) {

@@ -10,10 +10,30 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { detectAgents, detectFeatures, detectMode } from '../src/lib/detect.js';
 import { installSkills } from '../src/lib/install.js';
 import { updateRootDoc, rootDocAppendPrompt } from '../src/lib/rootdoc.js';
-import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from '../src/commands/init.js';
+import {
+  trackedState,
+  writeExcludeEntries,
+  installedPathsToExclude,
+} from '../src/lib/git.js';
+import {
+  CONDITIONAL_SKILLS,
+  REQUIRED_SKILLS,
+  offerKitExclude,
+  userLevelInstallPath,
+} from '../src/commands/init.js';
+
+function mkGitRepo() {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-git-test-'));
+  const git = (...a) => execFileSync('git', a, { cwd: dir, stdio: 'ignore' });
+  git('init', '-q');
+  git('config', 'user.email', 'test@example.com');
+  git('config', 'user.name', 'Test');
+  return dir;
+}
 
 function mkScratch() {
   return mkdtempSync(join(tmpdir(), 'agentic-test-'));
@@ -684,4 +704,131 @@ test('rootDocAppendPrompt: unknown tracking state is treated as not shared', () 
     untracked,
     'no evidence of sharing must not become a warning the user cannot act on'
   );
+});
+
+test('writeExcludeEntries: adds anchored, by-filename entries to .git/info/exclude', () => {
+  const dir = mkGitRepo();
+  try {
+    const res = writeExcludeEntries(dir, [
+      '.claude/skills/ad-audit/SKILL.md',
+      '.claude/agents/fresh-context-reviewer.md',
+    ]);
+    assert.deepEqual(res.added, [
+      '/.claude/skills/ad-audit/SKILL.md',
+      '/.claude/agents/fresh-context-reviewer.md',
+    ]);
+    const body = readFileSync(join(dir, '.git/info/exclude'), 'utf8');
+    // Anchored with a leading slash (this exact path, not a same-named file
+    // elsewhere) and never a bare directory.
+    assert.match(body, /^\/\.claude\/skills\/ad-audit\/SKILL\.md$/m);
+    assert.match(body, /^\/\.claude\/agents\/fresh-context-reviewer\.md$/m);
+    assert.doesNotMatch(body, /^\/?\.claude\/agents\/?$/m, 'never a directory entry');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('writeExcludeEntries: idempotent — a second run adds nothing already present', () => {
+  const dir = mkGitRepo();
+  try {
+    writeExcludeEntries(dir, ['.claude/skills/ad-audit/SKILL.md']);
+    const first = readFileSync(join(dir, '.git/info/exclude'), 'utf8');
+    const res = writeExcludeEntries(dir, [
+      '.claude/skills/ad-audit/SKILL.md',
+      '.claude/skills/ad-review/SKILL.md',
+    ]);
+    assert.deepEqual(res.added, ['/.claude/skills/ad-review/SKILL.md']);
+    const second = readFileSync(join(dir, '.git/info/exclude'), 'utf8');
+    // The already-present entry appears exactly once.
+    assert.equal(
+      (second.match(/\/\.claude\/skills\/ad-audit\/SKILL\.md/g) || []).length,
+      1
+    );
+    assert.ok(second.startsWith(first), 'existing content preserved verbatim');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('installedPathsToExclude: drops a tracked file in a mixed-ownership dir, keeps untracked kit files', () => {
+  const dir = mkGitRepo();
+  const git = (...a) => execFileSync('git', a, { cwd: dir, stdio: 'ignore' });
+  try {
+    // A team-authored subagent, tracked, in the same directory the kit uses.
+    mkdirSync(join(dir, '.claude/agents'), { recursive: true });
+    writeFileSync(join(dir, '.claude/agents/team-owned.md'), 'team\n');
+    git('add', '.claude/agents/team-owned.md');
+    git('commit', '-qm', 'team subagent');
+    // Kit files freshly written, untracked.
+    writeFileSync(join(dir, '.claude/agents/fresh-context-reviewer.md'), 'kit\n');
+    mkdirSync(join(dir, '.claude/skills/ad-audit'), { recursive: true });
+    writeFileSync(join(dir, '.claude/skills/ad-audit/SKILL.md'), 'kit\n');
+
+    const result = installedPathsToExclude(dir, [
+      '.claude/agents/team-owned.md',
+      '.claude/agents/fresh-context-reviewer.md',
+      '.claude/skills/ad-audit/SKILL.md',
+    ]);
+
+    assert.deepEqual(result.sort(), [
+      '.claude/agents/fresh-context-reviewer.md',
+      '.claude/skills/ad-audit/SKILL.md',
+    ]);
+    assert.ok(
+      !result.includes('.claude/agents/team-owned.md'),
+      'a tracked team file must never be excluded from git'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('userLevelInstallPath: finds a user-level state file, null when absent', () => {
+  const home = mkdtempSync(join(tmpdir(), 'agentic-home-'));
+  try {
+    assert.equal(userLevelInstallPath(home), null);
+    mkdirSync(join(home, '.claude'), { recursive: true });
+    writeFileSync(join(home, '.claude/agentic-state.json'), '{}');
+    assert.equal(
+      userLevelInstallPath(home),
+      join(home, '.claude/agentic-state.json')
+    );
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('offerKitExclude: non-interactive declines and writes nothing (refuse-to-guess default)', async () => {
+  const dir = mkGitRepo();
+  try {
+    mkdirSync(join(dir, '.claude/skills/ad-audit'), { recursive: true });
+    writeFileSync(join(dir, '.claude/skills/ad-audit/SKILL.md'), 'kit\n');
+
+    const added = await offerKitExclude({
+      cwd: dir,
+      paths: ['.claude/skills/ad-audit/SKILL.md'],
+      interactive: false,
+    });
+
+    assert.equal(added, 0);
+    assert.ok(
+      !existsSync(join(dir, '.git/info/exclude')) ||
+        !readFileSync(join(dir, '.git/info/exclude'), 'utf8').includes('ad-audit'),
+      'a non-interactive run must not silently modify .git/info/exclude'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('writeExcludeEntries: fail-open outside a git repository — writes nothing', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-nogit-'));
+  try {
+    const res = writeExcludeEntries(dir, ['.claude/skills/ad-audit/SKILL.md']);
+    assert.equal(res.skipped, 'not-a-repo');
+    assert.deepEqual(res.added, []);
+    assert.ok(!existsSync(join(dir, '.git')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

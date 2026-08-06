@@ -10,22 +10,22 @@ Implement [ADR-0049](../adr/0049-installer-shared-write-target-detection.md). To
 ## Checklist
 
 - [x] Read-only tracked-path probe (`src/lib/git.js`): returns tracked / untracked / unknown. Unresolvable git — no repository, no binary — yields `unknown` and never throws; detection must not be able to fail an install.
-- [ ] User-level install detection: resolve a user-level kit state file / skills directory and report it to the caller. Read-only.
+- [x] User-level install detection: `userLevelInstallPath` resolves a user-level state file (`~/.claude/agentic-state.json` / `~/.agents/agentic-state.json`); the install summary notes it. `home` is injectable for tests.
 - [x] Interactive root-doc confirmation in `init.js` states that the file is version-controlled and that the section will be visible to everyone sharing the repository, and defaults to no when the path is tracked. The decision lives in the pure `rootDocAppendPrompt` in `src/lib/rootdoc.js` and is unit-tested; the suite has no TTY and cannot drive the prompt.
-- [ ] Same interactive confirmation in `update.js`, reusing `rootDocAppendPrompt`.
+- [x] Same interactive confirmation in `update.js`, reusing `rootDocAppendPrompt`.
 - [x] `init.js` non-interactive `confirmAppend` refuses a tracked root doc: skips that write, states the reason on stderr, completes the rest of the install.
 - [x] `init.js` non-interactive `confirmReplace`: `init.js` never passed the callback at all, so `updateRootDoc`'s default — replace — silently rewrote a stale managed section in a tracked root doc. Both write paths now share one decision helper.
-- [ ] `update.js` equivalents for both callbacks.
+- [x] `update.js` equivalents for both callbacks — append and replace both refuse a tracked root doc unless `--force-root-doc`; the replace path keeps its pre-existing `--force` gate for an untracked doc.
 - [x] Override flag on `init` — `--force-root-doc`, boolean, surfaced in `--help`, named separately from `update`'s existing `--force` because that one means "overwrite user-edited files on conflict". The release-blocking gap is closed for `init`.
-- [ ] Same override on `update`, to land together with `update.js`'s refusal — the flag would be inert there today, so `--help` would be advertising a no-op.
-- [ ] `.git/info/exclude` writer, offered when kit files land untracked in a repository: entries enumerate installed files by path, a directory-level entry is never emitted, existing entries are not duplicated, `.gitignore` is never touched.
-- [ ] Install summary reports when a user-level install already covers the skills being written locally, at the point the operator can still decline them.
+- [x] Same override on `update` — `--force-root-doc`, now non-inert alongside update.js's refusal.
+- [x] `.git/info/exclude` writer (`writeExcludeEntries` + `installedPathsToExclude` in `src/lib/git.js`): anchored by filename, never a directory, idempotent, `.gitignore` never touched, fail-open outside a repo. Offered via `offerKitExclude` (interactive) shared by init and update.
+- [x] Install summary reports a user-level install. Note: it appears in the post-install summary (ADR-0049 Decision 2 names "the install summary"), not the pre-install confirmation, so "still decline" means decline to commit / uninstall rather than abort mid-run.
 - [x] Tests for the first slice: non-interactive refusal on a tracked root doc, and `untracked`-inside-a-repository still appends. The pre-existing suite covers `unknown` incidentally, since its scratch directories are not repositories.
 - [x] Test that the override flag reaches the write the refusal skips, driven through both failure modes (absent flag, then wrong behaviour).
-- [ ] Remaining tests: exclude writer emits filenames rather than directories and is idempotent across re-runs; a mixed-ownership agent directory keeps its tracked file visible to git.
+- [x] Tests: exclude writer anchored/idempotent/fail-open; `installedPathsToExclude` drops a tracked file in a mixed-ownership dir; `offerKitExclude` non-interactive writes nothing; `userLevelInstallPath` found/absent; update.js append-refusal + `--force-root-doc` append + `--force-root-doc` replace.
 - [x] Regression pin for the originating incident: a fixture repository with a tracked `AGENTS.md` where `init -y` leaves that file unmodified. This is the same test as the first-slice refusal above — the incident and the acceptance criterion are one assertion, not two.
 - [x] `CHANGELOG.md` `[Unreleased]` entry per the ADR-0048 changelog gate, kept current on each slice rather than written once at the end.
-- [ ] `AGENTS.md` Gotchas and `ARCHITECTURE.md` patterns updated for the new installer behaviour.
+- [x] `AGENTS.md` Gotchas and `ARCHITECTURE.md` patterns/helpers updated for the git-aware installer.
 - [ ] `npm test` green at the end of the task; `node bin/agentic.js update --yes` only if skill source changed (it has not — this task is installer code); `/ad-review main..HEAD` before the PR.
 
 ## Notes
