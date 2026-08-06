@@ -17,7 +17,7 @@ Four survived as genuinely absorbable, none adding adversarial pressure (ADR-004
 
 ## Decision
 
-1. **`ad-audit` Step 1 gains a deterministic resolution probe** (both hosts): a verbatim shell block that enumerates the machine store, the project layer, and the binding docs, with output pasted into the audit trail. Layer resolution is read from observed output, never from memory. This is the *minimal* realization of practice 1 — an embedded snippet, no installer changes; the full skill-`scripts/` infrastructure (install routing, parity tests, packaging) is deferred to task-0031 as its own piece of work.
+1. **`ad-audit` Step 1 gains a deterministic resolution probe** (both hosts): a verbatim shell block that enumerates the machine store, the project layer, and the binding docs, with output pasted into the audit trail. Layer resolution is read from observed output, never from memory. This is the *minimal* realization of practice 1 — an embedded snippet, no installer changes; the full skill-`scripts/` infrastructure (install routing, parity tests, packaging) is deferred to task-0031 as its own piece of work. **(Realization superseded — see Addendum below; the probe now ships as a skill script.)**
 2. **`ad-audit` gains a re-audit mode** (both hosts): when `.agentic/reviews/` holds a prior trail for the same target, every prior finding is carried into aggregation with a mandatory disposition — resolved (evidence) · refuted (evidence) · still-open. A prior finding that silently disappears invalidates the re-audit.
 3. **`ad-hooks` gains an opt-in third tier** (both hosts): a pre-commit review gate wiring `/ad-review` (or `/ad-audit` for team-bound work) over staged work, offered with the bottleneck trade-off stated and never scaffolded unasked or as a default.
 4. **`ad-level-up` Step 1 names the PR-history harvest as a first-class candidate source** (both hosts), with cadence guidance (monthly-ish or after a dense review round). Harvest is a source, not a bypass — harvested candidates clear every existing gate.
@@ -32,7 +32,7 @@ Positive:
 
 Negative / trade-offs:
 
-- An embedded shell probe is copy-maintained in two SKILL.md files until task-0031 lands a real scripts mechanism; drift between the copies is possible (mitigated: identical text, and the dogfood parity check catches divergence between src and installed copies, though not between hosts).
+- An embedded shell probe is copy-maintained in two SKILL.md files until task-0031 lands a real scripts mechanism; drift between the copies is possible (mitigated: identical text, and the dogfood parity check catches divergence between src and installed copies, though not between hosts). **(Resolved — see Addendum below.)**
 - Re-audit adds trail-reading cost to every repeat audit of the same target; proportionate, since the alternative is losing the thread.
 - The commit gate, if a user enables it despite the stated trade-off, can slow a frequent-commit workflow — deliberately left opt-in for exactly that reason.
 
@@ -41,3 +41,7 @@ Negative / trade-offs:
 - **Full skill-`scripts/` infrastructure now** — rejected for this change; it touches the installer, packaging (`package.json#files`), and parity tests, and deserves its own task (task-0031) rather than riding an absorption commit.
 - **Absorbing the session's remaining practices** — rejected each on its own ground: output-compression/controlled-language disciplines (conflict with the practitioner's standing communication contract); review-to-zero-findings loops (reported non-converging on the current frontier model by their own author; ADR-0045's posture already prefers verification over iteration pressure); pedagogical file ordering for reviewers (built for a sequential single-reviewer walk; this kit's reviewers are parallel-isolated per group, where ordering has no equivalent leverage); org-wide tiering and shared inventories (team infrastructure, not kit scope).
 - **A new standalone skill for the commit gate** — rejected; `ad-hooks` already owns deterministic gate scaffolding, and a third tier is a smaller, more discoverable change than a new skill name.
+
+## Addendum (2026-08-06) — Decision 1's realization superseded by task-0031's shipped skill script
+
+Decision 1's "minimal realization" trade-off (the probe copy-maintained as inline shell in two SKILL.md files) is superseded: task-0031 shipped the probe as a skill script — `scripts/resolve-rules.mjs` beside each host's SKILL.md, installed with the skill by the existing whole-tree walk, byte-parity-tested across hosts in `test/skills.test.js`, behavior-tested in `test/skill-scripts.test.js`. The inline blocks are gone from the source tree (npm consumers receive the change with the next published release); skills can now ship `scripts/` generally. Decisions 2-4 are unaffected.

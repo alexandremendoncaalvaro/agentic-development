@@ -39,8 +39,12 @@
           "sourceSha": "23484492c180890c66f07ecbc8adade9dcf469d36fc7dcfd24a132808288780d"
         },
         {
+          "path": ".claude/skills/ad-audit/scripts/resolve-rules.mjs",
+          "sourceSha": "c9afcab772e101074eb1fc9d53d4cfb210072b1f8429a3eedf2d2da767827862"
+        },
+        {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "b8d56753f6b5135ea0e62708f0167d9a1472ba3caa3d2c0bcf5b59771a5dacae"
+          "sourceSha": "6f4ad6fda3dbe1d9b719b3b4c78c919077293be0405b5c0a87b3606db890a066"
         }
       ]
     },

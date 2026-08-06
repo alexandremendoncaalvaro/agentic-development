@@ -35,15 +35,13 @@ Per ADR-0035 and ADR-0043, the rule-set is the union of:
 
 The rule-set — not this skill — defines the **groups** and any **critical** tag. Do not invent, resize, or hardcode groups or rule content. If the curated store defines groups explicitly, use them; if only the repo docs exist, treat each binding doc (and each accepted ADR) as a group. If no rule-set resolves at all, stop and tell the user there is nothing to audit against.
 
-**Deterministic resolution probe (ADR-0047).** Run this verbatim from the repo root and paste its output into the audit trail — layer resolution is read from observed output, never from memory, because this step's failure-mode is silent (a layer that exists but goes unread):
+**Deterministic resolution probe (ADR-0047; a shipped skill script per task-0031).** Run the probe installed beside this skill from the repo root and paste its output into the audit trail. Layer resolution is read from observed output, never from memory, because this step's failure-mode is silent (a layer that exists but goes unread). The default install path is:
 
 ```bash
-if [ -n "$AGENTIC_RULES_DIR" ]; then MS="$AGENTIC_RULES_DIR"; else MS="$HOME/.agentic/rules"; fi
-{ [ -d "$MS" ] && echo "MACHINE-STORE: $MS" && ls "$MS"; } || echo "MACHINE-STORE: absent"
-{ [ -d .agentic/rules ] && echo "PROJECT: .agentic/rules" && ls .agentic/rules; } || echo "PROJECT: absent"
-echo "BINDING DOCS:"; ls AGENTS.md ARCHITECTURE.md GUIDELINES.md CONTEXT.md CONTEXT-MAP.md 2>/dev/null
-for d in doc/adr docs/ADRs docs/adr; do [ -d "$d" ] && echo "ADRS: $d ($(ls "$d" | wc -l | tr -d ' ') files)"; done
+node .claude/skills/ad-audit/scripts/resolve-rules.mjs
 ```
+
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/resolve-rules.mjs` inside it.
 
 A deterministic value inside a non-deterministic flow: the probe pins what can be pinned; the model reads only the rules the probe proved exist.
 

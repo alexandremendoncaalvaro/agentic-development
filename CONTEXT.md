@@ -123,6 +123,14 @@ _Avoid_: "prose check" (sounds like style/grammar review); "distrust the author"
 
 **Related code:** [`src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md`](src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md), [`doc/adr/0046-ad-audit-file-coverage-severity-prose.md`](doc/adr/0046-ad-audit-file-coverage-severity-prose.md).
 
+### Skill script
+
+**Definition:** an executable file under `scripts/` beside a skill's `SKILL.md`, shipped and installed with the skill (SHA-tracked and three-way-diffed like any skill file) and invoked by path from the skill text. Host copies are byte-identical twins, enforced by test. First instance: `ad-audit`'s deterministic rules-resolution probe, `resolve-rules.mjs` (ADR-0047 Decision 1 realization, task-0031).
+
+_Avoid_: "preflight script" as the canonical noun (preflight is a common *role* of a skill script, not the concept's name); "helper script" (ambiguous with the repo-level `scripts/` release tooling, which never ships to npm).
+
+**Related code:** [`src/skills/claude-code/ad-audit/scripts/resolve-rules.mjs`](src/skills/claude-code/ad-audit/scripts/resolve-rules.mjs), [`src/lib/install.js`](src/lib/install.js), [`test/skills.test.js`](test/skills.test.js), [`test/skill-scripts.test.js`](test/skill-scripts.test.js).
+
 ## Relationships
 
 - A **Kit** install bounds itself by a single **Profile** per agent surface (`.claude/skills/` and `.agents/skills/` each carry their own profile state).

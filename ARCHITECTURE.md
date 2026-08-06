@@ -17,8 +17,8 @@ Three execution layers under `src/`, plus kit content read at runtime:
 
 Kit content lives under `src/skills/<agent>/<skill>/` and is read at runtime by `src/lib/install.js` only:
 
-* `src/skills/claude-code/<skill>/SKILL.md` — Markdown body, Anthropic Skills frontmatter, optional `manifest.json` declaring sibling-tree subagent files, optional `agents/<subagent>.md` files routed to `.claude/agents/`.
-* `src/skills/codex/<skill>/SKILL.md` plus `agents/openai.yaml` — XML body + minimal frontmatter (cc-sdd convention),.
+* `src/skills/claude-code/<skill>/SKILL.md` — Markdown body, Anthropic Skills frontmatter, optional `manifest.json` declaring sibling-tree subagent files, optional `agents/<subagent>.md` files routed to `.claude/agents/`, optional `scripts/` skill scripts installed with the skill (byte-identical across hosts, per task-0031).
+* `src/skills/codex/<skill>/SKILL.md` plus `agents/openai.yaml` — XML body + minimal frontmatter (cc-sdd convention); same optional `scripts/` skill scripts as the claude-code tree (byte-identical twins, parity-tested).
 * `templates/`, `prompts/` — kit-shipped baselines for the manual paste-into-agent flow. Not loaded at runtime by the installer; only mentioned by the README's `Manual prompts` section.
 * `scripts/` — repo-only release and git-hook tooling ([ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)): `release.sh` (with `release-apply.js` + the pure `release-lib.js`) and the lefthook gate scripts (`changelog-gate.js`, `commit-subject-check.js`, `push-branch-guard.js`). Wired by `lefthook.yml`; excluded from `package.json#files`, so none of it ships to npm.
 * `doc/adr/`, `doc/tasks/`, `WORKFLOW.md`, `AGENTS.md`, `ARCHITECTURE.md`, `CHANGELOG.md` — kit documentation. Not loaded at runtime.
@@ -42,6 +42,7 @@ Boundary rule: only `src/lib/install.js` resolves `KIT_ROOT`-rooted paths (`impo
 ## Naming Conventions
 
 * ES modules (`"type": "module"` in `package.json`). Built-in imports use the `node:` prefix (`node:fs`, `node:path`, `node:url`).
+* Skill scripts use the `.mjs` extension — they execute inside consumer projects where no `"type": "module"` `package.json` is in scope, so ESM must be declared by extension. The kit's own `src/*.js` stays `.js` under the root `package.json`.
 * Files: kebab-case (`init.js`, `detect.js`, `install.js`, `rootdoc.js`).
 * Exports: camelCase functions (`detectMode`, `detectAgents`, `detectFeatures`, `installSkills`, `updateRootDoc`, `initCommand`).
 * Skill names: `ad-<verb-or-noun>` (`ad-bootstrap`, `ad-architecture`, `ad-review`). Historical skills under closed ADRs / tasks may reference the pre-rename `agentic-<verb-or-noun>` prefix.
@@ -57,5 +58,5 @@ Boundary rule: only `src/lib/install.js` resolves `KIT_ROOT`-rooted paths (`impo
 
 Published on npm as `@alexandrealvaro/agentic` (`beta` dist-tag). Consumers run `npx @alexandrealvaro/agentic@beta init` to scaffold or `npx @alexandrealvaro/agentic@beta update` to absorb upstream kit changes. No server, no daemon, no scheduled jobs. `engines.node = ">=20.12.0"`. Package contents declared by `package.json#files`: `bin/`, `src/`, `templates/`, `prompts/`, `WORKFLOW.md`, `WORKFLOW-FLOWS.md`, `README.md`, `LICENSE`. `prepublishOnly` runs `npm test` (CLI `--help` smoke for `init` / `update` + `node --test test/*.test.js`).
 
-Test layout: `test/lib.test.js` (unit — `detectMode`, `detectAgents`, `detectFeatures`, `installSkills`, `updateRootDoc`), `test/init.test.js` (integration — spawns the CLI in `mktemp` directories), `test/state.test.js` (state file load / save / schema-version refusal / deterministic ordering), `test/update.test.js` (state-aware three-way diff matrix + `agentic update` end-to-end including the legacy-no-state fallback), `test/skills.test.js` (static — parses every `SKILL.md` frontmatter, every Codex `agents/openai.yaml`, every manifest-listed subagent file), `test/release.test.js` + `test/commit-gates.test.js` (unit — `release-lib` bump/rotate logic and the lefthook gates' pure policy cores), `test/release-e2e.test.js` (integration — runs `scripts/release.sh` inside a fixture git repo).
+Test layout: `test/lib.test.js` (unit — `detectMode`, `detectAgents`, `detectFeatures`, `installSkills`, `updateRootDoc`), `test/init.test.js` (integration — spawns the CLI in `mktemp` directories), `test/state.test.js` (state file load / save / schema-version refusal / deterministic ordering), `test/update.test.js` (state-aware three-way diff matrix + `agentic update` end-to-end including the legacy-no-state fallback), `test/skills.test.js` (static — parses every `SKILL.md` frontmatter, every Codex `agents/openai.yaml`, every manifest-listed subagent file), `test/release.test.js` + `test/commit-gates.test.js` (unit — `release-lib` bump/rotate logic and the lefthook gates' pure policy cores), `test/release-e2e.test.js` (integration — runs `scripts/release.sh` inside a fixture git repo), `test/skill-scripts.test.js` (integration — executes the `ad-audit` resolution probe against fixture layer layouts; host parity itself is enforced in `test/skills.test.js`).
 
