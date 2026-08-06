@@ -1,6 +1,6 @@
 # Task 0034: Give append-only layers a state projection and the agent a read contract
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-08-06
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
@@ -28,7 +28,7 @@ Decision record: [ADR-0049](../adr/0049-append-only-layers-own-a-state-projectio
 - [x] `ad-philosophy` delivers all thirteen Documentation Discipline rules the constitution declares
 - [x] Suite green, and every new test demonstrated red on the failure it claims to catch
 - [x] Fresh-context review, two axes, over the whole change — 6 blockers and 10 concerns, all accepted, 15 fixed and 1 deferred
-- [ ] Landed as atomic commits with DCO sign-off
+- [x] Landed with DCO sign-off — one commit, not the four originally planned; see Notes
 
 ## Plan
 
@@ -64,11 +64,15 @@ The `ad-drift` pair check, as written in prose, compared *file lists* — which 
 
 Deferred, recorded rather than dropped: two tests guarding defects fixed in this change do not use the `regression: <ref> <description>` naming GUIDELINES §9.5 requires.
 
+Landed as one commit rather than the four planned. Three files carry more than one concern inside a single hunk, and the environment has no interactive hunk staging, so a per-concern split needed sub-hunk surgery in each. The split was also weaker than it looked: the read contract, the projection, and the constitution install are one decision (ADR-0049 Decision 5 records why), so the intermediate commits would not have stood alone.
+
+Cost this task nearly paid: for most of the session, git in this repository resolved to a different worktree, because `core.worktree` was set in the *shared* config pointing at a sibling worktree another session had created. Every `git diff` and `git status` returned that session's changes while the files on disk held this one's. It was caught only because a file list did not match what had been edited — the review handoff was one step from being built from the wrong diff entirely. The stray key was removed after confirming each linked worktree resolves through its own `.git` file and per-worktree config, so none depended on it. Worth knowing: in a repo with several agent worktrees, `git rev-parse --show-toplevel` is the cheap check that the tree you are reading is the tree git is writing.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [x] Local tests pass — 374, from a 367 baseline
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] Local tests pass — 376, from a 367 baseline
+- [x] Code review completed — two-axis fresh-context, both axes
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
