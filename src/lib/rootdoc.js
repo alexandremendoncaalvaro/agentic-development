@@ -121,6 +121,25 @@ function replaceSection(body, newSection, bounds) {
 }
 
 /**
+ * Message and default for the interactive "regenerate the managed section?"
+ * confirmation on a git-tracked root doc (ADR-0049 Decision 2). Names both
+ * risks — the file is shared with everyone who clones the repo, and edits
+ * between the markers are lost — and defaults to no. Used only when the doc is
+ * tracked; the untracked case keeps each command's prior replace behaviour.
+ * Pure and separate from the TUI so the decision is unit-testable.
+ */
+export function rootDocReplacePrompt(path) {
+  return {
+    message:
+      `${path} is tracked by git — regenerating the managed ` +
+      `"Skills installed by agentic" section changes a file shared with ` +
+      `everyone who clones the repo, and any edits between the markers are ` +
+      `lost. Regenerate it anyway?`,
+    initialValue: false,
+  };
+}
+
+/**
  * The stderr line an unattended run prints when it declines to write a managed
  * section into a git-tracked root doc (ADR-0049). Shared by init and update so
  * the wording — the part most likely to drift between two call sites — lives in

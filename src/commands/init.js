@@ -1,11 +1,11 @@
 import * as p from '@clack/prompts';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../lib/detect.js';
 import { installSkills } from '../lib/install.js';
-import { saveState, loadState } from '../lib/state.js';
+import { saveState, loadState, userLevelInstallPath } from '../lib/state.js';
 import {
   DEFAULT_PROFILE,
   PROFILES,
@@ -17,6 +17,7 @@ import {
 import {
   updateRootDoc,
   rootDocAppendPrompt,
+  rootDocReplacePrompt,
   trackedRootDocSkipNotice,
 } from '../lib/rootdoc.js';
 import {
@@ -172,20 +173,6 @@ function skillsForAgent(agent, profileName, optedSkills) {
     return def && def.agents.includes(agent);
   });
   return [...universal, ...conditional];
-}
-
-/**
- * The user-level agentic install's state file, if one exists (ADR-0049
- * Decision 2). When present, a project install is not the only place the kit
- * lives, and the operator should see that before accepting local copies.
- * `home` is injectable for tests.
- */
-export function userLevelInstallPath(home = homedir()) {
-  for (const rel of ['.claude/agentic-state.json', '.agents/agentic-state.json']) {
-    const path = join(home, rel);
-    if (existsSync(path)) return path;
-  }
-  return null;
 }
 
 /**
@@ -416,10 +403,15 @@ export async function initCommand(opts) {
 
   // Distinct from the `confirmReplace` passed to installSkills above: that one
   // resolves a skill-file conflict and receives a question, this one receives
-  // the root doc's name. Named as in update.js, which already separates them.
-  // Interactive refresh of a stale section stays silent, as before.
+  // the root doc's name. A tracked doc names the sharing risk and defaults to
+  // no (ADR-0049 Decision 2); an untracked doc keeps the prior behaviour of
+  // silently regenerating the kit's own section.
   const confirmRootDocReplace = interactive
-    ? async () => true
+    ? async (path) => {
+        if (trackedState(cwd, path) !== 'tracked') return true;
+        const answer = await p.confirm(rootDocReplacePrompt(path));
+        return !p.isCancel(answer) && answer;
+      }
     : async (path) => allowUnattendedRootDocWrite(path);
 
   const rootDocAction = await updateRootDoc({

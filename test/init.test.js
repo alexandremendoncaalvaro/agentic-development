@@ -357,6 +357,28 @@ test('init -y --force-root-doc writes into a tracked root doc (ADR-0049)', () =>
   }
 });
 
+test('init -y --force-root-doc regenerates a stale section in a tracked root doc', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# AGENTS.md\n\n<!-- agentic-managed-skills:start -->\n\n' +
+        '## Skills installed by `agentic`\n\nstale table\n\n' +
+        '<!-- agentic-managed-skills:end -->\n'
+    );
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'tracked, stale managed section');
+
+    runInit(dir, ['--agent', 'claude-code', '-y', '--force-root-doc']);
+
+    const body = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    assert.doesNotMatch(body, /stale table/, 'the override must reach the replace path too');
+    assert.match(body, /ad-bootstrap/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 // The tracked check must not degrade into "refuse inside any repository".
 // Untracked and unknown are distinct states from tracked, and both still
 // authorise the append; only the other tests' non-repo scratch dirs cover

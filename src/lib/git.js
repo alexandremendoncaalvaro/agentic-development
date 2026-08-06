@@ -56,9 +56,20 @@ export function trackedState(cwd, relPath) {
  * @returns {string[]}  The subset to exclude.
  */
 export function installedPathsToExclude(cwd, relPaths) {
-  return relPaths.filter(
-    (p) => existsSync(join(cwd, p)) && trackedState(cwd, p) === 'untracked'
-  );
+  if (relPaths.length === 0) return [];
+  // One `ls-files` over the whole set instead of two subprocesses per file —
+  // matching leak-guard.js's batch-over-the-change-set precedent. Outside a
+  // repository this throws, and we return [] (nothing to exclude), the same
+  // fail-open result writeExcludeEntries gives.
+  let tracked;
+  try {
+    git(['rev-parse', '--git-dir'], cwd);
+    const out = gitOut(['ls-files', '--', ...relPaths], cwd);
+    tracked = new Set(out.split('\n').map((l) => l.trim()).filter(Boolean));
+  } catch {
+    return [];
+  }
+  return relPaths.filter((p) => existsSync(join(cwd, p)) && !tracked.has(p));
 }
 
 /**
@@ -87,9 +98,11 @@ export function writeExcludeEntries(cwd, relPaths) {
   } catch {
     return { added: [], excludeFile: null, skipped: 'not-a-repo' };
   }
-  // `--git-path` may return a path relative to cwd; resolve against cwd.
+  // `--git-path` may return a path relative to cwd; resolve against cwd with
+  // `join` (not string concat) to keep separators consistent on Windows,
+  // matching this codebase's path-portability discipline (install.js `toPosix`).
   if (excludeFile && !excludeFile.startsWith('/')) {
-    excludeFile = `${cwd}/${excludeFile}`;
+    excludeFile = join(cwd, excludeFile);
   }
 
   const existing = existsSync(excludeFile)

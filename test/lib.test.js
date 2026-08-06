@@ -13,7 +13,11 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { detectAgents, detectFeatures, detectMode } from '../src/lib/detect.js';
 import { installSkills } from '../src/lib/install.js';
-import { updateRootDoc, rootDocAppendPrompt } from '../src/lib/rootdoc.js';
+import {
+  updateRootDoc,
+  rootDocAppendPrompt,
+  rootDocReplacePrompt,
+} from '../src/lib/rootdoc.js';
 import {
   trackedState,
   writeExcludeEntries,
@@ -23,8 +27,8 @@ import {
   CONDITIONAL_SKILLS,
   REQUIRED_SKILLS,
   offerKitExclude,
-  userLevelInstallPath,
 } from '../src/commands/init.js';
+import { userLevelInstallPath } from '../src/lib/state.js';
 
 function mkGitRepo() {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-git-test-'));
@@ -704,6 +708,15 @@ test('rootDocAppendPrompt: unknown tracking state is treated as not shared', () 
     untracked,
     'no evidence of sharing must not become a warning the user cannot act on'
   );
+});
+
+test('rootDocReplacePrompt: names the sharing risk and the lost-edits risk, defaults to no', () => {
+  const { message, initialValue } = rootDocReplacePrompt('AGENTS.md');
+  assert.equal(initialValue, false, 'regenerating a shared, edited section must not be pre-answered yes');
+  assert.match(message, /tracked by git/);
+  assert.match(message, /everyone who clones the repo/);
+  assert.match(message, /lost/);
+  assert.match(message, /AGENTS\.md/);
 });
 
 test('writeExcludeEntries: adds anchored, by-filename entries to .git/info/exclude', () => {

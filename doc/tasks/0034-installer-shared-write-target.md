@@ -46,3 +46,16 @@ Two findings from the slice, both new:
 - Nothing in the suite exercised a git repository before this slice. Every scratch directory is a bare temp dir, which resolves to `unknown`, so `untracked` and `tracked` were both uncovered. `mkGitScratch` in `test/init.test.js` is the new fixture shape for the rest of the task.
 
 The probe is fail-open by design and diverges from `src/leak-guard.js`, which is fail-closed on the same git surface. The divergence is deliberate and documented at the helper: a guard that cannot resolve the repository must block, an installer that cannot resolve it must still install.
+
+### 2026-08-06 — fresh-context `/ad-review` and its fixes
+
+Two-axis review (Standards + Spec) on `origin/main..HEAD` returned two Blockers, both fixed here:
+
+- **Blocker A (both axes):** `init.js` interactive `confirmRootDocReplace` was `async () => true` — regenerated a stale section in a tracked root doc with no prompt, the append-path fix's mirror-image gap. Fixed: a tracked doc now prompts via the new pure `rootDocReplacePrompt` (default no), untracked keeps the silent regenerate. `update.js`'s interactive replace was fixed the same way (it previously named only the lost-edits risk, not the sharing risk — Standards + Spec Concern).
+- **Blocker B (Standards, data-loss):** `update.js` non-interactive replace checked `forceRootDoc` before tracked-state, so `--force-root-doc` overwrote a hand-edited section on an *untracked* doc — a flag scoped to the tracked case destroying a local edit. Fixed by checking tracked-state first; regression test `update -y --force-root-doc preserves a hand-edit in an UNTRACKED root doc` would fail on the old ordering.
+
+Concerns also resolved: `git.js` path built with `join` not string concat (portability); `installedPathsToExclude` batched to one `ls-files` instead of two subprocesses per file (leak-guard precedent); `userLevelInstallPath` moved to `state.js` (SRP, reuses STATE_DIRS/STATE_FILE); ARCHITECTURE.md + CHANGELOG corrected to match the code. Test matrix filled: `init` `--force-root-doc`-reaches-replace, `update` plain-refusal-on-replace. Suite 388/386/0.
+
+**Deferred (Standards Concern C5b):** `offerKitExclude` still lives in `init.js` and is imported by `update.js`, making `init.js` a shared-helper grab-bag. Relocating it needs a command-shared module (it depends on `@clack/prompts`, so it cannot go in a pure lib); low-urgency pure refactor with existing precedent (`update.js` already imports `CONDITIONAL_SKILLS`/`REQUIRED_SKILLS` from `init.js`). Left as a follow-up rather than expanding this PR.
+
+- [x] `/ad-review main..HEAD` before the PR — done; both Blockers resolved, one Concern deferred with rationale.

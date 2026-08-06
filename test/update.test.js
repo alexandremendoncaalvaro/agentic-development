@@ -101,6 +101,73 @@ test('update -y --force-root-doc appends into a tracked sectionless root doc (AD
   }
 });
 
+test('update -y leaves a stale section in a TRACKED root doc alone without a flag (ADR-0049)', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), STALE_ROOT_DOC);
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'tracked, stale managed section');
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+
+    runUpdate(dir, ['--agent', 'claude-code', '-y']);
+
+    assert.match(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      /stale table/,
+      'a tracked root doc must not be regenerated on the replace path without --force-root-doc'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// Blocker B regression: --force-root-doc is scoped to the tracked (shared)
+// case. On an UNTRACKED doc it must NOT destroy a hand-edited section — only
+// --force governs that. Before the fix, forceRootDoc short-circuited ahead of
+// the tracked check and wiped the edit.
+test('update -y --force-root-doc preserves a hand-edit in an UNTRACKED root doc (ADR-0049 Blocker B)', () => {
+  const { dir } = mkGitScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code', '-y']); // installs skills + state, no root doc
+    const handEdited =
+      '# AGENTS.md\n\n<!-- agentic-managed-skills:start -->\n\n' +
+      '## Skills installed by `agentic`\n\nMY HAND EDIT — keep this\n\n' +
+      '<!-- agentic-managed-skills:end -->\n';
+    writeFileSync(join(dir, 'AGENTS.md'), handEdited); // untracked — never git add
+
+    runUpdate(dir, ['--agent', 'claude-code', '-y', '--force-root-doc']);
+
+    assert.match(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      /MY HAND EDIT — keep this/,
+      '--force-root-doc must not overwrite a diverged section on an untracked doc'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('update -y --force regenerates a hand-edited section in an UNTRACKED root doc', () => {
+  const { dir } = mkGitScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# AGENTS.md\n\n<!-- agentic-managed-skills:start -->\n\n' +
+        '## Skills installed by `agentic`\n\nMY HAND EDIT\n\n' +
+        '<!-- agentic-managed-skills:end -->\n'
+    );
+
+    runUpdate(dir, ['--agent', 'claude-code', '-y', '--force']);
+
+    const body = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    assert.doesNotMatch(body, /MY HAND EDIT/, '--force still overwrites a diverged section (unchanged behaviour)');
+    assert.match(body, /ad-bootstrap/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 // The replace path already refused unattended (its pre-existing --force gate),
 // but --force-root-doc must drive it too, distinct from --force.
 test('update -y --force-root-doc regenerates a stale section in a tracked root doc (ADR-0049)', () => {

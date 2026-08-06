@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { DEFAULT_PROFILE, validateProfile } from './profiles.js';
 
@@ -14,6 +15,20 @@ export function statePath(cwd, agent) {
   const dir = STATE_DIRS[agent];
   if (!dir) throw new Error(`unknown agent "${agent}"`);
   return join(cwd, dir, STATE_FILE);
+}
+
+/**
+ * The user-level agentic install's state file, if one exists (ADR-0049
+ * Decision 2). When present, a project install is not the only place the kit
+ * lives, and the operator should see that. Reuses STATE_DIRS / STATE_FILE so
+ * it tracks the install layout. `home` is injectable for tests.
+ */
+export function userLevelInstallPath(home = homedir()) {
+  for (const dir of Object.values(STATE_DIRS)) {
+    const path = join(home, dir, STATE_FILE);
+    if (existsSync(path)) return path;
+  }
+  return null;
 }
 
 export function emptyState(agent, kitVersion, profile = DEFAULT_PROFILE) {

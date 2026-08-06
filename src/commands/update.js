@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures } from '../lib/detect.js';
 import { installSkills, removeOrphanSkills } from '../lib/install.js';
-import { loadState, saveState } from '../lib/state.js';
+import { loadState, saveState, userLevelInstallPath } from '../lib/state.js';
 import {
   DEFAULT_PROFILE,
   availableConditionalsForProfile,
@@ -14,6 +14,7 @@ import {
 import {
   updateRootDoc,
   rootDocAppendPrompt,
+  rootDocReplacePrompt,
   trackedRootDocSkipNotice,
 } from '../lib/rootdoc.js';
 import { trackedState } from '../lib/git.js';
@@ -22,7 +23,6 @@ import {
   CONDITIONAL_SKILLS,
   REQUIRED_SKILLS,
   offerKitExclude,
-  userLevelInstallPath,
 } from './init.js';
 
 const CONDITIONAL_BY_NAME = Object.fromEntries(
@@ -344,19 +344,27 @@ export async function updateCommand(opts) {
 
   const confirmRootDocReplace = interactive
     ? async (path) => {
-        const answer = await p.confirm({
-          message: `${path}: managed section diverged on disk. Regenerate it? (any edits between the agentic-managed-skills markers will be lost)`,
-          initialValue: false,
-        });
+        // A tracked doc names the sharing risk (ADR-0049 Decision 2); an
+        // untracked doc keeps the pre-existing diverged-section warning.
+        const answer = await p.confirm(
+          trackedState(cwd, path) === 'tracked'
+            ? rootDocReplacePrompt(path)
+            : {
+                message: `${path}: managed section diverged on disk. Regenerate it? (any edits between the agentic-managed-skills markers will be lost)`,
+                initialValue: false,
+              }
+        );
         if (p.isCancel(answer)) return false;
         return answer;
       }
-    : // Non-interactive replace keeps its pre-existing `--force` gate for an
-      // untracked doc, but a tracked doc is refused unless `--force-root-doc`
-      // (ADR-0049 sits in front of the divergence gate).
+    : // Tracked-state is checked FIRST: `--force-root-doc` authorizes writing a
+      // tracked (shared) doc only. On an untracked doc the pre-existing
+      // `--force` gate alone governs overwriting a diverged, hand-edited
+      // section — `--force-root-doc` must not reach it, or it would destroy a
+      // local edit it was never scoped to touch.
       async (path) => {
-        if (forceRootDoc) return true;
         if (trackedState(cwd, path) === 'tracked') {
+          if (forceRootDoc) return true;
           process.stderr.write(trackedRootDocSkipNotice(path) + '\n');
           return false;
         }
