@@ -1,6 +1,6 @@
 # ADR-0048: Release discipline — CHANGELOG.md, release script, and commit-time gates
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-08-05
 **Deciders:** Alexandre Alvaro
 
