@@ -196,6 +196,15 @@
         }
       ]
     },
+    "ad-question-me": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-question-me/SKILL.md",
+          "sourceSha": "ad53130483ecfe6c7e2fc9df7f0ceced99191db5dcbdedcbb706f56416657953"
+        }
+      ]
+    },
     "ad-review": {
       "version": "0.20.0-beta.1",
       "files": [
@@ -206,6 +215,15 @@
         {
           "path": ".claude/skills/ad-review/SKILL.md",
           "sourceSha": "fcada22e893d920a7eeb87c050372a4660df03b72c895e26f1ccdab563eb2bd1"
+        }
+      ]
+    },
+    "ad-roadmap": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-roadmap/SKILL.md",
+          "sourceSha": "7ef73550b19c4a5545512ad88feba9a3ea70ce2986f240f0c46740a042d70155"
         }
       ]
     },

@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-question-me
+  short_description: Value-first questioner — absorbs the value you intend, then raises only the questions that are the owner's judgment call or genuinely un-groundable, resolving anything answerable from code / docs itself. Ranked questions, killer first, no verdict.
+policy:
+  allow_implicit_invocation: false

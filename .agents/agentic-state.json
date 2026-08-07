@@ -276,6 +276,19 @@
         }
       ]
     },
+    "ad-question-me": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-question-me/agents/openai.yaml",
+          "sourceSha": "ca2b2e8744201225ba1c923427608ef975416104ec5e6be781207af1047295a6"
+        },
+        {
+          "path": ".agents/skills/ad-question-me/SKILL.md",
+          "sourceSha": "8b763dcb8d4ad33f77930543a3973a8b0e0578fb21a13739c32fe7429e6706d4"
+        }
+      ]
+    },
     "ad-review": {
       "version": "0.20.0-beta.1",
       "files": [
@@ -290,6 +303,19 @@
         {
           "path": ".codex/agents/fresh-context-reviewer.toml",
           "sourceSha": "301d5a0b86afbd2df3627127f561dbb1beb24b3b2f35c17706429d8d2dc2025f"
+        }
+      ]
+    },
+    "ad-roadmap": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-roadmap/agents/openai.yaml",
+          "sourceSha": "a1bf4de268d27ef41c7660090f1e7a556ceed292756dc2ccec8789747828b811"
+        },
+        {
+          "path": ".agents/skills/ad-roadmap/SKILL.md",
+          "sourceSha": "c4265b8c341b977cc4915e66d49c38f2facbba48262f976ca9fed027d7fb36f8"
         }
       ]
     },
