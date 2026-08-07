@@ -1,6 +1,6 @@
 # ADR-0050: Handle the conformance/design-intent gap by sharpening rule-anchored reviewers, not by adding a lens
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-08-06
 **Deciders:** Alexandre Alvaro
 
