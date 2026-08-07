@@ -59,3 +59,17 @@ Concerns also resolved: `git.js` path built with `join` not string concat (porta
 **Deferred (Standards Concern C5b):** `offerKitExclude` still lives in `init.js` and is imported by `update.js`, making `init.js` a shared-helper grab-bag. Relocating it needs a command-shared module (it depends on `@clack/prompts`, so it cannot go in a pure lib); low-urgency pure refactor with existing precedent (`update.js` already imports `CONDITIONAL_SKILLS`/`REQUIRED_SKILLS` from `init.js`). Left as a follow-up rather than expanding this PR.
 
 - [x] `/ad-review main..HEAD` before the PR — done; both Blockers resolved, one Concern deferred with rationale.
+
+### 2026-08-06 — frozen pending the parallel-merge burst (Alê's coordination call)
+
+`origin/main` advanced three times during this work — a state-projection / read-contract feature, its follow-ups, and a `0.20.0-beta.1` release (`7570f31`) — and kept moving faster than each integration attempt. Alê's decision: freeze C1 and integrate **once** when the burst settles, rather than race a moving target. Waiting on his signal that the parallel front has stopped.
+
+Frozen state: branch `claude/sharp-goldberg-b19c79`, tip is merge `851bbf2` (integrates `origin/main` at `f4420cf`), full suite 404/402/0. The installer-overlap resolution (their `installKitDocs` for the WORKFLOW.md install + this branch's `offerKitExclude` / tracked-root-doc guard) is already done and committed in `851bbf2` — reuse it, do not redo it.
+
+One-shot integration checklist for when main is stable:
+- [ ] Renumber this task 0035 → next free (main now holds `0035-windows-ci-matrix-decision.md`); likely `task-0036`. ADR-0050 was still free at last check — reconfirm before assuming.
+- [ ] Re-resolve `CHANGELOG.md`: the 0.20.0-beta.1 release rotated `[Unreleased]`; C1's entries were NOT in that release, so they belong under the new `[Unreleased]`.
+- [ ] Re-run the full gate and `/ad-review` against the stabilized base (the earlier review ran against the pre-merge tree; the merged result — especially the `installKitDocs` × `offerKitExclude` interaction below — has not had a fresh-context pass).
+- [ ] Open the PR via **`ghp`** (never `gh`, never `gh auth switch`).
+
+Open interaction for that re-review: `installKitDocs` writes `WORKFLOW.md` / `WORKFLOW-FLOWS.md` to the target root, so `offerKitExclude` now also offers to exclude them (it sweeps all untracked installed files). Harmless (interactive offer, file stays on disk) but unanticipated — decide at re-review whether root kit-docs belong in the exclude offer or only the agent-surface files.
