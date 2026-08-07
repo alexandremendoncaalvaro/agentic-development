@@ -52,8 +52,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-bootstrap/references/agents-template.md",
+          "sourceSha": "8ad3d3acba6ecfa17b8a785e5f26133928533889c9127d8d4a6902442219846d"
+        },
+        {
           "path": ".claude/skills/ad-bootstrap/SKILL.md",
-          "sourceSha": "efddcd5c9941959ff12bb99b518a12f65c89fac3b7313defc169ce742eef555a"
+          "sourceSha": "542818101f842f2226aa640079da18933e5833524057a051ca8c091aaf45917b"
         }
       ]
     },

@@ -72,8 +72,12 @@
           "sourceSha": "bf5836cc79a71b603c72094be2726e05c0d6b8a80f96264930bd3d3998cdb88a"
         },
         {
+          "path": ".agents/skills/ad-bootstrap/references/agents-template.md",
+          "sourceSha": "a3252539fca04e188322f8613d5c531e9058651638b36fe58f63f0fc2a8622ec"
+        },
+        {
           "path": ".agents/skills/ad-bootstrap/SKILL.md",
-          "sourceSha": "a0d01ea807df24d85329e8d5c46939907bf6cee5ab9bf53650f3f90a313f3bb9"
+          "sourceSha": "a3f0c7a0d6d9d33b3c82f4ca209b5c0566bfdb096cde849a5fec3953e7886f51"
         }
       ]
     },
