@@ -27,6 +27,7 @@ import {
   CONDITIONAL_SKILLS,
   REQUIRED_SKILLS,
   offerKitExclude,
+  kitExcludeCandidates,
 } from '../src/commands/init.js';
 import { userLevelInstallPath } from '../src/lib/state.js';
 
@@ -808,6 +809,39 @@ test('userLevelInstallPath: finds a user-level state file, null when absent', ()
     );
   } finally {
     rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('kitExcludeCandidates: sweeps the agent surface but never root kit-docs (ADR-0051 scope)', () => {
+  const dir = mkGitRepo();
+  try {
+    // Root kit-docs installKitDocs writes (ADR-0049 D6) — untracked, but NOT
+    // the exclude offer's business: the team may commit and diverge from them.
+    writeFileSync(join(dir, 'WORKFLOW.md'), 'kit\n');
+    writeFileSync(join(dir, 'WORKFLOW-FLOWS.md'), 'kit\n');
+    // Agent-surface files — these ARE the exclude offer's business.
+    mkdirSync(join(dir, '.claude/skills/ad-audit'), { recursive: true });
+    writeFileSync(join(dir, '.claude/skills/ad-audit/SKILL.md'), 'kit\n');
+    mkdirSync(join(dir, '.agents/skills/ad-audit'), { recursive: true });
+    writeFileSync(join(dir, '.agents/skills/ad-audit/SKILL.md'), 'kit\n');
+
+    const candidates = kitExcludeCandidates(dir, [
+      'WORKFLOW.md',
+      'WORKFLOW-FLOWS.md',
+      '.claude/skills/ad-audit/SKILL.md',
+      '.agents/skills/ad-audit/SKILL.md',
+    ]);
+
+    assert.deepEqual(candidates.sort(), [
+      '.agents/skills/ad-audit/SKILL.md',
+      '.claude/skills/ad-audit/SKILL.md',
+    ]);
+    assert.ok(
+      !candidates.includes('WORKFLOW.md') && !candidates.includes('WORKFLOW-FLOWS.md'),
+      'root kit-docs must not be offered for exclusion — the kit commits them'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 });
 

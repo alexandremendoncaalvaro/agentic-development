@@ -73,3 +73,11 @@ One-shot integration checklist for when main is stable:
 - [ ] Open the PR via **`ghp`** (never `gh`, never `gh auth switch`).
 
 Open interaction for that re-review: `installKitDocs` writes `WORKFLOW.md` / `WORKFLOW-FLOWS.md` to the target root, so `offerKitExclude` now also offers to exclude them (it sweeps all untracked installed files). Harmless (interactive offer, file stays on disk) but unanticipated — decide at re-review whether root kit-docs belong in the exclude offer or only the agent-surface files.
+
+### 2026-08-06 — post-integration re-review, and the scope fix it produced
+
+Integrated onto the stabilized `main` (renumber ADR-0051 / task-0036, CHANGELOG entries moved to `[Unreleased]` off the released section, PROJECTION.md count 26→27). A fresh-context re-review of the *merged* changeset confirmed both prior Blockers are cleared and test-pinned, and returned a verdict on the open interaction: the exclude offer's scope was **wrong** — `offerKitExclude` swept root kit-docs (`WORKFLOW.md` / `WORKFLOW-FLOWS.md`) under the same default-yes framing as agent-surface files, contradicting ADR-0051's two-surface scope and the kit's own convention of committing those docs (a Concern, not a Blocker: interactive-only, reversible, no data loss).
+
+Fixed here: `kitExcludeCandidates` (new, exported, unit-tested) scopes the offer to the agent surface (`.claude/`, `.agents/`, `.codex/`) via `AGENT_SURFACE_PREFIXES`; root kit-docs are outside the sweep, guarded instead by `installKitDocs`'s own report-and-skip. `ARCHITECTURE.md` corrected to state the scope. Suite 405/403/0.
+
+Re-review Notes not fixed (recorded, not lost): `cwd === homedir()` strict-string compare could misfire on a symlinked home (cosmetic — suppresses one summary line, no data safety); the `offerKitExclude` doc-comment's "freshly-installed" wording was tightened. The C5b coupling (`offerKitExclude` in `init.js`, imported by `update.js`) remains the deferred follow-up.
