@@ -6,6 +6,10 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Fixed
+
+- `ad-audit` SKILL.md on both hosts names the machine store by its canonical noun ("machine store", per CONTEXT.md) — four spots said "curated store", the alias the glossary exists to retire.
+
 ## [0.20.0-beta.1] - 2026-08-06
 
 ### Added
@@ -25,7 +29,6 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 ### Fixed
 
 - `ad-philosophy` claimed eleven Documentation Discipline rules while `WORKFLOW.md` declared thirteen authoritative, so the contract an agent loaded each session was two rules short of the one that bound it — and one of the two (cite a commit range by tag, not by SHA) had no delivery anywhere in the kit. Both hosts now deliver all thirteen, and the count parity is pinned by test.
-- `ad-audit` SKILL.md on both hosts names the machine store by its canonical noun ("machine store", per CONTEXT.md) — four spots said "curated store", the alias the glossary exists to retire.
 
 ## [0.19.0-beta.1] - 2026-08-05
 
