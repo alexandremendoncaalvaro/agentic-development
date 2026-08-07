@@ -535,18 +535,29 @@ test('every ADR amendment declares both sides of the pair', () => {
 // wrong once: the ADR that introduced the projection was itself missing from
 // the total. Everything else on that page needs a human; this does not.
 
-test('the ADR projection states the number of records the directory actually holds', () => {
+test('the ADR projection states the number of ACCEPTED records the directory holds', () => {
   const adrDir = join(REPO_ROOT, 'doc', 'adr');
   const projection = join(adrDir, 'PROJECTION.md');
   if (!existsSync(projection)) return; // the projection is permitted, not required
 
-  const records = readdirSync(adrDir).filter((f) => /^\d{4}-.*\.md$/.test(f)).length;
-  const claimed = readFileSync(projection, 'utf8').match(/All (\d+) ADRs/);
-  assert.ok(claimed, 'PROJECTION.md no longer states a record total in the form "All N ADRs"');
+  // Count only ACCEPTED ADRs, not every file. The projection projects what
+  // BINDS (ADR-0049), and its own maintenance rule is "a decision that changes
+  // what binds updates the projection in the same commit". A `proposed` ADR
+  // binds nothing yet — it changes what binds only when it is accepted — so it
+  // is out of the projection's count until then. Counting raw files instead
+  // made every `proposed`-ADR commit (the normal `/ad-adr` flow) trip this
+  // test against its own stated principle.
+  const accepted = readdirSync(adrDir)
+    .filter((f) => /^\d{4}-.*\.md$/.test(f))
+    .filter((f) => /^\*\*Status:\*\*\s*accepted\b/im.test(readFileSync(join(adrDir, f), 'utf8')))
+    .length;
+  const claimed = readFileSync(projection, 'utf8').match(/All (\d+) accepted ADRs/);
+  assert.ok(claimed, 'PROJECTION.md no longer states an accepted total in the form "All N accepted ADRs"');
   assert.equal(
     Number(claimed[1]),
-    records,
-    `PROJECTION.md claims ${claimed[1]} ADRs; doc/adr/ holds ${records}. ` +
-      'A decision that changes what binds updates the projection in the same commit.'
+    accepted,
+    `PROJECTION.md claims ${claimed[1]} accepted ADRs; doc/adr/ holds ${accepted}. ` +
+      'Accepting or superseding an ADR changes what binds — update the projection in the same commit. ' +
+      'Merely proposing one does not.'
   );
 });
