@@ -8,8 +8,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-adr/references/adr-template.md",
+          "sourceSha": "006689825a9d54b8777577f4ee66ce48ac04f9d171390e7dd375225669a05603"
+        },
+        {
           "path": ".claude/skills/ad-adr/SKILL.md",
-          "sourceSha": "54a073d4860e6b3b165fc2b6f8e3e2eab6f9ce9dc51e931d68b6ec4a0d8dcefc"
+          "sourceSha": "3082f71df05d9db4771a6d2571b7093eabc7488c527202d32ab3fe4d6673264d"
         }
       ]
     },
@@ -17,8 +21,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-architecture/references/architecture-template.md",
+          "sourceSha": "d882716a9ef93eaf353202b8fb5f862a9969ef73454a5a37a2d15fa4955c8655"
+        },
+        {
           "path": ".claude/skills/ad-architecture/SKILL.md",
-          "sourceSha": "ae3d7bbbd6b1e1922fc14c5c51c8d9ffa1edb53de7486bcba391826ab97e161b"
+          "sourceSha": "ad579034ed4100e78810c3a8eff5b830c7dff8a68b472bd22c921505bc9f2e5e"
         }
       ]
     },
@@ -244,8 +252,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-spec/references/spec-template.md",
+          "sourceSha": "8c1a1936b12ebde309ba2bb241f43ed23a71f8de76e862436e4682bc67439152"
+        },
+        {
           "path": ".claude/skills/ad-spec/SKILL.md",
-          "sourceSha": "6c32f003bc3f9083e148c072270a67b6599a54e56f7127f02dd8e2d3bc321ada"
+          "sourceSha": "3c3d61a87334d68f9fb9583e7d309069e4ecd95f7a802218c80e2ff6de3d17b3"
         }
       ]
     },
@@ -271,8 +283,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-task/references/task-template.md",
+          "sourceSha": "7cd864ba986f5851095c01800e3c121dc8b3cdd8409ea9bc2f4f72402ec067ed"
+        },
+        {
           "path": ".claude/skills/ad-task/SKILL.md",
-          "sourceSha": "ca9967f87e7dddba89243712f555ee14ae27e714704e524fe7e3153055804b9f"
+          "sourceSha": "1590a7bdb8490dd7fb587acdfc1e191398959d1725b150e183d11285553bc2f6"
         }
       ]
     },
