@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-roadmap
+  short_description: Read-only completion rollup — reconciles the product roadmap against implementing specs and tasks into an overall percentage plus a per-tier done / in progress / blocked / remaining breakdown, for a decision-maker.
+policy:
+  allow_implicit_invocation: false
