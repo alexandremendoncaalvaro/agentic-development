@@ -36,15 +36,15 @@
       "files": [
         {
           "path": ".claude/agents/audit-group-reviewer.md",
-          "sourceSha": "23484492c180890c66f07ecbc8adade9dcf469d36fc7dcfd24a132808288780d"
+          "sourceSha": "003f3b2efcb7bbe14931fdf7ec20e4aa8f9ccb6a0dffa1e3b2c0869a1c3c2e7e"
         },
         {
           "path": ".claude/skills/ad-audit/scripts/resolve-rules.mjs",
-          "sourceSha": "c9afcab772e101074eb1fc9d53d4cfb210072b1f8429a3eedf2d2da767827862"
+          "sourceSha": "baa5dc95352274fa017d90ca383bc586a0d4e0f94f840a9f1ad98fcc885fa31b"
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "6f4ad6fda3dbe1d9b719b3b4c78c919077293be0405b5c0a87b3606db890a066"
+          "sourceSha": "9cb550eae65a88125daa12a3f96112f35fd08ae1ef9f0f9a143a0481a3ddf34f"
         }
       ]
     },
