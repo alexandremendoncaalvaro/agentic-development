@@ -19,11 +19,8 @@ import {
 } from '../lib/rootdoc.js';
 import { trackedState } from '../lib/git.js';
 import { homedir } from 'node:os';
-import {
-  CONDITIONAL_SKILLS,
-  REQUIRED_SKILLS,
-  offerKitExclude,
-} from './init.js';
+import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from './init.js';
+import { offerKitExclude } from './kit-exclude.js';
 
 const CONDITIONAL_BY_NAME = Object.fromEntries(
   CONDITIONAL_SKILLS.map((s) => [s.name, s])
