@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-07-28
 **Deciders:** Alexandre Alvaro
+**Amends:** [ADR-0035](0035-rules-location-convention.md) — supersedes its rejection of a per-repo rules layer, for the project scope only; the machine store it defines is unchanged.
 
 ## Context
 

@@ -65,5 +65,8 @@ pre-push:
       use_stdin: true
       stage_fixed: false
     npm-test:
-      run: npm test
+      # Via the runner script so the hook's git environment (GIT_DIR etc.)
+      # never leaks into the suite's child processes — in a linked git
+      # worktree that leak alone turns 13 tests red (task-0033).
+      run: node scripts/hook-npm-test.js
       stage_fixed: false

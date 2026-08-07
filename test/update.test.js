@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import {
   mkdtempSync,
   rmSync,
@@ -54,6 +54,86 @@ const STALE_ROOT_DOC =
   '# AGENTS.md\n\n<!-- agentic-managed-skills:start -->\n\n' +
   '## Skills installed by `agentic`\n\nstale table\n\n' +
   '<!-- agentic-managed-skills:end -->\n';
+
+// --- Kit-doc install regressions (task-0035 of origin/main; kept from PR that
+// merged first) ------------------------------------------------------------
+// `WORKFLOW.md` being kit-owned settles who authors it, not whether an installer
+// may delete a user's edits without saying so. The first cut of installKitDocs
+// copied unconditionally: a target that had appended a local section lost it on
+// the next `update`, reported as a benign `~ WORKFLOW.md`. AGENTS.md states the
+// opposite as a contract — "Don't break this default by silently overwriting."
+test('regression: task 0034 — update skips a diverged kit doc instead of overwriting it', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    const edited = `${readFileSync(join(dir, 'WORKFLOW.md'), 'utf8')}\n## Local addition\n`;
+    writeFileSync(join(dir, 'WORKFLOW.md'), edited);
+
+    const run = spawnSync('node', [BIN, 'update', '--agent', 'claude-code', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+    });
+
+    assert.equal(
+      readFileSync(join(dir, 'WORKFLOW.md'), 'utf8'),
+      edited,
+      'update destroyed a user edit to WORKFLOW.md'
+    );
+    assert.match(
+      `${run.stdout}${run.stderr}`,
+      /! WORKFLOW\.md/,
+      'the skip must be reported, not silent — an unreported skip is its own defect'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('regression: task 0034 — update --force replaces a diverged kit doc', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    const pristine = readFileSync(join(dir, 'WORKFLOW.md'), 'utf8');
+    writeFileSync(join(dir, 'WORKFLOW.md'), `${pristine}\n## Local addition\n`);
+
+    spawnSync('node', [BIN, 'update', '--agent', 'claude-code', '--yes', '--force'], {
+      cwd: dir,
+      encoding: 'utf8',
+    });
+
+    assert.equal(
+      readFileSync(join(dir, 'WORKFLOW.md'), 'utf8'),
+      pristine,
+      '--force must restore the kit copy'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// Kit-doc actions are agent-independent, so they carry no `agent` field while
+// every skill-file action does. The report line used to interpolate the field
+// unconditionally, which surfaced as a literal `[undefined]` beside each
+// Constitution file — the report is the only place a user sees what an update
+// did, so a placeholder there reads as a broken install.
+test('regression: task 0034 — update reports kit docs without a placeholder agent tag', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    // Non-interactive `update` writes its report to stderr; asserting on the
+    // union of both streams keeps the test about what the user reads rather
+    // than about which stream carries it.
+    const run = spawnSync('node', [BIN, 'update', '--agent', 'claude-code', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+    });
+    const out = `${run.stdout}${run.stderr}`;
+    assert.ok(!out.includes('[undefined]'), `update report leaked a placeholder agent:\n${out}`);
+    assert.match(out, /WORKFLOW\.md/, 'update report does not mention the kit docs at all');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 // The unguarded update.js hole is the APPEND path (confirmAppend was
 // unconditional): a tracked root doc with no managed section yet.

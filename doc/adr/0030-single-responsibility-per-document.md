@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-05-11
 **Deciders:** Alexandre Alvaro
+**Amended by:** [ADR-0049](0049-append-only-layers-own-a-state-projection.md) — permits one state projection inside an append-only layer's own directory; the prohibition on other documents digesting a layer's index is unchanged.
 
 ## Context
 

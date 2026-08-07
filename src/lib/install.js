@@ -393,3 +393,69 @@ export async function removeOrphanSkills({
 
   return { actions, removedSkills };
 }
+
+// Layer 1 Constitution files the kit ships. Installed skills cite them by
+// section (`WORKFLOW §10`, `WORKFLOW.md §1`) and so do this installer's own
+// completion hints, so a target root without them leaves every one of those
+// references pointing at nothing. `WORKFLOW-FLOWS.md` ships alongside because
+// `WORKFLOW.md` references it in its own opening — installing one without the
+// other recreates the same defect one level down.
+const KIT_DOCS = ['WORKFLOW.md', 'WORKFLOW-FLOWS.md'];
+
+/**
+ * Install the kit-shipped Constitution files at the target repo root.
+ *
+ * Agent-independent: these land once per project, not once per agent surface,
+ * so this runs outside the per-agent install loop and its actions carry no
+ * `agent` field.
+ *
+ * Divergence is never overwritten silently. `WORKFLOW.md` being kit-owned
+ * (WORKFLOW.md §1) settles who authors the content, not whether an installer
+ * may delete a user's edits without telling them — a target that diverged is
+ * reported and skipped, and only `force` replaces it. This is the same default
+ * `installSkills` holds, and the reason AGENTS.md states it as a contract:
+ * a silent overwrite is indistinguishable from data loss at the call site.
+ *
+ * @param {object} opts
+ * @param {string} opts.cwd — target project root
+ * @param {boolean} [opts.dryRun] — plan only, write nothing
+ * @param {boolean} [opts.force] — replace a diverged target instead of skipping
+ *
+ * @returns {Array<{type: 'created'|'unchanged'|'replaced'|'skipped', path: string}>}
+ * @throws {Error} when a kit doc is missing from the kit root (packaging fault)
+ */
+export function installKitDocs({ cwd, dryRun = false, force = false }) {
+  const actions = [];
+
+  for (const doc of KIT_DOCS) {
+    const src = join(KIT_ROOT, doc);
+    if (!existsSync(src)) {
+      throw new Error(
+        `kit doc ${doc} is missing from the kit root (${KIT_ROOT}) — check package.json#files`
+      );
+    }
+
+    const target = join(cwd, doc);
+
+    if (!existsSync(target)) {
+      if (!dryRun) copyFileSync(src, target);
+      actions.push({ type: 'created', path: doc });
+      continue;
+    }
+
+    if (sameFile(src, target)) {
+      actions.push({ type: 'unchanged', path: doc });
+      continue;
+    }
+
+    if (!force) {
+      actions.push({ type: 'skipped', path: doc });
+      continue;
+    }
+
+    if (!dryRun) copyFileSync(src, target);
+    actions.push({ type: 'replaced', path: doc });
+  }
+
+  return actions;
+}

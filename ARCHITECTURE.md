@@ -21,7 +21,8 @@ Kit content lives under `src/skills/<agent>/<skill>/` and is read at runtime by 
 * `src/skills/codex/<skill>/SKILL.md` plus `agents/openai.yaml` — XML body + minimal frontmatter (cc-sdd convention); same optional `scripts/` skill scripts as the claude-code tree (byte-identical twins, parity-tested).
 * `templates/`, `prompts/` — kit-shipped baselines for the manual paste-into-agent flow. Not loaded at runtime by the installer; only mentioned by the README's `Manual prompts` section.
 * `scripts/` — repo-only release and git-hook tooling ([ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)): `release.sh` (with `release-apply.js` + the pure `release-lib.js`) and the lefthook gate scripts (`changelog-gate.js`, `commit-subject-check.js`, `push-branch-guard.js`). Wired by `lefthook.yml`; excluded from `package.json#files`, so none of it ships to npm.
-* `doc/adr/`, `doc/tasks/`, `WORKFLOW.md`, `AGENTS.md`, `ARCHITECTURE.md`, `CHANGELOG.md` — kit documentation. Not loaded at runtime.
+* `doc/adr/`, `doc/tasks/`, `AGENTS.md`, `ARCHITECTURE.md`, `CHANGELOG.md` — kit documentation. Not loaded at runtime.
+* `WORKFLOW.md`, `WORKFLOW-FLOWS.md` — the kit-shipped Layer 1 Constitution, and the one documentation pair the installer *does* read at runtime: `installKitDocs` copies both to the target root so the section numbers the installed skills cite resolve there ([ADR-0049](doc/adr/0049-append-only-layers-own-a-state-projection.md)). A diverged target copy is reported and skipped, never overwritten without `--force`.
 
 Boundary rule: only `src/lib/install.js` resolves `KIT_ROOT`-rooted paths (`import.meta.url` → `..`). Layers above never read `src/skills/` directly. AGENTS.md gotcha §89 documents the fragility (moving `install.js` breaks the path).
 

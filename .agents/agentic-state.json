@@ -13,7 +13,7 @@
         },
         {
           "path": ".agents/skills/ad-adr/SKILL.md",
-          "sourceSha": "02844f0762e7b799e54b010b07d13092092dbf533f5b4b3d98cffea6b6aeee95"
+          "sourceSha": "606ff3052599e71faebf34b666939fecf64693fb65c92152599cfd0efb6468b9"
         }
       ]
     },
@@ -52,15 +52,15 @@
         },
         {
           "path": ".agents/skills/ad-audit/scripts/resolve-rules.mjs",
-          "sourceSha": "c9afcab772e101074eb1fc9d53d4cfb210072b1f8429a3eedf2d2da767827862"
+          "sourceSha": "baa5dc95352274fa017d90ca383bc586a0d4e0f94f840a9f1ad98fcc885fa31b"
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "071417ad55ad43ecd93c04e8e07d5eb820277286db1b5fe15674d011fca3eebf"
+          "sourceSha": "6680729f90da6c36d0b2dd93a3d5fde71c53039c1b8cbc6cb35bba5e8ce308ea"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
-          "sourceSha": "1a7e70e970753707ea444ec20b14585c4763317f579aeb4a97e2824de932ced9"
+          "sourceSha": "07af6cc85b26efd3cb13a4074ff2a924beda8dbf5384aec4f5a825eeeab26bfa"
         }
       ]
     },
@@ -138,7 +138,7 @@
         },
         {
           "path": ".agents/skills/ad-drift/SKILL.md",
-          "sourceSha": "3173ac52d8c893c30e6000e137c2b1acc96338106544ac53f53517ad080c35b9"
+          "sourceSha": "e4fcf0dd00de84648f3eb4f86065eaaf20e32690aacf3d70d921663846bd493b"
         }
       ]
     },
@@ -246,7 +246,7 @@
         },
         {
           "path": ".agents/skills/ad-philosophy/SKILL.md",
-          "sourceSha": "5cb4be1993389a2cfcc05e7f377e61f0163c99896a739771dba12669d2bb0ae0"
+          "sourceSha": "dbb9b9de9a8676e91d3121bd2c218bd5388902793061eb0227a7b99e40a64f8c"
         }
       ]
     },

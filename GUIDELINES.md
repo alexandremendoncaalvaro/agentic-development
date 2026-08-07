@@ -336,7 +336,7 @@ Every document in this repo follows these rules:
 7. **No commented-out code; no orphan `TODO`/`FIXME` in source.** Every deferred item references a GitHub Issue or a `doc/tasks/NNNN-*.md` task.
 8. **Tests are living documentation of behavior.** Test names read as the spec they enforce.
 9. **Single responsibility per document.** Definition / decision-record / tracking — one role per document; no per-item tracking UI in definition docs.
-10. **Each layer owns its directory index.** `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are canonical indices; no digest of those indices in other documents.
+10. **Each layer owns its directory index.** `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are canonical indices; no digest of those indices in other documents. One exception, inside the layer only ([ADR-0049](doc/adr/0049-append-only-layers-own-a-state-projection.md)): an append-only layer may own a single state projection in its own directory, naming which records still bind and what corrected the rest. In this repo that is [`doc/adr/PROJECTION.md`](doc/adr/PROJECTION.md). A projection that only lists records is a duplicate index and stays forbidden.
 11. **Cross-references must be load-bearing.** If removing a reference leaves the surrounding statement intact, the reference was decoration — drop it.
 
 ### 11.1 Document Scope
@@ -345,6 +345,7 @@ Every document in this repo follows these rules:
 |----------|-------|----------|
 | `README.md` | What the kit is, how to install, how to use | Users |
 | `CHANGELOG.md` | Consumer-visible changes per release (Keep a Changelog; rotated only by `scripts/release.sh`, per [ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)) | Users, maintainers |
+| `doc/adr/PROJECTION.md` | Which ADRs still bind and what retired the rest — one screen, state only, never rationale ([ADR-0049](doc/adr/0049-append-only-layers-own-a-state-projection.md)) | Anyone reading the ADR layer |
 | `AGENTS.md` (+ `CLAUDE.md` mirror) | Distilled non-negotiable rules read every session | AI agents, contributors |
 | `WORKFLOW.md` | Universal engineering philosophy (kit-shipped to downstream installs) | Engineers |
 | `GUIDELINES.md` (this document) | Project-specific engineering standards | Engineers |

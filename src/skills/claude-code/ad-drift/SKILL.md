@@ -34,6 +34,19 @@ If the user names an artifact (`AGENTS.md`, `ARCHITECTURE.md`, ADRs, specs), aud
 * Numbering — gaps or duplicates in `doc/adr/NNNN-*.md`?
 * Status field — every ADR has one of `proposed | accepted | deprecated | superseded by ADR-NNNN`.
 * Superseded chains — every "superseded by ADR-NNNN" target exists.
+* **Amendment pairs** — a partial supersession is declared as a header-field pair: `**Amends:**` on the amending record, `**Amended by:**` on the amended one. Every one of each must have its counterpart. An unpaired field leaves a relation only prose can find, so a reader has to open every record in the directory to learn what still binds. Deterministic — compare the two sets, no judgement of intent:
+
+  Compare **relations, not filenames** — the two file lists are supposed to be disjoint, because the two halves of one relation live in different records. Read each field's value and check that `A declares Amends: B` is answered by `B declares Amended by: A`:
+
+  ```sh
+  grep -H '^\*\*Amends:\*\*' doc/adr/*.md
+  grep -H '^\*\*Amended by:\*\*' doc/adr/*.md
+  ```
+
+  A keyword sweep for `supersed|amends` is **not** the check: it reports records that merely discuss the vocabulary, and records that state they *augment rather than supersede*. Read the fields, not the prose.
+
+  Know the limit: this check is silent in a layer that never adopted the fields. Measured across three repositories, the field check returned nothing there while the keyword sweep returned between one and ten hits per layer, much of it noise. So when a layer holds records whose prose claims supersession and carries **no** amendment field anywhere, say so **once**, as an adoption suggestion — do not enumerate the sweep's hits as findings. A signal firing on a quarter of a directory stops being read.
+* **State projection contradicting a live record** (only if the layer has one — `<layer>/PROJECTION.md`, the name rule 10 fixes; check every append-only layer, not just `doc/adr/`). Report a record the projection calls fully binding whose own header says otherwise (`deprecated`, `superseded by`, or an `Amended by:` the projection omits), and a record the projection lists as retired-in-part that carries no such marker. **A missing projection is not a finding** — rule 10 permits one, it does not require one; flagging absence would turn a permission into an obligation the rule never granted.
 
 ### Spec drift (if `doc/specs/` exists)
 
@@ -66,7 +79,7 @@ Source code (sample, not exhaustive — flag findings, not every match):
 Per WORKFLOW §2 rules #9–#12, definition-layer documents do not take on tracking or duplicate other layers' indices, and `WORKFLOW.md` stays universal:
 
 * **Definition-layer tracking UI** (Rule #9) — grep `^- \[ \]\|^- \[x\]` inside `AGENTS.md`, `WORKFLOW.md`, `ARCHITECTURE.md`, `GUIDELINES.md`, `CONTEXT.md`, `doc/product/*.md`. Findings: definition documents must not carry per-item checkbox UI. Exception: fenced code blocks showing template examples (e.g., PR-body shape) are illustrative, not pillar tracking.
-* **Directory-as-index duplication** (Rule #10) — flag sections that re-state another layer's index. Concrete patterns: `## Active ADRs` inside `ARCHITECTURE.md` or `AGENTS.md`; multi-bullet `## Architectural Principles` digests that paraphrase each ADR; PRD `## Related → ADRs` bullet lists that enumerate the kit's ADR ledger.
+* **Directory-as-index duplication** (Rule #10) — flag sections that re-state another layer's index. Concrete patterns: `## Active ADRs` inside `ARCHITECTURE.md` or `AGENTS.md`; multi-bullet `## Architectural Principles` digests that paraphrase each ADR; PRD `## Related → ADRs` bullet lists that enumerate the kit's ADR ledger. **Not a finding:** a layer's own state projection inside its own directory — rule 10 sanctions exactly one per append-only layer. It *is* a finding when that projection only lists records without saying what still binds, which makes it a duplicate index wearing the exception's name.
 * **Kit-state in `WORKFLOW.md`** (Rule #12) — grep `ADR-[0-9]\{4\}` in `WORKFLOW.md`. Universal philosophy must not cite kit-specific ADR numbers (downstream installs receive `WORKFLOW.md` without `doc/adr/`). Literature citations (named books / papers) and generic `doc/adr/` directory references are allowed.
 * **Cross-references that are decoration** (Rule #11) — sample inline ADR refs (`per ADR-NNNN`) in narrative documents and apply the load-bearing test: if you delete the reference and the surrounding statement still stands, the reference was decoration; flag it. Judgment-call; surface as findings, not as automated reject.
 

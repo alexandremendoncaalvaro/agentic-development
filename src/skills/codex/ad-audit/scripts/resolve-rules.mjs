@@ -16,9 +16,19 @@
  * every machine. A layer path that exists but
  * is not a directory is reported absent, never crashed on — zero output is
  * the silent failure this probe exists to stop.
+ *
+ * Machine-store and project-layer rule files print as `<file>=<sha256>`
+ * content anchors (task-0033): the machine store lives outside the audited
+ * git tree and project-layer files may be machine-local (untracked), so the
+ * target SHA cannot be assumed to pin them — the anchor is what audit
+ * handoffs carry as the expectation reviewers must echo. Binding docs and
+ * ADRs stay bare; the target tree SHA pins them. A rule file that cannot be
+ * read prints as `<file>=UNREADABLE:<code>` — a visible failure in the
+ * trail, never a dead probe.
  */
 
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -46,6 +56,30 @@ function visibleEntries(dir) {
     .sort();
 }
 
+function isFile(path) {
+  try {
+    return statSync(path).isFile();
+  } catch {
+    return false;
+  }
+}
+
+// A non-file entry (e.g. a nested dir) lists bare; an unreadable file lists
+// as UNREADABLE with its error code instead of dying mid-report — zero
+// output is the silent failure this probe exists to stop.
+function anchoredEntries(dir) {
+  return visibleEntries(dir).map((name) => {
+    const abs = join(dir, name);
+    if (!isFile(abs)) return name;
+    try {
+      const sha256 = createHash('sha256').update(readFileSync(abs)).digest('hex');
+      return `${name}=${sha256}`;
+    } catch (error) {
+      return `${name}=UNREADABLE:${error.code ?? 'unknown'}`;
+    }
+  });
+}
+
 /**
  * Build the layer report. Exported so tests can exercise it in-process;
  * `main()` below owns the environment resolution and printing.
@@ -57,14 +91,14 @@ export function probeReport({ machineStore, repoRoot }) {
   const lines = [];
   if (isDirectory(machineStore)) {
     lines.push(`MACHINE-STORE: ${machineStore}`);
-    lines.push(...visibleEntries(machineStore));
+    lines.push(...anchoredEntries(machineStore));
   } else {
     lines.push('MACHINE-STORE: absent');
   }
   const projectRules = join(repoRoot, '.agentic', 'rules');
   if (isDirectory(projectRules)) {
     lines.push('PROJECT: .agentic/rules');
-    lines.push(...visibleEntries(projectRules));
+    lines.push(...anchoredEntries(projectRules));
   } else {
     lines.push('PROJECT: absent');
   }

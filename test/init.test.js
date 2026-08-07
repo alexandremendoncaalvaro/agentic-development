@@ -28,6 +28,37 @@ function runInit(cwd, args = []) {
   });
 }
 
+// The kit's Layer 1 Constitution splits ownership: `AGENTS.md` and
+// `GUIDELINES.md` are project-owned, `WORKFLOW.md` is kit-shipped. Installed
+// skills cite it by section (`WORKFLOW §10`, `WORKFLOW.md §1`), and the
+// installer's own completion hints print those section numbers — so a target
+// without the file leaves every one of those references pointing at nothing.
+// `WORKFLOW-FLOWS.md` ships with it because `WORKFLOW.md` references it in its
+// own opening; installing one without the other recreates the same defect one
+// level down.
+const KIT_DOCS = ['WORKFLOW.md', 'WORKFLOW-FLOWS.md'];
+
+test('init installs the kit-shipped constitution the skills cite by section', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    for (const doc of KIT_DOCS) {
+      const target = join(dir, doc);
+      assert.ok(
+        existsSync(target),
+        `${doc} must land at the target root — installed skills cite it by section`
+      );
+      assert.equal(
+        readFileSync(target, 'utf8'),
+        readFileSync(join(__dirname, '..', doc), 'utf8'),
+        `${doc} at the target root must match the kit copy — it is kit-shipped, not project-owned`
+      );
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('init --agent claude-code on greenfield → installs Claude skill', () => {
   const dir = mkScratch();
   try {

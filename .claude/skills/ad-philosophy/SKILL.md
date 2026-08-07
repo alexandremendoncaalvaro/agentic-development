@@ -48,6 +48,8 @@ Before implementing:
 
 For non-trivial changes, invoke `/ad-ground` — the workflow-operational skill that runs the four-source research pass (official docs, validated implementation references, in-repo patterns, git history) and synthesizes a happy path with citations. The skill carries the prescriptive deviation gate; this section carries the posture only. Skip for diffs you can describe in one sentence.
 
+**Read to a stop criterion.** Grounding bounds *what* to read; the read contract in WORKFLOW.md §1 (*Reading order*) bounds *how far*. Three rungs: the definition layer always (every document whose role is *definition* under rule 9 below); an area's decision records only when the change touches that area, and the specific record rather than the whole directory — starting from the layer's state projection when it has one; the evidence behind a decision only when the decision looks wrong. Volume of reading is not comprehension — climb only as far as the change requires, then stop.
+
 ## Decide When Grounded, Ask When Judgment
 
 Universal rule; WORKFLOW.md §7 subsection *Decide when grounded, ask when judgment* is the canonical source.
@@ -149,7 +151,7 @@ Companion to *Decide When Grounded*: that rule governs whether to decide or ask;
 
 ## Documentation Discipline
 
-**Every document the agent writes obeys these eleven rules.**
+**Every document the agent writes obeys these thirteen rules.**
 
 1. **Definitions and decisions only.** Capture what is true now and the decisions that brought it there. No speculation, no history, no unfounded plans. A deferred decision is in scope when it is *recorded* — an accepted ADR or a task file is the basis; "we might do X later" without a record is speculation and is cut.
 2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Applies to `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, and prose pages outside lifecycle-managed artifact directories. **Lifecycle-managed artifacts are exempt** — PRDs under `doc/product/`, specs under `doc/specs/`, ADRs under `doc/adr/`, and tasks under `doc/tasks/` keep their lifecycle fields because those fields are the auditability primitive. Outside those artifacts, use git history.
@@ -160,8 +162,10 @@ Companion to *Decide When Grounded*: that rule governs whether to decide or ask;
 7. **No commented-out code; no orphan `TODO` / `FIXME` in source.** Every deferred item references a tracked work item — a GitHub Issue, or a per-task file under `doc/tasks/NNNN-*.md`. The trace must be addressable from the source line.
 8. **Tests are living documentation of behavior.** Test names and assertions read as the spec they enforce. Spec changes drive test changes; never the reverse.
 9. **Single responsibility per document.** Each document plays one role — *definition* (pillar docs; read-mostly; no per-item tracking UI), *decision-record* (ADRs, specs; single `Status:` field; mostly immutable after acceptance), or *tracking* (tasks; full checkbox / append-only-Notes UI). A definition doc with checkboxes or a decision-record with granular per-item tracking has taken on adjacent layers' responsibilities.
-10. **Each layer owns its directory index.** `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are canonical indices of their layers. Other documents do not list or digest these indices — filesystem listing is the index.
+10. **Each layer owns its directory index.** `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are canonical indices of their layers. Other documents do not list or digest these indices — filesystem listing is the index. One exception, inside the layer only: a layer whose artifacts are append-only may own a single state projection in its own directory, naming which records still bind and what corrected the rest. A projection that only lists records is a duplicate index and stays forbidden.
 11. **Cross-references must be load-bearing.** Test: if removing the reference leaves the surrounding statement intact, the reference was decoration — drop it. Literature citations are load-bearing by definition.
+12. **Universal-vs-kit-state separation.** The universal philosophy document carries universal principles only — it never cites the shipping project's own ADR or task numbers, because the receiving project does not have those records. Other shipped artifacts (skills, templates) may cite the decisions that produced them. Literature citations remain; they are universal by definition.
+13. **Cite a commit range by tag, not by SHA.** Rebase, squash-merge and history rewrite all change hashes; tags survive them. Single-commit citations stay governed by rules 9 and 11.
 
 When generating or auditing a document, walk this list before declaring done.
 
