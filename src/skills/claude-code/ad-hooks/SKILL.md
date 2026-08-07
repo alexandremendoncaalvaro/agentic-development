@@ -1,7 +1,7 @@
 ---
 name: ad-hooks
-description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, or close the WORKFLOW §11 advisory-vs-deterministic gap. Opt-in skill; not auto-installed in the universal set.
-summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals.
+description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Also scaffolds Claude Code session-lifecycle hooks — currently a Stop hook that nudges /ad-handoff when context runs low (ADR-0055). Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, wire a session-lifecycle / Stop hook, nudge ad-handoff before context is lost, or close the WORKFLOW §11 advisory-vs-deterministic gap. Opt-in skill; not auto-installed in the universal set.
+summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals — plus a Claude Code session-lifecycle tier (a Stop hook that nudges /ad-handoff when context runs low).
 allowed-tools: Read, Write, Glob, Bash
 ---
 
@@ -94,6 +94,42 @@ After writing the config, output exactly the bootstrap command the user must run
 
 If the user is wiring CI alongside hooks (GitHub Actions / GitLab CI / Circle), point them at the existing `.github/workflows/`, `.gitlab-ci.yml`, or `.circleci/` directory. CI scaffolding is a separate skill's responsibility (deferred — not this one).
 
+## Session-lifecycle hooks (Claude Code only)
+
+Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; today it has one member. Claude Code only — Codex's compact hooks exist but context-injection parity is undocumented, so this tier is out of scope on Codex (do not invent Codex behavior).
+
+### Handoff-nudge `Stop` hook (ADR-0055)
+
+Nudges the user to run `/ad-handoff` before a long session's context is compacted or lost. Key facts (verified against the official hooks docs):
+
+* It hangs off the **`Stop`** event (fires when Claude finishes a turn), **not `PreCompact`** — `PreCompact` can only allow or block compaction, it cannot inject a message.
+* It emits **`{"systemMessage": …}` on exit 0 with no `decision` field**, so the session stops normally and the nudge **cannot loop**. It never uses `decision: "block"` or `hookSpecificOutput.additionalContext` (both continue the turn — loop-prone and disruptive).
+* It is **size-gated** (silent below a transcript-size threshold, read from `transcript_path` via `statSync`) and fires **at most once per session** (a temp-dir flag keyed on `session_id`), plus a defensive `stop_hook_active` early-exit — so it never nags every turn.
+
+Scaffold it in two parts:
+
+1. **The script** ships with this skill at `scripts/handoff-nudge.mjs` (Node, zero-dependency). In a consuming project the installed copy is `${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks/scripts/handoff-nudge.mjs`.
+2. **The wiring** — merge (never clobber) a `Stop` block into `.claude/settings.json`:
+
+   ```json
+   {
+     "hooks": {
+       "Stop": [
+         {
+           "matcher": "*",
+           "hooks": [
+             { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks/scripts/handoff-nudge.mjs\"" }
+           ]
+         }
+       ]
+     }
+   }
+   ```
+
+   Preserve any existing `.claude/settings.json` / `.claude/settings.local.json` content (e.g. a `permissions` block) — merge the `Stop` array in, do not overwrite the file.
+
+Tunable via environment: `AD_HANDOFF_NUDGE_THRESHOLD_BYTES` (default `750000` — chosen from measured transcript sizes; lower it to nudge earlier) and `AD_HANDOFF_NUDGE_STATE_DIR` (flag-file directory; default the OS temp dir).
+
 ## Output contract
 
 Filesystem changes:
@@ -102,7 +138,7 @@ Filesystem changes:
 - An updated `AGENTS.md` Quality Gates section (or appended if absent), naming the runner, the gates wired, the bootstrap command, and the no-bypass policy.
 - For the native-hooks fallback only: a `setup-hooks.sh` script the user runs after every clone.
 
-The skill does not execute the runner's install command. The skill does not write CI config. The skill does not configure agent-side hooks (`.claude/settings.json` `Stop` / `PreToolUse` / `PostToolUse`) — that is a different surface; future ADR may cover it.
+The skill does not execute the runner's install command. The skill does not write CI config. The git-hooks flow (Steps 0–6) does not configure agent-side session hooks — the separate Session-lifecycle hooks tier does that (`.claude/settings.json` `Stop`, currently the handoff-nudge hook — ADR-0055). Other agent events (`PreToolUse` / `PostToolUse`) remain future scope.
 
 A narrative document, so the documentation discipline rules apply at write time:
 

@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/src/skills/claude-code/ad-hooks/scripts/handoff-nudge.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

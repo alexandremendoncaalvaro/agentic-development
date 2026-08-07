@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { chmodSync, mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
+import { chmodSync, mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -195,6 +195,175 @@ test('resolve-rules.mjs: a subdirectory in a rules dir lists bare, not a crash',
     const out = runProbe(dir, { AGENTIC_RULES_DIR: machineStore });
     assert.match(out, /^nested$/m);
     assert.match(out, /^real\.md=[0-9a-f]{64}$/m);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- ad-hooks session-lifecycle handoff-nudge hook (ADR-0055) ---
+// The claude-code copy is executed; the byte-parity test in skills.test.js
+// guarantees the codex twin is identical, so one execution covers both.
+const NUDGE = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-hooks',
+  'scripts',
+  'handoff-nudge.mjs'
+);
+
+// Invoke the real script with a mock Stop-event JSON on stdin, exactly as
+// Claude Code would. Returns the captured stdout (empty string when silent).
+function runNudge(event, env = {}) {
+  return execFileSync('node', [NUDGE], {
+    input: JSON.stringify(event),
+    encoding: 'utf8',
+    env: { ...process.env, ...env },
+  });
+}
+
+// A transcript file of exactly `size` bytes, in a fresh temp dir the test owns.
+function makeTranscript(dir, size) {
+  const path = join(dir, 'transcript.jsonl');
+  writeFileSync(path, Buffer.alloc(size));
+  return path;
+}
+
+test('handoff-nudge: transcript over threshold, no prior flag → emits the systemMessage nudge', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-nudge-over-'));
+  try {
+    const transcript = makeTranscript(dir, 500);
+    const out = runNudge(
+      {
+        hook_event_name: 'Stop',
+        session_id: 'sess-over-abc',
+        transcript_path: transcript,
+        stop_hook_active: false,
+      },
+      {
+        AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '100',
+        AD_HANDOFF_NUDGE_STATE_DIR: dir,
+      }
+    );
+    // Exact shape the verified Stop contract requires: a single JSON object
+    // carrying `systemMessage`, no `decision` field (so the turn stops
+    // normally and the nudge cannot loop).
+    const parsed = JSON.parse(out);
+    assert.equal(typeof parsed.systemMessage, 'string');
+    assert.ok(parsed.systemMessage.includes('/ad-handoff'), 'nudge names /ad-handoff');
+    assert.ok(!('decision' in parsed), 'must NOT block/continue — no decision field');
+    // And the once-per-session flag was written for this session_id.
+    assert.ok(
+      existsSync(join(dir, 'ad-handoff-nudge-sess-over-abc.flag')),
+      'flag file written on first nudge'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('handoff-nudge: transcript under threshold → silent (no output)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-nudge-under-'));
+  try {
+    const transcript = makeTranscript(dir, 50);
+    const out = runNudge(
+      {
+        hook_event_name: 'Stop',
+        session_id: 'sess-under',
+        transcript_path: transcript,
+        stop_hook_active: false,
+      },
+      {
+        AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '100',
+        AD_HANDOFF_NUDGE_STATE_DIR: dir,
+      }
+    );
+    assert.equal(out, '', 'below threshold must be silent');
+    assert.ok(
+      !existsSync(join(dir, 'ad-handoff-nudge-sess-under.flag')),
+      'no flag written when it does not nudge'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('handoff-nudge: fires at most once per session_id (second Stop is silent)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-nudge-once-'));
+  try {
+    const transcript = makeTranscript(dir, 500);
+    const event = {
+      hook_event_name: 'Stop',
+      session_id: 'sess-once',
+      transcript_path: transcript,
+      stop_hook_active: false,
+    };
+    const env = { AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '100', AD_HANDOFF_NUDGE_STATE_DIR: dir };
+    const first = runNudge(event, env);
+    const second = runNudge(event, env);
+    assert.ok(first.includes('systemMessage'), 'first Stop nudges');
+    assert.equal(second, '', 'second Stop for the same session is silent (once-per-session guard)');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('handoff-nudge: stop_hook_active === true → silent, cannot loop', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-nudge-active-'));
+  try {
+    const transcript = makeTranscript(dir, 5000); // well over threshold
+    const out = runNudge(
+      {
+        hook_event_name: 'Stop',
+        session_id: 'sess-active',
+        transcript_path: transcript,
+        stop_hook_active: true,
+      },
+      { AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '100', AD_HANDOFF_NUDGE_STATE_DIR: dir }
+    );
+    assert.equal(out, '', 're-entrancy guard: stop_hook_active must silence the hook');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('handoff-nudge: missing transcript_path or unparseable stdin → silent, never disrupts', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-nudge-degrade-'));
+  try {
+    const env = { AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '1', AD_HANDOFF_NUDGE_STATE_DIR: dir };
+    const noPath = runNudge({ hook_event_name: 'Stop', session_id: 's' }, env);
+    assert.equal(noPath, '', 'missing transcript_path → silent');
+    const badJson = execFileSync('node', [NUDGE], {
+      input: 'not json at all',
+      encoding: 'utf8',
+      env: { ...process.env, ...env },
+    });
+    assert.equal(badJson, '', 'unparseable stdin → silent');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('handoff-nudge: parseable-but-non-object stdin → silent exit 0, never crashes', () => {
+  // JSON that parses without throwing but is not a plain object, so the
+  // JSON.parse catch never fires. `null` is the reported crasher (it reached
+  // `event.stop_hook_active` and threw a TypeError, exit 1); the rest cover the
+  // whole non-object class so the bug cannot regrow. All must degrade to a
+  // silent exit 0 — execFileSync throws on any non-zero exit, so no-crash is
+  // asserted implicitly, empty stdout explicitly.
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-nudge-nonobject-'));
+  try {
+    const env = { AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '1', AD_HANDOFF_NUDGE_STATE_DIR: dir };
+    for (const payload of ['null', 'true', '42', '"str"', '[]']) {
+      const out = execFileSync('node', [NUDGE], {
+        input: payload,
+        encoding: 'utf8',
+        env: { ...process.env, ...env },
+      });
+      assert.equal(out, '', `parseable non-object stdin ${payload} → silent, no output`);
+    }
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

@@ -1,7 +1,7 @@
 ---
 name: ad-hooks
-description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, or close the WORKFLOW §11 advisory-vs-deterministic gap. Opt-in skill; not auto-installed.
-summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals.
+description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, or close the WORKFLOW §11 advisory-vs-deterministic gap. Session-lifecycle hooks (e.g. a Stop hook nudging /ad-handoff when context runs low) are Claude-Code-scoped — see ADR-0055. Opt-in skill; not auto-installed.
+summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals. Session-lifecycle hooks (Stop handoff-nudge) are Claude-Code-scoped.
 ---
 
 <background_information>
@@ -61,7 +61,9 @@ Filesystem changes:
 - An updated `AGENTS.md` Quality Gates section.
 - For native-hooks fallback: a `setup-hooks.sh` script.
 
-The skill does not execute the runner's install command. The skill does not write CI config. The skill does not configure agent-side hooks (`.claude/settings.json`) — different surface, deferred.
+The skill does not execute the runner's install command. The skill does not write CI config.
+
+Session-lifecycle hooks — agent-side session events wired in the host's settings, such as a Stop hook that nudges `/ad-handoff` when context runs low (ADR-0055) — are Claude-Code-scoped. Codex exposes compact-related hooks, but context-injection parity for a one-time non-looping nudge is undocumented, so this tier is not wired on Codex. The shared `scripts/handoff-nudge.mjs` ships in both host trees for byte-parity discipline only; the Codex flow does not install a settings hook for it. If Codex documents context-injection parity, revisit ADR-0055.
 
 Documentation discipline rules apply at write time:
 - No emoji anywhere in scaffolded config or AGENTS.md update.
