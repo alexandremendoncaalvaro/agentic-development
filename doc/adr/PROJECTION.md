@@ -2,13 +2,13 @@
 
 Without this file, learning which architectural decisions still bind costs one pass over every record in this directory. The `Status:` field answers that question per *document*, and in practice supersession here has been per *stanza* — one consequence retired, one alternative reversed, one decision's realization replaced — so a record can read `accepted` while a named part of it is dead. This page is where that difference is visible in one screen. It carries state and the identity of the corrector, never the rationale: the rationale stays in the record, which is the only place it is safe to read it from.
 
-**The rule that keeps it true:** a change to what binds touches this file in the same commit as the record. `/ad-drift` reports an amendment relation whose two sides disagree; it cannot report a projection nobody updated, so the same-commit habit is the actual guarantee. Sanctioned by `WORKFLOW.md` §2 rule 10, which permits exactly one state projection per append-only layer, inside that layer's own directory.
+**The rule that keeps it true:** a change to what binds touches this file in the same commit as the record — accepting an ADR, or superseding/deprecating one. Merely *proposing* an ADR is not such a change: a `proposed` record binds nothing, so it stays out of this projection until it is accepted (the commit that accepts it is the one that adds it here). `/ad-drift` reports an amendment relation whose two sides disagree; it cannot report a projection nobody updated, so the same-commit habit is the actual guarantee. Sanctioned by `WORKFLOW.md` §2 rule 10, which permits exactly one state projection per append-only layer, inside that layer's own directory.
 
 ## Default
 
-All 28 ADRs are `Status: accepted` and bind in full, except the four below, which bind except for the named part.
+All 28 accepted ADRs bind in full, except the four below, which bind except for the named part.
 
-No ADR in this directory has been deprecated or superseded as a whole document.
+No ADR in this directory has been deprecated or superseded as a whole document. A `proposed` ADR is not counted here and does not appear until it is accepted — it binds nothing until then, and its acceptance is the change to what binds that adds it (see *The rule that keeps it true*).
 
 ## Binding with a part retired
 
