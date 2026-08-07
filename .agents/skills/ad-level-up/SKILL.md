@@ -2,7 +2,6 @@
 name: ad-level-up
 description: |
   Run this skill when the user explicitly invokes `/ad-level-up` or names it, or asks to evolve the project's rule-set — "add a convention", "update the rules", "new rule", "merge these rules", "we keep hitting X, make it a rule", "retire this rule" — or hands over a rule gap surfaced by `ad-audit`. Companion to `ad-audit`: where ad-audit audits against the rules, this evolves them, leanly. This skill is user-invoked (`allow_implicit_invocation: false`) because it can write to the rule-set — invoke it explicitly with `/ad-level-up` or by naming it, not from inferred conversation.
-  Mechanical shape: ONE pass in the current session. Every candidate clears four anti-overfitting gates plus an effectiveness pass or is rejected out loud; the drafted candidate then passes an adversarial multi-lens review; and NOTHING is written without the user's explicit approval, one item at a time. It presents a proposal with a plain-language rationale and applies only on your OK. Writes land in the curated rule-set — the ADR-0035 machine store for you-everywhere conventions, or the ADR-0043 project layer (`.agentic/rules/`) for this-project conventions.
 summary: Human-gated rule-set curation, companion to ad-audit. Four anti-overfitting gates + effectiveness pass + adversarial multi-lens review per candidate, then a HARD human gate — never writes unprompted. Targets the ADR-0035 machine store or ADR-0043 project layer. Ships a rule-candidate-reviewer subagent.
 ---
 

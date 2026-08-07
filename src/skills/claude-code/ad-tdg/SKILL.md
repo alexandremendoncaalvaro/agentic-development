@@ -9,6 +9,11 @@ allowed-tools: Read, Glob, Grep, Bash
 
 Implements WORKFLOW.md §9 (Outcome-Based Prompting / Test Dependency Map) end-to-end. Process scaffold for the implementation phase when the canonical technique is known and multiple implementation strategies are plausible. No file written — output is the verified implementation that lands through normal commits; ground-truth pair, candidate set, and selection criterion go into the commit message body or task `Notes`.
 
+## Non-negotiables (read first)
+
+- **Never edit the TDM tests to make them pass** — they are the verification surface; changing them while implementing is the hidden "almost right" WORKFLOW §12 names. If a test is wrong, fix it first as a separate diff.
+- **Type-check passing is not the gate — the test gate is.** Do not declare done before the TDM tests are green.
+
 ## Step 0 — Confirm regime
 
 TDG is for the *technique-known, implementation-strategy-uncertain* regime. Run the skill only when:

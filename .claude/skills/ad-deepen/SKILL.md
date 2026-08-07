@@ -75,7 +75,7 @@ The user picks one candidate by number. Drop into a grilling loop on that one:
 
 1. Walk the decision tree of the proposal branch by branch (one question per turn, recommendation included). Reuse the [`ad-grill-me`](../ad-grill-me/SKILL.md) discipline — codebase-first, single question, captured inline.
 2. Add new domain terms to `CONTEXT.md` lazily via `/ad-domain` as the proposal surfaces them.
-3. Offer an ADR only when the three criteria pass (hard to reverse, surprising without context, real trade-off —' ' If a deepening proposal does not need an ADR, it does not get one — most refactors do not.
+3. Offer an ADR only when the three criteria pass (hard to reverse, surprising without context, real trade-off). If a deepening proposal does not need an ADR, it does not get one — most refactors do not.
 4. When the proposal stabilizes: route to `/ad-tdg` (WORKFLOW §9) for the implementation pass with ground-truth pair + TDM + criterion-based selection.
 
 Reject candidates the grilling loop reveals as wrong-shaped. Better to discard a candidate at this stage than to ship a deepening that doesn't deepen.

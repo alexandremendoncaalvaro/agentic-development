@@ -7,7 +7,7 @@ summary: Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixtur
 <background_information>
 Implements WORKFLOW.md §14 (Staged Spikes With Golden Fixtures) end-to-end. The skill is for cases where the spec is clear but the technique is uncertain across multiple plausible approaches. WORKFLOW §9 (TDG) assumes the path is known and validates end-to-end; §14 assumes the path is unknown and validates per stage.
 
-The skill creates `spikes/NNNN-<slug>/` and fills it stage-by-stage. The directory is throwaway by design — when the spike concludes, an ADR records the decision and the spike directory is deleted (promote-or-delete lifecycle' '
+The skill creates `spikes/NNNN-<slug>/` and fills it stage-by-stage. The directory is throwaway by design — when the spike concludes, an ADR records the decision and the spike directory is deleted (promote-or-delete lifecycle).
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions an uncertain technique or asks to evaluate approaches, invoke this skill manually.
 </background_information>
@@ -20,13 +20,13 @@ Tests:
 - Are there ≥2 candidate techniques with materially different trade-offs that no source resolves? If no, this is not a spike.
 - Is end-to-end validation feasible without per-stage debug? If yes, this is `ad-task` + `ad-philosophy` Goal-Driven Execution territory.
 
-If spike warranted, confirm the recortte with the user and proceed.
+If spike warranted, confirm the focus with the user and proceed.
 
 Step 1 — discovery. List canonical approaches grounded in official docs and real examples. Pick one (or ≤3) by an explicit criterion.
 
 Process:
 - Search official documentation. Cite URL + version.
-- Search public implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists) for solutions to the same recortte. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and fetch via tools; never paraphrase from training memory.
+- Search public implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists) for solutions to the same focus. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and fetch via tools; never paraphrase from training memory.
 - Survey in-repo for analogous patterns. Cite `<file>:<line>` or "no analog found".
 - Survey git history for prior attempts. Cite `<commit-sha>` or "no prior attempt".
 
@@ -80,7 +80,7 @@ ADR captures: which technique picked, alternatives held in reserve, end-to-end p
 </instructions>
 
 <output_contract>
-A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout (discovery README, fixtures, pipeline, debug per stage, eval results). The directory is throwaway by design — promote-or-delete lifecycle' ' No `Status: shipped` lifecycle; spikes conclude with an ADR.
+A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout (discovery README, fixtures, pipeline, debug per stage, eval results). The directory is throwaway by design — promote-or-delete lifecycle. No `Status: shipped` lifecycle; spikes conclude with an ADR.
 </output_contract>
 
 ## Next

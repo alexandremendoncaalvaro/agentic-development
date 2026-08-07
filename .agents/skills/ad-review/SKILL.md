@@ -2,8 +2,6 @@
 name: ad-review
 description: |
   Run this skill when the user explicitly invokes `/ad-review` or names it ("run ad-review", "use the ad-review skill"), or when the user asks for a code review with an explicit scope ("review this branch", "review main..HEAD", "revisa esse diff <range>"). Auto-trigger note: `allow_implicit_invocation: true` is set so review-language can fire the skill, but this also means broad review-adjacent conversation may auto-invoke a multi-step file-writing workflow. If a request is ambiguous, ask the user to confirm scope before invoking.
-  Mechanical shape: ONE pass in the current session. The skill assembles the diff plus the relevant context, then produces a single review with findings grouped under `## Standards Findings` and `## Spec Findings` — two axes, one session. Standards = does the diff conform to AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs? Spec = does the diff match the originating task / spec / PRD? The two-axis structure exists so neither axis masks the other.
-  No `/clear`. No silent subagent spawn from the skill: Codex subagents are explicit user-directed workflows. The skill writes a single audit-trail handoff file at `.agentic/reviews/<ISO>-<scope>.md` for the record, then performs the review inline. For §10 ideal, use the bundled `fresh-context-reviewer` Codex subagent against that audit-trail file.
 summary: Two-axis code review per WORKFLOW §10. Claude Code uses fresh-context subagents; Codex writes an audit trail, reviews inline by default, and ships a reviewer subagent for explicit escalation.
 ---
 

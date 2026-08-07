@@ -63,7 +63,7 @@ When the host exposes `AskUserQuestion`, render the checkpoint as a structured m
 A single message structured as:
 
 ```
-## Recortte
+## Focus
 <one sentence>
 
 ## Source A — official documentation
