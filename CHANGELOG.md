@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [0.20.0-beta.1] - 2026-08-06
+
 ### Added
 
 - A read contract in `WORKFLOW.md` §1 (*Reading order*), delivered by `ad-philosophy` on both hosts (ADR-0049 Decision 5, task-0034): the definition layer always, an area's decision records only when the change touches that area, the evidence behind a decision only when the decision looks wrong. Volume of reading is not comprehension, and nothing previously told an agent where to stop.
