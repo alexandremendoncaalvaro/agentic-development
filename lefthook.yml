@@ -1,6 +1,7 @@
 # Lefthook quality gates for the agentic-development kit.
 #
-# Wired per WORKFLOW.md §11 + ADR-0012 (agentic-hooks). Scope is the
+# Wired per WORKFLOW.md §11; the gate set is chartered by ADR-0048 (the
+# earlier ADR-0012 is archived — git history is its ledger). Scope is the
 # minimum justified set for the kit's reality:
 #
 # - pre-commit: `leak-guard` (ADR-0033) is a fail-closed backstop that

@@ -69,7 +69,7 @@ No abbreviations except established domain terms: `cli`, `cwd`, `fs`, `os`, `tty
 ### 2.2 Error Handling
 
 - **Throw `Error` (or subclass) at module boundaries.** No silent failures; no `null`/`undefined` return codes.
-- **No exception swallowing.** `try` blocks must either re-throw, surface to the caller, or log with context. `catch (e) {}` is forbidden.
+- **No exception swallowing.** `try` blocks must either re-throw, surface to the caller, or log with context. `catch (e) {}` is forbidden. Exemption: filesystem existence probes (`isFile` / `isDirectory`-style helpers) may collapse a failed `stat` to `false` — the established repo idiom. A probe that *reads content* must surface the failure in its output (the resolution probe's `UNREADABLE:<code>` marker is the reference shape), never die or go silent.
 - **No `process.exit()` inside lib code.** Commands may call `process.exit(1)` on user-error paths; lib code returns / throws.
 - **Validate at boundaries.** User input (`--agent`, `--profile`) validated in command; filesystem reads in lib check existence and throw with the path on miss.
 

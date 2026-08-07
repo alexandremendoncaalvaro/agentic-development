@@ -33,7 +33,7 @@ Per ADR-0035 and ADR-0043, the rule-set is the union of:
 
 **Precedence:** union across layers, except on genuine conflict, where a project rule wins over a machine-store rule. Shadowing is never silent — apply the project rule and report the shadowed machine-store rule as a line in the audit output.
 
-The rule-set — not this skill — defines the **groups** and any **critical** tag. Do not invent, resize, or hardcode groups or rule content. If the curated store defines groups explicitly, use them; if only the repo docs exist, treat each binding doc (and each accepted ADR) as a group. If no rule-set resolves at all, stop and tell the user there is nothing to audit against.
+The rule-set — not this skill — defines the **groups** and any **critical** tag. Do not invent, resize, or hardcode groups or rule content. If the machine store defines groups explicitly, use them; if only the repo docs exist, treat each binding doc (and each accepted ADR) as a group. If no rule-set resolves at all, stop and tell the user there is nothing to audit against.
 
 **Deterministic resolution probe (ADR-0047; a shipped skill script per task-0031).** Run the probe installed beside this skill from the repo root and paste its output into the audit trail. Layer resolution is read from observed output, never from memory, because this step's failure-mode is silent (a layer that exists but goes unread). The default install path is:
 
@@ -77,7 +77,7 @@ with the expectation is itself a finding, never proceeded past silently.
 <the tree and SHA under audit>
 
 --- GROUP RULES ---
-<the full text of this group's rules — from the repo binding doc / ADR / curated store>
+<the full text of this group's rules — from the repo binding doc / ADR / machine store>
 
 --- CRITICAL? ---
 <yes | no — from the rule-set's own tag>
