@@ -100,8 +100,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-domain/references/context-templates.md",
+          "sourceSha": "8030a637bf3e7b7d5bdc0032bb931f94a7a369ba5e5941aa82c7ac880da10a34"
+        },
+        {
           "path": ".claude/skills/ad-domain/SKILL.md",
-          "sourceSha": "3a139614e28e71ac11048fe4f2bdb84df5140a24ba91b447cc9a81e0a6eb3981"
+          "sourceSha": "c8adcb426ad72529efc0a20182c7ad3e0e1854618158fee88e60d8b449938351"
         }
       ]
     },
@@ -136,8 +140,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-guidelines/references/guidelines-template.md",
+          "sourceSha": "66dae868f8196c5eded09dfefaafa773ef74d2e4128d85c0c117297d91f40c9d"
+        },
+        {
           "path": ".claude/skills/ad-guidelines/SKILL.md",
-          "sourceSha": "1a8e70b82b89d112433d2f81036e7392d2a332ed4ec376ada9a31ec826c85d2a"
+          "sourceSha": "78538c37640faefb2b3939ed9a14f0257b7641a743c684972b2d57492efe4141"
         }
       ]
     },
@@ -203,8 +211,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-prd/references/prd-template.md",
+          "sourceSha": "4513fe40a5d33aea32ac85968ba78913b9fdd0d226aa5860cd38aeb9d455eb76"
+        },
+        {
           "path": ".claude/skills/ad-prd/SKILL.md",
-          "sourceSha": "b01584d71823c2eb5afcb8698e052666e61dc1729938836d1f5544075384d407"
+          "sourceSha": "c8d288279b7d8634300c0c3cc3a770b5ff00469e31d62fbdccd879f20267f939"
         }
       ]
     },

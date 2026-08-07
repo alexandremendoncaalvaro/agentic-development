@@ -85,7 +85,7 @@ Only after the scan produces no answer does the skill ask. Asking about somethin
 
 ## Step 2 — Pre-fill the template
 
-Open `templates/guidelines.md`. Fill detected fields before any interview:
+Open [references/guidelines-template.md](references/guidelines-template.md). Fill detected fields before any interview:
 
 - **§2.1 Naming conventions** — fill the per-language convention table from the canonical conventions of the detected language (snake_case / PascalCase / camelCase / UPPER_SNAKE / kebab-case / file extensions).
 - **§2.2 Error handling** — fill the idiom of the detected language (`std::expected` for C++, `Result<T, E>` for Rust, discriminated unions for TS, typed exceptions for Python, error returns for Go).
@@ -179,7 +179,7 @@ The user confirms before the AGENTS.md rewrite. The skill never modifies AGENTS.
 
 ## Step 5 — Write the file
 
-Path: `GUIDELINES.md` at repo root. Use the template at `templates/guidelines.md`.
+Path: `GUIDELINES.md` at repo root. Use the template at [references/guidelines-template.md](references/guidelines-template.md).
 
 Sections the user skipped do not land in the file. Sections that were fully pre-filled land verbatim. Sections requiring user preference land with the user's answer.
 
