@@ -1,6 +1,6 @@
 # ADR-0052: ad-audit gains a serial empirical-falsification lane
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-08-07
 **Deciders:** Alexandre Alvaro
 

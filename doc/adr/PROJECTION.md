@@ -6,7 +6,7 @@ Without this file, learning which architectural decisions still bind costs one p
 
 ## Default
 
-All 28 ADRs carry the `Status:` they state: 27 are `accepted` — binding in full, except the four below, which bind except for the named part — and the 28th, [ADR-0052](0052-ad-audit-empirical-falsification-lane.md), is `proposed` and does not bind until accepted.
+All 28 ADRs are `Status: accepted` and bind in full, except the four below, which bind except for the named part.
 
 No ADR in this directory has been deprecated or superseded as a whole document.
 
