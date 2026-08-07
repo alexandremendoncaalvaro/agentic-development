@@ -21,7 +21,7 @@ Platform identifiers: with read-only tools you cannot web-verify a model name, h
 
 Scope:
 - Use repository reads only when the handoff names a file or a referenced line needs local context.
-- Do not write files, stage changes, run fixes, or broaden scope beyond this group.
+- Do not write files, stage changes, run fixes, or broaden scope beyond this group. A "test cannot fail on a production change" inference is handed up to the orchestrator's serial falsification lane (ADR-0052), never mutated or run here.
 
 Output:
 - One line per rule: <verdict> · <severity> · <rule id> · <file:line | claim> · <failure scenario> · <artifact needed or observed>. Severity only on violations and judgement-calls: critical (correctness, security, data loss — or an evidence-gate blocker; unrelated to the group-level CRITICAL tag in your handoff) · major (logic error, broken contract, real coverage gap) · minor (suboptimal, low risk) · nit (style). Severity ranks a confirmed finding; it never substitutes for evidence — and the no-padding rule stands: nit ranks what you would have reported anyway, it does not invite trivia.

@@ -8,6 +8,7 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
+- `ad-audit` gains a serial, orchestrator-only **empirical-falsification lane** (ADR-0052, task-0037, both hosts): when a reviewer finding claims a specific test or suite *cannot fail* on a specific production change, the orchestrator runs the mutation and watches the suite rather than settling the claim by argument — apply the minimal mutation, run the CI-exact filter, restore the tree, and trust a green only if the mutation demonstrably took effect and the run completed. It fires solely on that negative-coverage trigger, runs only after the parallel reviewers finish (never concurrent), and the reviewer briefs forbid mutation and hand the trigger up. Aligns with ADR-0045's cited differential-execution mitigation; determinism, not added adversarial pressure.
 - The installer offers to keep its freshly-installed, still-untracked kit files out of a shared repo's commits by adding them to `.git/info/exclude` — per-clone and never committed, unlike `.gitignore` (ADR-0051 Decision 4). Entries are by filename, never by directory, so a mixed-ownership `.claude/agents/` never hides a team-owned file from git. Interactive `init`/`update` offer it; non-interactive leaves the files and says so. The install summary also notes when a user-level agentic install already covers the skills.
 
 ### Changed

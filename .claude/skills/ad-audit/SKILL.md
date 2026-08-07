@@ -17,9 +17,9 @@ State exactly what is under review and which tree it rests on — the tree is pa
 
 - **Target:** a diff / branch / PR (`git diff <range>`), or a set of drafted claims and artifacts about to be posted (a message, a board comment, a report, a handoff). If ambiguous which, ask.
 - **Tree/SHA:** working-tree vs `origin/main` vs a deployed env. `git fetch origin main` and name the SHA under audit.
-- **Changed files (diff/branch/PR targets):** enumerate them (`git diff --name-only <range>`) — this list is the file-coverage axis Step 6 checks (ADR-0046). Bulk assets (fixtures, vendored, generated) may be bucketed as a named class rather than listed one by one — but a bucket clears N/A only after a spot-check of representative samples or a mechanical verification of the class, never on the label alone.
+- **Changed files (diff/branch/PR targets):** enumerate them (`git diff --name-only <range>`) — this list is the file-coverage axis Step 7 checks (ADR-0046). Bulk assets (fixtures, vendored, generated) may be bucketed as a named class rather than listed one by one — but a bucket clears N/A only after a spot-check of representative samples or a mechanical verification of the class, never on the label alone.
 
-**Re-audit (prior trail exists — ADR-0047).** Check `.agentic/reviews/` for a prior trail on this same target. If one exists, this run is a RE-AUDIT: load the latest trail and carry every prior finding into Step 6 with a mandatory disposition — **resolved** (evidence of the fix) · **refuted** (evidence it was wrong) · **still-open**. A prior finding that silently disappears invalidates the re-audit; findings are threads, not snapshots.
+**Re-audit (prior trail exists — ADR-0047).** Check `.agentic/reviews/` for a prior trail on this same target. If one exists, this run is a RE-AUDIT: load the latest trail and carry every prior finding into Step 7 with a mandatory disposition — **resolved** (evidence of the fix) · **refuted** (evidence it was wrong) · **still-open**. A prior finding that silently disappears invalidates the re-audit; findings are threads, not snapshots.
 
 When the host exposes `AskUserQuestion`, confirm the target as a multi-choice card.
 
@@ -43,7 +43,7 @@ node .claude/skills/ad-audit/scripts/resolve-rules.mjs
 
 If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/resolve-rules.mjs` inside it.
 
-**Content anchors (task-0033).** The probe prints each machine-store and project-layer rule file as `<file>=<sha256>` — the machine store lives outside the audited git tree and project-layer files may be machine-local (untracked), so the target SHA cannot be assumed to pin them. Binding docs and ADRs stay bare; the Step 0 tree SHA pins them. A file the probe reports `UNREADABLE` is resolved before dispatch, or its groups are marked unaccounted. Step 3 carries each group's expected anchors into its handoff; Step 6 refuses a reviewer whose echoed anchors do not match.
+**Content anchors (task-0033).** The probe prints each machine-store and project-layer rule file as `<file>=<sha256>` — the machine store lives outside the audited git tree and project-layer files may be machine-local (untracked), so the target SHA cannot be assumed to pin them. Binding docs and ADRs stay bare; the Step 0 tree SHA pins them. A file the probe reports `UNREADABLE` is resolved before dispatch, or its groups are marked unaccounted. Step 3 carries each group's expected anchors into its handoff; Step 7 refuses a reviewer whose echoed anchors do not match.
 
 A deterministic value inside a non-deterministic flow: the probe pins what can be pinned; the model reads only the rules the probe proved exist.
 
@@ -106,18 +106,28 @@ For every group the rule-set marks **critical**, beyond its Step-4 reviewer:
 - **Swap-and-agree.** Run that second pass **twice**, reordering both the rule order and the presentation order of the target's hunks between the two runs. Accept a `pass` for a rule only if it holds in both runs — a verdict that flips on order alone is unresolved, not a pass.
 - **Refute pass.** Try to refute each surviving finding against the grounded artifact before it stands.
 
-## Step 6 — Aggregate: union, then filter
+## Step 6 — Empirical falsification lane (serial, orchestrator-only)
+
+When a surviving finding asserts that a specific test or suite **cannot fail** on a specific production change — a negative-coverage / mirrored-declaration claim — do not settle it by argument: run it ([ADR-0052](../../../../doc/adr/0052-ad-audit-empirical-falsification-lane.md)). Reviewers never mutate the tree; a reviewer that reaches a "cannot fail" inference hands it up as a trigger and the orchestrator runs the lane.
+
+- **Trigger only.** Fires solely on a "test T cannot fail on production change W" claim. A finding that merely wants the author's own numbers reproduced is the evidence gate's job (Step 7), not this lane.
+- **Procedure.** Confirm the tree is already clean first (a dirty tree → stop; never risk uncommitted work) → apply the minimal mutation the test should catch → run the CI-exact filter → observe `{build result, effect/asset presence, pass-fail count}` → restore by reverting exactly the paths you touched (`git checkout -- <path>`, never a blanket `reset --hard` / `checkout -- .`) → confirm `git status` clean. Green (the suite stayed green through the mutation) confirms the finding; red refutes it.
+- **Isolate the mutation.** When the target's repo shares its `.git` with other worktrees, or is a shared checkout (per `AGENTS.md`'s disposable-clone rule), run the mutation in a scratch worktree / disposable clone, not in place — an interrupted in-place run must not strand a dirty tree on a branch someone else is using.
+- **Serial and isolated.** Run only after the Step 4 / Step 5 parallel reviewers have finished — never concurrent with them; a heavy suite alongside the fan-out is what overloaded the machine in the incident that motivated this lane. One mutation at a time.
+- **Trust only a run that demonstrably happened.** A green count counts only if the mutation is shown to have taken effect (e.g. the asset is actually absent) and the run actually completed. A killed run, or a zero exit over a skipped / `--no-build` run, is not a pass (CV.6).
+
+## Step 7 — Aggregate: union, then filter
 
 - **Union first.** Coverage lives in the union of the independent reviewers — never drop a lone finding for lack of a second voice.
 - **Anchor check (task-0033).** Compare each reviewer's echoed `Anchors:` line against its handoff's EXPECTED ANCHORS — every file hash and the target SHA. A mismatch, or a missing echo, makes that reviewer's verdicts **UNVERIFIED** — never silently accepted: re-dispatch the group, or mark it unaccounted in the coverage matrix. A "ran/read" assertion without a matching anchor is not trusted. Honest ceiling: a matching echo is necessary, not sufficient — it cannot prove the reviewer recomputed rather than copied; the expectations persist in the trail file so the comparison outlives the run.
 - **Filter as an independent meta-judge.** Do not let reviewers debate or see each other's reasoning (shared-history debate amplifies bias). Confirm real findings against the code/output; reject wrong ones **with evidence**.
 - **Coverage check — two axes.** (a) Every group accounted for — a dispatched reviewer's per-rule verdicts, or an explicit N/A-with-reason. (b) For diff targets, every changed file accounted for — it appears in at least one reviewer's `Files grounded` line, or carries an explicit N/A-with-reason (fixture, vendored, generated). A file nobody read is a coverage hole. If either axis has a gap, the audit is INCOMPLETE; resolve before the verdict.
 
-## Step 7 — Verdict
+## Step 8 — Verdict
 
 Never emit "approve". Order findings by severity — **critical** (correctness, security, data loss — or an evidence-gate blocker) · **major** (logic error, broken contract, real coverage gap) · **minor** (suboptimal, low risk) · **nit** (style) — so the reader triages instead of wading. The severity value `critical` names a finding; it is unrelated to the rule-set's CRITICAL tag on a *group* (Step 5). Severity ranks confirmed findings; it never relaxes the evidence bar. List each blocker with the evidence artifact it needs; state everything still unverified as an OPEN QUESTION. The bar: nothing clears until every teammate-visible claim carries a reproducible artifact and every blocker is resolved or refuted with evidence.
 
-## Step 8 — Close the loop
+## Step 9 — Close the loop
 
 If the audit surfaced a defect pattern no rule covers, or a rule that misled or was ambiguous, hand it to `/ad-level-up` as a candidate (it runs the anti-overfitting gates and never writes without approval). An audit that finds a real, generalising gap and raises no candidate is incomplete.
 
@@ -126,7 +136,7 @@ If the audit surfaced a defect pattern no rule covers, or a rule that misled or 
 - One `Task` invocation of `audit-group-reviewer` per dispatched group, in parallel; the cross-model second pass on each critical group.
 - One line per rule verdict: `<verdict> · <severity, on violations/judgement-calls> · <rule id> · <file:line | claim> · <failure scenario> · <artifact needed>`.
 - A **coverage matrix**: every group accounted for — dispatched (per-rule verdicts, anchors verified) or N/A-with-reason — and, for diff targets, every changed file (in a reviewer's `Files grounded` line, or N/A-with-reason) — so coverage is auditable at a glance.
-- Blockers grouped on top; then the open-question / still-unverified list; then any proposed rule delta for Step 8.
+- Blockers grouped on top; then the open-question / still-unverified list; then any proposed rule delta for Step 9.
 - No "approve" verdict, no defending the work, no rewrite. Empty result is reported explicitly.
 
 ## Next

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "kitVersion": "0.19.0-beta.1",
+  "kitVersion": "0.20.0-beta.1",
   "agent": "claude-code",
   "profile": "team",
   "skills": {
     "ad-adr": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-adr/SKILL.md",
@@ -14,7 +14,7 @@
       ]
     },
     "ad-architecture": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-architecture/SKILL.md",
@@ -23,7 +23,7 @@
       ]
     },
     "ad-archive": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-archive/SKILL.md",
@@ -32,11 +32,11 @@
       ]
     },
     "ad-audit": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/agents/audit-group-reviewer.md",
-          "sourceSha": "003f3b2efcb7bbe14931fdf7ec20e4aa8f9ccb6a0dffa1e3b2c0869a1c3c2e7e"
+          "sourceSha": "4523f3af2483f55cd9faa18e255575986aefbf4be4c213a1ff2c114a0017138f"
         },
         {
           "path": ".claude/skills/ad-audit/scripts/resolve-rules.mjs",
@@ -44,12 +44,12 @@
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "34e93d81e87ebe940c5ef8ed1d16250e2a0a6fb1fb29097a18bc7e842cf03e5e"
+          "sourceSha": "4b0e7baee40dff8dec0c38bc18d547a074568f1e52fff76900fc9b198d37e703"
         }
       ]
     },
     "ad-bootstrap": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-bootstrap/SKILL.md",
@@ -58,7 +58,7 @@
       ]
     },
     "ad-commit": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-commit/SKILL.md",
@@ -67,7 +67,7 @@
       ]
     },
     "ad-deepen": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-deepen/SKILL.md",
@@ -76,7 +76,7 @@
       ]
     },
     "ad-diagnose": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-diagnose/SKILL.md",
@@ -85,7 +85,7 @@
       ]
     },
     "ad-domain": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-domain/SKILL.md",
@@ -94,7 +94,7 @@
       ]
     },
     "ad-drift": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-drift/SKILL.md",
@@ -103,7 +103,7 @@
       ]
     },
     "ad-grill-me": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-grill-me/SKILL.md",
@@ -112,7 +112,7 @@
       ]
     },
     "ad-ground": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-ground/SKILL.md",
@@ -121,7 +121,7 @@
       ]
     },
     "ad-guidelines": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-guidelines/SKILL.md",
@@ -130,7 +130,7 @@
       ]
     },
     "ad-handoff": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-handoff/SKILL.md",
@@ -139,7 +139,7 @@
       ]
     },
     "ad-level-up": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/agents/rule-candidate-reviewer.md",
@@ -152,7 +152,7 @@
       ]
     },
     "ad-merge": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-merge/SKILL.md",
@@ -161,7 +161,7 @@
       ]
     },
     "ad-next": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-next/SKILL.md",
@@ -170,7 +170,7 @@
       ]
     },
     "ad-philosophy": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-philosophy/SKILL.md",
@@ -179,7 +179,7 @@
       ]
     },
     "ad-pr": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-pr/SKILL.md",
@@ -188,7 +188,7 @@
       ]
     },
     "ad-prd": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-prd/SKILL.md",
@@ -197,7 +197,7 @@
       ]
     },
     "ad-review": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/agents/fresh-context-reviewer.md",
@@ -210,7 +210,7 @@
       ]
     },
     "ad-rules": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-rules/SKILL.md",
@@ -219,7 +219,7 @@
       ]
     },
     "ad-spec": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-spec/SKILL.md",
@@ -228,7 +228,7 @@
       ]
     },
     "ad-spike": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-spike/SKILL.md",
@@ -237,7 +237,7 @@
       ]
     },
     "ad-subagent": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-subagent/SKILL.md",
@@ -246,7 +246,7 @@
       ]
     },
     "ad-task": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-task/SKILL.md",
@@ -255,7 +255,7 @@
       ]
     },
     "ad-tdd": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-tdd/SKILL.md",
@@ -264,7 +264,7 @@
       ]
     },
     "ad-tdg": {
-      "version": "0.19.0-beta.1",
+      "version": "0.20.0-beta.1",
       "files": [
         {
           "path": ".claude/skills/ad-tdg/SKILL.md",

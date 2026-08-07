@@ -265,6 +265,44 @@ test('the ad-audit skill carries the expected-anchors block and the UNVERIFIED r
   }
 });
 
+test('the ad-audit skill carries the empirical-falsification lane, on both hosts (ADR-0052)', () => {
+  for (const rel of ['claude-code/ad-audit/SKILL.md', 'codex/ad-audit/SKILL.md']) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
+    assert.ok(
+      body.includes('empirical falsification lane') || body.includes('Empirical falsification lane'),
+      `${rel} lost the empirical-falsification lane (ADR-0052, C4)`
+    );
+    assert.ok(
+      body.includes('ADR-0052'),
+      `${rel} no longer cites ADR-0052 for the lane`
+    );
+    // The lane's load-bearing constraints — orchestrator-only + serial — must
+    // survive an edit, since ADR-0052 makes them non-negotiable.
+    assert.ok(
+      body.toLowerCase().includes('cannot fail'),
+      `${rel} lost the lane's narrow "cannot fail" trigger`
+    );
+    assert.ok(
+      body.toLowerCase().includes('serial'),
+      `${rel} lost the lane's serial constraint (the load-113 lesson)`
+    );
+  }
+});
+
+test('both audit-group-reviewer briefs forbid mutation and hand the lane trigger up (ADR-0052)', () => {
+  for (const rel of ANCHOR_ECHO_BRIEFS) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
+    assert.ok(
+      body.includes('ADR-0052'),
+      `${rel} lost the ADR-0052 mutation guard`
+    );
+    assert.ok(
+      body.toLowerCase().includes('cannot fail'),
+      `${rel} no longer names the "cannot fail" inference it must hand up`
+    );
+  }
+});
+
 // --- Skill scripts host parity (task-0031) ---
 // A skill script (scripts/ beside SKILL.md) is host-agnostic executable code:
 // both hosts must ship it, byte-identical, so the copy-drift that motivated
