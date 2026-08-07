@@ -23,12 +23,11 @@ import {
   writeExcludeEntries,
   installedPathsToExclude,
 } from '../src/lib/git.js';
+import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from '../src/commands/init.js';
 import {
-  CONDITIONAL_SKILLS,
-  REQUIRED_SKILLS,
   offerKitExclude,
   kitExcludeCandidates,
-} from '../src/commands/init.js';
+} from '../src/commands/kit-exclude.js';
 import { userLevelInstallPath } from '../src/lib/state.js';
 
 function mkGitRepo() {
