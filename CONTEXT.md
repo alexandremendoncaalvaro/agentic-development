@@ -123,6 +123,14 @@ _Avoid_: "prose check" (sounds like style/grammar review); "distrust the author"
 
 **Related code:** [`src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md`](src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md), [`doc/adr/0046-ad-audit-file-coverage-severity-prose.md`](doc/adr/0046-ad-audit-file-coverage-severity-prose.md).
 
+### Empirical falsification lane
+
+**Definition:** the `ad-audit` step that **runs** a claim instead of arguing it ([ADR-0052](doc/adr/0052-ad-audit-empirical-falsification-lane.md)) — when a reviewer finding asserts a specific test or suite *cannot fail* on a specific production change, the orchestrator applies the minimal mutation, runs the CI-exact filter, observes the result, and restores the tree. Serial and only after the parallel reviewers finish; orchestrator-only (reviewers hand the trigger up, never mutate); a green counts only if the mutation demonstrably took effect and the run completed. Fires solely on the negative-coverage ("cannot fail") trigger — reproducing the author's own numbers is the evidence gate's job, not the lane's.
+
+_Avoid_: "reproduction step" (the evidence gate already reproduces author claims; the lane is narrower — it falsifies a "cannot fail" inference); "mutation testing" (that is a coverage-tooling technique over a whole suite; this is one targeted mutation to settle one finding).
+
+**Related code:** [`src/skills/claude-code/ad-audit/SKILL.md`](src/skills/claude-code/ad-audit/SKILL.md), [`src/skills/codex/ad-audit/SKILL.md`](src/skills/codex/ad-audit/SKILL.md), [`doc/adr/0052-ad-audit-empirical-falsification-lane.md`](doc/adr/0052-ad-audit-empirical-falsification-lane.md).
+
 ### Skill script
 
 **Definition:** an executable file under `scripts/` beside a skill's `SKILL.md`, shipped and installed with the skill (SHA-tracked and three-way-diffed like any skill file) and invoked by path from the skill text. Host copies are byte-identical twins, enforced by test. First instance: `ad-audit`'s deterministic rules-resolution probe, `resolve-rules.mjs` (ADR-0047 Decision 1 realization, task-0031).
