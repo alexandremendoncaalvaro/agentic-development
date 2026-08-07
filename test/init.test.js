@@ -308,3 +308,124 @@ test('init: invalid --agent value rejected', () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// A scratch directory that is a real git repository, so the installer's
+// tracked-path probe (ADR-0051) has something to resolve against.
+function mkGitScratch() {
+  const dir = mkScratch();
+  const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' });
+  git('init', '-q');
+  git('config', 'user.email', 'test@example.com');
+  git('config', 'user.name', 'Test');
+  return { dir, git };
+}
+
+test('init -y leaves a git-tracked root doc unmodified (ADR-0051)', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'team baseline');
+    const before = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+
+    assert.equal(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      before,
+      'a git-tracked root doc must not be rewritten by a non-interactive install'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// The append path is not the only unattended write: a root doc that already
+// carries a stale managed section takes the *replace* path instead, and
+// init.js never passed confirmReplace at all, so the library default (replace)
+// applied. Same hazard, different branch.
+test('init -y leaves a stale managed section in a tracked root doc alone', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# AGENTS.md\n\n<!-- agentic-managed-skills:start -->\n\n' +
+        '## Skills installed by `agentic`\n\nstale table\n\n' +
+        '<!-- agentic-managed-skills:end -->\n'
+    );
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'team baseline with a stale managed section');
+    const before = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+
+    assert.equal(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      before,
+      'a tracked root doc must not be rewritten unattended on the replace path either'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('init -y --force-root-doc writes into a tracked root doc (ADR-0051)', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'team baseline');
+
+    runInit(dir, ['--agent', 'claude-code', '-y', '--force-root-doc']);
+
+    assert.match(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      /agentic-managed-skills:start/,
+      'the override must reach the tracked root doc the refusal skips'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('init -y --force-root-doc regenerates a stale section in a tracked root doc', () => {
+  const { dir, git } = mkGitScratch();
+  try {
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# AGENTS.md\n\n<!-- agentic-managed-skills:start -->\n\n' +
+        '## Skills installed by `agentic`\n\nstale table\n\n' +
+        '<!-- agentic-managed-skills:end -->\n'
+    );
+    git('add', 'AGENTS.md');
+    git('commit', '-qm', 'tracked, stale managed section');
+
+    runInit(dir, ['--agent', 'claude-code', '-y', '--force-root-doc']);
+
+    const body = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+    assert.doesNotMatch(body, /stale table/, 'the override must reach the replace path too');
+    assert.match(body, /ad-bootstrap/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// The tracked check must not degrade into "refuse inside any repository".
+// Untracked and unknown are distinct states from tracked, and both still
+// authorise the append; only the other tests' non-repo scratch dirs cover
+// `unknown`, so this pins `untracked` inside a real repository.
+test('init -y still appends to an untracked root doc inside a git repo', () => {
+  const { dir } = mkGitScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n');
+
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+
+    assert.match(
+      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
+      /agentic-managed-skills:start/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

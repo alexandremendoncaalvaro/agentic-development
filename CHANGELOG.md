@@ -6,6 +6,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- The installer offers to keep its freshly-installed, still-untracked kit files out of a shared repo's commits by adding them to `.git/info/exclude` — per-clone and never committed, unlike `.gitignore` (ADR-0051 Decision 4). Entries are by filename, never by directory, so a mixed-ownership `.claude/agents/` never hides a team-owned file from git. Interactive `init`/`update` offer it; non-interactive leaves the files and says so. The install summary also notes when a user-level agentic install already covers the skills.
+
+### Changed
+
+- `init` no longer edits a shared root doc unattended (ADR-0051, task-0036). When a run is non-interactive and the project's `AGENTS.md` / `CLAUDE.md` is tracked by git, the managed `Skills installed by agentic` section is not written: the write is skipped, the reason goes to stderr, and the rest of the install proceeds. This covers both write paths — appending a new section and refreshing a stale one, the latter of which previously had no confirmation callback wired at all. For a tracked root doc, both interactive prompts — appending a new managed section and regenerating a stale one — now name the sharing risk (the section becomes visible to everyone who clones the repo) and default to declining instead of accepting; the previous wording spoke only to content being preserved, which reassures about the wrong risk. A root doc that is untracked, or a directory that is not a git repository at all, keeps the previous prompt and default. `--force-root-doc` is scoped to the tracked case: on an untracked doc it never overwrites a hand-edited section — only `--force` does. `init --force-root-doc` overrides the skip for callers that do want the section in a shared file; it is a distinct flag from `update --force`, which means "overwrite user-edited files on conflict".
+
 ### Fixed
 
 - `ad-audit` SKILL.md on both hosts names the machine store by its canonical noun ("machine store", per CONTEXT.md) — four spots said "curated store", the alias the glossary exists to retire.

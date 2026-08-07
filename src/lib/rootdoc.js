@@ -121,6 +121,72 @@ function replaceSection(body, newSection, bounds) {
 }
 
 /**
+ * Message and default for the interactive "regenerate the managed section?"
+ * confirmation on a git-tracked root doc (ADR-0051 Decision 2). Names both
+ * risks — the file is shared with everyone who clones the repo, and edits
+ * between the markers are lost — and defaults to no. Used only when the doc is
+ * tracked; the untracked case keeps each command's prior replace behaviour.
+ * Pure and separate from the TUI so the decision is unit-testable.
+ */
+export function rootDocReplacePrompt(path) {
+  return {
+    message:
+      `${path} is tracked by git — regenerating the managed ` +
+      `"Skills installed by agentic" section changes a file shared with ` +
+      `everyone who clones the repo, and any edits between the markers are ` +
+      `lost. Regenerate it anyway?`,
+    initialValue: false,
+  };
+}
+
+/**
+ * The stderr line an unattended run prints when it declines to write a managed
+ * section into a git-tracked root doc (ADR-0051). Shared by init and update so
+ * the wording — the part most likely to drift between two call sites — lives in
+ * one place; the trivial guard that calls it stays local to each command.
+ */
+export function trackedRootDocSkipNotice(path) {
+  return (
+    `skipped ${path}: tracked by git, so the managed section would be ` +
+    `visible to everyone sharing this repository. Re-run interactively ` +
+    `to decide, or pass --force-root-doc.`
+  );
+}
+
+/**
+ * Message and default answer for the interactive "append the managed section?"
+ * confirmation, given the root doc's name and its git tracking state.
+ *
+ * A tracked root doc is shared with everyone who clones the repository, so the
+ * prompt says exactly that and stops pre-answering yes (ADR-0051). The previous
+ * wording spoke only to content ("existing content preserved"), which reassures
+ * about the wrong risk: the hazard is not losing text, it is publishing a
+ * section into someone else's document.
+ *
+ * `unknown` is treated as `untracked` on purpose — absence of evidence that the
+ * file is shared is not evidence that it is, and a warning the user cannot act
+ * on trains them to dismiss the ones that matter.
+ *
+ * Pure and separate from the TUI so the decision is testable: the suite runs
+ * without a TTY and cannot drive the prompt itself.
+ */
+export function rootDocAppendPrompt(path, tracked) {
+  if (tracked === 'tracked') {
+    return {
+      message:
+        `${path} is tracked by git — this section will be visible to ` +
+        `everyone who shares the repository. Append the managed ` +
+        `"Skills installed by agentic" section anyway?`,
+      initialValue: false,
+    };
+  }
+  return {
+    message: `Append a managed "Skills installed by agentic" section to ${path}? (existing content preserved)`,
+    initialValue: true,
+  };
+}
+
+/**
  * Update or append the agentic-managed skills section in the project's root
  * doc (AGENTS.md preferred, CLAUDE.md as fallback). Never overwrites
  * user-authored content outside the marker block.

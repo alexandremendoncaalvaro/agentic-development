@@ -6,7 +6,7 @@ Without this file, learning which architectural decisions still bind costs one p
 
 ## Default
 
-All 26 ADRs are `Status: accepted` and bind in full, except the four below, which bind except for the named part.
+All 27 ADRs are `Status: accepted` and bind in full, except the four below, which bind except for the named part.
 
 No ADR in this directory has been deprecated or superseded as a whole document.
 

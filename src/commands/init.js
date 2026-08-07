@@ -1,10 +1,11 @@
 import * as p from '@clack/prompts';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures, detectMode } from '../lib/detect.js';
 import { installKitDocs, installSkills } from '../lib/install.js';
-import { saveState, loadState } from '../lib/state.js';
+import { saveState, loadState, userLevelInstallPath } from '../lib/state.js';
 import {
   DEFAULT_PROFILE,
   PROFILES,
@@ -13,7 +14,17 @@ import {
   profileOrDefault,
   requiredSkillsForProfile,
 } from '../lib/profiles.js';
-import { updateRootDoc } from '../lib/rootdoc.js';
+import {
+  updateRootDoc,
+  rootDocAppendPrompt,
+  rootDocReplacePrompt,
+  trackedRootDocSkipNotice,
+} from '../lib/rootdoc.js';
+import {
+  trackedState,
+  installedPathsToExclude,
+  writeExcludeEntries,
+} from '../lib/git.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -162,6 +173,60 @@ function skillsForAgent(agent, profileName, optedSkills) {
     return def && def.agents.includes(agent);
   });
   return [...universal, ...conditional];
+}
+
+// The exclude offer is scoped to the agent surface — the skill/subagent files
+// the kit installs under these roots. ADR-0051 Decision 4 covers exactly those
+// two write surfaces. Root kit-docs (WORKFLOW.md / WORKFLOW-FLOWS.md, installed
+// by installKitDocs per ADR-0049 Decision 6) are deliberately NOT swept: they
+// are project-facing constitution docs a team may commit and diverge from, and
+// installKitDocs already guards them with its own report-and-skip. Sweeping
+// them here would offer to hide a file the kit's own convention commits.
+const AGENT_SURFACE_PREFIXES = ['.claude/', '.agents/', '.codex/'];
+
+/**
+ * Offer to keep the kit files it installs under the agent surface out of a
+ * shared repo's commits via `.git/info/exclude` (ADR-0051 Decision 4). Shared
+ * by init and update. Returns the number of entries added. Interactive asks
+ * (default yes); non-interactive declines and notes it, holding the
+ * refuse-to-guess posture — the write is local-only, but a `-y`/CI run
+ * shouldn't silently hide files a user might mean to commit. Tracked files are
+ * already dropped by `installedPathsToExclude`, so a mixed-ownership directory
+ * is safe. The candidate set is every currently-untracked agent-surface path
+ * in this run's actions, not only files this run created — a previously
+ * declined file is offered again.
+ */
+/**
+ * The agent-surface, currently-untracked subset of `paths` — the exclude
+ * offer's candidate set. Extracted pure so the scoping is unit-testable
+ * without driving the interactive prompt (the suite has no TTY).
+ */
+export function kitExcludeCandidates(cwd, paths) {
+  const agentSurface = paths.filter((p) =>
+    AGENT_SURFACE_PREFIXES.some((prefix) => p.startsWith(prefix))
+  );
+  return installedPathsToExclude(cwd, agentSurface);
+}
+
+export async function offerKitExclude({ cwd, paths, interactive }) {
+  const toExclude = kitExcludeCandidates(cwd, paths);
+  if (toExclude.length === 0) return 0;
+  if (!interactive) {
+    process.stderr.write(
+      `note: ${toExclude.length} kit file(s) are untracked in this repo; ` +
+        `run interactively to add them to .git/info/exclude so they are not committed.\n`
+    );
+    return 0;
+  }
+  const answer = await p.confirm({
+    message:
+      `Exclude ${toExclude.length} installed kit file(s) from git via ` +
+      `.git/info/exclude, so they are not committed to this repo? ` +
+      `(per-clone, never committed; recommended when the repo is shared)`,
+    initialValue: true,
+  });
+  if (p.isCancel(answer) || !answer) return 0;
+  return writeExcludeEntries(cwd, toExclude).added.length;
 }
 
 export async function initCommand(opts) {
@@ -340,26 +405,75 @@ export async function initCommand(opts) {
     ]),
   ].filter((s) => installedSkillSet.has(s));
 
+  // A non-interactive run has nobody to ask, so it must not decide for the
+  // team: a tracked root doc is shared with everyone who clones the repo
+  // (ADR-0051). Unknown tracking state keeps the prior behaviour. Shared by
+  // both root-doc write paths — appending a new section and replacing a stale
+  // one are the same hazard on the same file.
+  const allowUnattendedRootDocWrite = (path) => {
+    if (opts.forceRootDoc) return true;
+    if (trackedState(cwd, path) !== 'tracked') return true;
+    process.stderr.write(trackedRootDocSkipNotice(path) + '\n');
+    return false;
+  };
+
   const confirmAppend = interactive
     ? async (path) => {
-        const answer = await p.confirm({
-          message: `Append a managed "Skills installed by agentic" section to ${path}? (existing content preserved)`,
-          initialValue: true,
-        });
+        // Message and default come from rootDocAppendPrompt so the decision is
+        // unit-tested; a TTY-less suite cannot drive p.confirm itself.
+        const answer = await p.confirm(
+          rootDocAppendPrompt(path, trackedState(cwd, path))
+        );
         if (p.isCancel(answer)) return false;
         return answer;
       }
-    : async () => true;
+    : async (path) => allowUnattendedRootDocWrite(path);
+
+  // Distinct from the `confirmReplace` passed to installSkills above: that one
+  // resolves a skill-file conflict and receives a question, this one receives
+  // the root doc's name. A tracked doc names the sharing risk and defaults to
+  // no (ADR-0051 Decision 2); an untracked doc keeps the prior behaviour of
+  // silently regenerating the kit's own section.
+  const confirmRootDocReplace = interactive
+    ? async (path) => {
+        if (trackedState(cwd, path) !== 'tracked') return true;
+        const answer = await p.confirm(rootDocReplacePrompt(path));
+        return !p.isCancel(answer) && answer;
+      }
+    : async (path) => allowUnattendedRootDocWrite(path);
 
   const rootDocAction = await updateRootDoc({
     cwd,
     skills: skillDisplayOrder,
     confirmAppend,
+    confirmReplace: confirmRootDocReplace,
+  });
+
+  // Keep freshly-installed kit files out of a shared repo's commits via
+  // .git/info/exclude — per-clone and never committed, unlike .gitignore
+  // (ADR-0051 Decision 4). Interactive offers; non-interactive leaves them and
+  // says so, holding the refuse-to-guess posture. Files already tracked (the
+  // dogfood self-install, a team-owned subagent) are dropped by filename, so a
+  // mixed-ownership directory never has a team file hidden from git.
+  const excluded = await offerKitExclude({
+    cwd,
+    paths: [...new Set(allActions.map((a) => a.path))],
+    interactive,
   });
 
   const lines = allActions.map((a) => `${ACTION_SYMBOL[a.type]} ${a.path}`);
   if (rootDocAction.type !== 'absent') {
     lines.push(`${ROOT_DOC_LABEL[rootDocAction.type]}${rootDocAction.path}`);
+  }
+  if (excluded > 0) {
+    lines.push(`! .git/info/exclude (+${excluded})`);
+  }
+  const userInstall = cwd === homedir() ? null : userLevelInstallPath();
+  if (userInstall) {
+    lines.push(
+      `note: agentic is also installed at the user level (${userInstall}); ` +
+        `a project install is only needed to pin a version or share it via the repo.`
+    );
   }
 
   if (interactive) {
