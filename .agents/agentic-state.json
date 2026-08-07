@@ -56,7 +56,7 @@
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "118ff2dbdb8696b949d0d5badd201a85c23b88efde115683b0e376a662c92b61"
+          "sourceSha": "f34dadbb3119d12d428942da5f02acb5e8c0c9d4eecf216340ed6cdce7defaed"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
