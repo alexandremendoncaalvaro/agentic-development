@@ -24,7 +24,9 @@ Step 4 — write the file. Path: `doc/adr/<NNNN>-<short-slug>.md`. Slug: kebab-c
 Stop after writing. Do NOT flip status to accepted — that requires user review.
 </instructions>
 
+<template path="doc/adr/NNNN-<slug>.md">
 The ADR skeleton lives in [references/adr-template.md](references/adr-template.md) — one decision per ADR; Status starts at proposed.
+</template>
 
 <output_contract>
 A single new file at `doc/adr/<NNNN>-<short-slug>.md`. Status proposed. No invented content. Existing ADRs are otherwise left alone, with one bounded exception: when this ADR declares `Amends: ADR-NNNN`, offer to add the matching `Amended by:` line to that ADR's header, and write it only on explicit confirmation. Header line only — the body stays the immutable record, so this records a new relation rather than retconning an old decision. Declining is a valid answer; `/ad-drift` reports the unpaired relation.
