@@ -62,7 +62,7 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `ad-design` | spec-driven | auto if frontend detected | Bootstrap `DESIGN.md` from existing tokens (Figma, tailwind.config, tokens.json, CSS custom props) | `/ad-design` |
 | `ad-subagent` | spec-driven | auto if installing for Claude Code or Codex | Drafts `.claude/agents/<name>.md` or `.codex/agents/<name>.toml` for bounded delegated work | `/ad-subagent` |
 | `ad-skill` | spec-driven | opt-in only | Drafts a new Claude Code or Codex skill at the appropriate path | `/ad-skill` |
-| `ad-hooks` | workflow-operational | opt-in only | Scaffolds deterministic quality gates per WORKFLOW §11 (pre-commit + pre-push); detects stack and recommends a runner (Husky / lefthook / pre-commit / native) | `/ad-hooks` |
+| `ad-hooks` | workflow-operational | opt-in only | Scaffolds deterministic quality gates per WORKFLOW §11 (pre-commit + pre-push); detects stack and recommends a runner (Husky / lefthook / pre-commit / native). Plus a Claude Code session-lifecycle tier — a `Stop` hook that nudges `/ad-handoff` when a session's context runs low (ADR-0055) | `/ad-hooks` |
 
 A short TUI shows the detected mode, agent, and feature signals (frontend / `.claude/` / `.agents/` presence) and lets you toggle the conditional skills. Non-interactive flags: `--agent claude-code | codex | both`, `--yes` to skip confirmations — auto-checked conditionals (e.g., `ad-design` if the project has React) install; `ad-skill` stays opt-in. Re-running on an installed project is idempotent — unchanged files report `·`, divergent ones prompt to replace.
 
