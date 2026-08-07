@@ -51,3 +51,18 @@ Negative / trade-offs:
 - **Union-only composition (no precedence)** — rejected. A genuine personal-vs-project conflict would surface as a finding on every audit of that repo — permanent noise for a deliberate divergence.
 - **Silent project-wins precedence** — rejected. A shadowed machine-store rule disappearing without trace is drift the practitioner cannot see; the report line costs nothing.
 - **Explicit override syntax in v1** — deferred (YAGNI). Implicit shadowing with a report covers the known cases; syntax lands if it misfires.
+
+## Addendum (2026-08-06) — visibility is a per-repo choice; this repo's `.gitignore` line is deliberate
+
+The visibility mode is chosen per repository at first project-rule creation
+(the `ad-level-up` flow asks): **committed** when the rules should version
+with the repo, **machine-local** via `.git/info/exclude` when they must leave
+no footprint. The `.gitignore` rejection above applies to that private mode
+in downstream repos, not to every exclusion ever.
+
+This repository's own committed `.gitignore` entry for `.agentic/rules/` is
+not that privacy mechanism: here the layer is banned entirely — the repo is
+public and its rules would be house IP — so the exclusion is deliberately
+team-visible, belt-and-suspenders with the leak-guard (ADR-0033), which
+blocks any staged `rules/` path regardless. Audits stop reporting the entry
+as a violation of this ADR.
