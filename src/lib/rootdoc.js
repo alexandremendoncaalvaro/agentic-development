@@ -122,7 +122,7 @@ function replaceSection(body, newSection, bounds) {
 
 /**
  * Message and default for the interactive "regenerate the managed section?"
- * confirmation on a git-tracked root doc (ADR-0050 Decision 2). Names both
+ * confirmation on a git-tracked root doc (ADR-0051 Decision 2). Names both
  * risks — the file is shared with everyone who clones the repo, and edits
  * between the markers are lost — and defaults to no. Used only when the doc is
  * tracked; the untracked case keeps each command's prior replace behaviour.
@@ -141,7 +141,7 @@ export function rootDocReplacePrompt(path) {
 
 /**
  * The stderr line an unattended run prints when it declines to write a managed
- * section into a git-tracked root doc (ADR-0050). Shared by init and update so
+ * section into a git-tracked root doc (ADR-0051). Shared by init and update so
  * the wording — the part most likely to drift between two call sites — lives in
  * one place; the trivial guard that calls it stays local to each command.
  */
@@ -158,7 +158,7 @@ export function trackedRootDocSkipNotice(path) {
  * confirmation, given the root doc's name and its git tracking state.
  *
  * A tracked root doc is shared with everyone who clones the repository, so the
- * prompt says exactly that and stops pre-answering yes (ADR-0050). The previous
+ * prompt says exactly that and stops pre-answering yes (ADR-0051). The previous
  * wording spoke only to content ("existing content preserved"), which reassures
  * about the wrong risk: the hazard is not losing text, it is publishing a
  * section into someone else's document.

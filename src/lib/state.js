@@ -18,7 +18,7 @@ export function statePath(cwd, agent) {
 }
 
 /**
- * The user-level agentic install's state file, if one exists (ADR-0050
+ * The user-level agentic install's state file, if one exists (ADR-0051
  * Decision 2). When present, a project install is not the only place the kit
  * lives, and the operator should see that. Reuses STATE_DIRS / STATE_FILE so
  * it tracks the install layout. `home` is injectable for tests.

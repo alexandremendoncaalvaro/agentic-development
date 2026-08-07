@@ -326,7 +326,7 @@ export async function updateCommand(opts) {
   ].filter((s) => installedSkillSet.has(s));
 
   // An unattended run must not decide for the team: a tracked root doc is
-  // shared with everyone who clones the repo (ADR-0050). Mirrors init.js;
+  // shared with everyone who clones the repo (ADR-0051). Mirrors init.js;
   // `--force-root-doc` is the explicit override, distinct from `--force`
   // (which overwrites user-edited skill files on conflict). Unknown tracking
   // state keeps the prior behaviour.
@@ -349,7 +349,7 @@ export async function updateCommand(opts) {
 
   const confirmRootDocReplace = interactive
     ? async (path) => {
-        // A tracked doc names the sharing risk (ADR-0050 Decision 2); an
+        // A tracked doc names the sharing risk (ADR-0051 Decision 2); an
         // untracked doc keeps the pre-existing diverged-section warning.
         const answer = await p.confirm(
           trackedState(cwd, path) === 'tracked'
@@ -385,7 +385,7 @@ export async function updateCommand(opts) {
   });
 
   // Keep freshly-installed kit files out of a shared repo's commits
-  // (ADR-0050 Decision 4). Skipped on a dry-run, which writes nothing.
+  // (ADR-0051 Decision 4). Skipped on a dry-run, which writes nothing.
   const excluded = dryRun
     ? 0
     : await offerKitExclude({

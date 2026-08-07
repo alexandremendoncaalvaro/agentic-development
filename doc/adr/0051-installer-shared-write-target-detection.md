@@ -1,4 +1,4 @@
-# ADR-0050: The installer detects a shared write target and refuses to guess
+# ADR-0051: The installer detects a shared write target and refuses to guess
 
 **Status:** accepted
 **Date:** 2026-08-06

@@ -310,7 +310,7 @@ test('init: invalid --agent value rejected', () => {
 });
 
 // A scratch directory that is a real git repository, so the installer's
-// tracked-path probe (ADR-0050) has something to resolve against.
+// tracked-path probe (ADR-0051) has something to resolve against.
 function mkGitScratch() {
   const dir = mkScratch();
   const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' });
@@ -320,7 +320,7 @@ function mkGitScratch() {
   return { dir, git };
 }
 
-test('init -y leaves a git-tracked root doc unmodified (ADR-0050)', () => {
+test('init -y leaves a git-tracked root doc unmodified (ADR-0051)', () => {
   const { dir, git } = mkGitScratch();
   try {
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');
@@ -369,7 +369,7 @@ test('init -y leaves a stale managed section in a tracked root doc alone', () =>
   }
 });
 
-test('init -y --force-root-doc writes into a tracked root doc (ADR-0050)', () => {
+test('init -y --force-root-doc writes into a tracked root doc (ADR-0051)', () => {
   const { dir, git } = mkGitScratch();
   try {
     writeFileSync(join(dir, 'AGENTS.md'), '# AGENTS.md\n\nTeam-owned guide.\n');

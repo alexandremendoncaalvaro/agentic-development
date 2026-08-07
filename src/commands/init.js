@@ -177,7 +177,7 @@ function skillsForAgent(agent, profileName, optedSkills) {
 
 /**
  * Offer to keep freshly-installed kit files out of a shared repo's commits via
- * `.git/info/exclude` (ADR-0050 Decision 4). Shared by init and update.
+ * `.git/info/exclude` (ADR-0051 Decision 4). Shared by init and update.
  * Returns the number of entries added. Interactive asks (default yes);
  * non-interactive declines and notes it, holding the refuse-to-guess posture —
  * the write is local-only, but a `-y`/CI run shouldn't silently hide files a
@@ -383,7 +383,7 @@ export async function initCommand(opts) {
 
   // A non-interactive run has nobody to ask, so it must not decide for the
   // team: a tracked root doc is shared with everyone who clones the repo
-  // (ADR-0050). Unknown tracking state keeps the prior behaviour. Shared by
+  // (ADR-0051). Unknown tracking state keeps the prior behaviour. Shared by
   // both root-doc write paths — appending a new section and replacing a stale
   // one are the same hazard on the same file.
   const allowUnattendedRootDocWrite = (path) => {
@@ -408,7 +408,7 @@ export async function initCommand(opts) {
   // Distinct from the `confirmReplace` passed to installSkills above: that one
   // resolves a skill-file conflict and receives a question, this one receives
   // the root doc's name. A tracked doc names the sharing risk and defaults to
-  // no (ADR-0050 Decision 2); an untracked doc keeps the prior behaviour of
+  // no (ADR-0051 Decision 2); an untracked doc keeps the prior behaviour of
   // silently regenerating the kit's own section.
   const confirmRootDocReplace = interactive
     ? async (path) => {
@@ -427,7 +427,7 @@ export async function initCommand(opts) {
 
   // Keep freshly-installed kit files out of a shared repo's commits via
   // .git/info/exclude — per-clone and never committed, unlike .gitignore
-  // (ADR-0050 Decision 4). Interactive offers; non-interactive leaves them and
+  // (ADR-0051 Decision 4). Interactive offers; non-interactive leaves them and
   // says so, holding the refuse-to-guess posture. Files already tracked (the
   // dogfood self-install, a team-owned subagent) are dropped by filename, so a
   // mixed-ownership directory never has a team file hidden from git.
