@@ -7,7 +7,7 @@
 **Quality bar:** docs read primarily by agents must be agent-comprehensible (terse, structured, no fluff); docs read by humans must be readable. Code: simple, secure, mature — right-sized for a CLI, no over-engineering.
 
 **Stack:** Node.js ≥20.12.0, ESM, plain JavaScript. Deps: `commander` (CLI), `@clack/prompts` (TUI — requires `node:util` `styleText`, which shipped in Node 20.12.0, not earlier 20.x). No DB, no build step, no framework.
-**Entry points:** `bin/agentic.js` (npm bin) → `src/index.js` (commander wiring) → `src/commands/<verb>.js`. Today: only `init`. Skill source under `src/skills/<agent>/<skill>/`, copied into the target's `.claude/skills/` or `.agents/skills/` at install time.
+**Entry points:** `bin/agentic.js` (npm bin) → `src/index.js` (commander wiring) → `src/commands/<verb>.js` (`init`, `update`, `profile`, `menu`). Skill source under `src/skills/<agent>/<skill>/`, copied into the target's `.claude/skills/` or `.agents/skills/` at install time.
 
 ## Setup, Build, Test
 
@@ -28,7 +28,7 @@ See [`GUIDELINES.md`](GUIDELINES.md) §8 for the full reference. Non-negotiable 
 * Commit-msg: `subject-check` (ADR-0048) blocks a subject over 72 chars; imperative-mood heuristics warn only.
 * Pre-push: `branch-guard` (ADR-0048) refuses a push updating `main`/`cli`, then `npm test`; CI (`.github/workflows/test.yml`) mirrors `npm test` across Node 20 / 22.
 * Never bypass: no `--no-verify`, no skipped hooks, no deleted failing tests.
-* CI failure is a local gate gap (WORKFLOW.md §11, TL;DR #22). Pre-push mirrors what CI runs — same commands, same matrix. `/ad-pr` refuses to open a PR when local gates are red; `/ad-hooks` diffs pre-push against `.github/workflows/*.yml` and warns on drift. If CI catches something pre-push did not, close the gate locally, don't iterate red CI runs.
+* CI failure is a local gate gap (WORKFLOW.md §11, TL;DR #22). Pre-push mirrors what CI runs — the same effective command (`npm test`; locally via the env-stripping runner `scripts/hook-npm-test.js`), same matrix. `/ad-pr` refuses to open a PR when local gates are red; `/ad-hooks` diffs pre-push against `.github/workflows/*.yml` and warns on drift. If CI catches something pre-push did not, close the gate locally, don't iterate red CI runs.
 
 ## Code Style
 
@@ -47,7 +47,7 @@ Binding decisions live in [`doc/adr/`](doc/adr/). Do not reinvent.
 ```
 bin/agentic.js                       npm bin entry (#!/usr/bin/env node)
 src/index.js                         commander program wiring
-src/commands/<verb>.js               one file per CLI command (today: init.js)
+src/commands/<verb>.js               one file per CLI command (init, update, profile, menu)
 src/lib/                             pure helpers (detect.js, install.js)
 src/leak-guard.js                    pre-commit house-IP leak-guard (ADR-0033), wired in lefthook.yml
 src/skills/<agent>/<skill>/          skill source — copied into target's

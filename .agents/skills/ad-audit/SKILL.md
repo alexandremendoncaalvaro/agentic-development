@@ -14,7 +14,7 @@ Mechanical shape:
 ```
 THIS SESSION:
   1. Target + tree (what is under audit, and on which tree/SHA?).
-  2. Resolve the rule-set: repo binding docs (always) + curated store at
+  2. Resolve the rule-set: repo binding docs (always) + machine store at
      $AGENTIC_RULES_DIR or ~/.agentic/rules/ (optional) + project rules at
      .agentic/rules/ (optional). The rule-set defines the groups and any
      CRITICAL tag — never hardcode them.
@@ -55,7 +55,7 @@ Step 1 — target + tree. State what is under audit (a diff / branch / PR, or dr
 
 Step 2 — resolve the rule-set (three layers, ADR-0035 + ADR-0043):
 - Repo binding docs (always): AGENTS.md, ARCHITECTURE.md, GUIDELINES.md, CONTEXT.md / CONTEXT-MAP.md, accepted ADRs under `doc/adr/` the target touches. Read what exists; never fabricate.
-- Curated store (optional): `$AGENTIC_RULES_DIR` if set, else `~/.agentic/rules/` if it exists; read its rule files. The rule-set defines the groups and any CRITICAL tag. If only repo docs exist, treat each binding doc / accepted ADR as a group. If no rule-set resolves, stop — nothing to audit against.
+- Curated machine store (optional): `$AGENTIC_RULES_DIR` if set, else `~/.agentic/rules/` if it exists; read its rule files. The rule-set defines the groups and any CRITICAL tag. If only repo docs exist, treat each binding doc / accepted ADR as a group. If no rule-set resolves, stop — nothing to audit against.
 - Project rules (optional): `.agentic/rules/` at the repo root, if present — same format as the machine store; committed or machine-local (`.git/info/exclude`), resolution does not care which.
 - Precedence: union across layers, except on genuine conflict, where a project rule wins over a machine-store rule — apply the project rule and report the shadowed store rule as a line in the audit output (never silent).
 - Deterministic resolution probe (ADR-0047; a shipped skill script per task-0031) — run the probe installed beside this skill from the repo root and paste the output into the audit trail; layer resolution is read from observed output, never from memory (the failure-mode is silent: a layer that exists but goes unread). Default install path below; if this skill loaded from a different base directory, substitute it (the script lives at `scripts/resolve-rules.mjs` inside it):

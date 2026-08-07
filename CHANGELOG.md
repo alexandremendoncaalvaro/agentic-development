@@ -8,6 +8,20 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
+- The installer offers to keep its freshly-installed, still-untracked kit files out of a shared repo's commits by adding them to `.git/info/exclude` — per-clone and never committed, unlike `.gitignore` (ADR-0051 Decision 4). Entries are by filename, never by directory, so a mixed-ownership `.claude/agents/` never hides a team-owned file from git. Interactive `init`/`update` offer it; non-interactive leaves the files and says so. The install summary also notes when a user-level agentic install already covers the skills.
+
+### Changed
+
+- `init` no longer edits a shared root doc unattended (ADR-0051, task-0036). When a run is non-interactive and the project's `AGENTS.md` / `CLAUDE.md` is tracked by git, the managed `Skills installed by agentic` section is not written: the write is skipped, the reason goes to stderr, and the rest of the install proceeds. This covers both write paths — appending a new section and refreshing a stale one, the latter of which previously had no confirmation callback wired at all. For a tracked root doc, both interactive prompts — appending a new managed section and regenerating a stale one — now name the sharing risk (the section becomes visible to everyone who clones the repo) and default to declining instead of accepting; the previous wording spoke only to content being preserved, which reassures about the wrong risk. A root doc that is untracked, or a directory that is not a git repository at all, keeps the previous prompt and default. `--force-root-doc` is scoped to the tracked case: on an untracked doc it never overwrites a hand-edited section — only `--force` does. `init --force-root-doc` overrides the skip for callers that do want the section in a shared file; it is a distinct flag from `update --force`, which means "overwrite user-edited files on conflict".
+
+### Fixed
+
+- `ad-audit` SKILL.md on both hosts names the machine store by its canonical noun ("machine store", per CONTEXT.md) — four spots said "curated store", the alias the glossary exists to retire.
+
+## [0.20.0-beta.1] - 2026-08-06
+
+### Added
+
 - A read contract in `WORKFLOW.md` §1 (*Reading order*), delivered by `ad-philosophy` on both hosts (ADR-0049 Decision 5, task-0034): the definition layer always, an area's decision records only when the change touches that area, the evidence behind a decision only when the decision looks wrong. Volume of reading is not comprehension, and nothing previously told an agent where to stop.
 - `init` and `update` now write `WORKFLOW.md` and `WORKFLOW-FLOWS.md` to the target repository root (ADR-0049 Decision 6). Installed skills cite the constitution by section and the installer's own hints print those section numbers, so every one of those references previously pointed at a file the target did not have. A target copy you have edited is **reported and skipped**, never overwritten — `--force` replaces it, matching the default skill installs already hold. Project-specific rules stay in `AGENTS.md` / `GUIDELINES.md`.
 - Partial supersession has a declared shape: `Amends:` and `Amended by:` header fields in the ADR template and `ad-adr` on both hosts (ADR-0049). `Status:` still covers whole-document supersession; the pair covers the case it cannot express, and being a pair is what makes the relation checkable without reading prose.
@@ -19,11 +33,6 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 - `ad-hooks` (both hosts): advisory-first debut rule — deterministic toolchain gates may block from day one; heuristic or novel gates debut warn-only with an explicit flip-to-block criterion.
 - Release discipline for the kit repo (task-0032, ADR-0048): `scripts/release.sh` (version bump + changelog rotation + release commit with DCO sign-off + annotated tag, stopping before push and publish), and three `lefthook.yml` gates — an advisory changelog reminder on npm-shipped content, a blocking over-72-char commit-subject check, and a blocking pre-push guard for `main`/`cli` — plus this changelog.
-- The installer offers to keep its freshly-installed, still-untracked kit files out of a shared repo's commits by adding them to `.git/info/exclude` — per-clone and never committed, unlike `.gitignore` (ADR-0051 Decision 4). Entries are by filename, never by directory, so a mixed-ownership `.claude/agents/` never hides a team-owned file from git. Interactive `init`/`update` offer it; non-interactive leaves the files and says so. The install summary also notes when a user-level agentic install already covers the skills.
-
-### Changed
-
-- `init` no longer edits a shared root doc unattended (ADR-0051, task-0036). When a run is non-interactive and the project's `AGENTS.md` / `CLAUDE.md` is tracked by git, the managed `Skills installed by agentic` section is not written: the write is skipped, the reason goes to stderr, and the rest of the install proceeds. This covers both write paths — appending a new section and refreshing a stale one, the latter of which previously had no confirmation callback wired at all. For a tracked root doc, both interactive prompts — appending a new managed section and regenerating a stale one — now name the sharing risk (the section becomes visible to everyone who clones the repo) and default to declining instead of accepting; the previous wording spoke only to content being preserved, which reassures about the wrong risk. A root doc that is untracked, or a directory that is not a git repository at all, keeps the previous prompt and default. `--force-root-doc` is scoped to the tracked case: on an untracked doc it never overwrites a hand-edited section — only `--force` does. `init --force-root-doc` overrides the skip for callers that do want the section in a shared file; it is a distinct flag from `update --force`, which means "overwrite user-edited files on conflict".
 
 ### Fixed
 
