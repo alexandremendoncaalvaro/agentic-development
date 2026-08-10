@@ -13,16 +13,19 @@ Codex auto-trigger on description keywords is less mature than Claude Code's. If
 </background_information>
 
 <instructions>
-Step 0 — read state. Detect baseline:
-- Profile + kit version: read `.claude/agentic-state.json` and `.agents/agentic-state.json` if present. Profile defaults to `team` per ADR-0013 when state file missing or no profile field.
-- Filesystem signals: `AGENTS.md` / `CLAUDE.md`, `GUIDELINES.md`, `ARCHITECTURE.md`, `DESIGN.md`, `WORKFLOW.md`, `README.md`, `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod`, `.husky/` / `lefthook.yml` / `.pre-commit-config.yaml`, `.github/workflows/`, current git branch.
-- Meaningful-code signals: non-trivial files under `src/`, `app/`, `lib/`, `test/`, `tests/`, `packages/`, framework entrypoints, or manifests with real scripts/dependencies. Treat only README/LICENSE/gitignore files, agentic state, empty artifact directories, and empty manifests as trivial.
-- Durable product-framing signals: PRD, specs, tasks, or README/docs/code that let you summarize the target user, problem, and current product behavior. Framework scaffolds or a few early files without that framing still count as unframed greenfield.
-- Per-artifact directories: list `doc/product/`, `doc/specs/`, `doc/adr/`, `doc/tasks/`. Read each file's frontmatter (`Status:`, `Created:`, `Spec ref:` for tasks) but NOT the full body.
-- Git state: current branch, commits ahead of `main` (`git rev-list --count main..HEAD`), unpushed commits, working-tree dirtiness.
-- Root-doc freshness: inspect headings and references only. If a PRD exists but `AGENTS.md` / `CLAUDE.md` does not reference `doc/product/` / `PRD`, mark the operational guide as possibly stale and recommend refreshing via `/ad-bootstrap` after the product contract.
+Step 0 — run the survey. The deterministic state-gathering — file-signal presence, `Status:` frontmatter parsing, ADR/task counts, the `git rev-list` ahead-of-main count, tests/hooks/CI detection, and spec-task reciprocity — is a bundled script (ADR-0057), not prose to re-derive by hand. Run it from the repo root and read its JSON. The default install path is:
 
-Do not parse skill bodies. Do not run tests. Do not invoke other skills.
+```bash
+node .agents/skills/ad-next/scripts/survey.mjs
+```
+
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/survey.mjs` inside it.
+
+Every field is an objective fact, and the survey never crashes: a missing directory, a corrupt state file, or a non-git tree each report as an explicit `null` or empty value. It also never fails silently on a read — an existing-but-unreadable file (or invalid JSON) is listed in `unreadable[]` (`{path, code}`) rather than swallowed; a non-empty `unreadable` means the survey is partial for those paths. The JSON carries `profile`, `kitVersion`, `git` (`branch`, `aheadOfMain`, `dirty`), `constitution` (`workflow`, `operationalGuide`, `guidelines`), `rootDocReferencesProduct` (does the operational guide name the product contract; `null` when no guide), `architecture`, `design`, `domain` (`contextMd`, `contextMap`, `emptyGlossary` — `null` when no root `CONTEXT.md`), `product` (`prd`, `productMap`, `status`, `specCount`), `specs[]` (`slug`, `status`, `taskCount`), `adrs` (`counts`, `proposed[]`), `tasks` (`counts`, `active[]`, `orphans[]`), `reciprocity` (`specsWithoutTasks[]`, `orphanTasks[]`), `code` (`tests`, `hooks`, `ci`), and `unreadable[]`.
+
+The survey targets the single-product / single-context layout. For a multi-product (`product.productMap: true`) or multi-context (`domain.contextMap: true`) repo it reports the index file's presence but does not enumerate the per-product / per-context files — read those yourself when the map is present.
+
+The survey gives you the facts; Steps 1-5 are the judgment the script deliberately leaves to you. Work them from the JSON, not from a re-scan. You still read a file's body only when a judgment call needs it — the two that always need a read: (a) is the code meaningful (non-trivial files under `src/`, `app/`, `lib/`, `test/`, `tests/`, `packages/`, framework entrypoints, or a manifest with real scripts/dependencies — treat README/LICENSE/gitignore, agentic state, empty artifact dirs, and empty manifests as trivial), and (b) can you summarize the product (target user, problem, current behavior) from the README/code? Both feed Step 1.
 
 Step 1 — classify scenario before ranking. Layer status is evidence; scenario determines the right next step.
 
@@ -33,42 +36,43 @@ Step 1 — classify scenario before ranking. Layer status is evidence; scenario 
 - Implementation in progress: dirty tree, branch ahead of `main`, in-progress tasks, blocked tasks, or proposed ADRs.
 - Maintenance / install hygiene: stale kit state, profile/install mismatch, missing expected conditional skills.
 
-If scenarios overlap, report the strongest active scenario in this order: implementation in progress, maintenance/install hygiene, feature planning, product-framed greenfield, brownfield, fresh/unframed greenfield. If code exists but product behavior cannot be summarized, choose fresh/unframed greenfield rather than brownfield.
+Durable product framing is a judgment call the survey does not make: `product.prd` and `specs` tell you the artifacts exist, but whether the README / code lets you summarize the target user, problem, and current product behavior is something you read for. If scenarios overlap, report the strongest active scenario in this order: implementation in progress, maintenance/install hygiene, feature planning, product-framed greenfield, brownfield, fresh/unframed greenfield. If code exists but product behavior cannot be summarized, choose fresh/unframed greenfield rather than brownfield.
 
-Step 2 — layer-by-layer status. Render six sections in this exact order. Use words for status (`present`, `in flight`, `missing`, `stale`) — no emoji.
+Step 2 — layer-by-layer status. Render six sections in the output order below, narrating the survey's facts. Use words for status (`present`, `in flight`, `missing`, `stale`) — no emoji. The interpretation rules the JSON does not encode:
 
-Layer 1 — Constitution: `WORKFLOW.md` (kit-shipped), `AGENTS.md` / `CLAUDE.md` (operational guide), `GUIDELINES.md` (full engineering reference). `AGENTS.md` missing is not the first greenfield finding when product framing is missing; recommend product discovery / PRD first, then `/ad-bootstrap`.
+Layer 1 — Constitution (`constitution`): `WORKFLOW.md` is kit-shipped and should always be present. `operationalGuide` names `AGENTS.md` or `CLAUDE.md` when present, else `null` — a missing operational guide is not the first greenfield finding when product framing is missing; recommend product discovery / PRD first, then `/ad-bootstrap`.
 
-Layer 2 — Domain (CONTEXT.md): present at repo root, *or* CONTEXT-MAP.md plus per-context CONTEXT.md files? Lazy-created per ADR-0019 — `missing` is valid for projects whose first domain term has not been resolved yet, not a finding to flag in poc / solo. For each present file, flag empty-glossary (Language section with zero terms).
+Layer 2 — Domain (`domain`): `CONTEXT.md` / `CONTEXT-MAP.md` are lazy-created (ADR-0019) — `contextMd: false` is valid, not a finding at poc / solo. `emptyGlossary: true` (a file with no term carrying an `_Avoid_:` line) is worse than no glossary — flag it; `emptyGlossary: null` means there is no root `CONTEXT.md` to judge. When `contextMap: true` (multi-context), read the per-context `CONTEXT.md` files the map lists to judge their glossaries — the survey does not.
 
-Layer 3 — Product (doc/product/): doc/product/PRD.md (single-product) or PRODUCT-MAP.md plus per-product slug files (multi-product)? Lazy-created per ADR-0027 — `missing` is valid at `poc` (PRD profile-excluded). In fresh/unframed greenfield at solo/team/mature, missing PRD is the primary navigation finding. For each present PRD, report Status + count of feature specs whose Related → PRD field points at it. Flag accepted PRDs with zero implementing specs.
+Layer 3 — Product (`product`): PRD is lazy-created (ADR-0027); `prd: false` is valid at `poc` (PRD profile-excluded). In fresh/unframed greenfield at solo/team/mature, a missing PRD is the primary navigation finding. `specCount` is the total number of specs: in the single-product layout every spec implements the one PRD, so an accepted PRD (`status: accepted`) with `specCount: 0` is the stuck state. When `productMap: true` (multi-product), read the per-product `<slug>.md` files the map lists for their status and implementing specs — the survey reports only the map's presence.
 
-Layer 4 — Specs (doc/specs/): for each file, report Status + count of tasks whose Spec ref points at it. Flag specs with Status: accepted and zero implementing tasks. If frontend signals exist, also report `DESIGN.md` as the visual contract; missing `DESIGN.md` is a recommendation before `/ad-spec` only when frontend tokens/styles exist or the next feature touches UI.
+Layer 4 — Specs (`specs[]`, `design`): list each spec as `<slug> (<status>, <taskCount> implementing tasks)`. Flag any spec with `status: accepted` and `taskCount: 0` — the most common stuck state; `reciprocity.specsWithoutTasks` pre-computes it. Report `DESIGN.md` (`design`) as the visual contract, and recommend it before `/ad-spec`, only when frontend signals exist or the next feature touches UI.
 
-Layer 5 — Plans / Decisions: `ARCHITECTURE.md`, doc/adr/ counts by status, doc/tasks/ counts by status. Flag proposed ADRs with their slug. List in-progress + blocked tasks with slug and Spec ref. Flag tasks with no Spec ref and no Board ref as orphans. `ARCHITECTURE.md` missing is a finding for team/mature brownfield or when a spec creates load-bearing system patterns; it is not the first step in fresh greenfield.
+Layer 5 — Plans / Decisions (`architecture`, `adrs`, `tasks`): a missing `ARCHITECTURE.md` (`architecture: false`) is a finding for team/mature brownfield with meaningful system patterns, or when a spec creates load-bearing constraints — not the first step in fresh greenfield. Report `adrs.counts` by status and flag every `adrs.proposed` slug. Report `tasks.counts` by status and list `tasks.active` (in-progress + blocked) with slug and `specRef`. Flag `tasks.orphans` (tasks with no Spec ref and no Board ref — no clear scope tie); route them to `/ad-drift` (Step 4) rather than dumping a long slug list.
 
-Layer 6 — Code: branch + ahead count, tests wired? (npm test / pytest / cargo test / go test), hooks wired? (.husky / lefthook.yml / .pre-commit-config.yaml / .git/hooks/), CI wired? (.github/workflows / .gitlab-ci.yml / .circleci/).
+Layer 6 — Code (`git`, `code`): branch + `aheadOfMain` commits ahead of `main`; tests / hooks / CI wired (`code.tests` / `code.hooks` / `code.ci`).
 
 Step 3 — cross-cut signals:
-- Pending fresh-context review: branch ≥1 commits ahead of main with no .agentic/reviews/<ts>-*.md for the current range → recommend ad-review.
-- Spec ↔ task reciprocity: tasks with non-empty Spec ref whose target spec is missing → orphan; accepted/shipped specs with zero Related → Tasks → spec without implementing tasks.
-- Profile vs install state: profile-declared skill set ≠ on-disk skill set → recommend `agentic update` or `agentic profile set <name>`.
-- Stale state file: kitVersion in state file ≠ currently-running kit → recommend `agentic update`.
+- Pending fresh-context review: if `git.aheadOfMain` is 1 or more and no `.agentic/reviews/<ts>-*.md` covers the current range, flag `/ad-review`. (List `.agentic/reviews/` yourself — the survey does not.)
+- Spec ↔ task reciprocity: `reciprocity.orphanTasks` (a task whose `Spec ref` points at a spec that does not exist) and `reciprocity.specsWithoutTasks` (an accepted/shipped spec with zero implementing tasks) arrive pre-computed.
+- Root-doc freshness: if `product.prd` is true but `rootDocReferencesProduct` is false, the operational guide never names the product contract — mark it possibly stale and recommend a `/ad-bootstrap` refresh after the product contract.
+- Profile vs install / stale state: the survey reports the recorded `profile` and `kitVersion` but not whether the installed skill set matches what the profile expects — that comparison needs the profile→skills truth table the CLI owns. Detect the divergence by running `agentic update --dry-run` (it reports what would change); then recommend `agentic update` or `agentic profile set <name>` to close it.
+- Unreadable files: a non-empty `unreadable[]` means those artifact files could not be read, so any count or status that would have come from them is missing — report the gap and its paths rather than treating the survey as complete.
 
-Step 4 — prioritize next actions. Rank by workflow leverage, not by document layer number. Return 3–5 concrete invocations, each as one-line "do X next" with slug / path.
+Step 4 — prioritize next actions. Rank by workflow leverage, not by document layer number. Return 3-5 concrete invocations, each as one-line "do X next" with slug / path.
 
 Priority heuristic:
 1. Protect active work: blocked tasks, proposed ADRs blocking implementation, dirty/ahead branch needing `/ad-review`, stale state that makes installed skills unreliable.
 2. Fresh / unframed greenfield: for solo/team/mature, recommend `/ad-grill-me` when the product ask is fuzzy or `/ad-prd` when it is clear; then `/ad-bootstrap`. Do not recommend `/ad-bootstrap` first, even when a framework scaffold already exists.
-3. Product-framed greenfield: if PRD exists, recommend `/ad-bootstrap` when `AGENTS.md` / `CLAUDE.md` is missing or stale, then `/ad-guidelines`, optional `/ad-design`, then `/ad-spec`.
-4. Brownfield: if meaningful code exists and `AGENTS.md` / `CLAUDE.md` is missing, recommend `/ad-bootstrap` scan-first. Then recommend `/ad-guidelines` for standards, `/ad-architecture` for team/mature system patterns, or `/ad-prd` only when product scope is being backfilled or changed.
+3. Product-framed greenfield: if PRD exists, recommend `/ad-bootstrap` when the operational guide is missing or stale, then `/ad-guidelines`, optional `/ad-design`, then `/ad-spec`.
+4. Brownfield: if meaningful code exists and the operational guide is missing, recommend `/ad-bootstrap` scan-first. Then recommend `/ad-guidelines` for standards, `/ad-architecture` for team/mature system patterns, or `/ad-prd` only when product scope is being backfilled or changed.
 5. Feature pipeline gaps: accepted PRD without specs → `/ad-spec`; accepted spec without tasks → `/ad-task`; missing research before implementation → `/ad-ground`.
 6. Quality gates and drift: mature hooks missing → `/ad-hooks`; orphan tasks/spec mismatches → `/ad-drift`; kit/profile drift → `agentic update` or `agentic profile set <name>`.
 
 If nothing actionable surfaces, say so: "No urgent next action. Continue current work or invoke `/ad-drift` for a full drift check."
 
 Step 5 — profile-aware filtering. Apply at the end:
-- poc: suppress Layer 3 (Product), Layer 4 (Specs), Layer 5 (Plans/Decisions) sections if those directories do not exist. Show Layer 1 + Layer 2 + Layer 6 only. Layer 2 (Domain) and Layer 3 (Product) render informationally — CONTEXT.md and PRD.md missing are *not* findings (lazy-created; PRD also profile-excluded). Recommendation set: `/ad-grill-me` for fuzzy exploration, `/ad-ground` for research-ready questions, `/ad-spike` when the technique is uncertain, `/ad-drift` for drift, `agentic update` for staleness. Do not recommend `/ad-prd`, `/ad-spec`, `/ad-task`, `/ad-bootstrap`, `/ad-guidelines`, `/ad-architecture`, `/ad-adr`, or `/ad-hooks` unless the user is graduating the project out of poc.
+- poc: suppress Layer 3 (Product), Layer 4 (Specs), Layer 5 (Plans/Decisions) sections if those directories do not exist. Show Layer 1 + Layer 2 + Layer 6 only. Layer 2 (Domain) and Layer 3 (Product) render informationally — `contextMd: false` and `prd: false` are *not* findings (lazy-created; PRD also profile-excluded). Recommendation set: `/ad-grill-me` for fuzzy exploration, `/ad-ground` for research-ready questions, `/ad-spike` when the technique is uncertain, `/ad-drift` for drift, `agentic update` for staleness. Do not recommend `/ad-prd`, `/ad-spec`, `/ad-task`, `/ad-bootstrap`, `/ad-guidelines`, `/ad-architecture`, `/ad-adr`, or `/ad-hooks` unless the user is graduating the project out of poc.
 - solo: Layer 3/4/5 render; ADR / ARCHITECTURE.md absence is informational, not a flag. PRD is universal for real products, but fresh greenfield still starts with product framing before `/ad-bootstrap`; brownfield quick fixes do not need PRD backfill before the fix. Specs are universal; spec-without-tasks remains a real finding. Layer 2 — same lazy-creation rule as poc.
 - team: full survey (default). Fresh greenfield still routes through product discovery / PRD before `/ad-bootstrap`; brownfield may bootstrap scan-first from existing code.
 - mature: additionally flag hooks-not-wired louder (WORKFLOW §11 binding for mature profile). Keep `/ad-hooks` after product/operational context unless the only finding is missing gates.

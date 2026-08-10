@@ -34,8 +34,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-archive/scripts/find-terminal.mjs",
+          "sourceSha": "49163ea3f3beae05b326e08dba54db7c1c3d3706b49dba5db3599fa0d149ae40"
+        },
+        {
           "path": ".claude/skills/ad-archive/SKILL.md",
-          "sourceSha": "b68ace3a3726fc52559f2a01a37d16a54163b02eb1304969f3a0cc8932bd1e69"
+          "sourceSha": "5f24aa2e63090f9f6e31922af547e1e443c0e0cfe513bb4369d235fb88a1606e"
         }
       ]
     },
@@ -134,8 +138,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-drift/scripts/drift-scan.mjs",
+          "sourceSha": "cf71fb5f96ceed6945ade2ce5015dc2c6838959751920d346430788bd7c5e747"
+        },
+        {
           "path": ".claude/skills/ad-drift/SKILL.md",
-          "sourceSha": "4d8e5770dfb5b11590922c7875cf99741ff73dae1caedd5f7986a3034e2a2e8e"
+          "sourceSha": "018e215b6e1ce240e3ca0d3bdbe6f1fb86ba057df5badaa518ff4c177012e2ab"
         }
       ]
     },
@@ -213,8 +221,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-next/scripts/survey.mjs",
+          "sourceSha": "b35adba041992f784f0387e8990b03255178ec57233d1d70293ae0edb5bb60a5"
+        },
+        {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "3baee92498c84b067385949fbac8b45a5e04c967eb59969787629ca2548ca4a7"
+          "sourceSha": "4f17215c1cb387048ffe7a12532572102b18eb17d1cb3bb0f5525a10a92e0b0a"
         }
       ]
     },

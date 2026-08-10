@@ -46,8 +46,12 @@
           "sourceSha": "a694ef8c1ce6d3b5f75f48491e9af9a4f7128f4b78acf0c964a0cc2008bc5c1c"
         },
         {
+          "path": ".agents/skills/ad-archive/scripts/find-terminal.mjs",
+          "sourceSha": "49163ea3f3beae05b326e08dba54db7c1c3d3706b49dba5db3599fa0d149ae40"
+        },
+        {
           "path": ".agents/skills/ad-archive/SKILL.md",
-          "sourceSha": "881e7d47a57720ed2119a36a25dcada2661f8ac79f366c697483f84f642d0e6e"
+          "sourceSha": "0b71a90a0b883a645c1c918107eb06f32bfdaaacf6488f595e183170114e9ae0"
         }
       ]
     },
@@ -174,8 +178,12 @@
           "sourceSha": "05f641a21f5c27c1630d35b060ad39b469d8e6a74b7e8f60b3363b39f9edc8e2"
         },
         {
+          "path": ".agents/skills/ad-drift/scripts/drift-scan.mjs",
+          "sourceSha": "cf71fb5f96ceed6945ade2ce5015dc2c6838959751920d346430788bd7c5e747"
+        },
+        {
           "path": ".agents/skills/ad-drift/SKILL.md",
-          "sourceSha": "e4fcf0dd00de84648f3eb4f86065eaaf20e32690aacf3d70d921663846bd493b"
+          "sourceSha": "2463408a321a88d67da3b9e2c5529bcbfe50324a33f8b001e021f6f2f205a7a8"
         }
       ]
     },
@@ -281,8 +289,12 @@
           "sourceSha": "492512161841e9e11b964276e11d73b7aea6f6f1be15be4cad0e3f386f85dfb4"
         },
         {
+          "path": ".agents/skills/ad-next/scripts/survey.mjs",
+          "sourceSha": "b35adba041992f784f0387e8990b03255178ec57233d1d70293ae0edb5bb60a5"
+        },
+        {
           "path": ".agents/skills/ad-next/SKILL.md",
-          "sourceSha": "236f544ed8eecc1fd647a73e8a81407e5cfcca926d7ac7fb2dfb58b560d529fe"
+          "sourceSha": "bd26c9b21959492228e6dbe36b24eb06acab5192476716c43025122f87ccc216"
         }
       ]
     },

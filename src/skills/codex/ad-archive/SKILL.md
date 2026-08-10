@@ -14,19 +14,23 @@ Three rules anchor the design:
 </background_information>
 
 <instructions>
-Step 1 — Discover candidates. Read frontmatter only; do not load full bodies.
+Step 1 — Discover candidates. The frontmatter scan for the four auto-includable candidate sets is a bundled script (ADR-0057), not prose to re-derive. Run it from the repo root and read its JSON:
 
-Tasks (`doc/tasks/NNNN-*.md`): include if `Status: done`. Exclude `proposed`, `in-progress`, `blocked`.
+```bash
+node .agents/skills/ad-archive/scripts/find-terminal.mjs
+```
 
-Specs (`doc/specs/NNNN-*.md`): include if `Status: shipped`. Exclude `draft`, `accepted`, anything `superseded by SPEC-NNNN` (chain target stays).
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/find-terminal.mjs` inside it.
 
-PRDs (`doc/product/PRD.md` single-product or `doc/product/<slug>.md` multi-product): include if `Status: superseded`. Exclude `draft`, `accepted`.
+The JSON carries four candidate arrays, each entry `{path, slug, status, created, title}`:
+- `tasks` — `Status: done` (excludes `proposed` / `in-progress` / `blocked`).
+- `specs` — `Status: shipped` (excludes `draft` / `accepted` and any `superseded by SPEC-NNNN`; chain target stays).
+- `prds` — `Status: superseded` (excludes `draft` / `accepted`); covers `doc/product/PRD.md` and per-product `<slug>.md`.
+- `adrs` — `Status: superseded by ADR-NNNN` (carries `supersededBy`) or `deprecated`. `Status: accepted` ADRs are deliberately absent — never auto-included; they require the explicit Step 3 absorption check. Chain target stays.
 
-ADRs (`doc/adr/NNNN-*.md`):
-- Auto-include if `Status: superseded by ADR-NNNN` or `Status: deprecated`. Chain target stays.
-- Do NOT auto-include `Status: accepted`. Accepted ADRs require the explicit Step 3 absorption check.
+Plus `unreadable` (`{path, code}`) — a candidate file the scan could not read; surface and resolve it before removing anything, never treat it as absent.
 
-Legacy plan docs (prose files under `doc/` not in `adr/`/`tasks/`/`specs/`/`product/`; e.g. `doc/v0.2-cli-plan.md`): present as candidates only when the user explicitly names them. No `Status:` field — user judgement required.
+Legacy plan docs (prose files under `doc/` not in `adr/`/`tasks/`/`specs/`/`product/`; e.g. `doc/v0.2-cli-plan.md`) are NOT in the scan — no `Status:` field, user judgement required. Present them as candidates only when the user explicitly names them.
 
 Step 2 — Present the slate. One block per category, one line per candidate, format:
 

@@ -368,3 +368,746 @@ test('handoff-nudge: parseable-but-non-object stdin → silent exit 0, never cra
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// --- ad-next deterministic state survey (ADR-0057, P2.1) ---
+// The claude-code copy is executed; the byte-parity test in skills.test.js
+// guarantees the codex twin is identical, so one execution covers both. The
+// script emits objective survey facts as JSON; the SKILL.md body narrates them
+// and keeps the judgment (scenario classification, prioritization, profile
+// filtering) as text per ADR-0057's agent-vs-script boundary.
+const SURVEY = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-next',
+  'scripts',
+  'survey.mjs'
+);
+
+// Run the survey against `cwd` and parse its stdout as JSON, exactly as the
+// skill would (`node <base>/scripts/survey.mjs` from the repo root). GIT_DIR &
+// friends are stripped so a linked-worktree test host cannot leak its git dir
+// into the child (AGENTS.md Gotchas — the observed task-0033 hazard).
+function runSurvey(cwd) {
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  const out = execFileSync('node', [SURVEY], { cwd, encoding: 'utf8', env });
+  return JSON.parse(out);
+}
+
+// Initialize a throwaway git repo whose default branch is `main`, with a
+// fixed inline identity so nothing touches global git config (never mutate the
+// machine-global committer — the task-0033 danger). GIT_DIR & friends stripped.
+function gitInit(dir) {
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  const git = (...args) =>
+    execFileSync(
+      'git',
+      [
+        '-c',
+        'user.email=test@example.com',
+        '-c',
+        'user.name=Test',
+        '-c',
+        'commit.gpgsign=false',
+        '-c',
+        'init.defaultBranch=main',
+        ...args,
+      ],
+      { cwd: dir, encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'ignore'] }
+    );
+  git('init');
+  return git;
+}
+
+test('survey: brownfield repo reports presence, counts, and reciprocity', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-brown-'));
+  try {
+    // Layer 1 constitution + singleton docs.
+    writeFileSync(join(dir, 'WORKFLOW.md'), '# workflow');
+    writeFileSync(join(dir, 'AGENTS.md'), '# agents');
+    writeFileSync(join(dir, 'GUIDELINES.md'), '# guidelines');
+    writeFileSync(join(dir, 'ARCHITECTURE.md'), '# architecture');
+    // Layer 2 domain with a populated glossary (an `_Avoid_:` line).
+    writeFileSync(join(dir, 'CONTEXT.md'), '# context\n\n**Term** — a thing.\n_Avoid_: other-name\n');
+    // Layer 3 product — PRD uses the plain `Status:` shape (not bold).
+    mkdirSync(join(dir, 'doc', 'product'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'product', 'PRD.md'), '# PRD\n\nStatus: accepted\nCreated: 2026-01-01\n');
+    // Layer 4 specs — one accepted spec, bold `**Status:**` shape.
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(
+      join(dir, 'doc', 'specs', '0001-auth-flow.md'),
+      '# Spec 0001\n\n**Status:** accepted\n'
+    );
+    // Layer 5 ADRs — 2 accepted, 1 proposed, plus a non-NNNN index file skipped.
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'adr', '0001-a.md'), '# ADR-0001\n\n**Status:** accepted\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0002-b.md'), '# ADR-0002\n\n**Status:** accepted\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0003-c.md'), '# ADR-0003\n\n**Status:** proposed\n');
+    writeFileSync(join(dir, 'doc', 'adr', 'PROJECTION.md'), '# not an adr');
+    // Layer 5 tasks — one in-progress task implementing spec 0001, one done,
+    // one orphan (no Spec ref, no Board ref).
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0001-build-auth.md'),
+      '# task-0001\n\n**Status:** in-progress\n**Spec ref:** doc/specs/0001-auth-flow.md\n**Board ref:**\n'
+    );
+    writeFileSync(join(dir, 'doc', 'tasks', '0002-shipped.md'), '# task-0002\n\n**Status:** done\n');
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0003-orphan.md'),
+      '# task-0003\n\n**Status:** proposed\n**Spec ref:**\n**Board ref:**\n'
+    );
+    // Layer 6 code signals.
+    writeFileSync(join(dir, 'package.json'), JSON.stringify({ scripts: { test: 'node --test' } }));
+    writeFileSync(join(dir, 'lefthook.yml'), 'pre-commit:\n');
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(dir, '.github', 'workflows', 'test.yml'), 'on: push\n');
+    // State file → profile.
+    mkdirSync(join(dir, '.claude'), { recursive: true });
+    writeFileSync(
+      join(dir, '.claude', 'agentic-state.json'),
+      JSON.stringify({ kitVersion: '9.9.9', profile: 'mature' })
+    );
+
+    const s = runSurvey(dir);
+
+    assert.equal(s.profile, 'mature');
+    assert.equal(s.kitVersion, '9.9.9');
+    assert.deepEqual(s.constitution, {
+      workflow: true,
+      operationalGuide: 'AGENTS.md',
+      guidelines: true,
+    });
+    assert.equal(s.architecture, true);
+    assert.equal(s.design, false);
+    assert.equal(s.domain.contextMd, true);
+    assert.equal(s.domain.emptyGlossary, false);
+    assert.equal(s.product.prd, true);
+    assert.equal(s.product.status, 'accepted', 'PRD plain `Status:` shape parses');
+    assert.equal(s.product.specCount, 1);
+    assert.deepEqual(s.adrs.counts, {
+      proposed: 1,
+      accepted: 2,
+      deprecated: 0,
+      superseded: 0,
+    });
+    assert.deepEqual(s.adrs.proposed, ['0003-c'], 'proposed ADR slug surfaced');
+    assert.equal(s.tasks.counts['in-progress'], 1);
+    assert.equal(s.tasks.counts.done, 1);
+    assert.equal(s.tasks.counts.proposed, 1);
+    assert.equal(s.tasks.active.length, 1, 'only in-progress/blocked tasks are active');
+    assert.equal(s.tasks.active[0].slug, '0001-build-auth');
+    assert.equal(s.tasks.active[0].specRef, 'doc/specs/0001-auth-flow.md');
+    // Orphan = no Spec ref AND no Board ref, literally, regardless of status.
+    // 0002-shipped carries neither field, so it is an orphan too; status-based
+    // de-emphasis is the narrating body's judgment, not the script's fact.
+    assert.deepEqual(s.tasks.orphans, ['0002-shipped', '0003-orphan']);
+    // Spec 0001 has one implementing task (0001), so it is NOT spec-without-tasks.
+    const spec = s.specs.find((x) => x.slug === '0001-auth-flow');
+    assert.equal(spec.status, 'accepted');
+    assert.equal(spec.taskCount, 1);
+    assert.deepEqual(s.reciprocity.specsWithoutTasks, []);
+    assert.deepEqual(s.reciprocity.orphanTasks, []);
+    assert.deepEqual(s.code, { tests: true, hooks: true, ci: true });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: CLAUDE.md is reported as the operational guide when AGENTS.md is absent', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-claude-'));
+  try {
+    writeFileSync(join(dir, 'CLAUDE.md'), '# claude');
+    const s = runSurvey(dir);
+    assert.equal(s.constitution.operationalGuide, 'CLAUDE.md');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: empty repo → defaults (team profile), zero counts, no crash', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-empty-'));
+  try {
+    const s = runSurvey(dir);
+    assert.equal(s.profile, 'team', 'profile defaults to team when no state file (ADR-0013)');
+    assert.equal(s.kitVersion, null);
+    assert.equal(s.constitution.operationalGuide, null);
+    assert.equal(s.architecture, false);
+    assert.equal(s.product.prd, false);
+    assert.deepEqual(s.specs, []);
+    assert.deepEqual(s.adrs.counts, { proposed: 0, accepted: 0, deprecated: 0, superseded: 0 });
+    assert.deepEqual(s.tasks.counts, { proposed: 0, 'in-progress': 0, blocked: 0, done: 0 });
+    assert.deepEqual(s.code, { tests: false, hooks: false, ci: false });
+    // Not a git repo → git facts are null, never a thrown error.
+    assert.equal(s.git.branch, null);
+    assert.equal(s.git.aheadOfMain, null);
+    assert.equal(s.git.dirty, null);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: git ahead-of-main count and branch come from a real repo', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-git-'));
+  try {
+    const git = gitInit(dir);
+    writeFileSync(join(dir, 'a.txt'), 'a');
+    git('add', 'a.txt');
+    git('commit', '-m', 'first');
+    git('checkout', '-b', 'feature');
+    writeFileSync(join(dir, 'b.txt'), 'b');
+    git('add', 'b.txt');
+    git('commit', '-m', 'second');
+    // A stray unstaged file so the tree is dirty.
+    writeFileSync(join(dir, 'dirty.txt'), 'x');
+
+    const s = runSurvey(dir);
+    assert.equal(s.git.branch, 'feature');
+    assert.equal(s.git.aheadOfMain, 1, 'one commit ahead of main');
+    assert.equal(s.git.dirty, true);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: spec↔task reciprocity flags stuck specs and orphan tasks', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-recip-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    // Accepted spec with zero implementing tasks → stuck.
+    writeFileSync(join(dir, 'doc', 'specs', '0001-lonely.md'), '# Spec\n\n**Status:** accepted\n');
+    // Draft spec with zero tasks → NOT stuck (only accepted/shipped count).
+    writeFileSync(join(dir, 'doc', 'specs', '0002-draft.md'), '# Spec\n\n**Status:** draft\n');
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    // Task pointing at a spec number that does not exist → orphan task.
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0001-ghost.md'),
+      '# task\n\n**Status:** proposed\n**Spec ref:** doc/specs/0099-missing.md\n'
+    );
+    const s = runSurvey(dir);
+    assert.deepEqual(s.reciprocity.specsWithoutTasks, ['0001-lonely']);
+    assert.deepEqual(s.reciprocity.orphanTasks, ['0001-ghost']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: CONTEXT.md with no _Avoid_ line flags an empty glossary', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-glossary-'));
+  try {
+    writeFileSync(join(dir, 'CONTEXT.md'), '# context\n\nNo terms defined yet.\n');
+    const s = runSurvey(dir);
+    assert.equal(s.domain.contextMd, true);
+    assert.equal(s.domain.emptyGlossary, true, 'no `_Avoid_:` line → empty glossary');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: profile falls back to the .agents state file when .claude is absent', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-agents-state-'));
+  try {
+    mkdirSync(join(dir, '.agents'), { recursive: true });
+    writeFileSync(
+      join(dir, '.agents', 'agentic-state.json'),
+      JSON.stringify({ kitVersion: '1.2.3', profile: 'poc' })
+    );
+    const s = runSurvey(dir);
+    assert.equal(s.profile, 'poc');
+    assert.equal(s.kitVersion, '1.2.3');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: a corrupt state file degrades to the team default, never crashes', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-badstate-'));
+  try {
+    mkdirSync(join(dir, '.claude'), { recursive: true });
+    writeFileSync(join(dir, '.claude', 'agentic-state.json'), '{ not valid json');
+    const s = runSurvey(dir);
+    assert.equal(s.profile, 'team');
+    assert.equal(s.kitVersion, null);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: rootDocReferencesProduct reflects whether the operational guide names the product', () => {
+  // No operational guide → null (not applicable).
+  const none = mkdtempSync(join(tmpdir(), 'agentic-survey-rootdoc-none-'));
+  // AGENTS.md that references the product contract → true.
+  const yes = mkdtempSync(join(tmpdir(), 'agentic-survey-rootdoc-yes-'));
+  // AGENTS.md that does not → false (the stale-operational-guide finding).
+  const no = mkdtempSync(join(tmpdir(), 'agentic-survey-rootdoc-no-'));
+  try {
+    assert.equal(runSurvey(none).rootDocReferencesProduct, null);
+    writeFileSync(join(yes, 'AGENTS.md'), '# agents\n\nSee doc/product/PRD.md for scope.\n');
+    assert.equal(runSurvey(yes).rootDocReferencesProduct, true);
+    writeFileSync(join(no, 'AGENTS.md'), '# agents\n\nNothing about the product here.\n');
+    assert.equal(runSurvey(no).rootDocReferencesProduct, false);
+  } finally {
+    for (const d of [none, yes, no]) rmSync(d, { recursive: true, force: true });
+  }
+});
+
+test('survey: a multi-context repo (CONTEXT-MAP, no root CONTEXT) reports emptyGlossary as null', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-multictx-'));
+  try {
+    writeFileSync(join(dir, 'CONTEXT-MAP.md'), '# context map\n');
+    const s = runSurvey(dir);
+    assert.equal(s.domain.contextMd, false);
+    assert.equal(s.domain.contextMap, true);
+    assert.equal(
+      s.domain.emptyGlossary,
+      null,
+      'no root CONTEXT.md → emptyGlossary is not-applicable (null), never a false `false`'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: a present-but-unreadable artifact is surfaced in `unreadable`, never silent', (t) => {
+  // GUIDELINES.md §2.2: a probe that READS CONTENT must surface a read failure
+  // in its output (the resolve-rules `UNREADABLE` marker is the reference
+  // shape), never go silent. chmod 000 cannot block reads for root / on Windows.
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-unreadable-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'adr', '0001-fine.md'), '# ADR\n\n**Status:** accepted\n');
+    const locked = join(dir, 'doc', 'adr', '0002-locked.md');
+    writeFileSync(locked, '# ADR\n\n**Status:** accepted\n');
+    chmodSync(locked, 0o000);
+    const s = runSurvey(dir);
+    assert.ok(Array.isArray(s.unreadable), 'survey carries an `unreadable` array');
+    const hit = s.unreadable.find((u) => u.path.includes('0002-locked.md'));
+    assert.ok(hit, 'the unreadable ADR file is surfaced, not swallowed');
+    assert.equal(hit.code, 'EACCES');
+    // The survey still completes and reports the readable ADR.
+    assert.equal(s.adrs.counts.accepted, 1, 'the readable ADR is still counted');
+  } finally {
+    // Restore perms so rmSync can clean up.
+    try {
+      chmodSync(join(dir, 'doc', 'adr', '0002-locked.md'), 0o644);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: an empty repo carries an empty `unreadable` list and null rootDocReferencesProduct', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-clean-'));
+  try {
+    const s = runSurvey(dir);
+    assert.deepEqual(s.unreadable, []);
+    assert.equal(s.rootDocReferencesProduct, null);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- ad-drift deterministic drift scan (ADR-0057, P2.2) ---
+// The claude-code copy is executed; the byte-parity test in skills.test.js
+// guarantees the codex twin is identical, so one execution covers both. The
+// script emits the six deterministic drift checks (numbering, status,
+// supersession, amendment-pairs, emoji, checkbox) as JSON; the SKILL.md body
+// narrates them alongside its judgment checks (AGENTS/ARCHITECTURE match,
+// business-context, scope-dup, index-dup, decoration refs, …), per ADR-0057.
+const DRIFT = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-drift',
+  'scripts',
+  'drift-scan.mjs'
+);
+
+function runScan(cwd) {
+  const out = execFileSync('node', [DRIFT], { cwd, encoding: 'utf8', env: process.env });
+  return JSON.parse(out);
+}
+
+test('drift-scan: numbering reports duplicates as drift and gaps as informational data', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-num-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'adr', '0001-a.md'), '# ADR\n\n**Status:** accepted\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0002-b.md'), '# ADR\n\n**Status:** accepted\n');
+    // A second 0002 → duplicate number. And 0003 is missing → gap at 3 (0004 present).
+    writeFileSync(join(dir, 'doc', 'adr', '0002-dupe.md'), '# ADR\n\n**Status:** accepted\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0004-d.md'), '# ADR\n\n**Status:** accepted\n');
+    const s = runScan(dir);
+    assert.deepEqual(s.numbering.adr.duplicates, ['0002'], 'duplicate NNNN is drift');
+    assert.deepEqual(s.numbering.adr.gaps, [3], 'a missing number is a gap (archiving-expected, informational)');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: status flags a missing or out-of-enum Status, per artifact layer', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-status-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'adr', '0001-ok.md'), '# ADR\n\n**Status:** accepted\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0002-bad.md'), '# ADR\n\n**Status:** wip\n'); // not in enum
+    writeFileSync(join(dir, 'doc', 'adr', '0003-none.md'), '# ADR\n\nno status line here\n');
+    // Specs use a different enum; `wip` is invalid there too, `draft` is valid.
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'specs', '0001-ok.md'), '# Spec\n\n**Status:** draft\n');
+    writeFileSync(join(dir, 'doc', 'specs', '0002-bad.md'), '# Spec\n\n**Status:** wip\n');
+    const s = runScan(dir);
+    const badAdr = s.status.adr.map((x) => x.slug).sort();
+    assert.deepEqual(badAdr, ['0002-bad', '0003-none'], 'invalid + missing ADR Status flagged');
+    assert.equal(s.status.adr.find((x) => x.slug === '0002-bad').status, 'wip');
+    assert.equal(s.status.adr.find((x) => x.slug === '0003-none').status, null);
+    assert.deepEqual(
+      s.status.specs.map((x) => x.slug),
+      ['0002-bad'],
+      'a valid spec status is not flagged; an out-of-enum one is'
+    );
+    assert.ok(!('tasks' in s.status), 'tasks are not a scripted numbering/status layer (no task-drift category)');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: supersession flags a superseded-by target that does not exist', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-super-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'adr', '0001-live.md'), '# ADR\n\n**Status:** accepted\n');
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0002-gone.md'),
+      '# ADR\n\n**Status:** superseded by ADR-0099\n'
+    );
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0003-ok.md'),
+      '# ADR\n\n**Status:** superseded by ADR-0001\n'
+    );
+    // A spec pointing at a missing SPEC target is flagged in the same list.
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(
+      join(dir, 'doc', 'specs', '0001-x.md'),
+      '# Spec\n\n**Status:** superseded by SPEC-0088\n'
+    );
+    const s = runScan(dir);
+    assert.equal(s.supersession.length, 2, 'the dangling adr and spec supersessions are flagged');
+    assert.ok(
+      s.supersession.some(
+        (x) => x.kind === 'adr' && x.from === '0002-gone' && x.target === 'ADR-0099' && x.targetExists === false
+      ),
+      'dangling ADR supersession'
+    );
+    assert.ok(
+      s.supersession.some(
+        (x) => x.kind === 'specs' && x.from === '0001-x' && x.target === 'SPEC-0088'
+      ),
+      'dangling SPEC supersession, tagged with the specs layer'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: amendment pairs flags an unpaired Amends / Amended-by relation', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-amend-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    // Unpaired: 0010 amends 0011, but 0011 declares no Amended-by.
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0010-a.md'),
+      '# ADR\n\n**Status:** accepted\n**Amends:** ADR-0011\n'
+    );
+    writeFileSync(join(dir, 'doc', 'adr', '0011-b.md'), '# ADR\n\n**Status:** accepted\n');
+    // Properly paired: 0012 amends 0013, 0013 declares Amended by 0012.
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0012-c.md'),
+      '# ADR\n\n**Status:** accepted\n**Amends:** ADR-0013\n'
+    );
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0013-d.md'),
+      '# ADR\n\n**Status:** superseded by ADR-0012\n**Amended by:** ADR-0012\n'
+    );
+    // The reverse unpaired direction: an `Amended by` with no answering `Amends`.
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0014-e.md'),
+      '# ADR\n\n**Status:** accepted\n**Amended by:** ADR-0015\n'
+    );
+    writeFileSync(join(dir, 'doc', 'adr', '0015-f.md'), '# ADR\n\n**Status:** accepted\n');
+    const s = runScan(dir);
+    assert.equal(s.amendmentPairs.length, 2, 'both unpaired directions are flagged, the pair is not');
+    assert.ok(
+      s.amendmentPairs.some((f) => f.record === '0010-a' && f.field === 'Amends' && f.value === 'ADR-0011'),
+      'unpaired Amends'
+    );
+    assert.ok(
+      s.amendmentPairs.some((f) => f.record === '0014-e' && f.field === 'Amended by' && f.value === 'ADR-0015'),
+      'unpaired Amended by (reverse direction)'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: emoji flags emoji in narrative docs, with the line number', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-emoji-'));
+  try {
+    writeFileSync(join(dir, 'README.md'), '# Readme\n\nAll good here.\n');
+    writeFileSync(join(dir, 'AGENTS.md'), '# Agents\n\nShip it \u{1F680} now.\n');
+    const s = runScan(dir);
+    assert.equal(s.emoji.length, 1, 'only the doc with an emoji is flagged');
+    assert.equal(s.emoji[0].path, 'AGENTS.md');
+    assert.equal(s.emoji[0].line, 3);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: checkbox flags checkbox UI in definition docs but not in tasks or fenced examples', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-checkbox-'));
+  try {
+    // A definition doc with a real checkbox (drift) and a fenced example (not drift).
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# Agents\n\n- [ ] a real checkbox\n\n```\n- [ ] fenced example, illustrative\n```\n'
+    );
+    // Specs are decision-records — a checkbox in one is drift (ADR-0030 §1).
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'specs', '0001-s.md'), '# Spec\n\n**Status:** draft\n\n- [ ] req as checkbox\n');
+    // Tasks legitimately use checkbox tracking UI — never flagged.
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'tasks', '0001-t.md'), '# task\n\n**Status:** proposed\n\n- [ ] ac\n');
+    const s = runScan(dir);
+    assert.deepEqual(
+      s.checkbox.map((c) => `${c.path}:${c.line}`).sort(),
+      ['AGENTS.md:3', join('doc', 'specs', '0001-s.md') + ':5'],
+      'definition-doc + spec checkboxes flagged; fenced example and task excluded'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: checkbox fence tracking respects the fence delimiter (char + length)', () => {
+  // A CommonMark fence closes only on the same character, length >= the opener.
+  // A naive any-fence toggle mis-parses nesting: a shorter/different fence line
+  // inside a block must NOT toggle the state.
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-fence-'));
+  try {
+    // Line 3 opens a 4-backtick fence; line 4 is a 3-backtick line that does
+    // NOT close it (shorter); line 5's checkbox is therefore still fenced; line
+    // 6 closes with 4 backticks; line 8's checkbox is real drift.
+    writeFileSync(
+      join(dir, 'GUIDELINES.md'),
+      [
+        '# Guidelines', // 1
+        '', // 2
+        '````', // 3 open (4 ticks)
+        '```', // 4 inner 3-tick line — not a close
+        '- [ ] still inside the 4-tick fence', // 5 fenced, not drift
+        '````', // 6 close (4 ticks)
+        '', // 7
+        '- [ ] a real checkbox after the block', // 8 drift
+      ].join('\n') + '\n'
+    );
+    const s = runScan(dir);
+    assert.deepEqual(
+      s.checkbox.map((c) => `${c.path}:${c.line}`),
+      ['GUIDELINES.md:8'],
+      'only the post-block checkbox is drift; the one inside the 4-tick fence is excluded'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: an empty repo yields all-clear checks and no crash', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-empty-'));
+  try {
+    const s = runScan(dir);
+    assert.deepEqual(s.numbering.adr, { gaps: [], duplicates: [] });
+    assert.deepEqual(s.status.adr, []);
+    assert.deepEqual(s.supersession, []);
+    assert.deepEqual(s.amendmentPairs, []);
+    assert.deepEqual(s.emoji, []);
+    assert.deepEqual(s.checkbox, []);
+    assert.deepEqual(s.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: a present-but-unreadable artifact is surfaced in `unreadable`, never silent', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-unreadable-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    const locked = join(dir, 'doc', 'adr', '0001-locked.md');
+    writeFileSync(locked, '# ADR\n\n**Status:** accepted\n');
+    chmodSync(locked, 0o000);
+    const s = runScan(dir);
+    const hit = s.unreadable.find((u) => u.path.includes('0001-locked.md'));
+    assert.ok(hit, 'the unreadable ADR is surfaced, not swallowed');
+    assert.equal(hit.code, 'EACCES');
+  } finally {
+    try {
+      chmodSync(join(dir, 'doc', 'adr', '0001-locked.md'), 0o644);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- ad-archive terminal-artifact discovery (ADR-0057, P2.3) ---
+// The claude-code copy is executed; the byte-parity test in skills.test.js
+// guarantees the codex twin is identical. The script emits the read-only
+// candidate discovery (Step 1); the SKILL.md body keeps the judgment: the
+// accepted-ADR absorption gate, user-named legacy docs, and the git rm itself.
+const TERMINAL = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-archive',
+  'scripts',
+  'find-terminal.mjs'
+);
+
+function runTerminal(cwd) {
+  const out = execFileSync('node', [TERMINAL], { cwd, encoding: 'utf8', env: process.env });
+  return JSON.parse(out);
+}
+
+test('find-terminal: includes only terminal artifacts, per category, with metadata', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    // Real tasks title the H1 as `# Task \`0001\`: ...` (backtick-wrapped number);
+    // the slate strips that prefix to the descriptive title.
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0001-shipped.md'),
+      '# Task `0001`: Apply the kit\n\n**Status:** done\n**Date:** 2026-05-08\n'
+    );
+    writeFileSync(join(dir, 'doc', 'tasks', '0002-wip.md'), '# task-0002\n\n**Status:** in-progress\n');
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'specs', '0001-live.md'), '# Spec 0001\n\n**Status:** shipped\n**Created:** 2026-06-01\n');
+    writeFileSync(join(dir, 'doc', 'specs', '0002-open.md'), '# Spec 0002\n\n**Status:** accepted\n');
+    mkdirSync(join(dir, 'doc', 'product'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'product', 'PRD.md'), '# PRD\n\nStatus: superseded\nCreated: 2026-01-01\n');
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0019-old.md'),
+      '# ADR-0019: Domain layer\n\n**Status:** superseded by ADR-0027\n**Date:** 2026-05-10\n'
+    );
+    writeFileSync(join(dir, 'doc', 'adr', '0024-dead.md'), '# ADR-0024\n\n**Status:** deprecated\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0027-live.md'), '# ADR-0027\n\n**Status:** accepted\n');
+    const t = runTerminal(dir);
+
+    assert.deepEqual(t.tasks.map((x) => x.slug), ['0001-shipped'], 'only done tasks');
+    assert.equal(t.tasks[0].status, 'done');
+    assert.equal(t.tasks[0].created, '2026-05-08');
+    assert.equal(t.tasks[0].title, 'Apply the kit', 'H1 stripped of the type-NNNN prefix');
+    assert.equal(t.tasks[0].path, join('doc', 'tasks', '0001-shipped.md'));
+
+    assert.deepEqual(t.specs.map((x) => x.slug), ['0001-live'], 'only shipped specs');
+    assert.equal(t.specs[0].created, '2026-06-01');
+
+    assert.deepEqual(t.prds.map((x) => x.slug), ['PRD'], 'only superseded PRDs');
+
+    assert.deepEqual(t.adrs.map((x) => x.slug).sort(), ['0019-old', '0024-dead'], 'superseded + deprecated, NOT accepted');
+    const superseded = t.adrs.find((x) => x.slug === '0019-old');
+    assert.equal(superseded.status, 'superseded');
+    assert.equal(superseded.supersededBy, 'ADR-0027', 'supersession target captured for the slate');
+    const deprecated = t.adrs.find((x) => x.slug === '0024-dead');
+    assert.equal(deprecated.status, 'deprecated');
+    assert.equal(deprecated.supersededBy, null);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('find-terminal: a spec superseded by another SPEC is excluded (chain target stays)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-super-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'specs', '0001-old.md'), '# Spec\n\n**Status:** superseded by SPEC-0009\n');
+    writeFileSync(join(dir, 'doc', 'specs', '0002-shipped.md'), '# Spec\n\n**Status:** shipped\n');
+    const t = runTerminal(dir);
+    assert.deepEqual(
+      t.specs.map((x) => x.slug),
+      ['0002-shipped'],
+      'only shipped specs; a `superseded by SPEC-NNNN` spec is not a removal candidate'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('find-terminal: a prefix-less title carrying a number is preserved (no false strip)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-title-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    // The H1 has no artifact-type prefix; "Fix 500:" must NOT be stripped.
+    writeFileSync(join(dir, 'doc', 'tasks', '0001-t.md'), '# Fix 500: recover retries\n\n**Status:** done\n');
+    const t = runTerminal(dir);
+    assert.equal(t.tasks[0].title, 'Fix 500: recover retries');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('find-terminal: an empty repo yields empty categories and no crash', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-empty-'));
+  try {
+    const t = runTerminal(dir);
+    assert.deepEqual(t, { tasks: [], specs: [], prds: [], adrs: [], unreadable: [] });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('find-terminal: a present-but-unreadable candidate is surfaced in `unreadable`', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-unreadable-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    const locked = join(dir, 'doc', 'tasks', '0001-locked.md');
+    writeFileSync(locked, '# task\n\n**Status:** done\n');
+    chmodSync(locked, 0o000);
+    const out = runTerminal(dir);
+    const hit = out.unreadable.find((u) => u.path.includes('0001-locked.md'));
+    assert.ok(hit, 'unreadable candidate surfaced');
+    assert.equal(hit.code, 'EACCES');
+    assert.deepEqual(out.tasks, [], 'an unreadable file is not silently included as a candidate');
+  } finally {
+    try {
+      chmodSync(join(dir, 'doc', 'tasks', '0001-locked.md'), 0o644);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
