@@ -9,9 +9,19 @@ Read-only. Produces a drift list comparing the repo's operational docs against w
 </background_information>
 
 <instructions>
-Step 1 — decide what to audit. If the user names an artifact (AGENTS.md, ARCHITECTURE.md, ADRs), audit only that. Otherwise audit all three categories below.
+Step 1 — decide what to audit. If the user names an artifact (AGENTS.md, ARCHITECTURE.md, ADRs), audit only that. Otherwise audit all categories below.
 
-Step 2 — run checks.
+Step 2 — run the deterministic scan. The mechanical checks — artifact numbering, `Status:` validity, supersession-target existence, amendment-pair matching, emoji in narrative docs, and checkbox UI in definition docs / specs — are a bundled script (ADR-0057), not prose to re-derive by hand. Run it from the repo root and read its JSON:
+
+```bash
+node .agents/skills/ad-drift/scripts/drift-scan.mjs
+```
+
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/drift-scan.mjs` inside it.
+
+The JSON carries `numbering` (per decision-record layer `adr` / `specs`, each with `duplicates` and `gaps`), `status` (`adr` / `specs`, records with a missing or out-of-enum `Status`), `supersession` (dangling `superseded by` targets), `amendmentPairs` (unpaired `Amends` / `Amended by` declarations), `emoji` (`{path, line}` in narrative docs), `checkbox` (`{path, line}` of checkbox UI in definition docs / specs, fenced examples excluded), and `unreadable` (`{path, code}` — files the scan could not read, so any check over them is missing; report the gap). Tasks are not a numbering/status layer here (the audit has no task-drift category — tasks surface only under spec reciprocity, which stays judgment below). Step 3 narrates these facts; everything the scan does not compute below is judgment you perform by reading.
+
+Step 3 — interpret checks.
 
 AGENTS.md drift (if present):
 - Stack — does the listed stack match `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` / equivalent?
@@ -26,22 +36,22 @@ ARCHITECTURE.md drift (if present):
 - No `## Active ADRs` section — ARCHITECTURE.md must not duplicate the `doc/adr/` directory index per ADR-0030 §2.
 
 ADR drift (if `doc/adr/` exists):
-- Numbering — gaps or duplicates in `doc/adr/NNNN-*.md`?
-- Status field — every ADR has one of `proposed | accepted | deprecated | superseded by ADR-NNNN`.
-- Superseded chains — every "superseded by ADR-NNNN" target exists.
-- Amendment pairs — a partial supersession is declared as a header-field pair: `**Amends:**` on the amending record, `**Amended by:**` on the amended one. Every one of each must have its counterpart; an unpaired field leaves a relation only prose can find, so a reader has to open every record in the directory to learn what still binds. Deterministic — compare relations, NOT filenames: the two file lists are supposed to be disjoint, because the two halves of one relation live in different records. Read each field's value with `grep -H '^\*\*Amends:\*\*' doc/adr/*.md` and `grep -H '^\*\*Amended by:\*\*' doc/adr/*.md`, then check that `A declares Amends: B` is answered by `B declares Amended by: A`. No judgement of intent. A keyword sweep for `supersed|amends` is NOT the check: it reports records that merely discuss the vocabulary, and records that state they augment rather than supersede. Read the fields, not the prose. Know the limit: this check is silent in a layer that never adopted the fields — measured across three repositories, the field check returned nothing there while the keyword sweep returned between one and ten hits per layer, much of it noise. So when a layer holds records whose prose claims supersession and carries no amendment field anywhere, say so once, as an adoption suggestion; do not enumerate the sweep's hits as findings. A signal firing on a quarter of a directory stops being read.
+- Numbering — `numbering.adr`: `duplicates` (two records sharing a number) is always drift. `gaps` is informational and expected wherever `/ad-archive` hard-deletes completed records (git history is their ledger); treat a gap as drift only when the project does not archive and the missing number is unexplained.
+- Status field — `status.adr` lists every ADR whose `Status` is missing or outside `proposed | accepted | deprecated | superseded`.
+- Superseded chains — `supersession` (its `adr` entries) lists every "superseded by ADR-NNNN" whose target record is absent.
+- Amendment pairs — a partial supersession is declared as a header-field pair: `**Amends:**` on the amending record, `**Amended by:**` on the amended one. `amendmentPairs` pre-computes every unpaired declaration, comparing relations NOT filenames (`A declares Amends: B` must be answered by `B declares Amended by: A`) — which is why a keyword sweep for `supersed|amends` is NOT the check: it reports records that merely discuss the vocabulary or state they augment rather than supersede. Know the limit: this check is silent in a layer that never adopted the fields (`amendmentPairs` is empty) — measured across three repositories, the field check returned nothing there while a keyword sweep returned between one and ten hits per layer, much of it noise. So when a layer holds records whose prose claims supersession and carries no amendment field anywhere, say so once, as an adoption suggestion; do not enumerate a sweep's hits as findings. A signal firing on a quarter of a directory stops being read.
 - State projection contradicting a live record (only if the layer has one — `<layer>/PROJECTION.md`, the name rule 10 fixes; check every append-only layer, not just `doc/adr/`). Report a record the projection calls fully binding whose own header says otherwise (`deprecated`, `superseded by`, or an `Amended by:` the projection omits), and a record the projection lists as retired-in-part that carries no such marker. A missing projection is NOT a finding — rule 10 permits one, it does not require one; flagging absence would turn a permission into an obligation the rule never granted.
 
 Spec drift (if `doc/specs/` exists; structural integrity only — does NOT deep-audit spec text against code, deferred per ADR-0011):
-- Numbering — gaps or duplicates in `doc/specs/NNNN-*.md`?
-- Status field — every spec has one of `draft | accepted | shipped | superseded by SPEC-NNNN`.
-- Superseded chains — every "superseded by SPEC-NNNN" target exists.
-- Reciprocity — every task with non-empty `Spec ref` points to a spec that exists; every accepted/shipped spec has at least one entry in its Related → Tasks list.
-- No checkbox UI — per ADR-0030 §1, Spec is decision-record (not tracking). Functional Requirements / Non-functional Requirements / Success Criteria must use plain bullets, not `- [ ]` checkboxes; implementation tracking lives in per-Spec tasks.
-- Status / task aggregate alignment — when every task referencing a spec is done, the spec's Status should be `shipped`. A spec with all tasks done but Status: accepted is drift between work-unit completion and feature-level claim.
+- Numbering — `numbering.specs`: `duplicates` is drift, `gaps` informational (as for ADRs).
+- Status field — `status.specs` lists every spec whose `Status` is missing or outside `draft | accepted | shipped | superseded`.
+- Superseded chains — `supersession` (its `specs` entries) lists every "superseded by SPEC-NNNN" whose target is absent.
+- Reciprocity — the scan does not compute this; read it. Every task with non-empty `Spec ref` points to a spec that exists; every accepted/shipped spec has at least one entry in its Related → Tasks list.
+- No checkbox UI — per ADR-0030 §1, Spec is decision-record (not tracking). Functional Requirements / Non-functional Requirements / Success Criteria must use plain bullets, not `- [ ]` checkboxes; implementation tracking lives in per-Spec tasks. `checkbox` (its `doc/specs/` entries) pre-computes these.
+- Status / task aggregate alignment — the scan does not compute this; read it. When every task referencing a spec is done, the spec's Status should be `shipped`. A spec with all tasks done but Status: accepted is drift between work-unit completion and feature-level claim.
 
 Documentation discipline drift (`WORKFLOW.md` §2 / ADR-0008). Audit narrative documents — `README.md`, `AGENTS.md` / `CLAUDE.md`, `ARCHITECTURE.md`, `DESIGN.md`, and prose pages under `doc/` that are not lifecycle-managed artifacts under `doc/product/`, `doc/specs/`, `doc/adr/`, or `doc/tasks/`:
-- Emoji — any present? Rule 3 forbids emoji anywhere (docs, code, comments, commits, skill outputs).
+- Emoji — `emoji` lists every `{path, line}` in the fixed narrative-doc set. Rule 3 forbids emoji anywhere (docs, code, comments, commits, skill outputs), so extend by eye to code/comments and to any non-lifecycle prose page under `doc/` — the scan's fixed doc set does not reach those.
 - Dates / version stamps / `DRAFT` markers / changelog blocks in narrative documents — Rule 2 forbids these. Lifecycle-managed artifacts under `doc/product/`, `doc/specs/`, `doc/adr/`, and `doc/tasks/` are exempt.
 - Business context first — does the first paragraph answer *why* the document exists, before *what* and *how*? Rule 4.
 - Scope duplication — does the document copy material that is canonically owned by another file? Rule 5 requires linking, not copying.
@@ -52,12 +62,12 @@ Source code (sample, not exhaustive — flag findings, not every match):
 - Commented-out code blocks — Rule 7. Removed code lives in git history.
 
 Single-responsibility drift (ADR-0030 / WORKFLOW §2 rules #9–#12):
-- Definition-layer tracking UI (Rule #9) — grep `^- \[ \]` / `^- \[x\]` inside AGENTS.md, WORKFLOW.md, ARCHITECTURE.md, GUIDELINES.md, CONTEXT.md, `doc/product/*.md`. Definition documents must not carry per-item checkbox UI. Fenced code-block examples (PR-body templates, etc.) are illustrative, not pillar tracking.
+- Definition-layer tracking UI (Rule #9) — `checkbox` lists checkbox UI (`{path, line}`) in AGENTS.md, WORKFLOW.md, ARCHITECTURE.md, GUIDELINES.md, CONTEXT.md, `doc/product/*.md`, and specs, with fenced code-block examples (PR-body templates, etc.) already excluded. Definition documents must not carry per-item checkbox UI.
 - Directory-as-index duplication (Rule #10) — flag sections that re-state another layer's index: `## Active ADRs` inside ARCHITECTURE.md or AGENTS.md; multi-bullet `## Architectural Principles` digests paraphrasing each ADR; PRD `## Related → ADRs` bullet lists enumerating the kit's ADR ledger. NOT a finding: a layer's own state projection inside its own directory — rule 10 sanctions exactly one per append-only layer. It IS a finding when that projection only lists records without saying what still binds, which makes it a duplicate index wearing the exception's name.
 - Kit-state in WORKFLOW.md (Rule #12) — grep `ADR-[0-9]{4}` in WORKFLOW.md. Universal philosophy must not cite kit-specific ADR numbers (downstream installs lack `doc/adr/`). Literature citations and generic `doc/adr/` references are allowed.
 - Cross-references that are decoration (Rule #11) — sample inline `per ADR-NNNN` refs in narrative documents and apply the load-bearing test: deletion leaves the surrounding statement intact → decoration; flag.
 
-Step 3 — output. One line per finding, formatted:
+Step 4 — output. One line per finding, formatted:
 `[file or section]: spec says X, code says Y. Suggested resolution: change spec / change code / discuss.`
 
 Group by artifact. If a category has no drift, print one line: `AGENTS.md — no drift.` etc. If an audited artifact does not exist, say so explicitly rather than reporting zero findings. The Documentation discipline drift category groups findings under `Documentation discipline — <category>: ...`.

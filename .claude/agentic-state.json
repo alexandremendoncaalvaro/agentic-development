@@ -125,8 +125,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-drift/scripts/drift-scan.mjs",
+          "sourceSha": "cf71fb5f96ceed6945ade2ce5015dc2c6838959751920d346430788bd7c5e747"
+        },
+        {
           "path": ".claude/skills/ad-drift/SKILL.md",
-          "sourceSha": "4d8e5770dfb5b11590922c7875cf99741ff73dae1caedd5f7986a3034e2a2e8e"
+          "sourceSha": "018e215b6e1ce240e3ca0d3bdbe6f1fb86ba057df5badaa518ff4c177012e2ab"
         }
       ]
     },

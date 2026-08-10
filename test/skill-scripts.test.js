@@ -718,3 +718,261 @@ test('survey: an empty repo carries an empty `unreadable` list and null rootDocR
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// --- ad-drift deterministic drift scan (ADR-0057, P2.2) ---
+// The claude-code copy is executed; the byte-parity test in skills.test.js
+// guarantees the codex twin is identical, so one execution covers both. The
+// script emits the six deterministic drift checks (numbering, status,
+// supersession, amendment-pairs, emoji, checkbox) as JSON; the SKILL.md body
+// narrates them alongside its judgment checks (AGENTS/ARCHITECTURE match,
+// business-context, scope-dup, index-dup, decoration refs, …), per ADR-0057.
+const DRIFT = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-drift',
+  'scripts',
+  'drift-scan.mjs'
+);
+
+function runScan(cwd) {
+  const out = execFileSync('node', [DRIFT], { cwd, encoding: 'utf8', env: process.env });
+  return JSON.parse(out);
+}
+
+test('drift-scan: numbering reports duplicates as drift and gaps as informational data', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-num-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'adr', '0001-a.md'), '# ADR\n\n**Status:** accepted\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0002-b.md'), '# ADR\n\n**Status:** accepted\n');
+    // A second 0002 → duplicate number. And 0003 is missing → gap at 3 (0004 present).
+    writeFileSync(join(dir, 'doc', 'adr', '0002-dupe.md'), '# ADR\n\n**Status:** accepted\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0004-d.md'), '# ADR\n\n**Status:** accepted\n');
+    const s = runScan(dir);
+    assert.deepEqual(s.numbering.adr.duplicates, ['0002'], 'duplicate NNNN is drift');
+    assert.deepEqual(s.numbering.adr.gaps, [3], 'a missing number is a gap (archiving-expected, informational)');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: status flags a missing or out-of-enum Status, per artifact layer', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-status-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'adr', '0001-ok.md'), '# ADR\n\n**Status:** accepted\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0002-bad.md'), '# ADR\n\n**Status:** wip\n'); // not in enum
+    writeFileSync(join(dir, 'doc', 'adr', '0003-none.md'), '# ADR\n\nno status line here\n');
+    // Specs use a different enum; `wip` is invalid there too, `draft` is valid.
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'specs', '0001-ok.md'), '# Spec\n\n**Status:** draft\n');
+    writeFileSync(join(dir, 'doc', 'specs', '0002-bad.md'), '# Spec\n\n**Status:** wip\n');
+    const s = runScan(dir);
+    const badAdr = s.status.adr.map((x) => x.slug).sort();
+    assert.deepEqual(badAdr, ['0002-bad', '0003-none'], 'invalid + missing ADR Status flagged');
+    assert.equal(s.status.adr.find((x) => x.slug === '0002-bad').status, 'wip');
+    assert.equal(s.status.adr.find((x) => x.slug === '0003-none').status, null);
+    assert.deepEqual(
+      s.status.specs.map((x) => x.slug),
+      ['0002-bad'],
+      'a valid spec status is not flagged; an out-of-enum one is'
+    );
+    assert.ok(!('tasks' in s.status), 'tasks are not a scripted numbering/status layer (no task-drift category)');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: supersession flags a superseded-by target that does not exist', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-super-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'adr', '0001-live.md'), '# ADR\n\n**Status:** accepted\n');
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0002-gone.md'),
+      '# ADR\n\n**Status:** superseded by ADR-0099\n'
+    );
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0003-ok.md'),
+      '# ADR\n\n**Status:** superseded by ADR-0001\n'
+    );
+    // A spec pointing at a missing SPEC target is flagged in the same list.
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(
+      join(dir, 'doc', 'specs', '0001-x.md'),
+      '# Spec\n\n**Status:** superseded by SPEC-0088\n'
+    );
+    const s = runScan(dir);
+    assert.equal(s.supersession.length, 2, 'the dangling adr and spec supersessions are flagged');
+    assert.ok(
+      s.supersession.some(
+        (x) => x.kind === 'adr' && x.from === '0002-gone' && x.target === 'ADR-0099' && x.targetExists === false
+      ),
+      'dangling ADR supersession'
+    );
+    assert.ok(
+      s.supersession.some(
+        (x) => x.kind === 'specs' && x.from === '0001-x' && x.target === 'SPEC-0088'
+      ),
+      'dangling SPEC supersession, tagged with the specs layer'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: amendment pairs flags an unpaired Amends / Amended-by relation', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-amend-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    // Unpaired: 0010 amends 0011, but 0011 declares no Amended-by.
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0010-a.md'),
+      '# ADR\n\n**Status:** accepted\n**Amends:** ADR-0011\n'
+    );
+    writeFileSync(join(dir, 'doc', 'adr', '0011-b.md'), '# ADR\n\n**Status:** accepted\n');
+    // Properly paired: 0012 amends 0013, 0013 declares Amended by 0012.
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0012-c.md'),
+      '# ADR\n\n**Status:** accepted\n**Amends:** ADR-0013\n'
+    );
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0013-d.md'),
+      '# ADR\n\n**Status:** superseded by ADR-0012\n**Amended by:** ADR-0012\n'
+    );
+    // The reverse unpaired direction: an `Amended by` with no answering `Amends`.
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0014-e.md'),
+      '# ADR\n\n**Status:** accepted\n**Amended by:** ADR-0015\n'
+    );
+    writeFileSync(join(dir, 'doc', 'adr', '0015-f.md'), '# ADR\n\n**Status:** accepted\n');
+    const s = runScan(dir);
+    assert.equal(s.amendmentPairs.length, 2, 'both unpaired directions are flagged, the pair is not');
+    assert.ok(
+      s.amendmentPairs.some((f) => f.record === '0010-a' && f.field === 'Amends' && f.value === 'ADR-0011'),
+      'unpaired Amends'
+    );
+    assert.ok(
+      s.amendmentPairs.some((f) => f.record === '0014-e' && f.field === 'Amended by' && f.value === 'ADR-0015'),
+      'unpaired Amended by (reverse direction)'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: emoji flags emoji in narrative docs, with the line number', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-emoji-'));
+  try {
+    writeFileSync(join(dir, 'README.md'), '# Readme\n\nAll good here.\n');
+    writeFileSync(join(dir, 'AGENTS.md'), '# Agents\n\nShip it \u{1F680} now.\n');
+    const s = runScan(dir);
+    assert.equal(s.emoji.length, 1, 'only the doc with an emoji is flagged');
+    assert.equal(s.emoji[0].path, 'AGENTS.md');
+    assert.equal(s.emoji[0].line, 3);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: checkbox flags checkbox UI in definition docs but not in tasks or fenced examples', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-checkbox-'));
+  try {
+    // A definition doc with a real checkbox (drift) and a fenced example (not drift).
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# Agents\n\n- [ ] a real checkbox\n\n```\n- [ ] fenced example, illustrative\n```\n'
+    );
+    // Specs are decision-records — a checkbox in one is drift (ADR-0030 §1).
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'specs', '0001-s.md'), '# Spec\n\n**Status:** draft\n\n- [ ] req as checkbox\n');
+    // Tasks legitimately use checkbox tracking UI — never flagged.
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'tasks', '0001-t.md'), '# task\n\n**Status:** proposed\n\n- [ ] ac\n');
+    const s = runScan(dir);
+    assert.deepEqual(
+      s.checkbox.map((c) => `${c.path}:${c.line}`).sort(),
+      ['AGENTS.md:3', join('doc', 'specs', '0001-s.md') + ':5'],
+      'definition-doc + spec checkboxes flagged; fenced example and task excluded'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: checkbox fence tracking respects the fence delimiter (char + length)', () => {
+  // A CommonMark fence closes only on the same character, length >= the opener.
+  // A naive any-fence toggle mis-parses nesting: a shorter/different fence line
+  // inside a block must NOT toggle the state.
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-fence-'));
+  try {
+    // Line 3 opens a 4-backtick fence; line 4 is a 3-backtick line that does
+    // NOT close it (shorter); line 5's checkbox is therefore still fenced; line
+    // 6 closes with 4 backticks; line 8's checkbox is real drift.
+    writeFileSync(
+      join(dir, 'GUIDELINES.md'),
+      [
+        '# Guidelines', // 1
+        '', // 2
+        '````', // 3 open (4 ticks)
+        '```', // 4 inner 3-tick line — not a close
+        '- [ ] still inside the 4-tick fence', // 5 fenced, not drift
+        '````', // 6 close (4 ticks)
+        '', // 7
+        '- [ ] a real checkbox after the block', // 8 drift
+      ].join('\n') + '\n'
+    );
+    const s = runScan(dir);
+    assert.deepEqual(
+      s.checkbox.map((c) => `${c.path}:${c.line}`),
+      ['GUIDELINES.md:8'],
+      'only the post-block checkbox is drift; the one inside the 4-tick fence is excluded'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: an empty repo yields all-clear checks and no crash', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-empty-'));
+  try {
+    const s = runScan(dir);
+    assert.deepEqual(s.numbering.adr, { gaps: [], duplicates: [] });
+    assert.deepEqual(s.status.adr, []);
+    assert.deepEqual(s.supersession, []);
+    assert.deepEqual(s.amendmentPairs, []);
+    assert.deepEqual(s.emoji, []);
+    assert.deepEqual(s.checkbox, []);
+    assert.deepEqual(s.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: a present-but-unreadable artifact is surfaced in `unreadable`, never silent', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-unreadable-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    const locked = join(dir, 'doc', 'adr', '0001-locked.md');
+    writeFileSync(locked, '# ADR\n\n**Status:** accepted\n');
+    chmodSync(locked, 0o000);
+    const s = runScan(dir);
+    const hit = s.unreadable.find((u) => u.path.includes('0001-locked.md'));
+    assert.ok(hit, 'the unreadable ADR is surfaced, not swallowed');
+    assert.equal(hit.code, 'EACCES');
+  } finally {
+    try {
+      chmodSync(join(dir, 'doc', 'adr', '0001-locked.md'), 0o644);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
