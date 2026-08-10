@@ -976,3 +976,138 @@ test('drift-scan: a present-but-unreadable artifact is surfaced in `unreadable`,
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// --- ad-archive terminal-artifact discovery (ADR-0057, P2.3) ---
+// The claude-code copy is executed; the byte-parity test in skills.test.js
+// guarantees the codex twin is identical. The script emits the read-only
+// candidate discovery (Step 1); the SKILL.md body keeps the judgment: the
+// accepted-ADR absorption gate, user-named legacy docs, and the git rm itself.
+const TERMINAL = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-archive',
+  'scripts',
+  'find-terminal.mjs'
+);
+
+function runTerminal(cwd) {
+  const out = execFileSync('node', [TERMINAL], { cwd, encoding: 'utf8', env: process.env });
+  return JSON.parse(out);
+}
+
+test('find-terminal: includes only terminal artifacts, per category, with metadata', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    // Real tasks title the H1 as `# Task \`0001\`: ...` (backtick-wrapped number);
+    // the slate strips that prefix to the descriptive title.
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0001-shipped.md'),
+      '# Task `0001`: Apply the kit\n\n**Status:** done\n**Date:** 2026-05-08\n'
+    );
+    writeFileSync(join(dir, 'doc', 'tasks', '0002-wip.md'), '# task-0002\n\n**Status:** in-progress\n');
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'specs', '0001-live.md'), '# Spec 0001\n\n**Status:** shipped\n**Created:** 2026-06-01\n');
+    writeFileSync(join(dir, 'doc', 'specs', '0002-open.md'), '# Spec 0002\n\n**Status:** accepted\n');
+    mkdirSync(join(dir, 'doc', 'product'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'product', 'PRD.md'), '# PRD\n\nStatus: superseded\nCreated: 2026-01-01\n');
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0019-old.md'),
+      '# ADR-0019: Domain layer\n\n**Status:** superseded by ADR-0027\n**Date:** 2026-05-10\n'
+    );
+    writeFileSync(join(dir, 'doc', 'adr', '0024-dead.md'), '# ADR-0024\n\n**Status:** deprecated\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0027-live.md'), '# ADR-0027\n\n**Status:** accepted\n');
+    const t = runTerminal(dir);
+
+    assert.deepEqual(t.tasks.map((x) => x.slug), ['0001-shipped'], 'only done tasks');
+    assert.equal(t.tasks[0].status, 'done');
+    assert.equal(t.tasks[0].created, '2026-05-08');
+    assert.equal(t.tasks[0].title, 'Apply the kit', 'H1 stripped of the type-NNNN prefix');
+    assert.equal(t.tasks[0].path, join('doc', 'tasks', '0001-shipped.md'));
+
+    assert.deepEqual(t.specs.map((x) => x.slug), ['0001-live'], 'only shipped specs');
+    assert.equal(t.specs[0].created, '2026-06-01');
+
+    assert.deepEqual(t.prds.map((x) => x.slug), ['PRD'], 'only superseded PRDs');
+
+    assert.deepEqual(t.adrs.map((x) => x.slug).sort(), ['0019-old', '0024-dead'], 'superseded + deprecated, NOT accepted');
+    const superseded = t.adrs.find((x) => x.slug === '0019-old');
+    assert.equal(superseded.status, 'superseded');
+    assert.equal(superseded.supersededBy, 'ADR-0027', 'supersession target captured for the slate');
+    const deprecated = t.adrs.find((x) => x.slug === '0024-dead');
+    assert.equal(deprecated.status, 'deprecated');
+    assert.equal(deprecated.supersededBy, null);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('find-terminal: a spec superseded by another SPEC is excluded (chain target stays)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-super-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'specs', '0001-old.md'), '# Spec\n\n**Status:** superseded by SPEC-0009\n');
+    writeFileSync(join(dir, 'doc', 'specs', '0002-shipped.md'), '# Spec\n\n**Status:** shipped\n');
+    const t = runTerminal(dir);
+    assert.deepEqual(
+      t.specs.map((x) => x.slug),
+      ['0002-shipped'],
+      'only shipped specs; a `superseded by SPEC-NNNN` spec is not a removal candidate'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('find-terminal: a prefix-less title carrying a number is preserved (no false strip)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-title-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    // The H1 has no artifact-type prefix; "Fix 500:" must NOT be stripped.
+    writeFileSync(join(dir, 'doc', 'tasks', '0001-t.md'), '# Fix 500: recover retries\n\n**Status:** done\n');
+    const t = runTerminal(dir);
+    assert.equal(t.tasks[0].title, 'Fix 500: recover retries');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('find-terminal: an empty repo yields empty categories and no crash', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-empty-'));
+  try {
+    const t = runTerminal(dir);
+    assert.deepEqual(t, { tasks: [], specs: [], prds: [], adrs: [], unreadable: [] });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('find-terminal: a present-but-unreadable candidate is surfaced in `unreadable`', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-unreadable-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    const locked = join(dir, 'doc', 'tasks', '0001-locked.md');
+    writeFileSync(locked, '# task\n\n**Status:** done\n');
+    chmodSync(locked, 0o000);
+    const out = runTerminal(dir);
+    const hit = out.unreadable.find((u) => u.path.includes('0001-locked.md'));
+    assert.ok(hit, 'unreadable candidate surfaced');
+    assert.equal(hit.code, 'EACCES');
+    assert.deepEqual(out.tasks, [], 'an unreadable file is not silently included as a candidate');
+  } finally {
+    try {
+      chmodSync(join(dir, 'doc', 'tasks', '0001-locked.md'), 0o644);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

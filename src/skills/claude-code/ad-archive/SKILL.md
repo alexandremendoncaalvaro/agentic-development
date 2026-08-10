@@ -21,19 +21,24 @@ Decision-record artifacts (`doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/
 
 ## Step 1 — Discover candidates
 
-Read frontmatter only; do not load full bodies. Build four candidate sets.
+The frontmatter scan for the four auto-includable candidate sets is a bundled script (ADR-0057), not prose to re-derive. Run it from the repo root and read its JSON:
 
-**Tasks** (`doc/tasks/NNNN-*.md`): include if `Status: done`. Exclude `proposed`, `in-progress`, `blocked`.
+```bash
+node .claude/skills/ad-archive/scripts/find-terminal.mjs
+```
 
-**Specs** (`doc/specs/NNNN-*.md`): include if `Status: shipped`. Exclude `draft`, `accepted`, anything `superseded by SPEC-NNNN` (the supersession chain is information; chain target stays).
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/find-terminal.mjs` inside it.
 
-**PRDs** (`doc/product/PRD.md` single-product or `doc/product/<slug>.md` multi-product): include if `Status: superseded`. Exclude `draft`, `accepted`.
+The JSON carries four candidate arrays, each entry `{path, slug, status, created, title}`:
 
-**ADRs** (`doc/adr/NNNN-*.md`):
-- *Auto-include* if `Status: superseded by ADR-NNNN` or `Status: deprecated`. The supersession chain target stays.
-- *Do not auto-include* `Status: accepted`. Accepted ADRs require the explicit Step 3 absorption check below.
+- `tasks` — `Status: done` (excludes `proposed` / `in-progress` / `blocked`).
+- `specs` — `Status: shipped` (excludes `draft` / `accepted` and any `superseded by SPEC-NNNN`; the supersession chain is information, the chain target stays).
+- `prds` — `Status: superseded` (excludes `draft` / `accepted`); covers `doc/product/PRD.md` and per-product `<slug>.md`.
+- `adrs` — `Status: superseded by ADR-NNNN` (carries `supersededBy`) or `deprecated`. **`Status: accepted` ADRs are deliberately absent** — they are never auto-included; they require the explicit Step 3 absorption check below. The supersession chain target stays.
 
-**Legacy plan docs** (prose files under `doc/` that are not in `adr/`, `tasks/`, `specs/`, `product/`; e.g. `doc/v0.2-cli-plan.md`): present as candidates only when the user explicitly names them. Do not auto-include — these have no `Status:` field, so judgement is required.
+Plus `unreadable` (`{path, code}`) — a candidate file the scan could not read; surface it and resolve it before removing anything, never treat it as absent.
+
+**Legacy plan docs** (prose files under `doc/` that are not in `adr/`, `tasks/`, `specs/`, `product/`; e.g. `doc/v0.2-cli-plan.md`) are *not* in the scan — they have no `Status:` field, so judgement is required. Present them as candidates only when the user explicitly names them.
 
 ## Step 2 — Present the slate
 

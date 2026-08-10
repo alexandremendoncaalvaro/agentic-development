@@ -34,8 +34,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-archive/scripts/find-terminal.mjs",
+          "sourceSha": "49163ea3f3beae05b326e08dba54db7c1c3d3706b49dba5db3599fa0d149ae40"
+        },
+        {
           "path": ".claude/skills/ad-archive/SKILL.md",
-          "sourceSha": "b68ace3a3726fc52559f2a01a37d16a54163b02eb1304969f3a0cc8932bd1e69"
+          "sourceSha": "5f24aa2e63090f9f6e31922af547e1e443c0e0cfe513bb4369d235fb88a1606e"
         }
       ]
     },

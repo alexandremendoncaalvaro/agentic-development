@@ -46,8 +46,12 @@
           "sourceSha": "a694ef8c1ce6d3b5f75f48491e9af9a4f7128f4b78acf0c964a0cc2008bc5c1c"
         },
         {
+          "path": ".agents/skills/ad-archive/scripts/find-terminal.mjs",
+          "sourceSha": "49163ea3f3beae05b326e08dba54db7c1c3d3706b49dba5db3599fa0d149ae40"
+        },
+        {
           "path": ".agents/skills/ad-archive/SKILL.md",
-          "sourceSha": "881e7d47a57720ed2119a36a25dcada2661f8ac79f366c697483f84f642d0e6e"
+          "sourceSha": "0b71a90a0b883a645c1c918107eb06f32bfdaaacf6488f595e183170114e9ae0"
         }
       ]
     },
