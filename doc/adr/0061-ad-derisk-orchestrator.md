@@ -1,4 +1,4 @@
-# ADR-0059: `ad-derisk` — a pre-construction de-risking orchestrator
+# ADR-0061: `ad-derisk` — a pre-construction de-risking orchestrator
 
 **Status:** accepted
 **Date:** 2026-08-10
@@ -6,7 +6,7 @@
 
 ## Context
 
-[ADR-0056](0056-evidence-graded-research-discovery-methodology.md) found that Front B — pre-construction de-risking — already has all the tools (`ad-ground`, `ad-spike`, `ad-tdg`, `ad-grill-me`) but lacks the governing loop: there is no risk register and no risk-based stopping criterion, so the pieces are selected by the `WORKFLOW-FLOWS` router (a branch-selector) rather than sequenced by a methodology. ADR-0056 §4 scoped a thin orchestrator and deferred the contract here (ADR-0007 §6). [ADR-0057](0057-grade-of-evidence-primitive.md) landed `WORKFLOW.md` §17 (the per-risk grade and the proportional stop bar); [ADR-0058](0058-ad-research-evidence-graded-studies.md) landed `ad-research`, with which this skill chains.
+[ADR-0058](0058-evidence-graded-research-discovery-methodology.md) found that Front B — pre-construction de-risking — already has all the tools (`ad-ground`, `ad-spike`, `ad-tdg`, `ad-grill-me`) but lacks the governing loop: there is no risk register and no risk-based stopping criterion, so the pieces are selected by the `WORKFLOW-FLOWS` router (a branch-selector) rather than sequenced by a methodology. ADR-0058 §4 scoped a thin orchestrator and deferred the contract here (ADR-0007 §6). [ADR-0059](0059-grade-of-evidence-primitive.md) landed `WORKFLOW.md` §17 (the per-risk grade and the proportional stop bar); [ADR-0060](0060-ad-research-evidence-graded-studies.md) landed `ad-research`, with which this skill chains.
 
 The gap is the loop and its stop condition, not the tools. Today the stop criteria are local per skill (`ad-ground`'s coverage checkpoint, `ad-spike`'s eval pass-rate, `ad-tdg`'s green tests); nothing says "enumerate the unknowns, drive each below an acceptable threshold, then build." The result is the two failure modes Fairbanks names: too much up-front work, or building in the dark.
 
@@ -20,7 +20,7 @@ We will ship `ad-derisk`, a workflow-operational orchestrator that reduces a def
 
 2. **No artifact of its own.** The running register is lightweight and lives in the task's `Notes`; the heavy evidence persists in the spikes and ADRs the loop spawns. This keeps the kit's "process is ephemeral, decisions persist" discipline, and makes `ad-derisk` a workflow-operational skill (it runs a process, like `ad-ground`), not a spec-driven one.
 
-3. **Reuse, do not duplicate.** It dispatches `ad-ground` / `ad-spike` / `ad-tdg` / `ad-grill-me` and grades via §17; it re-implements none of them. Its only additions are the risk register and the risk-based stop criterion — the governing loop ADR-0056 identified as missing.
+3. **Reuse, do not duplicate.** It dispatches `ad-ground` / `ad-spike` / `ad-tdg` / `ad-grill-me` and grades via §17; it re-implements none of them. Its only additions are the risk register and the risk-based stop criterion — the governing loop ADR-0058 identified as missing.
 
 4. **Proportional.** "Critical" and the stop bar scale with stakes times irreversibility (§17), so a small task runs a short loop and a high-blast-radius one runs the full loop. The stop criterion is the depth regulator, not fixed ceremony.
 
@@ -42,7 +42,7 @@ Negative / trade-offs:
 
 ## Alternatives Considered
 
-* **Leave de-risking to the `WORKFLOW-FLOWS` router** — rejected (ADR-0056). The router selects one skill per branch; it is not a loop and carries no risk register or stop criterion. The gap is precisely the governing loop, which a selector cannot be.
+* **Leave de-risking to the `WORKFLOW-FLOWS` router** — rejected (ADR-0058). The router selects one skill per branch; it is not a loop and carries no risk register or stop criterion. The gap is precisely the governing loop, which a selector cannot be.
 * **Add the risk loop to `ad-spike`** — rejected. `ad-spike` retires one uncertain technique; the de-risking loop spans techniques, facts, strategy, and scope, and sequences several skills. Overloading `ad-spike` exceeds its single purpose (the one-skill-one-purpose reasoning of ADR-0054).
 * **A persistent de-risking artifact (`doc/derisk/NNNN`)** — rejected. The decisions and evidence already persist in the spikes and ADRs the loop spawns; a separate artifact would duplicate them and violate single-responsibility (Documentation Discipline §9). The lightweight register in the task's `Notes` is enough.
-* **Do nothing (keep de-risking scattered)** — rejected (ADR-0056). Scattered tools with local stops reproduce the too-much / too-little failure the risk-driven model exists to prevent.
+* **Do nothing (keep de-risking scattered)** — rejected (ADR-0058). Scattered tools with local stops reproduce the too-much / too-little failure the risk-driven model exists to prevent.

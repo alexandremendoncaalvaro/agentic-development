@@ -1,4 +1,4 @@
-# ADR-0056: An evidence-graded methodology for research and pre-construction discovery
+# ADR-0058: An evidence-graded methodology for research and pre-construction discovery
 
 **Status:** accepted
 **Date:** 2026-08-10

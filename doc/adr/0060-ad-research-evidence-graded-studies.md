@@ -1,4 +1,4 @@
-# ADR-0058: `ad-research` — a research-to-conclusion skill writing evidence-graded studies
+# ADR-0060: `ad-research` — a research-to-conclusion skill writing evidence-graded studies
 
 **Status:** accepted
 **Date:** 2026-08-10
@@ -6,7 +6,7 @@
 
 ## Context
 
-[ADR-0056](0056-evidence-graded-research-discovery-methodology.md) adopted an evidence-graded methodology and named Front A — research-to-conclusion — as the kit's largest gap, deferring the skill contract to this implementing ADR (ADR-0007 §6). [ADR-0057](0057-grade-of-evidence-primitive.md) landed the shared grade-of-evidence primitive (`WORKFLOW.md` §17) that this skill consumes. This ADR is the Front A implementation.
+[ADR-0058](0058-evidence-graded-research-discovery-methodology.md) adopted an evidence-graded methodology and named Front A — research-to-conclusion — as the kit's largest gap, deferring the skill contract to this implementing ADR (ADR-0007 §6). [ADR-0059](0059-grade-of-evidence-primitive.md) landed the shared grade-of-evidence primitive (`WORKFLOW.md` §17) that this skill consumes. This ADR is the Front A implementation.
 
 The gap is concrete: `ad-ground` runs a four-source pass but its output is a *happy-path-to-implement*, not a standalone, evidence-graded conclusion to an open question — "should we adopt X?", "is approach A better than B?", "what is the state of the art on Y?". There is no `doc/research/` layer and no study artifact. The owner does this research by hand (Obsidian notes) with no evidence grading, no provenance, and no reproducible trail, so "the evidence is strong enough to conclude" is a gut call.
 
@@ -43,7 +43,7 @@ Negative / trade-offs:
 
 ## Alternatives Considered
 
-* **Extend `ad-ground` to emit a study** — rejected (ADR-0056). `ad-ground` is deliberately happy-path-to-implement and writes no artifact; a study is a different output with a different stop criterion, and overloading `ad-ground` blurs its single purpose.
+* **Extend `ad-ground` to emit a study** — rejected (ADR-0058). `ad-ground` is deliberately happy-path-to-implement and writes no artifact; a study is a different output with a different stop criterion, and overloading `ad-ground` blurs its single purpose.
 * **A mode of `ad-spec`** — rejected. `ad-spec` captures a feature contract (what to build); `ad-research` answers an open question (what is true / what to choose). Different object, different lifecycle (`draft → shipped` vs. `draft → concluded`), different output — the one-skill-one-purpose reasoning ADR-0054 used against fusing skills.
 * **No `doc/research/` layer; write conclusions straight into ADRs** — rejected. An ADR records a decision, not the evidence trail and appraisal behind it (Documentation Discipline §9, single responsibility). Conflating them bloats the ADR and loses the study's reproducibility. The study grounds the ADR; they are distinct roles.
-* **Do nothing (keep research by hand in Obsidian)** — rejected (ADR-0056). No grading, no provenance, no reproducibility, no proportional stop.
+* **Do nothing (keep research by hand in Obsidian)** — rejected (ADR-0058). No grading, no provenance, no reproducibility, no proportional stop.

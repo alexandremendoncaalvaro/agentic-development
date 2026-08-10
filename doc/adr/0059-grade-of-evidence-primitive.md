@@ -1,4 +1,4 @@
-# ADR-0057: A shared grade-of-evidence primitive, first consumed by `ad-ground`
+# ADR-0059: A shared grade-of-evidence primitive, first consumed by `ad-ground`
 
 **Status:** accepted
 **Date:** 2026-08-10
@@ -6,7 +6,7 @@
 
 ## Context
 
-[ADR-0056](0056-evidence-graded-research-discovery-methodology.md) adopted an evidence-graded methodology whose shared engine is a two-axis grade-of-evidence primitive, and it scoped the `ad-ground` increment to its own implementing ADR. This is that ADR. It is the prerequisite for both fronts (`ad-research`, `ad-derisk`), so it lands first.
+[ADR-0058](0058-evidence-graded-research-discovery-methodology.md) adopted an evidence-graded methodology whose shared engine is a two-axis grade-of-evidence primitive, and it scoped the `ad-ground` increment to its own implementing ADR. This is that ADR. It is the prerequisite for both fronts (`ad-research`, `ad-derisk`), so it lands first.
 
 The concrete gap is in `ad-ground`'s Step 4 confidence checkpoint (`.claude/skills/ad-ground/SKILL.md:46`). Today it is a *coverage* checklist — "A consulted: yes/no", "B consulted: yes/no", "C consulted: yes/no", "D checked: yes/no". It verifies that the four sources were *consulted*; it says nothing about how *reliable* what they returned is. An agent can pass the checkpoint on four weak sources — one undated blog, one unrelated gist, no in-repo analog, no prior commit — and proceed with false confidence. There is no per-claim reliability grade, no provenance beyond a bare citation, no honest handling of sources that disagree, and no proportional "is this enough to proceed for *this* decision" verdict. "Consulted four sources" is being read as "the evidence is strong", and those are not the same claim.
 
@@ -46,5 +46,5 @@ Negative / trade-offs:
 
 * **Define the primitive inside `ad-ground` and have the other skills reference the skill body** — rejected. Skills cite `WORKFLOW.md` section numbers, not each other's bodies (`ARCHITECTURE.md`; ADR-0049). A skill-local definition would force `ad-research` / `ad-derisk` to duplicate or cross-reference a skill body, which is exactly the drift this decision avoids. The constitution is the correct home for a cross-skill primitive.
 * **A standalone reference file outside `WORKFLOW.md`** — rejected. The installer reads `WORKFLOW.md` / `WORKFLOW-FLOWS.md` at runtime so cited section numbers resolve (`ARCHITECTURE.md`; ADR-0049); a new top-level file would need its own install plumbing for no benefit over a section.
-* **Replace `ad-ground`'s coverage checklist outright with the grade** — rejected. `ad-ground` auto-invokes everywhere; a hard replacement makes every research pass pay full grading cost. The additive quick/full split is the proportional path ADR-0056 mandates.
-* **Put the grade in the machine rule-set** — rejected for placement, on the same reasoning as ADR-0056 and [ADR-0052](0052-ad-audit-empirical-falsification-lane.md): the appraisal happens inside the skill, so a rule would double-report.
+* **Replace `ad-ground`'s coverage checklist outright with the grade** — rejected. `ad-ground` auto-invokes everywhere; a hard replacement makes every research pass pay full grading cost. The additive quick/full split is the proportional path ADR-0058 mandates.
+* **Put the grade in the machine rule-set** — rejected for placement, on the same reasoning as ADR-0058 and [ADR-0052](0052-ad-audit-empirical-falsification-lane.md): the appraisal happens inside the skill, so a rule would double-report.
