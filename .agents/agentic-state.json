@@ -221,8 +221,12 @@
           "sourceSha": "03013e0e2c657e8e978d38567b2a8f8c1e61cba1b57c1e48648c41a002f1de93"
         },
         {
+          "path": ".agents/skills/ad-handoff/references/handoff-template.md",
+          "sourceSha": "0113ee3b63c304144fd92ae4ddd54a1491bd8c4f04d31da39d1e46479081cefd"
+        },
+        {
           "path": ".agents/skills/ad-handoff/SKILL.md",
-          "sourceSha": "b3195ee42aaeba954f524696bdbbe7edcda3c66daf51f57d4b6387204b396b4e"
+          "sourceSha": "97f9710d68cb34bf6d7aeddcd59907a71373d68baff8c426b71c603082452af1"
         }
       ]
     },

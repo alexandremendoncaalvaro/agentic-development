@@ -169,8 +169,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-handoff/references/handoff-template.md",
+          "sourceSha": "292deca6d91d3e25c499716bb7d0c75f4b3c0d15d0b61f9217faa01036331b71"
+        },
+        {
           "path": ".claude/skills/ad-handoff/SKILL.md",
-          "sourceSha": "7e44984e7b572d51a7c2aae6775e8787f94d8c280d1feb5806be8b4d9b0fc896"
+          "sourceSha": "40851bd1282ced71533abe1b8baecda06cf8e185e6fe76458896c7ffbad336cd"
         }
       ]
     },
