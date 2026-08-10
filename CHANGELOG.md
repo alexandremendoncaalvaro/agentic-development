@@ -21,6 +21,7 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- Bare non-interactive `init` now installs both host trees (ADR-0062, task-0043). An empty repository or one with only `.claude/` previously received Claude Code skills only, silently omitting the supported Codex install at `.agents/skills`; explicit `--agent claude-code`, `codex`, and `both` selections remain unchanged.
 - `ad-audit` SKILL.md on both hosts names the machine store by its canonical noun ("machine store", per CONTEXT.md) — four spots said "curated store", the alias the glossary exists to retire.
 
 ## [0.20.0-beta.1] - 2026-08-06
