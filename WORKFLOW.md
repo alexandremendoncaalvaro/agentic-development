@@ -36,6 +36,7 @@ What to keep in mind:
 20. **Discipline scales with project maturity.** Same principles bind every project; the artifact set scales. A spike runs posture + research + audit; a regulated product adds spec / ADR / hooks / evals. Add ceremony only where it changes agent behavior; configure at init and reconfigure as the project matures.
 21. **Decide when grounded, ask when judgment.** The engineer is the boss, not the co-pilot. The agent is not being watched line by line; it is expected to bring decisions, not fork points. Grounded decisions land without a question — a canonical happy path with citations, a single-criterion winner among TDG approaches, a well-established industry pattern. Design/taste, product tradeoffs, irreversible or high-blast-radius actions, and genuinely close calls escalate with a recommendation plus why the alternatives are weaker.
 22. **CI failure is a local gate gap.** Pre-push mirrors what CI runs — same commands, same matrix. If CI catches something pre-push did not, the fix is to close the gate locally, not to iterate red CI runs. Pushing red-CI diffs burns cloud minutes and normalizes broken main.
+23. **Grade evidence, don't just count sources.** "Consulted four sources" is not "the evidence is strong." Rank each load-bearing claim by strength — measurement > primary-docs-plus-reference > consensus > single-source > opinion — with its provenance, and keep that separate from the decision's confidence: proceed, proceed-with-mitigation, or insufficient-run-a-spike. How strong the evidence must be scales with stakes times irreversibility.
 
 > Working with agents means trading typing for technical direction. The value is in giving the right context, setting boundaries, validating the result, and keeping "almost right" out of production.
 
@@ -107,7 +108,7 @@ Comments are exceptions. They justify *why* a non-obvious choice was made — ne
 The rules below are canonical.
 
 1. **Definitions and decisions only.** No speculation, history, or unfounded plans.
-2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are exempt — their lifecycle fields are the auditability primitive.
+2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/`, and evidence studies under `doc/research/` are exempt — their lifecycle fields are the auditability primitive, and a study additionally dates each source in its provenance because dated evidence is what makes it reproducible.
 3. **No emoji anywhere.**
 4. **Business context first.**
 5. **One scope per document. No duplication.**
@@ -376,6 +377,28 @@ The refactor phase is where deepening (§8) happens. Treat tests as a fixed cont
 
 When both apply (test-expressible AND multiple implementation strategies are plausible), use TDD as the outer loop and TDG inside the GREEN phase to select the strategy for that cycle.
 
+## 17. Grade the Evidence, Not Just the Coverage
+
+Research (§4-5) gathers sources; it does not, on its own, say how much to trust what it found. "I consulted four sources" and "the evidence is strong" are different claims — four undated blog posts that happen to agree are not a benchmark on the real target. So before a grounded decision, grade the evidence, and keep two judgments apart: *how strong is the evidence* and *how firm is the decision it supports*. Holding them separate is the core move of the GRADE method; collapsing them is how a confident conclusion gets built on weak ground.
+
+**Axis 1 — evidence strength, per claim.** Rank each load-bearing claim against a hierarchy, strongest first:
+
+1. **E1 — Measurement** — a reproducible experiment or benchmark on the real target. The strongest evidence is the one you ran.
+2. **E2 — Primary docs plus a validated reference** — official documentation for the version in use, convergent with a real implementation doing the same thing.
+3. **E3 — Consensus** — three or more reputable, independent sources agree.
+4. **E4 — Single source** — one reputable source, or a majority with relevant dissent.
+5. **E5 — Opinion** — isolated anecdote, undated, or a source of unknown reliability.
+
+Three modifiers move a claim up or down: **agreement** (independent sources converge, or they conflict), **applicability** (the evidence is about your version, stack, and scale — or a distant analogy), and **recency** (inside the topic's shelf life, or stale). Seal each claim High / Medium / Low / Very-low and record its **provenance** — the citation, its date, and how it was accessed. A claim you cannot source cannot be sealed High. When sources genuinely disagree, do not manufacture a consensus: record the positions side by side, with the evidence for each and the conditions under which each holds. An honest "contested" is worth more than a false "settled".
+
+**Axis 2 — confidence to proceed, per conclusion.** The decision is not the evidence. Combine the aggregated Axis-1 strength with the balance of upside and downside, and with reversibility and blast radius, into one verdict:
+
+- **Strong** — proceed.
+- **Conditional** — proceed with a named mitigation: a flag, a measurement after the fact, a ready rollback.
+- **Insufficient** — do not proceed yet; the gap is retirable by experiment. This is the signal to run a spike (§14), not to guess.
+
+**The bar is proportional.** How strong the evidence must be to earn "Strong" scales with stakes times irreversibility. A reversible, low-blast-radius change can proceed on Medium evidence; an irreversible or wide-blast-radius one demands Measurement, or a spike to reach it. This is the same "just enough, then stop" judgment that bounds how much architecture to do up front, expressed as *how adequate must the evidence be for this decision*. It is also what keeps grading from becoming ceremony: a small question earns a one-line verdict, and only the consequential decisions earn the full appraisal. Grade in proportion to what being wrong would cost.
+
 ---
 
 These are starting points. Prune what doesn't fit your codebase.
@@ -426,3 +449,8 @@ External claims (specific percentages, named frameworks) are cited under Sources
 - *Working Effectively with Legacy Code* (Feathers, 2004) — seams as test surfaces.
 - *Unit Testing Principles, Practices, and Patterns* (Khorikov, 2020) — behavior-vs-implementation test classification.
 - [`mattpocock/skills` engineering/tdd](https://github.com/mattpocock/skills/blob/main/skills/engineering/tdd/SKILL.md) — vertical-tracer-bullet framing adopted with attribution.
+
+**§17 — Grade the Evidence, Not Just the Coverage**
+- GRADE — Guyatt et al., "GRADE guidelines: 3. Rating the quality of evidence," *Journal of Clinical Epidemiology* (2011): https://www.jclinepi.com/article/S0895-4356(10)00332-X/fulltext — the separation of evidence quality from decision strength, and the quality tiers. GRADE handbook: https://gradepro.org/handbook/
+- Evidence-Based Software Engineering — Kitchenham, Dybå & Jørgensen, *Proc. ICSE* (2004): https://web-backend.simula.no/sites/default/files/publications/SE.5.Kitchenham.2004.pdf — the Appraise step of Ask / Acquire / Appraise / Apply / Assess.
+- *Just Enough Software Architecture: A Risk-Driven Approach* (Fairbanks, 2010) — the risk-proportional "just enough, then stop" framing behind the proportional bar.

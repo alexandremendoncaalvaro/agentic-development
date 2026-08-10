@@ -217,12 +217,18 @@ Source: `WORKFLOW.md` sections 1, 4-6; `ad-grill-me`, `ad-domain`, `ad-prd`, `ad
 
 ## Research And Technique Choice
 
-Use this after the problem is clear but the implementation path is not.
+Use this before writing code — to answer an open research question, de-risk a build that carries several unknowns, or pick an implementation technique.
 
 ```mermaid
 flowchart TD
-    Clear["Clear problem or spec"]
-    TechniqueUnknown{"Technique itself uncertain?<br>library, pipeline, novel approach"}
+    Start["Question or defined task, before implementation"]
+    OpenQ{"Open question whose output is a conclusion?<br>adopt X? A vs B? state of the art?"}
+    Research["/ad-research<br>Evidence-Based loop + WORKFLOW §17 grading<br>evidence-graded study at doc/research/NNNN"]
+    Verdict{"Study verdict (WORKFLOW §17 Axis 2)"}
+    Clear["Clear problem or defined task to build"]
+    ManyUnknowns{"Several unknowns to retire before building?"}
+    Derisk["/ad-derisk<br>risk register, dispatch per unknown,<br>stop when technical risk drops below non-technical risk"]
+    TechniqueUnknown{"Single technique uncertain?<br>library, pipeline, novel approach"}
     Spike["/ad-spike<br>golden fixture, staged pipeline, evaluation"]
     TechniqueKnown{"Technique known but strategy uncertain?"}
     Tdg["/ad-tdg<br>ground truth pair, Test Dependency Map, candidate approaches"]
@@ -230,11 +236,21 @@ flowchart TD
     Tdd["/ad-tdd<br>red, green, refactor"]
     Ground["/ad-ground<br>happy path before implementation"]
     Implement["Implement"]
-    AdrNeeded{"Spike or research created binding decision?"}
+    AdrNeeded{"Binding decision created?"}
     Adr["/ad-adr"]
     Task["/ad-task or update existing task"]
 
-    Clear --> TechniqueUnknown
+    Start --> OpenQ
+    OpenQ -->|yes| Research
+    Research --> Verdict
+    Verdict -->|binds a decision| Adr
+    Verdict -->|feeds a build| Clear
+    Verdict -->|insufficient, spike-first| Spike
+    OpenQ -->|no| Clear
+    Clear --> ManyUnknowns
+    ManyUnknowns -->|yes| Derisk
+    ManyUnknowns -->|no| TechniqueUnknown
+    Derisk --> TechniqueUnknown
     TechniqueUnknown -->|yes| Spike
     TechniqueUnknown -->|no| TechniqueKnown
     Spike --> AdrNeeded
@@ -251,7 +267,7 @@ flowchart TD
     Adr --> Task
 ```
 
-Source: `WORKFLOW.md` sections 4-5, 9, 14, 16.
+Source: `WORKFLOW.md` sections 4-5, 9, 14, 16, 17; `ad-research`, `ad-derisk`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-ground` skill contracts.
 
 ## Delegation Gate
 

@@ -27,6 +27,7 @@ A single message structured as:
 
 ## Happy path
 <one paragraph synthesizing A + B + C + D, with citations>
+<full mode: seal each load-bearing claim High / Medium / Low / Very-low with provenance, per WORKFLOW §17; record disagreements as side-by-side positions, not a forced consensus>
 
 ## Proposed implementation vs happy path
 - aligned: <what stays canonical>
@@ -40,4 +41,5 @@ A single message structured as:
 - D checked: yes / no — <gap if no>
 - happy path declared: yes
 - deviations justified: yes / no / n.a.
+- evidence grade (full mode): <Strong | Conditional: mitigation | Insufficient: spike-first> — <one-line basis, per WORKFLOW §17>
 ```

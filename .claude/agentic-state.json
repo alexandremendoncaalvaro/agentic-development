@@ -99,6 +99,15 @@
         }
       ]
     },
+    "ad-derisk": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-derisk/SKILL.md",
+          "sourceSha": "bf40e62d2aac300e0df0bd25fc97f0014e15d34b50362fb5a7c085087eae9dfc"
+        }
+      ]
+    },
     "ad-diagnose": {
       "version": "0.20.0-beta.1",
       "files": [
@@ -152,11 +161,11 @@
       "files": [
         {
           "path": ".claude/skills/ad-ground/references/output-format.md",
-          "sourceSha": "70306d1d2bb59284dc88905d668a8c1bc1017fe875101362a68402ae4b46f789"
+          "sourceSha": "cdedcce703c33e6d130a66a9bb2f2178151aa0c687d7fb74d8c14f28591fa673"
         },
         {
           "path": ".claude/skills/ad-ground/SKILL.md",
-          "sourceSha": "731d6ac2a5b52872b19db732ce932832b7ff370ae26d8de4d6d90bf1c3d9e808"
+          "sourceSha": "67e857d76750291fd70210d4836a439df04939a1873cc191e08055ada30f2bdc"
         }
       ]
     },
@@ -258,6 +267,19 @@
         {
           "path": ".claude/skills/ad-question-me/SKILL.md",
           "sourceSha": "ad53130483ecfe6c7e2fc9df7f0ceced99191db5dcbdedcbb706f56416657953"
+        }
+      ]
+    },
+    "ad-research": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-research/references/research-template.md",
+          "sourceSha": "92282bbc2f8a933057ff49d275bd866328f347d28800d9adc5d431b6eda0364b"
+        },
+        {
+          "path": ".claude/skills/ad-research/SKILL.md",
+          "sourceSha": "3c261aea0a8720c29aee3bb32135064bfae138f539d71c24bc3e35768c1b63e8"
         }
       ]
     },
