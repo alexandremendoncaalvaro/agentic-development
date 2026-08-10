@@ -350,8 +350,12 @@
           "sourceSha": "7ebcd503a5981bad53dfff5e179f8400051d2e9e074f5712e2aa613ed18ed8b7"
         },
         {
+          "path": ".agents/skills/ad-research/references/research-template.md",
+          "sourceSha": "92282bbc2f8a933057ff49d275bd866328f347d28800d9adc5d431b6eda0364b"
+        },
+        {
           "path": ".agents/skills/ad-research/SKILL.md",
-          "sourceSha": "5883a3dae8ef3066aeb8abcd62672cfefcf1876fb6164580708dd0915d980e1b"
+          "sourceSha": "4c39f2927c11ddf8b00857968a1670ccb8d74936e0511f6392716626faefdf81"
         }
       ]
     },

@@ -262,8 +262,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-research/references/research-template.md",
+          "sourceSha": "92282bbc2f8a933057ff49d275bd866328f347d28800d9adc5d431b6eda0364b"
+        },
+        {
           "path": ".claude/skills/ad-research/SKILL.md",
-          "sourceSha": "1e07ec692dcb41e4eda9faa5ab9e536e8c7841e58fab6b32d26fbdf5a71d4fc5"
+          "sourceSha": "3c261aea0a8720c29aee3bb32135064bfae138f539d71c24bc3e35768c1b63e8"
         }
       ]
     },
