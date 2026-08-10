@@ -119,6 +119,19 @@
         }
       ]
     },
+    "ad-derisk": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-derisk/agents/openai.yaml",
+          "sourceSha": "439ffe2d10bc83e17d46ec980ae4cc6afa0eb7a457a99ff102435bc89fae1db7"
+        },
+        {
+          "path": ".agents/skills/ad-derisk/SKILL.md",
+          "sourceSha": "bef6f0ee9dbe12f8fb0c5580f7d40347310ba1488b55692a53f7516e20ea1d5c"
+        }
+      ]
+    },
     "ad-diagnose": {
       "version": "0.20.0-beta.1",
       "files": [
@@ -188,11 +201,11 @@
         },
         {
           "path": ".agents/skills/ad-ground/references/output-format.md",
-          "sourceSha": "70306d1d2bb59284dc88905d668a8c1bc1017fe875101362a68402ae4b46f789"
+          "sourceSha": "cdedcce703c33e6d130a66a9bb2f2178151aa0c687d7fb74d8c14f28591fa673"
         },
         {
           "path": ".agents/skills/ad-ground/SKILL.md",
-          "sourceSha": "bcbbcb1662d4db3865b9e2213ebf0827545b74b54b709cc0efaa30b50173fba1"
+          "sourceSha": "5b608d8ac11657504c65bb1cf35570f163f122426376aa03dc22a66ef9b25c72"
         }
       ]
     },
@@ -326,6 +339,23 @@
         {
           "path": ".agents/skills/ad-question-me/SKILL.md",
           "sourceSha": "8b763dcb8d4ad33f77930543a3973a8b0e0578fb21a13739c32fe7429e6706d4"
+        }
+      ]
+    },
+    "ad-research": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-research/agents/openai.yaml",
+          "sourceSha": "7ebcd503a5981bad53dfff5e179f8400051d2e9e074f5712e2aa613ed18ed8b7"
+        },
+        {
+          "path": ".agents/skills/ad-research/references/research-template.md",
+          "sourceSha": "92282bbc2f8a933057ff49d275bd866328f347d28800d9adc5d431b6eda0364b"
+        },
+        {
+          "path": ".agents/skills/ad-research/SKILL.md",
+          "sourceSha": "4c39f2927c11ddf8b00857968a1670ccb8d74936e0511f6392716626faefdf81"
         }
       ]
     },

@@ -47,6 +47,8 @@ export const PROFILES = {
   },
   solo: {
     universal: [
+      'ad-research',
+      'ad-derisk',
       'ad-philosophy',
       'ad-ground',
       'ad-drift',
@@ -84,6 +86,8 @@ export const PROFILES = {
   },
   team: {
     universal: [
+      'ad-research',
+      'ad-derisk',
       'ad-bootstrap',
       'ad-philosophy',
       'ad-architecture',
@@ -124,6 +128,8 @@ export const PROFILES = {
   },
   mature: {
     universal: [
+      'ad-research',
+      'ad-derisk',
       'ad-bootstrap',
       'ad-philosophy',
       'ad-architecture',
