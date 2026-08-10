@@ -99,24 +99,9 @@ Never write inside the repo. Never add `.agentic/handoffs/` to the repo's `.giti
 
 ## Step 6 — Write the handoff
 
-File shape:
+The handoff's file shape lives in [references/handoff-template.md](references/handoff-template.md) — fill each `<placeholder>` from the state you collected; omit any section that does not apply, except `Roadmap` and `Asks that never landed`, which are never omitted (an empty sweep is written as "none").
 
-```markdown
-# Handoff — <slug> — <ISO date>
-
-**Repo:** <repo path>
-**Branch:** <current branch>
-**Started from:** <PR # / task # / spec # if known, else "ad-hoc work">
-
-## First action
-
-Invoke `/ad-philosophy` explicitly, then <one imperative sentence naming the concrete next move>.
-
-The explicit invocation is not ceremony: per ADR-0044 it forces an applied-binding statement — each of `ad-philosophy`'s behaviors named against *this* task's files and commands before any work starts. A fresh agent inheriting a mid-flight session is exactly the case where posture is assumed and then quietly dropped. This instruction stands in for the user's: treat it as an explicit invocation and produce the applied-binding statement, not as the auto-load path that skips it.
-
-It binds posture, not method — grounding, hypothesis discipline, test-first discipline and fresh-context review live in their own skills and are not carried by that statement. The next section states them outright.
-
-## Working rules
+The `## Working rules` section is copied into the handoff verbatim — this block, restated below, is deliberately not referenced:
 
 **These are restated, not referenced, and that is deliberate.** A handoff is an ephemeral `$TMPDIR` artifact read once by an agent with no history; a pointer it may not follow is worth less than four lines it cannot miss. The anti-duplication rule protects versioned documents from drifting copies — this file is deleted after it is read.
 
@@ -135,60 +120,6 @@ It binds posture, not method — grounding, hypothesis discipline, test-first di
 **Spike when the technique is the unknown.** If the uncertainty is *how* rather than *what* — several plausible approaches and no way to pick from reading — prove it with a staged spike and a golden fixture (`/ad-spike`) before correcting anything. Only when that is genuinely the situation; a spike for a problem whose technique is already settled is wasted motion.
 
 **Review before landing.** `/ad-review` on the range before anything merges, two axes, fresh context. The agent that wrote the code is biased about it.
-
-## Roadmap
-
-- [x] <landed item> — <the artifact that proves it>
-- [ ] <open item> — <blocking condition, owner>
-
-**Priority alignment:** <how this order reflects the user's stated priorities and any course correction they made, or "no correction stated this session">
-
-## State
-
-- **Working tree:** <git status one-line summary>
-- **Divergence:** <commits ahead/behind upstream, or "no remote tracked">
-- **In-progress diff:** <line count + file count, or inline if small>
-
-## Repo hygiene
-
-- **Deleted (merged, safe):** <name>, <name> — removed with `git branch -d`; commits live on <default> and in the reflog. (or "none")
-- **Left for you:** <name> (<unmerged | squash-merged — git cannot distinguish>) — `git branch -D <name>` (or "none")
-- **Worktrees:** <path> — `git worktree remove <path>` (or "one, clean")
-- **Stray files at root:** <path> — <gitignore it, or move it out> (or "none")
-
-## Open artifacts
-
-- Task: `doc/tasks/NNNN-<slug>.md` — <one-line status>
-- Spec: `doc/specs/NNNN-<slug>.md` — <one-line status>
-- ADR (drafting): `doc/adr/NNNN-<slug>.md` — <one-line status>
-- Touched but uncommitted: <list of paths>
-
-(Omit any subsection that does not apply. Do not invent references.)
-
-## Unresolved decisions
-
-- <question> — recommended: <answer>
-- <question from user> — not yet answered
-
-## Asks that never landed
-
-- <the user's request, in their framing> — <not started | stopped at X | dropped deliberately because Y>
-
-(Write "none" when the sweep is genuinely empty.)
-
-## Recent errors
-
-<verbatim last error + command, or "none">
-
-## Suggested skills for the next session
-
-- `/ad-<skill>` — <why this is the natural next move>
-- `/ad-<skill>` — <why>
-
-## Notes
-
-<anything that doesn't fit above — keep tight, one paragraph max>
-```
 
 Suggested-skills picks from the installed `ad-*` set. Common patterns:
 

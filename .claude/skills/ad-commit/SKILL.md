@@ -95,19 +95,7 @@ Body rules:
 - Wrap at ~72 chars. Blank line between paragraphs.
 - No trailing summary of what the diff shows. No marketing prose.
 
-Type guide:
-
-- `feat:` — new user-visible capability.
-- `fix:` — bug fix.
-- `chore:` — maintenance (deps, version bump, repo hygiene).
-- `docs:` — documentation only.
-- `refactor:` — code change that neither fixes a bug nor adds a feature.
-- `test:` — tests only.
-- `build:` — build system, package manifest, lockfile.
-- `ci:` — CI configuration.
-- `perf:` — performance improvement.
-- `style:` — formatting only (no semantic change).
-- `revert:` — reverts a prior commit.
+Type guide: pick the type from the commit-type catalog in [references/conventional-commits.md](references/conventional-commits.md) — each valid type with its meaning and when to use it.
 
 Breaking changes: add `!` after the type/scope and a `BREAKING CHANGE:` footer paragraph.
 

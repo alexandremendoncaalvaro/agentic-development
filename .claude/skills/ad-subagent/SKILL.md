@@ -20,7 +20,7 @@ Ask the user:
 
 ## Step 2 — Pick a pattern (or build custom)
 
-Common pre-baked shapes (from `prompts/subagent.md`):
+Common pre-baked shapes:
 
 | Pattern | Tools | Model | Notes |
 | --- | --- | --- | --- |
