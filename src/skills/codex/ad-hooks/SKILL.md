@@ -28,11 +28,11 @@ Step 1 — detect the runner. Read repo signals in this order:
 
 If multiple runners are present, surface the conflict and ask the user before scaffolding. Never silently pick.
 
-Step 2 — recommend the per-stack commands. For the chosen runner, propose the per-tier command set from the referenced command catalog (Node / Python / Go / Rust). For a mixed / other stack not in the catalog, ask for the per-tier command list. Do not invent.
+Step 2 — recommend the per-stack commands. For the chosen runner, propose the per-tier command set from the command catalog in [references/hook-commands.md](references/hook-commands.md) (Node / Python / Go / Rust). For a mixed / other stack not in the catalog, ask for the per-tier command list. Do not invent.
 
 Offer to swap any default. Confirm before writing.
 
-Step 3 — scaffold the runner config. Write the runner-specific config file using the referenced config shapes (Husky / lefthook / pre-commit / native — each with its file paths and bootstrap command).
+Step 3 — scaffold the runner config. Write the runner-specific config file using the config shapes in [references/hook-commands.md](references/hook-commands.md) (Husky / lefthook / pre-commit / native — each with its file paths and bootstrap command).
 
 Step 4 — update `AGENTS.md` Quality Gates. Append or refresh the section with: pre-commit gate list, pre-push gate list, runner name + config path, bootstrap command, CI status if known, no-bypass policy. Honor existing managed markers if `ad-bootstrap` already wrote Quality Gates.
 
@@ -44,8 +44,6 @@ Step 5 — mirror CI locally. WORKFLOW §11: "CI failure is a local gate gap." R
 5. Offer to close the gap. Propose specific edits to the runner config; ask the user before writing (matrix mirroring can be expensive).
 
 Step 6 — tell the user the bootstrap command. Output the exact one-line command the user runs. The skill does not execute it.
-
-The per-stack command catalog (Step 2) and the per-runner config shapes (Step 3) live in [references/hook-commands.md](references/hook-commands.md).
 </instructions>
 
 <output_contract>
