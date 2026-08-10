@@ -204,8 +204,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-next/scripts/survey.mjs",
+          "sourceSha": "b35adba041992f784f0387e8990b03255178ec57233d1d70293ae0edb5bb60a5"
+        },
+        {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "3baee92498c84b067385949fbac8b45a5e04c967eb59969787629ca2548ca4a7"
+          "sourceSha": "4f17215c1cb387048ffe7a12532572102b18eb17d1cb3bb0f5525a10a92e0b0a"
         }
       ]
     },

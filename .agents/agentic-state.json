@@ -268,8 +268,12 @@
           "sourceSha": "492512161841e9e11b964276e11d73b7aea6f6f1be15be4cad0e3f386f85dfb4"
         },
         {
+          "path": ".agents/skills/ad-next/scripts/survey.mjs",
+          "sourceSha": "b35adba041992f784f0387e8990b03255178ec57233d1d70293ae0edb5bb60a5"
+        },
+        {
           "path": ".agents/skills/ad-next/SKILL.md",
-          "sourceSha": "236f544ed8eecc1fd647a73e8a81407e5cfcca926d7ac7fb2dfb58b560d529fe"
+          "sourceSha": "bd26c9b21959492228e6dbe36b24eb06acab5192476716c43025122f87ccc216"
         }
       ]
     },
