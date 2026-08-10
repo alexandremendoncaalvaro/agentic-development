@@ -89,15 +89,19 @@ function citedAdrPaths(filePath) {
   return cited;
 }
 
-// A dead path in a subagent manifest ships just as widely as one in the
-// skill body, so the guard covers every installed file, not only SKILL.md.
+// A dead path in a subagent manifest or a bundled references/ file ships just
+// as widely as one in the skill body, so the guard covers every installed
+// file, not only SKILL.md. references/ joined the set with the ADR-0056
+// rollout: those files install alongside the skill, so a dead path inside one
+// dangles in every consumer exactly like a dead path in SKILL.md.
 function installedFiles(dir) {
   const files = [join(dir, 'SKILL.md')];
-  const agentsDir = join(dir, 'agents');
-  if (existsSync(agentsDir)) {
-    for (const entry of readdirSync(agentsDir)) {
-      if (statSync(join(agentsDir, entry)).isFile()) {
-        files.push(join(agentsDir, entry));
+  for (const sub of ['agents', 'references']) {
+    const subDir = join(dir, sub);
+    if (!existsSync(subDir)) continue;
+    for (const entry of readdirSync(subDir)) {
+      if (statSync(join(subDir, entry)).isFile()) {
+        files.push(join(subDir, entry));
       }
     }
   }
@@ -117,6 +121,34 @@ for (const agent of ['claude-code', 'codex']) {
               `path ships to every consuming project.`
           );
         }
+      }
+    });
+  }
+}
+
+// Documentation Discipline rule 3 (ad-philosophy) bans emoji in every shipped
+// file. The references/ files added by the ADR-0056 rollout had no guard — and
+// neither did SKILL.md or the agents/ briefs. installedFiles() already
+// enumerates every shipped file in a skill (SKILL.md + agents/ + references/),
+// so one check over it covers them all. The class targets pictographic emoji,
+// regional-indicator flags, and the emoji variation selector; text-level
+// dingbats are deliberately left out to avoid false positives on legitimate
+// symbols.
+const EMOJI = /[\u{1F300}-\u{1FAFF}\u{1F1E6}-\u{1F1FF}\u{FE0F}]/u;
+
+for (const agent of ['claude-code', 'codex']) {
+  for (const { name, dir } of listSkills(agent)) {
+    test(`skill ${agent}/${name}: no emoji in any installed file (Documentation Discipline)`, () => {
+      for (const filePath of installedFiles(dir)) {
+        readFileSync(filePath, 'utf8')
+          .split('\n')
+          .forEach((line, index) => {
+            assert.ok(
+              !EMOJI.test(line),
+              `${filePath.slice(REPO_ROOT.length + 1)}:${index + 1} contains an emoji — ` +
+                'Documentation Discipline rule 3 bans emoji in shipped skill files'
+            );
+          });
       }
     });
   }
