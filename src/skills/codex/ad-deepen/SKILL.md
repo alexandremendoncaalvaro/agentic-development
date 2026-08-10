@@ -67,28 +67,12 @@ Step 3 — grilling loop on the chosen candidate. The user picks one candidate b
 
 1. Walk the decision tree of the proposal branch by branch (one question per turn, recommendation included). Reuse the `ad-grill-me` discipline.
 2. Add new domain terms to `CONTEXT.md` lazily via `ad-domain` as the proposal surfaces them.
-3. Offer an ADR only when the three criteria pass (hard to reverse, surprising without context, real trade-off —' ' Most refactors do not need an ADR.
+3. Offer an ADR only when the three criteria pass (hard to reverse, surprising without context, real trade-off). Most refactors do not need an ADR.
 4. When the proposal stabilizes: route to `ad-tdg` (WORKFLOW §9) for the implementation pass with ground-truth pair + TDM + criterion-based selection.
 
 Reject candidates the grilling loop reveals as wrong-shaped. Better to discard at this stage than to ship a deepening that doesn't deepen.
 
-Vocabulary discipline (always on). Per ADR-0020, use the canonical vocabulary verbatim:
-
-- Module — any unit with an interface and an implementation.
-- Interface — what callers see.
-- Implementation — what they don't.
-- Depth — behavior leverage at the interface. Deep modules hide a lot of behavior behind a small interface.
-- Seam — where behavior can be altered without editing in place (Feathers).
-- Adapter — a concrete thing satisfying an interface at a seam. *Role*, not *substance*.
-- Leverage — what callers gain from depth.
-- Locality — what maintainers gain from depth (concentrated change, bugs, knowledge).
-
-Never use:
-- "Boundary" (overloaded with DDD bounded contexts) — use *Seam* or *Interface*.
-- "Service" / "Handler" / "Manager" / "Helper" without a domain noun in front.
-- "Depth = implementation lines / interface lines" — explicitly rejected by ADR-0020. Rewards padding.
-
-When the candidate's friction touches a domain noun, use the domain noun from `CONTEXT.md` ("the *Order* aggregate"), not a generic placeholder ("the order service").
+Vocabulary discipline (always on). Per ADR-0020, use the canonical vocabulary verbatim — the full glossary (terms to use, terms to avoid, domain-noun application) is in [references/vocabulary.md](references/vocabulary.md).
 </instructions>
 
 <output_contract>

@@ -25,30 +25,7 @@ Stop after writing. Do NOT flip status to accepted — that requires user review
 </instructions>
 
 <template path="doc/adr/NNNN-<slug>.md">
-# ADR-NNNN: `<short imperative title>`
-
-**Status:** `<proposed | accepted | deprecated | superseded by ADR-NNNN>`
-**Date:** `<YYYY-MM-DD>`
-**Deciders:** `<names or roles>`
-**Amends:** `<ADR-NNNN — which part of it this decision changes. Omit the line when none.>`
-**Amended by:** `<ADR-NNNN — which part of this decision it changed. Omit until it happens.>`
-
-## Context
-
-`<What is the issue motivating this decision? What forces are at play — technical, organizational, regulatory, cost?>`
-
-## Decision
-
-`<State as a directive: "We will…". One decision per ADR.>`
-
-## Consequences
-
-`<What becomes easier, harder, or different. List positive, negative, and neutral consequences.>`
-
-## Alternatives Considered
-
-* `<option>` — `<why rejected>`
-* `<option>` — `<why rejected>`
+The ADR skeleton lives in [references/adr-template.md](references/adr-template.md) — one decision per ADR; Status starts at proposed.
 </template>
 
 <output_contract>

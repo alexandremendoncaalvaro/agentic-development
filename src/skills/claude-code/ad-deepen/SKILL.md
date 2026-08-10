@@ -75,31 +75,14 @@ The user picks one candidate by number. Drop into a grilling loop on that one:
 
 1. Walk the decision tree of the proposal branch by branch (one question per turn, recommendation included). Reuse the [`ad-grill-me`](../ad-grill-me/SKILL.md) discipline — codebase-first, single question, captured inline.
 2. Add new domain terms to `CONTEXT.md` lazily via `/ad-domain` as the proposal surfaces them.
-3. Offer an ADR only when the three criteria pass (hard to reverse, surprising without context, real trade-off —' ' If a deepening proposal does not need an ADR, it does not get one — most refactors do not.
+3. Offer an ADR only when the three criteria pass (hard to reverse, surprising without context, real trade-off). If a deepening proposal does not need an ADR, it does not get one — most refactors do not.
 4. When the proposal stabilizes: route to `/ad-tdg` (WORKFLOW §9) for the implementation pass with ground-truth pair + TDM + criterion-based selection.
 
 Reject candidates the grilling loop reveals as wrong-shaped. Better to discard a candidate at this stage than to ship a deepening that doesn't deepen.
 
 ## Vocabulary discipline (always on)
 
-Per ADR-0020, use the canonical vocabulary verbatim throughout the skill's output:
-
-- **Module** — any unit with an interface and an implementation.
-- **Interface** — what callers see.
-- **Implementation** — what they don't.
-- **Depth** — behavior leverage at the interface. Deep modules hide a lot of behavior behind a small interface.
-- **Seam** — where behavior can be altered without editing in place (Feathers).
-- **Adapter** — a concrete thing satisfying an interface at a seam. *Role*, not *substance*.
-- **Leverage** — what callers gain from depth.
-- **Locality** — what maintainers gain from depth (concentrated change, bugs, knowledge).
-
-Never use:
-
-- "Boundary" (overloaded with DDD bounded contexts) — use *Seam* or *Interface*.
-- "Service" / "Handler" / "Manager" / "Helper" without a domain noun in front — these are noise.
-- "Depth = implementation lines / interface lines" — explicitly rejected by ADR-0020. Rewards padding.
-
-When the candidate's friction touches a domain noun, use the domain noun from `CONTEXT.md` ("the *Order* aggregate"), not a generic placeholder ("the order service").
+Per ADR-0020, use the canonical vocabulary verbatim throughout the skill's output. The full glossary — the terms to use, the terms to avoid, and how to apply them to domain nouns — is in [references/vocabulary.md](references/vocabulary.md).
 
 ## Output contract
 

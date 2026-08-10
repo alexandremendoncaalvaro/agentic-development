@@ -35,27 +35,13 @@ If multiple runners are present, surface the conflict and ask the user before sc
 
 ## Step 2 — Recommend the per-stack commands
 
-For the chosen runner, propose the per-tier command set:
-
-* **Node (`package.json` present):** lint = `npm run lint` (fall back to `npx eslint .` if no `lint` script); format check = `npm run format:check` (fall back to `npx prettier --check .`); secret-scan = `gitleaks detect --no-banner` (cite the install instruction); build = `npm run build` (skip if no script); test = `npm test`.
-* **Python (`pyproject.toml` present):** lint = `ruff check .`; format check = `ruff format --check .` or `black --check .`; secret-scan = `gitleaks detect --no-banner`; test = `pytest -q`.
-* **Go (`go.mod` present):** lint = `golangci-lint run`; format check = `gofmt -d .`; secret-scan = `gitleaks detect --no-banner`; build = `go build ./...`; test = `go test ./...`.
-* **Rust (`Cargo.toml` present):** lint = `cargo clippy -- -D warnings`; format check = `cargo fmt --check`; secret-scan = `gitleaks detect --no-banner`; build = `cargo build`; test = `cargo test`.
-* **Mixed / other:** ask the user for the per-tier command list. Do not invent.
+For the chosen runner, propose the per-tier command set. The per-stack command catalog — Node, Python, Go, and Rust, with the lint / format-check / secret-scan / build / test command per tier — is in [references/hook-commands.md](references/hook-commands.md). For a **mixed / other** stack not in the catalog, ask the user for the per-tier command list. Do not invent.
 
 Offer to swap any default. Confirm before writing.
 
 ## Step 3 — Scaffold the runner config
 
-Write the runner-specific config file. Below are the canonical shapes; adapt to the user's tier choices.
-
-**Husky** — `.husky/pre-commit` and `.husky/pre-push` (shell scripts). Plus a `prepare` script in `package.json` (`"prepare": "husky"`). User runs `npm install` once to bootstrap.
-
-**lefthook** — `lefthook.yml` at the repo root with `pre-commit` and `pre-push` commands keyed by stage. User runs `lefthook install` once.
-
-**pre-commit (pre-commit.com)** — `.pre-commit-config.yaml` referencing the canonical hooks for the stack (e.g., `pre-commit/mirrors-eslint`, `psf/black`, `astral-sh/ruff-pre-commit`). User runs `pre-commit install` and `pre-commit install --hook-type pre-push`.
-
-**Native `.git/hooks/`** — `.git/hooks/pre-commit` and `.git/hooks/pre-push` plus a `setup-hooks.sh` script the user runs after every clone (since `.git/` is not committed). Document the setup-script invocation in `AGENTS.md`.
+Write the runner-specific config file. The canonical config shapes per runner — Husky, lefthook, pre-commit, and native `.git/hooks/`, each with its file paths and one-time bootstrap command — are in [references/hook-commands.md](references/hook-commands.md); adapt them to the user's tier choices.
 
 ## Step 4 — Update `AGENTS.md` Quality Gates section
 

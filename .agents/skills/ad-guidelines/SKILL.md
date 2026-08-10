@@ -1,6 +1,6 @@
 ---
 name: ad-guidelines
-description: Draft or update `GUIDELINES.md` at the repo root — the project's full engineering reference. Layer 1 Constitution trinity member (alongside `WORKFLOW.md` universal philosophy and `AGENTS.md` distilled rules). Covers Clean Architecture binding, SOLID application, Object Calisthenics tier (loose / moderate / strict per Bay 2008), naming conventions, error handling, complexity discipline, API rules, performance standards, build system, static analysis, quality gates, testing strategy, git workflow, documentation, and security. Scan-first — reads language toolchain, existing test/lint/format config, and existing AGENTS.md sections, pre-fills every placeholder it can verify, then asks only the genuine gaps and preference questions. Use when the user wants to draft, scaffold, audit, or update engineering guidelines / code standards / coding conventions / SOLID adoption / Object Calisthenics / testing strategy / security policy / build conventions for the project. Skill is lazy — file only exists when the project needs engineering standards.
+description: Draft or update `GUIDELINES.md` at the repo root — the project's full engineering reference. Layer 1 Constitution trinity member (alongside `WORKFLOW.md` universal philosophy and `AGENTS.md` distilled rules), covering design principles, code standards, complexity, API, build, static analysis, quality gates, testing, git workflow, documentation, and security. Scan-first — reads the language toolchain, existing test/lint/format config, and existing AGENTS.md sections, pre-fills every placeholder it can verify, then asks only the genuine gaps. Use when the user wants to draft, scaffold, audit, or update engineering guidelines / code standards / coding conventions / SOLID adoption / Object Calisthenics / testing strategy / security policy / build conventions for the project. Skill is lazy — the file only exists when the project needs engineering standards.
 summary: Lazy lifecycle owner of `GUIDELINES.md` (Layer 1 Constitution, full engineering reference). Twelve sections — design principles, code standards, complexity, API, performance, build, static analysis, quality gates, testing, git, documentation, security. Pre-suggested defaults from canon + scan-first detection.
 ---
 
@@ -53,7 +53,7 @@ Profile: read `.claude/agentic-state.json` / `.agents/agentic-state.json`. Profi
 
 Only after the scan produces no answer does the skill ask. Asking about something the repo already states wastes the user's attention.
 
-Step 2 — pre-fill the template. Open `templates/guidelines.md`. Fill detected fields before any interview:
+Step 2 — pre-fill the template. Open [references/guidelines-template.md](references/guidelines-template.md). Fill detected fields before any interview:
 
 - §2.1 naming conventions table per language idiom.
 - §2.2 error handling per language idiom.
@@ -105,7 +105,7 @@ See `GUIDELINES.md` §2 for the full reference. Non-negotiable subset:
 
 User confirms before the AGENTS.md rewrite. Never modify AGENTS.md silently.
 
-Step 5 — write the file. Path: `GUIDELINES.md` at repo root. Use the template at `templates/guidelines.md`. Sections the user skipped do not land. Sections that were fully pre-filled land verbatim. Sections requiring preference land with the user's answer. Stop after writing; print a one-line summary.
+Step 5 — write the file. Path: `GUIDELINES.md` at repo root. Use the template at [references/guidelines-template.md](references/guidelines-template.md). Sections the user skipped do not land. Sections that were fully pre-filled land verbatim. Sections requiring preference land with the user's answer. Stop after writing; print a one-line summary.
 
 Step 6 — editing guidance for later turns. Tier change → update §3.1 checked rules; never delete the rule list (audit trail). New language → expand §2.1 table; do not rewrite existing rows. New static-analysis tool → add row to §7. Canonical example change → update §2.5 to point at the new source file; do not paste code into GUIDELINES.md. Perf budget change → update §5; never delete previous without recording rationale. Documentation extensions → append to §11.1 table. Never rewrite existing prose — append rationale paragraphs.
 </instructions>

@@ -28,20 +28,11 @@ Step 1 — detect the runner. Read repo signals in this order:
 
 If multiple runners are present, surface the conflict and ask the user before scaffolding. Never silently pick.
 
-Step 2 — recommend the per-stack commands:
-- Node: lint = `npm run lint` or `npx eslint .`; format check = `npm run format:check` or `npx prettier --check .`; secret-scan = `gitleaks detect --no-banner`; build = `npm run build` (skip if no script); test = `npm test`.
-- Python: lint = `ruff check .`; format check = `ruff format --check .` or `black --check .`; secret-scan = `gitleaks detect --no-banner`; test = `pytest -q`.
-- Go: lint = `golangci-lint run`; format check = `gofmt -d .`; secret-scan = `gitleaks detect --no-banner`; build = `go build ./...`; test = `go test ./...`.
-- Rust: lint = `cargo clippy -- -D warnings`; format check = `cargo fmt --check`; secret-scan = `gitleaks detect --no-banner`; build = `cargo build`; test = `cargo test`.
-- Mixed / other: ask for the per-tier command list. Do not invent.
+Step 2 — recommend the per-stack commands. For the chosen runner, propose the per-tier command set from the command catalog in [references/hook-commands.md](references/hook-commands.md) (Node / Python / Go / Rust). For a mixed / other stack not in the catalog, ask for the per-tier command list. Do not invent.
 
 Offer to swap any default. Confirm before writing.
 
-Step 3 — scaffold the runner config. Write the runner-specific config file:
-- Husky: `.husky/pre-commit` and `.husky/pre-push` (shell scripts) + `"prepare": "husky"` in `package.json`. Bootstrap: `npm install`.
-- lefthook: `lefthook.yml` at the repo root with `pre-commit` and `pre-push` commands keyed by stage. Bootstrap: `lefthook install`.
-- pre-commit: `.pre-commit-config.yaml` with stack-specific hook references. Bootstrap: `pre-commit install` and `pre-commit install --hook-type pre-push`.
-- Native: `.git/hooks/pre-commit` and `.git/hooks/pre-push` + a `setup-hooks.sh` script the user runs after every clone (since `.git/` is not committed).
+Step 3 — scaffold the runner config. Write the runner-specific config file using the config shapes in [references/hook-commands.md](references/hook-commands.md) (Husky / lefthook / pre-commit / native — each with its file paths and bootstrap command).
 
 Step 4 — update `AGENTS.md` Quality Gates. Append or refresh the section with: pre-commit gate list, pre-push gate list, runner name + config path, bootstrap command, CI status if known, no-bypass policy. Honor existing managed markers if `ad-bootstrap` already wrote Quality Gates.
 

@@ -1,6 +1,6 @@
 ---
 name: ad-guidelines
-description: Draft or update `GUIDELINES.md` at the repo root — the project's full engineering reference. Layer 1 Constitution trinity member (alongside `WORKFLOW.md` universal philosophy and `AGENTS.md` distilled rules). Covers Clean Architecture binding, SOLID application, Object Calisthenics tier (loose / moderate / strict per Bay 2008), naming conventions, error handling, complexity discipline, API rules, performance standards, build system, static analysis, quality gates, testing strategy, git workflow, documentation, and security. Scan-first — reads language toolchain, existing test/lint/format config, and existing AGENTS.md sections, pre-fills every placeholder it can verify, then asks only the genuine gaps and preference questions. Use when the user wants to draft, scaffold, audit, or update engineering guidelines / code standards / coding conventions / SOLID adoption / Object Calisthenics / testing strategy / security policy / build conventions for the project. Skill is lazy — file only exists when the project needs engineering standards.
+description: Draft or update `GUIDELINES.md` at the repo root — the project's full engineering reference. Layer 1 Constitution trinity member (alongside `WORKFLOW.md` universal philosophy and `AGENTS.md` distilled rules), covering design principles, code standards, complexity, API, build, static analysis, quality gates, testing, git workflow, documentation, and security. Scan-first — reads the language toolchain, existing test/lint/format config, and existing AGENTS.md sections, pre-fills every placeholder it can verify, then asks only the genuine gaps. Use when the user wants to draft, scaffold, audit, or update engineering guidelines / code standards / coding conventions / SOLID adoption / Object Calisthenics / testing strategy / security policy / build conventions for the project. Skill is lazy — the file only exists when the project needs engineering standards.
 summary: Lazy lifecycle owner of `GUIDELINES.md` (Layer 1 Constitution, full engineering reference). Twelve sections — design principles, code standards, complexity, API, performance, build, static analysis, quality gates, testing, git, documentation, security. Pre-suggested defaults from canon + scan-first detection.
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
@@ -85,7 +85,7 @@ Only after the scan produces no answer does the skill ask. Asking about somethin
 
 ## Step 2 — Pre-fill the template
 
-Open `templates/guidelines.md`. Fill detected fields before any interview:
+Open [references/guidelines-template.md](references/guidelines-template.md). Fill detected fields before any interview:
 
 - **§2.1 Naming conventions** — fill the per-language convention table from the canonical conventions of the detected language (snake_case / PascalCase / camelCase / UPPER_SNAKE / kebab-case / file extensions).
 - **§2.2 Error handling** — fill the idiom of the detected language (`std::expected` for C++, `Result<T, E>` for Rust, discriminated unions for TS, typed exceptions for Python, error returns for Go).
@@ -179,7 +179,7 @@ The user confirms before the AGENTS.md rewrite. The skill never modifies AGENTS.
 
 ## Step 5 — Write the file
 
-Path: `GUIDELINES.md` at repo root. Use the template at `templates/guidelines.md`.
+Path: `GUIDELINES.md` at repo root. Use the template at [references/guidelines-template.md](references/guidelines-template.md).
 
 Sections the user skipped do not land in the file. Sections that were fully pre-filled land verbatim. Sections requiring user preference land with the user's answer.
 

@@ -9,6 +9,11 @@ allowed-tools: Read, Bash
 
 Implements ADR-0023. Drafts atomic Conventional Commits with DCO `Signed-off-by` sign-off. Helper, not blocker — the senior engineer keeps decision authority.
 
+## Non-negotiables (read first)
+
+- **DCO `Signed-off-by` on every commit — never a `Co-Authored-By` trailer** (ADR-0023 §Decision 1: DCO only).
+- **Never bypass the hooks** — no `--no-verify`, no `--no-gpg-sign`. A failing hook stops the commit; fix the cause, don't skip it.
+
 ## Step 0 — Confirm regime
 
 Run when the user wants to land changes as commits and at least one holds:
@@ -90,19 +95,7 @@ Body rules:
 - Wrap at ~72 chars. Blank line between paragraphs.
 - No trailing summary of what the diff shows. No marketing prose.
 
-Type guide:
-
-- `feat:` — new user-visible capability.
-- `fix:` — bug fix.
-- `chore:` — maintenance (deps, version bump, repo hygiene).
-- `docs:` — documentation only.
-- `refactor:` — code change that neither fixes a bug nor adds a feature.
-- `test:` — tests only.
-- `build:` — build system, package manifest, lockfile.
-- `ci:` — CI configuration.
-- `perf:` — performance improvement.
-- `style:` — formatting only (no semantic change).
-- `revert:` — reverts a prior commit.
+Type guide: pick the type from the commit-type catalog in [references/conventional-commits.md](references/conventional-commits.md) — each valid type with its meaning and when to use it.
 
 Breaking changes: add `!` after the type/scope and a `BREAKING CHANGE:` footer paragraph.
 

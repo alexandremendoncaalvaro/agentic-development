@@ -65,7 +65,7 @@ Do not invent values. When the user does not know, leave `<TODO>` in the field a
 
 Step 4 — interview UX. Codex has no `AskUserQuestion` primitive. Use inline numbered text for multi-choice prompts. One question per turn; do not chain three text questions in one message.
 
-Step 5 — write the file. Path: `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` (multi-product). Use the template at `templates/prd.md`. Stop after writing. Do not flip status to `accepted` — that requires user review.
+Step 5 — write the file. Path: `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` (multi-product). Use the template at [references/prd-template.md](references/prd-template.md). Stop after writing. Do not flip status to `accepted` — that requires user review.
 
 Step 6 — editing guidance for later turns. When the user later works on the PRD:
 

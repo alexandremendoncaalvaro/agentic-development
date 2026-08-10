@@ -21,7 +21,7 @@ Concrete tests to run before starting:
 * Are there ≥2 candidate techniques with materially different trade-offs that no source resolves? If no, this is not a spike.
 * Is end-to-end validation against expected outputs feasible without per-stage debug? If yes, this is `ad-task` + `ad-philosophy` Goal-Driven Execution territory, not a spike.
 
-If the spike is warranted, confirm with the user the *recortte* (the specific surface where uncertainty sits — not the whole feature) and proceed.
+If the spike is warranted, confirm with the user the *focus* (the specific surface where uncertainty sits — not the whole feature) and proceed.
 
 ## Step 1 — Discovery
 
@@ -30,14 +30,14 @@ List canonical approaches grounded in **official docs and real examples**. Pick 
 Candidate-listing process:
 
 1. Search official documentation for the language / library / domain in question. Cite URL + version.
-2. Search public implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists) for solutions to the same technical recortte. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and fetch via tools; never paraphrase from training memory.
+2. Search public implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists) for solutions to the same technical focus. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and fetch via tools; never paraphrase from training memory.
 3. Survey in-repo for analogous patterns the codebase already uses. Cite `<file>:<line>` or "no analog found".
 4. Survey git history for prior attempts at the same problem. Cite `<commit-sha>` or "no prior attempt".
 
 Output format:
 
 ```markdown
-## Discovery — <recortte>
+## Discovery — <focus>
 
 ### Candidate techniques
 1. **<name>** — <one-line description>. Source: <URL or repo:path>. Trade-offs: <pros / cons>.
@@ -67,27 +67,7 @@ Where `NNNN` is the next available 4-digit number (mirrors ADR / task / spec num
 
 The fixture format is JSON keyed by input path (recommended) or whatever shape the domain demands. For computer vision: bounding boxes, sizes, lighting condition, difficulty tag, edge case markers. For multi-stage transformations: intermediate states. For library choice: representative inputs covering typical and edge cases.
 
-Example fixture file (`spikes/0001-detect-circles/fixtures/golden.json`):
-
-```json
-{
-  "inputs/easy-01.jpg": {
-    "expected": [
-      { "bbox": [120, 80, 240, 200], "label": "circle", "size": "large", "lighting": "even" }
-    ],
-    "difficulty": "easy",
-    "edge_cases": []
-  },
-  "inputs/hard-01.jpg": {
-    "expected": [
-      { "bbox": [50, 60, 90, 100], "label": "circle", "size": "small", "lighting": "low" },
-      { "bbox": [200, 80, 260, 140], "label": "circle", "size": "medium", "lighting": "even", "occluded": true }
-    ],
-    "difficulty": "hard",
-    "edge_cases": ["low-light", "partial-occlusion", "multiple-objects"]
-  }
-}
-```
+For a worked fixture file (`spikes/0001-detect-circles/fixtures/golden.json`) with easy / hard inputs, bounding boxes, difficulty tags, and edge-case markers, see [references/fixture-example.md](references/fixture-example.md).
 
 Curation principles:
 
@@ -101,23 +81,7 @@ The fixture is the contract the pipeline validates against. Treat it like spec t
 
 One technique per stage. Each stage emits a **debug artifact** that makes its output inspectable.
 
-Pipeline structure:
-
-```
-spikes/NNNN-<slug>/
-├── README.md          # spike framing (Step 1 output)
-├── fixtures/          # golden inputs + expected outputs
-│   └── golden.json
-├── pipeline/          # one file per stage
-│   ├── 01-preprocess.<ext>
-│   ├── 02-detect.<ext>
-│   └── 03-postprocess.<ext>
-├── debug/             # per-stage debug artifacts
-│   ├── 01-preprocess/
-│   ├── 02-detect/
-│   └── 03-postprocess/
-└── eval/              # evaluation results (Step 4)
-```
+Pipeline structure — see the spike directory layout in [references/pipeline-layout.md](references/pipeline-layout.md).
 
 Each stage's debug artifact format depends on the domain:
 
@@ -139,33 +103,7 @@ Run the pipeline against the fixture and emit two layers of results:
 * **End-to-end:** how many fixture inputs produced expected outputs? Reported as pass / fail per input, plus aggregate pass rate.
 * **Per-stage:** for each fixture input, where did the pipeline diverge? Stage NN's output vs the expected intermediate. Reported as pass / fail per (input, stage).
 
-Output to `spikes/NNNN-<slug>/eval/results.json`:
-
-```json
-{
-  "fixture": "fixtures/golden.json",
-  "pipeline_version": "<commit-sha or timestamp>",
-  "end_to_end": {
-    "total": 10,
-    "passed": 7,
-    "failed": 3
-  },
-  "per_stage": {
-    "01-preprocess": { "passed": 10, "failed": 0 },
-    "02-detect": { "passed": 8, "failed": 2 },
-    "03-postprocess": { "passed": 7, "failed": 1 }
-  },
-  "failures": [
-    {
-      "input": "inputs/hard-02.jpg",
-      "diverged_at": "02-detect",
-      "expected": [...],
-      "actual": [...],
-      "debug_artifact": "debug/02-detect/hard-02.png"
-    }
-  ]
-}
-```
+Output to `spikes/NNNN-<slug>/eval/results.json` — see the two-layer results shape in [references/eval-format.md](references/eval-format.md).
 
 The per-stage layer is what makes the spike actionable. End-to-end says *that* it failed; per-stage + debug artifact says *where* and *why*.
 
@@ -173,44 +111,21 @@ The per-stage layer is what makes the spike actionable. End-to-end says *that* i
 
 When the spike concludes — either the picked technique works or it does not — record the outcome via `/ad-adr` and delete the spike directory. The ADR is the persistent artifact; the spike code is throwaway.
 
-ADR template for spike outcomes:
-
-```markdown
-# ADR-NNNN: We will use technique X for <recortte>
-
-## Context
-
-<why the spike was needed — what was uncertain>
-
-## Decision
-
-We will use technique X. The spike at `spikes/NNNN-<slug>/` (now deleted) showed:
-- End-to-end pass rate: <%>
-- Failures concentrated at stage <NN>, root cause <Y>
-- Mitigation: <Z>
-
-Alternatives held in reserve and rejected:
-- Technique A: rejected because <reason from spike eval>
-- Technique B: rejected because <reason from spike eval>
-
-## Consequences
-
-<follow-on work this decision unblocks; rails to maintain>
-```
+For the spike-outcome ADR template, see [references/spike-adr-template.md](references/spike-adr-template.md).
 
 Then:
 
 ```bash
 rm -rf spikes/NNNN-<slug>/
 git add doc/adr/NNNN-<slug>.md
-git commit -m "feat: adopt technique X for <recortte> per spike NNNN"
+git commit -m "feat: adopt technique X for <focus> per spike NNNN"
 ```
 
 Spikes that conclude inconclusively get an ADR too — `Decision: defer; the spike at NNNN inconclusive because Y` — and the directory is deleted. Inconclusive spikes are real signal; preserving the framing in an ADR prevents re-litigation.
 
 ## Output contract
 
-A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout above (discovery README, fixtures, pipeline, debug per stage, eval results). The directory is throwaway by design — promote-or-delete lifecycle' ' No `Status: shipped` lifecycle; spikes do not "ship" — they conclude with an ADR.
+A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout above (discovery README, fixtures, pipeline, debug per stage, eval results). The directory is throwaway by design — promote-or-delete lifecycle. No `Status: shipped` lifecycle; spikes do not "ship" — they conclude with an ADR.
 
 When the host exposes `AskUserQuestion`, use it for the Step 1 selection criterion confirmation and the Step 5 promote/delete decision.
 

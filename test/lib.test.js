@@ -136,38 +136,41 @@ test('detectAgents: .claude/ + .agents/ → ["claude-code","codex"] (determinist
   }
 });
 
-test('installSkills: claude-code ad-bootstrap → file at .claude/skills/...', async () => {
+test('installSkills: claude-code ad-skill → file at .claude/skills/...', async () => {
+  // ad-skill is the minimal-install fixture: lean, single-file on Claude, and
+  // untouched by the references/ progressive-disclosure rollout (ADR-0056), so
+  // this stays a genuine one-file assertion.
   const dir = mkScratch();
   try {
     const { actions } = await installSkills({
       cwd: dir,
       agents: ['claude-code'],
-      skills: ['ad-bootstrap'],
+      skills: ['ad-skill'],
     });
     assert.equal(actions.length, 1);
     assert.equal(actions[0].type, 'created');
-    assert.equal(actions[0].path, '.claude/skills/ad-bootstrap/SKILL.md');
-    assert.ok(existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')));
+    assert.equal(actions[0].path, '.claude/skills/ad-skill/SKILL.md');
+    assert.ok(existsSync(join(dir, '.claude/skills/ad-skill/SKILL.md')));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('installSkills: codex ad-bootstrap → SKILL.md + agents/openai.yaml', async () => {
+test('installSkills: codex ad-skill → SKILL.md + agents/openai.yaml', async () => {
   const dir = mkScratch();
   try {
     const { actions } = await installSkills({
       cwd: dir,
       agents: ['codex'],
-      skills: ['ad-bootstrap'],
+      skills: ['ad-skill'],
     });
     const paths = actions.map((a) => a.path).sort();
     assert.deepEqual(paths, [
-      '.agents/skills/ad-bootstrap/SKILL.md',
-      '.agents/skills/ad-bootstrap/agents/openai.yaml',
+      '.agents/skills/ad-skill/SKILL.md',
+      '.agents/skills/ad-skill/agents/openai.yaml',
     ]);
     for (const action of actions) assert.equal(action.type, 'created');
-    assert.ok(existsSync(join(dir, '.agents/skills/ad-bootstrap/agents/openai.yaml')));
+    assert.ok(existsSync(join(dir, '.agents/skills/ad-skill/agents/openai.yaml')));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -404,6 +407,7 @@ test('installSkills: codex ad-review → SKILL.md + openai.yaml + bundled subage
     assert.deepEqual(paths, [
       '.agents/skills/ad-review/SKILL.md',
       '.agents/skills/ad-review/agents/openai.yaml',
+      '.agents/skills/ad-review/references/codex-escalation.md',
       '.codex/agents/fresh-context-reviewer.toml',
     ]);
     assert.ok(existsSync(join(dir, '.codex/agents/fresh-context-reviewer.toml')));

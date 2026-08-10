@@ -28,17 +28,7 @@ Step 0 — detect existing structure. Before writing, locate the existing artifa
 
 Lazy-creation rule: do not create the file just because the skill was invoked. Create it only when there is at least one resolved term to write.
 
-Step 1 — resolve the term. A glossary entry has four parts:
-
-```markdown
-### <Canonical Noun>
-
-**Definition:** <one-sentence, project-specific, no general programming words>.
-
-_Avoid_: <Alias 1>, <Alias 2>. <Why each is misleading>.
-
-**Related code:** [`path/to/file.ts:42`](path/to/file.ts:42).
-```
+Step 1 — resolve the term. A glossary entry has four parts — see the glossary-entry shape in [references/context-templates.md](references/context-templates.md).
 
 Resolution discipline:
 - Be opinionated. One canonical name. Others become `_Avoid_` aliases with a one-line reason.
@@ -46,65 +36,15 @@ Resolution discipline:
 - Project-specific only. "Customer", "Triage role", "Materialization cascade" qualify. "Service", "Handler", "Controller" do not (those belong to architectural vocabulary per ADR-0020, not domain).
 - Flag conflicts. If two terms could mean the same thing, add the conflict to the **Flagged ambiguities** section instead of forcing a premature resolution.
 
-Step 2 — locate the insertion point. `CONTEXT.md` has three canonical sections:
-
-```markdown
-# <Project Name> — Domain Glossary
-
-## Language
-
-<term entries here, one per `### <Term>` heading>
-
-## Relationships
-
-- A **Customer** has many **Orders**.
-- An **Order** belongs to one **Customer** and contains one or more **LineItems**.
-
-## Flagged ambiguities
-
-- "Account" vs "User" — see Issue #42; treated interchangeably in code today, separation pending ADR-NNNN.
-```
+Step 2 — locate the insertion point. `CONTEXT.md` has three canonical sections — see the CONTEXT.md layout in [references/context-templates.md](references/context-templates.md).
 
 Insert the new term alphabetically under `## Language`. If a relationship clause is implied, append to `## Relationships`. If the resolution surfaces an ambiguity rather than closing one, append to `## Flagged ambiguities` and mark the term entry "(resolution pending)".
 
 Step 3 — write or update. First creation uses `Write`; subsequent updates use `Edit`. Preserve existing entries — never reorder or rewrite past terms while adding new ones.
 
-For first creation, the file shape is:
+For first creation, the file shape is the first-creation shape in [references/context-templates.md](references/context-templates.md).
 
-```markdown
-# <Project Name> — Domain Glossary
-
-_Lazy artifact — only contains terms that have been resolved through grilling, spec drafting, or explicit capture. Empty entries are worse than no entry; speculation belongs elsewhere._
-
-_Maintained by `/ad-domain`._
-
-## Language
-
-### <First resolved term>
-
-...
-
-## Relationships
-
-(empty until the second term resolves)
-
-## Flagged ambiguities
-
-(empty)
-```
-
-For multi-context repos, `CONTEXT-MAP.md` is the index:
-
-```markdown
-# Context Map
-
-This repository contains multiple bounded contexts. Each has its own `CONTEXT.md`.
-
-- **Ordering** — `src/ordering/CONTEXT.md`. Owns: Customer, Order, LineItem, Cancellation.
-- **Billing** — `src/billing/CONTEXT.md`. Owns: Invoice, Payment, Refund.
-
-System-wide ADRs live at `doc/adr/`. Context-scoped ADRs live under each context.
-```
+For multi-context repos, `CONTEXT-MAP.md` is the index — see the CONTEXT-MAP shape in [references/context-templates.md](references/context-templates.md).
 
 Step 4 — cross-reference adjacent layers. Per ADR-0019 §6 reciprocity rules:
 - Code → Domain. When the new term has obvious code references, list them in the entry's `**Related code:**` line. Use `Glob` / `Grep` for the canonical noun and the aliases; the latter often surfaces drift.

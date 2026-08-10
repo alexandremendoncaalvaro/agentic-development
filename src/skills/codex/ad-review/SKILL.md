@@ -2,8 +2,6 @@
 name: ad-review
 description: |
   Run this skill when the user explicitly invokes `/ad-review` or names it ("run ad-review", "use the ad-review skill"), or when the user asks for a code review with an explicit scope ("review this branch", "review main..HEAD", "revisa esse diff <range>"). Auto-trigger note: `allow_implicit_invocation: true` is set so review-language can fire the skill, but this also means broad review-adjacent conversation may auto-invoke a multi-step file-writing workflow. If a request is ambiguous, ask the user to confirm scope before invoking.
-  Mechanical shape: ONE pass in the current session. The skill assembles the diff plus the relevant context, then produces a single review with findings grouped under `## Standards Findings` and `## Spec Findings` — two axes, one session. Standards = does the diff conform to AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs? Spec = does the diff match the originating task / spec / PRD? The two-axis structure exists so neither axis masks the other.
-  No `/clear`. No silent subagent spawn from the skill: Codex subagents are explicit user-directed workflows. The skill writes a single audit-trail handoff file at `.agentic/reviews/<ISO>-<scope>.md` for the record, then performs the review inline. For §10 ideal, use the bundled `fresh-context-reviewer` Codex subagent against that audit-trail file.
 summary: Two-axis code review per WORKFLOW §10. Claude Code uses fresh-context subagents; Codex writes an audit trail, reviews inline by default, and ships a reviewer subagent for explicit escalation.
 ---
 
@@ -193,46 +191,7 @@ This step is the Option β escalation gate. The decision and the N=3 axis-bleed 
 **Optional escalation — true fresh-context review via subagent (explicit user-spawned).**
 If the user wants the §10 ideal (a reviewer with no inherited bias), tell them after Step 6 / Step 7:
 
-```
-For a fresh-context review, spawn the bundled Codex reviewer subagent against the audit-trail file.
-
-1. If the project was installed with agentic, the bundled reviewer should already exist at:
-     .codex/agents/fresh-context-reviewer.toml
-
-   If it is missing, create it with `/ad-subagent` or a standalone TOML file at one of:
-     ~/.codex/agents/fresh-context-reviewer.toml          (personal — shared across all projects)
-     .codex/agents/fresh-context-reviewer.toml            (project-scoped — committed with the repo)
-
-   Minimum custom body (per developers.openai.com/codex/subagents). Required fields:
-   `name`, `description`, `developer_instructions`. Optional fields: `model`,
-   `model_reasoning_effort`, `sandbox_mode`. NOTE on TOML indentation: the
-   triple-quoted `developer_instructions` string preserves leading whitespace
-   verbatim, so dedent the body to column 0 when copying — do not carry the
-   display indentation below.
-
-       name = "fresh-context-reviewer"
-       description = "Adversarial §10 reviewer. Reads only the handoff file."
-       model = "gpt-5.4"                   # optional — omit to inherit parent session
-       model_reasoning_effort = "high"     # optional
-       sandbox_mode = "read-only"          # optional
-       developer_instructions = """
-   Read only the handoff file the user passes. No prior context.
-   Report findings under ## Standards Findings and ## Spec Findings.
-   Each finding one line: file:line: <severity>: <problem>. <fix>.
-   Severity is the literal word Blocker, Concern, or Note.
-   Do NOT synthesize an "approve" verdict.
-   """
-
-2. From Codex, explicitly spawn it against the audit-trail file:
-
-     > spawn the fresh-context-reviewer agent. Read <audit-path>.
-
-The subagent loads only the handoff file, so it has no inherited context from this
-session. Requires Codex subagent support (see developers.openai.com/codex/subagents).
-NOTE: the [agents] block in ~/.codex/config.toml is for global subagent
-settings (max_threads, max_depth) only — not for declaring individual
-subagents.
-```
+The setup — bundled subagent locations, the minimum TOML config body, and the explicit spawn command — is in [references/codex-escalation.md](references/codex-escalation.md).
 
 Do not silently spawn the agent yourself. The user must explicitly request the escalation.
 </instructions>
