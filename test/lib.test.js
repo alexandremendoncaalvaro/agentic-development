@@ -407,6 +407,7 @@ test('installSkills: codex ad-review → SKILL.md + openai.yaml + bundled subage
     assert.deepEqual(paths, [
       '.agents/skills/ad-review/SKILL.md',
       '.agents/skills/ad-review/agents/openai.yaml',
+      '.agents/skills/ad-review/references/codex-escalation.md',
       '.codex/agents/fresh-context-reviewer.toml',
     ]);
     assert.ok(existsSync(join(dir, '.codex/agents/fresh-context-reviewer.toml')));

@@ -333,8 +333,12 @@
           "sourceSha": "40ef8c3d937fa61a69ab2b58f4e94562a860fb6c8a131b000204ce211d2ae28f"
         },
         {
+          "path": ".agents/skills/ad-review/references/codex-escalation.md",
+          "sourceSha": "14a311fb2c17649510d527f5396756df7afd1be6d09ce442ad4344033f52ebf8"
+        },
+        {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "611d8f5164abc2b2c8e8dfddc83761146174de743a329a7dcb3745fcbd321494"
+          "sourceSha": "fe30679043dbf5feedb568654763d6ecccae092386f2f68baee3df0b71f1e609"
         },
         {
           "path": ".codex/agents/fresh-context-reviewer.toml",
