@@ -110,8 +110,12 @@
           "sourceSha": "6642764689f0501c11a1aff360647d794cbf3d6028936bda25da8b2c11c989d0"
         },
         {
+          "path": ".agents/skills/ad-deepen/references/vocabulary.md",
+          "sourceSha": "a97adea8269255ac352c79d6aefeef4d10035f1f22e09bed7f385a03413e29a4"
+        },
+        {
           "path": ".agents/skills/ad-deepen/SKILL.md",
-          "sourceSha": "b0d9c519fd5e5b63f882a197a167a703036d506f5a5c5c9ccb02116296324394"
+          "sourceSha": "3abcb15f8a2d6a1fa2d8186541e1383cb3c4d07eabf15cf352ecb8d78b39c2b1"
         }
       ]
     },
@@ -123,8 +127,12 @@
           "sourceSha": "d0a077e66a3d4f193fd565fea5356091cff7ffb4ea9b9729d2db256d9143bac2"
         },
         {
+          "path": ".agents/skills/ad-diagnose/references/loop-recipes.md",
+          "sourceSha": "3fd6f42efd0a84a87d60144bc51b92e81f51255c88020a8cf1bac38f78a7fd1e"
+        },
+        {
           "path": ".agents/skills/ad-diagnose/SKILL.md",
-          "sourceSha": "ac40f0cd79dc11c53b4be942be6a0dddf13abb23569f028318db3143339febcd"
+          "sourceSha": "7a3c1764b6242b39b3041e6e69a04610690854dae25060e4f8e76898622cb361"
         }
       ]
     },
@@ -179,8 +187,12 @@
           "sourceSha": "0966b5f78a57b689380c1ba6459d9913800735609c1f06f46f524218ca640706"
         },
         {
+          "path": ".agents/skills/ad-ground/references/output-format.md",
+          "sourceSha": "70306d1d2bb59284dc88905d668a8c1bc1017fe875101362a68402ae4b46f789"
+        },
+        {
           "path": ".agents/skills/ad-ground/SKILL.md",
-          "sourceSha": "b1d467414707047bf0278a99336693aa6b2df0974e99a96eb4922334204879aa"
+          "sourceSha": "bcbbcb1662d4db3865b9e2213ebf0827545b74b54b709cc0efaa30b50173fba1"
         }
       ]
     },
