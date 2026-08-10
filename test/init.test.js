@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import {
   mkdtempSync,
+  mkdirSync,
   rmSync,
   writeFileSync,
   readFileSync,
@@ -94,6 +95,29 @@ test('init --agent both → installs into both .claude and .agents', () => {
     assert.ok(
       existsSync(join(dir, '.agents/skills/ad-bootstrap/agents/openai.yaml'))
     );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('regression: bare non-interactive init on greenfield installs both hosts', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--yes']);
+    assert.ok(existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')));
+    assert.ok(existsSync(join(dir, '.agents/skills/ad-bootstrap/SKILL.md')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('regression: bare non-interactive init in a Claude project installs Codex', () => {
+  const dir = mkScratch();
+  try {
+    mkdirSync(join(dir, '.claude'));
+    runInit(dir, ['--yes']);
+    assert.ok(existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')));
+    assert.ok(existsSync(join(dir, '.agents/skills/ad-bootstrap/SKILL.md')));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

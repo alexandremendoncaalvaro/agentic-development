@@ -130,11 +130,10 @@ const CONDITIONAL_BY_NAME = Object.fromEntries(
   CONDITIONAL_SKILLS.map((s) => [s.name, s])
 );
 
-function resolveAgents(flagValue, detectedAgents) {
+function resolveAgents(flagValue) {
   if (flagValue === 'both') return ['claude-code', 'codex'];
   if (flagValue) return [flagValue];
-  if (detectedAgents.length > 0) return detectedAgents;
-  return ['claude-code'];
+  return ['claude-code', 'codex'];
 }
 
 /**
@@ -300,7 +299,7 @@ export async function initCommand(opts) {
       return;
     }
   } else {
-    agents = resolveAgents(opts.agent, detectedAgents);
+    agents = resolveAgents(opts.agent);
     optedSkills = pickConditionalAuto(features, agents, profileName);
   }
 
