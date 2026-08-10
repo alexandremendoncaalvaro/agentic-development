@@ -42,7 +42,7 @@ If any check fails, surface the gap to the user and ask before proceeding. Do no
 A single message structured as:
 
 ```
-## Recortte
+## Focus
 <one sentence>
 
 ## Source A — official documentation

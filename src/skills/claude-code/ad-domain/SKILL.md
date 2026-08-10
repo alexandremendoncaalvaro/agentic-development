@@ -31,17 +31,7 @@ Lazy-creation rule: do not create the file just because the skill was invoked. C
 
 ## Step 1 — Resolve the term
 
-A glossary entry has four parts:
-
-```markdown
-### <Canonical Noun>
-
-**Definition:** <one-sentence, project-specific, no general programming words>.
-
-_Avoid_: <Alias 1>, <Alias 2>. <Why each is misleading>.
-
-**Related code:** [`path/to/file.ts:42`](../path/to/file.ts:42), [`path/to/other.ts`](../path/to/other.ts).
-```
+A glossary entry has four parts — see the glossary-entry shape in [references/context-templates.md](references/context-templates.md).
 
 Resolution discipline:
 
@@ -52,24 +42,7 @@ Resolution discipline:
 
 ## Step 2 — Locate the insertion point
 
-`CONTEXT.md` has three canonical sections:
-
-```markdown
-# <Project Name> — Domain Glossary
-
-## Language
-
-<term entries here, one per `### <Term>` heading>
-
-## Relationships
-
-- A **Customer** has many **Orders**.
-- An **Order** belongs to one **Customer** and contains one or more **LineItems**.
-
-## Flagged ambiguities
-
-- "Account" vs "User" — see Issue #42; treated interchangeably in code today, separation pending [ADR-NNNN](../doc/adr/NNNN-account-user-separation.md).
-```
+`CONTEXT.md` has three canonical sections — see the CONTEXT.md layout in [references/context-templates.md](references/context-templates.md).
 
 Insert the new term alphabetically under `## Language`. If a relationship clause is implied by the new term, append it to `## Relationships`. If the resolution surfaces an ambiguity rather than closing one, append to `## Flagged ambiguities` and mark the term entry "(resolution pending)".
 
@@ -77,42 +50,9 @@ Insert the new term alphabetically under `## Language`. If a relationship clause
 
 Use `Write` for the first creation, `Edit` for subsequent updates. Preserve existing entries — never reorder or rewrite past terms while adding new ones (the file is append-shaped within sections).
 
-For first creation, the file shape is:
+For first creation, the file shape is the first-creation shape in [references/context-templates.md](references/context-templates.md).
 
-```markdown
-# <Project Name> — Domain Glossary
-
-_Lazy artifact — only contains terms that have been resolved through grilling, spec drafting, or explicit capture. Empty entries are worse than no entry; speculation belongs elsewhere._
-
-_Maintained by `/ad-domain`._
-
-## Language
-
-### <First resolved term>
-
-...
-
-## Relationships
-
-(empty until the second term resolves)
-
-## Flagged ambiguities
-
-(empty)
-```
-
-For multi-context repos, `CONTEXT-MAP.md` is the index:
-
-```markdown
-# Context Map
-
-This repository contains multiple bounded contexts. Each has its own `CONTEXT.md`.
-
-- **Ordering** — [`src/ordering/CONTEXT.md`](src/ordering/CONTEXT.md). Owns: Customer, Order, LineItem, Cancellation.
-- **Billing** — [`src/billing/CONTEXT.md`](src/billing/CONTEXT.md). Owns: Invoice, Payment, Refund.
-
-System-wide ADRs live at [`doc/adr/`](doc/adr/). Context-scoped ADRs live under each context (e.g., [`src/ordering/doc/adr/`](src/ordering/doc/adr/)).
-```
+For multi-context repos, `CONTEXT-MAP.md` is the index — see the CONTEXT-MAP shape in [references/context-templates.md](references/context-templates.md).
 
 ## Step 4 — Cross-reference adjacent layers
 

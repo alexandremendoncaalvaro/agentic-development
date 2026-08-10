@@ -21,7 +21,7 @@ Concrete tests to run before starting:
 * Are there ≥2 candidate techniques with materially different trade-offs that no source resolves? If no, this is not a spike.
 * Is end-to-end validation against expected outputs feasible without per-stage debug? If yes, this is `ad-task` + `ad-philosophy` Goal-Driven Execution territory, not a spike.
 
-If the spike is warranted, confirm with the user the *recortte* (the specific surface where uncertainty sits — not the whole feature) and proceed.
+If the spike is warranted, confirm with the user the *focus* (the specific surface where uncertainty sits — not the whole feature) and proceed.
 
 ## Step 1 — Discovery
 
@@ -30,14 +30,14 @@ List canonical approaches grounded in **official docs and real examples**. Pick 
 Candidate-listing process:
 
 1. Search official documentation for the language / library / domain in question. Cite URL + version.
-2. Search public implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists) for solutions to the same technical recortte. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and fetch via tools; never paraphrase from training memory.
+2. Search public implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists) for solutions to the same technical focus. Cite `<source>:<locator>` — `<repo>:<path>:<line-range>` for repos, `<URL>` for Stack Overflow / blog / gist — and fetch via tools; never paraphrase from training memory.
 3. Survey in-repo for analogous patterns the codebase already uses. Cite `<file>:<line>` or "no analog found".
 4. Survey git history for prior attempts at the same problem. Cite `<commit-sha>` or "no prior attempt".
 
 Output format:
 
 ```markdown
-## Discovery — <recortte>
+## Discovery — <focus>
 
 ### Candidate techniques
 1. **<name>** — <one-line description>. Source: <URL or repo:path>. Trade-offs: <pros / cons>.
@@ -176,7 +176,7 @@ When the spike concludes — either the picked technique works or it does not �
 ADR template for spike outcomes:
 
 ```markdown
-# ADR-NNNN: We will use technique X for <recortte>
+# ADR-NNNN: We will use technique X for <focus>
 
 ## Context
 
@@ -203,14 +203,14 @@ Then:
 ```bash
 rm -rf spikes/NNNN-<slug>/
 git add doc/adr/NNNN-<slug>.md
-git commit -m "feat: adopt technique X for <recortte> per spike NNNN"
+git commit -m "feat: adopt technique X for <focus> per spike NNNN"
 ```
 
 Spikes that conclude inconclusively get an ADR too — `Decision: defer; the spike at NNNN inconclusive because Y` — and the directory is deleted. Inconclusive spikes are real signal; preserving the framing in an ADR prevents re-litigation.
 
 ## Output contract
 
-A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout above (discovery README, fixtures, pipeline, debug per stage, eval results). The directory is throwaway by design — promote-or-delete lifecycle' ' No `Status: shipped` lifecycle; spikes do not "ship" — they conclude with an ADR.
+A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout above (discovery README, fixtures, pipeline, debug per stage, eval results). The directory is throwaway by design — promote-or-delete lifecycle. No `Status: shipped` lifecycle; spikes do not "ship" — they conclude with an ADR.
 
 When the host exposes `AskUserQuestion`, use it for the Step 1 selection criterion confirmation and the Step 5 promote/delete decision.
 

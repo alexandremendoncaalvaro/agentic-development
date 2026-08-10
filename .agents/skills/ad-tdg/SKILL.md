@@ -10,6 +10,8 @@ Implements WORKFLOW.md §9 (Outcome-Based Prompting / Test Dependency Map) end-t
 No file is written. The output of the skill is the verified implementation that lands in the repo through normal commits. The ground-truth pair, candidate set, selection criterion, and TDM list go into the commit message body — or the task's `Notes` log when one exists — not into a separate `doc/` artifact.
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions outcome-based prompting, ground truth, three approaches, or a Test Dependency Map, invoke this skill manually.
+
+Non-negotiables (read first): never edit the TDM tests to make them pass — they are the verification surface, and changing them while implementing is the hidden "almost right" WORKFLOW §12 names (fix a wrong test first, as its own diff); and type-check passing is not the gate — the test gate is, so do not declare done before the TDM tests are green.
 </background_information>
 
 <instructions>

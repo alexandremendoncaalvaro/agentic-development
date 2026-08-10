@@ -1,6 +1,6 @@
 ---
 name: ad-merge
-description: Evaluate and merge a GitHub pull request. Four phases — preflight (`gh` auth + PR resolution), evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings yielding to user), merge via `gh pr merge` with auto-detected mode (squash / rebase / merge) and `--delete-branch`. Helper posture' ' — surfaces warnings, does not block on the senior engineer's judgment. Triggers on "merge this PR", "evaluate the PR", "is it mergeable", "gh pr merge", "/ad-merge".
+description: Evaluate and merge a GitHub pull request. Four phases — preflight (`gh` auth + PR resolution), evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings yielding to user), merge via `gh pr merge` with auto-detected mode (squash / rebase / merge) and `--delete-branch`. Helper posture — surfaces warnings, does not block on the senior engineer's judgment. Triggers on "merge this PR", "evaluate the PR", "is it mergeable", "gh pr merge", "/ad-merge".
 summary: Evaluate and merge a GitHub pull request. Four phases — preflight, evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`.
 allowed-tools: Read, Bash, Grep
 ---
@@ -115,4 +115,4 @@ The output is a merged PR. The skill returns:
 - After merge: pull the latest base locally (`git checkout <base> && git pull`).
 - If the merge surfaced a recurring drift (no fresh-context review on multiple PRs, no linked task on several merges): `/ad-drift` to scan for systemic gaps, or update `WORKFLOW.md` §10 / §11 expectations.
 - If the merge closed a task: confirm the task file's `Status:` is `done` and the Notes log captures the merge commit URL.
-- If the merge shipped a binding decision worth recording: `/ad-adr` (three-criteria rule' ' — hard to reverse, surprising without context, real trade-off).
+- If the merge shipped a binding decision worth recording: `/ad-adr` (three-criteria rule — hard to reverse, surprising without context, real trade-off).

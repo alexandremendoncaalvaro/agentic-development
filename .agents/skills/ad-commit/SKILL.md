@@ -8,6 +8,8 @@ summary: Atomic Conventional Commits with DCO `Signed-off-by` sign-off. Four pha
 Implements ADR-0023. Drafts atomic Conventional Commits with DCO `Signed-off-by` sign-off. Helper, not blocker — the senior engineer keeps decision authority.
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions committing, staging, or signing off, invoke this skill manually.
+
+Non-negotiables (read first): DCO `Signed-off-by` on every commit, never a `Co-Authored-By` trailer (ADR-0023 §Decision 1); never bypass the hooks (`--no-verify` / `--no-gpg-sign`) — a failing hook stops the commit, so fix the cause rather than skip it.
 </background_information>
 
 <instructions>
