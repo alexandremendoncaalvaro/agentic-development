@@ -44,15 +44,7 @@ The fixture is the contract the pipeline validates against. Treat like spec text
 
 Step 3 — pipeline with gates. One technique per stage. Each stage emits a debug artifact making its output inspectable.
 
-Layout:
-```
-spikes/NNNN-<slug>/
-├── README.md          # spike framing (Step 1 output)
-├── fixtures/          # golden inputs + expected outputs
-├── pipeline/          # one file per stage (01-preprocess, 02-detect, etc)
-├── debug/             # per-stage debug artifacts (image / JSON / log row)
-└── eval/              # evaluation results (Step 4)
-```
+Layout — see the spike directory layout in [references/pipeline-layout.md](references/pipeline-layout.md).
 
 Each stage takes (input, context), returns (output, debug-record). Debug-record written to `debug/NN-<stage>/`. Pipeline halts and reports stage on first divergence.
 
@@ -60,15 +52,7 @@ Step 4 — two-layer evaluation:
 - End-to-end: pass rate against fixture inputs.
 - Per-stage: for each input, where did pipeline diverge?
 
-Output to `spikes/NNNN-<slug>/eval/results.json`:
-```
-{
-  "fixture": "fixtures/golden.json",
-  "end_to_end": { "total": 10, "passed": 7, "failed": 3 },
-  "per_stage": { "01-preprocess": { "passed": 10, "failed": 0 }, ... },
-  "failures": [{ "input": "...", "diverged_at": "02-detect", "debug_artifact": "..." }]
-}
-```
+Output to `spikes/NNNN-<slug>/eval/results.json` — see the two-layer results shape in [references/eval-format.md](references/eval-format.md).
 
 Per-stage layer is what makes the spike actionable.
 

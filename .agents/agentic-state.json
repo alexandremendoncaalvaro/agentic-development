@@ -393,8 +393,16 @@
           "sourceSha": "38d86eb524e455765dd144e0626cc6a56d9edce7f91580801bcc119758294d2a"
         },
         {
+          "path": ".agents/skills/ad-spike/references/eval-format.md",
+          "sourceSha": "0bc2de895357aab31931dcc0d341ce3608abbe6655490209fb2043557ebb5938"
+        },
+        {
+          "path": ".agents/skills/ad-spike/references/pipeline-layout.md",
+          "sourceSha": "33c1f176fd1ffe59ce28dbbd52a5e95d913a39c92c1ab8afb00707563b27c616"
+        },
+        {
           "path": ".agents/skills/ad-spike/SKILL.md",
-          "sourceSha": "64b148a3afa5726271c1685680c4782136480042617e922b00e2d3ca163d7818"
+          "sourceSha": "f22c8372256908b77cf5818056c8954975dfd159d41277f6f9cfc6b778dd13a3"
         }
       ]
     },

@@ -293,8 +293,24 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-spike/references/eval-format.md",
+          "sourceSha": "8fb50326453f58e495ac9dba4b68ef49b97662275800866c98dc8ce15561fdcd"
+        },
+        {
+          "path": ".claude/skills/ad-spike/references/fixture-example.md",
+          "sourceSha": "4d478526a6224494b6b915551ca8677bb9e9cf3cafed6a6a0ea60cc0b77f8460"
+        },
+        {
+          "path": ".claude/skills/ad-spike/references/pipeline-layout.md",
+          "sourceSha": "d353fb58812958a7cf6023cee9b8253a82ebfc497d6175ef2d136f285be4a102"
+        },
+        {
+          "path": ".claude/skills/ad-spike/references/spike-adr-template.md",
+          "sourceSha": "0075f1c430d490c3fe489e040db1d6c51a819cc979dae6c673f537854f33f74a"
+        },
+        {
           "path": ".claude/skills/ad-spike/SKILL.md",
-          "sourceSha": "c73d0933ca16700243290c38e64ec58428d4ab74f63be09f0b5b32af1eaf324a"
+          "sourceSha": "fffdf47603948d0435362e79d3595f3eb166de5d8facb34f4100c9cdbe447639"
         }
       ]
     },
@@ -303,7 +319,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-subagent/SKILL.md",
-          "sourceSha": "221ef5318d335e67d9c25c8d9fddb1cc5ae832897d5228ee44ab711ae9126bfe"
+          "sourceSha": "b425479e6d7d3a3527e88c1afbb66ad29d202f23806234f31ec1a83462c3b527"
         }
       ]
     },
