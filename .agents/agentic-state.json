@@ -103,6 +103,19 @@
         }
       ]
     },
+    "ad-derisk": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-derisk/agents/openai.yaml",
+          "sourceSha": "439ffe2d10bc83e17d46ec980ae4cc6afa0eb7a457a99ff102435bc89fae1db7"
+        },
+        {
+          "path": ".agents/skills/ad-derisk/SKILL.md",
+          "sourceSha": "bef6f0ee9dbe12f8fb0c5580f7d40347310ba1488b55692a53f7516e20ea1d5c"
+        }
+      ]
+    },
     "ad-diagnose": {
       "version": "0.20.0-beta.1",
       "files": [
@@ -164,7 +177,7 @@
         },
         {
           "path": ".agents/skills/ad-ground/SKILL.md",
-          "sourceSha": "12c199eac2ac61d3e1cf8c6511307d4c2ea9caf2634ae68da84cb8f9151ba54f"
+          "sourceSha": "757a344f13107ff3f597525c6f19d8e4efc64262bfa99b1261188d43690f9a5b"
         }
       ]
     },
@@ -286,6 +299,19 @@
         {
           "path": ".agents/skills/ad-question-me/SKILL.md",
           "sourceSha": "8b763dcb8d4ad33f77930543a3973a8b0e0578fb21a13739c32fe7429e6706d4"
+        }
+      ]
+    },
+    "ad-research": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".agents/skills/ad-research/agents/openai.yaml",
+          "sourceSha": "7ebcd503a5981bad53dfff5e179f8400051d2e9e074f5712e2aa613ed18ed8b7"
+        },
+        {
+          "path": ".agents/skills/ad-research/SKILL.md",
+          "sourceSha": "5883a3dae8ef3066aeb8abcd62672cfefcf1876fb6164580708dd0915d980e1b"
         }
       ]
     },

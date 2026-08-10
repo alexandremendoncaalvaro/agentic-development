@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-derisk
+  short_description: Pre-construction de-risking — enumerate a defined task's unknowns, retire each with the right existing skill, grade per WORKFLOW §17, and stop when residual technical risk falls below the non-technical risks.
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-research
+  short_description: Turn an open question into an evidence-graded study at doc/research/NNNN-<slug>.md (Evidence-Based loop + WORKFLOW §17 grading; graduates a binding conclusion to an ADR).
+policy:
+  allow_implicit_invocation: false

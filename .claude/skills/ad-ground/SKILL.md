@@ -1,7 +1,7 @@
 ---
 name: ad-ground
-description: Four-source pre-implementation research — official docs, validated implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists), in-repo patterns, and git history — then synthesize a happy path and gate any deviation with an irrefutable justification before code is written. Auto-invokes on non-trivial work, refactors, library or pattern selection, "research before coding", "before implementing", "which library", "which pattern", "how to approach", "ground before coding". Workflow-operational counterpart to WORKFLOW.md §4 (Find the Happy Path) and §5 (Ground in Real Patterns); pairs with ad-philosophy (posture) and ad-review (post-implementation §10 review).
-summary: Four-source pre-implementation research (docs / impl-refs / in-repo / git history) + happy-path synthesis + deviation gate. WORKFLOW §4 + §5.
+description: Four-source pre-implementation research — official docs, validated implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists), in-repo patterns, and git history — then synthesize a happy path and gate any deviation with an irrefutable justification before code is written, grading how strong the evidence is and how confident to proceed (WORKFLOW §17) and routing to ad-spike when it is insufficient. Auto-invokes on non-trivial work, refactors, library or pattern selection, "research before coding", "before implementing", "which library", "which pattern", "how to approach", "ground before coding". Workflow-operational counterpart to WORKFLOW.md §4 (Find the Happy Path) and §5 (Ground in Real Patterns); pairs with ad-philosophy (posture) and ad-review (post-implementation §10 review).
+summary: Four-source pre-implementation research (docs / impl-refs / in-repo / git history) + happy-path synthesis + deviation gate + proportional evidence grading. WORKFLOW §4 + §5 + §17.
 allowed-tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
 ---
 
@@ -45,7 +45,9 @@ The gate is prescriptive, not descriptive: WORKFLOW §4 asks "was the deviation 
 
 ## Step 4 — Confidence checkpoint
 
-Before handing off to implementation, report a soft verdict against four checks:
+Before handing off to implementation, report a soft verdict. Two modes, chosen by stakes times irreversibility.
+
+**Quick mode — the default for small, reversible scopes.** The coverage checklist:
 
 - A consulted (≥1 official-doc citation per language/library)
 - B consulted (≥1 implementation-reference citation, with cite-and-fetched code)
@@ -54,9 +56,15 @@ Before handing off to implementation, report a soft verdict against four checks:
 - Happy path declared (Step 2)
 - Deviation, if any, justified (Step 3)
 
-If any check fails, surface the gap to the user and ask before proceeding rather than blocking. The user retains the authority to skip; the discipline is in surfacing, not in enforcement.
+**Full mode — when stakes times irreversibility justify it.** Grade the evidence per WORKFLOW §17, on top of the coverage checks:
 
-When the host exposes `AskUserQuestion`, render the checkpoint as a structured multi-choice card listing the six checks with their yes/no/n.a. status plus a final `proceed / pause for more research` selector — instead of dropping the verdict as plain text. Falls back to numbered text on hosts without the primitive (Codex).
+- Seal each load-bearing claim in the happy path High / Medium / Low / Very-low (Axis 1), each with its provenance — citation, date, access method. A claim you cannot source cannot be sealed High. Where sources genuinely disagree, record the positions side by side rather than forcing a consensus.
+- Report one Axis-2 verdict for the decision: **Strong** (proceed), **Conditional** (proceed with a named mitigation), or **Insufficient / spike-first** (do not proceed; the gap is retirable by experiment). The bar for Strong scales with stakes times irreversibility.
+- An Insufficient / spike-first verdict is the handoff to `/ad-spike` (WORKFLOW §14): the technique is not yet grounded enough to build on, and a staged spike is how it gets retired.
+
+If any coverage check fails, or the full-mode Axis-2 verdict is not Strong, surface the gap to the user and ask before proceeding rather than blocking. The user retains the authority to skip; the discipline is in surfacing, not in enforcement.
+
+When the host exposes `AskUserQuestion`, render the checkpoint as a structured multi-choice card — the coverage checks with their yes/no/n.a. status, the Axis-2 verdict in full mode, and a final `proceed / pause for more research / run a spike` selector — instead of dropping the verdict as plain text. Falls back to numbered text on hosts without the primitive (Codex).
 
 ## Output contract
 
@@ -89,6 +97,7 @@ A single message structured as:
 
 ## Happy path
 <one paragraph synthesizing A + B + C + D, with citations>
+<full mode: seal each load-bearing claim High / Medium / Low / Very-low with provenance, per WORKFLOW §17; record disagreements as side-by-side positions, not a forced consensus>
 
 ## Proposed implementation vs happy path
 - aligned: <what stays canonical>
@@ -102,6 +111,7 @@ A single message structured as:
 - D checked: yes / no — <gap if no>
 - happy path declared: yes
 - deviations justified: yes / no / n.a.
+- evidence grade (full mode): <Strong | Conditional: mitigation | Insufficient: spike-first> — <one-line basis, per WORKFLOW §17>
 ```
 
 No code is written by this skill. The output feeds the next turn (or `/ad-task`, `/ad-philosophy`'s Goal-Driven Execution, or freeform implementation).
