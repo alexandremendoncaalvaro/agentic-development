@@ -60,10 +60,65 @@ test('ad-merge has a release-only mode that preserves the tagged commit', () => 
     const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-merge', 'SKILL.md'), 'utf8');
     assert.match(body, /release-only/i, `${agent} ad-merge must name its release-only mode`);
     assert.match(body, /--merge/, `${agent} ad-merge must force --merge for a release`);
-    assert.match(body, /ghp pr merge <num> --merge/, `${agent} ad-merge must use the configured GitHub wrapper`);
-    assert.match(body, /ghp repo view --json mergeCommitAllowed/, `${agent} ad-merge must use ghp for release preflight`);
+    assert.match(
+      body,
+      /<github-command> pr merge <num> --merge/,
+      `${agent} ad-merge must use its preflight GitHub frontend for a release`
+    );
     assert.match(body, /squash/i, `${agent} ad-merge must reject squash for a release`);
     assert.match(body, /rebase/i, `${agent} ad-merge must reject rebase for a release`);
+  }
+});
+
+test('GitHub workflow skills reuse their preflight frontend for every GitHub command', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    for (const skill of ['ad-pr', 'ad-merge']) {
+      const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+      assert.match(
+        body,
+        /AGENTIC_GH=<wrapper>/,
+        `${agent}/${skill} must accept the repository's executable GitHub wrapper`
+      );
+      assert.match(body, /`github\.command`/, `${agent}/${skill} must retain the preflight frontend`);
+      assert.match(body, /<github-command>/, `${agent}/${skill} must use the preflight frontend in later phases`);
+      assert.match(
+        body,
+        /<github-command> auth login/,
+        `${agent}/${skill} must recover authentication through the preflight frontend`
+      );
+      assert.match(
+        body,
+        /configured wrapper/,
+        `${agent}/${skill} must distinguish an unavailable configured wrapper from a missing CLI`
+      );
+      assert.doesNotMatch(
+        body,
+        /^gh (?:api|auth login|pr (?:create|merge|view))/m,
+        `${agent}/${skill} must not run a later GitHub command through a different frontend`
+      );
+      assert.doesNotMatch(
+        body,
+        /GH_CONFIG_DIR="\$HOME\/\.config\/gh-personal"/,
+        `${agent}/${skill} must not ship this repository's local account configuration`
+      );
+    }
+    const prBody = readFileSync(join(SKILLS_ROOT, agent, 'ad-pr', 'SKILL.md'), 'utf8');
+    assert.match(
+      prBody,
+      /<github-command> pr create --draft/,
+      `${agent}/ad-pr must retain the preflight frontend for a red draft`
+    );
+    assert.doesNotMatch(
+      prBody,
+      /`gh pr create --draft`/,
+      `${agent}/ad-pr must not suggest a red draft through a different frontend`
+    );
+    const mergeBody = readFileSync(join(SKILLS_ROOT, agent, 'ad-merge', 'SKILL.md'), 'utf8');
+    assert.match(
+      mergeBody,
+      /pullRequest\.reviews/,
+      `${agent}/ad-merge must reuse reviews returned by the preflight`
+    );
   }
 });
 

@@ -121,6 +121,13 @@ function withRepository(args, repository) {
   return repository === null ? args : [...args, '--repo', repository];
 }
 
+function repositoryViewArgs(repository) {
+  const args = ['repo', 'view'];
+  if (repository !== null) args.push(repository);
+  args.push('--json', MERGE_FIELDS);
+  return args;
+}
+
 function viewPullRequest(gh, repoRoot, env, target, errors) {
   const args = ['pr', 'view'];
   if (target) args.push(target);
@@ -162,7 +169,7 @@ function mergeReport(gh, repoRoot, env, target, errors) {
   );
   const mergeMethods = commandJson(
     gh,
-    withRepository(['repo', 'view', '--json', MERGE_FIELDS], repository),
+    repositoryViewArgs(repository),
     repoRoot,
     env,
     'gh repo merge methods',

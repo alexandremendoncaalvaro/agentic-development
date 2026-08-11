@@ -5,7 +5,7 @@ summary: Open a GitHub pull request with a uniform body shape (Summary / Test pl
 ---
 
 <background_information>
-Implements ADR-0024 and ADR-0032 (`doc/adr/0032-ci-failure-is-local-gate-gap.md`). Opens a PR via `gh pr create` with a uniform body shape (Summary / Test plan / Links). Helper posture on scope, links, and body drafting — warnings surface without refusing. Hard gate on local quality: the skill refuses to open a PR when pre-push / CI-mirror gates exit non-zero (WORKFLOW §11 — CI failure is a local gate gap). No `--no-verify` symmetric bypass; users who need to open a red draft invoke `gh pr create --draft` directly.
+Implements ADR-0024 and ADR-0032 (`doc/adr/0032-ci-failure-is-local-gate-gap.md`). Opens a PR via `gh pr create` with a uniform body shape (Summary / Test plan / Links). Helper posture on scope, links, and body drafting — warnings surface without refusing. Hard gate on local quality: the skill refuses to open a PR when pre-push / CI-mirror gates exit non-zero (WORKFLOW §11 — CI failure is a local gate gap). No `--no-verify` symmetric bypass; users who need to open a red draft invoke `<github-command> pr create --draft` directly.
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions opening a PR or submitting changes for review, invoke this skill manually.
 </background_information>
@@ -23,9 +23,11 @@ Phase 1 — preflight. Run the deterministic probe from the consumer repository 
 node .agents/skills/ad-pr/scripts/gh-preflight.mjs pr
 ```
 
-If this skill was loaded from another base directory, substitute that base. Execute it; do not re-derive its probes in prose. Its JSON reports `github` (`command`, `installed`, `authenticated`), `git` (`branch`, `upstream`, `aheadOfUpstream`), `baseBranch`, and structured `errors`. It performs read-only `gh` / `git` probes and never switches GitHub accounts. An environment may set `AGENTIC_GH` to an approved **executable** wrapper; never use `gh auth switch`.
+If this skill was loaded from another base directory, substitute that base. Execute it; do not re-derive its probes in prose. Its JSON reports `github` (`command`, `installed`, `authenticated`), `git` (`branch`, `upstream`, `aheadOfUpstream`), `baseBranch`, and structured `errors`. It performs read-only `gh` / `git` probes and never switches GitHub accounts. Before execution, consult the repository's binding docs: if they name an approved **executable** frontend wrapper, run `AGENTIC_GH=<wrapper> node .agents/skills/ad-pr/scripts/gh-preflight.mjs pr`; otherwise run the command above. Never use `gh auth switch`.
 
-If `github.installed` is false, surface: "`gh` CLI not installed. Install: https://cli.github.com/ then run `gh auth login`. This skill cannot open the PR without it." If `github.authenticated` is false, surface the same hint with `gh auth login`. Soft-fail — do not silently fall back to `git push` only. Surface every remaining `errors` entry as a partial-preflight fact; do not claim a failed probe passed.
+Let `<github-command>` be the returned `github.command`. Use exactly `<github-command>` for every later GitHub read or write in this workflow; never substitute bare `gh`, which could select a different account than the preflight.
+
+If `github.installed` is false, distinguish the failure before offering recovery: when `github.command` is not `gh`, surface: "The configured wrapper `<github-command>` is unavailable. Restore the approved executable wrapper, then rerun this skill." Do not fall back to a different frontend. Otherwise surface: "GitHub CLI not installed. Install: https://cli.github.com/, then rerun this skill." If `github.authenticated` is false, surface: "Run `<github-command> auth login`, then rerun this skill." Soft-fail — do not silently fall back to `git push` only. Surface every remaining `errors` entry as a partial-preflight fact; do not claim a failed probe passed.
 
 If `git.upstream` is null or `git.aheadOfUpstream` is greater than zero, prompt: "Branch not pushed to origin. Run `git push -u origin <branch>` first? (y/n)". On confirm, run the push and continue.
 
@@ -76,10 +78,10 @@ Rules:
 
 Surface the draft to the user for approval before opening.
 
-Phase 4 — open + report. Call `gh pr create` with HEREDOC body:
+Phase 4 — open + report. Call `<github-command> pr create` with HEREDOC body:
 
 ```
-gh pr create --title "<type>(<scope>): <subject>" --body "$(cat <<'EOF'
+<github-command> pr create --title "<type>(<scope>): <subject>" --body "$(cat <<'EOF'
 ## Summary
 - ...
 
@@ -103,7 +105,7 @@ The output is an opened PR on GitHub. The skill returns the PR URL.
 
 ## Next
 
-- After PR opens and CI starts: monitor via `gh pr checks`.
+- After PR opens and CI starts: monitor via `<github-command> pr checks`.
 - When CI is green: `ad-merge` to evaluate and merge.
 - If a fresh-context review is wanted before merge: `ad-review` (WORKFLOW §10).
 - If preflight surfaced "no CI workflow file": `ad-hooks` (when installed) covers local gates; remote CI is a separate concern outside this skill.

@@ -297,11 +297,11 @@
         },
         {
           "path": ".agents/skills/ad-merge/scripts/gh-preflight.mjs",
-          "sourceSha": "ef29165e9dece46661eda564c29fe2b287d467460b09fa2fcd667fac1267669f"
+          "sourceSha": "cefb5d2368e63ab893f4b3318bcd3df1e5a2300f4a9e7d0eea0bce6fb0f25a98"
         },
         {
           "path": ".agents/skills/ad-merge/SKILL.md",
-          "sourceSha": "1443bd1002638958b1e8b1f3682ca0c8c67ff319d1bb98f2cd0583ec663949e8"
+          "sourceSha": "7a351e35c1d4992ced7ad5779cffe100ec72a50a14c65cae8f0c61be4ef0516c"
         }
       ]
     },
@@ -344,11 +344,11 @@
         },
         {
           "path": ".agents/skills/ad-pr/scripts/gh-preflight.mjs",
-          "sourceSha": "ef29165e9dece46661eda564c29fe2b287d467460b09fa2fcd667fac1267669f"
+          "sourceSha": "cefb5d2368e63ab893f4b3318bcd3df1e5a2300f4a9e7d0eea0bce6fb0f25a98"
         },
         {
           "path": ".agents/skills/ad-pr/SKILL.md",
-          "sourceSha": "64aaff4782b45251eaa8741bc4552498e01ef35f17bee1cca015fd987ee49964"
+          "sourceSha": "24f0f2457cb3805ee0364b0c99b071b9b3d2d6bb5707c59a04413dcef91c48f3"
         }
       ]
     },

@@ -1994,7 +1994,7 @@ test('gh-preflight: a PR URL scopes checks and merge policy to its repository', 
       'pr\u0000checks\u0000https://github.com/acme/other/pull/42\u0000--json\u0000name,bucket,state,link\u0000--repo\u0000acme/other': {
         stdout: '[{"name":"test","bucket":"pass","state":"SUCCESS","link":"https://example.test/check"}]\n',
       },
-      'repo\u0000view\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed\u0000--repo\u0000acme/other': {
+      'repo\u0000view\u0000acme/other\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed': {
         stdout: '{"mergeCommitAllowed":false,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
       },
     });
