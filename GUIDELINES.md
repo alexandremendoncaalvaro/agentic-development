@@ -15,7 +15,7 @@ The codebase follows a strict two-phase split per [ADR-0002](doc/adr/0002-two-ph
 ```
 CLI (bin/agentic.js → src/index.js → src/commands/<verb>.js)
         depends on
-src/lib/ (pure helpers: detect, install, profiles, rootdoc, state)
+src/lib/ (pure helpers: detect, install, rootdoc, state)
         depends on
 src/skills/<agent>/<skill>/ (kit content — read at install time)
 ```
@@ -60,7 +60,7 @@ If a change adds complexity that doesn't directly serve the install/update/audit
 |---------|-----------|
 | Functions, variables | `camelCase` (`installSkills`, `detectMode`, `cwd`) |
 | File names | `kebab-case.js` (`agentic-state.json`, `init.js`, `update.js`) |
-| Constants | `UPPER_SNAKE_CASE` (`SCHEMA_VERSION`, `REQUIRED_SKILLS`, `KIT_ROOT`) |
+| Constants | `UPPER_SNAKE_CASE` (`SCHEMA_VERSION`, `STATE_FILE`, `KIT_ROOT`) |
 | Module-internal helpers | leading-lowercase, not exported |
 | Public API surface | named exports only — no default exports |
 
@@ -71,7 +71,7 @@ No abbreviations except established domain terms: `cli`, `cwd`, `fs`, `os`, `tty
 - **Throw `Error` (or subclass) at module boundaries.** No silent failures; no `null`/`undefined` return codes.
 - **No exception swallowing.** `try` blocks must either re-throw, surface to the caller, or log with context. `catch (e) {}` is forbidden. Exemption: filesystem existence probes (`isFile` / `isDirectory`-style helpers) may collapse a failed `stat` to `false` — the established repo idiom. A probe that *reads content* must surface the failure in its output (the resolution probe's `UNREADABLE:<code>` marker is the reference shape), never die or go silent.
 - **No `process.exit()` inside lib code.** Commands may call `process.exit(1)` on user-error paths; lib code returns / throws.
-- **Validate at boundaries.** User input (`--agent`, `--profile`) validated in command; filesystem reads in lib check existence and throw with the path on miss.
+- **Validate at boundaries.** User input (`--agent`) validated in command; filesystem reads in lib check existence and throw with the path on miss.
 
 ### 2.3 Module Surface
 
@@ -141,7 +141,7 @@ Tier is editable as the project matures (append a rationale paragraph; do not de
 
 ### 4.1 Stability
 
-- **CLI surface** (`agentic init`, `agentic update`, `agentic profile`) is versioned. Breaking changes require a major-version bump and a migration note in the release.
+- **CLI surface** (`agentic init`, `agentic update`) is versioned. Breaking changes require a major-version bump and a migration note in the release.
 - **`src/lib/` surface** is internal — change freely; downstream consumers do not depend on it.
 - **Skill SKILL.md frontmatter** (`name`, `description`, `summary`, `allowed-tools`) is a public contract — `test/skills.test.js` enforces presence and size caps.
 
@@ -236,8 +236,8 @@ Developer commits
 
 ```
         E2E (none today)         Full CLI execution against a tmp repo
-      Integration (most)         install / update / profile across tmp repos
-    Unit (some)                  Pure helpers (detect, profiles, rootdoc)
+      Integration (most)         install / update across tmp repos
+    Unit (some)                  Pure helpers (detect, install, rootdoc)
 ```
 
 The kit's nature (filesystem operations) means most tests are integration-style — they spin up a tmp dir, run the CLI, assert on resulting files.
@@ -248,11 +248,11 @@ The kit's nature (filesystem operations) means most tests are integration-style 
 
 ### 9.3 Unit Tests
 
-Pure helpers in `src/lib/` — `detect.js`, `profiles.js`, `rootdoc.js`, `state.js`. No filesystem, no subprocess. Each test under one second.
+Pure helpers in `src/lib/` — `detect.js`, `install.js`, `rootdoc.js`, `state.js`. No filesystem, no subprocess. Each test under one second.
 
 ### 9.4 Integration Tests
 
-Run `node bin/agentic.js init` / `update` / `profile` against a tmp directory. Assert on the resulting file tree, state file contents, AGENTS.md managed-section markers.
+Run `node bin/agentic.js init` / `update` against a tmp directory. Assert on the resulting file tree, state file contents, AGENTS.md managed-section markers.
 
 Fixtures live under `test/fixtures/`. Keep total fixture size minimal — under 100 KB. Generate brownfield state inline in tests when possible.
 

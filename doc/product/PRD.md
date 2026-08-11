@@ -2,7 +2,7 @@
 
 Status: accepted
 Created: 2026-05-11
-Updated: 2026-05-24
+Updated: 2026-08-11
 Owner: Alexandre Alvaro
 
 ## Product
@@ -29,7 +29,7 @@ Definitional. Tracking of whether each goal is met lives in per-feature tasks.
 
 - Install a complete artifact stack in one command (`agentic init`) — AGENTS, WORKFLOW, GUIDELINES, ARCHITECTURE, ADRs, tasks, skills.
 - Stay in sync with upstream kit changes via state-aware three-way diff (`agentic update`).
-- Scale discipline to project maturity via four profiles (`poc` / `solo` / `team` / `mature`); never pre-impose ceremony.
+- Install the full dual-host skill set without configuration; let the request and repository determine the appropriate discipline.
 - Cover both major agentic hosts identically (Claude Code + Codex CLI) via `agents.md` open standard.
 - Ship every recommended skill as a deterministic, scan-first generator that pre-fills detected fields and asks only the genuine gaps.
 - Provide an unbroken happy path across the six-layer artifact stack: Constitution → Domain → Product → Spec → Plan/Decisions → Code.
@@ -39,14 +39,14 @@ Definitional. Tracking of whether each goal is met lives in per-feature tasks.
 - **Not a vibe-coding accelerator.** The kit's posture rejects undisciplined LLM use; users who want raw generation speed are not the audience.
 - **Not a product-strategy tool.** Product framing (this PRD) is *upstream* of engineering; the kit captures it but does not generate strategy. PMs / product leads do not interact with the kit directly.
 - **Not a hosted SaaS.** CLI is offline; no network calls, no telemetry, no account. Future hosted variants are a separate product if they exist at all.
-- **Not framework-coupled.** Kit is agent-host-agnostic via `agents.md`. No IDE-plugin parity, no editor extensions in the core kit.
+- **Not an IDE-integration layer.** The core supports Claude Code and Codex today; no editor extensions or broad host-parity promise is in scope.
 - **Not opinionated about implementation language.** Skill generators produce language-aware artifacts (naming conventions, error idioms, test framework detection) but the kit itself ships as Node-only minimal CLI.
 
 ## Success Metrics
 
 Definitional. Product-level KPIs that count, and the measurement source for each. Current values are not tracked here.
 
-- **Idempotent install across all four profiles.** Source: `npm test` integration suite + `.github/workflows/test.yml` matrix (Node 20 / 22).
+- **Idempotent complete install on both hosts.** Source: `npm test` integration suite + `.github/workflows/test.yml` matrix (Node 20 / 22).
 - **Cross-host parity.** Source: `test/skills.test.js` frontmatter + manifest validation; every shipped skill installs identically for Claude Code and Codex.
 - **Documentation discipline holds in the kit itself.** Source: `/ad-drift` runs at release boundaries; zero rule-1 / rule-2 / rule-5 / rule-9 / rule-10 violations.
 - **External adoption signal.** Source: `npm view @alexandrealvaro/agentic` + GitHub Insights. No internal target before 1.0 — pre-1.0 is dogfood-mode.
@@ -54,16 +54,15 @@ Definitional. Product-level KPIs that count, and the measurement source for each
 
 ## Roadmap
 
-Multi-feature scope tiers. No status annotations — implementation tracking lives in `doc/tasks/`. Each line names a feature and the user value it carries.
+Multi-feature scope tiers. Delivered capability is listed once; pending work remains in the Next and Later tiers.
 
 - **MVP tier — Layer 1 Constitution trinity.** `ad-bootstrap` (AGENTS), `ad-guidelines` (GUIDELINES), `WORKFLOW` (kit-shipped).
 - **MVP tier — Layer 2 Domain.** `ad-domain` lazy `CONTEXT.md` lifecycle.
 - **MVP tier — Layer 3 Product.** `ad-prd` lazy `doc/product/PRD.md` lifecycle.
 - **MVP tier — Layer 4 Spec.** `ad-spec` feature-level specs at `doc/specs/`.
 - **MVP tier — Layer 5 Plan/Decisions.** `ad-architecture`, `ad-adr`, `ad-task` — ARCHITECTURE, ADRs, tasks.
-- **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill-me`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-audit`, `ad-level-up`, `ad-next`, `ad-drift`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-hooks`.
+- **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill-me`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-audit`, `ad-level-up`, `ad-next`, `ad-drift`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-release`, `ad-hooks`, `ad-handoff`, `ad-subagent`, `ad-research`, `ad-derisk`, `ad-roadmap`, and `ad-question-me`.
 - **Next tier — AGENTS ↔ GUIDELINES reciprocity automation.** `ad-bootstrap` writes pointer stubs (instead of inline rules) when `GUIDELINES.md` exists; `ad-drift` flags duplication.
-- **Next tier — Release skill (`ad-release`).** Version-bump, changelog, npm publish, GitHub release. Replaces the current manual flow.
 - **Next tier — Community-facing docs (`CONTRIBUTING.md` / `SECURITY.md`) scaffolds.** GitHub-conventional companion to `AGENTS.md`.
 - **Later tier — Per-language guideline presets.** `ad-guidelines` ships canned templates for Rust / Python / Go / TypeScript / C++ beyond the current per-language detection.
 - **Later tier — Skill eval harness.** Trajectory eval per `WORKFLOW.md` §13, applied to each shipped skill against a fixture corpus.
@@ -73,7 +72,7 @@ Multi-feature scope tiers. No status annotations — implementation tracking liv
 
 What binds across the entire product. Skip the section if none.
 
-- **Technical:** Node ≥20 (ESM, `node:util` `styleText`). Agent-host-agnostic via `agents.md` open standard; supports Claude Code and Codex today. No framework dependency in the kit (`commander` + `@clack/prompts` only).
+- **Technical:** Node ≥20 (ESM, `node:util` `styleText`). Supports Claude Code and Codex today through their native skill locations. No framework dependency in the kit (`commander` + `@clack/prompts` only).
 - **Business:** Solo maintainer; pre-1.0 beta. License: MIT. No paid tier, no telemetry, no account.
 - **Regulatory:** None today. Future hosted variants (if any) would need their own posture.
 - **Operational:** Kit content ships via `package.json#files`. Every shipped skill must pass `test/skills.test.js` (frontmatter, summary cap, manifest). No skill ships without an accepted ADR.
@@ -88,7 +87,7 @@ Deferred decisions. Each becomes a future ADR, a spec-time decision, or an expli
 - **Telemetry policy when going hosted.** If a hosted variant ships, opt-in telemetry vs strict offline. Decision deferred until a hosted variant is on the roadmap (not currently).
 - **How to measure "kit landed correctly" without telemetry.** Indirect signals (test green at install, audit clean) cover *correctness*; do not cover *fit*. Survey or community-channel signal is the open question.
 - **Whether `doc/specs/` becomes a universal artifact for the kit itself**, or work continues to be tracked exclusively as `doc/tasks/` per the existing pattern. The kit currently does not have a single feature spec — only tasks.
-  - **Resolution:** `doc/specs/` is universal for the kit going forward. Two backfilled specs (ad-handoff and two-axis ad-review) shipped and were swept into git history per `/ad-archive`; consult `git log --diff-filter=D -- doc/specs/` for the archived ledger. Future feature-level work on the kit lands a spec under `doc/specs/` before tasks decompose against it, per the `team` profile expectation. Tasks carry `Spec ref` to their parent spec.
+  - **Resolution:** `doc/specs/` is universal for the kit going forward. Two backfilled specs (ad-handoff and two-axis ad-review) shipped and were swept into git history per `/ad-archive`; consult `git log --diff-filter=D -- doc/specs/` for the archived ledger. Future feature-level work on the kit lands a spec under `doc/specs/` before tasks decompose against it. Tasks carry `Spec ref` to their parent spec.
 
 ## Related
 

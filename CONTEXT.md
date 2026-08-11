@@ -14,14 +14,6 @@ _Avoid_: "framework" (the kit prescribes nothing at runtime; it just installs fi
 
 **Related code:** [`package.json`](package.json), [`bin/agentic.js`](bin/agentic.js), [`src/skills/`](src/skills/).
 
-### Profile
-
-**Definition:** a project-maturity tier (`poc` / `solo` / `team` / `mature`) declared in the install state file. Bounds which skills auto-install and which conditional rules apply. Tiers form a monotone superset chain — `poc ⊆ solo ⊆ team ⊆ mature`.
-
-_Avoid_: "mode" (mode is detected from filesystem signals: `audit | greenfield | brownfield` — orthogonal axis); "level" (overloaded with severity); "tier" (acceptable in prose but not as the canonical noun).
-
-**Related code:** [`src/lib/profiles.js`](src/lib/profiles.js), [`src/commands/profile.js`](src/commands/profile.js).
-
 ### Workflow-operational skill
 
 **Definition:** a skill that **executes a process** rather than producing a persistent artifact. Examples: `ad-review` (runs a §10 review), `ad-commit` (drafts and writes a commit), `ad-handoff` (compacts a session), `ad-diagnose` (runs the §15 diagnosis loop), `ad-philosophy` (loads posture guardrails).
@@ -141,8 +133,7 @@ _Avoid_: "preflight script" as the canonical noun (preflight is a common *role* 
 
 ## Relationships
 
-- A **Kit** install bounds itself by a single **Profile** per agent surface (`.claude/skills/` and `.agents/skills/` each carry their own profile state).
-- A **Profile** declares which **Workflow-operational skills** and **Spec-driven skills** install universally and which install conditionally.
+- A **Kit** install materializes every bundled **Workflow-operational skill** and **Spec-driven skill** for each selected agent surface (`.claude/skills/` and `.agents/skills/`).
 - A **Fresh-context review** is implemented as a **Two-axis review** on every kit-supported host; the implementation differs per host but the noun does not.
 - A **Two-axis review** produces one or more **Review handoffs** as its audit trail.
 - A **Session handoff** and a **Review handoff** are sibling flavours of **Handoff**; they share neither path nor lifecycle. Each is owned by exactly one skill (`ad-handoff` and `ad-review` respectively).

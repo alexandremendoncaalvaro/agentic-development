@@ -60,7 +60,7 @@ Ask the user which categories to sweep. Default phrasing: "Proceed with all auto
 
 If the user adds any `Status: accepted` ADR to the removal set, run the absorption check before accepting:
 
-1. Ask the user where the decision has been absorbed. Required form: `<file>#<section-or-anchor>` or `<file>:<line>` (e.g. `ARCHITECTURE.md#data-flow`, `GUIDELINES.md§Naming`, `src/lib/profiles.js:23`).
+1. Ask the user where the decision has been absorbed. Required form: `<file>#<section-or-anchor>` or `<file>:<line>` (e.g. `ARCHITECTURE.md#data-flow`, `GUIDELINES.md§Naming`, `src/lib/install.js:23`).
 2. Extract two-to-four substance keywords from the ADR's title and Decision section (not the slug — substance). Example: ADR-0004 "File-based task tracking" → keywords `file-based`, `task tracking`, `doc/tasks`, `Markdown`.
 3. Grep the absorption target for each keyword. Require at least one keyword match.
 4. If grep fails: refuse removal. Print:

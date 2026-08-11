@@ -1,13 +1,13 @@
 ---
 name: ad-deepen
-description: Surface deepening opportunities in the codebase using the Ousterhout/Feathers vocabulary from WORKFLOW §8 (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three-phase process — explore organically, present numbered candidates with deletion-test framing, grilling loop on the chosen candidate. Pairs with `ad-drift` (audit detects drift; deepen proposes refactors). Triggers on "deepen", "refactor for depth", "shallow module", "deletion test", "two-adapters rule", "interface is the test surface", "leverage", "locality", "/ad-deepen". Profile-scoped to `team` and `mature` only — premature for `poc` and `solo` per ADR-0020 §4.
-summary: Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one. Pairs with `ad-drift`. Profile-scoped to `team` and `mature` only.
+description: Surface deepening opportunities in the codebase using the Ousterhout/Feathers vocabulary from WORKFLOW §8 (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three-phase process — explore organically, present numbered candidates with deletion-test framing, grilling loop on the chosen candidate. Pairs with `ad-drift` (audit detects drift; deepen proposes refactors). Triggers on "deepen", "refactor for depth", "shallow module", "deletion test", "two-adapters rule", "interface is the test surface", "leverage", "locality", "/ad-deepen".
+summary: Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one. Pairs with `ad-drift`.
 ---
 
 <background_information>
 Implements ADR-0020 (`doc/adr/0020-deep-modules-vocabulary.md`) — operational counterpart to the WORKFLOW §8 architectural vocabulary. Surfaces deepening opportunities and walks the user through them. Process scaffold; no primary file output.
 
-Profile scope: `team` and `mature` only. Architectural deepening is premature for ≤200-line experiments. `poc` and `solo` users do not have this skill installed; to enable deepening, re-init the project at `team` profile (`agentic profile set team`) once the codebase has stabilized enough to warrant it. Per ADR-0020 §4.
+Use this only when design friction is real: repeated behavior, callers that need a stable seam, or a module whose interface exposes too much. Architectural deepening is premature for a one-shot ≤200-line experiment. Per ADR-0020 §4.
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions deepening, shallow modules, the deletion test, or the two-adapters rule, invoke this skill manually.
 </background_information>
@@ -22,7 +22,7 @@ Step 0 — confirm regime. Deepen is for the *stable-codebase, friction-visible*
 
 Route elsewhere when:
 - The change is a one-line fix or mechanical refactor → no scaffold needed.
-- The codebase is `poc`-shaped (one-shot script, ≤200 lines, no callers): deepening is premature; ship the experiment first.
+- The codebase is a one-shot script (≤200 lines, no callers): deepening is premature; ship the experiment first.
 - The friction is a *bug*, not a *shape* — `ad-diagnose` (WORKFLOW §15).
 - The friction is a *naming/vocabulary* drift — `ad-domain`.
 - The friction is *missing context*, not module shape — `ad-grill-me`.

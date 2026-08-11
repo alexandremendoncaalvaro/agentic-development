@@ -84,10 +84,10 @@ A correct seam is one where the test exercises the real bug pattern as it occurs
 
 If no correct seam exists, that itself is the finding.
 
-To pick the right routing branch below, run from the consumer repo root: `node .agents/skills/ad-diagnose/scripts/project-signals.mjs AGENTS.md --host codex`. Use `profile.name`; default is already `team` when no state file exists. Surface every `unreadable[]` entry as a diagnosis constraint rather than silently assuming the file is absent.
+To pick the right routing branch below, run from the consumer repo root: `node .agents/skills/ad-diagnose/scripts/project-signals.mjs AGENTS.md`. Use `mode` and `stacks` only to choose relevant repo evidence and test infrastructure. Surface every `unreadable[]` entry as a diagnosis constraint rather than silently assuming the file is absent.
 
-- If the project profile is `team` or `mature`: hand off to `ad-deepen` (ADR-0020) with the specifics — the "test surface impact" line in the candidate template was made for this case.
-- If the project profile is `poc` or `solo`: `ad-deepen` is not installed (premature per ADR-0020 §4). Capture the seam gap in the commit message body and the task `Notes` log as a finding for a future deepening pass; if the project is graduating to `team`, re-init at the higher profile to enable `ad-deepen` then.
+- If the missing seam exposes load-bearing design friction: hand off to `ad-deepen` (ADR-0020) with the specifics — the "test surface impact" line in the candidate template was made for this case.
+- If the code is a one-off with no callers: capture the seam gap in the commit message body and the task `Notes` log; do not force an architectural refactor.
 
 If a correct seam exists:
 1. Turn the minimised repro into a failing test at that seam.
@@ -118,7 +118,7 @@ Each session produces:
 ## Next
 
 - After fix + regression test land: `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10.
-- If Phase 5 found no correct seam for the regression test and the profile is `team` / `mature`: `/ad-deepen` to surface the deepening opportunity that would create one. On `poc` / `solo`, capture the gap in the commit message and the task Notes — `ad-deepen` is not installed at those profiles.
+- If Phase 5 found no correct seam for the regression test and the missing seam is load-bearing: `/ad-deepen` to surface the opportunity that would create one. For a one-off with no callers, capture the gap in the commit message and task Notes instead of forcing a refactor.
 - If Phase 1 could not build a loop and the user provided a captured artifact: re-enter Phase 1 with the artifact as the loop seed.
 - If the bug turned out to be a vocabulary drift: `/ad-domain` to update `CONTEXT.md` and `/ad-drift` to scan for further drift.
 - If the bug is one of several in a related cluster: `/ad-task` to capture the cluster as a tracked task with this diagnose run cited in the Notes.

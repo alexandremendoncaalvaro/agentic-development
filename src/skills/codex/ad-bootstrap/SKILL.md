@@ -14,7 +14,7 @@ Three modes, detected from filesystem state:
 </background_information>
 
 <instructions>
-Step 0 — from the consumer repo root, run `node .agents/skills/ad-bootstrap/scripts/project-signals.mjs AGENTS.md --host codex` and parse its JSON. Its `mode` selects the filesystem-state branch above; use `stacks` to focus the manifest scan and surface every `unreadable[]` entry as a scan gap, never as an absent path. Skip Step 1 unless the mode is brownfield.
+Step 0 — from the consumer repo root, run `node .agents/skills/ad-bootstrap/scripts/project-signals.mjs AGENTS.md` and parse its JSON. Its `mode` selects the filesystem-state branch above; use `stacks` to focus the manifest scan and surface every `unreadable[]` entry as a scan gap, never as an absent path. Skip Step 1 unless the mode is brownfield.
 
 Step 1 — scan (brownfield only). Read in this order, taking the first that exists for each category:
 - Manifests: `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `Gemfile`, `composer.json`, `pubspec.yaml`.
@@ -62,8 +62,8 @@ A single `AGENTS.md` at the repo root, ≤150 lines, every line operational. No 
 
 ## Next
 
-- In `team` / `mature`: run `/ad-architecture` once load-bearing patterns emerge in the code.
-- When you scope a product (multi-feature, target user, success metrics): `/ad-prd` (Layer 3 of the six-layer artifact stack; excluded from `poc`).
+- Run `/ad-architecture` once load-bearing patterns emerge in the code.
+- When you scope a product (multi-feature, target user, success metrics): `/ad-prd` (Layer 3 of the six-layer artifact stack).
 - When you start your first feature: `/ad-spec` (Layer 4 of the six-layer artifact stack; references parent PRD for product-scope inheritance).
-- Skip both above in `poc` / `solo` until the project genuinely needs them — the WORKFLOW §1 prune principle applies.
+- Do not create artifacts before the work needs them — the WORKFLOW §1 prune principle applies.
 - `ad-philosophy` auto-loads on non-trivial work.

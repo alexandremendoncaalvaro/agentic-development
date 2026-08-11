@@ -26,7 +26,7 @@ Route elsewhere when:
 - Scope is an architectural decision → `/ad-adr`.
 - Scope is fuzzy and needs interview-before-research → `/ad-grill-me`, which can route back here once the product framing is sharp.
 
-A spike or PoC does not need a PRD — the skill is excluded from the `poc` profile. If the user is on `poc` profile and invokes `/ad-prd`, ask explicitly whether the project has graduated to `solo` or `team` before writing.
+A spike or one-off change does not need a PRD. If the user invokes `/ad-prd`, their request establishes that a durable product contract is in scope; write only the scope the work needs.
 
 ## Step 1 — Codebase-first scan
 

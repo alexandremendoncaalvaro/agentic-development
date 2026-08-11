@@ -12,7 +12,6 @@ import {
 import { fileURLToPath } from 'node:url';
 import { basename, dirname, join, relative, sep as PATH_SEP } from 'node:path';
 import { SCHEMA_VERSION } from './state.js';
-import { DEFAULT_PROFILE, validateProfile } from './profiles.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const KIT_ROOT = join(__dirname, '..', '..');
@@ -47,6 +46,18 @@ export function agentLayout(agent) {
   const layout = AGENT_LAYOUT[agent];
   if (!layout) throw new Error(`unknown agent "${agent}"`);
   return layout;
+}
+
+/**
+ * List the skills bundled for one host. Source directories are canonical, so
+ * a new dual-host skill automatically joins the default install set.
+ */
+export function bundledSkills(agent) {
+  const { sourceDir } = agentLayout(agent);
+  const root = join(KIT_ROOT, sourceDir);
+  return readdirSync(root)
+    .filter((name) => statSync(join(root, name)).isDirectory())
+    .sort();
 }
 
 function walkSkill(srcRoot) {
@@ -192,11 +203,9 @@ export async function installSkills({
   confirmReplace = async () => false,
   previousStates = {},
   kitVersion = null,
-  profile = null,
   dryRun = false,
   force = false,
 }) {
-  if (profile !== null) validateProfile(profile);
   const actions = [];
   const nextStates = {};
 
@@ -306,15 +315,10 @@ export async function installSkills({
       };
     }
 
-    // Profile resolution order: explicit `profile` arg > prior state's
-    // profile > DEFAULT_PROFILE. installSkills is the single owner of the
-    // returned nextStates' shape; callers no longer inject `profile`
-    // post-hoc per review C3 (v0.11.3).
     nextStates[agent] = {
       schemaVersion: SCHEMA_VERSION,
       kitVersion: kitVersion ?? prev?.kitVersion ?? null,
       agent,
-      profile: profile ?? prev?.profile ?? DEFAULT_PROFILE,
       skills: nextSkills,
     };
   }

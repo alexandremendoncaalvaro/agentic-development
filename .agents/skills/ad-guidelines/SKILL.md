@@ -9,13 +9,11 @@ Layer 1 Constitution trinity member. Lazy lifecycle owner of `GUIDELINES.md` at 
 
 `GUIDELINES.md` is the full reference; `AGENTS.md` is the distilled summary. Each AGENTS.md section that has detail points to the corresponding GUIDELINES.md section. The two never duplicate — `ad-drift` flags duplication as drift.
 
-Skill is excluded from `poc` profile. Universal at `solo` / `team` / `mature`.
-
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions engineering guidelines, code standards, SOLID, Object Calisthenics, testing strategy, or security policy, invoke this skill manually.
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when the user wants to scope or update project-level engineering standards: new project past poc, existing rules buried in AGENTS.md, stack change, Object Calisthenics tier review.
+Step 0 — confirm regime. Run when the user wants to scope or update project-level engineering standards: new project, existing rules buried in AGENTS.md, stack change, Object Calisthenics tier review.
 
 Route elsewhere when:
 
@@ -25,7 +23,7 @@ Route elsewhere when:
 - Scope is one binding decision → `ad-adr`.
 - Scope is wiring the gates → `ad-hooks`.
 
-Step 1 — codebase-first scan. From the consumer repo root, first run `node .agents/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md --host codex` and parse its JSON. `stacks` narrows the manifest reads below and `profile.name` supplies the strictness default. Surface every `unreadable[]` entry as a scan gap, never as an absent path. Before any preference question, detect:
+Step 1 — codebase-first scan. From the consumer repo root, first run `node .agents/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md` and parse its JSON. `stacks` narrows the manifest reads below. Surface every `unreadable[]` entry as a scan gap, never as an absent path. Before any preference question, detect:
 
 Language and toolchain:
 - `package.json` → JS/TS; read engines, scripts, deps, devDeps.
@@ -49,7 +47,7 @@ Existing standards:
 
 Canonical examples: for brownfield projects, identify candidate source files that future agents should imitate. Prefer one boundary example, one core/domain function, and one test. Record paths only, never pasted snippets. If no representative code exists, omit the section until the project has examples worth copying.
 
-Profile: use `profile.name` from the detector. It shapes strictness defaults (mature → strict Object Calisthenics by default; solo → loose).
+Project posture: derive strictness from existing code, delivery risk, and stated constraints — never from installer metadata. A disposable experiment may need only a light baseline; long-lived or safety-sensitive code needs explicit, enforceable standards.
 
 Only after the scan produces no answer does the skill ask. Asking about something the repo already states wastes the user's attention.
 
@@ -74,7 +72,7 @@ Step 3 — interview to fill preference questions. One question at a time. Skip 
 
 3.1 Project tradeoff statement. One sentence. Suggest from signals; user confirms or supplies.
 
-3.2 Object Calisthenics tier. Three-choice. Default per profile (poc N/A; solo loose; team moderate; mature strict).
+3.2 Object Calisthenics tier. Three-choice. Reuse the existing tier when one exists. Otherwise suggest Moderate for code expected to live beyond an experiment; suggest Loose only for explicitly disposable work; choose Strict only when the project requires it.
 
 - Loose: rules 6, 7 relaxed, 1 as guideline.
 - Moderate: loose + rules 2, 3, 4.
@@ -115,5 +113,5 @@ Step 6 — editing guidance for later turns. Tier change → update §3.1 checke
 - Side-effect (optional, user-confirmed): `AGENTS.md` engineering sections rewritten as pointer stubs to `GUIDELINES.md`.
 - No dates inside narrative prose; the file is project-state, not a decision-record artifact.
 
-Next: invoke `ad-hooks` to wire the quality gates this file describes (team/mature); invoke `ad-bootstrap` to refresh AGENTS.md with pointer-style sections; invoke `ad-adr` when a binding decision arises the guidelines do not yet cover; periodic drift via `ad-drift`.
+Next: invoke `ad-hooks` when the project needs executable quality gates; invoke `ad-bootstrap` to refresh AGENTS.md with pointer-style sections; invoke `ad-adr` when a binding decision arises the guidelines do not yet cover; periodic drift via `ad-drift`.
 </output_contract>
