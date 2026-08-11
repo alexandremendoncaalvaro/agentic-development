@@ -66,7 +66,7 @@ Multi-feature scope tiers. Delivered capability is listed once; pending work rem
 - **Next tier — Community-facing docs (`CONTRIBUTING.md` / `SECURITY.md`) scaffolds.** GitHub-conventional companion to `AGENTS.md`.
 - **Later tier — Per-language guideline presets.** `ad-guidelines` ships canned templates for Rust / Python / Go / TypeScript / C++ beyond the current per-language detection.
 - **Later tier — Skill eval harness.** Trajectory eval per `WORKFLOW.md` §13, applied to each shipped skill against a fixture corpus.
-- **Later tier — Promotion to `main` + 1.0 release.** `cli` branch graduates when MVP feature surface is complete, audit reports clean across own dogfood, and pre-1.0 gaps (lint/format wiring, secret-scan, dep-audit per `GUIDELINES.md` §7 and §12) are closed.
+- **Later tier — 1.0 release readiness.** `main` is the sole development branch. A 1.0 release requires the MVP feature surface, clean own-dogfood audit reports, and closure of the pre-1.0 gaps (lint/format wiring, secret-scan, dep-audit per `GUIDELINES.md` §7 and §12).
 
 ## Constraints
 

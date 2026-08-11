@@ -56,6 +56,15 @@ Open design questions (resolve in the joint grill/spec):
 3. HTML output path: inline the artifact conventions vs a bundled scaffold in references/.
 4. Naming: working name `ad-report`; weigh alternatives in grill.
 
+### 2026-08-11 — installation-plan correction
+
+The Plan line that says to register the skill in `src/lib/profiles.js` is
+obsolete. Profiles were retired: every directory under
+`src/skills/<host>/` now installs for that host. When this task is built, add
+the dual-host source directories, refresh dogfood with
+`node bin/agentic.js update --yes`, and rely on the existing source-set parity
+tests; do not recreate a profile registry.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

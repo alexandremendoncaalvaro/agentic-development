@@ -64,6 +64,15 @@ User idea: give the publication skill an **auto-trigger / proactive nudge**, the
 
 User refined: this is TWO separate skills. This task (0041) is the **publication** skill — outward-facing text into a collaboration surface (issue proposal, PR comment, board comment). Standalone **reports** of a study / analysis / initiative (often HTML) are their own skill, split out to **task 0042** (working name `ad-report`). The two share the same DNA — ground in the best examples (user's own + team's), optional external niche research, same-or-better, BLUF + diagrams, and ONE curated exemplar/template library with per-type entries — so design them together (grill/spec) even though they ship as two skills.
 
+### 2026-08-11 — installation-plan correction
+
+The Plan line that says to register the skill in `src/lib/profiles.js` is
+obsolete. Profiles were retired: every directory under
+`src/skills/<host>/` now installs for that host. When this task is built, add
+the dual-host source directories, refresh dogfood with
+`node bin/agentic.js update --yes`, and rely on the existing source-set parity
+tests; do not recreate a profile registry.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
