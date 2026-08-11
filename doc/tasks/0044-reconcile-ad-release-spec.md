@@ -75,6 +75,11 @@ The local gate passed with 579 tests and 0 failures. The final two-axis
 proposed for the maintainer-owned dist-tag decision, so this closure does not
 claim the release specification is shipped.
 
+### 2026-08-11 — merged
+
+Merged through [PR #96](https://github.com/alexandremendoncaalvaro/agentic-development/pull/96)
+as commit [`6d8bd72`](https://github.com/alexandremendoncaalvaro/agentic-development/commit/6d8bd72d54e71bd166d30f8aee371cb983ebb483).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
