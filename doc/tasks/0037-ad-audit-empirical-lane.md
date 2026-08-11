@@ -1,6 +1,6 @@
 # task-0037: ad-audit empirical-falsification lane (ADR-0052, C4)
 
-**Status:** in-progress
+**Status:** done
 **Date:** 2026-08-07
 
 ## Goal
@@ -17,9 +17,9 @@ Grounded against the current `ad-audit` on `main` (not memory — the skill move
 - [x] Dogfood refresh (`node bin/agentic.js update --yes`) — installed `.claude/skills` + `.agents/skills` copies and the two installed briefs synced byte-identical (parity test green).
 - [x] `CHANGELOG.md` `[Unreleased]` entry.
 - [x] Structural test: both hosts' `ad-audit` name the lane; `npm test` green.
-- [ ] `/ad-review` (fresh context) on the diff.
-- [ ] `/ad-audit` (Alê's mandatory final gate for this piece) on the diff; resolve/refute findings with evidence.
-- [ ] Flip ADR-0052 to `accepted` on Alê's OK; open the PR via `ghp` against `main`.
+- [x] `/ad-review` (fresh context) on the diff.
+- [x] `/ad-audit` (Alê's mandatory final gate for this piece) on the diff; resolve/refute findings with evidence.
+- [x] Flip ADR-0052 to `accepted` on Alê's OK; open the PR via `ghp` against `main`.
 
 ## Notes
 
@@ -28,3 +28,7 @@ Grounded against the current `ad-audit` on `main` (not memory — the skill move
 Renumbering is the fiddly part: the two hosts number their steps differently (claude-code aggregate = Step 6; codex aggregate = Step 7), so the lane lands at a different integer per host (6 vs 7). Done by descending blanket renumber (8→9, 7→8, then 6→7 on claude-code only) to avoid double-shift, then insert, then grep-verify the sequence and ref tally on both. The final `/ad-audit` is the safety net for any renumber drift.
 
 The `PROJECTION.md` count invariant trips on every `proposed`-ADR commit (the test wants count == file count, the prose assumes all accepted). ADR-0052 was counted 27→28 with a "proposed — not yet binding" note. Flagged as recurring friction of the normal `/ad-adr` flow; a fix to that feature is separate.
+
+### 2026-08-10 — reconciliation
+
+The lane was completed and merged in PR #77 (`84fc6fe`). The implementation commit is `1f8bc12`; the mandatory `/ad-audit` findings were resolved in `b7f61c8`; ADR-0052 was ratified accepted in `d0f4d06` before the PR merged. The current sources, reviewer briefs, dogfood copies, and structural regression tests still carry the lane, and the full suite now passes 572/572. The stale checklist was clerical, so this task is closed rather than reopened.

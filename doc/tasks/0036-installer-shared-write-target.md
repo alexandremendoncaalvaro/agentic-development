@@ -1,6 +1,6 @@
 # task-0036: Installer detects a shared write target (ADR-0051)
 
-**Status:** in-progress
+**Status:** done
 **Date:** 2026-08-06
 
 ## Goal
@@ -26,7 +26,7 @@ Implement [ADR-0051](../adr/0051-installer-shared-write-target-detection.md). To
 - [x] Regression pin for the originating incident: a fixture repository with a tracked `AGENTS.md` where `init -y` leaves that file unmodified. This is the same test as the first-slice refusal above — the incident and the acceptance criterion are one assertion, not two.
 - [x] `CHANGELOG.md` `[Unreleased]` entry per the ADR-0048 changelog gate, kept current on each slice rather than written once at the end.
 - [x] `AGENTS.md` Gotchas and `ARCHITECTURE.md` patterns/helpers updated for the git-aware installer.
-- [ ] `npm test` green at the end of the task; `node bin/agentic.js update --yes` only if skill source changed (it has not — this task is installer code); `/ad-review main..HEAD` before the PR.
+- [x] `npm test` green at the end of the task; `node bin/agentic.js update --yes` only if skill source changed (it has not — this task is installer code); `/ad-review main..HEAD` before the PR.
 
 ## Notes
 
@@ -81,3 +81,7 @@ Integrated onto the stabilized `main` (renumber ADR-0051 / task-0036, CHANGELOG 
 Fixed here: `kitExcludeCandidates` (new, exported, unit-tested) scopes the offer to the agent surface (`.claude/`, `.agents/`, `.codex/`) via `AGENT_SURFACE_PREFIXES`; root kit-docs are outside the sweep, guarded instead by `installKitDocs`'s own report-and-skip. `ARCHITECTURE.md` corrected to state the scope. Suite 405/403/0.
 
 Re-review Notes not fixed (recorded, not lost): `cwd === homedir()` strict-string compare could misfire on a symlinked home (cosmetic — suppresses one summary line, no data safety); the `offerKitExclude` doc-comment's "freshly-installed" wording was tightened. The C5b coupling (`offerKitExclude` in `init.js`, imported by `update.js`) remains the deferred follow-up.
+
+### 2026-08-10 — reconciliation
+
+This task's implementation was already merged by PR #75 (`a129b01`, `feat(installer): detect shared write targets and refuse to guess (ADR-0051)`). Its deferred C5b extraction then merged separately in PR #76, as this task's Notes anticipated. The missing task closure was clerical: the tracked-root-doc guard, the bounded exclude offer, and their regression tests are present on `main`; the current full suite passed 572/572. The reviewed implementation and its accepted ADR therefore meet this task's completion criteria.
