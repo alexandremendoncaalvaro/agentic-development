@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-`@alexandrealvaro/agentic` — a CLI + manual-prompt kit that bootstraps and audits AGENTS.md, ARCHITECTURE.md, ADRs, tasks, skills, and subagents for engineering production code with LLMs.
+`@alexandrealvaro/agentic` — a CLI + Agent Skills kit that bootstraps and audits AGENTS.md, ARCHITECTURE.md, ADRs, tasks, skills, and subagents for engineering production code with LLMs.
 
 **Quality bar:** docs read primarily by agents must be agent-comprehensible (terse, structured, no fluff); docs read by humans must be readable. Code: simple, secure, mature — right-sized for a CLI, no over-engineering.
 
@@ -54,8 +54,6 @@ src/skills/<agent>/<skill>/          skill source — copied into target's
                                      .claude/skills/ or .agents/skills/ at install
 scripts/                             repo-only release + hook tooling (ADR-0048);
                                      never shipped to npm
-templates/                           manual templates shipped to npm
-prompts/                             manual paste-into-agent prompts shipped to npm
 test/*.test.js                       unit + integration suite (node:test)
 CHANGELOG.md                         release record (Keep a Changelog), rotated
                                      only by scripts/release.sh
@@ -92,7 +90,7 @@ See [`GUIDELINES.md`](GUIDELINES.md) §12 for the full reference. Non-negotiable
 
 Real traps confirmed in code or ADRs.
 
-* **Kit content ships via `package.json#files`.** Adding a directory under `src/skills/`, `templates/`, or `prompts/` does nothing for npm consumers unless its top-level dir is listed. Verify with `npm pack --dry-run` after touching the file list.
+* **Kit content ships via `package.json#files`.** Adding a directory under `src/skills/` does nothing for npm consumers unless its top-level dir is listed. Verify with `npm pack --dry-run` after touching the file list.
 * **ESM only.** `"type": "module"` — `require()` will crash. Use `import`. Built-ins via `node:` prefix.
 * **Skill source is read at install time** from disk via `src/lib/install.js` (`KIT_ROOT` resolves up two from `src/lib/`). Moving `src/lib/install.js` breaks that path.
 * **`detectMode` ignores dotfiles + a fixed `TRIVIAL_ENTRIES` set** (`src/lib/detect.js`). Adding a new "trivial" file (e.g., `.editorconfig`) without updating that set will misclassify a project as `brownfield`.

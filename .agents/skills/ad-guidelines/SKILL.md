@@ -25,7 +25,7 @@ Route elsewhere when:
 - Scope is one binding decision → `ad-adr`.
 - Scope is wiring the gates → `ad-hooks`.
 
-Step 1 — codebase-first scan. Before any preference question, detect:
+Step 1 — codebase-first scan. From the consumer repo root, first run `node .agents/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md --host codex` and parse its JSON. `stacks` narrows the manifest reads below and `profile.name` supplies the strictness default. Surface every `unreadable[]` entry as a scan gap, never as an absent path. Before any preference question, detect:
 
 Language and toolchain:
 - `package.json` → JS/TS; read engines, scripts, deps, devDeps.
@@ -49,7 +49,7 @@ Existing standards:
 
 Canonical examples: for brownfield projects, identify candidate source files that future agents should imitate. Prefer one boundary example, one core/domain function, and one test. Record paths only, never pasted snippets. If no representative code exists, omit the section until the project has examples worth copying.
 
-Profile: read `.claude/agentic-state.json` / `.agents/agentic-state.json`. Profile shapes strictness defaults (mature → strict Object Calisthenics by default; solo → loose).
+Profile: use `profile.name` from the detector. It shapes strictness defaults (mature → strict Object Calisthenics by default; solo → loose).
 
 Only after the scan produces no answer does the skill ask. Asking about something the repo already states wastes the user's attention.
 

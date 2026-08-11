@@ -24,8 +24,6 @@ import { pathToFileURL } from 'node:url';
 const WATCHED_PREFIXES = [
   'src/',
   'bin/',
-  'templates/',
-  'prompts/',
   'WORKFLOW.md',
   'WORKFLOW-FLOWS.md',
 ];

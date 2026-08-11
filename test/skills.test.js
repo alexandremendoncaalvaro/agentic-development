@@ -60,10 +60,65 @@ test('ad-merge has a release-only mode that preserves the tagged commit', () => 
     const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-merge', 'SKILL.md'), 'utf8');
     assert.match(body, /release-only/i, `${agent} ad-merge must name its release-only mode`);
     assert.match(body, /--merge/, `${agent} ad-merge must force --merge for a release`);
-    assert.match(body, /ghp pr merge <num> --merge/, `${agent} ad-merge must use the configured GitHub wrapper`);
-    assert.match(body, /ghp repo view --json mergeCommitAllowed/, `${agent} ad-merge must use ghp for release preflight`);
+    assert.match(
+      body,
+      /<github-command> pr merge <num> --merge/,
+      `${agent} ad-merge must use its preflight GitHub frontend for a release`
+    );
     assert.match(body, /squash/i, `${agent} ad-merge must reject squash for a release`);
     assert.match(body, /rebase/i, `${agent} ad-merge must reject rebase for a release`);
+  }
+});
+
+test('GitHub workflow skills reuse their preflight frontend for every GitHub command', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    for (const skill of ['ad-pr', 'ad-merge']) {
+      const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+      assert.match(
+        body,
+        /AGENTIC_GH=<wrapper>/,
+        `${agent}/${skill} must accept the repository's executable GitHub wrapper`
+      );
+      assert.match(body, /`github\.command`/, `${agent}/${skill} must retain the preflight frontend`);
+      assert.match(body, /<github-command>/, `${agent}/${skill} must use the preflight frontend in later phases`);
+      assert.match(
+        body,
+        /<github-command> auth login/,
+        `${agent}/${skill} must recover authentication through the preflight frontend`
+      );
+      assert.match(
+        body,
+        /configured wrapper/,
+        `${agent}/${skill} must distinguish an unavailable configured wrapper from a missing CLI`
+      );
+      assert.doesNotMatch(
+        body,
+        /^gh (?:api|auth login|pr (?:create|merge|view))/m,
+        `${agent}/${skill} must not run a later GitHub command through a different frontend`
+      );
+      assert.doesNotMatch(
+        body,
+        /GH_CONFIG_DIR="\$HOME\/\.config\/gh-personal"/,
+        `${agent}/${skill} must not ship this repository's local account configuration`
+      );
+    }
+    const prBody = readFileSync(join(SKILLS_ROOT, agent, 'ad-pr', 'SKILL.md'), 'utf8');
+    assert.match(
+      prBody,
+      /<github-command> pr create --draft/,
+      `${agent}/ad-pr must retain the preflight frontend for a red draft`
+    );
+    assert.doesNotMatch(
+      prBody,
+      /`gh pr create --draft`/,
+      `${agent}/ad-pr must not suggest a red draft through a different frontend`
+    );
+    const mergeBody = readFileSync(join(SKILLS_ROOT, agent, 'ad-merge', 'SKILL.md'), 'utf8');
+    assert.match(
+      mergeBody,
+      /pullRequest\.reviews/,
+      `${agent}/ad-merge must reuse reviews returned by the preflight`
+    );
   }
 });
 
@@ -351,7 +406,11 @@ test('both audit-group-reviewer briefs forbid mutation and hand the lane trigger
 // A skill script (scripts/ beside SKILL.md) is host-agnostic executable code:
 // both hosts must ship it, byte-identical, so the copy-drift that motivated
 // task-0031 (inline probe blocks maintained per host) cannot re-enter through
-// the scripts/ door.
+// the scripts/ door. ADR-0057 Decision 3 permits one named exception: global
+// rules resolution is host-divergent because each host's own path must win.
+const HOST_DIVERGENT_SCRIPTS = new Set([
+  'ad-rules/scripts/resolve-global-rules.mjs',
+]);
 
 function listSkillScripts(agent) {
   const out = new Map();
@@ -365,7 +424,7 @@ function listSkillScripts(agent) {
   return out;
 }
 
-test('skill scripts: both hosts ship the same script set, byte-identical', () => {
+test('skill scripts: matching sets, byte-identical except documented host divergence', () => {
   const claude = listSkillScripts('claude-code');
   const codex = listSkillScripts('codex');
   assert.deepEqual(
@@ -375,7 +434,21 @@ test('skill scripts: both hosts ship the same script set, byte-identical', () =>
   );
   for (const [rel, claudePath] of claude) {
     const same = readFileSync(claudePath).equals(readFileSync(codex.get(rel)));
+    if (HOST_DIVERGENT_SCRIPTS.has(rel)) continue;
     assert.ok(same, `${rel}: claude-code and codex copies must be byte-identical`);
+  }
+});
+
+test('ad-rules global resolution is the sole documented host-divergent script', () => {
+  const claude = listSkillScripts('claude-code');
+  const codex = listSkillScripts('codex');
+  for (const rel of HOST_DIVERGENT_SCRIPTS) {
+    assert.ok(claude.has(rel), `Claude Code must ship ${rel}`);
+    assert.ok(codex.has(rel), `Codex must ship ${rel}`);
+    assert.ok(
+      !readFileSync(claude.get(rel)).equals(readFileSync(codex.get(rel))),
+      `${rel} must keep its intentional host-specific priority order`
+    );
   }
 });
 

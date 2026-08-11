@@ -9,8 +9,6 @@
   "files": [
     "bin/",
     "src/",
-    "templates/",
-    "prompts/",
     "WORKFLOW.md",
     "WORKFLOW-FLOWS.md",
     "README.md",

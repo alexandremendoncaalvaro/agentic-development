@@ -21,18 +21,11 @@ Route elsewhere when:
 
 Step 1 — resolve the host's global rules. This is the primary target and the reason the skill exists.
 
-Check the canonical per-host locations. Resolve symlinks with `-f` and report both ends — a global `CLAUDE.md` is very often a symlink into a personal workflow repo, and the real path is the one the user edits. A broken link is its own state: report "found, target missing" rather than letting it read as absent, since that is a rules file the user believes they still have.
+Run from the consumer repo root: `node .agents/skills/ad-rules/scripts/resolve-global-rules.mjs`.
 
-```bash
-for p in ~/.codex/AGENTS.md ~/.codex/instructions.md ~/.claude/CLAUDE.md ~/.claude/AGENTS.md; do
-  if [ -L "$p" ]; then
-    if [ -e "$p" ]; then echo "LINK   $p -> $(readlink -f "$p")"
-    else echo "BROKEN $p -> $(readlink "$p") (target missing)"; fi
-  elif [ -e "$p" ]; then
-    echo "FILE   $p"
-  fi
-done
-```
+If this skill is loaded from a different base directory, substitute that installed skill directory for `.agents/skills/ad-rules` in the command.
+
+Parse its JSON. `primary` is the first readable file in Codex's canonical priority order; `sources` reports every found file, including `symlink` entries with both `path` and `resolvedPath`. A `broken-symlink` is "found, target missing", not absent. Surface every `unreadable[]` entry; never collapse it into an absent source.
 
 If none resolves, search for a practitioner file under the names these carry in the wild — `AGENTS.<initials>.md`, `AGENTS.global.md`, `CLAUDE.md`, `rules.md` — and present what you found for the user to pick. Never assume the first hit is theirs; always name a file outside the repo before opening it:
 
@@ -41,7 +34,7 @@ find "$HOME" -maxdepth 4 \( -iname 'AGENTS*.md' -o -iname 'CLAUDE.md' \) \
   -not -path '*/node_modules/*' -not -path '*/.git/*' 2>/dev/null | head -20
 ```
 
-When more than one canonical path resolves, the first in the list above wins — this host's own file — and the others are reported as also-present rather than merged. An absent global layer is a valid state, not an error. Say so plainly rather than manufacturing a source.
+When more than one canonical path resolves, `primary` wins — this host's own file has priority — and the others are reported as also-present rather than merged. An absent global layer is a valid state, not an error. Say so plainly rather than manufacturing a source.
 
 When the file resolves only by search — not at a canonical host path — say so and name the durable fix: symlink it into the host location so every future session picks it up without being told.
 

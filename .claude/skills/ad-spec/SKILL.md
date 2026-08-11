@@ -11,7 +11,7 @@ Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: `dr
 
 ## Step 1 — Determine NNNN and slug
 
-List `doc/specs/`. NNNN = next available 4-digit number after the highest existing (mirrors the ADR and task conventions). If `doc/specs/` does not exist, create it; start at `0001`. Slug: kebab-case, ≤6 words, derived from the feature title.
+Run `node .claude/skills/ad-spec/scripts/next-number.mjs doc/specs` from the consumer root. Use JSON `next` as NNNN; it preserves archived gaps. If `unreadable` is non-empty, stop until access is resolved; if `exhausted` is true, stop for a numbering decision. If loaded elsewhere, substitute the skill base path. Slug: kebab-case, ≤6 words, derived from the feature title.
 
 ## Step 2 — Confirm scope
 

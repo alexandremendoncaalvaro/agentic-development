@@ -84,7 +84,7 @@ A correct seam is one where the test exercises the real bug pattern as it occurs
 
 If no correct seam exists, that itself is the finding.
 
-To pick the right routing branch below, determine the current profile: read `.agents/agentic-state.json` (or `.claude/agentic-state.json` for Claude Code installs) and inspect the `profile` field. Default to `team` if the file is absent.
+To pick the right routing branch below, run from the consumer repo root: `node .agents/skills/ad-diagnose/scripts/project-signals.mjs AGENTS.md --host codex`. Use `profile.name`; default is already `team` when no state file exists. Surface every `unreadable[]` entry as a diagnosis constraint rather than silently assuming the file is absent.
 
 - If the project profile is `team` or `mature`: hand off to `ad-deepen` (ADR-0020) with the specifics — the "test surface impact" line in the candidate template was made for this case.
 - If the project profile is `poc` or `solo`: `ad-deepen` is not installed (premature per ADR-0020 §4). Capture the seam gap in the commit message body and the task `Notes` log as a finding for a future deepening pass; if the project is graduating to `team`, re-init at the higher profile to enable `ad-deepen` then.

@@ -21,7 +21,16 @@ Confirm both tiers are in scope. If the user wants only one, scaffold only that 
 
 Visual / E2E for UI projects (Cypress, Playwright) live in CI, not pre-push. Out of scope.
 
-Step 1 — detect the runner. Read repo signals in this order:
+Step 1 — detect the runner. Run the deterministic detector from the consumer repository root:
+
+```bash
+node .agents/skills/ad-hooks/scripts/detect-hooks.mjs
+```
+
+If this skill was loaded from a different base directory, substitute that base; the bundled script is `scripts/detect-hooks.mjs`. Execute it; do not read it as prose. Its JSON reports `stacks`, `runners`, `prePush` (`files`, gate `commands`), `ci` (`files`, gate `commands`, `matrices`), raw textual `drift.ciOnlyCommands`, and `unreadable`. A non-empty `unreadable` means the scan is partial; name those paths instead of treating them as absent.
+
+Use its facts in this order:
+
 1. Existing runner. `.husky/` → Husky. `lefthook.yml` or `.lefthook.yml` → lefthook. `.pre-commit-config.yaml` → pre-commit. `.git/hooks/` with non-sample scripts → native hooks.
 2. Stack signals (if no runner present). `package.json` → recommend Husky or lefthook. `pyproject.toml` → recommend pre-commit. `go.mod` → recommend lefthook. `Cargo.toml` → recommend lefthook. Multiple stacks → recommend lefthook (cross-language by default).
 3. No signals. Recommend native `.git/hooks/` only as fallback. Warn the user that native hooks are not portable across clones.
@@ -36,12 +45,11 @@ Step 3 — scaffold the runner config. Write the runner-specific config file usi
 
 Step 4 — update `AGENTS.md` Quality Gates. Append or refresh the section with: pre-commit gate list, pre-push gate list, runner name + config path, bootstrap command, CI status if known, no-bypass policy. Honor existing managed markers if `ad-bootstrap` already wrote Quality Gates.
 
-Step 5 — mirror CI locally. WORKFLOW §11: "CI failure is a local gate gap." Read the CI config and compare:
-1. Detect CI surface in order: `.github/workflows/*.yml`, `.gitlab-ci.yml`, `.circleci/config.yml`, `azure-pipelines.yml`, `.buildkite/pipeline.yml`. If none, note the gap and skip — mirror check has no target.
-2. Extract CI commands from `run:` / `script:` steps — test / lint / typecheck / build. Skip checkout, setup, cache, publish.
-3. Extract CI matrix — language versions, OS runners, feature flags. These become pre-push matrix requirements when they change the failure surface.
-4. Diff against pre-push. For each CI command not covered locally, warn: `CI runs <cmd> — pre-push does not. Add to pre-push or CI will catch what local won't.` For each matrix dimension CI covers that pre-push does not, warn: `CI matrix <dim>=<values>, pre-push runs <value>.`
-5. Offer to close the gap. Propose specific edits to the runner config; ask the user before writing (matrix mirroring can be expensive).
+Step 5 — mirror CI locally. WORKFLOW §11: "CI failure is a local gate gap." The detector already performed the deterministic scan; do not re-derive it in prose.
+1. CI surface and commands. `ci.files` is the detected CI surface; when it is empty, note the gap and stop this step. `ci.commands` contains test / lint / typecheck / build-like `run:` / `script:` commands; `prePush.commands` contains the corresponding local gate commands.
+2. Matrix. `ci.matrices` contains inline CI matrix dimensions. Compare them with the actual local runtime the pre-push hook uses; a script cannot infer a developer's installed version. For each meaningful missing dimension, warn: `CI matrix <dim>=<values>, pre-push runs <value>. Failures under <missing-value> will only surface in CI.`
+3. Command drift. `drift.ciOnlyCommands` is an exact-text diff. For each command with no wrapper evidence, warn: `CI runs <cmd> — pre-push does not. Add to pre-push or CI will catch what local won't.` A wrapper may be semantically equivalent while spelling the command differently; inspect and state that evidence rather than claiming a gap from raw text alone.
+4. Offer to close the gap. Propose specific edits to the runner config; ask the user before writing (matrix mirroring can be expensive).
 
 Step 6 — tell the user the bootstrap command. Output the exact one-line command the user runs. The skill does not execute it.
 </instructions>

@@ -38,7 +38,7 @@ Create the spike directory:
 ```
 mkdir -p spikes/NNNN-<slug>/{fixtures,debug,eval}
 ```
-NNNN = next 4-digit number after highest existing under `spikes/`.
+Get NNNN by running `node .agents/skills/ad-spike/scripts/next-number.mjs spikes` from the consumer root. Use JSON `next`; archived gaps stay unused. Stop until access is resolved when `unreadable` is non-empty, and stop for a numbering decision when `exhausted` is true. If loaded elsewhere, substitute the skill base path.
 
 The fixture is the contract the pipeline validates against. Treat like spec text — should not change once the spike runs unless ground truth changes.
 

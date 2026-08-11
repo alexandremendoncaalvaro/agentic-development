@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { chmodSync, mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync, mkdirSync, existsSync, symlinkSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -1349,6 +1349,992 @@ test('find-terminal: a present-but-unreadable candidate is surfaced in `unreadab
     } catch {
       /* ignore */
     }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- ad-hooks deterministic detector (ADR-0057, P2.4) ----------------------
+// The Claude Code copy is executed; test/skills.test.js enforces that the
+// Codex copy is byte-identical. The detector reports low-freedom facts only;
+// runner choice and gate edits stay in the skill body.
+const HOOKS = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-hooks',
+  'scripts',
+  'detect-hooks.mjs'
+);
+
+function runHooksDetector(cwd) {
+  const out = execFileSync('node', [HOOKS], { cwd, encoding: 'utf8', env: process.env });
+  return JSON.parse(out);
+}
+
+test('detect-hooks: reports stack, runner, CI/pre-push commands, and uncovered CI work', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-detector-'));
+  try {
+    writeFileSync(join(dir, 'package.json'), '{"name":"fixture"}\n');
+    writeFileSync(
+      join(dir, 'lefthook.yml'),
+      [
+        'pre-push:',
+        '  commands:',
+        '    test:',
+        '      run: npm test',
+        '',
+      ].join('\n')
+    );
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(
+      join(dir, '.github', 'workflows', 'test.yml'),
+      [
+        'name: test',
+        'jobs:',
+        '  test:',
+        '    strategy:',
+        '      matrix:',
+        "        node-version: ['20.x', '22.x']",
+        '    steps:',
+        '      - run: npm test',
+        '      - run: npm run lint',
+        '',
+      ].join('\n')
+    );
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.stacks, ['node']);
+    assert.deepEqual(report.runners, ['lefthook']);
+    assert.deepEqual(report.prePush, {
+      files: ['lefthook.yml'],
+      commands: ['npm test'],
+    });
+    assert.deepEqual(report.ci.files, ['.github/workflows/test.yml']);
+    assert.deepEqual(report.ci.commands, ['npm test', 'npm run lint']);
+    assert.deepEqual(report.ci.matrices, [{ key: 'node-version', values: ['20.x', '22.x'] }]);
+    assert.deepEqual(report.drift.ciOnlyCommands, ['npm run lint']);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: does not count a runner-installed hook stub as a native runner', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-managed-stub-'));
+  try {
+    writeFileSync(join(dir, 'lefthook.yml'), 'pre-push:\n  commands: {}\n');
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    writeFileSync(join(dir, '.git', 'hooks', 'pre-push'), '#!/bin/sh\nlefthook run pre-push\n');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['lefthook']);
+    assert.deepEqual(report.prePush.files, ['lefthook.yml']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: reads shell commands from a Husky pre-push hook', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-husky-'));
+  try {
+    mkdirSync(join(dir, '.husky'));
+    writeFileSync(join(dir, '.husky', 'pre-push'), '#!/bin/sh\nnpm test\nnpm run lint\n');
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(
+      join(dir, '.github', 'workflows', 'test.yml'),
+      'steps:\n  - run: npm test\n  - run: npm run lint\n'
+    );
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['husky']);
+    assert.deepEqual(report.prePush.commands, ['npm test', 'npm run lint']);
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: reads shell commands from a native pre-push hook', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-native-'));
+  try {
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    writeFileSync(join(dir, '.git', 'hooks', 'pre-push'), '#!/bin/sh\nnpm test\n');
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(dir, '.github', 'workflows', 'test.yml'), 'steps:\n  - run: npm test\n');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['native']);
+    assert.deepEqual(report.prePush.commands, ['npm test']);
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: reports a native hook beside another runner', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-mixed-native-'));
+  try {
+    mkdirSync(join(dir, '.husky'));
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    writeFileSync(join(dir, '.git', 'hooks', 'pre-push'), '#!/bin/sh\nnpm test\n');
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(dir, '.github', 'workflows', 'test.yml'), 'steps:\n  - run: npm test\n');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['husky', 'native']);
+    assert.deepEqual(report.prePush.commands, ['npm test']);
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: resolves native hooks from a linked Git worktree', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-linked-worktree-'));
+  const main = join(dir, 'main');
+  const linked = join(dir, 'linked');
+  try {
+    mkdirSync(main);
+    execFileSync('git', ['init', '-q', main]);
+    writeFileSync(join(main, 'README.md'), 'fixture\n');
+    execFileSync('git', ['-C', main, 'add', 'README.md']);
+    execFileSync('git', [
+      '-C',
+      main,
+      '-c',
+      'user.name=fixture',
+      '-c',
+      'user.email=fixture@example.test',
+      'commit',
+      '-qm',
+      'fixture',
+    ]);
+    execFileSync('git', ['-C', main, 'worktree', 'add', '-qb', 'linked', linked]);
+    writeFileSync(join(main, '.git', 'hooks', 'pre-push'), '#!/bin/sh\nnpm test\n');
+    mkdirSync(join(linked, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(linked, '.github', 'workflows', 'test.yml'), 'steps:\n  - run: npm test\n');
+
+    const report = runHooksDetector(linked);
+    assert.deepEqual(report.runners, ['native']);
+    assert.deepEqual(report.prePush.commands, ['npm test']);
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: an unreadable native hook does not imply a native runner', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-unreadable-native-'));
+  try {
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    const hook = join(dir, '.git', 'hooks', 'pre-push');
+    writeFileSync(hook, '#!/bin/sh\nnpm test\n');
+    chmodSync(hook, 0o000);
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, []);
+    assert.deepEqual(report.unreadable, [{ path: '.git/hooks/pre-push', code: 'EACCES' }]);
+  } finally {
+    try {
+      chmodSync(join(dir, '.git', 'hooks', 'pre-push'), 0o755);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: an empty readable native hook is still a native runner', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-empty-native-'));
+  try {
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    writeFileSync(join(dir, '.git', 'hooks', 'pre-push'), '');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['native']);
+    assert.deepEqual(report.prePush, {
+      files: ['.git/hooks/pre-push'],
+      commands: [],
+    });
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: reads a pre-commit pre-push entry and recognizes pytest', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-pre-commit-'));
+  try {
+    writeFileSync(
+      join(dir, '.pre-commit-config.yaml'),
+      [
+        'repos:',
+        '  - repo: local',
+        '    hooks:',
+        '      - id: test',
+        '        entry: pytest',
+        '        language: system',
+        '        stages: [pre-push]',
+        '',
+      ].join('\n')
+    );
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(dir, '.github', 'workflows', 'test.yml'), 'steps:\n  - run: pytest\n');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['pre-commit']);
+    assert.deepEqual(report.prePush, {
+      files: ['.pre-commit-config.yaml'],
+      commands: ['pytest'],
+    });
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: an unreadable workflows directory is surfaced, never silent', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-unreadable-directory-'));
+  try {
+    const workflows = join(dir, '.github', 'workflows');
+    mkdirSync(workflows, { recursive: true });
+    chmodSync(workflows, 0o000);
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.unreadable, [{ path: '.github/workflows', code: 'EACCES' }]);
+  } finally {
+    try {
+      chmodSync(join(dir, '.github', 'workflows'), 0o755);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: an unreadable CI config is surfaced, never silent', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-unreadable-'));
+  try {
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    const locked = join(dir, '.github', 'workflows', 'test.yml');
+    writeFileSync(locked, 'jobs: {}\n');
+    chmodSync(locked, 0o000);
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.unreadable, [{ path: '.github/workflows/test.yml', code: 'EACCES' }]);
+  } finally {
+    try {
+      chmodSync(join(dir, '.github', 'workflows', 'test.yml'), 0o644);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- shared next-NNNN detector (ADR-0057, P2.5) -----------------------------
+const NUMBER_SKILLS = ['ad-adr', 'ad-spec', 'ad-task', 'ad-spike'];
+const NUMBER_SCRIPTS = NUMBER_SKILLS.map((skill) =>
+  join(__dirname, '..', 'src', 'skills', 'claude-code', skill, 'scripts', 'next-number.mjs')
+);
+
+function runNumberDetector(cwd, directory, environment = {}) {
+  const out = execFileSync('node', [NUMBER_SCRIPTS[0], directory], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, ...environment },
+  });
+  return JSON.parse(out);
+}
+
+test('next-number: reports sorted artifact numbers and the slot after the maximum', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-'));
+  try {
+    const artifacts = join(dir, 'doc', 'adr');
+    mkdirSync(artifacts, { recursive: true });
+    for (const name of ['0001-first.md', '0042-answer.md', 'not-an-artifact.md', '10000-overflow.md']) {
+      writeFileSync(join(artifacts, name), 'fixture\n');
+    }
+
+    assert.deepEqual(runNumberDetector(dir, 'doc/adr'), {
+      directory: 'doc/adr',
+      numbers: ['0001', '0042'],
+      next: '0043',
+      exhausted: false,
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: an absent artifact directory starts at 0001', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-empty-'));
+  try {
+    assert.deepEqual(runNumberDetector(dir, 'spikes'), {
+      directory: 'spikes',
+      numbers: [],
+      next: '0001',
+      exhausted: false,
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: an initialized repository with no commits starts at 0001', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-unborn-head-'));
+  try {
+    execFileSync('git', ['init', '-q', dir]);
+
+    assert.deepEqual(runNumberDetector(dir, 'doc/adr'), {
+      directory: 'doc/adr',
+      numbers: [],
+      next: '0001',
+      exhausted: false,
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: an unreadable artifact directory blocks numbering', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-unreadable-'));
+  try {
+    const artifacts = join(dir, 'doc', 'specs');
+    mkdirSync(artifacts, { recursive: true });
+    chmodSync(artifacts, 0o000);
+
+    assert.deepEqual(runNumberDetector(dir, 'doc/specs'), {
+      directory: 'doc/specs',
+      numbers: [],
+      next: null,
+      exhausted: false,
+      unreadable: [{ path: 'doc/specs', code: 'EACCES' }],
+    });
+  } finally {
+    try { chmodSync(join(dir, 'doc', 'specs'), 0o755); } catch { /* ignore */ }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: 9999 is explicit exhaustion, not a five-digit artifact number', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-exhausted-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'tasks', '9999-last.md'), 'fixture\n');
+
+    assert.deepEqual(runNumberDetector(dir, 'doc/tasks'), {
+      directory: 'doc/tasks',
+      numbers: ['9999'],
+      next: null,
+      exhausted: true,
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: an archived highest artifact remains reserved from Git history', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-ledger-'));
+  try {
+    const artifacts = join(dir, 'doc', 'adr');
+    mkdirSync(artifacts, { recursive: true });
+    execFileSync('git', ['init', '-q', dir]);
+    writeFileSync(join(artifacts, '0042-archived.md'), 'fixture\n');
+    execFileSync('git', ['-C', dir, 'add', 'doc/adr/0042-archived.md']);
+    execFileSync('git', ['-C', dir, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'fixture']);
+    execFileSync('git', ['-C', dir, 'rm', '-q', 'doc/adr/0042-archived.md']);
+    execFileSync('git', ['-C', dir, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'archive']);
+
+    assert.equal(runNumberDetector(dir, 'doc/adr').next, '0043');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: broken Git metadata blocks ledger-dependent numbering', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-broken-git-'));
+  try {
+    writeFileSync(join(dir, '.git'), 'gitdir: missing\n');
+
+    const report = runNumberDetector(dir, 'doc/adr');
+    assert.equal(report.next, null);
+    assert.deepEqual(report.unreadable, [{ path: 'git-history:doc/adr', code: 'GIT_ERROR' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: a configured but unreadable Git directory blocks numbering', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-git-dir-'));
+  try {
+    const report = runNumberDetector(dir, 'doc/adr', {
+      GIT_DIR: join(dir, 'missing-git-directory'),
+    });
+    assert.equal(report.next, null);
+    assert.deepEqual(report.unreadable, [{ path: 'git-history:doc/adr', code: 'GIT_ERROR' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: all four skills ship the same self-contained detector on both hosts', () => {
+  const source = readFileSync(NUMBER_SCRIPTS[0]);
+  for (const skill of NUMBER_SKILLS) {
+    for (const host of ['claude-code', 'codex']) {
+      const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'next-number.mjs');
+      assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
+    }
+  }
+});
+
+// --- GitHub CLI preflight (ADR-0057, P2.6) ---------------------------------
+const GH_PREFLIGHT_SKILLS = ['ad-pr', 'ad-merge'];
+const GH_PREFLIGHT_SCRIPTS = GH_PREFLIGHT_SKILLS.map((skill) =>
+  join(__dirname, '..', 'src', 'skills', 'claude-code', skill, 'scripts', 'gh-preflight.mjs')
+);
+
+function runGhPreflight(cwd, args, environment = {}) {
+  const out = execFileSync('node', [GH_PREFLIGHT_SCRIPTS[0], ...args], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, ...environment },
+  });
+  return JSON.parse(out);
+}
+
+function writeFakeGh(dir, responses) {
+  const path = join(dir, 'fake-gh');
+  writeFileSync(path, `#!/usr/bin/env node
+if (process.env.AGENTIC_TEST_GH_REQUIRE_CLEAN_GIT_ENV === 'true' && ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE'].some((name) => process.env[name])) process.exit(97);
+const responses = JSON.parse(process.env.AGENTIC_TEST_GH_RESPONSES || '{}');
+const response = responses[process.argv.slice(2).join('\\u0000')] || { status: 0, stdout: '' };
+process.stdout.write(response.stdout || '');
+process.stderr.write(response.stderr || '');
+process.exit(response.status || 0);
+`);
+  chmodSync(path, 0o755);
+  return {
+    AGENTIC_GH: path,
+    AGENTIC_TEST_GH_RESPONSES: JSON.stringify(responses),
+  };
+}
+
+function commitFixture(repo, subject) {
+  execFileSync('git', ['-C', repo, 'add', '.']);
+  execFileSync('git', ['-C', repo, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', subject]);
+}
+
+function pushedFeatureFixture(dir) {
+  execFileSync('git', ['init', '-q', dir]);
+  writeFileSync(join(dir, 'README.md'), 'fixture\n');
+  commitFixture(dir, 'initial');
+  execFileSync('git', ['-C', dir, 'branch', '-M', 'main']);
+  execFileSync('git', ['-C', dir, 'checkout', '-qb', 'feat/preflight']);
+  execFileSync('git', ['-C', dir, 'remote', 'add', 'origin', 'https://example.test/fixture.git']);
+  execFileSync('git', ['-C', dir, 'update-ref', 'refs/remotes/origin/feat/preflight', 'HEAD']);
+  execFileSync('git', ['-C', dir, 'branch', '--set-upstream-to=origin/feat/preflight', 'feat/preflight']);
+}
+
+test('gh-preflight: PR reports authenticated GitHub and a pushed branch', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-pr-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+    });
+
+    assert.deepEqual(runGhPreflight(dir, ['pr'], env), {
+      operation: 'pr',
+      github: { command: env.AGENTIC_GH, installed: true, authenticated: true },
+      git: { branch: 'feat/preflight', upstream: 'origin/feat/preflight', aheadOfUpstream: 0 },
+      baseBranch: 'main',
+      pullRequest: null,
+      pullRequestState: 'not-requested',
+      checks: [],
+      mergeMethods: null,
+      targetRepository: null,
+      errors: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: strips inherited Git worktree variables before GitHub probes', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-clean-env-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+    });
+    const report = runGhPreflight(dir, ['pr'], {
+      ...env,
+      AGENTIC_TEST_GH_REQUIRE_CLEAN_GIT_ENV: 'true',
+      GIT_DIR: join(dir, 'wrong-git-dir'),
+      GIT_WORK_TREE: join(dir, 'wrong-work-tree'),
+      GIT_INDEX_FILE: join(dir, 'wrong-index'),
+    });
+    assert.equal(report.github.authenticated, true);
+    assert.equal(report.git.branch, 'feat/preflight');
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: merge reports the PR, checks, and allowed merge methods', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-merge-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u000042\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        stdout: '{"number":42,"headRefName":"feat/preflight","baseRefName":"main","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviews":[]}\n',
+      },
+      'pr\u0000checks\u000042\u0000--json\u0000name,bucket,state,link': {
+        stdout: '[{"name":"test","bucket":"pass","state":"SUCCESS","link":"https://example.test/check"}]\n',
+      },
+      'repo\u0000view\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed': {
+        stdout: '{"mergeCommitAllowed":true,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge', '42'], env);
+    assert.equal(report.operation, 'merge');
+    assert.equal(report.pullRequest.number, 42);
+    assert.equal(report.pullRequestState, 'present');
+    assert.equal(report.pullRequest.mergeStateStatus, 'CLEAN');
+    assert.deepEqual(report.checks, [{ name: 'test', bucket: 'pass', state: 'SUCCESS', link: 'https://example.test/check' }]);
+    assert.deepEqual(report.mergeMethods, { mergeCommitAllowed: true, squashMergeAllowed: true, rebaseMergeAllowed: false });
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: pending checks retain their JSON despite gh exit code 8', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-pending-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u000042\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        stdout: '{"number":42,"headRefName":"feat/preflight","baseRefName":"main","mergeable":"UNKNOWN","mergeStateStatus":"UNKNOWN","reviews":[]}\n',
+      },
+      'pr\u0000checks\u000042\u0000--json\u0000name,bucket,state,link': {
+        status: 8,
+        stdout: '[{"name":"test","bucket":"pending","state":"IN_PROGRESS","link":"https://example.test/check"}]\n',
+      },
+      'repo\u0000view\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed': {
+        stdout: '{"mergeCommitAllowed":true,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge', '42'], env);
+    assert.deepEqual(report.checks, [{ name: 'test', bucket: 'pending', state: 'IN_PROGRESS', link: 'https://example.test/check' }]);
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: a PR URL scopes checks and merge policy to its repository', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-cross-repo-'));
+  try {
+    pushedFeatureFixture(dir);
+    const url = 'https://github.com/acme/other/pull/42';
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u0000https://github.com/acme/other/pull/42\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        stdout: '{"number":42,"url":"https://github.com/acme/other/pull/42","headRefName":"feat/preflight","baseRefName":"main","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviews":[]}\n',
+      },
+      'pr\u0000checks\u0000https://github.com/acme/other/pull/42\u0000--json\u0000name,bucket,state,link\u0000--repo\u0000acme/other': {
+        stdout: '[{"name":"test","bucket":"pass","state":"SUCCESS","link":"https://example.test/check"}]\n',
+      },
+      'repo\u0000view\u0000acme/other\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed': {
+        stdout: '{"mergeCommitAllowed":false,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge', url], env);
+    assert.deepEqual(report.checks, [{ name: 'test', bucket: 'pass', state: 'SUCCESS', link: 'https://example.test/check' }]);
+    assert.deepEqual(report.mergeMethods, { mergeCommitAllowed: false, squashMergeAllowed: true, rebaseMergeAllowed: false });
+    assert.equal(report.targetRepository, 'acme/other');
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: a missing PR is distinct from a failed PR probe', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-absent-pr-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        status: 1,
+        stderr: 'no pull requests found for branch "feat/preflight"\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge'], env);
+    assert.equal(report.pullRequest, null);
+    assert.equal(report.pullRequestState, 'absent');
+    assert.equal(report.targetRepository, null);
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: a failed PR probe is not reported as an absent PR', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-pr-error-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        status: 1,
+        stderr: 'network unavailable\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge'], env);
+    assert.equal(report.pullRequest, null);
+    assert.equal(report.pullRequestState, 'unavailable');
+    assert.deepEqual(report.errors, [{ probe: 'gh pr view', code: 'EXIT_1' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: an unavailable GitHub CLI is structured rather than thrown', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-missing-'));
+  try {
+    pushedFeatureFixture(dir);
+    const missing = join(dir, 'missing-gh');
+    const report = runGhPreflight(dir, ['pr'], { AGENTIC_GH: missing });
+    assert.deepEqual(report.github, { command: missing, installed: false, authenticated: null });
+    assert.deepEqual(report.errors, [{ probe: 'gh --version', code: 'ENOENT' }]);
+    assert.equal(report.baseBranch, null);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: both skills ship the same self-contained detector on both hosts', () => {
+  const source = readFileSync(GH_PREFLIGHT_SCRIPTS[0]);
+  for (const skill of GH_PREFLIGHT_SKILLS) {
+    for (const host of ['claude-code', 'codex']) {
+      const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'gh-preflight.mjs');
+      assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
+    }
+  }
+});
+
+// --- project stack/profile signals (ADR-0057, P2.7) ------------------------
+// The detector owns only low-freedom filesystem facts. Each skill keeps the
+// judgment about which source files to read and what the facts imply.
+const PROJECT_SIGNAL_SKILLS = ['ad-bootstrap', 'ad-architecture', 'ad-guidelines', 'ad-diagnose'];
+const PROJECT_SIGNAL_SCRIPTS = PROJECT_SIGNAL_SKILLS.map((skill) =>
+  join(__dirname, '..', 'src', 'skills', 'claude-code', skill, 'scripts', 'project-signals.mjs')
+);
+
+function runProjectSignals(cwd, document = 'AGENTS.md', host = 'claude-code') {
+  const out = execFileSync('node', [PROJECT_SIGNAL_SCRIPTS[0], document, '--host', host], {
+    cwd,
+    encoding: 'utf8',
+    env: process.env,
+  });
+  return JSON.parse(out);
+}
+
+test('project-signals: reports the bootstrap mode, every stack marker, and the host profile', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-'));
+  try {
+    writeFileSync(join(dir, 'package.json'), '{"name":"fixture"}\n');
+    writeFileSync(join(dir, 'pyproject.toml'), '[project]\nname = "fixture"\n');
+    writeFileSync(join(dir, 'go.mod'), 'module fixture\n');
+    mkdirSync(join(dir, '.claude'));
+    mkdirSync(join(dir, '.agents'));
+    writeFileSync(join(dir, '.claude', 'agentic-state.json'), '{"profile":"mature"}\n');
+    writeFileSync(join(dir, '.agents', 'agentic-state.json'), '{"profile":"solo"}\n');
+
+    assert.deepEqual(runProjectSignals(dir), {
+      document: 'AGENTS.md',
+      mode: 'brownfield',
+      stacks: ['node', 'python', 'go'],
+      profile: { name: 'mature', source: '.claude/agentic-state.json' },
+      unreadable: [],
+    });
+    assert.deepEqual(runProjectSignals(dir, 'AGENTS.md', 'codex').profile, {
+      name: 'solo',
+      source: '.agents/agentic-state.json',
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: distinguishes audit, greenfield, and architecture bootstrap modes', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-modes-'));
+  try {
+    assert.equal(runProjectSignals(dir).mode, 'greenfield');
+    assert.equal(runProjectSignals(dir, 'ARCHITECTURE.md').mode, 'bootstrap');
+    writeFileSync(join(dir, 'AGENTS.md'), '# agents\n');
+    assert.equal(runProjectSignals(dir).mode, 'audit');
+    writeFileSync(join(dir, 'ARCHITECTURE.md'), '# architecture\n');
+    assert.equal(runProjectSignals(dir, 'ARCHITECTURE.md').mode, 'audit');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: malformed state is visible in unreadable and falls back to team', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-invalid-state-'));
+  try {
+    mkdirSync(join(dir, '.claude'));
+    writeFileSync(join(dir, '.claude', 'agentic-state.json'), '{not json}\n');
+
+    assert.deepEqual(runProjectSignals(dir), {
+      document: 'AGENTS.md',
+      mode: 'greenfield',
+      stacks: [],
+      profile: { name: 'team', source: null },
+      unreadable: [{ path: '.claude/agentic-state.json', code: 'INVALID_JSON' }],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: a valid JSON value without a profile is invalid state, not a crash', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-non-object-state-'));
+  try {
+    mkdirSync(join(dir, '.claude'));
+    writeFileSync(join(dir, '.claude', 'agentic-state.json'), 'null\n');
+
+    const report = runProjectSignals(dir);
+    assert.deepEqual(report.profile, { name: 'team', source: null });
+    assert.deepEqual(report.unreadable, [{ path: '.claude/agentic-state.json', code: 'INVALID_PROFILE' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: a state path that cannot be read is surfaced in unreadable', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-unreadable-state-'));
+  try {
+    mkdirSync(join(dir, '.claude', 'agentic-state.json'), { recursive: true });
+
+    const report = runProjectSignals(dir);
+    assert.deepEqual(report.profile, { name: 'team', source: null });
+    assert.deepEqual(report.unreadable, [{ path: '.claude/agentic-state.json', code: 'EISDIR' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: all four skills ship the same self-contained detector on both hosts', () => {
+  const source = readFileSync(PROJECT_SIGNAL_SCRIPTS[0]);
+  for (const skill of PROJECT_SIGNAL_SKILLS) {
+    for (const host of ['claude-code', 'codex']) {
+      const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'project-signals.mjs');
+      assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
+    }
+  }
+});
+
+// --- host-global rules resolution (ADR-0057, P2.8) -------------------------
+// This is the sole intentionally host-divergent helper: the host's own global
+// rules path wins, while the other host's paths remain fallback candidates.
+const GLOBAL_RULES_SCRIPTS = {
+  'claude-code': join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-rules', 'scripts', 'resolve-global-rules.mjs'),
+  codex: join(__dirname, '..', 'src', 'skills', 'codex', 'ad-rules', 'scripts', 'resolve-global-rules.mjs'),
+};
+
+function runGlobalRules(cwd, host, home) {
+  const out = execFileSync('node', [GLOBAL_RULES_SCRIPTS[host]], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, HOME: home, USERPROFILE: home },
+  });
+  return JSON.parse(out);
+}
+
+test('resolve-global-rules: Claude resolves a global symlink and reports both ends', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-claude-'));
+  try {
+    const home = join(dir, 'home');
+    const target = join(home, 'workflow', 'AGENTS.ale.md');
+    const link = join(home, '.claude', 'CLAUDE.md');
+    mkdirSync(join(home, 'workflow'), { recursive: true });
+    mkdirSync(join(home, '.claude'));
+    writeFileSync(target, '# global rules\n');
+    symlinkSync('../workflow/AGENTS.ale.md', link, 'file');
+    const resolvedTarget = realpathSync(target);
+
+    assert.deepEqual(runGlobalRules(dir, 'claude-code', home), {
+      host: 'claude-code',
+      primary: {
+        path: link,
+        state: 'symlink',
+        linkTarget: '../workflow/AGENTS.ale.md',
+        resolvedPath: resolvedTarget,
+      },
+      sources: [{
+        path: link,
+        state: 'symlink',
+        linkTarget: '../workflow/AGENTS.ale.md',
+        resolvedPath: resolvedTarget,
+      }],
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolve-global-rules: Codex prioritizes its own global rules over Claude fallback', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-codex-'));
+  try {
+    const home = join(dir, 'home');
+    const codex = join(home, '.codex', 'AGENTS.md');
+    const claude = join(home, '.claude', 'CLAUDE.md');
+    mkdirSync(join(home, '.codex'), { recursive: true });
+    mkdirSync(join(home, '.claude'));
+    writeFileSync(codex, '# codex rules\n');
+    writeFileSync(claude, '# claude rules\n');
+
+    const report = runGlobalRules(dir, 'codex', home);
+    assert.deepEqual(report.primary, {
+      path: codex,
+      state: 'file',
+      linkTarget: null,
+      resolvedPath: codex,
+    });
+    assert.deepEqual(report.sources.map((source) => source.path), [codex, claude]);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolve-global-rules: a broken global link is distinct from an absent layer', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-broken-'));
+  try {
+    const home = join(dir, 'home');
+    const link = join(home, '.claude', 'CLAUDE.md');
+    mkdirSync(join(home, '.claude'), { recursive: true });
+    symlinkSync('../missing/AGENTS.md', link, 'file');
+
+    const report = runGlobalRules(dir, 'claude-code', home);
+    assert.equal(report.primary, null);
+    assert.deepEqual(report.sources, [{
+      path: link,
+      state: 'broken-symlink',
+      linkTarget: '../missing/AGENTS.md',
+      resolvedPath: null,
+    }]);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolve-global-rules: no canonical file is a clean absent layer', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-absent-'));
+  try {
+    const home = join(dir, 'home');
+    mkdirSync(home);
+
+    assert.deepEqual(runGlobalRules(dir, 'claude-code', home), {
+      host: 'claude-code',
+      primary: null,
+      sources: [],
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolve-global-rules: an unreadable global file is not selected as primary', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-unreadable-'));
+  const home = join(dir, 'home');
+  const file = join(home, '.claude', 'CLAUDE.md');
+  try {
+    mkdirSync(join(home, '.claude'), { recursive: true });
+    writeFileSync(file, '# global rules\n');
+    chmodSync(file, 0o000);
+
+    const report = runGlobalRules(dir, 'claude-code', home);
+    assert.equal(report.primary, null);
+    assert.deepEqual(report.sources, [{
+      path: file,
+      state: 'unreadable',
+      linkTarget: null,
+      resolvedPath: file,
+    }]);
+    assert.deepEqual(report.unreadable, [{ path: file, code: 'EACCES' }]);
+  } finally {
+    try { chmodSync(file, 0o644); } catch { /* ignore */ }
     rmSync(dir, { recursive: true, force: true });
   }
 });

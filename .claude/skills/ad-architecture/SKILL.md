@@ -11,7 +11,13 @@ Produces `ARCHITECTURE.md` at the repo root. Pairs with ADRs in `doc/adr/` — a
 
 ## Step 0 — Detect mode
 
-Inspect the repo:
+Run from the consumer repo root before inspecting it:
+
+```bash
+node .claude/skills/ad-architecture/scripts/project-signals.mjs ARCHITECTURE.md --host claude-code
+```
+
+Parse its JSON. Its `mode` selects the branch below; use `stacks` to focus the code scan and surface every `unreadable[]` entry as a scan gap, never as an absent path. Then inspect the repo:
 
 * `ARCHITECTURE.md` exists at the repo root → **audit** mode. **Do not rewrite it.** Stop after producing a drift list (see Step 4).
 * `ARCHITECTURE.md` absent → **bootstrap** mode. Scan first, pre-fill, ask only the gaps.

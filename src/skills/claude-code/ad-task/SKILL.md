@@ -11,7 +11,7 @@ Drafts `doc/tasks/<NNNN>-<short-slug>.md` for one tracked task. Format chosen so
 
 ## Step 1 — Determine NNNN and slug
 
-List `doc/tasks/`. NNNN = next available 4-digit number after the highest existing (mirrors the ADR convention). If `doc/tasks/` does not exist, create it; start at `0001`. Slug: kebab-case, ≤6 words, derived from the user's task title.
+Run `node .claude/skills/ad-task/scripts/next-number.mjs doc/tasks` from the consumer root. Use JSON `next` as NNNN; it preserves archived gaps. If `unreadable` is non-empty, stop until access is resolved; if `exhausted` is true, stop for a numbering decision. If loaded elsewhere, substitute the skill base path. Slug: kebab-case, ≤6 words, derived from the user's task title.
 
 ## Step 2 — Interview to fill
 

@@ -14,7 +14,7 @@ Three modes, detected from filesystem state:
 </background_information>
 
 <instructions>
-Step 0 — detect mode from the filesystem state above. Skip Step 1 unless the mode is brownfield.
+Step 0 — from the consumer repo root, run `node .agents/skills/ad-bootstrap/scripts/project-signals.mjs AGENTS.md --host codex` and parse its JSON. Its `mode` selects the filesystem-state branch above; use `stacks` to focus the manifest scan and surface every `unreadable[]` entry as a scan gap, never as an absent path. Skip Step 1 unless the mode is brownfield.
 
 Step 1 — scan (brownfield only). Read in this order, taking the first that exists for each category:
 - Manifests: `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `Gemfile`, `composer.json`, `pubspec.yaml`.

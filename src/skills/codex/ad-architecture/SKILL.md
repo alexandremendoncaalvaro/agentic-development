@@ -13,7 +13,7 @@ Two modes detected from filesystem state:
 </background_information>
 
 <instructions>
-Step 0 — detect mode from the filesystem state above.
+Step 0 — from the consumer repo root, run `node .agents/skills/ad-architecture/scripts/project-signals.mjs ARCHITECTURE.md --host codex` and parse its JSON. Its `mode` selects the filesystem-state branch above; use `stacks` to focus the code scan and surface every `unreadable[]` entry as a scan gap, never as an absent path.
 
 Step 1 — scan the code. Read in this order, taking the first that exists for each category:
 - Top-level directory listing — infer the layered/hexagonal/clean structure.
