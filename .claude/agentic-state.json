@@ -213,7 +213,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-merge/SKILL.md",
-          "sourceSha": "fe6200256f387f3ca9ef7f7ad91f6e9009e24b0407993719c58c9a8ed508e9c6"
+          "sourceSha": "cf941716ff4f1b2bb76ae0d6cc6cfa927e71bb06bf6cd591a5c4fe3b43ec4575"
         }
       ]
     },
@@ -267,6 +267,23 @@
         {
           "path": ".claude/skills/ad-question-me/SKILL.md",
           "sourceSha": "ad53130483ecfe6c7e2fc9df7f0ceced99191db5dcbdedcbb706f56416657953"
+        }
+      ]
+    },
+    "ad-release": {
+      "version": "0.20.0-beta.1",
+      "files": [
+        {
+          "path": ".claude/skills/ad-release/scripts/release-plan.mjs",
+          "sourceSha": "171ffc4e059e16135704ed1fd1979e67f29429985c0c748f63244f638e24f327"
+        },
+        {
+          "path": ".claude/skills/ad-release/scripts/release-state.mjs",
+          "sourceSha": "9389a1f34c9c801bf42fc87b69c5c8cd86dc6e8b6cec62a750c129934bc4b08d"
+        },
+        {
+          "path": ".claude/skills/ad-release/SKILL.md",
+          "sourceSha": "98179a079101c75a2a33e7238d238128c536dfff7d616de6011d66b3be52e7c0"
         }
       ]
     },

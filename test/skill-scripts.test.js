@@ -399,6 +399,58 @@ function runSurvey(cwd) {
   return JSON.parse(out);
 }
 
+// --- ad-release deterministic local release-state probe (ADR-0063) ---
+// The claude-code copy is executed; skills.test.js enforces a byte-identical
+// Codex twin. The probe reports local facts only: it never contacts npm or
+// GitHub, and its JSON is the input to the skill's judgment and confirmations.
+const RELEASE_STATE = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-release',
+  'scripts',
+  'release-state.mjs'
+);
+
+function runReleaseState(cwd, args = []) {
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  const out = execFileSync('node', [RELEASE_STATE, ...args], {
+    cwd,
+    encoding: 'utf8',
+    env,
+  });
+  return JSON.parse(out);
+}
+
+const RELEASE_PLAN = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-release',
+  'scripts',
+  'release-plan.mjs'
+);
+
+function runReleasePlan(input) {
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  const out = execFileSync('node', [RELEASE_PLAN], {
+    encoding: 'utf8',
+    input: JSON.stringify(input),
+    env,
+  });
+  return JSON.parse(out);
+}
+
 // Initialize a throwaway git repo whose default branch is `main`, with a
 // fixed inline identity so nothing touches global git config (never mutate the
 // machine-global committer — the task-0033 danger). GIT_DIR & friends stripped.
@@ -426,6 +478,195 @@ function gitInit(dir) {
   git('init');
   return git;
 }
+
+test('release-state: reports a release-ready tagged package as JSON', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-release-state-'));
+  try {
+    const git = gitInit(dir);
+    writeFileSync(
+      join(dir, 'package.json'),
+      JSON.stringify({
+        name: '@example/package',
+        version: '1.2.3',
+        scripts: { release: 'node scripts/release.mjs' },
+        publishConfig: { tag: 'beta' },
+      })
+    );
+    writeFileSync(join(dir, 'package-lock.json'), '{}\n');
+    writeFileSync(join(dir, 'CHANGELOG.md'), '# Changelog\n\n## [Unreleased]\n\n- Ready\n');
+    git('add', '.');
+    git('commit', '-m', 'chore: fixture');
+    git('tag', '-a', 'v1.2.3', '-m', 'v1.2.3');
+
+    const state = runReleaseState(dir, ['--tag', 'v1.2.3']);
+
+    assert.deepEqual(state.package, {
+      name: '@example/package',
+      version: '1.2.3',
+      publishTag: 'beta',
+      releaseScript: 'node scripts/release.mjs',
+    });
+    assert.deepEqual(state.files, {
+      packageJson: true,
+      packageLock: true,
+      changelog: { exists: true, hasUnreleased: true },
+    });
+    assert.deepEqual(state.git.tag, {
+      name: 'v1.2.3',
+      exists: true,
+      annotated: true,
+    });
+    assert.equal(state.git.branch, 'main');
+    assert.equal(state.git.dirty, false);
+    assert.equal(state.git.origin, null);
+    assert.deepEqual(state.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('release-state: reports a content-read failure in unreadable', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-release-state-unreadable-'));
+  try {
+    writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'example' }));
+    mkdirSync(join(dir, 'CHANGELOG.md'));
+
+    const state = runReleaseState(dir);
+
+    assert.deepEqual(state.unreadable, ['CHANGELOG.md:EISDIR']);
+    assert.deepEqual(state.files.changelog, { exists: true, hasUnreleased: null });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('release-state: reports an unreadable package lock', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-release-state-lock-unreadable-'));
+  try {
+    writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'example' }));
+    mkdirSync(join(dir, 'package-lock.json'));
+
+    const state = runReleaseState(dir);
+
+    assert.deepEqual(state.unreadable, ['package-lock.json:EISDIR']);
+    assert.equal(state.files.packageLock, true);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('release-plan: branch and tag pushes use isolated exact refs', () => {
+  const context = {
+    releaseKind: 'patch',
+    branch: 'chore/release-v1.2.3',
+    tag: 'v1.2.3',
+    merged: true,
+  };
+
+  const branch = runReleasePlan({
+    ...context,
+    completed: ['local-release'],
+    confirmation: { stage: 'branch-push', approved: true },
+  });
+  const tag = runReleasePlan({
+    ...context,
+    completed: ['local-release', 'branch-push'],
+    confirmation: { stage: 'tag-push', approved: true },
+  });
+
+  assert.deepEqual(branch.execution, [
+    'git',
+    'push',
+    '--no-follow-tags',
+    'origin',
+    'refs/heads/chore/release-v1.2.3:refs/heads/chore/release-v1.2.3',
+  ]);
+  assert.deepEqual(tag.execution, [
+    'git',
+    'push',
+    'origin',
+    'refs/tags/v1.2.3:refs/tags/v1.2.3',
+  ]);
+});
+
+test('release-plan: every direct release effect remains unexecuted when refused', () => {
+  const context = {
+    releaseKind: 'patch',
+    branch: 'chore/release-v1.2.3',
+    tag: 'v1.2.3',
+    prerelease: false,
+  };
+  const cases = [
+    { completed: [], merged: false, stage: 'local-release' },
+    { completed: ['local-release'], merged: false, stage: 'branch-push' },
+    { completed: ['local-release', 'branch-push'], merged: true, stage: 'tag-push' },
+    {
+      completed: ['local-release', 'branch-push', 'tag-push'],
+      merged: true,
+      stage: 'npm-publish',
+    },
+    {
+      completed: ['local-release', 'branch-push', 'tag-push', 'npm-publish'],
+      merged: true,
+      stage: 'github-release',
+    },
+  ];
+
+  for (const { completed, merged, stage } of cases) {
+    const refused = runReleasePlan({
+      ...context,
+      completed,
+      merged,
+      confirmation: { stage, approved: false },
+    });
+    assert.equal(refused.next.id, stage);
+    assert.equal(refused.next.requiresConfirmation, true);
+    assert.equal(refused.execution, null, `${stage} must not execute when refused`);
+    assert.deepEqual(refused.unreadable, []);
+
+    const approved = runReleasePlan({
+      ...context,
+      completed,
+      merged,
+      confirmation: { stage, approved: true },
+    });
+    assert.equal(approved.next.id, stage);
+    assert.ok(Array.isArray(approved.execution) && approved.execution.length > 0);
+  }
+});
+
+test('release-plan: a post-publish resume offers only GitHub Release recovery', () => {
+  const plan = runReleasePlan({
+    tag: 'v1.2.3',
+    prerelease: false,
+    completed: ['local-release', 'branch-push', 'tag-push', 'npm-publish'],
+    merged: true,
+    confirmation: { stage: 'github-release', approved: true },
+  });
+
+  assert.equal(plan.next.id, 'github-release');
+  assert.deepEqual(plan.execution, [
+    'ghp',
+    'release',
+    'create',
+    'v1.2.3',
+    '--verify-tag',
+    '--notes-from-tag',
+  ]);
+});
+
+test('release-plan: never offers npm publish while the tagged commit is unmerged', () => {
+  const plan = runReleasePlan({
+    tag: 'v1.2.3',
+    completed: ['local-release', 'branch-push', 'tag-push'],
+    merged: false,
+    confirmation: { stage: 'npm-publish', approved: true },
+  });
+
+  assert.equal(plan.next.id, 'npm-publish');
+  assert.equal(plan.execution, null);
+  assert.match(plan.blocked, /merged release commit/);
+});
 
 test('survey: brownfield repo reports presence, counts, and reciprocity', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-brown-'));

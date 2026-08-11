@@ -21,6 +21,7 @@
   },
   "scripts": {
     "start": "node bin/agentic.js",
+    "release": "./scripts/release.sh",
     "test": "node bin/agentic.js --help && node bin/agentic.js init --help && node bin/agentic.js update --help && node bin/agentic.js profile --help && node --test test/*.test.js",
     "prepublishOnly": "npm test"
   },

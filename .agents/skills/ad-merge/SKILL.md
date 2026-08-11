@@ -17,6 +17,8 @@ Route elsewhere when:
 - No PR exists yet → `ad-pr` first.
 - Commits are not on the branch yet → `ad-commit` first.
 
+Release-only mode. `ad-release` first invokes `ad-merge --release --preflight` before opening its release PR. This preflight requires a repository that allows merge commits; reject a repository that permits only squash or rebase, because its tagged release commit would not remain an ancestor of the base branch. After the PR exists, `ad-release` invokes `ad-merge --release <PR>`; that mode forces `--merge` and never offers a merge-mode choice.
+
 Phase 1 — preflight. Check `gh` is installed and authenticated:
 
 ```
@@ -66,10 +68,13 @@ State the decision back to the user before Phase 4 so they can interject.
 Phase 4 — merge. Detect repo's allowed merge modes:
 
 ```
-gh repo view --json mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed
+ghp repo view --json mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed
 ```
 
+When invoked with `--release --preflight`, stop after this check: require `mergeCommitAllowed: true` and report whether the release PR may be opened. When invoked with `--release <PR>`, repeat the check immediately before merging. If merge commits are no longer allowed, stop; never substitute squash or rebase.
+
 Decision tree:
+- Release-only mode → use `ghp pr merge <num> --merge --delete-branch`. Do not ask for a mode, and reject a request for `--squash` or `--rebase`.
 - Exactly one mode allowed → use it.
 - Multiple modes allowed → ask the user: "Repo allows squash / rebase / merge-commit. Pick one." Wait for their choice.
 - None allowed (rare) → surface the policy error and stop.

@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-08-05
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0063 — its manually performed post-local-release tail steps.
 
 ## Context
 

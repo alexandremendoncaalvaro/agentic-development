@@ -55,6 +55,18 @@ for (const agent of ['claude-code', 'codex']) {
   }
 }
 
+test('ad-merge has a release-only mode that preserves the tagged commit', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-merge', 'SKILL.md'), 'utf8');
+    assert.match(body, /release-only/i, `${agent} ad-merge must name its release-only mode`);
+    assert.match(body, /--merge/, `${agent} ad-merge must force --merge for a release`);
+    assert.match(body, /ghp pr merge <num> --merge/, `${agent} ad-merge must use the configured GitHub wrapper`);
+    assert.match(body, /ghp repo view --json mergeCommitAllowed/, `${agent} ad-merge must use ghp for release preflight`);
+    assert.match(body, /squash/i, `${agent} ad-merge must reject squash for a release`);
+    assert.match(body, /rebase/i, `${agent} ad-merge must reject rebase for a release`);
+  }
+});
+
 // Archiving an ADR hard-deletes the file and leaves the plain-text `ADR-NNNN`
 // mention as a breadcrumb resolvable via git log (576bb9d). A cited *path*
 // does not survive that: it ships to every consuming project pointing at a
