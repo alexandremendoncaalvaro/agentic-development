@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [0.20.0-beta.2] - 2026-08-11
+
 ### Added
 
 - Deterministic P2 workflow probes (ADR-0057, both hosts): `ad-hooks` detects the project stack, hook runner, and CI-versus-pre-push drift; `ad-adr`, `ad-spec`, `ad-task`, and `ad-spike` share next-artifact numbering; `ad-pr` and `ad-merge` share GitHub/Git preflight; `ad-architecture`, `ad-bootstrap`, `ad-diagnose`, and `ad-guidelines` read project signals; and `ad-rules` resolves the host's global rules. The zero-dependency Node scripts have expected-output coverage and preserve unreadable-file facts in structured output.
@@ -28,6 +30,7 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- Updated the development-only `js-yaml` dependency to 4.3.1, removing the audited high-severity quadratic CPU denial-of-service vulnerability in affected 4.x releases.
 - Bare non-interactive `init` now installs both host trees (ADR-0062, task-0043). An empty repository or one with only `.claude/` previously received Claude Code skills only, silently omitting the supported Codex install at `.agents/skills`; explicit `--agent claude-code`, `codex`, and `both` selections remain unchanged.
 - `ad-audit` SKILL.md on both hosts names the machine store by its canonical noun ("machine store", per CONTEXT.md) — four spots said "curated store", the alias the glossary exists to retire.
 
