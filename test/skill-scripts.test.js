@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync, mkdirSync, existsSync, symlinkSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -2194,5 +2194,147 @@ test('project-signals: all four skills ship the same self-contained detector on 
       const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'project-signals.mjs');
       assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
     }
+  }
+});
+
+// --- host-global rules resolution (ADR-0057, P2.8) -------------------------
+// This is the sole intentionally host-divergent helper: the host's own global
+// rules path wins, while the other host's paths remain fallback candidates.
+const GLOBAL_RULES_SCRIPTS = {
+  'claude-code': join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-rules', 'scripts', 'resolve-global-rules.mjs'),
+  codex: join(__dirname, '..', 'src', 'skills', 'codex', 'ad-rules', 'scripts', 'resolve-global-rules.mjs'),
+};
+
+function runGlobalRules(cwd, host, home) {
+  const out = execFileSync('node', [GLOBAL_RULES_SCRIPTS[host]], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, HOME: home, USERPROFILE: home },
+  });
+  return JSON.parse(out);
+}
+
+test('resolve-global-rules: Claude resolves a global symlink and reports both ends', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-claude-'));
+  try {
+    const home = join(dir, 'home');
+    const target = join(home, 'workflow', 'AGENTS.ale.md');
+    const link = join(home, '.claude', 'CLAUDE.md');
+    mkdirSync(join(home, 'workflow'), { recursive: true });
+    mkdirSync(join(home, '.claude'));
+    writeFileSync(target, '# global rules\n');
+    symlinkSync('../workflow/AGENTS.ale.md', link, 'file');
+    const resolvedTarget = realpathSync(target);
+
+    assert.deepEqual(runGlobalRules(dir, 'claude-code', home), {
+      host: 'claude-code',
+      primary: {
+        path: link,
+        state: 'symlink',
+        linkTarget: '../workflow/AGENTS.ale.md',
+        resolvedPath: resolvedTarget,
+      },
+      sources: [{
+        path: link,
+        state: 'symlink',
+        linkTarget: '../workflow/AGENTS.ale.md',
+        resolvedPath: resolvedTarget,
+      }],
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolve-global-rules: Codex prioritizes its own global rules over Claude fallback', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-codex-'));
+  try {
+    const home = join(dir, 'home');
+    const codex = join(home, '.codex', 'AGENTS.md');
+    const claude = join(home, '.claude', 'CLAUDE.md');
+    mkdirSync(join(home, '.codex'), { recursive: true });
+    mkdirSync(join(home, '.claude'));
+    writeFileSync(codex, '# codex rules\n');
+    writeFileSync(claude, '# claude rules\n');
+
+    const report = runGlobalRules(dir, 'codex', home);
+    assert.deepEqual(report.primary, {
+      path: codex,
+      state: 'file',
+      linkTarget: null,
+      resolvedPath: codex,
+    });
+    assert.deepEqual(report.sources.map((source) => source.path), [codex, claude]);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolve-global-rules: a broken global link is distinct from an absent layer', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-broken-'));
+  try {
+    const home = join(dir, 'home');
+    const link = join(home, '.claude', 'CLAUDE.md');
+    mkdirSync(join(home, '.claude'), { recursive: true });
+    symlinkSync('../missing/AGENTS.md', link, 'file');
+
+    const report = runGlobalRules(dir, 'claude-code', home);
+    assert.equal(report.primary, null);
+    assert.deepEqual(report.sources, [{
+      path: link,
+      state: 'broken-symlink',
+      linkTarget: '../missing/AGENTS.md',
+      resolvedPath: null,
+    }]);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolve-global-rules: no canonical file is a clean absent layer', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-absent-'));
+  try {
+    const home = join(dir, 'home');
+    mkdirSync(home);
+
+    assert.deepEqual(runGlobalRules(dir, 'claude-code', home), {
+      host: 'claude-code',
+      primary: null,
+      sources: [],
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('resolve-global-rules: an unreadable global file is not selected as primary', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-global-rules-unreadable-'));
+  const home = join(dir, 'home');
+  const file = join(home, '.claude', 'CLAUDE.md');
+  try {
+    mkdirSync(join(home, '.claude'), { recursive: true });
+    writeFileSync(file, '# global rules\n');
+    chmodSync(file, 0o000);
+
+    const report = runGlobalRules(dir, 'claude-code', home);
+    assert.equal(report.primary, null);
+    assert.deepEqual(report.sources, [{
+      path: file,
+      state: 'unreadable',
+      linkTarget: null,
+      resolvedPath: file,
+    }]);
+    assert.deepEqual(report.unreadable, [{ path: file, code: 'EACCES' }]);
+  } finally {
+    try { chmodSync(file, 0o644); } catch { /* ignore */ }
+    rmSync(dir, { recursive: true, force: true });
   }
 });

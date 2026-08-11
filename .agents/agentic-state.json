@@ -462,8 +462,12 @@
           "sourceSha": "cc65316c26fb5a41ed5e6b5a1847dab62483d83b4161787783460835c31ce12d"
         },
         {
+          "path": ".agents/skills/ad-rules/scripts/resolve-global-rules.mjs",
+          "sourceSha": "adaba807cf4540b73197e054bee2276fe1545385d2b2025642edf6d6690db7a0"
+        },
+        {
           "path": ".agents/skills/ad-rules/SKILL.md",
-          "sourceSha": "c0ca9a82450ae11290e109a46766c237cb5a879b4cd403195aec16c8ab9dfb3f"
+          "sourceSha": "e1cf05eaa9f94448bdac0b893ae3c422e5782835884236af382821233972fa8b"
         }
       ]
     },

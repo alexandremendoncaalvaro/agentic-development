@@ -354,8 +354,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-rules/scripts/resolve-global-rules.mjs",
+          "sourceSha": "7142a08180a76345348631444fccb94bad786a166d555d9b049b34b2d102f993"
+        },
+        {
           "path": ".claude/skills/ad-rules/SKILL.md",
-          "sourceSha": "1c5dd6565ff7965c5a18ed26469767044a4baabc5762aae8fa801cd184f3a2e0"
+          "sourceSha": "8c5933b01a7d9592f9e32d0251dc2cf5c98a75cef50f0487831cf147372fa279"
         }
       ]
     },

@@ -351,7 +351,11 @@ test('both audit-group-reviewer briefs forbid mutation and hand the lane trigger
 // A skill script (scripts/ beside SKILL.md) is host-agnostic executable code:
 // both hosts must ship it, byte-identical, so the copy-drift that motivated
 // task-0031 (inline probe blocks maintained per host) cannot re-enter through
-// the scripts/ door.
+// the scripts/ door. ADR-0057 Decision 3 permits one named exception: global
+// rules resolution is host-divergent because each host's own path must win.
+const HOST_DIVERGENT_SCRIPTS = new Set([
+  'ad-rules/scripts/resolve-global-rules.mjs',
+]);
 
 function listSkillScripts(agent) {
   const out = new Map();
@@ -365,7 +369,7 @@ function listSkillScripts(agent) {
   return out;
 }
 
-test('skill scripts: both hosts ship the same script set, byte-identical', () => {
+test('skill scripts: matching sets, byte-identical except documented host divergence', () => {
   const claude = listSkillScripts('claude-code');
   const codex = listSkillScripts('codex');
   assert.deepEqual(
@@ -375,7 +379,21 @@ test('skill scripts: both hosts ship the same script set, byte-identical', () =>
   );
   for (const [rel, claudePath] of claude) {
     const same = readFileSync(claudePath).equals(readFileSync(codex.get(rel)));
+    if (HOST_DIVERGENT_SCRIPTS.has(rel)) continue;
     assert.ok(same, `${rel}: claude-code and codex copies must be byte-identical`);
+  }
+});
+
+test('ad-rules global resolution is the sole documented host-divergent script', () => {
+  const claude = listSkillScripts('claude-code');
+  const codex = listSkillScripts('codex');
+  for (const rel of HOST_DIVERGENT_SCRIPTS) {
+    assert.ok(claude.has(rel), `Claude Code must ship ${rel}`);
+    assert.ok(codex.has(rel), `Codex must ship ${rel}`);
+    assert.ok(
+      !readFileSync(claude.get(rel)).equals(readFileSync(codex.get(rel))),
+      `${rel} must keep its intentional host-specific priority order`
+    );
   }
 });
 
