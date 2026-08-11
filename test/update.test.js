@@ -285,6 +285,7 @@ test('init writes state.json for claude-code', () => {
     const state = loadState(dir, 'claude-code');
     assert.ok(state, 'state file must exist after init');
     assert.equal(state.agent, 'claude-code');
+    assert.equal('profile' in state, false, 'installation state does not classify project maturity');
     assert.ok(state.skills['ad-bootstrap']);
     assert.ok(
       state.skills['ad-bootstrap'].files.some((f) =>
@@ -292,6 +293,23 @@ test('init writes state.json for claude-code', () => {
       )
     );
     assert.ok(state.skills['ad-bootstrap'].files[0].sourceSha.match(/^[a-f0-9]{64}$/));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('update removes a legacy profile field from state', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    const path = statePath(dir, 'claude-code');
+    const legacy = JSON.parse(readFileSync(path, 'utf8'));
+    legacy.profile = 'team';
+    writeFileSync(path, `${JSON.stringify(legacy, null, 2)}\n`);
+
+    runUpdate(dir, ['--agent', 'claude-code', '--yes']);
+
+    assert.equal('profile' in JSON.parse(readFileSync(path, 'utf8')), false);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

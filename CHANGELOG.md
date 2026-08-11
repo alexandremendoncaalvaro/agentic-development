@@ -1,10 +1,15 @@
 # Changelog
 
-Notable changes to `@alexandrealvaro/agentic`, newest first — consumers install the published npm version, not `main`, so an unlogged change is invisible to every install. Format per [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions per [Semantic Versioning](https://semver.org) on the house `-beta.N` channel (`publishConfig.tag: beta`). `scripts/release.sh` owns the rotation of `[Unreleased]` into a version heading — do not rotate by hand.
+Notable changes to `@alexandrealvaro/agentic`, newest first — consumers install the published npm version, not `main`, so an unlogged change is invisible to every install. Format per [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org) on the pre-1.0 `-beta.N` channel. `scripts/release.sh` owns the rotation of `[Unreleased]` into a version heading — do not rotate by hand.
 
 Releases older than 0.19.0-beta.1 predate this file; their record is the annotated git tags and [GitHub Releases](https://github.com/alexandremendoncaalvaro/agentic-development/releases).
 
 ## [Unreleased]
+
+### Changed
+
+- The installer now materializes every bundled skill for each selected host (ADR-0064), rather than asking for a `poc` / `solo` / `team` / `mature` profile. Bare `init` still installs both hosts; `--agent` restricts hosts only. The profile command and state field are removed, legacy state is migrated on the next update, and skills choose relevance from the request and repository rather than installer metadata.
+- Public onboarding documentation now leads with project installation, update, global CLI, user-level setup, and `/ad-next`; detailed installation, workflow, and skill references live under `doc/guides/`.
 
 ## [0.20.0-beta.2] - 2026-08-11
 

@@ -10,7 +10,7 @@
  * ADR/task counts, the `git rev-list` ahead-of-main count, tests/hooks/CI
  * presence, and spec-task reciprocity. The SKILL.md body reads this JSON and
  * keeps the JUDGMENT as text: scenario classification, next-action
- * prioritization, and profile-aware filtering. That split is exactly ADR-0057's
+ * prioritization. That split is exactly ADR-0057's
  * agent-vs-script boundary — deterministic gathering is a low-freedom script,
  * open-ended reasoning stays high-freedom prose.
  *
@@ -128,7 +128,7 @@ function slugOf(filename) {
 // --- Layer probes -------------------------------------------------------------
 
 function surveyState(repoRoot, unreadable) {
-  const fallback = { profile: 'team', kitVersion: null };
+  const fallback = { kitVersion: null };
   for (const rel of ['.claude/agentic-state.json', '.agents/agentic-state.json']) {
     if (!isFile(join(repoRoot, rel))) continue;
     const before = unreadable.length;
@@ -137,7 +137,7 @@ function surveyState(repoRoot, unreadable) {
     if (!raw.trim()) return fallback; // empty file → default, not a parse error
     try {
       const parsed = JSON.parse(raw);
-      return { profile: parsed.profile || 'team', kitVersion: parsed.kitVersion || null };
+      return { kitVersion: parsed?.kitVersion || null };
     } catch {
       unreadable.push({ path: rel, code: 'INVALID_JSON' });
       return fallback;
@@ -339,7 +339,7 @@ function surveyGit(repoRoot) {
  */
 export function surveyReport({ repoRoot }) {
   const unreadable = [];
-  const { profile, kitVersion } = surveyState(repoRoot, unreadable);
+  const { kitVersion } = surveyState(repoRoot, unreadable);
   const constitution = surveyConstitution(repoRoot);
   const tasks = surveyTasks(repoRoot, unreadable);
   const specs = surveySpecs(repoRoot, tasks.specRefs, unreadable);
@@ -360,7 +360,6 @@ export function surveyReport({ repoRoot }) {
   void specRefs;
 
   return {
-    profile,
     kitVersion,
     git: surveyGit(repoRoot),
     constitution,

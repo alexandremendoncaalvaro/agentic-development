@@ -14,7 +14,7 @@ If you are unsure where you are, run `/ad-next`. It is read-only and exists exac
 flowchart TD
     Start["I just installed agentic or opened a project"]
     Installed{"Skills installed here?"}
-    Init["agentic init<br>choose profile and agent"]
+    Init["agentic init<br>install skills for one or both hosts"]
     Ready["Open Claude Code or Codex<br>with installed skills"]
     Unsure{"Not sure what state the project is in?"}
     Next["/ad-next<br>state survey and prioritized next actions"]
@@ -47,36 +47,32 @@ flowchart TD
 
 Source: `WORKFLOW.md` sections 1, 4-6, 10-12, 15-16; `ad-next` skill contract.
 
-## Profile Gate
+## Context Gate
 
 ```mermaid
 flowchart TD
-    Work["Project maturity profile"]
-    Poc["poc<br>experiment or spike"]
-    Solo["solo<br>real product, one engineer"]
-    Team["team<br>shared product"]
-    Mature["mature<br>regulated or gate-heavy product"]
+    Work["What does this work need?"]
+    Experiment["Exploration or one-off change"]
+    Durable["Durable product or feature"]
+    Shared["Shared, high-risk, or regulated delivery"]
 
-    PocFlow["Use /ad-grill-me, /ad-ground, /ad-spike, /ad-tdg, /ad-tdd, /ad-diagnose, /ad-drift, /ad-next<br>Do not create PRD/spec/task/ADR unless the project graduates"]
-    SoloFlow["Available beyond poc: /ad-prd, /ad-bootstrap, /ad-guidelines, /ad-spec, /ad-task, /ad-review, /ad-commit, /ad-pr, /ad-merge<br>/ad-architecture and /ad-adr are opt-in"]
-    TeamFlow["Use the full artifact stack after product framing<br>/ad-architecture, /ad-adr, /ad-deepen, /ad-audit and /ad-level-up are in the normal path"]
-    MatureFlow["Team flow plus /ad-hooks as an expected gate-wiring step"]
+    ExperimentFlow["Use /ad-grill-me, /ad-ground, /ad-spike, /ad-tdg, /ad-tdd, /ad-diagnose, /ad-drift, /ad-next<br>Create a PRD, spec, task, or ADR only when it changes the work"]
+    DurableFlow["Use product framing, then the feature pipeline<br>/ad-prd → /ad-bootstrap → /ad-spec → /ad-task"]
+    SharedFlow["Add the safeguards the risk needs<br>/ad-architecture, /ad-adr, /ad-review, /ad-audit, /ad-hooks"]
 
-    Work --> Poc
-    Work --> Solo
-    Work --> Team
-    Work --> Mature
-    Poc --> PocFlow
-    Solo --> SoloFlow
-    Team --> TeamFlow
-    Mature --> MatureFlow
+    Work --> Experiment
+    Work --> Durable
+    Work --> Shared
+    Experiment --> ExperimentFlow
+    Durable --> DurableFlow
+    Shared --> SharedFlow
 ```
 
 Source: `WORKFLOW.md` section 1 and TL;DR #20.
 
 ## New Product Or First Real Feature
 
-Use this when the project has no durable product framing yet, or when a greenfield repo is moving past a throwaway PoC.
+Use this when the project has no durable product framing yet, or when a greenfield repo is moving past a throwaway experiment.
 
 ```mermaid
 flowchart TD
@@ -354,7 +350,7 @@ flowchart TD
     Verify["Run tests and quality gates"]
     ReviewNeeded{"Non-trivial behavior or standards risk?"}
     Review["/ad-review main..HEAD"]
-    HighStakes{"Going to the team, a PR, or a handoff?<br>(team / mature profiles)"}
+    HighStakes{"Going to a shared surface, a PR, or a handoff?"}
     MaxGate["/ad-audit<br>maximum gate, rules-anchored, evidence per claim"]
     Findings{"Actionable findings?"}
     Fix["Fix, verify again"]

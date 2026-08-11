@@ -43,7 +43,7 @@ The projection appeared regardless, in the worst available place: `AGENTS.md` cl
 
 6. **`init` and `update` write `WORKFLOW.md` and `WORKFLOW-FLOWS.md` to the target root, and never overwrite a diverged copy silently.** Twenty-one installed skills cite the constitution by section and the installer's own completion hints print those numbers, against a file no target had — the read contract added the twenty-first, which is what forced this. Kit-owned settles who *authors* the content; it does not license deleting a user's edits. A target that diverged is reported and skipped; only `--force` replaces it, matching the default `installSkills` already holds. Recorded as its own decision because this repo treats an install-target change as ADR-worthy (ADR-0048 rejected "task alone" for the same reason).
 
-No profile gate on any of the above. The comparators that scope by profile (`ad-deepen`, `ad-audit`) do so because they impose work; a permission imposes none, so gating it would be ceremony with nothing behind it.
+No installation gate applies to any of the above. Skills such as `ad-deepen` and `ad-audit` assess whether their work is proportionate to the repository and request; a permission imposes none, so withholding it would be ceremony with nothing behind it.
 
 ## Consequences
 

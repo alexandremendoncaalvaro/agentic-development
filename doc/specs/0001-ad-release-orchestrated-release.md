@@ -36,7 +36,7 @@ The kit already makes the local half of a release deterministic: its `scripts/re
 
 ### Functional
 
-- R1: `ad-release` is a dual-host workflow-operational skill, available in `solo`, `team`, and `mature` profiles and excluded from `poc`.
+- R1: `ad-release` is a dual-host workflow-operational skill installed for every selected host; its applicability is determined by the repository's release contract.
 - R2: The skill supports one root npm package with GitHub as its release host. It refuses to proceed when `package.json`, `package-lock.json`, `CHANGELOG.md`, the repository remote, `package.json#scripts.release`, or an explicit `package.json#publishConfig.tag` is absent. The configured script must accept one of `patch | minor | major | prerelease` plus `--dry-run`; a repository without that contract is out of scope. For this kit, implementation adds `"release": "./scripts/release.sh"` as a thin wrapper around ADR-0048's only release path.
 - R3: A new release starts from one requested bump kind; a resume starts from an explicit existing release tag, never a bump kind. Before any mutation, the skill reports the current branch, working-tree state, computed version from `npm run release -- <kind> --dry-run` for a new release, `[Unreleased]` readiness, local tag collision, npm package name, configured publish tag, and remote release/tag state. It invokes `npm pack --dry-run` to show the publish surface. For a resume, it verifies that the explicit tag is annotated and identifies the release commit and its package version; it refuses an ambiguous or mismatched tag instead of calculating another version.
 - R4: The only path that mutates the local version, changelog, release commit, and annotated tag is the configured `npm run release -- <kind>` script. That script is an allowed wrapper only when it delegates solely to the repository's existing release path; in this kit it delegates to `scripts/release.sh`. The skill first runs its dry-run, then requires explicit confirmation before the real invocation. It never reimplements version calculation or changelog rotation.
@@ -70,7 +70,7 @@ The kit already makes the local half of a release deterministic: its `scripts/re
 - A successful release has one DCO-signed-off release commit preserved as an ancestor of the base branch, one annotated remote tag, one matching npm package version built from that tag under its configured dist-tag, and one GitHub Release whose notes come from that tag.
 - A fixture proves the five direct confirmation boundaries independently: refusing each confirmation leaves the corresponding local release, release-branch push, post-merge tag push, npm publish, or GitHub Release action unstarted; PR creation and merge remain delegated to the separately gated `ad-pr` and `ad-merge` workflows.
 - A rerun after each injected partial-failure boundary names the already-complete steps and offers no command that republishes the same npm version or recreates a tag/release blindly.
-- Both hosts install the same release contract and all skill, script, profile, and fixture tests pass.
+- Both hosts install the same release contract and all skill, script, and fixture tests pass.
 
 ## Edge Cases
 

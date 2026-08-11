@@ -2,8 +2,9 @@ import * as p from '@clack/prompts';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { detectAgents, detectFeatures } from '../lib/detect.js';
+import { detectAgents } from '../lib/detect.js';
 import {
+  bundledSkills,
   installKitDocs,
   installSkills,
   removeOrphanSkills,
@@ -12,12 +13,6 @@ import {
 import { retiredSkillNamesForAgent } from '../lib/skill-migrations.js';
 import { loadState, saveState, userLevelInstallPath } from '../lib/state.js';
 import {
-  DEFAULT_PROFILE,
-  availableConditionalsForProfile,
-  profileOrDefault,
-  requiredSkillsForProfile,
-} from '../lib/profiles.js';
-import {
   updateRootDoc,
   rootDocAppendPrompt,
   rootDocReplacePrompt,
@@ -25,20 +20,7 @@ import {
 } from '../lib/rootdoc.js';
 import { trackedState } from '../lib/git.js';
 import { homedir } from 'node:os';
-import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from './init.js';
 import { offerKitExclude } from './kit-exclude.js';
-
-const CONDITIONAL_BY_NAME = Object.fromEntries(
-  CONDITIONAL_SKILLS.map((s) => [s.name, s])
-);
-
-function evaluateRule(rule, features, targetAgents) {
-  if (rule === 'frontend') return features.frontend === true;
-  if (rule === 'claude-code') return targetAgents.includes('claude-code');
-  if (rule === true) return true;
-  if (rule === false) return false;
-  return false;
-}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -81,27 +63,7 @@ function resolveAgents(flagValue, detectedAgents, previousAgents) {
   if (flagValue) return [flagValue];
   if (previousAgents.length > 0) return previousAgents;
   if (detectedAgents.length > 0) return detectedAgents;
-  return ['claude-code'];
-}
-
-function pickConditionalAuto(features, targetAgents, profileName) {
-  const out = [];
-  for (const { name, rule } of availableConditionalsForProfile(profileName)) {
-    const def = CONDITIONAL_BY_NAME[name];
-    if (!def) continue;
-    if (!def.agents.some((a) => targetAgents.includes(a))) continue;
-    if (evaluateRule(rule, features, targetAgents)) out.push(name);
-  }
-  return out;
-}
-
-function skillsForAgent(agent, profileName, optedSkills) {
-  const universal = requiredSkillsForProfile(profileName);
-  const conditional = optedSkills.filter((skillName) => {
-    const def = CONDITIONAL_BY_NAME[skillName];
-    return def && def.agents.includes(agent);
-  });
-  return [...universal, ...conditional];
+  return ['claude-code', 'codex'];
 }
 
 /**
@@ -124,52 +86,6 @@ function loadStatesOnce(cwd) {
   return { statesByAgent, agents };
 }
 
-function previouslyOptedConditional(previousStates, currentAgents, profileName) {
-  const available = new Set(
-    availableConditionalsForProfile(profileName).map((c) => c.name)
-  );
-  const opted = new Set();
-  for (const agent of currentAgents) {
-    const prev = previousStates[agent];
-    if (!prev) continue;
-    for (const skill of Object.keys(prev.skills ?? {})) {
-      if (
-        CONDITIONAL_BY_NAME[skill] &&
-        available.has(skill)
-      ) {
-        opted.add(skill);
-      }
-    }
-  }
-  return [...opted];
-}
-
-function profileFromStates(statesByAgent, currentAgents) {
-  // Profile must match across every installed agent in the project — not
-  // only across the agents the current invocation targets. Without this,
-  // `--agent claude-code` on a project where codex was installed with a
-  // different profile masks the disagreement and produces inconsistent
-  // installs. Per review B2 (v0.11.3): always inspect the FULL set of
-  // loaded states, not the narrowed slice.
-  const seen = new Set();
-  for (const [agent, state] of Object.entries(statesByAgent)) {
-    if (state?.profile) seen.add(state.profile);
-  }
-  if (seen.size === 0) {
-    // No state on disk for any agent. Fall back to the default; current
-    // invocation is a fresh / legacy install handled by the legacy path.
-    return DEFAULT_PROFILE;
-  }
-  if (seen.size > 1) {
-    throw new Error(
-      `state files disagree on profile (${[...seen].join(
-        ', '
-      )}). Run \`agentic profile set <name>\` to reconcile across all installed agents before re-running update.`
-    );
-  }
-  return [...seen][0];
-}
-
 export async function updateCommand(opts) {
   if (opts.agent && !AGENT_FLAG_VALUES.includes(opts.agent)) {
     throw new Error(
@@ -186,7 +102,6 @@ export async function updateCommand(opts) {
   const forceRootDoc = Boolean(opts.forceRootDoc);
 
   const detectedAgents = detectAgents(cwd);
-  const features = detectFeatures(cwd);
   const { statesByAgent, agents: previousAgents } = loadStatesOnce(cwd);
 
   const agents = resolveAgents(opts.agent, detectedAgents, previousAgents);
@@ -198,19 +113,6 @@ export async function updateCommand(opts) {
     previousStates[agent] = statesByAgent[agent] ?? null;
   }
 
-  // Pass the FULL loaded set, not the narrowed slice. profileFromStates
-  // surfaces cross-agent disagreement even when the current invocation
-  // targets only one agent (review B2, v0.11.3).
-  const profileName = profileFromStates(statesByAgent, agents);
-  const previousOpted = previouslyOptedConditional(
-    previousStates,
-    agents,
-    profileName
-  );
-  const autoOpted = pickConditionalAuto(features, agents, profileName);
-  const defaultOpted = previousOpted.length ? previousOpted : autoOpted;
-
-  let optedSkills;
   if (interactive) {
     p.intro(`agentic update${dryRun ? ' (dry-run)' : ''}${force ? ' (force)' : ''}`);
     const previousLine = previousAgents.length
@@ -219,42 +121,10 @@ export async function updateCommand(opts) {
     p.note(
       `Previous install: ${previousLine}\n` +
         `Updating for: ${agents.map((a) => AGENT_LABEL[a]).join(' + ')}\n` +
-        `Profile: ${profileName}\n` +
+        'Skills: all bundled skills\n' +
         `Kit version: ${pkg.version}`,
       'Update plan'
     );
-
-    const conditionalOptions = availableConditionalsForProfile(profileName)
-      .map(({ name, rule }) => {
-        const def = CONDITIONAL_BY_NAME[name];
-        if (!def) return null;
-        if (!def.agents.some((a) => agents.includes(a))) return null;
-        const auto = evaluateRule(rule, features, agents);
-        return {
-          value: name,
-          label: name,
-          hint: auto ? def.hintWhenAuto : def.hintWhenManual,
-        };
-      })
-      .filter(Boolean);
-
-    if (conditionalOptions.length > 0) {
-      const picked = await p.multiselect({
-        message: 'Optional skills (toggle to include or exclude):',
-        options: conditionalOptions,
-        initialValues: defaultOpted,
-        required: false,
-      });
-      if (p.isCancel(picked)) {
-        p.cancel('Cancelled.');
-        return;
-      }
-      optedSkills = picked;
-    } else {
-      optedSkills = [];
-    }
-  } else {
-    optedSkills = defaultOpted;
   }
 
   const confirmReplace = interactive
@@ -278,7 +148,7 @@ export async function updateCommand(opts) {
   const nextStates = {};
 
   for (const agent of agents) {
-    const agentSkills = skillsForAgent(agent, profileName, optedSkills);
+    const agentSkills = bundledSkills(agent);
     for (const s of agentSkills) installedSkillSet.add(s);
 
     const orphanResult = await removeOrphanSkills({
@@ -306,13 +176,10 @@ export async function updateCommand(opts) {
       confirmReplace,
       previousStates: { [agent]: previousStates[agent] ?? null },
       kitVersion: pkg.version,
-      profile: profileName,
       dryRun,
       force,
     });
     allActions.push(...result.actions);
-    // installSkills now stamps `profile` into nextStates per review C3.
-    // No post-hoc injection.
     nextStates[agent] = result.nextStates[agent];
   }
 
@@ -327,16 +194,7 @@ export async function updateCommand(opts) {
     }
   }
 
-  // Dedup: ad-architecture and ad-adr are universal at team /
-  // mature (in REQUIRED_SKILLS) AND conditional at solo (in
-  // CONDITIONAL_SKILLS) per review B1 (v0.11.3). Without the Set, the
-  // managed-skills section would list those rows twice.
-  const skillDisplayOrder = [
-    ...new Set([
-      ...REQUIRED_SKILLS,
-      ...CONDITIONAL_SKILLS.map((s) => s.name),
-    ]),
-  ].filter((s) => installedSkillSet.has(s));
+  const skillDisplayOrder = [...installedSkillSet].sort();
 
   // An unattended run must not decide for the team: a tracked root doc is
   // shared with everyone who clones the repo (ADR-0051). Mirrors init.js;
