@@ -256,7 +256,11 @@ function detectPrePush(repoRoot, runners, unreadable) {
 function ciFiles(repoRoot, unreadable) {
   const githubWorkflows = listDir(repoRoot, '.github/workflows', unreadable)
     .filter((name) => /\.ya?ml$/.test(name))
-    .map((name) => join('.github', 'workflows', name));
+    // Reported paths are output data, not filesystem paths: every other
+    // repo-relative string here is written forward-slash, and `join` would
+    // emit `.github\workflows\x.yml` on Windows, making the script's
+    // "stable JSON facts" contract differ by platform.
+    .map((name) => `.github/workflows/${name}`);
   return [...githubWorkflows, ...CI_CONFIGS.filter((rel) => isFile(join(repoRoot, rel)))];
 }
 
