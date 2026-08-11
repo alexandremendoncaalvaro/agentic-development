@@ -1,4 +1,10 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 export const SCHEMA_VERSION = 1;
@@ -73,6 +79,17 @@ export function saveState(cwd, agent, state) {
   mkdirSync(dirname(path), { recursive: true });
   const ordered = orderState(state);
   writeFileSync(path, JSON.stringify(ordered, null, 2) + '\n');
+}
+
+/**
+ * Remove one exact agentic state file. Deliberately leaves its parent agent
+ * directory alone: it can contain host- and project-owned files.
+ */
+export function removeState(cwd, agent, dryRun = false) {
+  const path = statePath(cwd, agent);
+  if (!existsSync(path)) return false;
+  if (!dryRun) unlinkSync(path);
+  return true;
 }
 
 function orderState(state) {

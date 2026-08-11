@@ -490,6 +490,15 @@
           "sourceSha": "cc81b6314359871a72adc02cffce80e215c8a3f77d60afd58e429a1751515b09"
         }
       ]
+    },
+    "ad-update": {
+      "version": "0.20.0-beta.2",
+      "files": [
+        {
+          "path": ".claude/skills/ad-update/SKILL.md",
+          "sourceSha": "2dc223c96596671f15e21153254dc04737b24f32bec15f21d4f4c6ca5ca3bcd3"
+        }
+      ]
     }
   }
 }

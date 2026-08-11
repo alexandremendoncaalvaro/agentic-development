@@ -31,6 +31,7 @@ Requires Node.js 20.12 or newer. Claude Code skills install under `.claude/skill
 | Install for Codex only | `npx --yes @alexandrealvaro/agentic init --agent codex --yes` |
 | Update this project to the current kit | `npx --yes @alexandrealvaro/agentic update --yes` |
 | Preview an update | `npx --yes @alexandrealvaro/agentic update --dry-run --yes` |
+| Remove agentic from this project | `npx --yes @alexandrealvaro/agentic uninstall --yes` |
 | Install the `agentic` command globally | `npm install --global @alexandrealvaro/agentic` |
 | Remove the global command | `npm uninstall --global @alexandrealvaro/agentic` |
 

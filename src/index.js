@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { initCommand } from './commands/init.js';
 import { updateCommand } from './commands/update.js';
+import { uninstallCommand } from './commands/uninstall.js';
 import { menuCommand } from './commands/menu.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -42,6 +43,15 @@ export async function run(argv) {
       'write the managed skills section even when the root doc is tracked by git (non-interactive default: skip)'
     )
     .action(updateCommand);
+
+  program
+    .command('uninstall')
+    .description('Remove agentic-managed files from this project while preserving local edits')
+    .option('-a, --agent <agent>', 'restrict removal to a specific agent: claude-code | codex | both')
+    .option('-y, --yes', 'skip the destructive-action confirmation prompt')
+    .option('--dry-run', 'preview the action plan without removing files')
+    .option('--force', 'also remove user-edited files recorded in agentic state')
+    .action(uninstallCommand);
 
   // No-args + interactive TTY → show the picker. Anything else (flags,
   // subcommand, --help, --version, piped stdin) falls through to commander.

@@ -338,6 +338,8 @@ export async function installSkills({
  * @param {string[]} opts.currentSkills
  * @param {(question: string) => Promise<boolean>} [opts.confirmRemove]
  * @param {boolean} [opts.dryRun]
+ * @param {boolean} [opts.force] Remove a state-recorded divergent file only
+ *   when the caller has made that destructive intent explicit.
  *
  * @returns {Promise<{ actions: Array<{type, path, agent}>, removedSkills: string[] }>}
  */
@@ -348,6 +350,7 @@ export async function removeOrphanSkills({
   currentSkills,
   confirmRemove = async () => false,
   dryRun = false,
+  force = false,
 }) {
   const actions = [];
   const removedSkills = [];
@@ -362,7 +365,7 @@ export async function removeOrphanSkills({
       const abs = join(cwd, f.path);
       return existsSync(abs) && sha256Of(abs) !== f.sourceSha;
     });
-    if (diverged.length > 0) {
+    if (diverged.length > 0 && !force) {
       for (const f of diverged) {
         actions.push({ type: 'orphan-kept', path: f.path, agent });
       }
@@ -438,7 +441,16 @@ export function removeRetiredSkills({
 
   const layout = agentLayout(agent);
   for (const migration of migrations) {
-    const existingFiles = migration.files.filter(({ path }) =>
+    // The state is the strongest migration proof: it records every exact file
+    // that this kit installed, including manifest-routed subagents. A legacy
+    // name with `files: []` therefore migrates only from a state-aware install;
+    // no-state installs need declared historical fingerprints below.
+    const declaredFiles = migration.files ?? [];
+    const declaredPaths = new Set(declaredFiles.map(({ path }) => path));
+    const stateFiles = (previousState?.skills?.[migration.from]?.files ?? [])
+      .filter(({ path }) => !declaredPaths.has(path))
+      .map(({ path }) => ({ path, knownShas: [] }));
+    const existingFiles = [...declaredFiles, ...stateFiles].filter(({ path }) =>
       existsSync(join(cwd, path))
     );
     if (existingFiles.length === 0) continue;

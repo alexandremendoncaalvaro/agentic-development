@@ -642,21 +642,25 @@ test('regression: a known legacy fingerprint migrates without state or deleting 
 });
 
 test('retiredSkillsForAgent records the verified ad-grill source fingerprints', () => {
-  assert.deepEqual(retiredSkillsForAgent('claude-code'), [
-    {
-      from: 'ad-grill',
-      to: 'ad-grill-me',
-      files: [
-        {
-          path: '.claude/skills/ad-grill/SKILL.md',
-          knownShas: [
-            '0df4dcd35113f75ff82e76ea2dc63f341256977ef12a09e51b756bf09b1f3e2e',
-          ],
-        },
-      ],
-    },
-  ]);
-  assert.deepEqual(retiredSkillsForAgent('codex')[0].files, [
+  const claudeGrill = retiredSkillsForAgent('claude-code').find(
+    ({ from }) => from === 'ad-grill'
+  );
+  assert.deepEqual(claudeGrill, {
+    from: 'ad-grill',
+    to: 'ad-grill-me',
+    files: [
+      {
+        path: '.claude/skills/ad-grill/SKILL.md',
+        knownShas: [
+          '0df4dcd35113f75ff82e76ea2dc63f341256977ef12a09e51b756bf09b1f3e2e',
+        ],
+      },
+    ],
+  });
+  const codexGrill = retiredSkillsForAgent('codex').find(
+    ({ from }) => from === 'ad-grill'
+  );
+  assert.deepEqual(codexGrill.files, [
     {
       path: '.agents/skills/ad-grill/SKILL.md',
       knownShas: [
@@ -670,6 +674,52 @@ test('retiredSkillsForAgent records the verified ad-grill source fingerprints', 
       ],
     },
   ]);
+});
+
+test('regression: a state-recorded agentic-prefix skill is migrated by name', () => {
+  const dir = mkScratch();
+  try {
+    const legacyPath = '.claude/skills/agentic-bootstrap/SKILL.md';
+    const legacyBody = 'previous prefix kit skill\n';
+    mkdirSync(dirname(join(dir, legacyPath)), { recursive: true });
+    writeFileSync(join(dir, legacyPath), legacyBody);
+    const state = emptyState('claude-code', '0.3.0-beta.1');
+    state.skills['agentic-bootstrap'] = {
+      version: '0.3.0-beta.1',
+      files: [{ path: legacyPath, sourceSha: sha256(legacyBody) }],
+    };
+
+    const result = removeRetiredSkills({
+      cwd: dir,
+      agent: 'claude-code',
+      previousState: state,
+    });
+
+    assert.equal(existsSync(join(dir, legacyPath)), false);
+    assert.deepEqual(result.actions, [
+      { type: 'migration-removed', path: legacyPath, agent: 'claude-code' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('retiredSkillsForAgent records the verified ad-clean source fingerprint', () => {
+  const claudeClean = retiredSkillsForAgent('claude-code').find(
+    ({ from }) => from === 'ad-clean'
+  );
+  assert.deepEqual(claudeClean, {
+    from: 'ad-clean',
+    to: 'ad-archive',
+    files: [
+      {
+        path: '.claude/skills/ad-clean/SKILL.md',
+        knownShas: [
+          'bb315007e059943dd230b8b5c264d7efad0abe88aad2ec1b01ddc915976bc642',
+        ],
+      },
+    ],
+  });
 });
 
 test('regression: an edited renamed skill is preserved as one intact unit', () => {

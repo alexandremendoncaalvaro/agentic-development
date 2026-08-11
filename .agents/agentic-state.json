@@ -626,6 +626,19 @@
           "sourceSha": "f7ab5066dca8b08820e5e14ccfa6170f1bc9fe140a1529bd33c6c50e9b9b6c51"
         }
       ]
+    },
+    "ad-update": {
+      "version": "0.20.0-beta.2",
+      "files": [
+        {
+          "path": ".agents/skills/ad-update/agents/openai.yaml",
+          "sourceSha": "c09b1c6dd5e5c20f3f4558791c5fc8dcc6c328bd53436e63806da81c957df818"
+        },
+        {
+          "path": ".agents/skills/ad-update/SKILL.md",
+          "sourceSha": "c403f277a3fd935aba2cbd1e28c06c18e308d590c7a33cd3b4c3653876dde7eb"
+        }
+      ]
     }
   }
 }

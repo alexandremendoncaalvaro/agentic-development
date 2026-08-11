@@ -71,19 +71,23 @@ Preview before writing:
 npx --yes @alexandrealvaro/agentic update --dry-run --yes
 ```
 
-`update` compares the current kit source, the hashes saved at the last install, and the target files. It updates unchanged kit files, preserves a user-edited skill by default, and asks before overwriting an actual conflict. Use `--force` only when you deliberately want the kit version to replace a user edit.
+`update` compares the current kit source, the hashes saved at the last install, and the target files. It updates unchanged kit files, preserves a user-edited skill by default, and asks before overwriting an actual conflict. Declared skill replacements also remove a retired name only when every known legacy file is unchanged; an edited retired skill stays intact. Use `--force` only when you deliberately want the kit version to replace a user edit.
 
 ## Remove a project installation
 
-There is currently no `agentic uninstall` command. It would be unsafe to guess: agent directories can contain project-owned files, and a state file does not preserve the original bytes of a locally edited skill.
+From the project root, remove the files recorded in agentic's state:
 
-If you deliberately remove a project materialization, use `.claude/agentic-state.json` and `.agents/agentic-state.json` only as an inventory. For every listed path, first verify that it is an unedited kit file or make a backup. Do not delete `.claude/` or `.agents/` wholesale.
+```bash
+npx --yes @alexandrealvaro/agentic uninstall --yes
+```
 
-Before removing root files, check ownership:
+Preview first when you want an inventory:
 
-- Remove `WORKFLOW.md` and `WORKFLOW-FLOWS.md` only when the project did not add its own content.
-- Remove the bounded `agentic-managed-skills` section from `AGENTS.md` or `CLAUDE.md` only when it is no longer wanted; preserve everything outside its markers.
-- Keep project-owned `.claude/agents/`, `.codex/agents/`, and every locally edited skill file unless you deliberately mean to discard it.
+```bash
+npx --yes @alexandrealvaro/agentic uninstall --dry-run --yes
+```
+
+The command removes only exact files listed in `.claude/agentic-state.json` and `.agents/agentic-state.json`; it never deletes `.claude/`, `.agents/`, or `.codex/` wholesale. A locally edited managed file stays by default and its state entry remains for a later decision. Pass `--force` only when you explicitly want to discard those edits. `WORKFLOW.md`, `WORKFLOW-FLOWS.md`, and the bounded managed section in `AGENTS.md` / `CLAUDE.md` are project-facing and are deliberately left for manual review.
 
 ## Troubleshooting
 

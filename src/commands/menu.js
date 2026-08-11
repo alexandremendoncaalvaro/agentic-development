@@ -2,7 +2,7 @@ import * as p from '@clack/prompts';
 
 /**
  * Interactive menu shown when `agentic` is invoked with no arguments on a TTY.
- * Lets the user pick init / update without remembering subcommand
+ * Lets the user pick init / update / uninstall without remembering subcommand
  * names. Dispatches by re-running the parser with synthesized argv so each
  * sub-command keeps its own interactive flow (clack prompts inside init,
  * three-way diff confirmation inside update, etc).
@@ -21,6 +21,10 @@ export async function menuCommand(runWithArgv) {
         value: 'init',
         label: 'init — install agentic skills into this project',
       },
+      {
+        value: 'uninstall',
+        label: 'uninstall — remove agentic-managed files from this project',
+      },
       { value: 'exit', label: 'exit' },
     ],
   });
@@ -34,6 +38,7 @@ export async function menuCommand(runWithArgv) {
   const dispatch = {
     update: [...baseArgv, 'update'],
     init: [...baseArgv, 'init'],
+    uninstall: [...baseArgv, 'uninstall'],
   };
 
   await runWithArgv(dispatch[choice]);

@@ -57,6 +57,7 @@ Every skill below installs for each selected host. Installation is not a mandate
 | `/ad-pr` | A branch is ready for a pull request. | GitHub PR with a uniform body. |
 | `/ad-merge` | A PR is ready for merge evaluation. | CI-aware merge decision and merge. |
 | `/ad-release` | A supported npm package is ready to release. | Confirmed release, publish, and GitHub Release workflow. |
+| `/ad-update` | You want to inspect or apply the current kit update from the agent session. | Safe project-local update plan, then an explicit apply when requested. |
 | `/ad-handoff` | A session must continue with fresh context. | Compact handoff in the OS temp directory. |
 | `/ad-roadmap` | You need a product-roadmap completion rollup. | Tiered done / in-progress / remaining report. |
 | `/ad-archive` | Completed planning artifacts have been absorbed. | Safe deletion into Git history. |
