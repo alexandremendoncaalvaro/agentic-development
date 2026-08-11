@@ -11,18 +11,25 @@ on:
       - cli
 
 jobs:
+  # The kit installs onto whatever machine a practitioner works on, and the
+  # suite spawns real binaries, walks real paths, and drives real git hooks —
+  # all of which behave differently on Windows. Running Linux alone let sixteen
+  # tests rot red there while every check stayed green: POSIX-only fixtures, a
+  # path interpolated into a RegExp, and OS-native separators reaching a script's
+  # JSON contract. Windows is a first-class target, so it is a first-class lane.
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest]
         node-version: ['20.x', '22.x']
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js ${{ matrix.node-version }}
+      - name: Set up Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
