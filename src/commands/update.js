@@ -3,7 +3,13 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { detectAgents, detectFeatures } from '../lib/detect.js';
-import { installKitDocs, installSkills, removeOrphanSkills } from '../lib/install.js';
+import {
+  installKitDocs,
+  installSkills,
+  removeOrphanSkills,
+  removeRetiredSkills,
+} from '../lib/install.js';
+import { retiredSkillNamesForAgent } from '../lib/skill-migrations.js';
 import { loadState, saveState, userLevelInstallPath } from '../lib/state.js';
 import {
   DEFAULT_PROFILE,
@@ -57,6 +63,8 @@ const ACTION_SYMBOL = {
   removed: '-',
   'removed-missing': '?',
   'orphan-kept': '?',
+  'migration-removed': '-',
+  'migration-kept': '!',
 };
 
 const ROOT_DOC_LABEL = {
@@ -277,11 +285,19 @@ export async function updateCommand(opts) {
       cwd,
       agent,
       previousState: previousStates[agent],
-      currentSkills: agentSkills,
+      currentSkills: [...agentSkills, ...retiredSkillNamesForAgent(agent)],
       confirmRemove,
       dryRun,
     });
     allActions.push(...orphanResult.actions);
+
+    const migrationResult = removeRetiredSkills({
+      cwd,
+      agent,
+      previousState: previousStates[agent],
+      dryRun,
+    });
+    allActions.push(...migrationResult.actions);
 
     const result = await installSkills({
       cwd,

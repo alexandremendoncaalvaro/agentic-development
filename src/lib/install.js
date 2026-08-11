@@ -5,13 +5,14 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
-  rmSync,
+  rmdirSync,
   statSync,
   unlinkSync,
 } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { basename, dirname, join, relative, sep as PATH_SEP } from 'node:path';
 import { SCHEMA_VERSION } from './state.js';
+import { retiredSkillsForAgent } from './skill-migrations.js';
 import { DEFAULT_PROFILE, validateProfile } from './profiles.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -353,6 +354,16 @@ export async function removeOrphanSkills({
 
   for (const [skill, entry] of Object.entries(previousState.skills)) {
     if (currentSet.has(skill)) continue;
+    const diverged = entry.files.filter((f) => {
+      const abs = join(cwd, f.path);
+      return existsSync(abs) && sha256Of(abs) !== f.sourceSha;
+    });
+    if (diverged.length > 0) {
+      for (const f of diverged) {
+        actions.push({ type: 'orphan-kept', path: f.path, agent });
+      }
+      continue;
+    }
     const remove = await confirmRemove(
       `Remove orphan skill "${skill}" for ${agent}? (no longer in your install set)`
     );
@@ -379,19 +390,74 @@ export async function removeOrphanSkills({
       }
       actions.push({ type: 'removed', path: f.path, agent });
     }
-    // Try to drop the empty skill directory under skillsDir/<skill>.
-    const skillDir = join(cwd, layout.skillsDir, skill);
-    if (!dryRun && existsSync(skillDir)) {
-      try {
-        rmSync(skillDir, { recursive: true, force: true });
-      } catch {
-        // best-effort cleanup
-      }
-    }
+    removeEmptySkillDirectory(cwd, layout, skill, dryRun);
     removedSkills.push(skill);
   }
 
   return { actions, removedSkills };
+}
+
+function removeEmptySkillDirectory(cwd, layout, skill, dryRun) {
+  const skillDir = join(cwd, layout.skillsDir, skill);
+  if (dryRun || !existsSync(skillDir)) return;
+  if (readdirSync(skillDir).length === 0) rmdirSync(skillDir);
+}
+
+/**
+ * Remove skills explicitly retired by the kit. Every existing managed file
+ * must still match either its saved state fingerprint or a declared legacy
+ * fingerprint. A single local edit preserves the entire retired skill so an
+ * update never leaves a half-deleted user customization behind.
+ *
+ * @param {object} opts
+ * @param {string} opts.cwd
+ * @param {string} opts.agent
+ * @param {object|null} opts.previousState
+ * @param {Array<object>} [opts.migrations]
+ * @param {boolean} [opts.dryRun]
+ * @returns {{ actions: Array<{type, path, agent}> }}
+ */
+export function removeRetiredSkills({
+  cwd,
+  agent,
+  previousState,
+  migrations = retiredSkillsForAgent(agent),
+  dryRun = false,
+}) {
+  const actions = [];
+  const stateShas = new Map();
+  for (const [skill, entry] of Object.entries(previousState?.skills ?? {})) {
+    for (const file of entry.files ?? []) {
+      stateShas.set(file.path, file.sourceSha);
+    }
+  }
+
+  const layout = agentLayout(agent);
+  for (const migration of migrations) {
+    const existingFiles = migration.files.filter(({ path }) =>
+      existsSync(join(cwd, path))
+    );
+    if (existingFiles.length === 0) continue;
+
+    const changedFiles = existingFiles.filter(({ path, knownShas }) => {
+      const actualSha = sha256Of(join(cwd, path));
+      return actualSha !== stateShas.get(path) && !knownShas.includes(actualSha);
+    });
+    if (changedFiles.length > 0) {
+      for (const { path } of changedFiles) {
+        actions.push({ type: 'migration-kept', path, agent });
+      }
+      continue;
+    }
+
+    for (const { path } of existingFiles) {
+      if (!dryRun) unlinkSync(join(cwd, path));
+      actions.push({ type: 'migration-removed', path, agent });
+    }
+    removeEmptySkillDirectory(cwd, layout, migration.from, dryRun);
+  }
+
+  return { actions };
 }
 
 // Layer 1 Constitution files the kit ships. Installed skills cite them by
