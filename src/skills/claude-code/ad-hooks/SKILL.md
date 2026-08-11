@@ -25,7 +25,15 @@ Visual / E2E for UI projects (Cypress, Playwright, Claude in Chrome) are mention
 
 ## Step 1 — Detect the runner
 
-Read the repo signals in this order:
+Run the deterministic detector from the consumer repository root:
+
+```bash
+node .claude/skills/ad-hooks/scripts/detect-hooks.mjs
+```
+
+If this skill was loaded from a different base directory, substitute that base; the bundled script is `scripts/detect-hooks.mjs`. Execute it; do not read it as prose. Its JSON reports `stacks`, `runners`, `prePush` (`files`, gate `commands`), `ci` (`files`, gate `commands`, `matrices`), raw textual `drift.ciOnlyCommands`, and `unreadable`. A non-empty `unreadable` means the scan is partial; name those paths instead of treating them as absent.
+
+Use its facts in this order:
 
 1. **Existing runner.** `.husky/` → Husky present. `lefthook.yml` or `.lefthook.yml` → lefthook present. `.pre-commit-config.yaml` → pre-commit present. `.git/hooks/` with non-sample scripts → native hooks present.
 2. **Stack signals (if no runner present).** `package.json` → Node-rooted; recommend Husky (most common in Node ecosystem) or lefthook (cross-language fit). `pyproject.toml` → Python-rooted; recommend pre-commit. `go.mod` → Go-rooted; recommend lefthook. `Cargo.toml` → Rust-rooted; recommend lefthook. Multiple stacks → recommend lefthook (cross-language by default).
@@ -64,13 +72,12 @@ Honor the existing managed-skills / managed-quality-gates markers if `ad-bootstr
 
 ## Step 5 — Mirror CI locally (drift check)
 
-Local gates must mirror what CI runs — same commands, same matrix. WORKFLOW §11: "CI failure is a local gate gap." Read the CI config and compare.
+Local gates must mirror what CI runs — same commands, same matrix. WORKFLOW §11: "CI failure is a local gate gap." The detector already performed the deterministic scan; do not re-derive it in prose.
 
-1. **Detect the CI surface.** In order: `.github/workflows/*.yml` (GitHub Actions), `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml` (Circle), `azure-pipelines.yml` (Azure), `.buildkite/pipeline.yml` (Buildkite). If none, note the gap and stop this step — the mirror check has no target.
-2. **Extract CI commands.** Parse the `run:` / `script:` steps from the CI config. Focus on test / lint / typecheck / build invocations; ignore checkout, setup, cache, publish steps.
-3. **Extract CI matrix.** Language versions (Node 20 / 22, Python 3.11 / 3.12, Go 1.22, etc.), OS runners (`ubuntu-latest`, `macos-latest`), feature flags. These become the pre-push matrix requirement when they change the failure surface.
-4. **Diff against the pre-push tier.** For each CI command not covered by pre-push, warn: `CI runs <cmd> — pre-push does not. Add to pre-push or CI will catch what local won't.` For each matrix dimension CI covers that pre-push does not (e.g., pre-push runs Node 22 only, CI runs 20 + 22), warn: `CI matrix <dim>=<values>, pre-push runs <value>. Failures under <missing-value> will only surface in CI.`
-5. **Offer to close the gap.** If gaps exist, propose specific edits to the runner config (extra commands, matrix loop via `Node --version` iteration, feature-flag pass). Ask the user before writing — matrix mirroring can be expensive; the user picks.
+1. **CI surface and commands.** `ci.files` is the detected CI surface; when it is empty, note the gap and stop this step. `ci.commands` contains test / lint / typecheck / build-like `run:` / `script:` commands; `prePush.commands` contains the corresponding local gate commands.
+2. **Matrix.** `ci.matrices` contains inline CI matrix dimensions. Compare them with the actual local runtime the pre-push hook uses; a script cannot infer a developer's installed version. For each meaningful missing dimension, warn: `CI matrix <dim>=<values>, pre-push runs <value>. Failures under <missing-value> will only surface in CI.`
+3. **Command drift.** `drift.ciOnlyCommands` is an exact-text diff. For each command with no wrapper evidence, warn: `CI runs <cmd> — pre-push does not. Add to pre-push or CI will catch what local won't.` A wrapper may be semantically equivalent while spelling the command differently; inspect and state that evidence rather than claiming a gap from raw text alone.
+4. **Offer to close the gap.** If gaps exist, propose specific edits to the runner config (extra commands, matrix loop via `Node --version` iteration, feature-flag pass). Ask the user before writing — matrix mirroring can be expensive; the user picks.
 
 The mirror check runs after Step 4 wrote the config, so gap edits layer on top of a working scaffold. If the CI surface is absent, note: "No CI config detected — pre-push is the only gate. Add CI so contributors cannot bypass via `--no-verify` and re-run this skill to re-mirror."
 

@@ -1352,3 +1352,296 @@ test('find-terminal: a present-but-unreadable candidate is surfaced in `unreadab
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// --- ad-hooks deterministic detector (ADR-0057, P2.4) ----------------------
+// The Claude Code copy is executed; test/skills.test.js enforces that the
+// Codex copy is byte-identical. The detector reports low-freedom facts only;
+// runner choice and gate edits stay in the skill body.
+const HOOKS = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-hooks',
+  'scripts',
+  'detect-hooks.mjs'
+);
+
+function runHooksDetector(cwd) {
+  const out = execFileSync('node', [HOOKS], { cwd, encoding: 'utf8', env: process.env });
+  return JSON.parse(out);
+}
+
+test('detect-hooks: reports stack, runner, CI/pre-push commands, and uncovered CI work', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-detector-'));
+  try {
+    writeFileSync(join(dir, 'package.json'), '{"name":"fixture"}\n');
+    writeFileSync(
+      join(dir, 'lefthook.yml'),
+      [
+        'pre-push:',
+        '  commands:',
+        '    test:',
+        '      run: npm test',
+        '',
+      ].join('\n')
+    );
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(
+      join(dir, '.github', 'workflows', 'test.yml'),
+      [
+        'name: test',
+        'jobs:',
+        '  test:',
+        '    strategy:',
+        '      matrix:',
+        "        node-version: ['20.x', '22.x']",
+        '    steps:',
+        '      - run: npm test',
+        '      - run: npm run lint',
+        '',
+      ].join('\n')
+    );
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.stacks, ['node']);
+    assert.deepEqual(report.runners, ['lefthook']);
+    assert.deepEqual(report.prePush, {
+      files: ['lefthook.yml'],
+      commands: ['npm test'],
+    });
+    assert.deepEqual(report.ci.files, ['.github/workflows/test.yml']);
+    assert.deepEqual(report.ci.commands, ['npm test', 'npm run lint']);
+    assert.deepEqual(report.ci.matrices, [{ key: 'node-version', values: ['20.x', '22.x'] }]);
+    assert.deepEqual(report.drift.ciOnlyCommands, ['npm run lint']);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: does not count a runner-installed hook stub as a native runner', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-managed-stub-'));
+  try {
+    writeFileSync(join(dir, 'lefthook.yml'), 'pre-push:\n  commands: {}\n');
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    writeFileSync(join(dir, '.git', 'hooks', 'pre-push'), '#!/bin/sh\nlefthook run pre-push\n');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['lefthook']);
+    assert.deepEqual(report.prePush.files, ['lefthook.yml']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: reads shell commands from a Husky pre-push hook', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-husky-'));
+  try {
+    mkdirSync(join(dir, '.husky'));
+    writeFileSync(join(dir, '.husky', 'pre-push'), '#!/bin/sh\nnpm test\nnpm run lint\n');
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(
+      join(dir, '.github', 'workflows', 'test.yml'),
+      'steps:\n  - run: npm test\n  - run: npm run lint\n'
+    );
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['husky']);
+    assert.deepEqual(report.prePush.commands, ['npm test', 'npm run lint']);
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: reads shell commands from a native pre-push hook', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-native-'));
+  try {
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    writeFileSync(join(dir, '.git', 'hooks', 'pre-push'), '#!/bin/sh\nnpm test\n');
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(dir, '.github', 'workflows', 'test.yml'), 'steps:\n  - run: npm test\n');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['native']);
+    assert.deepEqual(report.prePush.commands, ['npm test']);
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: reports a native hook beside another runner', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-mixed-native-'));
+  try {
+    mkdirSync(join(dir, '.husky'));
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    writeFileSync(join(dir, '.git', 'hooks', 'pre-push'), '#!/bin/sh\nnpm test\n');
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(dir, '.github', 'workflows', 'test.yml'), 'steps:\n  - run: npm test\n');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['husky', 'native']);
+    assert.deepEqual(report.prePush.commands, ['npm test']);
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: resolves native hooks from a linked Git worktree', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-linked-worktree-'));
+  const main = join(dir, 'main');
+  const linked = join(dir, 'linked');
+  try {
+    mkdirSync(main);
+    execFileSync('git', ['init', '-q', main]);
+    writeFileSync(join(main, 'README.md'), 'fixture\n');
+    execFileSync('git', ['-C', main, 'add', 'README.md']);
+    execFileSync('git', [
+      '-C',
+      main,
+      '-c',
+      'user.name=fixture',
+      '-c',
+      'user.email=fixture@example.test',
+      'commit',
+      '-qm',
+      'fixture',
+    ]);
+    execFileSync('git', ['-C', main, 'worktree', 'add', '-qb', 'linked', linked]);
+    writeFileSync(join(main, '.git', 'hooks', 'pre-push'), '#!/bin/sh\nnpm test\n');
+    mkdirSync(join(linked, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(linked, '.github', 'workflows', 'test.yml'), 'steps:\n  - run: npm test\n');
+
+    const report = runHooksDetector(linked);
+    assert.deepEqual(report.runners, ['native']);
+    assert.deepEqual(report.prePush.commands, ['npm test']);
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: an unreadable native hook does not imply a native runner', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-unreadable-native-'));
+  try {
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    const hook = join(dir, '.git', 'hooks', 'pre-push');
+    writeFileSync(hook, '#!/bin/sh\nnpm test\n');
+    chmodSync(hook, 0o000);
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, []);
+    assert.deepEqual(report.unreadable, [{ path: '.git/hooks/pre-push', code: 'EACCES' }]);
+  } finally {
+    try {
+      chmodSync(join(dir, '.git', 'hooks', 'pre-push'), 0o755);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: an empty readable native hook is still a native runner', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-empty-native-'));
+  try {
+    mkdirSync(join(dir, '.git', 'hooks'), { recursive: true });
+    writeFileSync(join(dir, '.git', 'hooks', 'pre-push'), '');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['native']);
+    assert.deepEqual(report.prePush, {
+      files: ['.git/hooks/pre-push'],
+      commands: [],
+    });
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: reads a pre-commit pre-push entry and recognizes pytest', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-pre-commit-'));
+  try {
+    writeFileSync(
+      join(dir, '.pre-commit-config.yaml'),
+      [
+        'repos:',
+        '  - repo: local',
+        '    hooks:',
+        '      - id: test',
+        '        entry: pytest',
+        '        language: system',
+        '        stages: [pre-push]',
+        '',
+      ].join('\n')
+    );
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(dir, '.github', 'workflows', 'test.yml'), 'steps:\n  - run: pytest\n');
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.runners, ['pre-commit']);
+    assert.deepEqual(report.prePush, {
+      files: ['.pre-commit-config.yaml'],
+      commands: ['pytest'],
+    });
+    assert.deepEqual(report.drift.ciOnlyCommands, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: an unreadable workflows directory is surfaced, never silent', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-unreadable-directory-'));
+  try {
+    const workflows = join(dir, '.github', 'workflows');
+    mkdirSync(workflows, { recursive: true });
+    chmodSync(workflows, 0o000);
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.unreadable, [{ path: '.github/workflows', code: 'EACCES' }]);
+  } finally {
+    try {
+      chmodSync(join(dir, '.github', 'workflows'), 0o755);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('detect-hooks: an unreadable CI config is surfaced, never silent', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-hooks-unreadable-'));
+  try {
+    mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
+    const locked = join(dir, '.github', 'workflows', 'test.yml');
+    writeFileSync(locked, 'jobs: {}\n');
+    chmodSync(locked, 0o000);
+
+    const report = runHooksDetector(dir);
+    assert.deepEqual(report.unreadable, [{ path: '.github/workflows/test.yml', code: 'EACCES' }]);
+  } finally {
+    try {
+      chmodSync(join(dir, '.github', 'workflows', 'test.yml'), 0o644);
+    } catch {
+      /* ignore */
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
