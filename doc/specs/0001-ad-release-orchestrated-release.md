@@ -93,10 +93,15 @@ The kit already makes the local half of a release deterministic: its `scripts/re
 ## Open Questions
 
 - Resolved — [ADR-0063](../adr/0063-orchestrate-external-npm-release-steps.md) accepts the five separately confirmed effects and the state-aware recovery contract.
+- Unresolved — [`task-0050`](../tasks/0050-decide-release-dist-tag-contract.md)
+  owns reconciliation of the configured `beta` dist-tag with the observed
+  `latest` assignment of `0.20.0-beta.2`. Until that maintainer decision is
+  recorded, this specification remains `accepted`.
 
 ## Related
 
 - ADRs: [ADR-0048](../adr/0048-kit-release-discipline-gates.md) (existing local release path); [ADR-0063](../adr/0063-orchestrate-external-npm-release-steps.md) (external release contract).
-- Tasks: none yet.
+- Tasks: [`task-0044`](../tasks/0044-reconcile-ad-release-spec.md),
+  [`task-0050`](../tasks/0050-decide-release-dist-tag-contract.md).
 - Sources: [npm publish documentation](https://docs.npmjs.com/cli/v10/commands/npm-publish/), [GitHub CLI `gh release create` manual](https://cli.github.com/manual/gh_release_create), [semantic-release npm plugin](https://github.com/semantic-release/npm).
 - Supersedes / Depends on: depends on the existing `scripts/release.sh` contract.
