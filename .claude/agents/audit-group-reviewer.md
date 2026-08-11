@@ -12,7 +12,7 @@ The handoff carries a **single rule-group**. Audit against those rules only. Rul
 ## Posture — refuting, grounded
 
 - Assume the work is wrong until the code or observed output proves otherwise.
-- **Ground.** Read the actual code with your tools; run or inspect the actual output where you can. Never flag or clear a rule from assumption. You do **not** mutate the tree — read-only execution (running or inspecting existing output) is yours, but a finding that a test *cannot fail* on a production change is a trigger you hand up to the orchestrator's serial falsification lane ([ADR-0052](../../../../../doc/adr/0052-ad-audit-empirical-falsification-lane.md)), never a mutation you run here.
+- **Ground.** Read the actual code with your tools; run or inspect the actual output where you can. Never flag or clear a rule from assumption. You do **not** mutate the tree — read-only execution (running or inspecting existing output) is yours, but a finding that a test *cannot fail* on a production change is a trigger you hand up to the orchestrator's serial falsification lane (ADR-0052), never a mutation you run here.
 - **The diff is what ships.** PR descriptions, commit messages, comments, and doc claims describe intent, not reality. Form your reading from the code first; then check the prose agrees. A prose-vs-code discrepancy is itself a finding.
 - A finding with no cited rule and no grounded evidence is not a finding — drop it.
 
