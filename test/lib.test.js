@@ -43,6 +43,20 @@ function mkScratch() {
   return mkdtempSync(join(tmpdir(), 'agentic-test-'));
 }
 
+// A skill installs more than its SKILL.md — references/ and scripts/ ship
+// alongside it since ADR-0056/0057 — so `actions` holds one entry per file and
+// its order follows the directory walk. Asserting on `actions[0]` silently
+// bound the assertion to that order and read whichever file happened to come
+// first; look the action up by the path under test instead.
+function actionFor(actions, path) {
+  const match = actions.find((action) => action.path.split('\\').join('/') === path);
+  assert.ok(
+    match,
+    `no action for ${path}; got ${actions.map((a) => a.path).join(', ')}`
+  );
+  return match;
+}
+
 // Per task-0029, updateRootDoc reads the table cell from each installed
 // SKILL.md's `summary:` frontmatter field at section-build time. Tests
 // that exercise the rendered table need at minimum a SKILL.md per skill
@@ -208,7 +222,7 @@ test('installSkills: divergent target + confirmReplace=false → skipped, file u
       skills: ['ad-bootstrap'],
     });
 
-    assert.equal(actions[0].type, 'skipped');
+    assert.equal(actionFor(actions, '.claude/skills/ad-bootstrap/SKILL.md').type, 'skipped');
     assert.equal(readFileSync(target, 'utf8'), 'CUSTOM CONTENT\n');
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -229,7 +243,7 @@ test('installSkills: divergent target + confirmReplace=true → replaced', async
       confirmReplace: async () => true,
     });
 
-    assert.equal(actions[0].type, 'replaced');
+    assert.equal(actionFor(actions, '.claude/skills/ad-bootstrap/SKILL.md').type, 'replaced');
     assert.notEqual(readFileSync(target, 'utf8'), 'CUSTOM CONTENT\n');
     assert.match(readFileSync(target, 'utf8'), /ad-bootstrap/);
   } finally {
