@@ -280,8 +280,12 @@
           "sourceSha": "289c42e691f628f05406c415d03beea7450c7c5c5012dae0a1de365ddec28eac"
         },
         {
+          "path": ".agents/skills/ad-merge/scripts/gh-preflight.mjs",
+          "sourceSha": "ef29165e9dece46661eda564c29fe2b287d467460b09fa2fcd667fac1267669f"
+        },
+        {
           "path": ".agents/skills/ad-merge/SKILL.md",
-          "sourceSha": "7cce85ef801bc905fc174834dddcc81d4e61a488a3d9befc26ae9751af79e9e8"
+          "sourceSha": "1443bd1002638958b1e8b1f3682ca0c8c67ff319d1bb98f2cd0583ec663949e8"
         }
       ]
     },
@@ -323,8 +327,12 @@
           "sourceSha": "2062555928cbdf4eac21ad1ca3e4d9ca6dfdc8a8cecae5a9b79c2c9dd14c177f"
         },
         {
+          "path": ".agents/skills/ad-pr/scripts/gh-preflight.mjs",
+          "sourceSha": "ef29165e9dece46661eda564c29fe2b287d467460b09fa2fcd667fac1267669f"
+        },
+        {
           "path": ".agents/skills/ad-pr/SKILL.md",
-          "sourceSha": "e6bd803887c234788a0abc424c75e74b78154423b12acbfe21496da1279d1402"
+          "sourceSha": "64aaff4782b45251eaa8741bc4552498e01ef35f17bee1cca015fd987ee49964"
         }
       ]
     },

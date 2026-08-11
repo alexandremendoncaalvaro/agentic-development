@@ -1809,3 +1809,277 @@ test('next-number: all four skills ship the same self-contained detector on both
     }
   }
 });
+
+// --- GitHub CLI preflight (ADR-0057, P2.6) ---------------------------------
+const GH_PREFLIGHT_SKILLS = ['ad-pr', 'ad-merge'];
+const GH_PREFLIGHT_SCRIPTS = GH_PREFLIGHT_SKILLS.map((skill) =>
+  join(__dirname, '..', 'src', 'skills', 'claude-code', skill, 'scripts', 'gh-preflight.mjs')
+);
+
+function runGhPreflight(cwd, args, environment = {}) {
+  const out = execFileSync('node', [GH_PREFLIGHT_SCRIPTS[0], ...args], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, ...environment },
+  });
+  return JSON.parse(out);
+}
+
+function writeFakeGh(dir, responses) {
+  const path = join(dir, 'fake-gh');
+  writeFileSync(path, `#!/usr/bin/env node
+if (process.env.AGENTIC_TEST_GH_REQUIRE_CLEAN_GIT_ENV === 'true' && ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE'].some((name) => process.env[name])) process.exit(97);
+const responses = JSON.parse(process.env.AGENTIC_TEST_GH_RESPONSES || '{}');
+const response = responses[process.argv.slice(2).join('\\u0000')] || { status: 0, stdout: '' };
+process.stdout.write(response.stdout || '');
+process.stderr.write(response.stderr || '');
+process.exit(response.status || 0);
+`);
+  chmodSync(path, 0o755);
+  return {
+    AGENTIC_GH: path,
+    AGENTIC_TEST_GH_RESPONSES: JSON.stringify(responses),
+  };
+}
+
+function commitFixture(repo, subject) {
+  execFileSync('git', ['-C', repo, 'add', '.']);
+  execFileSync('git', ['-C', repo, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', subject]);
+}
+
+function pushedFeatureFixture(dir) {
+  execFileSync('git', ['init', '-q', dir]);
+  writeFileSync(join(dir, 'README.md'), 'fixture\n');
+  commitFixture(dir, 'initial');
+  execFileSync('git', ['-C', dir, 'branch', '-M', 'main']);
+  execFileSync('git', ['-C', dir, 'checkout', '-qb', 'feat/preflight']);
+  execFileSync('git', ['-C', dir, 'remote', 'add', 'origin', 'https://example.test/fixture.git']);
+  execFileSync('git', ['-C', dir, 'update-ref', 'refs/remotes/origin/feat/preflight', 'HEAD']);
+  execFileSync('git', ['-C', dir, 'branch', '--set-upstream-to=origin/feat/preflight', 'feat/preflight']);
+}
+
+test('gh-preflight: PR reports authenticated GitHub and a pushed branch', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-pr-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+    });
+
+    assert.deepEqual(runGhPreflight(dir, ['pr'], env), {
+      operation: 'pr',
+      github: { command: env.AGENTIC_GH, installed: true, authenticated: true },
+      git: { branch: 'feat/preflight', upstream: 'origin/feat/preflight', aheadOfUpstream: 0 },
+      baseBranch: 'main',
+      pullRequest: null,
+      pullRequestState: 'not-requested',
+      checks: [],
+      mergeMethods: null,
+      targetRepository: null,
+      errors: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: strips inherited Git worktree variables before GitHub probes', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-clean-env-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+    });
+    const report = runGhPreflight(dir, ['pr'], {
+      ...env,
+      AGENTIC_TEST_GH_REQUIRE_CLEAN_GIT_ENV: 'true',
+      GIT_DIR: join(dir, 'wrong-git-dir'),
+      GIT_WORK_TREE: join(dir, 'wrong-work-tree'),
+      GIT_INDEX_FILE: join(dir, 'wrong-index'),
+    });
+    assert.equal(report.github.authenticated, true);
+    assert.equal(report.git.branch, 'feat/preflight');
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: merge reports the PR, checks, and allowed merge methods', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-merge-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u000042\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        stdout: '{"number":42,"headRefName":"feat/preflight","baseRefName":"main","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviews":[]}\n',
+      },
+      'pr\u0000checks\u000042\u0000--json\u0000name,bucket,state,link': {
+        stdout: '[{"name":"test","bucket":"pass","state":"SUCCESS","link":"https://example.test/check"}]\n',
+      },
+      'repo\u0000view\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed': {
+        stdout: '{"mergeCommitAllowed":true,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge', '42'], env);
+    assert.equal(report.operation, 'merge');
+    assert.equal(report.pullRequest.number, 42);
+    assert.equal(report.pullRequestState, 'present');
+    assert.equal(report.pullRequest.mergeStateStatus, 'CLEAN');
+    assert.deepEqual(report.checks, [{ name: 'test', bucket: 'pass', state: 'SUCCESS', link: 'https://example.test/check' }]);
+    assert.deepEqual(report.mergeMethods, { mergeCommitAllowed: true, squashMergeAllowed: true, rebaseMergeAllowed: false });
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: pending checks retain their JSON despite gh exit code 8', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-pending-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u000042\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        stdout: '{"number":42,"headRefName":"feat/preflight","baseRefName":"main","mergeable":"UNKNOWN","mergeStateStatus":"UNKNOWN","reviews":[]}\n',
+      },
+      'pr\u0000checks\u000042\u0000--json\u0000name,bucket,state,link': {
+        status: 8,
+        stdout: '[{"name":"test","bucket":"pending","state":"IN_PROGRESS","link":"https://example.test/check"}]\n',
+      },
+      'repo\u0000view\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed': {
+        stdout: '{"mergeCommitAllowed":true,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge', '42'], env);
+    assert.deepEqual(report.checks, [{ name: 'test', bucket: 'pending', state: 'IN_PROGRESS', link: 'https://example.test/check' }]);
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: a PR URL scopes checks and merge policy to its repository', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-cross-repo-'));
+  try {
+    pushedFeatureFixture(dir);
+    const url = 'https://github.com/acme/other/pull/42';
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u0000https://github.com/acme/other/pull/42\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        stdout: '{"number":42,"url":"https://github.com/acme/other/pull/42","headRefName":"feat/preflight","baseRefName":"main","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviews":[]}\n',
+      },
+      'pr\u0000checks\u0000https://github.com/acme/other/pull/42\u0000--json\u0000name,bucket,state,link\u0000--repo\u0000acme/other': {
+        stdout: '[{"name":"test","bucket":"pass","state":"SUCCESS","link":"https://example.test/check"}]\n',
+      },
+      'repo\u0000view\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed\u0000--repo\u0000acme/other': {
+        stdout: '{"mergeCommitAllowed":false,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge', url], env);
+    assert.deepEqual(report.checks, [{ name: 'test', bucket: 'pass', state: 'SUCCESS', link: 'https://example.test/check' }]);
+    assert.deepEqual(report.mergeMethods, { mergeCommitAllowed: false, squashMergeAllowed: true, rebaseMergeAllowed: false });
+    assert.equal(report.targetRepository, 'acme/other');
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: a missing PR is distinct from a failed PR probe', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-absent-pr-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        status: 1,
+        stderr: 'no pull requests found for branch "feat/preflight"\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge'], env);
+    assert.equal(report.pullRequest, null);
+    assert.equal(report.pullRequestState, 'absent');
+    assert.equal(report.targetRepository, null);
+    assert.deepEqual(report.errors, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: a failed PR probe is not reported as an absent PR', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-pr-error-'));
+  try {
+    pushedFeatureFixture(dir);
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status': { stdout: 'fixture authenticated\n' },
+      'repo\u0000view\u0000--json\u0000defaultBranchRef': {
+        stdout: '{"defaultBranchRef":{"name":"main"}}\n',
+      },
+      'pr\u0000view\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
+        status: 1,
+        stderr: 'network unavailable\n',
+      },
+    });
+
+    const report = runGhPreflight(dir, ['merge'], env);
+    assert.equal(report.pullRequest, null);
+    assert.equal(report.pullRequestState, 'unavailable');
+    assert.deepEqual(report.errors, [{ probe: 'gh pr view', code: 'EXIT_1' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: an unavailable GitHub CLI is structured rather than thrown', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-gh-preflight-missing-'));
+  try {
+    pushedFeatureFixture(dir);
+    const missing = join(dir, 'missing-gh');
+    const report = runGhPreflight(dir, ['pr'], { AGENTIC_GH: missing });
+    assert.deepEqual(report.github, { command: missing, installed: false, authenticated: null });
+    assert.deepEqual(report.errors, [{ probe: 'gh --version', code: 'ENOENT' }]);
+    assert.equal(report.baseBranch, null);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('gh-preflight: both skills ship the same self-contained detector on both hosts', () => {
+  const source = readFileSync(GH_PREFLIGHT_SCRIPTS[0]);
+  for (const skill of GH_PREFLIGHT_SKILLS) {
+    for (const host of ['claude-code', 'codex']) {
+      const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'gh-preflight.mjs');
+      assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
+    }
+  }
+});

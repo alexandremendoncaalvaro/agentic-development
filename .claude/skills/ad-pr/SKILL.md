@@ -23,39 +23,27 @@ Route elsewhere when:
 
 ## Phase 1 — Preflight
 
-Check `gh` is installed and authenticated:
+Run the deterministic preflight from the consumer repository root:
 
 ```bash
-gh --version
-gh auth status
+node .claude/skills/ad-pr/scripts/gh-preflight.mjs pr
 ```
 
-If `gh` is missing, surface:
+If this skill was loaded from another base directory, substitute that base. Execute the script; do not re-derive its probes in prose. Its JSON reports `github` (`command`, `installed`, `authenticated`), `git` (`branch`, `upstream`, `aheadOfUpstream`), `baseBranch`, and structured `errors`. It performs read-only `gh` / `git` probes; it never switches GitHub accounts. An environment may set `AGENTIC_GH` to an approved **executable** wrapper, but never use `gh auth switch`.
+
+If `github.installed` is false, surface:
 
 > `gh` CLI not installed. Install: https://cli.github.com/ then run `gh auth login`. This skill cannot open the PR without it.
 
-If `gh auth status` fails, surface the same hint with `gh auth login`. **Soft-fail** — do not silently fall back to `git push` only.
+If `github.authenticated` is false, surface the same hint with `gh auth login`. **Soft-fail** — do not silently fall back to `git push` only. Surface every remaining `errors` entry as a partial-preflight fact; do not claim a failed probe passed.
 
-Check the branch is pushed:
-
-```bash
-git rev-parse --abbrev-ref @{u}
-git rev-list --count <base>..HEAD
-```
-
-If no upstream is set or the branch is unpushed, prompt the user:
+If `git.upstream` is null or `git.aheadOfUpstream` is greater than zero, prompt the user:
 
 > Branch not pushed to origin. Run `git push -u origin <branch>` first? (y/n)
 
 If they confirm, run the push and continue.
 
-Detect the base branch:
-
-```bash
-gh repo view --json defaultBranchRef --jq .defaultBranchRef.name
-```
-
-Default to `main` if the call fails.
+Use `baseBranch` as the base. If it is null because the read-only GitHub probe failed, default to `main` and say that fallback explicitly.
 
 Run local gates before opening the PR (WORKFLOW §11 — CI failure is a local gate gap). The gate check runs **after** `git push` has landed the branch (so the pre-push hook has already fired once) and **before** `gh pr create` — the goal is to catch the case where a developer skipped the pre-push hook, ran on a different matrix leg than CI, or wired the runner incompletely, and to refuse to open the PR against a red tree:
 

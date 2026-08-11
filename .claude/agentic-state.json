@@ -216,8 +216,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-merge/scripts/gh-preflight.mjs",
+          "sourceSha": "ef29165e9dece46661eda564c29fe2b287d467460b09fa2fcd667fac1267669f"
+        },
+        {
           "path": ".claude/skills/ad-merge/SKILL.md",
-          "sourceSha": "cf941716ff4f1b2bb76ae0d6cc6cfa927e71bb06bf6cd591a5c4fe3b43ec4575"
+          "sourceSha": "fd0e6838b477d337b8cd002f6a11b1ef1403b3d00df1a148846604c4e2e9974b"
         }
       ]
     },
@@ -247,8 +251,12 @@
       "version": "0.20.0-beta.1",
       "files": [
         {
+          "path": ".claude/skills/ad-pr/scripts/gh-preflight.mjs",
+          "sourceSha": "ef29165e9dece46661eda564c29fe2b287d467460b09fa2fcd667fac1267669f"
+        },
+        {
           "path": ".claude/skills/ad-pr/SKILL.md",
-          "sourceSha": "730df11dfb83cbc31be9cfbc9c4d416fca13d9bf2e67c4728598e3900693a054"
+          "sourceSha": "a926be1fd128191701783ec814eeec577d3350e241a5542ee06766d8c1176882"
         }
       ]
     },
