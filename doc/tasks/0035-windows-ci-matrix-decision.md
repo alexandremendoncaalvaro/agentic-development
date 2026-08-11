@@ -1,6 +1,6 @@
 # Task 0035: Decide the Windows CI matrix leg
 
-**Status:** proposed
+**Status:** done
 **Created:** 2026-08-06
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
@@ -23,29 +23,29 @@ verified outcome, and a Windows contributor is the first CI.
 
 ## Acceptance Criteria
 
-- [ ] An ADR records the decision: adopt a `windows-latest` matrix leg, or
+- [x] An ADR records the decision: adopt a `windows-latest` matrix leg, or
       reject it with rationale (e.g. document Linux/macOS as the supported
       contributor platforms) — either outcome closes the question.
-- [ ] If adopted: `windows-latest` runs green in `.github/workflows/test.yml`
+- [x] If adopted: `windows-latest` runs green in `.github/workflows/test.yml`
       on a real PR, including `test/skill-scripts.test.js` (probe execution)
       and the platform-guarded skips behaving as designed.
-- [ ] If adopted: the `protect-main` ruleset's required checks are updated to
+- [x] If adopted: the `protect-main` ruleset's required checks are updated to
       match the new matrix (or the ADR records why the Windows leg is
       non-required).
-- [ ] task-0031's Windows OPEN QUESTION and the AGENTS.md/GUIDELINES.md
+- [x] task-0031's Windows OPEN QUESTION and the AGENTS.md/GUIDELINES.md
       platform claims are reconciled with the decision (reference, not
       duplication).
 
 ## Plan
 
-- [ ] Draft the ADR via `/ad-adr` with both options costed: matrix minutes,
+- [x] Draft the ADR via `/ad-adr` with both options costed: matrix minutes,
       the `core.symlinks`/CRLF gotchas already named in task-0031, and the
       win32 branches now in the tree (`scripts/hook-npm-test.js`,
       probe test skips).
-- [ ] Alê decides (this is the HITL gate).
-- [ ] If adopted: add the matrix leg in `.github/workflows/test.yml` on a
+- [x] Alê decides (this is the HITL gate).
+- [x] If adopted: add the matrix leg in `.github/workflows/test.yml` on a
       branch, open a PR, observe the Windows run's actual output.
-- [ ] Close the loop: flip this task's boxes only after the observed run (or
+- [x] Close the loop: flip this task's boxes only after the observed run (or
       the rejection ADR) exists.
 
 ## Notes
@@ -80,11 +80,38 @@ selectively applying it to a new branch, refresh dogfood state, run the full
 gate, observe the four matrix jobs, and then update the ruleset with their
 observed job names.
 
+### 2026-08-11 — adoption
+
+Alê approved the adoption of `windows-latest`. ADR-0065 records the decision
+and amends ADR-0032's stale Linux-plus-macOS example. PR #92 already recovered
+the portability fixes from the closed PR #90 onto `main`; this task's remaining
+work is therefore limited to the matrix leg, its observed run, and ruleset
+enforcement rather than replaying the old branch.
+
+### 2026-08-11 — closure
+
+[`PR #94`](https://github.com/alexandremendoncaalvaro/agentic-development/pull/94)
+observed the current-base `test` workflow green on all four legs:
+`ubuntu-latest` and `windows-latest`, each on Node 20.x and 22.x. This runs
+the complete suite, including `test/skill-scripts.test.js`; platform-guarded
+skips completed as designed. The
+[`protect-main` ruleset](https://github.com/alexandremendoncaalvaro/agentic-development/rules/20514812)
+now requires GitHub's observed contexts: `test (ubuntu-latest, 20.x)`,
+`test (ubuntu-latest, 22.x)`, `test (windows-latest, 20.x)`, and
+`test (windows-latest, 22.x)`.
+
+Task-0031's historical Windows question is resolved by this measurement; its
+append-only Notes record the resolution. AGENTS.md and GUIDELINES.md describe
+the Node-version matrix but make no conflicting operating-system support
+claim, so ADR-0065 remains the canonical decision rather than duplicating its
+platform rationale in those definition documents. The two-axis review is
+recorded at `.agentic/reviews/2026-08-11T2235Z-working-tree.md`.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
