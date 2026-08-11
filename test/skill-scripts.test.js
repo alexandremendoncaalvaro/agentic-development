@@ -1825,17 +1825,19 @@ function runGhPreflight(cwd, args, environment = {}) {
   return JSON.parse(out);
 }
 
+// A shebang plus the execute bit makes a wrapper runnable on POSIX and on
+// nothing else: Windows has neither, so the fake gh was unspawnable and every
+// test using it failed there. Write it as a .mjs instead — gh-preflight runs a
+// Node-script wrapper under its own node binary, shell-free, on both platforms.
 function writeFakeGh(dir, responses) {
-  const path = join(dir, 'fake-gh');
-  writeFileSync(path, `#!/usr/bin/env node
-if (process.env.AGENTIC_TEST_GH_REQUIRE_CLEAN_GIT_ENV === 'true' && ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE'].some((name) => process.env[name])) process.exit(97);
+  const path = join(dir, 'fake-gh.mjs');
+  writeFileSync(path, `if (process.env.AGENTIC_TEST_GH_REQUIRE_CLEAN_GIT_ENV === 'true' && ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE'].some((name) => process.env[name])) process.exit(97);
 const responses = JSON.parse(process.env.AGENTIC_TEST_GH_RESPONSES || '{}');
 const response = responses[process.argv.slice(2).join('\\u0000')] || { status: 0, stdout: '' };
 process.stdout.write(response.stdout || '');
 process.stderr.write(response.stderr || '');
 process.exit(response.status || 0);
 `);
-  chmodSync(path, 0o755);
   return {
     AGENTIC_GH: path,
     AGENTIC_TEST_GH_RESPONSES: JSON.stringify(responses),
