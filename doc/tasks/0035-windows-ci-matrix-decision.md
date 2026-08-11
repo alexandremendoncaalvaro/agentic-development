@@ -107,6 +107,9 @@ claim, so ADR-0065 remains the canonical decision rather than duplicating its
 platform rationale in those definition documents. The two-axis review is
 recorded at `.agentic/reviews/2026-08-11T2235Z-working-tree.md`.
 
+PR #94 merged into `main` as
+[`046965f`](https://github.com/alexandremendoncaalvaro/agentic-development/commit/046965f14760306dcfdde550467a3969dd81cc6b).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
