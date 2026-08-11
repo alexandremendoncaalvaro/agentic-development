@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-07-01
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0065 — its CI OS matrix example and realized runner set.
 
 ## Context
 

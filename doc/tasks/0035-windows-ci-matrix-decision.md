@@ -23,7 +23,7 @@ verified outcome, and a Windows contributor is the first CI.
 
 ## Acceptance Criteria
 
-- [ ] An ADR records the decision: adopt a `windows-latest` matrix leg, or
+- [x] An ADR records the decision: adopt a `windows-latest` matrix leg, or
       reject it with rationale (e.g. document Linux/macOS as the supported
       contributor platforms) — either outcome closes the question.
 - [ ] If adopted: `windows-latest` runs green in `.github/workflows/test.yml`
@@ -38,11 +38,11 @@ verified outcome, and a Windows contributor is the first CI.
 
 ## Plan
 
-- [ ] Draft the ADR via `/ad-adr` with both options costed: matrix minutes,
+- [x] Draft the ADR via `/ad-adr` with both options costed: matrix minutes,
       the `core.symlinks`/CRLF gotchas already named in task-0031, and the
       win32 branches now in the tree (`scripts/hook-npm-test.js`,
       probe test skips).
-- [ ] Alê decides (this is the HITL gate).
+- [x] Alê decides (this is the HITL gate).
 - [ ] If adopted: add the matrix leg in `.github/workflows/test.yml` on a
       branch, open a PR, observe the Windows run's actual output.
 - [ ] Close the loop: flip this task's boxes only after the observed run (or
@@ -79,6 +79,14 @@ remain outstanding. If Alê adopts Windows, recover the implementation by
 selectively applying it to a new branch, refresh dogfood state, run the full
 gate, observe the four matrix jobs, and then update the ruleset with their
 observed job names.
+
+### 2026-08-11 — adoption
+
+Alê approved the adoption of `windows-latest`. ADR-0065 records the decision
+and amends ADR-0032's stale Linux-plus-macOS example. PR #92 already recovered
+the portability fixes from the closed PR #90 onto `main`; this task's remaining
+work is therefore limited to the matrix leg, its observed run, and ruleset
+enforcement rather than replaying the old branch.
 
 ## Definition of Done
 
