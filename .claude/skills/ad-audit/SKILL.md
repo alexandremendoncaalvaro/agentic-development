@@ -108,7 +108,7 @@ For every group the rule-set marks **critical**, beyond its Step-4 reviewer:
 
 ## Step 6 — Empirical falsification lane (serial, orchestrator-only)
 
-When a surviving finding asserts that a specific test or suite **cannot fail** on a specific production change — a negative-coverage / mirrored-declaration claim — do not settle it by argument: run it ([ADR-0052](../../../../doc/adr/0052-ad-audit-empirical-falsification-lane.md)). Reviewers never mutate the tree; a reviewer that reaches a "cannot fail" inference hands it up as a trigger and the orchestrator runs the lane.
+When a surviving finding asserts that a specific test or suite **cannot fail** on a specific production change — a negative-coverage / mirrored-declaration claim — do not settle it by argument: run it (ADR-0052). Reviewers never mutate the tree; a reviewer that reaches a "cannot fail" inference hands it up as a trigger and the orchestrator runs the lane.
 
 - **Trigger only.** Fires solely on a "test T cannot fail on production change W" claim. A finding that merely wants the author's own numbers reproduced is the evidence gate's job (Step 7), not this lane.
 - **Procedure.** Confirm the tree is already clean first (a dirty tree → stop; never risk uncommitted work) → apply the minimal mutation the test should catch → run the CI-exact filter → observe `{build result, effect/asset presence, pass-fail count}` → restore by reverting exactly the paths you touched (`git checkout -- <path>`, never a blanket `reset --hard` / `checkout -- .`) → confirm `git status` clean. Green (the suite stayed green through the mutation) confirms the finding; red refutes it.

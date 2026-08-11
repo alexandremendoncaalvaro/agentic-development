@@ -296,7 +296,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/detect-hooks.mjs",
-          "sourceSha": "2ff2a501ed587d4189535db78337e41678577d7ef6d980b6e8a5b2811029f8cd"
+          "sourceSha": "2c56ea41a2babf40a7b05d8aecdf87740f4ded9fc9437241ba9f5234d69508ae"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/handoff-nudge.mjs",
@@ -334,7 +334,7 @@
         },
         {
           "path": ".agents/skills/ad-merge/scripts/gh-preflight.mjs",
-          "sourceSha": "cefb5d2368e63ab893f4b3318bcd3df1e5a2300f4a9e7d0eea0bce6fb0f25a98"
+          "sourceSha": "e7f45e58dd7642f5b1feefec88782690af9c6d4cbe7d92f8152526433133f14d"
         },
         {
           "path": ".agents/skills/ad-merge/SKILL.md",
@@ -381,7 +381,7 @@
         },
         {
           "path": ".agents/skills/ad-pr/scripts/gh-preflight.mjs",
-          "sourceSha": "cefb5d2368e63ab893f4b3318bcd3df1e5a2300f4a9e7d0eea0bce6fb0f25a98"
+          "sourceSha": "e7f45e58dd7642f5b1feefec88782690af9c6d4cbe7d92f8152526433133f14d"
         },
         {
           "path": ".agents/skills/ad-pr/SKILL.md",
