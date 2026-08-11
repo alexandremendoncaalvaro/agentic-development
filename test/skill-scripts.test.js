@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { chmodSync, mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -1643,5 +1643,169 @@ test('detect-hooks: an unreadable CI config is surfaced, never silent', (t) => {
       /* ignore */
     }
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- shared next-NNNN detector (ADR-0057, P2.5) -----------------------------
+const NUMBER_SKILLS = ['ad-adr', 'ad-spec', 'ad-task', 'ad-spike'];
+const NUMBER_SCRIPTS = NUMBER_SKILLS.map((skill) =>
+  join(__dirname, '..', 'src', 'skills', 'claude-code', skill, 'scripts', 'next-number.mjs')
+);
+
+function runNumberDetector(cwd, directory, environment = {}) {
+  const out = execFileSync('node', [NUMBER_SCRIPTS[0], directory], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, ...environment },
+  });
+  return JSON.parse(out);
+}
+
+test('next-number: reports sorted artifact numbers and the slot after the maximum', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-'));
+  try {
+    const artifacts = join(dir, 'doc', 'adr');
+    mkdirSync(artifacts, { recursive: true });
+    for (const name of ['0001-first.md', '0042-answer.md', 'not-an-artifact.md', '10000-overflow.md']) {
+      writeFileSync(join(artifacts, name), 'fixture\n');
+    }
+
+    assert.deepEqual(runNumberDetector(dir, 'doc/adr'), {
+      directory: 'doc/adr',
+      numbers: ['0001', '0042'],
+      next: '0043',
+      exhausted: false,
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: an absent artifact directory starts at 0001', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-empty-'));
+  try {
+    assert.deepEqual(runNumberDetector(dir, 'spikes'), {
+      directory: 'spikes',
+      numbers: [],
+      next: '0001',
+      exhausted: false,
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: an initialized repository with no commits starts at 0001', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-unborn-head-'));
+  try {
+    execFileSync('git', ['init', '-q', dir]);
+
+    assert.deepEqual(runNumberDetector(dir, 'doc/adr'), {
+      directory: 'doc/adr',
+      numbers: [],
+      next: '0001',
+      exhausted: false,
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: an unreadable artifact directory blocks numbering', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-unreadable-'));
+  try {
+    const artifacts = join(dir, 'doc', 'specs');
+    mkdirSync(artifacts, { recursive: true });
+    chmodSync(artifacts, 0o000);
+
+    assert.deepEqual(runNumberDetector(dir, 'doc/specs'), {
+      directory: 'doc/specs',
+      numbers: [],
+      next: null,
+      exhausted: false,
+      unreadable: [{ path: 'doc/specs', code: 'EACCES' }],
+    });
+  } finally {
+    try { chmodSync(join(dir, 'doc', 'specs'), 0o755); } catch { /* ignore */ }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: 9999 is explicit exhaustion, not a five-digit artifact number', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-exhausted-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'tasks', '9999-last.md'), 'fixture\n');
+
+    assert.deepEqual(runNumberDetector(dir, 'doc/tasks'), {
+      directory: 'doc/tasks',
+      numbers: ['9999'],
+      next: null,
+      exhausted: true,
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: an archived highest artifact remains reserved from Git history', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-ledger-'));
+  try {
+    const artifacts = join(dir, 'doc', 'adr');
+    mkdirSync(artifacts, { recursive: true });
+    execFileSync('git', ['init', '-q', dir]);
+    writeFileSync(join(artifacts, '0042-archived.md'), 'fixture\n');
+    execFileSync('git', ['-C', dir, 'add', 'doc/adr/0042-archived.md']);
+    execFileSync('git', ['-C', dir, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'fixture']);
+    execFileSync('git', ['-C', dir, 'rm', '-q', 'doc/adr/0042-archived.md']);
+    execFileSync('git', ['-C', dir, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'archive']);
+
+    assert.equal(runNumberDetector(dir, 'doc/adr').next, '0043');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: broken Git metadata blocks ledger-dependent numbering', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-broken-git-'));
+  try {
+    writeFileSync(join(dir, '.git'), 'gitdir: missing\n');
+
+    const report = runNumberDetector(dir, 'doc/adr');
+    assert.equal(report.next, null);
+    assert.deepEqual(report.unreadable, [{ path: 'git-history:doc/adr', code: 'GIT_ERROR' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: a configured but unreadable Git directory blocks numbering', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-next-number-git-dir-'));
+  try {
+    const report = runNumberDetector(dir, 'doc/adr', {
+      GIT_DIR: join(dir, 'missing-git-directory'),
+    });
+    assert.equal(report.next, null);
+    assert.deepEqual(report.unreadable, [{ path: 'git-history:doc/adr', code: 'GIT_ERROR' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('next-number: all four skills ship the same self-contained detector on both hosts', () => {
+  const source = readFileSync(NUMBER_SCRIPTS[0]);
+  for (const skill of NUMBER_SKILLS) {
+    for (const host of ['claude-code', 'codex']) {
+      const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'next-number.mjs');
+      assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
+    }
   }
 });

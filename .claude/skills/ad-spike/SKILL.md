@@ -63,7 +63,7 @@ Create the spike directory:
 mkdir -p spikes/NNNN-<slug>/{fixtures,debug,eval}
 ```
 
-Where `NNNN` is the next available 4-digit number (mirrors ADR / task / spec numbering). List `spikes/` and pick the next slot.
+Get NNNN by running `node .claude/skills/ad-spike/scripts/next-number.mjs spikes` from the consumer root. Use JSON `next`; archived gaps stay unused. Stop until access is resolved when `unreadable` is non-empty, and stop for a numbering decision when `exhausted` is true. If loaded elsewhere, substitute the skill base path.
 
 The fixture format is JSON keyed by input path (recommended) or whatever shape the domain demands. For computer vision: bounding boxes, sizes, lighting condition, difficulty tag, edge case markers. For multi-stage transformations: intermediate states. For library choice: representative inputs covering typical and edge cases.
 

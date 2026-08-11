@@ -11,7 +11,7 @@ Codex auto-trigger on description keywords is less mature than Claude Code's. If
 </background_information>
 
 <instructions>
-Step 1 — determine NNNN and slug. List `doc/specs/`. NNNN = next available 4-digit number after the highest existing (mirrors ADR and task conventions). If `doc/specs/` does not exist, create it; start at 0001. Slug: kebab-case, ≤6 words, derived from the feature title.
+Step 1 — determine NNNN and slug. Run `node .agents/skills/ad-spec/scripts/next-number.mjs doc/specs` from the consumer root. Use JSON `next`; archived gaps stay unused. Stop until access is resolved when `unreadable` is non-empty, and stop for a numbering decision when `exhausted` is true. If loaded elsewhere, substitute the skill base path. Slug: kebab-case, ≤6 words, derived from the feature title.
 
 Step 2 — confirm scope. The spec captures one feature. If the user's request implies multiple, ask which to write first; the others become follow-up specs. A "feature" here is the smallest user-visible outcome that has its own success criteria — not a task (work unit) and not a binding architectural decision (ADR).
 

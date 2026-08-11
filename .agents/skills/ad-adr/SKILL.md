@@ -9,7 +9,7 @@ Drafts `doc/adr/NNNN-<short-title>.md` for one architecture decision. Status lif
 </background_information>
 
 <instructions>
-Step 1 — determine NNNN. List `doc/adr/`. NNNN = next available 4-digit number after the highest existing. If `doc/adr/` does not exist, create it; start at 0001.
+Step 1 — determine NNNN. Run `node .agents/skills/ad-adr/scripts/next-number.mjs doc/adr` from the consumer root. Use JSON `next`; archived gaps stay unused. Stop until access is resolved when `unreadable` is non-empty, and stop for a numbering decision when `exhausted` is true. If loaded elsewhere, substitute the skill base path.
 
 Step 2 — confirm scope. The ADR captures one decision. If the user's request implies multiple, ask which to write first; the others become follow-up ADRs.
 

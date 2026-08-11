@@ -9,7 +9,7 @@ Drafts `doc/tasks/<NNNN>-<short-slug>.md` for one tracked task. Format chosen so
 </background_information>
 
 <instructions>
-Step 1 — determine NNNN and slug. List `doc/tasks/`. NNNN = next available 4-digit number after the highest existing (mirrors the ADR convention). If `doc/tasks/` does not exist, create it; start at 0001. Slug: kebab-case, ≤6 words, derived from the user's task title.
+Step 1 — determine NNNN and slug. Run `node .agents/skills/ad-task/scripts/next-number.mjs doc/tasks` from the consumer root. Use JSON `next`; archived gaps stay unused. Stop until access is resolved when `unreadable` is non-empty, and stop for a numbering decision when `exhausted` is true. If loaded elsewhere, substitute the skill base path. Slug: kebab-case, ≤6 words, derived from the user's task title.
 
 Step 2 — interview to fill. Ask one question per missing field, in this order:
 - Context: why this task exists, what problem it solves, any assumption being tested.

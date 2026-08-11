@@ -11,7 +11,7 @@ Drafts `doc/adr/NNNN-<short-title>.md` for one architecture decision. Status lif
 
 ## Step 1 — Determine NNNN
 
-List `doc/adr/`. NNNN = next available 4-digit number after the highest existing. If `doc/adr/` does not exist, create it; start at `0001`.
+Run `node .claude/skills/ad-adr/scripts/next-number.mjs doc/adr` from the consumer root. Use JSON `next` as NNNN; it preserves archived gaps. If `unreadable` is non-empty, stop until access is resolved; if `exhausted` is true, stop for a numbering decision. If loaded elsewhere, substitute the skill base path. The decision scope stays in this step's text.
 
 ## Step 2 — Confirm scope
 
