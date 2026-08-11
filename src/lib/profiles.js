@@ -72,6 +72,7 @@ export const PROFILES = {
       'ad-commit',
       'ad-pr',
       'ad-merge',
+      'ad-release',
       'ad-handoff',
     ],
     conditional: {
@@ -116,6 +117,7 @@ export const PROFILES = {
       'ad-commit',
       'ad-pr',
       'ad-merge',
+      'ad-release',
       'ad-handoff',
     ],
     conditional: {
@@ -158,6 +160,7 @@ export const PROFILES = {
       'ad-commit',
       'ad-pr',
       'ad-merge',
+      'ad-release',
       'ad-handoff',
     ],
     conditional: {

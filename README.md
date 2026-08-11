@@ -60,6 +60,7 @@ Two categories ([ADR-0007](doc/adr/0007-workflow-operational-skills.md)) and two
 | `ad-commit` | workflow-operational | universal in `solo` / `team` / `mature` | Atomic Conventional Commits with DCO `Signed-off-by` sign-off; four phases — scope intake, stage-split when concerns mix, draft message, sign + write. Identity from `git config`. No `Co-Authored-By`. Helper, not blocker | `/ad-commit` |
 | `ad-pr` | workflow-operational | universal in `solo` / `team` / `mature` | Open a GitHub PR with a uniform body shape (Summary / Test plan / Links); four phases — preflight (`gh` auth + branch pushed), scope assembly, draft body, open + report URL. Title format = Conventional Commits | `/ad-pr` |
 | `ad-merge` | workflow-operational | universal in `solo` / `team` / `mature` | Evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability) and merge a GitHub PR; CI green = hard gate (yields to explicit user override); others = warnings. Merge mode auto-detected from `gh repo view`; `--delete-branch` by default | `/ad-merge` |
+| `ad-release` | workflow-operational | universal in `solo` / `team` / `mature` | Safely orchestrate a single npm package release through its configured script, release PR, tag, npm publish, and GitHub Release. Five explicit confirmations, exact tagged content, and state-aware recovery | `/ad-release` |
 | `ad-handoff` | workflow-operational | universal | Compact the current session into `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md` so a fresh agent (or post-`/clear` continuation) can pick up. Captures live state, references PRD / spec / task / ADR by path (never duplicates them), suggests next skills, redacts secrets. Ephemeral — never written into the repo | `/ad-handoff` |
 | `ad-design` | spec-driven | auto if frontend detected | Bootstrap `DESIGN.md` from existing tokens (Figma, tailwind.config, tokens.json, CSS custom props) | `/ad-design` |
 | `ad-subagent` | spec-driven | auto if installing for Claude Code or Codex | Drafts `.claude/agents/<name>.md` or `.codex/agents/<name>.toml` for bounded delegated work | `/ad-subagent` |
@@ -77,9 +78,9 @@ The kit ships four profiles that select which skills auto-install. Same WORKFLOW
 | Profile | Universal install set | Conditional posture | Recommended for |
 | --- | --- | --- | --- |
 | `poc` | 13 — philosophy, ground, drift, next, rules, archive, spike, tdg, tdd, domain, grill-me, diagnose, handoff | all blocked; `ad-prd` + `ad-guidelines` blocked | spike, hackathon, exploration |
-| `solo` | 26 — + bootstrap, prd, guidelines, spec, task, review, roadmap, research, derisk, question-me, commit, pr, merge | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code or Codex | solo developer shipping a real product |
-| `team` (default) | 31 — + architecture, adr, audit, level-up, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
-| `mature` | 31 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
+| `solo` | 27 — + bootstrap, prd, guidelines, spec, task, review, roadmap, research, derisk, question-me, commit, pr, merge, release | architecture / adr / hooks opt-in; design auto if frontend; subagent auto for Claude Code or Codex | solo developer shipping a real product |
+| `team` (default) | 32 — + architecture, adr, audit, level-up, deepen | hooks opt-in; design / subagent / skill follow autoIf | team product, shared discipline |
+| `mature` | 32 — same as team | hooks **recommended**; deepening surfaced via `ad-deepen` | regulated / public-facing production |
 
 Select at init time:
 

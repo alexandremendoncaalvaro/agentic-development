@@ -208,6 +208,29 @@ test('ad-merge is universal in solo / team / mature only (not poc per ADR-0025)'
   );
 });
 
+test('ad-release installs for solo / team / mature, never poc (ADR-0063)', () => {
+  for (const name of ['solo', 'team', 'mature']) {
+    const universal = new Set(PROFILES[name].universal);
+    assert.ok(
+      universal.has('ad-release'),
+      `profile ${name} must include ad-release per ADR-0063`
+    );
+  }
+  assert.ok(
+    !new Set(PROFILES.poc.universal).has('ad-release'),
+    'ad-release must not install for poc per ADR-0063'
+  );
+
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'both', '--profile', 'team', '--yes']);
+    assert.ok(existsSync(join(dir, '.claude/skills/ad-release/SKILL.md')));
+    assert.ok(existsSync(join(dir, '.agents/skills/ad-release/SKILL.md')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('ad-deepen is universal in team and mature only (premature for poc and solo per ADR-0020 §4)', () => {
   // Present in team and mature.
   for (const name of ['team', 'mature']) {

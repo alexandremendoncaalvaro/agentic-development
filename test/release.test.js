@@ -1,6 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { bumpVersion, rotateChangelog } from '../scripts/release-lib.js';
+
+const PACKAGE_PATH = fileURLToPath(new URL('../package.json', import.meta.url));
+
+test('package.json exposes the ADR-0048 release script for ad-release', () => {
+  const pkg = JSON.parse(readFileSync(PACKAGE_PATH, 'utf8'));
+  assert.equal(pkg.scripts.release, './scripts/release.sh');
+});
 
 // --- bumpVersion — house convention: every release is X.Y.Z-beta.N ---
 
