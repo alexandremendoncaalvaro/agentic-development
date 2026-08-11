@@ -21,6 +21,14 @@ const PROBE = join(
   'resolve-rules.mjs'
 );
 
+// Interpolating a filesystem path straight into a RegExp is safe only on
+// POSIX. A Windows path carries backslashes, and `C:\Users\...` reaches the
+// engine as the escapes `\U`, `\A`, ... — a pattern that quietly matches
+// something else instead of failing loudly. Escape before interpolating.
+function reEscape(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function runProbe(cwd, env = {}) {
   return execFileSync('node', [PROBE], {
     cwd,
@@ -47,7 +55,7 @@ test('resolve-rules.mjs: reports every layer that exists', () => {
 
     writeFileSync(join(repo, 'CONTEXT.md'), '# context');
     const out = runProbe(repo, { AGENTIC_RULES_DIR: machineStore });
-    assert.match(out, new RegExp(`^MACHINE-STORE: ${machineStore}$`, 'm'));
+    assert.match(out, new RegExp(`^MACHINE-STORE: ${reEscape(machineStore)}$`, 'm'));
     assert.match(out, /^cv\.md=[0-9a-f]{64}$/m);
     assert.match(out, /^gh\.md=[0-9a-f]{64}$/m);
     assert.match(out, /^PROJECT: \.agentic\/rules$/m);
@@ -2210,7 +2218,7 @@ test('resolve-global-rules: Claude resolves a global symlink and reports both en
     mkdirSync(join(home, 'workflow'), { recursive: true });
     mkdirSync(join(home, '.claude'));
     writeFileSync(target, '# global rules\n');
-    symlinkSync('../workflow/AGENTS.ale.md', link, 'file');
+    symlinkSync(join('..', 'workflow', 'AGENTS.ale.md'), link, 'file');
     const resolvedTarget = realpathSync(target);
 
     assert.deepEqual(runGlobalRules(dir, 'claude-code', home), {
@@ -2218,13 +2226,13 @@ test('resolve-global-rules: Claude resolves a global symlink and reports both en
       primary: {
         path: link,
         state: 'symlink',
-        linkTarget: '../workflow/AGENTS.ale.md',
+        linkTarget: join('..', 'workflow', 'AGENTS.ale.md'),
         resolvedPath: resolvedTarget,
       },
       sources: [{
         path: link,
         state: 'symlink',
-        linkTarget: '../workflow/AGENTS.ale.md',
+        linkTarget: join('..', 'workflow', 'AGENTS.ale.md'),
         resolvedPath: resolvedTarget,
       }],
       unreadable: [],
@@ -2265,14 +2273,18 @@ test('resolve-global-rules: a broken global link is distinct from an absent laye
     const home = join(dir, 'home');
     const link = join(home, '.claude', 'CLAUDE.md');
     mkdirSync(join(home, '.claude'), { recursive: true });
-    symlinkSync('../missing/AGENTS.md', link, 'file');
+    symlinkSync(join('..', 'missing', 'AGENTS.md'), link, 'file');
 
     const report = runGlobalRules(dir, 'claude-code', home);
     assert.equal(report.primary, null);
     assert.deepEqual(report.sources, [{
       path: link,
       state: 'broken-symlink',
-      linkTarget: '../missing/AGENTS.md',
+      // The script reports the target the OS stored, and Windows stores it
+      // with native separators whatever form it was created from. Build the
+      // expectation the same way the other paths here are built, rather than
+      // pinning a POSIX-shaped literal the platform never returns.
+      linkTarget: join('..', 'missing', 'AGENTS.md'),
       resolvedPath: null,
     }]);
     assert.deepEqual(report.unreadable, []);
