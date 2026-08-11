@@ -1,6 +1,6 @@
 # Spec `0001`: Orchestrate a safe npm package release
 
-**Status:** draft
+**Status:** accepted
 **Created:** 2026-08-10
 **Owner:** Alexandre Alvaro
 
@@ -92,11 +92,11 @@ The kit already makes the local half of a release deterministic: its `scripts/re
 
 ## Open Questions
 
-- The confirmation boundaries and recovery contract are a binding decision; record and accept an ADR before implementation. The current recommendation is the contract specified here: five separately confirmed effects (local release, release-branch push, post-merge tag push, npm publish, GitHub Release) and a state-aware rerun rather than automated retries.
+- Resolved — [ADR-0063](../adr/0063-orchestrate-external-npm-release-steps.md) accepts the five separately confirmed effects and the state-aware recovery contract.
 
 ## Related
 
-- ADRs: [ADR-0048](../adr/0048-kit-release-discipline-gates.md) (existing local release path); release-contract ADR to be added before implementation.
+- ADRs: [ADR-0048](../adr/0048-kit-release-discipline-gates.md) (existing local release path); [ADR-0063](../adr/0063-orchestrate-external-npm-release-steps.md) (external release contract).
 - Tasks: none yet.
 - Sources: [npm publish documentation](https://docs.npmjs.com/cli/v10/commands/npm-publish/), [GitHub CLI `gh release create` manual](https://cli.github.com/manual/gh_release_create), [semantic-release npm plugin](https://github.com/semantic-release/npm).
 - Supersedes / Depends on: depends on the existing `scripts/release.sh` contract.
