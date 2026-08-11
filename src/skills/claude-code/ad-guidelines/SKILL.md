@@ -34,6 +34,14 @@ Skill excluded from `poc` profile — a spike does not need full engineering gui
 
 Before asking any preference question, look. The repo answers most fields.
 
+First run from the consumer repo root:
+
+```bash
+node .claude/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md --host claude-code
+```
+
+Parse its JSON. `stacks` narrows the manifest reads below and `profile.name` supplies the strictness default. Surface every `unreadable[]` entry as a scan gap, never as an absent path.
+
 ### Language and toolchain
 
 - `package.json` → JavaScript / TypeScript; read `engines`, `scripts`, `dependencies`, `devDependencies`.
@@ -79,7 +87,7 @@ For brownfield projects, identify candidate source files that future agents shou
 
 ### Profile and project posture
 
-Read `.claude/agentic-state.json` / `.agents/agentic-state.json` for the active profile. Profile affects strictness defaults (mature → strict Object Calisthenics by default; solo → loose by default).
+Use `profile.name` from the detector for the active profile. Profile affects strictness defaults (mature → strict Object Calisthenics by default; solo → loose by default).
 
 Only after the scan produces no answer does the skill ask. Asking about something the repo already states wastes the user's attention.
 

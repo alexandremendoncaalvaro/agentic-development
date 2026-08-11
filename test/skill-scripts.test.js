@@ -2083,3 +2083,116 @@ test('gh-preflight: both skills ship the same self-contained detector on both ho
     }
   }
 });
+
+// --- project stack/profile signals (ADR-0057, P2.7) ------------------------
+// The detector owns only low-freedom filesystem facts. Each skill keeps the
+// judgment about which source files to read and what the facts imply.
+const PROJECT_SIGNAL_SKILLS = ['ad-bootstrap', 'ad-architecture', 'ad-guidelines', 'ad-diagnose'];
+const PROJECT_SIGNAL_SCRIPTS = PROJECT_SIGNAL_SKILLS.map((skill) =>
+  join(__dirname, '..', 'src', 'skills', 'claude-code', skill, 'scripts', 'project-signals.mjs')
+);
+
+function runProjectSignals(cwd, document = 'AGENTS.md', host = 'claude-code') {
+  const out = execFileSync('node', [PROJECT_SIGNAL_SCRIPTS[0], document, '--host', host], {
+    cwd,
+    encoding: 'utf8',
+    env: process.env,
+  });
+  return JSON.parse(out);
+}
+
+test('project-signals: reports the bootstrap mode, every stack marker, and the host profile', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-'));
+  try {
+    writeFileSync(join(dir, 'package.json'), '{"name":"fixture"}\n');
+    writeFileSync(join(dir, 'pyproject.toml'), '[project]\nname = "fixture"\n');
+    writeFileSync(join(dir, 'go.mod'), 'module fixture\n');
+    mkdirSync(join(dir, '.claude'));
+    mkdirSync(join(dir, '.agents'));
+    writeFileSync(join(dir, '.claude', 'agentic-state.json'), '{"profile":"mature"}\n');
+    writeFileSync(join(dir, '.agents', 'agentic-state.json'), '{"profile":"solo"}\n');
+
+    assert.deepEqual(runProjectSignals(dir), {
+      document: 'AGENTS.md',
+      mode: 'brownfield',
+      stacks: ['node', 'python', 'go'],
+      profile: { name: 'mature', source: '.claude/agentic-state.json' },
+      unreadable: [],
+    });
+    assert.deepEqual(runProjectSignals(dir, 'AGENTS.md', 'codex').profile, {
+      name: 'solo',
+      source: '.agents/agentic-state.json',
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: distinguishes audit, greenfield, and architecture bootstrap modes', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-modes-'));
+  try {
+    assert.equal(runProjectSignals(dir).mode, 'greenfield');
+    assert.equal(runProjectSignals(dir, 'ARCHITECTURE.md').mode, 'bootstrap');
+    writeFileSync(join(dir, 'AGENTS.md'), '# agents\n');
+    assert.equal(runProjectSignals(dir).mode, 'audit');
+    writeFileSync(join(dir, 'ARCHITECTURE.md'), '# architecture\n');
+    assert.equal(runProjectSignals(dir, 'ARCHITECTURE.md').mode, 'audit');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: malformed state is visible in unreadable and falls back to team', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-invalid-state-'));
+  try {
+    mkdirSync(join(dir, '.claude'));
+    writeFileSync(join(dir, '.claude', 'agentic-state.json'), '{not json}\n');
+
+    assert.deepEqual(runProjectSignals(dir), {
+      document: 'AGENTS.md',
+      mode: 'greenfield',
+      stacks: [],
+      profile: { name: 'team', source: null },
+      unreadable: [{ path: '.claude/agentic-state.json', code: 'INVALID_JSON' }],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: a valid JSON value without a profile is invalid state, not a crash', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-non-object-state-'));
+  try {
+    mkdirSync(join(dir, '.claude'));
+    writeFileSync(join(dir, '.claude', 'agentic-state.json'), 'null\n');
+
+    const report = runProjectSignals(dir);
+    assert.deepEqual(report.profile, { name: 'team', source: null });
+    assert.deepEqual(report.unreadable, [{ path: '.claude/agentic-state.json', code: 'INVALID_PROFILE' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: a state path that cannot be read is surfaced in unreadable', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-signals-unreadable-state-'));
+  try {
+    mkdirSync(join(dir, '.claude', 'agentic-state.json'), { recursive: true });
+
+    const report = runProjectSignals(dir);
+    assert.deepEqual(report.profile, { name: 'team', source: null });
+    assert.deepEqual(report.unreadable, [{ path: '.claude/agentic-state.json', code: 'EISDIR' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-signals: all four skills ship the same self-contained detector on both hosts', () => {
+  const source = readFileSync(PROJECT_SIGNAL_SCRIPTS[0]);
+  for (const skill of PROJECT_SIGNAL_SKILLS) {
+    for (const host of ['claude-code', 'codex']) {
+      const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'project-signals.mjs');
+      assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
+    }
+  }
+});

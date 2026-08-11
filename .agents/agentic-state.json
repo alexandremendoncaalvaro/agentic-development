@@ -37,8 +37,12 @@
           "sourceSha": "d882716a9ef93eaf353202b8fb5f862a9969ef73454a5a37a2d15fa4955c8655"
         },
         {
+          "path": ".agents/skills/ad-architecture/scripts/project-signals.mjs",
+          "sourceSha": "6a8c5bdb336989ca427057d481fd7172a47910d0be462e9649c301bceb9d9114"
+        },
+        {
           "path": ".agents/skills/ad-architecture/SKILL.md",
-          "sourceSha": "fdccc227d98db04aff26b00a9499e97604413258dd2d6abe972647a34d001adf"
+          "sourceSha": "6aff173533ebd1886e9db951a4240482c75d46f62cf2626592edf8da90e03e86"
         }
       ]
     },
@@ -92,8 +96,12 @@
           "sourceSha": "a3252539fca04e188322f8613d5c531e9058651638b36fe58f63f0fc2a8622ec"
         },
         {
+          "path": ".agents/skills/ad-bootstrap/scripts/project-signals.mjs",
+          "sourceSha": "6a8c5bdb336989ca427057d481fd7172a47910d0be462e9649c301bceb9d9114"
+        },
+        {
           "path": ".agents/skills/ad-bootstrap/SKILL.md",
-          "sourceSha": "a3f0c7a0d6d9d33b3c82f4ca209b5c0566bfdb096cde849a5fec3953e7886f51"
+          "sourceSha": "914e89012b8f682789cdb0f9c79d6bd601cc91f139c6b017e513caa51f6ff403"
         }
       ]
     },
@@ -152,8 +160,12 @@
           "sourceSha": "3fd6f42efd0a84a87d60144bc51b92e81f51255c88020a8cf1bac38f78a7fd1e"
         },
         {
+          "path": ".agents/skills/ad-diagnose/scripts/project-signals.mjs",
+          "sourceSha": "6a8c5bdb336989ca427057d481fd7172a47910d0be462e9649c301bceb9d9114"
+        },
+        {
           "path": ".agents/skills/ad-diagnose/SKILL.md",
-          "sourceSha": "7a3c1764b6242b39b3041e6e69a04610690854dae25060e4f8e76898622cb361"
+          "sourceSha": "03761463bb55aa5e9df1b826dfb03ddf056213898071cc350dd66ed1cdc78a09"
         }
       ]
     },
@@ -233,8 +245,12 @@
           "sourceSha": "66dae868f8196c5eded09dfefaafa773ef74d2e4128d85c0c117297d91f40c9d"
         },
         {
+          "path": ".agents/skills/ad-guidelines/scripts/project-signals.mjs",
+          "sourceSha": "6a8c5bdb336989ca427057d481fd7172a47910d0be462e9649c301bceb9d9114"
+        },
+        {
           "path": ".agents/skills/ad-guidelines/SKILL.md",
-          "sourceSha": "aab21cfc1242a7735647f03248396ee0cdff7a0a980dddf11b50e66439aa884d"
+          "sourceSha": "35caafedea269453e2885b6f39aef981a9e6a0dddef73671f35a6e5e8cc91d69"
         }
       ]
     },

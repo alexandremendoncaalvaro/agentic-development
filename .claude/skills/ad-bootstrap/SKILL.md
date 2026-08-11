@@ -11,7 +11,13 @@ Produces `AGENTS.md` at the repo root, ≤150 lines, every line operational. Gen
 
 ## Step 0 — Detect mode
 
-Inspect the repo:
+Run from the consumer repo root before inspecting it:
+
+```bash
+node .claude/skills/ad-bootstrap/scripts/project-signals.mjs AGENTS.md --host claude-code
+```
+
+Parse its JSON. Its `mode` selects the branch below; use `stacks` to focus the manifest scan and surface every `unreadable[]` entry as a scan gap, never as an absent path. Then inspect the repo:
 
 * `AGENTS.md` exists at the repo root → **audit** mode. **Do not rewrite it.** Stop after producing a drift list (see Step 4).
 * `AGENTS.md` absent and the directory only holds trivial entries (`.git`, `node_modules`, `.gitignore`, `.gitattributes`, `.DS_Store`, `.env*`, `.idea`, `.vscode`, `LICENSE*`, `README.md`) → **greenfield** mode. There is nothing to scan; walk the template's `<placeholders>` with the user one at a time and skip Step 1.
