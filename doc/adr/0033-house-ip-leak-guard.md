@@ -24,7 +24,7 @@ The denylist patterns are the sensitive markers themselves, so shipping them wou
 
 The gate is fail-closed and honors the no-bypass rule in [`WORKFLOW.md`](../../WORKFLOW.md) §11: no `--no-verify`, no skipped hooks. It is implemented as a small Node script under `src/` (ESM, `node:` built-ins only) with a `node:test` suite, wired into `lefthook.yml` alongside the existing `pre-push` gate.
 
-The guard is a repository hygiene mechanism, not a skill: it installs no skill surface and registers no profile entry.
+The guard is a repository hygiene mechanism, not a skill: it installs no skill surface and registers no skill entry.
 
 ## Consequences
 

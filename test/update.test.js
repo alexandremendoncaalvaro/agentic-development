@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import {
   mkdtempSync,
   rmSync,
@@ -12,7 +13,12 @@ import {
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { installSkills, removeOrphanSkills } from '../src/lib/install.js';
+import {
+  installSkills,
+  removeOrphanSkills,
+  removeRetiredSkills,
+} from '../src/lib/install.js';
+import { retiredSkillsForAgent } from '../src/lib/skill-migrations.js';
 import { loadState, saveState, emptyState, statePath, STATE_DIRS } from '../src/lib/state.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -36,6 +42,10 @@ function runUpdate(cwd, args = []) {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   });
+}
+
+function sha256(text) {
+  return createHash('sha256').update(text).digest('hex');
 }
 
 // A scratch directory that is a real git repository, for the ADR-0051
@@ -275,6 +285,7 @@ test('init writes state.json for claude-code', () => {
     const state = loadState(dir, 'claude-code');
     assert.ok(state, 'state file must exist after init');
     assert.equal(state.agent, 'claude-code');
+    assert.equal('profile' in state, false, 'installation state does not classify project maturity');
     assert.ok(state.skills['ad-bootstrap']);
     assert.ok(
       state.skills['ad-bootstrap'].files.some((f) =>
@@ -282,6 +293,23 @@ test('init writes state.json for claude-code', () => {
       )
     );
     assert.ok(state.skills['ad-bootstrap'].files[0].sourceSha.match(/^[a-f0-9]{64}$/));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('update removes a legacy profile field from state', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    const path = statePath(dir, 'claude-code');
+    const legacy = JSON.parse(readFileSync(path, 'utf8'));
+    legacy.profile = 'team';
+    writeFileSync(path, `${JSON.stringify(legacy, null, 2)}\n`);
+
+    runUpdate(dir, ['--agent', 'claude-code', '--yes']);
+
+    assert.equal('profile' in JSON.parse(readFileSync(path, 'utf8')), false);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -519,9 +547,10 @@ test('removeOrphanSkills: previous skill no longer in opted set → prompt → c
       skills: ['ad-bootstrap'],
     });
     const state = emptyState('claude-code', '0.3.0');
+    const path = '.claude/skills/ad-bootstrap/SKILL.md';
     state.skills['ad-bootstrap'] = {
       version: '0.3.0',
-      files: [{ path: '.claude/skills/ad-bootstrap/SKILL.md', sourceSha: 'sha' }],
+      files: [{ path, sourceSha: sha256(readFileSync(join(dir, path), 'utf8')) }],
     };
 
     const result = await removeOrphanSkills({
@@ -551,9 +580,10 @@ test('removeOrphanSkills: confirmRemove=true → file deleted, action removed', 
       skills: ['ad-bootstrap'],
     });
     const state = emptyState('claude-code', '0.3.0');
+    const path = '.claude/skills/ad-bootstrap/SKILL.md';
     state.skills['ad-bootstrap'] = {
       version: '0.3.0',
-      files: [{ path: '.claude/skills/ad-bootstrap/SKILL.md', sourceSha: 'sha' }],
+      files: [{ path, sourceSha: sha256(readFileSync(join(dir, path), 'utf8')) }],
     };
 
     const result = await removeOrphanSkills({
@@ -569,6 +599,323 @@ test('removeOrphanSkills: confirmRemove=true → file deleted, action removed', 
       'file must be deleted'
     );
     assert.equal(result.actions[0].type, 'removed');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('regression: a known legacy fingerprint migrates without state or deleting local files', () => {
+  const dir = mkScratch();
+  try {
+    const legacyPath = '.claude/skills/ad-grill/SKILL.md';
+    const legacyBody = 'legacy kit skill\n';
+    const legacyDir = join(dir, '.claude/skills/ad-grill');
+    mkdirSync(legacyDir, { recursive: true });
+    writeFileSync(join(dir, legacyPath), legacyBody);
+    writeFileSync(join(legacyDir, 'local-notes.md'), 'keep me\n');
+
+    const result = removeRetiredSkills({
+      cwd: dir,
+      agent: 'claude-code',
+      previousState: null,
+      migrations: [
+        {
+          from: 'ad-grill',
+          to: 'ad-grill-me',
+          files: [{ path: legacyPath, knownShas: [sha256(legacyBody)] }],
+        },
+      ],
+    });
+
+    assert.equal(existsSync(join(dir, legacyPath)), false);
+    assert.equal(
+      readFileSync(join(legacyDir, 'local-notes.md'), 'utf8'),
+      'keep me\n',
+      'the migration must never recursively delete user files beside kit files'
+    );
+    assert.deepEqual(result.actions, [
+      { type: 'migration-removed', path: legacyPath, agent: 'claude-code' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('retiredSkillsForAgent records the verified ad-grill source fingerprints', () => {
+  const claudeGrill = retiredSkillsForAgent('claude-code').find(
+    ({ from }) => from === 'ad-grill'
+  );
+  assert.deepEqual(claudeGrill, {
+    from: 'ad-grill',
+    to: 'ad-grill-me',
+    files: [
+      {
+        path: '.claude/skills/ad-grill/SKILL.md',
+        knownShas: [
+          '0df4dcd35113f75ff82e76ea2dc63f341256977ef12a09e51b756bf09b1f3e2e',
+        ],
+      },
+    ],
+  });
+  const codexGrill = retiredSkillsForAgent('codex').find(
+    ({ from }) => from === 'ad-grill'
+  );
+  assert.deepEqual(codexGrill.files, [
+    {
+      path: '.agents/skills/ad-grill/SKILL.md',
+      knownShas: [
+        '7bb9a87fae699f1e7f5e468f5419027560f84587a7bfefea8df7822438b8ca79',
+      ],
+    },
+    {
+      path: '.agents/skills/ad-grill/agents/openai.yaml',
+      knownShas: [
+        'cff51605a057a12be162116d2b8a7c885e72e407df642f807d6b6b38e2f1824d',
+      ],
+    },
+  ]);
+});
+
+test('regression: a state-recorded agentic-prefix skill is migrated by name', () => {
+  const dir = mkScratch();
+  try {
+    const legacyPath = '.claude/skills/agentic-bootstrap/SKILL.md';
+    const legacyBody = 'previous prefix kit skill\n';
+    mkdirSync(dirname(join(dir, legacyPath)), { recursive: true });
+    writeFileSync(join(dir, legacyPath), legacyBody);
+    const state = emptyState('claude-code', '0.3.0-beta.1');
+    state.skills['agentic-bootstrap'] = {
+      version: '0.3.0-beta.1',
+      files: [{ path: legacyPath, sourceSha: sha256(legacyBody) }],
+    };
+
+    const result = removeRetiredSkills({
+      cwd: dir,
+      agent: 'claude-code',
+      previousState: state,
+    });
+
+    assert.equal(existsSync(join(dir, legacyPath)), false);
+    assert.deepEqual(result.actions, [
+      { type: 'migration-removed', path: legacyPath, agent: 'claude-code' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('retiredSkillsForAgent records the verified ad-clean source fingerprint', () => {
+  const claudeClean = retiredSkillsForAgent('claude-code').find(
+    ({ from }) => from === 'ad-clean'
+  );
+  assert.deepEqual(claudeClean, {
+    from: 'ad-clean',
+    to: 'ad-archive',
+    files: [
+      {
+        path: '.claude/skills/ad-clean/SKILL.md',
+        knownShas: [
+          'bb315007e059943dd230b8b5c264d7efad0abe88aad2ec1b01ddc915976bc642',
+        ],
+      },
+    ],
+  });
+});
+
+test('regression: an edited renamed skill is preserved as one intact unit', () => {
+  const dir = mkScratch();
+  try {
+    const legacyPath = '.claude/skills/ad-grill/SKILL.md';
+    const originalBody = 'legacy kit skill\n';
+    const editedBody = `${originalBody}local edit\n`;
+    mkdirSync(dirname(join(dir, legacyPath)), { recursive: true });
+    writeFileSync(join(dir, legacyPath), editedBody);
+
+    const state = emptyState('claude-code', '0.18.0-beta.1');
+    state.skills['ad-grill'] = {
+      version: '0.18.0-beta.1',
+      files: [{ path: legacyPath, sourceSha: sha256(originalBody) }],
+    };
+
+    const result = removeRetiredSkills({
+      cwd: dir,
+      agent: 'claude-code',
+      previousState: state,
+      migrations: [
+        {
+          from: 'ad-grill',
+          to: 'ad-grill-me',
+          files: [{ path: legacyPath, knownShas: [] }],
+        },
+      ],
+    });
+
+    assert.equal(readFileSync(join(dir, legacyPath), 'utf8'), editedBody);
+    assert.deepEqual(result.actions, [
+      { type: 'migration-kept', path: legacyPath, agent: 'claude-code' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('regression: update --yes migrates a pristine ad-grill install to ad-grill-me', () => {
+  const dir = mkScratch();
+  try {
+    const legacyPath = '.claude/skills/ad-grill/SKILL.md';
+    const legacyBody = 'legacy kit skill\n';
+    mkdirSync(dirname(join(dir, legacyPath)), { recursive: true });
+    writeFileSync(join(dir, legacyPath), legacyBody);
+    const state = emptyState('claude-code', '0.18.0-beta.1');
+    state.skills['ad-grill'] = {
+      version: '0.18.0-beta.1',
+      files: [{ path: legacyPath, sourceSha: sha256(legacyBody) }],
+    };
+    saveState(dir, 'claude-code', state);
+
+    const run = spawnSync('node', [BIN, 'update', '--agent', 'claude-code', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+    });
+
+    assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
+    assert.equal(existsSync(join(dir, legacyPath)), false);
+    assert.ok(existsSync(join(dir, '.claude/skills/ad-grill-me/SKILL.md')));
+    assert.match(
+      `${run.stdout}${run.stderr}`,
+      /- \[claude-code\] \.claude\/skills\/ad-grill\/SKILL\.md/,
+      'the update report must make an automatic retirement visible'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('regression: update --yes migrates the Codex ad-grill files together', () => {
+  const dir = mkScratch();
+  try {
+    const skillPath = '.agents/skills/ad-grill/SKILL.md';
+    const metadataPath = '.agents/skills/ad-grill/agents/openai.yaml';
+    const skillBody = 'legacy Codex skill\n';
+    const metadataBody = 'legacy metadata\n';
+    mkdirSync(dirname(join(dir, metadataPath)), { recursive: true });
+    writeFileSync(join(dir, skillPath), skillBody);
+    writeFileSync(join(dir, metadataPath), metadataBody);
+    const state = emptyState('codex', '0.18.0-beta.1');
+    state.skills['ad-grill'] = {
+      version: '0.18.0-beta.1',
+      files: [
+        { path: skillPath, sourceSha: sha256(skillBody) },
+        { path: metadataPath, sourceSha: sha256(metadataBody) },
+      ],
+    };
+    saveState(dir, 'codex', state);
+
+    const run = spawnSync('node', [BIN, 'update', '--agent', 'codex', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+    });
+
+    assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
+    assert.equal(existsSync(join(dir, skillPath)), false);
+    assert.equal(existsSync(join(dir, metadataPath)), false);
+    assert.ok(existsSync(join(dir, '.agents/skills/ad-grill-me/SKILL.md')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('removeRetiredSkills: dry-run reports the migration without deleting it', () => {
+  const dir = mkScratch();
+  try {
+    const legacyPath = '.claude/skills/ad-grill/SKILL.md';
+    const legacyBody = 'legacy kit skill\n';
+    mkdirSync(dirname(join(dir, legacyPath)), { recursive: true });
+    writeFileSync(join(dir, legacyPath), legacyBody);
+    const state = emptyState('claude-code', '0.18.0-beta.1');
+    state.skills['ad-grill'] = {
+      version: '0.18.0-beta.1',
+      files: [{ path: legacyPath, sourceSha: sha256(legacyBody) }],
+    };
+
+    const result = removeRetiredSkills({
+      cwd: dir,
+      agent: 'claude-code',
+      previousState: state,
+      migrations: [
+        {
+          from: 'ad-grill',
+          to: 'ad-grill-me',
+          files: [{ path: legacyPath, knownShas: [] }],
+        },
+      ],
+      dryRun: true,
+    });
+
+    assert.equal(readFileSync(join(dir, legacyPath), 'utf8'), legacyBody);
+    assert.deepEqual(result.actions, [
+      { type: 'migration-removed', path: legacyPath, agent: 'claude-code' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('removeOrphanSkills: an edited orphan stays even when removal is confirmed', async () => {
+  const dir = mkScratch();
+  try {
+    const path = '.claude/skills/ad-bootstrap/SKILL.md';
+    mkdirSync(dirname(join(dir, path)), { recursive: true });
+    writeFileSync(join(dir, path), 'local edit\n');
+    const state = emptyState('claude-code', '0.3.0');
+    state.skills['ad-bootstrap'] = {
+      version: '0.3.0',
+      files: [{ path, sourceSha: sha256('kit original\n') }],
+    };
+
+    const result = await removeOrphanSkills({
+      cwd: dir,
+      agent: 'claude-code',
+      previousState: state,
+      currentSkills: [],
+      confirmRemove: async () => true,
+    });
+
+    assert.equal(readFileSync(join(dir, path), 'utf8'), 'local edit\n');
+    assert.deepEqual(result.removedSkills, []);
+    assert.deepEqual(result.actions, [
+      { type: 'orphan-kept', path, agent: 'claude-code' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('removeOrphanSkills: cleanup keeps an untracked local file in the old skill directory', async () => {
+  const dir = mkScratch();
+  try {
+    const path = '.claude/skills/ad-bootstrap/SKILL.md';
+    const skillDir = dirname(join(dir, path));
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(join(dir, path), 'kit original\n');
+    writeFileSync(join(skillDir, 'local-notes.md'), 'keep me\n');
+    const state = emptyState('claude-code', '0.3.0');
+    state.skills['ad-bootstrap'] = {
+      version: '0.3.0',
+      files: [{ path, sourceSha: sha256('kit original\n') }],
+    };
+
+    const result = await removeOrphanSkills({
+      cwd: dir,
+      agent: 'claude-code',
+      previousState: state,
+      currentSkills: [],
+      confirmRemove: async () => true,
+    });
+
+    assert.deepEqual(result.removedSkills, ['ad-bootstrap']);
+    assert.equal(existsSync(join(dir, path)), false);
+    assert.equal(readFileSync(join(skillDir, 'local-notes.md'), 'utf8'), 'keep me\n');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

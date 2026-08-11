@@ -15,7 +15,7 @@ Layer 1 Constitution trinity member. Lazy lifecycle owner of `GUIDELINES.md` at 
 
 Run when the user wants to scope or update project-level engineering standards. Triggers:
 
-- New project past `poc` profile that needs explicit standards.
+- New project that needs explicit standards.
 - Existing project with engineering rules buried in `AGENTS.md` — extract and scale.
 - Stack change (new language, new architecture) that needs a guidelines update.
 - Object Calisthenics tier review.
@@ -28,8 +28,6 @@ Route elsewhere when:
 - Scope is one binding decision (e.g., "pick error-handling library X") → `/ad-adr`.
 - Scope is wiring the gates this file describes → `/ad-hooks`.
 
-Skill excluded from `poc` profile — a spike does not need full engineering guidelines.
-
 ## Step 1 — Codebase-first scan
 
 Before asking any preference question, look. The repo answers most fields.
@@ -37,10 +35,10 @@ Before asking any preference question, look. The repo answers most fields.
 First run from the consumer repo root:
 
 ```bash
-node .claude/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md --host claude-code
+node .claude/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md
 ```
 
-Parse its JSON. `stacks` narrows the manifest reads below and `profile.name` supplies the strictness default. Surface every `unreadable[]` entry as a scan gap, never as an absent path.
+Parse its JSON. `stacks` narrows the manifest reads below. Surface every `unreadable[]` entry as a scan gap, never as an absent path.
 
 ### Language and toolchain
 
@@ -85,9 +83,9 @@ Parse its JSON. `stacks` narrows the manifest reads below and `profile.name` sup
 
 For brownfield projects, identify candidate source files that future agents should imitate. Prefer one boundary example, one core/domain function, and one test. Record paths only, never pasted snippets. If no representative code exists, omit the section until the project has examples worth copying.
 
-### Profile and project posture
+### Project posture
 
-Use `profile.name` from the detector for the active profile. Profile affects strictness defaults (mature → strict Object Calisthenics by default; solo → loose by default).
+Derive strictness from existing code, delivery risk, and stated constraints — never from installer metadata. A disposable experiment may need only a light baseline; long-lived or safety-sensitive code needs explicit, enforceable standards.
 
 Only after the scan produces no answer does the skill ask. Asking about something the repo already states wastes the user's attention.
 
@@ -122,7 +120,7 @@ Suggest from project signals (e.g., a CLI tool → "portability over speed"; a r
 
 ### 3.2 Object Calisthenics tier
 
-Three-choice question. Default depends on profile (poc — N/A; solo — loose; team — moderate; mature — strict).
+Three-choice question. Reuse the existing tier when one exists. Otherwise suggest **Moderate** for code expected to live beyond an experiment; suggest **Loose** only for explicitly disposable work; choose **Strict** only when the project requires it.
 
 - **Loose** — Rule 6 (no abbreviations), Rule 7 (small entities, relaxed targets), Rule 1 (one level of indentation as guideline).
 - **Moderate** — Loose + Rule 2 (no `else`), Rule 3 (wrap primitives), Rule 4 (first-class collections).
@@ -212,7 +210,7 @@ Never rewrite existing prose — append rationale paragraphs where decisions evo
 
 ## Next
 
-- After writing `GUIDELINES.md`: invoke `/ad-hooks` to wire the quality gates this file describes (`team` and `mature` profiles).
+- After writing `GUIDELINES.md`: invoke `/ad-hooks` when the project needs executable quality gates.
 - After writing `GUIDELINES.md`: invoke `/ad-bootstrap` to refresh `AGENTS.md` with pointer-style sections.
 - When a binding decision arises that the guidelines do not yet cover (e.g., picking a specific error-handling library, naming an exception hierarchy): `/ad-adr`.
 - Periodic drift check: `/ad-drift` flags AGENTS sections that duplicate GUIDELINES sections, and GUIDELINES sections whose claims do not match the code (e.g., naming convention says snake_case but half the codebase is camelCase).

@@ -7,7 +7,7 @@ summary: Safely orchestrate a single npm package release through its configured 
 <background_information>
 Implements ADR-0063 and amends ADR-0048's manually performed external tail. The configured root `npm run release -- <kind>` script remains the only path that mutates the version, changelog, DCO-signed release commit, and annotated tag. This skill orchestrates the surrounding state checks and explicitly approved external effects.
 
-Only one root npm package released through GitHub is supported. The skill is unavailable to the `poc` profile. It never switches GitHub authentication, reads credential files, surfaces tokens or OTP values, changes npm dist-tags, or retries an irreversible operation blindly.
+Only one root npm package released through GitHub is supported. It never switches GitHub authentication, reads credential files, surfaces tokens or OTP values, changes npm dist-tags, or retries an irreversible operation blindly.
 </background_information>
 
 <instructions>

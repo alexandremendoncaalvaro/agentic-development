@@ -112,6 +112,6 @@ When the change is committed, the behaviors covered, the deepening that surfaced
 
 - After Step 4 refactor passes: commit the change. Each commit lands one or a small handful of behavior-shaped tests with their implementation; commits stay atomic.
 - `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10. TDD verifies the implementation against tested behaviors; §10 review checks coupling, edge cases, spec drift the tests did not cover.
-- If the cycle surfaced a refactor opportunity larger than the GREEN-phase refactor allows: `/ad-deepen` (WORKFLOW §8; `team` / `mature` profiles only).
+- If the cycle surfaced a refactor opportunity larger than the GREEN-phase refactor allows: `/ad-deepen` (WORKFLOW §8), when the design friction is load-bearing.
 - If multiple tests fail in unexpected ways during the cycle (not the predicted RED for the new test): `/ad-diagnose` to investigate the regression before continuing the TDD loop.
 - If the work spans multiple sessions: `/ad-task` for explicit decomposition; cite this TDD run in the task `Notes`.

@@ -39,7 +39,7 @@ We will adopt a single evidence-graded methodology for research and discovery, s
 
 5. **The two fronts chain.** A study (A) that concludes "spike-first" hands to B; a de-risking pass (B) that hits a knowledge gap spawns a focused study (A). Same engine, different entry and exit.
 
-6. **It lands the kit-native way.** A `WORKFLOW.md` section carries the philosophy; the two skills plus the `ad-ground` increment carry the operation (each under its own ADR); a study template carries the report shape. Dual-host (Claude Code + Codex), words-only per the emoji ban (ADR-0008); profile-scoping is deferred to the per-skill ADRs.
+6. **It lands the kit-native way.** A `WORKFLOW.md` section carries the philosophy; the two skills plus the `ad-ground` increment carry the operation (each under its own ADR); a study template carries the report shape. Dual-host (Claude Code + Codex), words-only per the emoji ban (ADR-0008); contextual relevance is held in each skill body.
 
 ## Consequences
 

@@ -82,5 +82,5 @@ No file written. Output is structured conversation: regime confirmation, vertica
 
 When the change is committed, the behaviors covered, the deepening that surfaced, and the rejected couplings (if any) go into the commit message body. When a task file exists, the same content lands in the task's `Notes` log under a dated entry.
 
-Next: commit the change atomically per behavior cluster; `/ad-review` (WORKFLOW §10) before merge; route to `/ad-deepen` if a refactor surfaces larger than GREEN-phase scope allows (team / mature profiles only); route to `/ad-diagnose` if unexpected test regressions appear during the cycle.
+Next: commit the change atomically per behavior cluster; `/ad-review` (WORKFLOW §10) before merge; route to `/ad-deepen` if a refactor surfaces larger than GREEN-phase scope allows and the design friction is load-bearing; route to `/ad-diagnose` if unexpected test regressions appear during the cycle.
 </output_contract>

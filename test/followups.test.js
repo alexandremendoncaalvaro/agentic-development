@@ -197,7 +197,6 @@ test('saveState (via orderState): malformed state with non-array files throws wi
       schemaVersion: 1,
       kitVersion: '0.9.4-test',
       agent: 'claude-code',
-      profile: 'team',
       skills: {
         'ad-bootstrap': {
           version: '0.9.4-test',
@@ -223,7 +222,6 @@ test('saveState (via orderState): missing skills object throws', () => {
       schemaVersion: 1,
       kitVersion: '0.9.4-test',
       agent: 'claude-code',
-      profile: 'team',
       // skills is missing
     };
     assert.throws(

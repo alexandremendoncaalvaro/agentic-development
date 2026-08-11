@@ -11,7 +11,7 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { detectAgents, detectFeatures, detectMode } from '../src/lib/detect.js';
+import { detectAgents, detectMode } from '../src/lib/detect.js';
 import { installSkills } from '../src/lib/install.js';
 import {
   updateRootDoc,
@@ -23,7 +23,6 @@ import {
   writeExcludeEntries,
   installedPathsToExclude,
 } from '../src/lib/git.js';
-import { CONDITIONAL_SKILLS, REQUIRED_SKILLS } from '../src/commands/init.js';
 import {
   offerKitExclude,
   kitExcludeCandidates,
@@ -251,119 +250,6 @@ test('installSkills: unknown agent throws', async () => {
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('detectFeatures: empty dir → all flags false', () => {
-  const dir = mkScratch();
-  try {
-    assert.deepEqual(detectFeatures(dir), {
-      frontend: false,
-      hasClaudeCode: false,
-      hasCodex: false,
-    });
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('detectFeatures: package.json with React dep → frontend true', () => {
-  const dir = mkScratch();
-  try {
-    writeFileSync(
-      join(dir, 'package.json'),
-      JSON.stringify({ name: 'x', dependencies: { react: '^18' } })
-    );
-    assert.equal(detectFeatures(dir).frontend, true);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('detectFeatures: tailwind.config.ts → frontend true (no manifest needed)', () => {
-  const dir = mkScratch();
-  try {
-    writeFileSync(join(dir, 'tailwind.config.ts'), 'export default {}\n');
-    assert.equal(detectFeatures(dir).frontend, true);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('detectFeatures: tokens.json → frontend true', () => {
-  const dir = mkScratch();
-  try {
-    writeFileSync(join(dir, 'tokens.json'), '{}\n');
-    assert.equal(detectFeatures(dir).frontend, true);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('detectFeatures: nested *.tsx within depth limit → frontend true', () => {
-  const dir = mkScratch();
-  try {
-    mkdirSync(join(dir, 'src', 'components'), { recursive: true });
-    writeFileSync(join(dir, 'src', 'components', 'Foo.tsx'), 'export const Foo = () => null;\n');
-    assert.equal(detectFeatures(dir).frontend, true);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('detectFeatures: *.tsx inside node_modules ignored → frontend false', () => {
-  const dir = mkScratch();
-  try {
-    mkdirSync(join(dir, 'node_modules', 'lib'), { recursive: true });
-    writeFileSync(
-      join(dir, 'node_modules', 'lib', 'Foo.tsx'),
-      'export const Foo = () => null;\n'
-    );
-    writeFileSync(join(dir, 'package.json'), '{"name":"x"}\n');
-    assert.equal(detectFeatures(dir).frontend, false);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('detectFeatures: backend Node project (no React, no jsx) → frontend false', () => {
-  const dir = mkScratch();
-  try {
-    writeFileSync(
-      join(dir, 'package.json'),
-      JSON.stringify({ name: 'api', dependencies: { express: '^4' } })
-    );
-    mkdirSync(join(dir, 'src'));
-    writeFileSync(join(dir, 'src', 'server.js'), 'console.log("hi");\n');
-    assert.equal(detectFeatures(dir).frontend, false);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('detectFeatures: .claude/ → hasClaudeCode true, hasCodex false', () => {
-  const dir = mkScratch();
-  try {
-    mkdirSync(join(dir, '.claude'));
-    const f = detectFeatures(dir);
-    assert.equal(f.hasClaudeCode, true);
-    assert.equal(f.hasCodex, false);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('detectFeatures: .agents/ or .openai/ → hasCodex true', () => {
-  const dir1 = mkScratch();
-  const dir2 = mkScratch();
-  try {
-    mkdirSync(join(dir1, '.agents'));
-    assert.equal(detectFeatures(dir1).hasCodex, true);
-    mkdirSync(join(dir2, '.openai'));
-    assert.equal(detectFeatures(dir2).hasCodex, true);
-  } finally {
-    rmSync(dir1, { recursive: true, force: true });
-    rmSync(dir2, { recursive: true, force: true });
   }
 });
 

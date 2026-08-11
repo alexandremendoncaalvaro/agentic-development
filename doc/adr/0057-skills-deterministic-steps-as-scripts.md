@@ -23,7 +23,7 @@ We will adopt an agent-vs-script policy for both host trees.
 
 1. Deterministic, consistency-critical sub-steps in a skill are bundled as `scripts/` the agent **executes**, with explicit execute-vs-read intent stated in the body ("run X" vs "see X"). Scripts follow "solve, don't defer" — they handle their own error conditions and document their constants rather than punting to the model.
 2. Genuine judgment workflows stay high-freedom text and are **out of scope**: grounding, grilling, code review, diagnosis reasoning, TDD/TDG, and posture (`ad-philosophy`). Scripting them would over-constrain reasoning where high freedom is correct.
-3. Deterministic logic reused across skills — next-`NNNN` numbering, `gh`/git preflight, repo/stack/profile detection — is factored so it is not re-derived per skill. Whether that is a per-skill copy or one shared module is an explicit sub-decision at rollout. Host-divergent helpers (e.g. `ad-rules` resolving `~/.codex/AGENTS.md` vs `~/.claude/CLAUDE.md`) are authored per host, never shared across trees.
+3. Deterministic logic reused across skills — next-`NNNN` numbering, `gh`/git preflight, and repo/stack detection — is factored so it is not re-derived per skill. Whether that is a per-skill copy or one shared module is an explicit sub-decision at rollout. Host-divergent helpers (e.g. `ad-rules` resolving `~/.codex/AGENTS.md` vs `~/.claude/CLAUDE.md`) are authored per host, never shared across trees.
 4. Every change is made in both `src/skills/` trees, re-synced via `node bin/agentic.js update --yes`, with `npm test` green, and each new script verified to install into a consumer via `npm pack --dry-run` plus a scratch `init`.
 
 ## Consequences

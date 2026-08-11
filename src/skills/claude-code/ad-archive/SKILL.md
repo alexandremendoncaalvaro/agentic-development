@@ -77,7 +77,7 @@ If the user wants to also remove one or more `Status: accepted` ADRs, run the ab
 
 For each named accepted ADR:
 
-1. Ask the user where the decision has been absorbed. Required form: `<file>#<section-or-anchor>` or `<file>:<line>` (e.g. `ARCHITECTURE.md#data-flow`, `GUIDELINES.md§Naming`, `src/lib/profiles.js:23`).
+1. Ask the user where the decision has been absorbed. Required form: `<file>#<section-or-anchor>` or `<file>:<line>` (e.g. `ARCHITECTURE.md#data-flow`, `GUIDELINES.md§Naming`, `src/lib/install.js:23`).
 2. Extract two-to-four substance keywords from the ADR's title and Decision section (not the slug — substance). Example: ADR-0004 "File-based task tracking" → keywords `file-based`, `task tracking`, `doc/tasks`, `Markdown`.
 3. Grep the absorption target for each keyword. Require at least one keyword to match. (Title-derived literal keywords may collide; substance keywords are the test.)
 4. If the grep fails: refuse removal. Print:

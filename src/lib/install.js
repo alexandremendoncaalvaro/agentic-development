@@ -5,14 +5,14 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
-  rmSync,
+  rmdirSync,
   statSync,
   unlinkSync,
 } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { basename, dirname, join, relative, sep as PATH_SEP } from 'node:path';
 import { SCHEMA_VERSION } from './state.js';
-import { DEFAULT_PROFILE, validateProfile } from './profiles.js';
+import { retiredSkillsForAgent } from './skill-migrations.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const KIT_ROOT = join(__dirname, '..', '..');
@@ -47,6 +47,18 @@ export function agentLayout(agent) {
   const layout = AGENT_LAYOUT[agent];
   if (!layout) throw new Error(`unknown agent "${agent}"`);
   return layout;
+}
+
+/**
+ * List the skills bundled for one host. Source directories are canonical, so
+ * a new dual-host skill automatically joins the default install set.
+ */
+export function bundledSkills(agent) {
+  const { sourceDir } = agentLayout(agent);
+  const root = join(KIT_ROOT, sourceDir);
+  return readdirSync(root)
+    .filter((name) => statSync(join(root, name)).isDirectory())
+    .sort();
 }
 
 function walkSkill(srcRoot) {
@@ -192,11 +204,9 @@ export async function installSkills({
   confirmReplace = async () => false,
   previousStates = {},
   kitVersion = null,
-  profile = null,
   dryRun = false,
   force = false,
 }) {
-  if (profile !== null) validateProfile(profile);
   const actions = [];
   const nextStates = {};
 
@@ -306,15 +316,10 @@ export async function installSkills({
       };
     }
 
-    // Profile resolution order: explicit `profile` arg > prior state's
-    // profile > DEFAULT_PROFILE. installSkills is the single owner of the
-    // returned nextStates' shape; callers no longer inject `profile`
-    // post-hoc per review C3 (v0.11.3).
     nextStates[agent] = {
       schemaVersion: SCHEMA_VERSION,
       kitVersion: kitVersion ?? prev?.kitVersion ?? null,
       agent,
-      profile: profile ?? prev?.profile ?? DEFAULT_PROFILE,
       skills: nextSkills,
     };
   }
@@ -333,6 +338,8 @@ export async function installSkills({
  * @param {string[]} opts.currentSkills
  * @param {(question: string) => Promise<boolean>} [opts.confirmRemove]
  * @param {boolean} [opts.dryRun]
+ * @param {boolean} [opts.force] Remove a state-recorded divergent file only
+ *   when the caller has made that destructive intent explicit.
  *
  * @returns {Promise<{ actions: Array<{type, path, agent}>, removedSkills: string[] }>}
  */
@@ -343,6 +350,7 @@ export async function removeOrphanSkills({
   currentSkills,
   confirmRemove = async () => false,
   dryRun = false,
+  force = false,
 }) {
   const actions = [];
   const removedSkills = [];
@@ -353,6 +361,16 @@ export async function removeOrphanSkills({
 
   for (const [skill, entry] of Object.entries(previousState.skills)) {
     if (currentSet.has(skill)) continue;
+    const diverged = entry.files.filter((f) => {
+      const abs = join(cwd, f.path);
+      return existsSync(abs) && sha256Of(abs) !== f.sourceSha;
+    });
+    if (diverged.length > 0 && !force) {
+      for (const f of diverged) {
+        actions.push({ type: 'orphan-kept', path: f.path, agent });
+      }
+      continue;
+    }
     const remove = await confirmRemove(
       `Remove orphan skill "${skill}" for ${agent}? (no longer in your install set)`
     );
@@ -379,19 +397,83 @@ export async function removeOrphanSkills({
       }
       actions.push({ type: 'removed', path: f.path, agent });
     }
-    // Try to drop the empty skill directory under skillsDir/<skill>.
-    const skillDir = join(cwd, layout.skillsDir, skill);
-    if (!dryRun && existsSync(skillDir)) {
-      try {
-        rmSync(skillDir, { recursive: true, force: true });
-      } catch {
-        // best-effort cleanup
-      }
-    }
+    removeEmptySkillDirectory(cwd, layout, skill, dryRun);
     removedSkills.push(skill);
   }
 
   return { actions, removedSkills };
+}
+
+function removeEmptySkillDirectory(cwd, layout, skill, dryRun) {
+  const skillDir = join(cwd, layout.skillsDir, skill);
+  if (dryRun || !existsSync(skillDir)) return;
+  if (readdirSync(skillDir).length === 0) rmdirSync(skillDir);
+}
+
+/**
+ * Remove skills explicitly retired by the kit. Every existing managed file
+ * must still match either its saved state fingerprint or a declared legacy
+ * fingerprint. A single local edit preserves the entire retired skill so an
+ * update never leaves a half-deleted user customization behind.
+ *
+ * @param {object} opts
+ * @param {string} opts.cwd
+ * @param {string} opts.agent
+ * @param {object|null} opts.previousState
+ * @param {Array<object>} [opts.migrations]
+ * @param {boolean} [opts.dryRun]
+ * @returns {{ actions: Array<{type, path, agent}> }}
+ */
+export function removeRetiredSkills({
+  cwd,
+  agent,
+  previousState,
+  migrations = retiredSkillsForAgent(agent),
+  dryRun = false,
+}) {
+  const actions = [];
+  const stateShas = new Map();
+  for (const [skill, entry] of Object.entries(previousState?.skills ?? {})) {
+    for (const file of entry.files ?? []) {
+      stateShas.set(file.path, file.sourceSha);
+    }
+  }
+
+  const layout = agentLayout(agent);
+  for (const migration of migrations) {
+    // The state is the strongest migration proof: it records every exact file
+    // that this kit installed, including manifest-routed subagents. A legacy
+    // name with `files: []` therefore migrates only from a state-aware install;
+    // no-state installs need declared historical fingerprints below.
+    const declaredFiles = migration.files ?? [];
+    const declaredPaths = new Set(declaredFiles.map(({ path }) => path));
+    const stateFiles = (previousState?.skills?.[migration.from]?.files ?? [])
+      .filter(({ path }) => !declaredPaths.has(path))
+      .map(({ path }) => ({ path, knownShas: [] }));
+    const existingFiles = [...declaredFiles, ...stateFiles].filter(({ path }) =>
+      existsSync(join(cwd, path))
+    );
+    if (existingFiles.length === 0) continue;
+
+    const changedFiles = existingFiles.filter(({ path, knownShas }) => {
+      const actualSha = sha256Of(join(cwd, path));
+      return actualSha !== stateShas.get(path) && !knownShas.includes(actualSha);
+    });
+    if (changedFiles.length > 0) {
+      for (const { path } of changedFiles) {
+        actions.push({ type: 'migration-kept', path, agent });
+      }
+      continue;
+    }
+
+    for (const { path } of existingFiles) {
+      if (!dryRun) unlinkSync(join(cwd, path));
+      actions.push({ type: 'migration-removed', path, agent });
+    }
+    removeEmptySkillDirectory(cwd, layout, migration.from, dryRun);
+  }
+
+  return { actions };
 }
 
 // Layer 1 Constitution files the kit ships. Installed skills cite them by

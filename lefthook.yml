@@ -10,7 +10,7 @@
 #   repo. This repo is public; the guard stops house IP from leaking in.
 # - pre-push: `npm test` is the deterministic gate every commit pushed
 #   to origin must pass. The unit + integration suite covers state,
-#   install, update, profile, frontmatter, and Windows-path regressions;
+#   install, update, frontmatter, and Windows-path regressions;
 #   running it on every push catches regressions before they reach `cli`.
 # - pre-commit: `changelog-gate` (task-0032) warns — never blocks — when a
 #   commit touches shipped kit content (src/skills/, src/lib/, src/commands/,
