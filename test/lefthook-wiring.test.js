@@ -5,9 +5,20 @@ import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveSpawn } from '../scripts/hook-npm-test.js';
 
 const KIT_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const LEFTHOOK_BIN = join(KIT_ROOT, 'node_modules', '.bin', 'lefthook');
+
+// npm writes two shims into node_modules/.bin: an extensionless shell script
+// for POSIX and a .cmd wrapper for Windows, which cannot execute the former.
+// resolveSpawn owns the rule for running each (a .cmd needs the shell).
+const LEFTHOOK_SHIM = join(
+  KIT_ROOT,
+  'node_modules',
+  '.bin',
+  process.platform === 'win32' ? 'lefthook.cmd' : 'lefthook'
+);
+const LEFTHOOK = resolveSpawn(LEFTHOOK_SHIM);
 
 // The gate scripts' pure cores are unit-tested elsewhere; this file tests the
 // WIRING — the real lefthook.yml installed as real git hooks, exercised by a
@@ -39,7 +50,7 @@ function mkWiredRepo() {
   // --no-verify skips pre-commit/commit-msg during setup; pre-push is untouched.
   git('add', '-A');
   git('commit', '-q', '--no-verify', '-m', 'seed');
-  execFileSync(LEFTHOOK_BIN, ['install'], { cwd: work });
+  execFileSync(LEFTHOOK.command, ['install'], { cwd: work, shell: LEFTHOOK.shell });
   return { dir, work, git };
 }
 
@@ -78,7 +89,7 @@ test('wiring: lefthook.yml routes the pre-push test gate through the env-strippi
   );
 });
 
-test('wiring: an empty-diff push updating main is still blocked by branch-guard', { skip: !existsSync(LEFTHOOK_BIN) && 'lefthook binary not installed' }, () => {
+test('wiring: an empty-diff push updating main is still blocked by branch-guard', { skip: !existsSync(LEFTHOOK_SHIM) && 'lefthook binary not installed' }, () => {
   const { dir, git } = mkWiredRepo();
   try {
     // First push seeds origin/main so the second push has an EMPTY file diff —
@@ -106,7 +117,7 @@ test('wiring: an empty-diff push updating main is still blocked by branch-guard'
   }
 });
 
-test('wiring: a feature-branch push passes the installed pre-push chain', { skip: !existsSync(LEFTHOOK_BIN) && 'lefthook binary not installed' }, () => {
+test('wiring: a feature-branch push passes the installed pre-push chain', { skip: !existsSync(LEFTHOOK_SHIM) && 'lefthook binary not installed' }, () => {
   const { dir, git } = mkWiredRepo();
   try {
     git('switch', '-q', '-c', 'feat/wiring');

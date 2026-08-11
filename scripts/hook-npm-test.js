@@ -18,6 +18,8 @@
  */
 
 import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { delimiter, extname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export function sanitizedEnv(env) {
@@ -28,13 +30,51 @@ export function sanitizedEnv(env) {
   return clean;
 }
 
+// Windows has no single answer for "run this command". `npm` is really
+// `npm.cmd`, which spawnSync refuses to execute without a shell; `node` is
+// `node.exe`, which it runs directly. Handing everything to the shell — what
+// this runner used to do — makes cmd.exe re-parse the arguments, so anything
+// carrying spaces, quotes, or parentheses arrives corrupted. That silently
+// broke the argv-override path this runner documents, and with it the wiring
+// test that exercises the real spawn.
+//
+// Resolve against PATH and PATHEXT instead: an executable image runs directly
+// with its arguments intact, and only a script wrapper needs the shell. POSIX
+// needs none of this. `platform` and `env` are injected so the Windows branch
+// is covered on any host — the suite's CI runs Linux only.
+const DIRECT_EXEC = new Set(['.exe', '.com']);
+
+export function resolveSpawn(cmd, { platform = process.platform, env = process.env } = {}) {
+  if (platform !== 'win32') return { command: cmd, shell: false };
+
+  const known = extname(cmd).toLowerCase();
+  if (known) {
+    return DIRECT_EXEC.has(known) ? { command: cmd, shell: false } : { command: cmd, shell: true };
+  }
+
+  const dirs = (env.PATH || env.Path || '').split(delimiter).filter(Boolean);
+  const exts = (env.PATHEXT || '.COM;.EXE;.BAT;.CMD').split(';').filter(Boolean);
+  for (const dir of dirs) {
+    for (const ext of exts) {
+      const candidate = join(dir, `${cmd}${ext.toLowerCase()}`);
+      if (!existsSync(candidate)) continue;
+      return DIRECT_EXEC.has(ext.toLowerCase())
+        ? { command: candidate, shell: false }
+        : { command: cmd, shell: true };
+    }
+  }
+  // Unresolvable: let the shell run and report it, as it did before.
+  return { command: cmd, shell: true };
+}
+
 function main() {
   const argv = process.argv.slice(2);
   const [cmd, ...args] = argv.length > 0 ? argv : ['npm', 'test'];
-  const result = spawnSync(cmd, args, {
+  const { command, shell } = resolveSpawn(cmd);
+  const result = spawnSync(command, args, {
     stdio: 'inherit',
     env: sanitizedEnv(process.env),
-    shell: process.platform === 'win32',
+    shell,
   });
   if (result.error) {
     console.error(`hook-npm-test: failed to spawn ${cmd}: ${result.error.message}`);
