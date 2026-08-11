@@ -19,6 +19,7 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 ### Fixed
 
 - `update` now applies declared skill-name migrations safely: a retired skill is removed only when its exact known files still match a saved or historical kit fingerprint. A local edit preserves the whole retired skill rather than leaving a half-deleted customization.
+- The `ad-audit` skill and its `audit-group-reviewer` brief (Claude Code) linked ADR-0052 with a path authored against this repo's source layout. It resolves here, where the source sits under `src/skills/claude-code/ad-audit/`, and points outside the target repo entirely once the skill installs to `.claude/skills/ad-audit/` — five levels up from an installed agent brief lands above the drive root. Both now carry the bare `ADR-0052` reference the Codex twins already used. A new guard fails any skill-source relative link that climbs above the skills root, which is the level installation flattens to, so the class cannot ship again unseen.
 
 ## [0.20.0-beta.2] - 2026-08-11
 
