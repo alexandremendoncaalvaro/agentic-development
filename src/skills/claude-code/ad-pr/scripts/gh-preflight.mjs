@@ -34,11 +34,27 @@ function failureCode(error) {
   return 'ERROR';
 }
 
+// AGENTIC_GH names an executable wrapper — but on Windows there is no way to
+// author one without compiling a binary. A .cmd/.bat cannot be spawned without
+// a shell (EINVAL since the CVE-2024-27980 mitigation), and reaching for a
+// shell would re-parse arguments that include user-supplied PR numbers and
+// URLs, opening an injection surface this read-only probe must not have. So a
+// Node script counts as a wrapper and runs under this process's own node
+// binary: still shell-free, and the same seam on both platforms.
+const NODE_SCRIPT = /\.[cm]?js$/i;
+
+function spawnTarget(commandName, args) {
+  return NODE_SCRIPT.test(commandName)
+    ? [process.execPath, [commandName, ...args]]
+    : [commandName, args];
+}
+
 function command(commandName, args, cwd, env) {
+  const [file, argv] = spawnTarget(commandName, args);
   try {
     return {
       ok: true,
-      stdout: execFileSync(commandName, args, {
+      stdout: execFileSync(file, argv, {
         cwd,
         env,
         encoding: 'utf8',

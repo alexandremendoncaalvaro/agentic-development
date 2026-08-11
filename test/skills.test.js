@@ -494,6 +494,66 @@ test('the read contract is delivered on both hosts and its cited section exists'
   }
 });
 
+// --- No skill link may climb above the skills root ---
+
+// Skill sources live at `src/skills/<agent>/<skill>/...` but ship into a target
+// repo at `.claude/skills/<skill>/...`, so a relative link is only portable if
+// it stays inside the skills root. Two ad-audit files linked ADR-0052 with a
+// path authored against THIS repo's layout (`../../../../doc/adr/...`) — correct
+// here, and pointing outside the target repo entirely once installed. Nothing
+// read the link from the installed side, so it shipped. Sibling-skill links
+// (`../ad-ground/SKILL.md`) climb one level and survive; anything reaching the
+// kit's own `doc/` does not, and belongs in prose as a bare `ADR-NNNN`, which is
+// what the Codex twins of both files already did.
+//
+// The bound is deliberately the skills root, not each file's exact installed
+// depth: agent briefs flatten to `.claude/agents/<name>.md` on install, so for
+// them this rule is looser than reality. It still catches the whole class.
+
+function skillFilesWithText(dir, prefix = '') {
+  const out = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    const rel = prefix ? `${prefix}/${entry}` : entry;
+    if (statSync(full).isDirectory()) {
+      out.push(...skillFilesWithText(full, rel));
+    } else if (/\.(md|toml)$/.test(entry)) {
+      out.push({ rel, text: readFileSync(full, 'utf8') });
+    }
+  }
+  return out;
+}
+
+test('no skill link escapes the skills root, so it survives installation', () => {
+  const escaping = [];
+  for (const agent of ['claude-code', 'codex']) {
+    for (const { name, dir } of listSkills(agent)) {
+      for (const { rel, text } of skillFilesWithText(dir)) {
+        // Directories the file sits inside, counted from the skills root:
+        // `SKILL.md` → 1 (the skill dir), `agents/brief.md` → 2.
+        const depth = rel.split('/').length;
+        text.split('\n').forEach((line, index) => {
+          for (const link of line.matchAll(/\]\((\.\.\/[^)\s]*)\)/g)) {
+            const ups = link[1].split('/').filter((seg) => seg === '..').length;
+            if (ups > depth) {
+              escaping.push(
+                `${agent}/${name}/${rel}:${index + 1} links ${link[1]} ` +
+                  `(${ups} levels up from depth ${depth})`
+              );
+            }
+          }
+        });
+      }
+    }
+  }
+
+  assert.deepEqual(
+    escaping,
+    [],
+    `skill links climb above the skills root and break once installed:\n  ${escaping.join('\n  ')}`
+  );
+});
+
 // --- Every WORKFLOW section a skill cites must exist ---
 
 // Skills cite the constitution by section number (`WORKFLOW §10`,
