@@ -21,8 +21,6 @@ test('changelog-gate: every npm-shipped path triggers the warning', () => {
     'src/index.js',
     'src/leak-guard.js',
     'bin/agentic.js',
-    'templates/AGENTS.template.md',
-    'prompts/bootstrap.md',
     'WORKFLOW.md',
     'WORKFLOW-FLOWS.md',
   ]) {

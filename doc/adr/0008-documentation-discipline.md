@@ -26,7 +26,7 @@ Coverage in the kit today is partial:
 
 Two of the rules collide with explicit kit decisions:
 
-- **Rule 2 vs. ADR/task tracking.** [`templates/adr.md`](../../templates/adr.md) carries `**Date:**` (Nygard format), [`templates/task.md`](../../templates/task.md) carries `**Created:**` and an append-only `Notes` log dated per entry. ADR-0004 institutes file-based task tracking with date-stamped notes. Stripping dates everywhere would break the Nygard supersession lifecycle (`superseded by ADR-NNNN` is meaningless without ordering) and undo the auditability ADR-0004 was selected for.
+- **Rule 2 vs. ADR/task tracking.** [`ad-adr`'s template](../../src/skills/claude-code/ad-adr/references/adr-template.md) carries `**Date:**` (Nygard format), [`ad-task`'s template](../../src/skills/claude-code/ad-task/references/task-template.md) carries `**Created:**` and an append-only `Notes` log dated per entry. ADR-0004 institutes file-based task tracking with date-stamped notes. Stripping dates everywhere would break the Nygard supersession lifecycle (`superseded by ADR-NNNN` is meaningless without ordering) and undo the auditability ADR-0004 was selected for.
 - **Rule 7 vs. ADR-0004.** Rule 7 as originally written said "use GitHub Issues". The kit explicitly chose file-based tracking (`doc/tasks/NNNN-*.md`) over an external board.
 
 ADR-0005 already settled where prescriptive, repository-agnostic rules belong: in the `agentic-philosophy` skill, lazy-loaded on non-trivial work, not bundled into `AGENTS.md`. The motivation there applies identically to documentation discipline — rules are universal, prescriptive, and pay no token cost on trivial turns.
