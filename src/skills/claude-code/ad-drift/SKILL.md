@@ -15,7 +15,7 @@ If the user names an artifact (`AGENTS.md`, `ARCHITECTURE.md`, ADRs, specs), aud
 
 ## Step 2 — Run the deterministic scan
 
-The mechanical checks — artifact numbering, `Status:` validity, supersession-target existence, amendment-pair matching, emoji in narrative docs, and checkbox UI in definition docs / specs — are a bundled script (ADR-0057), not prose to re-derive by hand. Run it from the repo root and read its JSON:
+The mechanical checks — artifact numbering, `Status:` validity, supersession-target existence, amendment-pair matching, emoji in narrative docs, checkbox UI in definition docs / specs, and AGENTS-to-GUIDELINES reciprocity — are a bundled script (ADR-0057), not prose to re-derive by hand. Run it from the repo root and read its JSON:
 
 ```bash
 node .claude/skills/ad-drift/scripts/drift-scan.mjs
@@ -23,7 +23,7 @@ node .claude/skills/ad-drift/scripts/drift-scan.mjs
 
 If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/drift-scan.mjs` inside it.
 
-The JSON carries `numbering` (per decision-record layer `adr` / `specs`, each with `duplicates` and `gaps`), `status` (`adr` / `specs`, records with a missing or out-of-enum `Status`), `supersession` (dangling `superseded by` targets), `amendmentPairs` (unpaired `Amends` / `Amended by` declarations), `emoji` (`{path, line}` in narrative docs), `checkbox` (`{path, line}` of checkbox UI in definition docs / specs, fenced examples excluded), and `unreadable` (`{path, code}` — files the scan could not read, so any check over them is missing; report the gap). Tasks are not a numbering/status layer here (the audit has no task-drift category — tasks surface only under spec reciprocity, which stays judgment below). Step 3 narrates these facts; everything the scan does not compute below is judgment you perform by reading.
+The JSON carries `numbering` (per decision-record layer `adr` / `specs`, each with `duplicates` and `gaps`), `status` (`adr` / `specs`, records with a missing or out-of-enum `Status`), `supersession` (dangling `superseded by` targets), `amendmentPairs` (unpaired `Amends` / `Amended by` declarations), `emoji` (`{path, line}` in narrative docs), `checkbox` (`{path, line}` of checkbox UI in definition docs / specs, fenced examples excluded), `constitutionReciprocity` (an `applicable` flag and `duplicateSections` entries `{section, guidelinesSection, line}`), and `unreadable` (`{path, code}` — files the scan could not read, so any check over them is missing; report the gap). A reciprocity entry means that a mapped AGENTS heading exists but lacks its designated `GUIDELINES.md` section pointer; an absent heading is valid, and a pointer may retain a short operational subset. Tasks are not a numbering/status layer here (the audit has no task-drift category — tasks surface only under spec reciprocity, which stays judgment below). Step 3 narrates these facts; everything the scan does not compute below is judgment you perform by reading.
 
 ## Step 3 — Interpret checks
 
@@ -34,6 +34,7 @@ The JSON carries `numbering` (per decision-record layer `adr` / `specs`, each wi
 * Quality gates — do referenced hook configs exist (`.husky/`, `.pre-commit-config.yaml`, `.github/workflows/`)?
 * Repository layout — do referenced directories exist?
 * Pre-approved commands — anything in the list missing from the toolchain?
+* AGENTS-to-GUIDELINES reciprocity — when `constitutionReciprocity.applicable` is true, report each `duplicateSections` entry as a duplicate detailed-rules finding. A missing mapped heading is valid; a designated pointer within the heading is valid even with a short operational subset.
 
 ### `ARCHITECTURE.md` drift (if present)
 

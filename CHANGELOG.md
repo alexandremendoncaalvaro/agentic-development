@@ -8,6 +8,7 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
+- `ad-drift` now reports deterministic AGENTS-to-GUIDELINES reciprocity facts for the four operational sections. It accepts designated pointers and identifies a mapped section that omits its pointer, while ignoring Markdown code examples and surfacing unreadable root documents.
 - `agentic uninstall` removes only exact files recorded in the project state, preserves locally edited managed files by default, supports a no-write `--dry-run`, and requires both `--yes` and `--force` to remove a local edit unattended. It deliberately leaves host directories and project-facing root documentation in place for manual ownership review.
 - `/ad-update` gives Claude Code and Codex a session-native path to preview and, when explicitly requested, safely apply the current project's Agentic Development update. It routes through the state-aware CLI, never infers `--force`, and exposes preserved edits or migration actions rather than hiding them.
 
