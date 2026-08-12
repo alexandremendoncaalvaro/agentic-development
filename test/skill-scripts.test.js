@@ -969,8 +969,9 @@ test('survey: an empty repo carries an empty `unreadable` list and null rootDocR
 // --- ad-drift deterministic drift scan (ADR-0057, P2.2) ---
 // The claude-code copy is executed; the byte-parity test in skills.test.js
 // guarantees the codex twin is identical, so one execution covers both. The
-// script emits the six deterministic drift checks (numbering, status,
-// supersession, amendment-pairs, emoji, checkbox) as JSON; the SKILL.md body
+// script emits the seven deterministic drift checks (numbering, status,
+// supersession, amendment-pairs, emoji, checkbox, constitution reciprocity)
+// as JSON; the SKILL.md body
 // narrates them alongside its judgment checks (AGENTS/ARCHITECTURE match,
 // business-context, scope-dup, index-dup, decoration refs, …), per ADR-0057.
 const DRIFT = join(
@@ -988,6 +989,215 @@ function runScan(cwd) {
   const out = execFileSync('node', [DRIFT], { cwd, encoding: 'utf8', env: process.env });
   return JSON.parse(out);
 }
+
+test('drift-scan: flags a mapped AGENTS section without its GUIDELINES pointer', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-'));
+  try {
+    writeFileSync(join(dir, 'GUIDELINES.md'), '# Guidelines\n\n## 2. Code standards\n');
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# Agents\n\n## Code Style\n\n- Use named exports.\n- Use single quotes.\n'
+    );
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: true,
+      duplicateSections: [{ section: 'Code Style', guidelinesSection: 2, line: 3 }],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: accepts a mapped AGENTS section with a GUIDELINES pointer', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-pointer-'));
+  try {
+    writeFileSync(join(dir, 'GUIDELINES.md'), '# Guidelines\n\n## 2. Code standards\n');
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# Agents\n\n## Code Style\n\nSee [GUIDELINES.md](GUIDELINES.md) §2 for the full reference.\n\n- Use named exports.\n'
+    );
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: true,
+      duplicateSections: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: accepts a plain-text GUIDELINES pointer in the mapped section', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-plain-'));
+  try {
+    writeFileSync(join(dir, 'GUIDELINES.md'), '# Guidelines\n\n## 8. Quality gates\n');
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# Agents\n\n## Quality Gates\n\nSee GUIDELINES.md §8 for the full reference.\n'
+    );
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: true,
+      duplicateSections: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: rejects a pointer outside its mapped AGENTS section', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-outside-'));
+  try {
+    writeFileSync(join(dir, 'GUIDELINES.md'), '# Guidelines\n\n## 2. Code standards\n');
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# Agents\n\n## Code Style\n\n- Use named exports.\n\n## Gotchas\n\nSee GUIDELINES.md §2 for the full reference.\n'
+    );
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: true,
+      duplicateSections: [{ section: 'Code Style', guidelinesSection: 2, line: 3 }],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: detects a mapped heading with optional ATX closing markers', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-atx-'));
+  try {
+    writeFileSync(join(dir, 'GUIDELINES.md'), '# Guidelines\n\n## 2. Code standards\n');
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      '# Agents\n\n## Code Style ##\n\n- Use named exports.\n'
+    );
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: true,
+      duplicateSections: [{ section: 'Code Style', guidelinesSection: 2, line: 3 }],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: ignores a mapped-looking heading inside a fenced code block', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-fence-'));
+  try {
+    writeFileSync(join(dir, 'GUIDELINES.md'), '# Guidelines\n\n## 2. Code standards\n');
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      [
+        '# Agents',
+        '',
+        '```markdown',
+        '## Code Style',
+        '- An illustrative rule.',
+        '```',
+        '',
+        '## Code Style',
+        '',
+        'See GUIDELINES.md §2 for the full reference.',
+      ].join('\n') + '\n'
+    );
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: true,
+      duplicateSections: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: ignores a GUIDELINES pointer inside a fenced code block', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-pointer-fence-'));
+  try {
+    writeFileSync(join(dir, 'GUIDELINES.md'), '# Guidelines\n\n## 2. Code standards\n');
+    writeFileSync(
+      join(dir, 'AGENTS.md'),
+      [
+        '# Agents',
+        '',
+        '## Code Style',
+        '',
+        '```markdown',
+        'See GUIDELINES.md §2 for the full reference.',
+        '```',
+        '',
+        '- Use named exports.',
+      ].join('\n') + '\n'
+    );
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: true,
+      duplicateSections: [{ section: 'Code Style', guidelinesSection: 2, line: 3 }],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: skips constitution reciprocity without both root documents', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-absent-'));
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# Agents\n\n## Code Style\n\n- Use named exports.\n');
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: false,
+      duplicateSections: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: surfaces an unreadable GUIDELINES file during reciprocity', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-unreadable-'));
+  const guidelines = join(dir, 'GUIDELINES.md');
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# Agents\n\n## Code Style\n\n- Use named exports.\n');
+    writeFileSync(guidelines, '# Guidelines\n');
+    chmodSync(guidelines, 0o000);
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: false,
+      duplicateSections: [],
+    });
+    assert.ok(
+      s.unreadable.some((entry) => entry.path === 'GUIDELINES.md' && entry.code === 'EACCES'),
+      'a content-read failure must be surfaced, not treated as an absent guide'
+    );
+  } finally {
+    try {
+      chmodSync(guidelines, 0o644);
+    } catch {
+      // The fixture may not have reached chmod before an earlier assertion.
+    }
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 test('drift-scan: numbering reports duplicates as drift and gaps as informational data', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-num-'));
@@ -1193,6 +1403,7 @@ test('drift-scan: an empty repo yields all-clear checks and no crash', () => {
     assert.deepEqual(s.amendmentPairs, []);
     assert.deepEqual(s.emoji, []);
     assert.deepEqual(s.checkbox, []);
+    assert.deepEqual(s.constitutionReciprocity, { applicable: false, duplicateSections: [] });
     assert.deepEqual(s.unreadable, []);
   } finally {
     rmSync(dir, { recursive: true, force: true });

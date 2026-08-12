@@ -70,6 +70,38 @@ test('ad-merge has a release-only mode that preserves the tagged commit', () => 
   }
 });
 
+test('ad-bootstrap templates preserve every AGENTS to GUIDELINES pointer mapping', () => {
+  const mappings = [
+    ['Code Style', 2],
+    ['Quality Gates', 8],
+    ['Commit & PR Conventions', 10],
+    ['Security & Privacy', 12],
+  ];
+
+  for (const agent of ['claude-code', 'codex']) {
+    const template = readFileSync(
+      join(SKILLS_ROOT, agent, 'ad-bootstrap', 'references', 'agents-template.md'),
+      'utf8'
+    );
+    for (const [heading, guidelinesSection] of mappings) {
+      const start = template.indexOf(`## ${heading}\n`);
+      assert.notEqual(start, -1, `${agent} template must define the ${heading} section`);
+      const end = template.indexOf('\n## ', start + 1);
+      const body = template.slice(start, end === -1 ? template.length : end);
+      const pointerStart = body.indexOf('<when-guidelines-md-exists>');
+      const pointerEnd = body.indexOf('</when-guidelines-md-exists>');
+      assert.notEqual(pointerStart, -1, `${agent} ${heading} needs a GUIDELINES-only branch`);
+      assert.notEqual(pointerEnd, -1, `${agent} ${heading} must close its GUIDELINES-only branch`);
+      const pointerBranch = body.slice(pointerStart, pointerEnd);
+      assert.match(
+        pointerBranch,
+        new RegExp(`GUIDELINES\\.md[^\\n]*§\\s*${guidelinesSection}\\b`),
+        `${agent} ${heading} must point to GUIDELINES.md §${guidelinesSection} when it exists`
+      );
+    }
+  }
+});
+
 test('GitHub workflow skills reuse their preflight frontend for every GitHub command', () => {
   for (const agent of ['claude-code', 'codex']) {
     for (const skill of ['ad-pr', 'ad-merge']) {
