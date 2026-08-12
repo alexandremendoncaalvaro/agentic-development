@@ -38,7 +38,7 @@ Decision record: [ADR-0049](../adr/0049-append-only-layers-own-a-state-projectio
 - [x] Rule 10 carve-out, template fields, `ad-adr` behaviour, first projection, `AGENTS.md` cleanup
 - [x] Drift checks, measured against every repository on the machine that has an ADR layer
 - [x] Deliver the orphan Documentation Discipline rule and pin the count parity by test
-- [ ] `/ad-review`, then `/ad-commit`
+- [x] `/ad-review`, then `/ad-commit`
 
 ## Notes
 
@@ -67,6 +67,12 @@ The review's one deferred item is closed: the two tests guarding defects fixed h
 Landed as one commit rather than the four planned. Three files carry more than one concern inside a single hunk, and the environment has no interactive hunk staging, so a per-concern split needed sub-hunk surgery in each. The split was also weaker than it looked: the read contract, the projection, and the constitution install are one decision (ADR-0049 Decision 5 records why), so the intermediate commits would not have stood alone.
 
 Cost this task nearly paid: for most of the session, git in this repository resolved to a different worktree, because `core.worktree` was set in the *shared* config pointing at a sibling worktree another session had created. Every `git diff` and `git status` returned that session's changes while the files on disk held this one's. It was caught only because a file list did not match what had been edited — the review handoff was one step from being built from the wrong diff entirely. The stray key was removed after confirming each linked worktree resolves through its own `.git` file and per-worktree config, so none depended on it. Worth knowing: in a repo with several agent worktrees, `git rev-parse --show-toplevel` is the cheap check that the tree you are reading is the tree git is writing.
+
+### 2026-08-12
+
+Task-ledger audit corrected the final Plan checkbox. The required review and
+signed commit are already evidenced in the preceding Notes and in commit
+`839bf92`; the unchecked box was a stale tracking mark, not unfinished work.
 
 ## Definition of Done
 

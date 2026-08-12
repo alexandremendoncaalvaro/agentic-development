@@ -203,14 +203,17 @@ function surveyTasks(repoRoot, unreadable) {
     if (!ARTIFACT_FILE.test(name)) continue;
     const body = readContent(repoRoot, join('doc', 'tasks', name), unreadable);
     const status = parseStatus(body);
+    const scopeRef = parseRef(body, 'Scope ref');
     if (status && status in counts) counts[status] += 1;
     const specRef = parseRef(body, 'Spec ref');
-    const boardRef = parseRef(body, 'Board ref');
     if (status === 'in-progress' || status === 'blocked') {
       active.push({ slug: slugOf(name), status, specRef: specRef || null });
     }
-    // Orphan = no scope tie at all: neither a Spec ref nor a Board ref.
-    if (!specRef && !boardRef) orphans.push(slugOf(name));
+    // An unfinished task needs a repository-local source anchor. `Scope ref`
+    // is the current contract and `Spec ref` is compatible legacy evidence;
+    // an external Board ref is supplementary only (ADR-0067). Completed
+    // legacy tasks are history, not navigation findings.
+    if (status !== 'done' && !scopeRef && !specRef) orphans.push(slugOf(name));
     if (specRef) specRefs.push({ slug: slugOf(name), number: artifactNumber(specRef) });
   }
   return { counts, active, orphans, specRefs };

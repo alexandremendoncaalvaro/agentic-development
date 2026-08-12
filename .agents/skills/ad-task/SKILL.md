@@ -9,16 +9,23 @@ Drafts `doc/tasks/<NNNN>-<short-slug>.md` for one tracked task. Format chosen so
 </background_information>
 
 <instructions>
+Step 0 — scope preflight. Establish the **current repository** before naming or drafting anything. From the consumer root, run `node .agents/skills/ad-task/scripts/scope-anchors.mjs` (substitute the skill base path when loaded elsewhere). Read its JSON: `cwd` and `gitRoot` identify the target; `anchors` is the complete allow-list of repository-local sources. If `unreadable` is non-empty, stop until access is resolved.
+
+A new task requires one exact repository-local **Scope ref**: a repo-relative path to the PRD roadmap line, an existing feature spec, an accepted ADR, or a root artifact that already defines the work. A board ticket, a global rule, or a request remembered from another repository does not qualify. `Spec ref` remains optional because a small task can be directly grounded in the PRD or an ADR.
+
+Choose an exact entry from `anchors`, then run the same script with that bare path as its argument. Proceed only when `verification.valid` is `true`. If no local scope anchor exists, do not write a task. First create or amend the product, spec, or decision artifact in this current repository; then create the task against that artifact. Never use a blank, `<TODO>`, or another repository's path for `Scope ref`.
+
 Step 1 — determine NNNN and slug. Run `node .agents/skills/ad-task/scripts/next-number.mjs doc/tasks` from the consumer root. Use JSON `next`; archived gaps stay unused. Stop until access is resolved when `unreadable` is non-empty, and stop for a numbering decision when `exhausted` is true. If loaded elsewhere, substitute the skill base path. Slug: kebab-case, ≤6 words, derived from the user's task title.
 
 Step 2 — interview to fill. Ask one question per missing field, in this order:
 - Context: why this task exists, what problem it solves, any assumption being tested.
 - Acceptance Criteria: measurable conditions. Each is a checkbox; pass/fail must be observable, not aspirational ("loads in under 2s", not "fast enough").
 - Plan: concrete sequential steps with file paths where applicable. Each is a checkbox.
+- Scope ref: require the exact repository-local anchor validated in Step 0, with an optional section or roadmap-tier suffix. It is mandatory; a board reference never replaces it.
 - Owner: ask.
 - Execution: `AFK` when the task is specified enough for an agent to execute with bounded context and disjoint write scope; `HITL` when it needs human judgment, taste, external access, or frequent back-and-forth.
 - Spec ref: ask; leave blank when no spec drives this task. When a feature spec exists at `doc/specs/NNNN-<slug>.md`, link it here so the spec's Related → Tasks list reciprocates.
-- Board ref: ask; leave blank if solo work.
+- Board ref: ask; leave blank if solo work. It supplements the local Scope ref; it never replaces it.
 
 Status starts at proposed. Created: today, ISO format. Notes: empty. Definition of Done section: copy verbatim from the template.
 
@@ -39,7 +46,9 @@ Use the task template in [references/task-template.md](references/task-template.
 </template>
 
 <output_contract>
-A single new file at `doc/tasks/<NNNN>-<short-slug>.md`. Status proposed. Notes empty. No existing tasks modified. No invented values.
+A single new file at `doc/tasks/<NNNN>-<short-slug>.md`. Status proposed. Its
+non-empty `Scope ref` resolves to a repository-local source artifact. Notes
+empty. No existing tasks modified. No invented values.
 
 Task files are decision-record artifacts and are exempt from the no-dates rule (Documentation Discipline §2): `**Created:**` and the dated `Notes` log are required by design. Remaining Documentation Discipline rules (`WORKFLOW.md` §2) apply at write time:
 - No emoji anywhere in the file.

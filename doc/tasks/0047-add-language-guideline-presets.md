@@ -2,6 +2,7 @@
 
 **Status:** proposed
 **Created:** 2026-08-11
+**Scope ref:** doc/product/PRD.md — Later tier: Per-language guideline presets
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
 **Spec ref:**

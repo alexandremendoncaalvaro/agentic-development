@@ -296,11 +296,11 @@
       "files": [
         {
           "path": ".claude/skills/ad-next/scripts/survey.mjs",
-          "sourceSha": "78881d16bb0b7344195fb4d03f998f345a5e85bbd9ad32885ebaaccf8e30e398"
+          "sourceSha": "1524d4c2c509ee2101a7c90ffe25b76c2a08cb8a2090704469ba5be4bb6ca022"
         },
         {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "5888b7477bfde9886b1ca086765cdebb42b77d23788b4496a94521b672f67523"
+          "sourceSha": "0bbebe7287253966706d13627478ea63325011b13d52ca8cdda5b5d2bc4c8593"
         }
       ]
     },
@@ -482,15 +482,19 @@
       "files": [
         {
           "path": ".claude/skills/ad-task/references/task-template.md",
-          "sourceSha": "7cd864ba986f5851095c01800e3c121dc8b3cdd8409ea9bc2f4f72402ec067ed"
+          "sourceSha": "70464c14dc5c7ca3bd00ea25c67c6cc8d441210000d12f851ebf663519a85112"
         },
         {
           "path": ".claude/skills/ad-task/scripts/next-number.mjs",
           "sourceSha": "94b9eb42c1e5a3bad32136f8646ef44dd191050f6acc6f4d29b99daeecf9c9b1"
         },
         {
+          "path": ".claude/skills/ad-task/scripts/scope-anchors.mjs",
+          "sourceSha": "5ed53d310b508c9c44fe435cd6dffc044e9488ffe4ee1ef28756e77d897e50f7"
+        },
+        {
           "path": ".claude/skills/ad-task/SKILL.md",
-          "sourceSha": "1d6ada85e9a45c97585822f8bc52cf1b15f435e24e35c8f20e5ff845b0d03a93"
+          "sourceSha": "d2f60ac06e16d063125918e94d64db905a65b3c60e8989cd617411e0d059d36b"
         }
       ]
     },
