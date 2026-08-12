@@ -1,6 +1,6 @@
 # Spec `0001`: Orchestrate a safe npm package release
 
-**Status:** accepted
+**Status:** shipped
 **Created:** 2026-08-10
 **Owner:** Alexandre Alvaro
 
@@ -93,10 +93,10 @@ The kit already makes the local half of a release deterministic: its `scripts/re
 ## Open Questions
 
 - Resolved — [ADR-0063](../adr/0063-orchestrate-external-npm-release-steps.md) accepts the five separately confirmed effects and the state-aware recovery contract.
-- Unresolved — [`task-0050`](../tasks/0050-decide-release-dist-tag-contract.md)
-  owns reconciliation of the configured `beta` dist-tag with the observed
-  `latest` assignment of `0.20.0-beta.2`. Until that maintainer decision is
-  recorded, this specification remains `accepted`.
+- Resolved — [ADR-0066](../adr/0066-publish-prereleases-on-latest.md) sets
+  `latest` as the configured dist-tag for the kit's `-beta.N` releases. The
+  observed `latest` assignment of `0.20.0-beta.2` is intentional; the release
+  workflow continues to report, never mutate, that configured tag.
 
 ## Related
 

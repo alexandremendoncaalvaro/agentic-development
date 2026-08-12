@@ -12,7 +12,7 @@ const KIT_ROOT = fileURLToPath(new URL('..', import.meta.url));
 // release.sh resolves its repo root as `dirname $0`/.., so the copy makes the
 // fixture repo the release target and the whole pipeline runs for real
 // (no hooks: lefthook is not installed in the fixture).
-function mkReleaseRepo() {
+function mkReleaseRepo({ publishTag = 'latest' } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-release-e2e-'));
   const git = (...args) =>
     execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8' });
@@ -24,7 +24,15 @@ function mkReleaseRepo() {
   cpSync(join(KIT_ROOT, 'scripts'), join(dir, 'scripts'), { recursive: true });
   writeFileSync(
     join(dir, 'package.json'),
-    `${JSON.stringify({ name: 'release-e2e-fixture', version: '0.1.0-beta.1' }, null, 2)}\n`
+    `${JSON.stringify(
+      {
+        name: 'release-e2e-fixture',
+        version: '0.1.0-beta.1',
+        publishConfig: { tag: publishTag },
+      },
+      null,
+      2
+    )}\n`
   );
   writeFileSync(
     join(dir, 'CHANGELOG.md'),
@@ -45,6 +53,7 @@ test('regression: task-0032 annotated tag body keeps markdown headings (--cleanu
   try {
     const out = releaseSh('prerelease');
     assert.match(out, /release 0\.1\.0-beta\.2 committed and tagged locally/);
+    assert.match(out, /publishConfig tags it latest/);
     const tagBody = git('cat-file', '-p', git('rev-parse', 'refs/tags/v0.1.0-beta.2').trim());
     assert.match(tagBody, /### Added/, 'markdown heading must survive in the tag body');
     assert.match(tagBody, /- A thing\./);
@@ -52,6 +61,16 @@ test('regression: task-0032 annotated tag body keeps markdown headings (--cleanu
     assert.match(git('log', '-1', '--format=%(trailers:key=Signed-off-by)'), /Signed-off-by:/);
     const rotated = readFileSync(join(dir, 'CHANGELOG.md'), 'utf8');
     assert.match(rotated, /## \[0\.1\.0-beta\.2\] - \d{4}-\d{2}-\d{2}/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('release.sh reports the manifest-configured npm dist-tag', () => {
+  const { dir, releaseSh } = mkReleaseRepo({ publishTag: 'canary' });
+  try {
+    const out = releaseSh('prerelease');
+    assert.match(out, /publishConfig tags it canary/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

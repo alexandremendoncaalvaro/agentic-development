@@ -17,6 +17,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 - The installer now materializes every bundled skill for each selected host (ADR-0064), rather than asking for a `poc` / `solo` / `team` / `mature` profile. Bare `init` still installs both hosts; `--agent` restricts hosts only. The profile command and state field are removed, legacy state is migrated on the next update, and skills choose relevance from the request and repository rather than installer metadata.
 - Public onboarding documentation now leads with project installation, update, global CLI, user-level setup, and `/ad-next`; detailed installation, workflow, and skill references live under `doc/guides/`.
+- Pre-1.0 `-beta.N` releases now publish on npm's default `latest` dist-tag
+  (ADR-0066), so an ordinary package install receives the current kit version.
 
 ### Fixed
 

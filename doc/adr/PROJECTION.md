@@ -6,7 +6,7 @@ Without this file, learning which architectural decisions still bind costs one p
 
 ## Default
 
-All 41 accepted ADRs bind in full, except the thirteen below, which bind except for the named part.
+All 42 accepted ADRs bind in full, except the thirteen below, which bind except for the named part.
 
 No ADR in this directory has been deprecated or superseded as a whole document. A `proposed` ADR is not counted here and does not appear until it is accepted — it binds nothing until then, and its acceptance is the change to what binds that adds it (see *The rule that keeps it true*).
 
