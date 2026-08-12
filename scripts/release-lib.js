@@ -7,9 +7,8 @@
  * tarball (`package.json#files` includes all of `src/`).
  */
 
-// Every release in this repo's tag history is X.Y.Z-beta.N (the npm dist-tag
-// channel is `beta` via publishConfig.tag), so bumps land on -beta.1 and only
-// `prerelease` walks the beta counter.
+// Every release in this repo's tag history is X.Y.Z-beta.N. The suffix marks
+// maturity; publishConfig controls the separate npm install channel (ADR-0066).
 const VERSION_RE = /^(\d+)\.(\d+)\.(\d+)(?:-beta\.(\d+))?$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 

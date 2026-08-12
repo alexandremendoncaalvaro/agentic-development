@@ -11,6 +11,11 @@ test('package.json exposes the ADR-0048 release script for ad-release', () => {
   assert.equal(pkg.scripts.release, './scripts/release.sh');
 });
 
+test('package.json publishes prerelease builds to the latest dist-tag (ADR-0066)', () => {
+  const pkg = JSON.parse(readFileSync(PACKAGE_PATH, 'utf8'));
+  assert.equal(pkg.publishConfig.tag, 'latest');
+});
+
 // --- bumpVersion — house convention: every release is X.Y.Z-beta.N ---
 
 test('bumpVersion: patch resets to -beta.1 on the next patch line', () => {

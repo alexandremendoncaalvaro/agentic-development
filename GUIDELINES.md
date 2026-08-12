@@ -279,11 +279,12 @@ The Test Dependency Map (TDM) — list which tests cover a file before modifying
 
 ### 10.1 Branch Strategy
 
-- `main` — stable promotion target. Releases tagged from here.
-- `cli` — active dev (functions like `develop`). Beta releases publish from this branch.
+- `main` — sole development and stable promotion target. Release commits merge
+  here before their tags are pushed and their packages publish from a
+  tag-pinned worktree.
 - Feature branches: `feat/<slug>`, `fix/<slug>`, `chore/<slug>`, `refactor/<slug>`, `docs/<slug>`, `test/<slug>`, `perf/<slug>`.
 
-**Never push directly to `main` or `cli`.** Always open a PR.
+**Never push directly to `main`.** Always open a PR.
 
 ### 10.2 Commit Messages
 

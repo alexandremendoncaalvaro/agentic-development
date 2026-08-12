@@ -4,7 +4,7 @@
 # (+ lockfile), rotates CHANGELOG.md's [Unreleased] into the new version
 # heading, creates the release commit with DCO sign-off and the annotated
 # tag — and deliberately stops there. Pushing the branch/tag and
-# `npm publish` (2FA) stay human steps: see README.md "Release and publish".
+# `npm publish` (2FA) stay human steps and are orchestrated by ad-release.
 #
 # Usage: scripts/release.sh <patch|minor|major|prerelease> [--dry-run]
 set -euo pipefail
@@ -29,6 +29,12 @@ if [ -z "$KIND" ]; then
 fi
 
 cd "$(dirname "$0")/.."
+
+PUBLISH_TAG="$(node -p "require('./package.json').publishConfig?.tag || ''")"
+if [ -z "$PUBLISH_TAG" ]; then
+  echo "error: package.json publishConfig.tag is required" >&2
+  exit 1
+fi
 
 # Every mutating step goes through run() so --dry-run previews the exact
 # commands without touching the tree, the index, or the tag namespace.
@@ -102,6 +108,6 @@ else
   echo "  git push -u origin $BRANCH        # then open the PR: /ad-pr"
   echo "  # after the PR merges:"
   echo "  git push origin v$NEW_VERSION"
-  echo "  npm publish                        # npm OTP (2FA); publishConfig tags it beta"
-  echo "  npm dist-tag ls @alexandrealvaro/agentic   # verify; see README 'Release and publish'"
+  echo "  npm publish                        # npm OTP (2FA); publishConfig tags it $PUBLISH_TAG"
+  echo "  npm dist-tag ls @alexandrealvaro/agentic   # verify the configured tag"
 fi
