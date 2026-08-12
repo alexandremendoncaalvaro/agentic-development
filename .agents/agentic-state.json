@@ -117,6 +117,31 @@
         }
       ]
     },
+    "ad-community-docs": {
+      "version": "0.20.0-beta.2",
+      "files": [
+        {
+          "path": ".agents/skills/ad-community-docs/agents/openai.yaml",
+          "sourceSha": "7a81758ae98a67e6a6748eab285f71127e3a4a5d5ec1d3c96c0791b037006dc2"
+        },
+        {
+          "path": ".agents/skills/ad-community-docs/references/contributing-template.md",
+          "sourceSha": "3f0c3fa7e3dd2cdcde8286be2be5e8e20bd615b48be1da5ab18df7aef430ff42"
+        },
+        {
+          "path": ".agents/skills/ad-community-docs/references/security-template.md",
+          "sourceSha": "7cefb989509ff05c30db20f76f55078906d57b4827be7f70daeb056f2334da33"
+        },
+        {
+          "path": ".agents/skills/ad-community-docs/scripts/community-doc-signals.mjs",
+          "sourceSha": "9eae39d449304035910fc1f193ffd5726c60b5d8d2df747130d4684f91c9f319"
+        },
+        {
+          "path": ".agents/skills/ad-community-docs/SKILL.md",
+          "sourceSha": "e8d2795c1c42828a481426122c4039e014befd8ef04910c9d70891643297faac"
+        }
+      ]
+    },
     "ad-deepen": {
       "version": "0.20.0-beta.2",
       "files": [
