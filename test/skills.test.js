@@ -102,6 +102,16 @@ test('ad-bootstrap templates preserve every AGENTS to GUIDELINES pointer mapping
   }
 });
 
+test('ad-community-docs keeps policy ownership with the maintainer on both hosts', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-community-docs', 'SKILL.md'), 'utf8');
+    assert.match(body, /unreadable\[\]/, `${agent} must surface unreadable policy documents`);
+    assert.match(body, /do not overwrite/i, `${agent} must preserve existing policy documents`);
+    assert.match(body, /not configured/i, `${agent} must preserve an explicit unconfigured policy`);
+    assert.match(body, /never replace/i, `${agent} must not replace existing documents`);
+  }
+});
+
 test('GitHub workflow skills reuse their preflight frontend for every GitHub command', () => {
   for (const agent of ['claude-code', 'codex']) {
     for (const skill of ['ad-pr', 'ad-merge']) {

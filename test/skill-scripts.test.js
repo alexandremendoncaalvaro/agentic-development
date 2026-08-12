@@ -2403,6 +2403,88 @@ test('project-signals: all four skills ship the same self-contained detector on 
   }
 });
 
+// --- community-document signals (task-0046) ---------------------------------
+const COMMUNITY_DOC_SCRIPTS = ['claude-code', 'codex'].map((host) =>
+  join(
+    __dirname,
+    '..',
+    'src',
+    'skills',
+    host,
+    'ad-community-docs',
+    'scripts',
+    'community-doc-signals.mjs'
+  )
+);
+
+function runCommunityDocSignals(cwd) {
+  const out = execFileSync('node', [COMMUNITY_DOC_SCRIPTS[0]], {
+    cwd,
+    encoding: 'utf8',
+    env: process.env,
+  });
+  return JSON.parse(out);
+}
+
+test('community-doc-signals: reports conventional document locations without inferring policy', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-community-docs-'));
+  try {
+    mkdirSync(join(dir, '.github'));
+    mkdirSync(join(dir, 'docs'));
+    writeFileSync(join(dir, '.github', 'CONTRIBUTING.md'), '# Contributing\n');
+    writeFileSync(join(dir, 'docs', 'SECURITY.md'), '# Security\n');
+
+    assert.deepEqual(runCommunityDocSignals(dir), {
+      documents: {
+        contributing: ['.github/CONTRIBUTING.md'],
+        security: ['docs/SECURITY.md'],
+      },
+      unreadable: [],
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('community-doc-signals: reports every conventional location in stable order', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-community-docs-order-'));
+  try {
+    mkdirSync(join(dir, '.github'));
+    mkdirSync(join(dir, 'docs'));
+    for (const path of ['CONTRIBUTING.md', '.github/CONTRIBUTING.md', 'docs/CONTRIBUTING.md']) {
+      writeFileSync(join(dir, path), '# Contributing\n');
+    }
+
+    const report = runCommunityDocSignals(dir);
+    assert.deepEqual(report.documents.contributing, [
+      'CONTRIBUTING.md',
+      '.github/CONTRIBUTING.md',
+      'docs/CONTRIBUTING.md',
+    ]);
+    assert.deepEqual(report.documents.security, []);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('community-doc-signals: keeps an unreadable document in unreadable instead of swallowing it', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-community-docs-unreadable-'));
+  try {
+    mkdirSync(join(dir, 'SECURITY.md'));
+
+    const report = runCommunityDocSignals(dir);
+    assert.deepEqual(report.documents, { contributing: [], security: ['SECURITY.md'] });
+    assert.deepEqual(report.unreadable, [{ path: 'SECURITY.md', code: 'EISDIR' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('community-doc-signals: source copies are byte-identical across hosts', () => {
+  assert.deepEqual(readFileSync(COMMUNITY_DOC_SCRIPTS[0]), readFileSync(COMMUNITY_DOC_SCRIPTS[1]));
+});
+
 // --- host-global rules resolution (ADR-0057, P2.8) -------------------------
 // This is the sole intentionally host-divergent helper: the host's own global
 // rules path wins, while the other host's paths remain fallback candidates.

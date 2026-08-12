@@ -130,6 +130,7 @@ const INSTALLED_SKILLS = [
   'ad-audit',
   'ad-bootstrap',
   'ad-commit',
+  'ad-community-docs',
   'ad-deepen',
   'ad-derisk',
   'ad-design',
@@ -179,6 +180,12 @@ test('init --agent both installs every bundled skill for both agents', () => {
       assert.ok(
         existsSync(join(dir, `.agents/skills/${skill}/agents/openai.yaml`)),
         `Codex openai.yaml missing for ${skill}`
+      );
+    }
+    for (const agent of ['.claude', '.agents']) {
+      assert.ok(
+        existsSync(join(dir, `${agent}/skills/ad-community-docs/scripts/community-doc-signals.mjs`)),
+        `${agent} ad-community-docs detector missing`
       );
     }
   } finally {
