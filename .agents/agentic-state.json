@@ -262,11 +262,19 @@
         },
         {
           "path": ".agents/skills/ad-ground/references/output-format.md",
-          "sourceSha": "cdedcce703c33e6d130a66a9bb2f2178151aa0c687d7fb74d8c14f28591fa673"
+          "sourceSha": "e1820637b6c6cf5b8432ed021e107267c7b6194fbcc1748914c655d0b0ab64c6"
+        },
+        {
+          "path": ".agents/skills/ad-ground/references/record-template.md",
+          "sourceSha": "37f0a5cf6e953ed3e43b69db0ea96831ea85c2f34571e87af45f37b9365826be"
+        },
+        {
+          "path": ".agents/skills/ad-ground/scripts/validate-record.mjs",
+          "sourceSha": "ecb8fad46cbb66888600ec47818f58570d39037d9edd9750ef46173768027f9d"
         },
         {
           "path": ".agents/skills/ad-ground/SKILL.md",
-          "sourceSha": "5b608d8ac11657504c65bb1cf35570f163f122426376aa03dc22a66ef9b25c72"
+          "sourceSha": "61dd4be8179c8a01f00af3056d965606a30bdfa787325e67203c2d37d2710b61"
         }
       ]
     },
@@ -393,7 +401,7 @@
         },
         {
           "path": ".agents/skills/ad-philosophy/SKILL.md",
-          "sourceSha": "a18acce87e8fe2f24c04e282d38f820d7121acfbee6e6e2743bf117b2c15666a"
+          "sourceSha": "9efd475c471bc0786e4a6c298bb0896b0e861bf1684fe8dd0ed325cb571c5081"
         }
       ]
     },
@@ -482,7 +490,7 @@
         },
         {
           "path": ".agents/skills/ad-research/SKILL.md",
-          "sourceSha": "4c39f2927c11ddf8b00857968a1670ccb8d74936e0511f6392716626faefdf81"
+          "sourceSha": "d778d617fba6dbcbdb8f7b7e6d78924564b4f26bcf06e8ded16f91445bd27b11"
         }
       ]
     },
@@ -618,7 +626,7 @@
         },
         {
           "path": ".agents/skills/ad-task/references/task-template.md",
-          "sourceSha": "70464c14dc5c7ca3bd00ea25c67c6cc8d441210000d12f851ebf663519a85112"
+          "sourceSha": "b6d9c9dbed853d31b7211a268783bc3f37bc0f6629cb5239cba59d657248fe61"
         },
         {
           "path": ".agents/skills/ad-task/scripts/next-number.mjs",
@@ -630,7 +638,7 @@
         },
         {
           "path": ".agents/skills/ad-task/SKILL.md",
-          "sourceSha": "0e07acfb66a642af8a5b77e6e8f15207ea624e18fc7c33009ee39c32ec3337f6"
+          "sourceSha": "df7cdd54bb25d8151d36a132b9553ef301bd402153af90d8525dd4af7bedd63e"
         }
       ]
     },

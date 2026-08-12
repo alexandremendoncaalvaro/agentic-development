@@ -60,7 +60,7 @@ Universal rule; WORKFLOW.md §7 subsection *Decide when grounded, ask when judgm
 
 Default is decide, not ask:
 
-- `/ad-ground` returned a canonical happy path with citations — take it. Do not ask.
+- `/ad-ground` returned a canonical happy path with citations **and a durable evidence record** — take it. Do not ask. A material decision whose citations exist only in the session is not grounded enough to direct repository work; persist its claim-to-source map in the project's evidence artifact first.
 - Three approaches, one wins on the picked criterion (§9 TDG) — pick it. Do not survey.
 - Well-established industry pattern, canonical library, statistically dominant shape — take it. Do not ask.
 - Deterministic outcome (type-check, tests, gate scripts all green) — state the result. Do not ask whether it counts as done.

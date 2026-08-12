@@ -10,12 +10,14 @@ const ROOT_DOCS = ['AGENTS.md', 'CLAUDE.md'];
 
 // These are the only package versions that copied the Constitution into a
 // project root. A hash match is the proof that deleting the file cannot erase
-// project-authored content. The source tags are v0.20.0-beta.1 through .4.
+// project-authored content. The source tags are v0.20.0-beta.1 through .4,
+// plus the current development copy until the next tag records it.
 const LEGACY_KIT_DOC_SHAS = {
   'WORKFLOW.md': new Set([
     '66777bcd07b6be52e2a202e4deacba3f68ae784e344ed73e45d46827a8b77526',
     '53597cc2208c1926bc1e1cc8e37fab3809a2ee78c2772abf05b0aac891b65212',
     'c2d7777864d95acb1655bf800f4ce39d7638ccdd9e85a687d51d71744aa29a46',
+    'fb7bd9c4821036ea0b9c0febbf0608eb406d64492512308ee7cf58be74e86913',
   ]),
   'WORKFLOW-FLOWS.md': new Set([
     'efb3fcca7356a5cafe19b6d0019fd133d695293476d9608ea5b72a5e85722b25',

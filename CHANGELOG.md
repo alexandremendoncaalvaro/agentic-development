@@ -6,6 +6,15 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `/ad-ground` now persists a versioned, claim-to-source evidence receipt for
+  every material implementation decision. The receipt links to its governing
+  task, spec, or ADR; its byte-identical host validator checks the source map
+  and reports unreadable content instead of silently omitting it. A structural
+  pass intentionally does not certify external source truth: review reopens
+  every cited source.
+
 ## [0.20.0-beta.5] - 2026-08-14
 
 ### Changed

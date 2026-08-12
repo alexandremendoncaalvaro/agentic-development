@@ -44,6 +44,7 @@ Ask one question per missing field, in this order:
 * **Acceptance Criteria:** measurable conditions. Each is a checkbox; pass/fail must be observable, not aspirational ("loads in under 2s", not "fast enough").
 * **Plan:** concrete sequential steps with file paths where applicable. Each is a checkbox.
 * **Scope ref:** require the exact repository-local anchor validated in Step 0, with an optional section or roadmap-tier suffix. It is mandatory; a board reference never replaces it.
+* **Evidence ref:** leave blank when creating a proposed task unless a durable evidence record already grounds its implementation decision. Before non-trivial implementation begins, `/ad-ground` fills it with the validated `doc/research/NNNN-ground-<slug>.md` receipt; it supplements `Scope ref`, which remains the admission anchor.
 * **Owner:** ask.
 * **Execution:** `AFK` when the task is specified enough for an agent to execute with bounded context and disjoint write scope; `HITL` when it needs human judgment, taste, external access, or frequent back-and-forth.
 * **Spec ref:** ask; leave blank when no spec drives this task. When a feature spec exists at `doc/specs/NNNN-<slug>.md`, link it here so the spec's `Related → Tasks` list reciprocates.
@@ -81,7 +82,8 @@ Use the task template in [references/task-template.md](references/task-template.
 
 A single new file at `doc/tasks/<NNNN>-<short-slug>.md`. Status `proposed`.
 Its non-empty `Scope ref` resolves to a repository-local source artifact.
-Notes empty. No existing tasks modified. No invented values.
+`Evidence ref` is blank unless an existing durable record directly grounds the
+task. Notes empty. No existing tasks modified. No invented values.
 
 Task files are decision-record artifacts and are **exempt** from the no-dates rule (Documentation Discipline §2): the `**Created:**` field anchors the task in time and the append-only `Notes` log is dated per entry by design. The remaining Documentation Discipline rules (`WORKFLOW.md` §2) apply at write time:
 

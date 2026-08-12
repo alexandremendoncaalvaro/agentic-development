@@ -13,7 +13,7 @@ Use this when the product outcome is not yet captured.
 3. `/ad-bootstrap` to create or audit the operational guide from real context.
 4. `/ad-guidelines` when the project needs explicit engineering standards.
 5. `/ad-spec` for one feature, then `/ad-task` for implementable vertical work.
-6. `/ad-ground` before implementation, followed by `/ad-tdd` or `/ad-tdg` as appropriate.
+6. `/ad-ground` before implementation; link its validated evidence record from the governing artifact, then use `/ad-tdd` or `/ad-tdg` as appropriate.
 
 Do not create a PRD, architecture document, or task merely because it appears in this list. Create it when it changes how the agent or team will build the work.
 
@@ -21,7 +21,7 @@ Do not create a PRD, architecture document, or task merely because it appears in
 
 Use this when code already defines most of the product behavior.
 
-1. `/ad-ground` to inspect official documentation, repository patterns, and history before changing behavior.
+1. `/ad-ground` to inspect official documentation, repository patterns, and history, then persist a validated evidence record before changing behavior.
 2. `/ad-spec` when the feature needs a durable acceptance contract; skip it for a contained, obvious change.
 3. `/ad-architecture` or `/ad-adr` only when existing system patterns or a hard-to-reverse decision need to be recorded.
 4. `/ad-tdd` for test-expressible behavior; `/ad-tdg` when several implementation strategies are plausible.
