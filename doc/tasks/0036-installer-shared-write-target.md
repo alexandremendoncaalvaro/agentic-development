@@ -67,10 +67,10 @@ Concerns also resolved: `git.js` path built with `join` not string concat (porta
 Frozen state: branch `claude/sharp-goldberg-b19c79`, tip is merge `851bbf2` (integrates `origin/main` at `f4420cf`), full suite 404/402/0. The installer-overlap resolution (their `installKitDocs` for the WORKFLOW.md install + this branch's `offerKitExclude` / tracked-root-doc guard) is already done and committed in `851bbf2` — reuse it, do not redo it.
 
 One-shot integration checklist for when main is stable:
-- [ ] Renumber this task 0035 → next free (main now holds `0035-windows-ci-matrix-decision.md`); likely `task-0036`. ADR-0051 was still free at last check — reconfirm before assuming.
-- [ ] Re-resolve `CHANGELOG.md`: the 0.20.0-beta.1 release rotated `[Unreleased]`; C1's entries were NOT in that release, so they belong under the new `[Unreleased]`.
-- [ ] Re-run the full gate and `/ad-review` against the stabilized base (the earlier review ran against the pre-merge tree; the merged result — especially the `installKitDocs` × `offerKitExclude` interaction below — has not had a fresh-context pass).
-- [ ] Open the PR via **`ghp`** (never `gh`, never `gh auth switch`).
+- [x] Renumber this task 0035 → next free (main now holds `0035-windows-ci-matrix-decision.md`); likely `task-0036`. ADR-0051 was still free at last check — reconfirm before assuming.
+- [x] Re-resolve `CHANGELOG.md`: the 0.20.0-beta.1 release rotated `[Unreleased]`; C1's entries were NOT in that release, so they belong under the new `[Unreleased]`.
+- [x] Re-run the full gate and `/ad-review` against the stabilized base (the earlier review ran against the pre-merge tree; the merged result — especially the `installKitDocs` × `offerKitExclude` interaction below — has not had a fresh-context pass).
+- [x] Open the PR via **`ghp`** (never `gh`, never `gh auth switch`).
 
 Open interaction for that re-review: `installKitDocs` writes `WORKFLOW.md` / `WORKFLOW-FLOWS.md` to the target root, so `offerKitExclude` now also offers to exclude them (it sweeps all untracked installed files). Harmless (interactive offer, file stays on disk) but unanticipated — decide at re-review whether root kit-docs belong in the exclude offer or only the agent-surface files.
 
@@ -85,3 +85,9 @@ Re-review Notes not fixed (recorded, not lost): `cwd === homedir()` strict-strin
 ### 2026-08-10 — reconciliation
 
 This task's implementation was already merged by PR #75 (`a129b01`, `feat(installer): detect shared write targets and refuse to guess (ADR-0051)`). Its deferred C5b extraction then merged separately in PR #76, as this task's Notes anticipated. The missing task closure was clerical: the tracked-root-doc guard, the bounded exclude offer, and their regression tests are present on `main`; the current full suite passed 572/572. The reviewed implementation and its accepted ADR therefore meet this task's completion criteria.
+
+### 2026-08-12
+
+Task-ledger audit checked the four frozen integration steps that the following
+post-integration Notes already describe as complete. The task status was
+correct; the unchecked historical checklist was not.

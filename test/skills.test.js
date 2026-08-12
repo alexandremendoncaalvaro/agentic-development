@@ -112,6 +112,20 @@ test('ad-community-docs keeps policy ownership with the maintainer on both hosts
   }
 });
 
+test('ad-task requires a local scope anchor before creating a task', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-task');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const template = readFileSync(join(skillDir, 'references', 'task-template.md'), 'utf8');
+
+    assert.match(body, /scope preflight/i, `${agent} must establish the target repository first`);
+    assert.match(body, /current repository/i, `${agent} must anchor the task to its repository`);
+    assert.match(body, /scope-anchors\.mjs/, `${agent} must run deterministic anchor discovery`);
+    assert.match(body, /do not write/i, `${agent} must stop when no local scope anchor exists`);
+    assert.match(template, /^\*\*Scope ref:\*\*/m, `${agent} task template needs a Scope ref field`);
+  }
+});
+
 test('GitHub workflow skills reuse their preflight frontend for every GitHub command', () => {
   for (const agent of ['claude-code', 'codex']) {
     for (const skill of ['ad-pr', 'ad-merge']) {

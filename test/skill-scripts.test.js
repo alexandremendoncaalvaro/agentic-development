@@ -754,10 +754,11 @@ test('survey: brownfield repo reports presence, counts, and reciprocity', () => 
     assert.equal(s.tasks.active.length, 1, 'only in-progress/blocked tasks are active');
     assert.equal(s.tasks.active[0].slug, '0001-build-auth');
     assert.equal(s.tasks.active[0].specRef, 'doc/specs/0001-auth-flow.md');
-    // Orphan = no Spec ref AND no Board ref, literally, regardless of status.
-    // 0002-shipped carries neither field, so it is an orphan too; status-based
-    // de-emphasis is the narrating body's judgment, not the script's fact.
-    assert.deepEqual(s.tasks.orphans, ['0002-shipped', '0003-orphan']);
+    // Only unfinished tasks without a local Scope or Spec ref are navigation
+    // orphans.
+    // 0002-shipped predates Scope ref and is retained as history, not an
+    // actionable finding; 0003 remains an unanchored proposed task.
+    assert.deepEqual(s.tasks.orphans, ['0003-orphan']);
     // Spec 0001 has one implementing task (0001), so it is NOT spec-without-tasks.
     const spec = s.specs.find((x) => x.slug === '0001-auth-flow');
     assert.equal(spec.status, 'accepted');
@@ -844,6 +845,131 @@ test('survey: spec↔task reciprocity flags stuck specs and orphan tasks', () =>
     assert.deepEqual(s.reciprocity.specsWithoutTasks, ['0001-lonely']);
     assert.deepEqual(s.reciprocity.orphanTasks, ['0001-ghost']);
   } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: a local Scope ref keeps a task out of the orphan list', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-task-scope-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'product'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'product', 'PRD.md'), '# PRD\n\nStatus: accepted\n');
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0001-local-scope.md'),
+      '# task\n\n**Status:** proposed\n**Scope ref:** doc/product/PRD.md — Later tier\n**Spec ref:**\n**Board ref:**\n'
+    );
+
+    const survey = runSurvey(dir);
+    assert.deepEqual(survey.tasks.orphans, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('survey: a Board ref alone does not anchor an unfinished task', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-board-only-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0001-board-only.md'),
+      '# task\n\n**Status:** proposed\n**Scope ref:**\n**Spec ref:**\n**Board ref:** https://board.example/task/1\n'
+    );
+
+    const survey = runSurvey(dir);
+    assert.deepEqual(survey.tasks.orphans, ['0001-board-only']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// --- ad-task scope-anchor preflight (ADR-0067) -----------------------------
+const TASK_SCOPE = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-task',
+  'scripts',
+  'scope-anchors.mjs'
+);
+
+function runTaskScope(cwd, scopeRef) {
+  const args = [TASK_SCOPE];
+  if (scopeRef !== undefined) args.push(scopeRef);
+  return JSON.parse(execFileSync('node', args, { cwd, encoding: 'utf8' }));
+}
+
+test('scope-anchors: lists only repository-local product, spec, accepted ADR, and root anchors', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-task-scope-'));
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# guide\n');
+    writeFileSync(join(dir, 'ARCHITECTURE.md'), '# architecture\n');
+    mkdirSync(join(dir, 'doc', 'product'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'product', 'PRD.md'), '# product\n');
+    mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'specs', '0001-install.md'), '# spec\n');
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(join(dir, 'doc', 'adr', '0001-accepted.md'), '# adr\n\n**Status:** accepted\n');
+    writeFileSync(join(dir, 'doc', 'adr', '0002-proposed.md'), '# adr\n\n**Status:** proposed\n');
+
+    const report = runTaskScope(dir);
+    // macOS exposes /var through the /private/var symlink to child processes.
+    assert.equal(realpathSync(report.cwd), realpathSync(dir));
+    assert.equal(report.gitRoot, null);
+    assert.deepEqual(report.anchors, [
+      'AGENTS.md',
+      'ARCHITECTURE.md',
+      'doc/adr/0001-accepted.md',
+      'doc/product/PRD.md',
+      'doc/specs/0001-install.md',
+    ]);
+    assert.equal(report.verification, null);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('scope-anchors: verifies an exact local anchor and rejects an external path', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-task-scope-verify-'));
+  try {
+    writeFileSync(join(dir, 'README.md'), '# readme\n');
+
+    assert.deepEqual(runTaskScope(dir, 'README.md').verification, {
+      path: 'README.md',
+      valid: true,
+    });
+    assert.deepEqual(runTaskScope(dir, '../other-repo/doc/product/PRD.md').verification, {
+      path: '../other-repo/doc/product/PRD.md',
+      valid: false,
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('scope-anchors: surfaces an unreadable ADR instead of silently omitting it', (t) => {
+  if (process.platform === 'win32' || process.getuid?.() === 0) {
+    t.skip('chmod 000 does not block reads for this platform or user');
+    return;
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-task-scope-unreadable-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    const locked = join(dir, 'doc', 'adr', '0001-locked.md');
+    writeFileSync(locked, '# adr\n\n**Status:** accepted\n');
+    chmodSync(locked, 0o000);
+
+    const report = runTaskScope(dir);
+    assert.deepEqual(report.unreadable, [{ path: 'doc/adr/0001-locked.md', code: 'EACCES' }]);
+  } finally {
+    try {
+      chmodSync(join(dir, 'doc', 'adr', '0001-locked.md'), 0o644);
+    } catch {
+      /* ignore */
+    }
     rmSync(dir, { recursive: true, force: true });
   }
 });
