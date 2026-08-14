@@ -39,6 +39,10 @@ export async function run(argv) {
     .option('--scope <scope>', 'install scope: user (default) | project')
     .option('-y, --yes', 'skip confirmation prompts (non-interactive)')
     .option('--dry-run', 'preview the action plan without writing any files')
+    .option(
+      '--migrate-legacy',
+      'remove a legacy project-local installation after previewing it (requires --scope project)'
+    )
     .option('--force', 'overwrite user-edited files on conflict (non-interactive default: no)')
     .option(
       '--force-root-doc',

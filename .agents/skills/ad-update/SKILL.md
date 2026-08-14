@@ -25,9 +25,17 @@ npx --yes @alexandrealvaro/agentic@latest update --yes
 
 If the request is only to inspect, explain, or preview, stop after Step 1. Pass `--agent claude-code` or `--agent codex` only when the user scopes the host. Do not add `--force` unless the user explicitly chooses to replace a locally edited file after seeing the plan. For a deliberate project materialization, run the same command from that repository root with `--scope project`; only that mode supports the root-document safeguards.
 
-Step 3 — verify and report. Report the command's concrete result: created, updated, preserved, skipped, and migrated files. State whether the global kit was changed; never call it "latest" merely because the command ran. If a local edit was preserved, name the path and offer the user's actual choices: keep it, reconcile it manually, or re-run with explicit `--force`.
+Step 3 — migrate a legacy project only when the user asks to clean prior project copies. First preview from that repository root:
 
-The CLI's state-aware comparison and named migrations are authoritative. Do not delete skill directories manually to make an update appear clean; use `agentic uninstall --scope project --dry-run --yes` when the user instead wants to remove a project installation.
+```bash
+npx --yes @alexandrealvaro/agentic@latest update --scope project --migrate-legacy --dry-run --yes
+```
+
+Then apply the reviewed plan without `--dry-run`. The migration removes state-recorded pristine skills, exact historical copies of `WORKFLOW.md` / `WORKFLOW-FLOWS.md`, and the bounded generated skills section in `AGENTS.md` or `CLAUDE.md`. It preserves changed skills and unknown workflow files; use `--force` only after the user explicitly chooses to remove a changed skill.
+
+Step 4 — verify and report. Report the command's concrete result: created, updated, preserved, skipped, and migrated files. State whether the global kit was changed; never call it "latest" merely because the command ran. If a local edit was preserved, name the path and offer the user's actual choices: keep it, reconcile it manually, or re-run with explicit `--force`.
+
+The CLI's state-aware comparison and named migrations are authoritative. Do not delete skill directories manually to make an update appear clean; use the explicit legacy migration when the user wants to remove a former project installation.
 </instructions>
 
 <output_contract>
