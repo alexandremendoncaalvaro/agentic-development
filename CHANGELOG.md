@@ -6,14 +6,17 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
-## [0.20.0-beta.4] - 2026-08-14
-
 ### Changed
 
 - `update --scope project --migrate-legacy` now gives prior project-local
   installations a safe, previewable path to the global kit: it removes only
   state-recorded pristine skills, exact historical Constitution copies, and
   the bounded generated skills section while preserving divergent files.
+
+## [0.20.0-beta.4] - 2026-08-14
+
+### Changed
+
 - The default `init` and `update` installation is now user-scoped: skills and
   the Agentic Development constitution live in the user's global host
   directories, while a project-local materialization is an explicit
