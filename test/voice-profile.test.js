@@ -878,7 +878,8 @@ test('npm package dry-run includes every canonical personal voice skill file', (
     'src/skills/codex/ad-voice-tune',
   ]) {
     for (const file of filesUnder(join(root, skill))) {
-      assert.ok(packed.has(join(skill, file)), `${join(skill, file)} missing from npm package`);
+      const packagePath = join(skill, file).replaceAll('\\', '/');
+      assert.ok(packed.has(packagePath), `${packagePath} missing from npm package`);
     }
   }
 });
