@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [0.20.0-beta.5] - 2026-08-14
+
 ### Changed
 
 - `update --scope project --migrate-legacy` now gives prior project-local
