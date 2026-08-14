@@ -32,7 +32,7 @@ function runInit(cwd, args = []) {
 function runGlobalInit(cwd, home, args = []) {
   return execFileSync('node', [BIN, 'init', ...args], {
     cwd,
-    env: { ...process.env, HOME: home },
+    env: { ...process.env, HOME: home, USERPROFILE: home },
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   });
