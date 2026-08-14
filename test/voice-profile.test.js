@@ -13,6 +13,7 @@ import {
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveSpawn } from '../scripts/hook-npm-test.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCRIPT = join(
@@ -424,7 +425,7 @@ test('voice profile resolve: environment directory wins over the home fallback',
     const fromEnvironment = JSON.parse(
       run(['resolve'], {
         cwd: dir,
-        env: { AGENTIC_VOICE_DIR: environment, HOME: home },
+        env: { AGENTIC_VOICE_DIR: environment, HOME: home, USERPROFILE: home },
       })
     );
     assert.equal(fromEnvironment.source, 'environment');
@@ -433,7 +434,7 @@ test('voice profile resolve: environment directory wins over the home fallback',
     const fromHome = JSON.parse(
       run(['resolve'], {
         cwd: dir,
-        env: { AGENTIC_VOICE_DIR: '', HOME: home },
+        env: { AGENTIC_VOICE_DIR: '', HOME: home, USERPROFILE: home },
       })
     );
     assert.equal(fromHome.source, 'default');
@@ -861,10 +862,11 @@ test('personal voice dogfood copies match every canonical source file', () => {
 
 test('npm package dry-run includes every canonical personal voice skill file', () => {
   const root = join(__dirname, '..');
-  const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  const result = spawnSync(npm, ['pack', '--dry-run', '--json', '--ignore-scripts'], {
+  const npm = resolveSpawn('npm');
+  const result = spawnSync(npm.command, ['pack', '--dry-run', '--json', '--ignore-scripts'], {
     cwd: root,
     encoding: 'utf8',
+    shell: npm.shell,
   });
   assert.equal(result.status, 0, result.stderr);
   const packed = new Set(JSON.parse(result.stdout)[0].files.map((file) => file.path));
