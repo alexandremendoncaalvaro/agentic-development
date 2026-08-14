@@ -3,11 +3,9 @@ import { installedPathsToExclude, writeExcludeEntries } from '../lib/git.js';
 
 // The exclude offer is scoped to the agent surface — the skill/subagent files
 // the kit installs under these roots. ADR-0051 Decision 4 covers exactly those
-// two write surfaces. Root kit-docs (WORKFLOW.md / WORKFLOW-FLOWS.md, installed
-// by installKitDocs per ADR-0049 Decision 6) are deliberately NOT swept: they
-// are project-facing constitution docs a team may commit and diverge from, and
-// installKitDocs already guards them with its own report-and-skip. Sweeping
-// them here would offer to hide a file the kit's own convention commits.
+// project writes. The machine-global Constitution never enters this candidate
+// set, and a deliberate project Constitution is team-owned rather than a
+// machine-local file to hide.
 const AGENT_SURFACE_PREFIXES = ['.claude/', '.agents/', '.codex/'];
 
 /**
