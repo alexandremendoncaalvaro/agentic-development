@@ -1,0 +1,6 @@
+interface:
+  display_name: "Personal voice"
+  short_description: "Write in your confirmed personal voice"
+  default_prompt: "Use $ad-voice to rewrite this text in my confirmed personal voice."
+policy:
+  allow_implicit_invocation: true

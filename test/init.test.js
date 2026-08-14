@@ -162,6 +162,8 @@ const INSTALLED_SKILLS = [
   'ad-tdd',
   'ad-tdg',
   'ad-update',
+  'ad-voice',
+  'ad-voice-tune',
 ];
 
 test('init --agent both installs every bundled skill for both agents', () => {

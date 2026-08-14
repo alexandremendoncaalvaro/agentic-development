@@ -524,6 +524,52 @@
           "sourceSha": "2dc223c96596671f15e21153254dc04737b24f32bec15f21d4f4c6ca5ca3bcd3"
         }
       ]
+    },
+    "ad-voice": {
+      "version": "0.20.0-beta.2",
+      "files": [
+        {
+          "path": ".claude/skills/ad-voice/references/application.md",
+          "sourceSha": "aa8c6cf3981837c01fd68b9c38ef80f75762459136566d99522fa50e62aaedf9"
+        },
+        {
+          "path": ".claude/skills/ad-voice/references/human-writing-baseline.md",
+          "sourceSha": "7f3900ce46a1b93adefd25020f86b0ff3f729b742d260fa8a29d539574f6f973"
+        },
+        {
+          "path": ".claude/skills/ad-voice/references/profile-contract.md",
+          "sourceSha": "733cc7d424b5db62679411c4bed63357d5e2bf191335d46ad82a7b80775a16cf"
+        },
+        {
+          "path": ".claude/skills/ad-voice/scripts/voice-profile.mjs",
+          "sourceSha": "17517c1306b15ae48caf96a29f9a000fc5b40776c0160c37ecf2f73d559376db"
+        },
+        {
+          "path": ".claude/skills/ad-voice/SKILL.md",
+          "sourceSha": "84a01dd2c0233e90f41d1147180b88c683b4f5faf9c56f6fa352c79c16303233"
+        }
+      ]
+    },
+    "ad-voice-tune": {
+      "version": "0.20.0-beta.2",
+      "files": [
+        {
+          "path": ".claude/skills/ad-voice-tune/references/calibration.md",
+          "sourceSha": "ed5fe7d076380d1ef704cadaa0f65e8973ea4ff14ede189c919c3e2c767bacdb"
+        },
+        {
+          "path": ".claude/skills/ad-voice-tune/references/profile-contract.md",
+          "sourceSha": "733cc7d424b5db62679411c4bed63357d5e2bf191335d46ad82a7b80775a16cf"
+        },
+        {
+          "path": ".claude/skills/ad-voice-tune/scripts/voice-profile.mjs",
+          "sourceSha": "17517c1306b15ae48caf96a29f9a000fc5b40776c0160c37ecf2f73d559376db"
+        },
+        {
+          "path": ".claude/skills/ad-voice-tune/SKILL.md",
+          "sourceSha": "cf245c2ed986da30686b30b30ca9c5d6a894aa370c512c90b209c9f52344809d"
+        }
+      ]
     }
   }
 }
