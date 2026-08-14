@@ -8,6 +8,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
+- `ad-voice` and `ad-voice-tune` add a private, machine-local personal voice
+  layer on both hosts. Application is read-only and preserves factual invariants;
+  calibration separates owner identity, community accommodation, and situational
+  context behind source-read and per-delta write approvals. A shared deterministic
+  script resolves, validates, and atomically writes the derived-only profile.
 - `ad-community-docs` scaffolds or audits GitHub-conventional `CONTRIBUTING.md` and `SECURITY.md` on both hosts. It deterministically detects existing documents in the root, `.github/`, and `docs/`, preserves local policy, and asks maintainers only for security policy facts the repository cannot establish.
 - `ad-drift` now reports deterministic AGENTS-to-GUIDELINES reciprocity facts for the four operational sections. It accepts designated pointers and identifies a mapped section that omits its pointer, while ignoring Markdown code examples and surfacing unreadable root documents.
 - `agentic uninstall` removes only exact files recorded in the project state, preserves locally edited managed files by default, supports a no-write `--dry-run`, and requires both `--yes` and `--force` to remove a local edit unattended. It deliberately leaves host directories and project-facing root documentation in place for manual ownership review.

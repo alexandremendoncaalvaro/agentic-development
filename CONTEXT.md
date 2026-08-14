@@ -6,6 +6,30 @@ _Maintained by `/ad-domain`._
 
 ## Language
 
+### Personal voice
+
+**Definition:** the user's stable, owner-specific communication signature, expressed through observable writing and speech patterns while remaining recognizably the same across audience, relationship, channel, and language adaptations.
+
+_Avoid_: "tone" (a temporary situational adjustment, not the stable signature); "persona" (implies a performed identity); "team voice" (other people's writing may inform channel conventions but never evidence the user's personal voice).
+
+### Audience adaptation
+
+**Definition:** a context-specific adjustment to how the user's personal voice addresses a particular reader or relationship without replacing or averaging away that personal voice.
+
+_Avoid_: "voice variant" (suggests multiple identities rather than one voice adapting); "impersonation" (the target audience shapes clarity and register, not identity).
+
+### Communicative identity
+
+**Definition:** the user-approved, language-portable part of a personal voice: how the user takes a position, exposes reasoning, uses examples, expresses certainty, relates to the reader, and balances directness with warmth. It is grounded in observable communication, especially in the user's native language, and rendered through equivalent conventions in another language.
+
+_Avoid_: "psychological profile" (the feature neither diagnoses nor infers hidden traits); "personality type" (a categorical label is not communication evidence); "literal style translation" (surface markers such as fillers and contractions are language-specific).
+
+### Accommodation corpus
+
+**Definition:** an authorized set of messages from the target community, such as a team Slack scope, used to learn shared vocabulary, formality, brevity, politeness, and channel conventions. It shapes how the user's voice fits the community but never counts as evidence of the user's identity.
+
+_Avoid_: "team voice" (the corpus provides conventions, not an identity to imitate); "owner sample" (other authors remain separately attributed); "style target" (distinctive individual phrasing must not be copied).
+
 ### Kit
 
 **Definition:** the `@alexandrealvaro/agentic` npm package — a CLI plus the source-of-truth `src/skills/` tree that installs the `ad-*` skill set (and bundled Claude Code subagents) into a target project's agent surface.
@@ -133,6 +157,8 @@ _Avoid_: "preflight script" as the canonical noun (preflight is a common *role* 
 
 ## Relationships
 
+- An **Audience adaptation** changes the expression of a **Personal voice** for a reader or relationship; it never changes whose voice it is.
+- A **Personal voice** carries the user's **Communicative identity** across languages; an **Accommodation corpus** supplies target-community conventions without supplying identity.
 - A **Kit** install materializes every bundled **Workflow-operational skill** and **Spec-driven skill** for each selected agent surface (`.claude/skills/` and `.agents/skills/`).
 - A **Fresh-context review** is implemented as a **Two-axis review** on every kit-supported host; the implementation differs per host but the noun does not.
 - A **Two-axis review** produces one or more **Review handoffs** as its audit trail.

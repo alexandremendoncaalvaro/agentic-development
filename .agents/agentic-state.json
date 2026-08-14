@@ -668,6 +668,60 @@
           "sourceSha": "c403f277a3fd935aba2cbd1e28c06c18e308d590c7a33cd3b4c3653876dde7eb"
         }
       ]
+    },
+    "ad-voice": {
+      "version": "0.20.0-beta.2",
+      "files": [
+        {
+          "path": ".agents/skills/ad-voice/agents/openai.yaml",
+          "sourceSha": "665c4581e558048e13aa75d55ffff747889b0eee8d568cbace461a5801ac831b"
+        },
+        {
+          "path": ".agents/skills/ad-voice/references/application.md",
+          "sourceSha": "aa8c6cf3981837c01fd68b9c38ef80f75762459136566d99522fa50e62aaedf9"
+        },
+        {
+          "path": ".agents/skills/ad-voice/references/human-writing-baseline.md",
+          "sourceSha": "7f3900ce46a1b93adefd25020f86b0ff3f729b742d260fa8a29d539574f6f973"
+        },
+        {
+          "path": ".agents/skills/ad-voice/references/profile-contract.md",
+          "sourceSha": "733cc7d424b5db62679411c4bed63357d5e2bf191335d46ad82a7b80775a16cf"
+        },
+        {
+          "path": ".agents/skills/ad-voice/scripts/voice-profile.mjs",
+          "sourceSha": "17517c1306b15ae48caf96a29f9a000fc5b40776c0160c37ecf2f73d559376db"
+        },
+        {
+          "path": ".agents/skills/ad-voice/SKILL.md",
+          "sourceSha": "76617f8108d11a346d5117edc3acf344e9ea26f75e4d26e4ce1e28eecb5b0179"
+        }
+      ]
+    },
+    "ad-voice-tune": {
+      "version": "0.20.0-beta.2",
+      "files": [
+        {
+          "path": ".agents/skills/ad-voice-tune/agents/openai.yaml",
+          "sourceSha": "d55413c93ae32ceeb367110510d3c222cd64fb7e7a381089a74d4c05a0df45db"
+        },
+        {
+          "path": ".agents/skills/ad-voice-tune/references/calibration.md",
+          "sourceSha": "ed5fe7d076380d1ef704cadaa0f65e8973ea4ff14ede189c919c3e2c767bacdb"
+        },
+        {
+          "path": ".agents/skills/ad-voice-tune/references/profile-contract.md",
+          "sourceSha": "733cc7d424b5db62679411c4bed63357d5e2bf191335d46ad82a7b80775a16cf"
+        },
+        {
+          "path": ".agents/skills/ad-voice-tune/scripts/voice-profile.mjs",
+          "sourceSha": "17517c1306b15ae48caf96a29f9a000fc5b40776c0160c37ecf2f73d559376db"
+        },
+        {
+          "path": ".agents/skills/ad-voice-tune/SKILL.md",
+          "sourceSha": "e2fee81348a19d1a8660d5e826285b0baadb3419763a7a26702d0f913676e4bf"
+        }
+      ]
     }
   }
 }

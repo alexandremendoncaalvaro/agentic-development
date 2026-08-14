@@ -49,6 +49,13 @@ Every skill below installs for each selected host. Installation is not a mandate
 | `/ad-level-up` | An audit found a genuine rule gap. | Human-gated rule-set curation. |
 | `/ad-hooks` | The project needs executable local quality gates. | Proposed hook and CI wiring. |
 
+## Write in a personal voice
+
+| Skill | Use it when | Outcome |
+| --- | --- | --- |
+| `/ad-voice` | A draft, rewrite, or translation should sound like you in its destination context. | One fact-preserving draft from the confirmed local profile. |
+| `/ad-voice-tune` | Your private voice profile needs creation or one evidence-backed correction. | One human-approved profile delta, with identity and community evidence kept separate. |
+
 ## Ship and maintain
 
 | Skill | Use it when | Outcome |
