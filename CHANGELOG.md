@@ -6,6 +6,16 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- The default `init` and `update` installation is now user-scoped: skills and
+  the Agentic Development constitution live in the user's global host
+  directories, while a project-local materialization is an explicit
+  `--scope project` exception. This prevents shared repositories from
+  receiving kit-owned workflow files by default. Package-executed update
+  commands also pin `@latest`, so a stale globally installed binary cannot
+  shadow the published kit.
+
 ## [0.20.0-beta.3] - 2026-08-13
 
 ### Added
