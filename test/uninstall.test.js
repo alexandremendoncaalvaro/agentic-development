@@ -21,7 +21,7 @@ function mkScratch() {
 }
 
 function runInit(cwd, args = []) {
-  return execFileSync('node', [BIN, 'init', ...args], {
+  return execFileSync('node', [BIN, 'init', '--scope', 'project', ...args], {
     cwd,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -47,8 +47,8 @@ test('uninstall --yes removes a pristine host install and its state', () => {
     assert.equal(existsSync(statePath(dir, 'claude-code')), false);
     assert.equal(
       existsSync(join(dir, 'WORKFLOW.md')),
-      true,
-      'root documents are project-facing and must never be removed by uninstall'
+      false,
+      'project install must not create a root workflow document'
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });

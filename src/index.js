@@ -22,8 +22,9 @@ export async function run(argv) {
 
   program
     .command('init')
-    .description('Install agentic skills into this project for Claude Code and/or Codex')
+    .description('Install agentic skills globally by default, or explicitly into a project')
     .option('-a, --agent <agent>', 'install for a specific agent: claude-code | codex | both')
+    .option('--scope <scope>', 'install scope: user (default) | project')
     .option('-y, --yes', 'skip confirmation prompts (non-interactive)')
     .option(
       '--force-root-doc',
@@ -33,8 +34,9 @@ export async function run(argv) {
 
   program
     .command('update')
-    .description('Pull upstream kit changes into an installed project (three-way diff against the saved state)')
+    .description('Pull upstream kit changes into the global install by default, or an explicit project install')
     .option('-a, --agent <agent>', 'restrict update to a specific agent: claude-code | codex | both')
+    .option('--scope <scope>', 'install scope: user (default) | project')
     .option('-y, --yes', 'skip confirmation prompts (non-interactive)')
     .option('--dry-run', 'preview the action plan without writing any files')
     .option('--force', 'overwrite user-edited files on conflict (non-interactive default: no)')
@@ -48,6 +50,7 @@ export async function run(argv) {
     .command('uninstall')
     .description('Remove agentic-managed files from this project while preserving local edits')
     .option('-a, --agent <agent>', 'restrict removal to a specific agent: claude-code | codex | both')
+    .option('--scope <scope>', 'removal scope: project (default) | user')
     .option('-y, --yes', 'skip the destructive-action confirmation prompt')
     .option('--dry-run', 'preview the action plan without removing files')
     .option('--force', 'also remove user-edited files recorded in agentic state')

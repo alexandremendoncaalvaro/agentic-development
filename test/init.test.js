@@ -22,41 +22,53 @@ function mkScratch() {
 }
 
 function runInit(cwd, args = []) {
-  return execFileSync('node', [BIN, 'init', ...args], {
+  return execFileSync('node', [BIN, 'init', '--scope', 'project', ...args], {
     cwd,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 }
 
-// The kit's Layer 1 Constitution splits ownership: `AGENTS.md` and
-// `GUIDELINES.md` are project-owned, `WORKFLOW.md` is kit-shipped. Installed
-// skills cite it by section (`WORKFLOW §10`, `WORKFLOW.md §1`), and the
-// installer's own completion hints print those section numbers — so a target
-// without the file leaves every one of those references pointing at nothing.
-// `WORKFLOW-FLOWS.md` ships with it because `WORKFLOW.md` references it in its
-// own opening; installing one without the other recreates the same defect one
-// level down.
+function runGlobalInit(cwd, home, args = []) {
+  return execFileSync('node', [BIN, 'init', ...args], {
+    cwd,
+    env: { ...process.env, HOME: home, USERPROFILE: home },
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+}
+
 const KIT_DOCS = ['WORKFLOW.md', 'WORKFLOW-FLOWS.md'];
 
-test('init installs the kit-shipped constitution the skills cite by section', () => {
+test('project init does not install kit constitution into a repository', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code']);
     for (const doc of KIT_DOCS) {
-      const target = join(dir, doc);
-      assert.ok(
-        existsSync(target),
-        `${doc} must land at the target root — installed skills cite it by section`
-      );
-      assert.equal(
-        readFileSync(target, 'utf8'),
-        readFileSync(join(__dirname, '..', doc), 'utf8'),
-        `${doc} at the target root must match the kit copy — it is kit-shipped, not project-owned`
-      );
+      assert.equal(existsSync(join(dir, doc)), false, `${doc} polluted the project root`);
     }
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('default init installs globally and leaves the invoking repository clean', () => {
+  const dir = mkScratch();
+  const home = mkScratch();
+  try {
+    runGlobalInit(dir, home, ['--agent', 'codex', '--yes']);
+
+    assert.equal(existsSync(join(dir, '.agents')), false, 'default init wrote into the repository');
+    assert.ok(existsSync(join(home, '.agents/skills/ad-bootstrap/SKILL.md')));
+    for (const doc of KIT_DOCS) {
+      assert.ok(existsSync(join(home, '.agentic/kit', doc)), `${doc} missing from global kit`);
+    }
+    const rules = readFileSync(join(home, '.codex/AGENTS.md'), 'utf8');
+    assert.match(rules, /agentic-global-constitution:start/);
+    assert.match(rules, /\.agentic[\\/]kit[\\/]WORKFLOW\.md/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+    rmSync(home, { recursive: true, force: true });
   }
 });
 

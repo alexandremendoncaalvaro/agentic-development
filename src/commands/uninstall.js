@@ -2,6 +2,7 @@ import * as p from '@clack/prompts';
 import { relative } from 'node:path';
 import { removeOrphanSkills } from '../lib/install.js';
 import { loadState, removeState, saveState, statePath } from '../lib/state.js';
+import { resolveScope, targetForScope } from '../lib/scope.js';
 
 const VALID_AGENTS = ['claude-code', 'codex'];
 const AGENT_FLAG_VALUES = ['claude-code', 'codex', 'both'];
@@ -45,7 +46,8 @@ export async function uninstallCommand(opts) {
     );
   }
 
-  const cwd = process.cwd();
+  const scope = resolveScope(opts.scope ?? 'project');
+  const cwd = targetForScope(scope, process.cwd());
   const dryRun = Boolean(opts.dryRun);
   const force = Boolean(opts.force);
   const interactive = process.stdout.isTTY && !opts.yes;
@@ -116,9 +118,15 @@ export async function uninstallCommand(opts) {
     const symbol = ACTION_SYMBOL[action.type] ?? '?';
     return `${symbol} [${action.agent}] ${action.path}`;
   });
-  lines.push(
-    'note: kept WORKFLOW.md, WORKFLOW-FLOWS.md, and the managed root-doc section; review those project-facing files manually.'
-  );
+  if (scope === 'project') {
+    lines.push(
+      'note: kept legacy WORKFLOW.md, WORKFLOW-FLOWS.md, and the managed root-doc section; review those project-facing files manually.'
+    );
+  } else {
+    lines.push(
+      'note: kept ~/.agentic/kit and the global instruction import; review those global files manually.'
+    );
+  }
 
   if (interactive) {
     p.note(lines.join('\n'), dryRun ? 'Plan' : 'Result');

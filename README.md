@@ -9,7 +9,7 @@ It is not an agent runtime, a framework, or a product-management tool. It instal
 From a project root, install the complete skill set for both hosts:
 
 ```bash
-npx --yes @alexandrealvaro/agentic init --yes
+npx --yes @alexandrealvaro/agentic@latest init --yes
 ```
 
 Then open the project in Claude Code or Codex and invoke:
@@ -26,16 +26,17 @@ Requires Node.js 20.12 or newer. Claude Code skills install under `.claude/skill
 
 | Need | Command |
 | --- | --- |
-| Install in this project | `npx --yes @alexandrealvaro/agentic init --yes` |
-| Install for Claude Code only | `npx --yes @alexandrealvaro/agentic init --agent claude-code --yes` |
-| Install for Codex only | `npx --yes @alexandrealvaro/agentic init --agent codex --yes` |
-| Update this project to the current kit | `npx --yes @alexandrealvaro/agentic update --yes` |
-| Preview an update | `npx --yes @alexandrealvaro/agentic update --dry-run --yes` |
-| Remove agentic from this project | `npx --yes @alexandrealvaro/agentic uninstall --yes` |
+| Install the personal default | `npx --yes @alexandrealvaro/agentic@latest init --yes` |
+| Install personal Claude Code skills only | `npx --yes @alexandrealvaro/agentic@latest init --agent claude-code --yes` |
+| Install personal Codex skills only | `npx --yes @alexandrealvaro/agentic@latest init --agent codex --yes` |
+| Update the personal kit | `npx --yes @alexandrealvaro/agentic@latest update --yes` |
+| Preview an update | `npx --yes @alexandrealvaro/agentic@latest update --dry-run --yes` |
+| Install into a project deliberately | `npx --yes @alexandrealvaro/agentic@latest init --scope project --yes` |
+| Remove a project installation | `npx --yes @alexandrealvaro/agentic@latest uninstall --scope project --yes` |
 | Install the `agentic` command globally | `npm install --global @alexandrealvaro/agentic` |
 | Remove the global command | `npm uninstall --global @alexandrealvaro/agentic` |
 
-After a global CLI install, run `agentic init --yes` or `agentic update --yes` from a project. A global CLI install and a user-level skill install are different things; the [installation guide](https://github.com/alexandremendoncaalvaro/agentic-development/blob/main/doc/guides/installation.md) explains both, including safe project removal.
+After a global CLI install, `agentic init --yes` and `agentic update --yes` maintain the personal, machine-global kit from any directory. Add `--scope project` only for a deliberate shared project install. A global CLI install and a user-level skill install are different things; the [installation guide](https://github.com/alexandremendoncaalvaro/agentic-development/blob/main/doc/guides/installation.md) explains both, including safe project removal.
 
 ## Everyday workflow
 

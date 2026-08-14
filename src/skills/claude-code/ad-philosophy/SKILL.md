@@ -8,6 +8,8 @@ summary: Universal agent guardrails (think, decide when grounded, verify done, r
 
 Eight behaviors apply to every non-trivial change. Bias toward caution over speed; for trivial diffs, use judgment. A separate Documentation Discipline section at the end applies to every document the agent writes.
 
+The workflow constitution is machine-global: the user-level install keeps it at `~/.agentic/kit/WORKFLOW.md` (with `WORKFLOW-FLOWS.md` beside it) and adds that import to the host's global instruction file. It is not a repository artifact. A repository's own binding documents and rules still take precedence when they conflict.
+
 ## Explicit Invocation Is a Recommitment
 
 **Applies only when the user invoked this skill as a request** — they typed `/ad-philosophy`, or asked for it by name. It does not fire on an incidental mention (discussing the skill, asking how it works). When the skill auto-loaded as posture, skip this section: read the behaviors and continue the task silently.

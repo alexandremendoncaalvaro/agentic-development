@@ -14,6 +14,8 @@ import {
 } from '../lib/rootdoc.js';
 import { trackedState } from '../lib/git.js';
 import { offerKitExclude } from './kit-exclude.js';
+import { configureGlobalConstitution, globalKitPath } from '../lib/global-rules.js';
+import { resolveScope, targetForScope } from '../lib/scope.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -65,7 +67,9 @@ export async function initCommand(opts) {
     );
   }
 
-  const cwd = process.cwd();
+  const invocationCwd = process.cwd();
+  const scope = resolveScope(opts.scope);
+  const cwd = targetForScope(scope, invocationCwd);
   const interactive = process.stdout.isTTY && !opts.yes && !opts.agent;
 
   const detectedMode = detectMode(cwd);
@@ -144,9 +148,15 @@ export async function initCommand(opts) {
     saveState(cwd, agent, nextStates[agent]);
   }
 
-  // Agent-independent: the Constitution lands once at the target root, not per
-  // agent surface, so it sits outside the loop above.
-  allActions.push(...installKitDocs({ cwd }));
+  // The constitution is machine-global. A project installation is deliberately
+  // skills-only: it may be a team-pinned exception, but it never sprays root
+  // kit files into a repository.
+  if (scope === 'user') {
+    allActions.push(...installKitDocs({ targetDir: globalKitPath() }));
+    for (const agent of agents) {
+      allActions.push(configureGlobalConstitution({ agent }));
+    }
+  }
 
   const skillDisplayOrder = [...installedSkillSet].sort();
 
@@ -187,12 +197,14 @@ export async function initCommand(opts) {
       }
     : async (path) => allowUnattendedRootDocWrite(path);
 
-  const rootDocAction = await updateRootDoc({
-    cwd,
-    skills: skillDisplayOrder,
-    confirmAppend,
-    confirmReplace: confirmRootDocReplace,
-  });
+  const rootDocAction = scope === 'project'
+    ? await updateRootDoc({
+        cwd,
+        skills: skillDisplayOrder,
+        confirmAppend,
+        confirmReplace: confirmRootDocReplace,
+      })
+    : { type: 'absent' };
 
   // Keep freshly-installed kit files out of a shared repo's commits via
   // .git/info/exclude — per-clone and never committed, unlike .gitignore
@@ -200,11 +212,13 @@ export async function initCommand(opts) {
   // says so, holding the refuse-to-guess posture. Files already tracked (the
   // dogfood self-install, a team-owned subagent) are dropped by filename, so a
   // mixed-ownership directory never has a team file hidden from git.
-  const excluded = await offerKitExclude({
-    cwd,
-    paths: [...new Set(allActions.map((a) => a.path))],
-    interactive,
-  });
+  const excluded = scope === 'project'
+    ? await offerKitExclude({
+        cwd,
+        paths: [...new Set(allActions.map((a) => a.path))],
+        interactive,
+      })
+    : 0;
 
   const lines = allActions.map((a) => `${ACTION_SYMBOL[a.type]} ${a.path}`);
   if (rootDocAction.type !== 'absent') {
@@ -213,7 +227,7 @@ export async function initCommand(opts) {
   if (excluded > 0) {
     lines.push(`! .git/info/exclude (+${excluded})`);
   }
-  const userInstall = cwd === homedir() ? null : userLevelInstallPath();
+  const userInstall = scope === 'user' || cwd === homedir() ? null : userLevelInstallPath();
   if (userInstall) {
     lines.push(
       `note: agentic is also installed at the user level (${userInstall}); ` +
@@ -226,7 +240,7 @@ export async function initCommand(opts) {
     p.outro(
       `Done. Installed ${installedSkillSet.size} skills for ${agents
         .map((a) => AGENT_LABEL[a])
-        .join(' + ')}. Start with /ad-next; ad-philosophy auto-loads on non-trivial work.`
+        .join(' + ')} (${scope} scope). Start with /ad-next; ad-philosophy auto-loads on non-trivial work.`
     );
   } else {
     for (const line of lines) {

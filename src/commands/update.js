@@ -21,6 +21,8 @@ import {
 import { trackedState } from '../lib/git.js';
 import { homedir } from 'node:os';
 import { offerKitExclude } from './kit-exclude.js';
+import { configureGlobalConstitution, globalKitPath } from '../lib/global-rules.js';
+import { resolveScope, targetForScope } from '../lib/scope.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -93,7 +95,9 @@ export async function updateCommand(opts) {
     );
   }
 
-  const cwd = process.cwd();
+  const invocationCwd = process.cwd();
+  const scope = resolveScope(opts.scope);
+  const cwd = targetForScope(scope, invocationCwd);
   // `--agent` is purely a narrowing flag and does not imply non-interactive
   // intent. Only `--yes` or a non-TTY shell suppress the TUI per ADR-0009.
   const interactive = process.stdout.isTTY && !opts.yes;
@@ -183,10 +187,12 @@ export async function updateCommand(opts) {
     nextStates[agent] = result.nextStates[agent];
   }
 
-  // Agent-independent: the Constitution lands once at the target root, not per
-  // agent surface, so it sits outside the loop above. An update refreshes it
-  // because the kit owns the content — see installKitDocs.
-  allActions.push(...installKitDocs({ cwd, dryRun, force }));
+  if (scope === 'user') {
+    allActions.push(...installKitDocs({ targetDir: globalKitPath(), dryRun, force }));
+    for (const agent of agents) {
+      allActions.push(configureGlobalConstitution({ agent, dryRun }));
+    }
+  }
 
   if (!dryRun) {
     for (const agent of agents) {
@@ -247,17 +253,19 @@ export async function updateCommand(opts) {
         return Boolean(force);
       };
 
-  const rootDocAction = await updateRootDoc({
-    cwd,
-    skills: skillDisplayOrder,
-    confirmAppend,
-    confirmReplace: confirmRootDocReplace,
-    dryRun,
-  });
+  const rootDocAction = scope === 'project'
+    ? await updateRootDoc({
+        cwd,
+        skills: skillDisplayOrder,
+        confirmAppend,
+        confirmReplace: confirmRootDocReplace,
+        dryRun,
+      })
+    : { type: 'absent' };
 
   // Keep freshly-installed kit files out of a shared repo's commits
   // (ADR-0051 Decision 4). Skipped on a dry-run, which writes nothing.
-  const excluded = dryRun
+  const excluded = scope === 'user' || dryRun
     ? 0
     : await offerKitExclude({
         cwd,
@@ -277,7 +285,7 @@ export async function updateCommand(opts) {
   if (excluded > 0) {
     lines.push(`! .git/info/exclude (+${excluded})`);
   }
-  const userInstall = cwd === homedir() ? null : userLevelInstallPath();
+  const userInstall = scope === 'user' || cwd === homedir() ? null : userLevelInstallPath();
   if (userInstall) {
     lines.push(
       `note: agentic is also installed at the user level (${userInstall}); ` +
@@ -289,7 +297,7 @@ export async function updateCommand(opts) {
     p.note(lines.join('\n') || '(no changes)', dryRun ? 'Plan' : 'Result');
     const closing = dryRun
       ? 'Dry-run only — nothing written. Re-run without --dry-run to apply.'
-      : `Updated to ${pkg.version}. State saved at .claude/agentic-state.json / .agents/agentic-state.json.`;
+      : `Updated ${scope} install to ${pkg.version}. State saved at .claude/agentic-state.json / .agents/agentic-state.json.`;
     p.outro(closing);
   } else {
     for (const line of lines) {
