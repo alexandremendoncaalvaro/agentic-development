@@ -29,7 +29,7 @@ function mkScratch() {
 }
 
 function runInit(cwd, args = []) {
-  return execFileSync('node', [BIN, 'init', ...args], {
+  return execFileSync('node', [BIN, 'init', '--scope', 'project', ...args], {
     cwd,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -37,7 +37,7 @@ function runInit(cwd, args = []) {
 }
 
 function runUpdate(cwd, args = []) {
-  return execFileSync('node', [BIN, 'update', ...args], {
+  return execFileSync('node', [BIN, 'update', '--scope', 'project', ...args], {
     cwd,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -65,21 +65,14 @@ const STALE_ROOT_DOC =
   '## Skills installed by `agentic`\n\nstale table\n\n' +
   '<!-- agentic-managed-skills:end -->\n';
 
-// --- Kit-doc install regressions (origin/main's task-0034, WORKFLOW.md
-// install; kept verbatim from the PR that merged first) ---------------------
-// `WORKFLOW.md` being kit-owned settles who authors it, not whether an installer
-// may delete a user's edits without saying so. The first cut of installKitDocs
-// copied unconditionally: a target that had appended a local section lost it on
-// the next `update`, reported as a benign `~ WORKFLOW.md`. AGENTS.md states the
-// opposite as a contract — "Don't break this default by silently overwriting."
-test('regression: task 0034 — update skips a diverged kit doc instead of overwriting it', () => {
+test('project update leaves a legacy workflow file untouched, even with --force', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code']);
-    const edited = `${readFileSync(join(dir, 'WORKFLOW.md'), 'utf8')}\n## Local addition\n`;
+    const edited = '# Legacy workflow\n\n## Local addition\n';
     writeFileSync(join(dir, 'WORKFLOW.md'), edited);
 
-    const run = spawnSync('node', [BIN, 'update', '--agent', 'claude-code', '--yes'], {
+    const run = spawnSync('node', [BIN, 'update', '--scope', 'project', '--agent', 'claude-code', '--yes', '--force'], {
       cwd: dir,
       encoding: 'utf8',
     });
@@ -87,59 +80,9 @@ test('regression: task 0034 — update skips a diverged kit doc instead of overw
     assert.equal(
       readFileSync(join(dir, 'WORKFLOW.md'), 'utf8'),
       edited,
-      'update destroyed a user edit to WORKFLOW.md'
+      'project update must never write a repository workflow file'
     );
-    assert.match(
-      `${run.stdout}${run.stderr}`,
-      /! WORKFLOW\.md/,
-      'the skip must be reported, not silent — an unreported skip is its own defect'
-    );
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('regression: task 0034 — update --force replaces a diverged kit doc', () => {
-  const dir = mkScratch();
-  try {
-    runInit(dir, ['--agent', 'claude-code']);
-    const pristine = readFileSync(join(dir, 'WORKFLOW.md'), 'utf8');
-    writeFileSync(join(dir, 'WORKFLOW.md'), `${pristine}\n## Local addition\n`);
-
-    spawnSync('node', [BIN, 'update', '--agent', 'claude-code', '--yes', '--force'], {
-      cwd: dir,
-      encoding: 'utf8',
-    });
-
-    assert.equal(
-      readFileSync(join(dir, 'WORKFLOW.md'), 'utf8'),
-      pristine,
-      '--force must restore the kit copy'
-    );
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-// Kit-doc actions are agent-independent, so they carry no `agent` field while
-// every skill-file action does. The report line used to interpolate the field
-// unconditionally, which surfaced as a literal `[undefined]` beside each
-// Constitution file — the report is the only place a user sees what an update
-// did, so a placeholder there reads as a broken install.
-test('regression: task 0034 — update reports kit docs without a placeholder agent tag', () => {
-  const dir = mkScratch();
-  try {
-    runInit(dir, ['--agent', 'claude-code']);
-    // Non-interactive `update` writes its report to stderr; asserting on the
-    // union of both streams keeps the test about what the user reads rather
-    // than about which stream carries it.
-    const run = spawnSync('node', [BIN, 'update', '--agent', 'claude-code', '--yes'], {
-      cwd: dir,
-      encoding: 'utf8',
-    });
-    const out = `${run.stdout}${run.stderr}`;
-    assert.ok(!out.includes('[undefined]'), `update report leaked a placeholder agent:\n${out}`);
-    assert.match(out, /WORKFLOW\.md/, 'update report does not mention the kit docs at all');
+    assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -773,7 +716,7 @@ test('regression: update --yes migrates a pristine ad-grill install to ad-grill-
     };
     saveState(dir, 'claude-code', state);
 
-    const run = spawnSync('node', [BIN, 'update', '--agent', 'claude-code', '--yes'], {
+    const run = spawnSync('node', [BIN, 'update', '--scope', 'project', '--agent', 'claude-code', '--yes'], {
       cwd: dir,
       encoding: 'utf8',
     });
@@ -811,7 +754,7 @@ test('regression: update --yes migrates the Codex ad-grill files together', () =
     };
     saveState(dir, 'codex', state);
 
-    const run = spawnSync('node', [BIN, 'update', '--agent', 'codex', '--yes'], {
+    const run = spawnSync('node', [BIN, 'update', '--scope', 'project', '--agent', 'codex', '--yes'], {
       cwd: dir,
       encoding: 'utf8',
     });

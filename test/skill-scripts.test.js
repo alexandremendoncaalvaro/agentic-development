@@ -730,7 +730,7 @@ test('survey: brownfield repo reports presence, counts, and reciprocity', () => 
     assert.equal('profile' in s, false, 'install state does not classify project maturity');
     assert.equal(s.kitVersion, '9.9.9');
     assert.deepEqual(s.constitution, {
-      workflow: true,
+      globalWorkflow: false,
       operationalGuide: 'AGENTS.md',
       guidelines: true,
     });

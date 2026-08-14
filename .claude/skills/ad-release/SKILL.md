@@ -47,7 +47,7 @@ After the release commit is reachable from the merged base branch, show the exac
 
 Create a disposable detached worktree at the annotated tag. Within it, run `npm ci`, verify the tag's package version, the package test gate, and `npm pack --dry-run`. If any check fails, do not publish; report the worktree path if cleanup cannot complete. Query the registry first and stop if the name-and-version already exists.
 
-Show the exact `npm publish` command, effect, configured dist-tag, and postcondition. Request the fourth direct confirmation. On approval, run `npm publish` once from the tag-pinned worktree and let npm request its own OTP. Verify the exact name-and-version and report its configured dist-tag; never change any tag. Remove the disposable worktree after a verified result.
+Show the exact `npm publish` command, effect, configured dist-tag, and postcondition. Request the fourth direct confirmation. On approval, run `npm publish` once from the tag-pinned worktree and let npm request its own OTP. Verify the exact name-and-version and report its configured dist-tag; never change any tag. Then run `node <skill-dir>/scripts/verify-published-package.mjs <package-name> <version>`: it places a stale global binary on `PATH` and proves that `npx --yes <package-name>@latest --version` still resolves the release. Remove the disposable worktree after a verified result.
 
 ## Phase 6 — GitHub Release
 

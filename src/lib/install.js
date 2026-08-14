@@ -485,7 +485,7 @@ export function removeRetiredSkills({
 const KIT_DOCS = ['WORKFLOW.md', 'WORKFLOW-FLOWS.md'];
 
 /**
- * Install the kit-shipped Constitution files at the target repo root.
+ * Install the kit-shipped Constitution files at their one machine-global home.
  *
  * Agent-independent: these land once per project, not once per agent surface,
  * so this runs outside the per-agent install loop and its actions carry no
@@ -499,14 +499,14 @@ const KIT_DOCS = ['WORKFLOW.md', 'WORKFLOW-FLOWS.md'];
  * a silent overwrite is indistinguishable from data loss at the call site.
  *
  * @param {object} opts
- * @param {string} opts.cwd — target project root
+ * @param {string} opts.targetDir — global constitution directory
  * @param {boolean} [opts.dryRun] — plan only, write nothing
  * @param {boolean} [opts.force] — replace a diverged target instead of skipping
  *
  * @returns {Array<{type: 'created'|'unchanged'|'replaced'|'skipped', path: string}>}
  * @throws {Error} when a kit doc is missing from the kit root (packaging fault)
  */
-export function installKitDocs({ cwd, dryRun = false, force = false }) {
+export function installKitDocs({ targetDir, dryRun = false, force = false }) {
   const actions = [];
 
   for (const doc of KIT_DOCS) {
@@ -517,26 +517,29 @@ export function installKitDocs({ cwd, dryRun = false, force = false }) {
       );
     }
 
-    const target = join(cwd, doc);
+    const target = join(targetDir, doc);
 
     if (!existsSync(target)) {
-      if (!dryRun) copyFileSync(src, target);
-      actions.push({ type: 'created', path: doc });
+      if (!dryRun) {
+        mkdirSync(targetDir, { recursive: true });
+        copyFileSync(src, target);
+      }
+      actions.push({ type: 'created', path: join('.agentic/kit', doc) });
       continue;
     }
 
     if (sameFile(src, target)) {
-      actions.push({ type: 'unchanged', path: doc });
+      actions.push({ type: 'unchanged', path: join('.agentic/kit', doc) });
       continue;
     }
 
     if (!force) {
-      actions.push({ type: 'skipped', path: doc });
+      actions.push({ type: 'skipped', path: join('.agentic/kit', doc) });
       continue;
     }
 
     if (!dryRun) copyFileSync(src, target);
-    actions.push({ type: 'replaced', path: doc });
+    actions.push({ type: 'replaced', path: join('.agentic/kit', doc) });
   }
 
   return actions;

@@ -33,6 +33,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -153,7 +154,7 @@ function surveyConstitution(repoRoot) {
       ? 'CLAUDE.md'
       : null;
   return {
-    workflow: isFile(join(repoRoot, 'WORKFLOW.md')),
+    globalWorkflow: isFile(join(homedir(), '.agentic', 'kit', 'WORKFLOW.md')),
     operationalGuide,
     guidelines: isFile(join(repoRoot, 'GUIDELINES.md')),
   };
