@@ -68,6 +68,7 @@ const STALE_ROOT_DOC =
 test('project update leaves a legacy workflow file untouched, even with --force', () => {
   const dir = mkScratch();
   try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# Team guide\n');
     runInit(dir, ['--agent', 'claude-code']);
     const edited = '# Legacy workflow\n\n## Local addition\n';
     writeFileSync(join(dir, 'WORKFLOW.md'), edited);
@@ -83,6 +84,108 @@ test('project update leaves a legacy workflow file untouched, even with --force'
       'project update must never write a repository workflow file'
     );
     assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('legacy project migration previews then removes only known kit artifacts', () => {
+  const dir = mkScratch();
+  try {
+    writeFileSync(join(dir, 'AGENTS.md'), '# Team guide\n');
+    runInit(dir, ['--agent', 'claude-code']);
+    const workflow = readFileSync(join(__dirname, '..', 'WORKFLOW.md'), 'utf8');
+    const flows = readFileSync(join(__dirname, '..', 'WORKFLOW-FLOWS.md'), 'utf8');
+    writeFileSync(join(dir, 'WORKFLOW.md'), workflow);
+    writeFileSync(join(dir, 'WORKFLOW-FLOWS.md'), flows);
+    const rootBefore = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+
+    const preview = spawnSync('node', [
+      BIN,
+      'update',
+      '--scope',
+      'project',
+      '--migrate-legacy',
+      '--dry-run',
+      '--yes',
+    ], { cwd: dir, encoding: 'utf8' });
+
+    assert.equal(preview.status, 0, `${preview.stdout}${preview.stderr}`);
+    assert.ok(existsSync(join(dir, 'WORKFLOW.md')), 'preview must not remove WORKFLOW.md');
+    assert.equal(readFileSync(join(dir, 'AGENTS.md'), 'utf8'), rootBefore);
+    assert.match(`${preview.stdout}${preview.stderr}`, /- WORKFLOW\.md/);
+    assert.match(`${preview.stdout}${preview.stderr}`, /- AGENTS\.md/);
+
+    const apply = spawnSync('node', [
+      BIN,
+      'update',
+      '--scope',
+      'project',
+      '--migrate-legacy',
+      '--yes',
+    ], { cwd: dir, encoding: 'utf8' });
+
+    assert.equal(apply.status, 0, `${apply.stdout}${apply.stderr}`);
+    assert.equal(existsSync(join(dir, 'WORKFLOW.md')), false);
+    assert.equal(existsSync(join(dir, 'WORKFLOW-FLOWS.md')), false);
+    assert.equal(existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')), false);
+    assert.equal(existsSync(statePath(dir, 'claude-code')), false);
+    assert.doesNotMatch(readFileSync(join(dir, 'AGENTS.md'), 'utf8'), /agentic-managed-skills/);
+
+    const repeat = spawnSync('node', [
+      BIN,
+      'update',
+      '--scope',
+      'project',
+      '--migrate-legacy',
+      '--yes',
+    ], { cwd: dir, encoding: 'utf8' });
+    assert.equal(repeat.status, 0, `${repeat.stdout}${repeat.stderr}`);
+    assert.equal(`${repeat.stdout}${repeat.stderr}`, '', 'migration must settle after one apply');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('legacy project migration preserves edited skills and unknown workflow documents', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code']);
+    const editedPath = join(dir, '.claude/skills/ad-bootstrap/SKILL.md');
+    writeFileSync(editedPath, 'Project-owned skill edit\n');
+    const workflow = '# Project-owned workflow\n';
+    writeFileSync(join(dir, 'WORKFLOW.md'), workflow);
+
+    const run = spawnSync('node', [
+      BIN,
+      'update',
+      '--scope',
+      'project',
+      '--migrate-legacy',
+      '--yes',
+    ], { cwd: dir, encoding: 'utf8' });
+
+    assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
+    assert.equal(readFileSync(editedPath, 'utf8'), 'Project-owned skill edit\n');
+    assert.equal(readFileSync(join(dir, 'WORKFLOW.md'), 'utf8'), workflow);
+    const state = loadState(dir, 'claude-code');
+    assert.deepEqual(Object.keys(state.skills), ['ad-bootstrap']);
+    assert.match(`${run.stdout}${run.stderr}`, /! \[claude-code\].*ad-bootstrap/);
+    assert.match(`${run.stdout}${run.stderr}`, /! WORKFLOW\.md/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('legacy project migration rejects the user-level scope', () => {
+  const dir = mkScratch();
+  try {
+    const run = spawnSync('node', [BIN, 'update', '--migrate-legacy', '--yes'], {
+      cwd: dir,
+      encoding: 'utf8',
+    });
+    assert.notEqual(run.status, 0);
+    assert.match(`${run.stdout}${run.stderr}`, /--migrate-legacy requires --scope project/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

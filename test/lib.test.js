@@ -718,8 +718,7 @@ test('userLevelInstallPath: finds a user-level state file, null when absent', ()
 test('kitExcludeCandidates: sweeps the agent surface but never root kit-docs (ADR-0051 scope)', () => {
   const dir = mkGitRepo();
   try {
-    // Root kit-docs installKitDocs writes (ADR-0049 D6) — untracked, but NOT
-    // the exclude offer's business: the team may commit and diverge from them.
+    // Root-named project docs are never the exclude offer's business.
     writeFileSync(join(dir, 'WORKFLOW.md'), 'kit\n');
     writeFileSync(join(dir, 'WORKFLOW-FLOWS.md'), 'kit\n');
     // Agent-surface files — these ARE the exclude offer's business.
@@ -741,7 +740,7 @@ test('kitExcludeCandidates: sweeps the agent surface but never root kit-docs (AD
     ]);
     assert.ok(
       !candidates.includes('WORKFLOW.md') && !candidates.includes('WORKFLOW-FLOWS.md'),
-      'root kit-docs must not be offered for exclusion — the kit commits them'
+      'root docs must not be offered for exclusion'
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });

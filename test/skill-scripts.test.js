@@ -398,8 +398,8 @@ const SURVEY = join(
 // skill would (`node <base>/scripts/survey.mjs` from the repo root). GIT_DIR &
 // friends are stripped so a linked-worktree test host cannot leak its git dir
 // into the child (AGENTS.md Gotchas — the observed task-0033 hazard).
-function runSurvey(cwd) {
-  const env = { ...process.env };
+function runSurvey(cwd, environment = {}) {
+  const env = { ...process.env, ...environment };
   delete env.GIT_DIR;
   delete env.GIT_WORK_TREE;
   delete env.GIT_INDEX_FILE;
@@ -725,7 +725,7 @@ test('survey: brownfield repo reports presence, counts, and reciprocity', () => 
       JSON.stringify({ kitVersion: '9.9.9' })
     );
 
-    const s = runSurvey(dir);
+    const s = runSurvey(dir, { HOME: dir, USERPROFILE: dir });
 
     assert.equal('profile' in s, false, 'install state does not classify project maturity');
     assert.equal(s.kitVersion, '9.9.9');

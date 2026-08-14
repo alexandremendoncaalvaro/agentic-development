@@ -121,6 +121,31 @@ function replaceSection(body, newSection, bounds) {
 }
 
 /**
+ * Remove the exact managed section from one root document. This is deliberately
+ * narrower than updating it: the bounded markers prove ownership, while every
+ * byte outside them stays project-owned. Used only by the explicit legacy
+ * project migration after the constitution moved to the user-level install.
+ */
+export function removeManagedSkillsSection({ cwd, name, dryRun = false }) {
+  const path = join(cwd, name);
+  if (!existsSync(path)) return { type: 'absent', path: name };
+
+  const body = readFileSync(path, 'utf8');
+  const bounds = findSectionBounds(body);
+  if (!bounds) return { type: 'absent', path: name };
+
+  const before = body.slice(0, bounds.startIdx);
+  const after = body.slice(bounds.endIdx + SECTION_END.length);
+  // The installer separates an appended section with a blank line and leaves
+  // one trailing newline. Drop only that joining newline, never prose around it.
+  const updated = before.endsWith('\n\n') && after.startsWith('\n')
+    ? before + after.slice(1)
+    : before + after;
+  if (!dryRun) writeFileSync(path, updated);
+  return { type: 'migration-removed', path: name };
+}
+
+/**
  * Message and default for the interactive "regenerate the managed section?"
  * confirmation on a git-tracked root doc (ADR-0051 Decision 2). Names both
  * risks — the file is shared with everyone who clones the repo, and edits

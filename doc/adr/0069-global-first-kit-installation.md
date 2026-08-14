@@ -1,6 +1,6 @@
 # ADR-0069: Make kit installation global-first
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-08-14
 **Deciders:** Alexandre Alvaro
 

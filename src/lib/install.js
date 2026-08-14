@@ -477,17 +477,15 @@ export function removeRetiredSkills({
 }
 
 // Layer 1 Constitution files the kit ships. Installed skills cite them by
-// section (`WORKFLOW §10`, `WORKFLOW.md §1`) and so do this installer's own
-// completion hints, so a target root without them leaves every one of those
-// references pointing at nothing. `WORKFLOW-FLOWS.md` ships alongside because
-// `WORKFLOW.md` references it in its own opening — installing one without the
-// other recreates the same defect one level down.
+// section (`WORKFLOW §10`, `WORKFLOW.md §1`), so they share one machine-global
+// home. `WORKFLOW-FLOWS.md` ships alongside because `WORKFLOW.md` references
+// it in its own opening.
 const KIT_DOCS = ['WORKFLOW.md', 'WORKFLOW-FLOWS.md'];
 
 /**
  * Install the kit-shipped Constitution files at their one machine-global home.
  *
- * Agent-independent: these land once per project, not once per agent surface,
+ * Agent-independent: these land once per user, not once per agent surface,
  * so this runs outside the per-agent install loop and its actions carry no
  * `agent` field.
  *

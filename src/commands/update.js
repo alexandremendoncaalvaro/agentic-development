@@ -22,6 +22,7 @@ import { trackedState } from '../lib/git.js';
 import { homedir } from 'node:os';
 import { offerKitExclude } from './kit-exclude.js';
 import { configureGlobalConstitution, globalKitPath } from '../lib/global-rules.js';
+import { migrateLegacyProject } from '../lib/legacy-project-migration.js';
 import { resolveScope, targetForScope } from '../lib/scope.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -49,6 +50,8 @@ const ACTION_SYMBOL = {
   'orphan-kept': '?',
   'migration-removed': '-',
   'migration-kept': '!',
+  'migration-state-removed': '-',
+  'migration-state-updated': '!',
 };
 
 const ROOT_DOC_LABEL = {
@@ -104,6 +107,36 @@ export async function updateCommand(opts) {
   const dryRun = Boolean(opts.dryRun);
   const force = Boolean(opts.force);
   const forceRootDoc = Boolean(opts.forceRootDoc);
+
+  if (opts.migrateLegacy) {
+    if (scope !== 'project') {
+      throw new Error('--migrate-legacy requires --scope project');
+    }
+    const { actions } = await migrateLegacyProject({
+      cwd,
+      agent: opts.agent,
+      dryRun,
+      force,
+    });
+    const lines = actions.map((action) => {
+      const symbol = ACTION_SYMBOL[action.type] ?? '?';
+      return action.agent
+        ? `${symbol} [${action.agent}] ${action.path}`
+        : `${symbol} ${action.path}`;
+    });
+    if (interactive) {
+      p.intro(`agentic update — migrate legacy project${dryRun ? ' (dry-run)' : ''}`);
+      p.note(lines.join('\n') || '(no legacy Agentic Development files found)', dryRun ? 'Plan' : 'Result');
+      p.outro(
+        dryRun
+          ? 'Dry-run only — nothing removed. Re-run without --dry-run to apply.'
+          : 'Legacy project materialization migrated to the global kit.'
+      );
+    } else {
+      for (const line of lines) process.stderr.write(`${line}\n`);
+    }
+    return;
+  }
 
   const detectedAgents = detectAgents(cwd);
   const { statesByAgent, agents: previousAgents } = loadStatesOnce(cwd);
