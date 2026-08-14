@@ -65,7 +65,7 @@ test('default init installs globally and leaves the invoking repository clean', 
     }
     const rules = readFileSync(join(home, '.codex/AGENTS.md'), 'utf8');
     assert.match(rules, /agentic-global-constitution:start/);
-    assert.match(rules, /\.agentic\/kit\/WORKFLOW\.md/);
+    assert.match(rules, /\.agentic[\\/]kit[\\/]WORKFLOW\.md/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
     rmSync(home, { recursive: true, force: true });
