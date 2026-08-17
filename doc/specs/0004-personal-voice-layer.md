@@ -1,6 +1,6 @@
 # Spec `0004`: Preserve the user's personal voice
 
-**Status:** accepted
+**Status:** shipped
 **Created:** 2026-08-13
 **Owner:** Alexandre Alvaro
 
