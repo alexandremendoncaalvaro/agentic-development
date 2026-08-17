@@ -1,8 +1,8 @@
 # Task `0055`: Investigate publication and reporting skills
 
-**Status:** `proposed`
-**Created:** `2026-08-13`
-**Scope ref:** `doc/product/PRD.md` Later tier — Example-grounded publication and reporting
+**Status:** proposed
+**Created:** 2026-08-13
+**Scope ref:** doc/product/PRD.md — Later tier: Example-grounded publication and reporting
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
 **Spec ref:**

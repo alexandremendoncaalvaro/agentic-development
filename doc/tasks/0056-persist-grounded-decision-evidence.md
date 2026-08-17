@@ -1,4 +1,4 @@
-# Task `0053`: Persist grounded decision evidence
+# Task `0056`: Persist grounded decision evidence
 
 **Status:** done
 **Created:** 2026-08-12
