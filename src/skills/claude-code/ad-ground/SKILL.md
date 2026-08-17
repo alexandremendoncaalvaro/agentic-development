@@ -1,13 +1,13 @@
 ---
 name: ad-ground
-description: Four-source pre-implementation research — official docs, validated implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists), in-repo patterns, and git history — then synthesize a happy path and gate any deviation with an irrefutable justification before code is written, grading how strong the evidence is and how confident to proceed (WORKFLOW §17) and routing to ad-spike when it is insufficient. Auto-invokes on non-trivial work, refactors, library or pattern selection, "research before coding", "before implementing", "which library", "which pattern", "how to approach", "ground before coding". Workflow-operational counterpart to WORKFLOW.md §4 (Find the Happy Path) and §5 (Ground in Real Patterns); pairs with ad-philosophy (posture) and ad-review (post-implementation §10 review).
-summary: Four-source pre-implementation research (docs / impl-refs / in-repo / git history) + happy-path synthesis + deviation gate + proportional evidence grading. WORKFLOW §4 + §5 + §17.
+description: Four-source pre-implementation research — official docs, validated implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists), in-repo patterns, and git history — then synthesize a happy path, persist its claim-to-source evidence as an auditable project record, and gate any deviation before code is written. Grades evidence and confidence per WORKFLOW §17; routes insufficient evidence to ad-spike. Auto-invokes on non-trivial work, refactors, library or pattern selection, "research before coding", "before implementing", "which library", "which pattern", "how to approach", "ground before coding". Workflow-operational counterpart to WORKFLOW.md §4 + §5.
+summary: Four-source pre-implementation research + versioned claim-to-source evidence record, happy-path synthesis, deviation gate, and proportional evidence grading. WORKFLOW §4 + §5 + §17.
 allowed-tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
 ---
 
 # /ad-ground
 
-Implements WORKFLOW §4 + §5 end-to-end as a single research pass. The four sources are joined by **AND**, not OR — every non-trivial change runs the full research pass, then synthesizes a happy path, then justifies any deviation. Output is the input to whatever skill or freeform turn produces the implementation plan; this skill does not write code.
+Implements WORKFLOW §4 + §5 end-to-end as a single research pass. The four sources are joined by **AND**, not OR — every non-trivial change runs the full research pass, then synthesizes a happy path, persists the evidence trail, then justifies any deviation. This skill writes a ground record, never production code.
 
 ## Step 0 — Scope the research scope
 
@@ -66,15 +66,40 @@ If any coverage check fails, or the full-mode Axis-2 verdict is not Strong, surf
 
 When the host exposes `AskUserQuestion`, render the checkpoint as a structured multi-choice card — the coverage checks with their yes/no/n.a. status, the Axis-2 verdict in full mode, and a final `proceed / pause for more research / run a spike` selector — instead of dropping the verdict as plain text. Falls back to numbered text on hosts without the primitive (Codex).
 
+## Step 5 — Persist the evidence receipt
+
+Chat citations are not an audit trail. Before the decision directs a non-trivial repository change, write a versioned ground record under `doc/research/`. It is a receipt for an already-defined implementation path, not an `ad-research` study answering an open question; both share the directory and monotonic number ledger.
+
+When this pass is the Acquire phase of `/ad-research`, the study is already the durable evidence artifact: put the same claim-to-source map in that study and do **not** create a duplicate ground receipt.
+
+From the consumer root, determine the next number with the installed shared probe:
+
+```bash
+node .claude/skills/ad-adr/scripts/next-number.mjs doc/research
+```
+
+Use JSON `next`. Stop until access is resolved if `unreadable` is non-empty, or for a numbering decision if `exhausted` is true. Write `doc/research/<NNNN>-ground-<slug>.md` from [references/record-template.md](references/record-template.md). Every load-bearing claim gets an `E<N>` section with a §17 strength and one or more source IDs; the source register carries at least one `A`, `B`, `C`, and `D` source, each with citation, access date, and access method. Record an empty git-history search as `D1`, including the command and its `no prior attempt found` result — absence is evidence only when the search is reproducible.
+
+Set `Decision ref` to the task, spec, ADR, or other durable project artifact the record supports. Add the ground record's repository-relative path to that artifact's `Evidence ref` field; when a task tracks the work, update that field or append the path to its dated Notes entry. Do not create a new planning artifact solely to hold a trivial decision.
+
+Validate the completed receipt before implementation:
+
+```bash
+node .claude/skills/ad-ground/scripts/validate-record.mjs \
+  doc/research/<NNNN>-ground-<slug>.md
+```
+
+Proceed only when `valid` is `true` and `unreadable` is empty. The offline checker proves the claim-to-source map is structurally complete; it does not prove an external source's content. Reopen every cited source during review or audit. A receipt without that re-check is a trace, not proof.
+
 ## Output contract
 
-The output-format skeleton lives in [references/output-format.md](references/output-format.md) — a single structured message with the sections in the order shown.
+The output-format skeleton lives in [references/output-format.md](references/output-format.md) — a single structured message that reports the record path, validation result, decision, and confidence in that order.
 
-No code is written by this skill. The output feeds the next turn (or `/ad-task`, `/ad-philosophy`'s Goal-Driven Execution, or freeform implementation).
+No production code is written by this skill. The durable ground record feeds the next turn (or `/ad-task`, `/ad-philosophy`'s Goal-Driven Execution, or freeform implementation).
 
 ## Next
 
-- Implement per the synthesized happy path. Cite the sources you grounded against in commit messages or task `Notes`.
+- Implement per the synthesized happy path and link the validated ground record from the governing task, spec, or ADR.
 - `/ad-task` if the work needs explicit decomposition into checkbox-toggle work units.
 - `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10.
 - `/ad-adr` if the deviation gate surfaced a binding architectural decision.

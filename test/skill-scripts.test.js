@@ -901,6 +901,152 @@ function runTaskScope(cwd, scopeRef) {
   return JSON.parse(execFileSync('node', args, { cwd, encoding: 'utf8' }));
 }
 
+// --- ad-ground durable evidence receipt (ADR-0070) ---
+// The Claude Code copy is executed; skills.test.js enforces byte parity with
+// the Codex twin. The checker is deliberately offline: it proves the receipt
+// exposes an auditable claim-to-source map, while a reviewer reopens sources
+// to verify their content.
+const GROUND_RECORD = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-ground',
+  'scripts',
+  'validate-record.mjs'
+);
+
+function runGroundRecord(cwd, record) {
+  return JSON.parse(execFileSync('node', [GROUND_RECORD, record], { cwd, encoding: 'utf8' }));
+}
+
+function writeGroundRecord(dir, body) {
+  const record = 'doc/research/0002-ground-durable-evidence.md';
+  mkdirSync(dirname(join(dir, record)), { recursive: true });
+  writeFileSync(join(dir, record), body);
+  return record;
+}
+
+const VALID_GROUND_RECORD = `# GROUND-0002: Durable evidence for a grounded decision
+
+**Status:** recorded
+**Decision:** Persist the implementation path and its supporting evidence.
+**Decision ref:** doc/tasks/0056-persist-ground-evidence.md
+**Confidence:** Strong
+
+## Decision and confidence
+
+Persist a receipt before implementation proceeds.
+
+## Evidence
+
+### E1 — A source map makes the implementation decision auditable.
+
+**Strength:** High
+**Provenance:** A1, B1, C1, D1
+
+## Source register
+
+- **A1:** W3C PROV Primer — https://www.w3.org/TR/prov-primer/ (accessed 2026-08-12 via WebFetch)
+- **B1:** Agent Decision Records — https://github.com/me2resh/agent-decision-record (accessed 2026-08-12 via WebFetch)
+- **C1:** WORKFLOW.md:380 — local evidence grading contract (accessed 2026-08-12 via Read)
+- **D1:** git log --all --oneline -- src/skills/claude-code/ad-ground — evidence-grade implementation history (accessed 2026-08-12 via Bash)
+
+## Limitations and reversal
+
+The receipt proves a cited source exists in the map; it does not prove the source's content. Reopen sources during review.
+
+## Audit path
+
+Run validate-record.mjs, then inspect every cited source.
+`;
+
+test('validate-record: accepts a complete durable ground receipt', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-valid-'));
+  try {
+    const record = writeGroundRecord(dir, VALID_GROUND_RECORD);
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.record, record);
+    assert.equal(report.valid, true);
+    assert.deepEqual(report.errors, []);
+    assert.deepEqual(report.unreadable, []);
+    assert.deepEqual(report.sources, { A: 1, B: 1, C: 1, D: 1 });
+    assert.deepEqual(report.claims, [{ id: 'E1', provenance: ['A1', 'B1', 'C1', 'D1'] }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: rejects a claim whose cited source is not registered', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-bad-ref-'));
+  try {
+    const record = writeGroundRecord(
+      dir,
+      VALID_GROUND_RECORD.replace('A1, B1, C1, D1', 'A1, B1, C1, Z1')
+    );
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.errors, ['E1 references unknown source Z1']);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: rejects a source without access provenance', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-no-access-'));
+  try {
+    const record = writeGroundRecord(
+      dir,
+      VALID_GROUND_RECORD.replace(
+        'W3C PROV Primer — https://www.w3.org/TR/prov-primer/ (accessed 2026-08-12 via WebFetch)',
+        'W3C PROV Primer — https://www.w3.org/TR/prov-primer/'
+      )
+    );
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.errors, ['A1 has no access date and method']);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: rejects a title whose number differs from its filename', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-wrong-number-'));
+  try {
+    const record = writeGroundRecord(
+      dir,
+      VALID_GROUND_RECORD.replace('GROUND-0002:', 'GROUND-0001:')
+    );
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.errors, ['record title number must match filename']);
+    assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: surfaces an unreadable receipt in unreadable', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-unreadable-'));
+  try {
+    const record = 'doc/research/0002-ground-durable-evidence.md';
+    mkdirSync(join(dir, record), { recursive: true });
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.unreadable, [{ path: record, code: 'EISDIR' }]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scope-anchors: lists only repository-local product, spec, accepted ADR, and root anchors', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-task-scope-'));
   try {

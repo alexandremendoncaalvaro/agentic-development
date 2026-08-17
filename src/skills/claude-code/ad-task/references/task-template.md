@@ -4,6 +4,7 @@
 **Status:** `<proposed | in-progress | blocked | done>`
 **Created:** `<YYYY-MM-DD>`
 **Scope ref:** `<required repository-local source path, plus optional section or roadmap tier>`
+**Evidence ref:** `<doc/research/NNNN-ground-<slug>.md — blank until a non-trivial implementation decision is grounded>`
 **Owner:** `<name or role>`
 **Execution:** `<AFK | HITL>`
 **Spec ref:** `<doc/specs/NNNN-<slug>.md or SPEC-NNNN — blank when no spec drives this task>`

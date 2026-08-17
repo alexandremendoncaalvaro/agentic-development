@@ -8,7 +8,7 @@ Every skill below installs for each selected host. Installation is not a mandate
 | --- | --- | --- |
 | `/ad-next` | You do not know the next useful action. | State survey and prioritized recommendations. |
 | `/ad-philosophy` | Work is non-trivial or needs an explicit engineering posture. | Grounded, decisive, verifiable working rules. |
-| `/ad-ground` | You are about to implement a non-trivial change. | Evidence-backed happy path before code. |
+| `/ad-ground` | You are about to implement a non-trivial change. | Evidence-backed happy path and a versioned audit record before code. |
 | `/ad-grill-me` | The ask is fuzzy. | The minimum owner decisions and sharper vocabulary. |
 | `/ad-question-me` | You want only genuine owner decisions challenged. | Ranked questions without re-asking groundable facts. |
 | `/ad-domain` | A project term needs a stable meaning. | `CONTEXT.md` or a context map. |

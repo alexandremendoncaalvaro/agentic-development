@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-08-10
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0070
 
 ## Context
 

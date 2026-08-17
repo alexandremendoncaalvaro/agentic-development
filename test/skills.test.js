@@ -123,6 +123,26 @@ test('ad-task requires a local scope anchor before creating a task', () => {
     assert.match(body, /scope-anchors\.mjs/, `${agent} must run deterministic anchor discovery`);
     assert.match(body, /do not write/i, `${agent} must stop when no local scope anchor exists`);
     assert.match(template, /^\*\*Scope ref:\*\*/m, `${agent} task template needs a Scope ref field`);
+    assert.match(template, /^\*\*Evidence ref:\*\*/m, `${agent} task template needs an Evidence ref field`);
+  }
+});
+
+test('ad-ground persists a validated evidence receipt before non-trivial work', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-ground');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const template = readFileSync(join(skillDir, 'references', 'record-template.md'), 'utf8');
+    const philosophy = readFileSync(join(SKILLS_ROOT, agent, 'ad-philosophy', 'SKILL.md'), 'utf8');
+
+    assert.match(body, /Persist the evidence receipt|persist the evidence receipt/i, `${agent} must persist ground evidence`);
+    assert.match(body, /validate-record\.mjs/, `${agent} must validate the evidence receipt`);
+    assert.match(body, /chat citations are not an audit trail/i, `${agent} must reject chat-only grounding`);
+    assert.match(body, /reopen every cited source/i, `${agent} must distinguish a source map from source verification`);
+    assert.match(template, /^# GROUND-<NNNN>:/m, `${agent} must ship the ground-record template`);
+    assert.match(template, /^## Source register$/m, `${agent} record must register sources`);
+    assert.match(template, /^## Audit path$/m, `${agent} record must explain audit replay`);
+    assert.match(philosophy, /durable (project artifact|evidence record)/i, `${agent} philosophy must require durable evidence`);
+    assert.match(philosophy, /chat-only citations|citations exist only in the session/i, `${agent} philosophy must reject chat-only grounding`);
   }
 });
 
