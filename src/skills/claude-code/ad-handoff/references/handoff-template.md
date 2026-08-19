@@ -5,13 +5,37 @@
 **Branch:** <current branch>
 **Started from:** <PR # / task # / spec # if known, else "ad-hoc work">
 
-## First action
+## Resume protocol
 
-Invoke `/ad-philosophy` explicitly, then <one imperative sentence naming the concrete next move>.
+Before doing any work, complete a private preparation pass:
 
-The explicit invocation is not ceremony: per ADR-0044 it forces an applied-binding statement — each of `ad-philosophy`'s behaviors named against *this* task's files and commands before any work starts. A fresh agent inheriting a mid-flight session is exactly the case where posture is assumed and then quietly dropped. This instruction stands in for the user's: treat it as an explicit invocation and produce the applied-binding statement, not as the auto-load path that skips it.
+1. Read this handoff end to end, including `Working rules`, `Roadmap`, unresolved decisions, unlanded asks, errors, and the recommended next move.
+2. Read and apply the global and repository instructions plus every task, spec, ADR, research record, or other artifact referenced by this handoff. References are reading obligations, not decoration.
+3. Apply all eight `ad-philosophy` behaviors privately. Select and follow every method skill the work requires; do not claim grounding, reproduction, testing, or review happened unless its evidence exists.
+4. Reconcile the handoff with the live branch, working tree, diff, and recent verification so stale claims cannot silently direct the session.
 
-It binds posture, not method — grounding, hypothesis discipline, test-first discipline and fresh-context review live in their own skills and are not carried by that statement. The next section states them outright.
+Do not narrate that pass. Do not print the full applied-binding statement, rule excerpts, raw file inventory, or command log. If a rule changes the inherited plan, a source is unreadable, or a prerequisite is unmet, surface that consequence under `Your attention` instead of hiding it.
+
+Then print only the following, in the user's language. Keep it to one screen and prefer a second plain sentence over compressed jargon:
+
+### Preparation
+
+- [x] **Rules:** <compact names of the global, repository, and handoff rule sources actually applied>
+- [x] **Context:** <handoff plus the task/spec/ADR/research artifacts actually read>
+- [x] **State:** <live branch, diff, errors, and verification reconciled>
+- [x] **Method:** <applicable skills and grounding/testing/review status; use "not required" or "pending" honestly>
+
+Use `[ ]` instead of `[x]` for anything not verified. Never turn an assumption into a checked box.
+
+### Brief
+
+- **Final objective:** <the end outcome and why it matters, in product or business terms>
+- **Roadmap:** <Done — the meaningful progress; Now — the current phase; Next — the remaining arc. Summarize the whole front in at most three short lines, not the full checklist.>
+- **This session:** <what you are doing now and why this is the right next move>
+- **Done when:** <the governing acceptance criteria, definition of done, or scope boundary translated into one plain outcome>
+- **Your attention:** <"None now" when no judgment call remains, otherwise one decision with the recommendation first, only viable competing options, and value-level trade-offs>
+
+Do not manufacture a decision to make the brief look complete. Exclude dominated options; if grounding leaves one clear winner, choose it and report `None now`. After printing the brief, continue immediately with <one imperative sentence naming the concrete next move>, unless `Your attention` contains a decision that genuinely blocks it.
 
 ## Working rules
 

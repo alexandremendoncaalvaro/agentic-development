@@ -244,11 +244,11 @@
       "files": [
         {
           "path": ".claude/skills/ad-handoff/references/handoff-template.md",
-          "sourceSha": "292deca6d91d3e25c499716bb7d0c75f4b3c0d15d0b61f9217faa01036331b71"
+          "sourceSha": "5a471ad235f7fca128e1e6ed7a54504c3590a74b65bb161e51e07ab0bf9cd402"
         },
         {
           "path": ".claude/skills/ad-handoff/SKILL.md",
-          "sourceSha": "40851bd1282ced71533abe1b8baecda06cf8e185e6fe76458896c7ffbad336cd"
+          "sourceSha": "8c6aa84073bb2ba5986defd668de1e6b4c65d07c10d962d534c1214e6ad4e14b"
         }
       ]
     },

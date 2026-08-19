@@ -146,6 +146,64 @@ test('ad-ground persists a validated evidence receipt before non-trivial work', 
   }
 });
 
+test('ad-handoff keeps preparation exhaustive but makes the resume brief concise', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-handoff');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const template = readFileSync(join(skillDir, 'references', 'handoff-template.md'), 'utf8');
+
+    assert.match(body, /preparation receipt/i, `${agent} must require a compact preparation receipt`);
+    assert.match(body, /private preparation pass/i, `${agent} must preserve exhaustive private preparation`);
+    assert.match(
+      body,
+      /do not print the full applied-binding statement/i,
+      `${agent} must keep the verbose posture audit out of the resumed session`
+    );
+    assert.match(template, /^## Resume protocol$/m, `${agent} template needs a resume protocol`);
+    for (const label of ['Rules', 'Context', 'State', 'Method']) {
+      assert.match(
+        template,
+        new RegExp(`- \\[x\\] \\*\\*${label}:\\*\\*`),
+        `${agent} resume receipt must cover ${label.toLowerCase()}`
+      );
+    }
+    for (const label of ['Final objective', 'Roadmap', 'This session', 'Done when', 'Your attention']) {
+      assert.match(
+        template,
+        new RegExp(`- \\*\\*${label}:\\*\\*`),
+        `${agent} executive brief must include ${label.toLowerCase()}`
+      );
+    }
+    assert.match(
+      template,
+      /only viable competing options/i,
+      `${agent} must exclude dominated decision options`
+    );
+    assert.match(
+      template,
+      /continue immediately/i,
+      `${agent} must not ask for permission when no judgment call remains`
+    );
+    assert.doesNotMatch(
+      template,
+      /Invoke `?\/?ad-philosophy`? explicitly/,
+      `${agent} resume must not trigger the verbose explicit-invocation output`
+    );
+    if (agent === 'claude-code') {
+      assert.match(
+        body,
+        /follow its `Resume protocol` before any work/i,
+        'Claude handoff chip must use the compact resume protocol'
+      );
+      assert.doesNotMatch(
+        body,
+        /instruction to invoke `\/ad-philosophy` explicitly before any work/i,
+        'Claude handoff chip must not restore the verbose explicit-invocation path'
+      );
+    }
+  }
+});
+
 test('GitHub workflow skills reuse their preflight frontend for every GitHub command', () => {
   for (const agent of ['claude-code', 'codex']) {
     for (const skill of ['ad-pr', 'ad-merge']) {

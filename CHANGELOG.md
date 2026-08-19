@@ -15,6 +15,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   pass intentionally does not certify external source truth: review reopens
   every cited source.
 
+### Changed
+
+- `/ad-handoff` keeps the complete rules, artifacts, roadmap, and live state in
+  its session packet while a resumed session shows only a short preparation
+  receipt and a plain-language executive brief. The brief explains the final
+  objective, roadmap position, current focus, definition of done, and only the
+  judgment calls that genuinely need the maintainer.
+
 ## [0.20.0-beta.5] - 2026-08-14
 
 ### Changed
