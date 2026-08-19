@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [0.20.0-beta.6] - 2026-08-19
+
 ### Added
 
 - `/ad-ground` now persists a versioned, claim-to-source evidence receipt for
