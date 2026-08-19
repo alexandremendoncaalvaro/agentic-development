@@ -1,7 +1,7 @@
 ---
 name: ad-handoff
 description: Compact the current session into a handoff document a fresh agent can pick up from. Saves to the OS temp dir (never the repo). Captures live state — current branch, open artifacts, unresolved decisions, in-progress diff, recent errors — references existing artifacts (PRD / spec / task / ADR) by path instead of duplicating them, and lists suggested next skills. Redacts secrets before writing. Triggers on "handoff", "hand off this session", "compact this conversation", "save context for next session", "pass to another agent", "wrap up the session", "context exhausted", "/clear", "/ad-handoff".
-summary: Compact current session into a handoff doc in the OS temp dir. Rebuilds the work as a done/open roadmap checklist, sweeps for asks that never landed, reports repo hygiene without acting on it, binds the next agent to ad-philosophy, references artifacts by path, redacts secrets. Never commits.
+summary: Compact current session into a handoff doc in the OS temp dir. Preserves a full agent packet while the next session opens with a short preparation receipt and executive brief. Rebuilds the roadmap, catches lost asks, reports hygiene, references artifacts, redacts secrets. Never commits.
 ---
 
 <background_information>
@@ -72,6 +72,10 @@ Never write inside the repo. Never add `.agentic/handoffs/` to the repo's `.giti
 
 Step 6 — write the handoff. The handoff's file shape lives in [references/handoff-template.md](references/handoff-template.md) — fill each `<placeholder>` from the state you collected; omit any section that does not apply, except `Roadmap` and `Asks that never landed`, which are never omitted (an empty sweep is written as "none").
 
+The template's `## Resume protocol` separates what the incoming agent must do from what the maintainer needs to see. The agent completes a **private preparation pass** over the handoff, global and repository rules, every referenced artifact, live repository state, all eight `ad-philosophy` behaviors, and the applicable method skills. It then emits only the template's four-line preparation receipt and five-part executive brief. Do not print the full applied-binding statement, rule excerpts, file inventory, or command log. This is the auto-load path with an explicit coverage receipt, not an explicit `ad-philosophy` invocation; a rule-driven correction or unmet prerequisite remains visible under `Your attention`.
+
+The brief is a one-screen situational model for the boss who did not watch the session: final objective, the whole roadmap compressed to Done / Now / Next, what this session is doing and why now, the governing definition of done, and whether the maintainer must act. Use the user's language and plain value terms. When no judgment call remains, say so and continue immediately. When one remains, bring the recommendation first and only viable competing options; a dominated option is not a choice.
+
 The `## Working rules` section is copied into the handoff verbatim — this block, restated below, is deliberately not referenced:
 
 **These are restated, not referenced, and that is deliberate.** A handoff is an ephemeral `$TMPDIR` artifact read once by an agent with no history; a pointer it may not follow is worth less than four lines it cannot miss. The anti-duplication rule protects versioned documents from drifting copies — this file is deleted after it is read.
@@ -117,6 +121,7 @@ Do not auto-execute `/clear` or anything destructive. The user decides when to d
 - The roadmap is one checklist covering done and open work in dependency order, each line self-sufficient, with an explicit priority-alignment line.
 - Repo hygiene deletes fully-merged branches with `git branch -d` and reports them; everything destructive (`-D`, worktree removal, file deletion) is reported with its command and never run. Confirmation is matched to blast radius (WORKFLOW §7), not waived and not inflated.
 - The `Working rules` section states the rules outright rather than pointing at them; `ad-philosophy` binds posture and is never presented as covering grounding, hypothesis, test or review discipline.
+- The resume protocol keeps preparation exhaustive and private, emits a four-line preparation receipt plus a one-screen executive brief, and never prints the full `ad-philosophy` applied-binding statement.
 - References artifacts by path; never duplicates their content.
 - Secrets are replaced with `<REDACTED:type>` placeholders.
 - Suggested skills are drawn from the installed `ad-*` set and each line carries a one-clause rationale.

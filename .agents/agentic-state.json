@@ -304,15 +304,15 @@
       "files": [
         {
           "path": ".agents/skills/ad-handoff/agents/openai.yaml",
-          "sourceSha": "03013e0e2c657e8e978d38567b2a8f8c1e61cba1b57c1e48648c41a002f1de93"
+          "sourceSha": "d70432fc5d3b688849bb07f928a616abd2206ba3c5a6b4b6076b17f489e7bff4"
         },
         {
           "path": ".agents/skills/ad-handoff/references/handoff-template.md",
-          "sourceSha": "0113ee3b63c304144fd92ae4ddd54a1491bd8c4f04d31da39d1e46479081cefd"
+          "sourceSha": "060071c5a151e91e943ef9b2a451727834ec29eaeecf48113e1fa1c247c33108"
         },
         {
           "path": ".agents/skills/ad-handoff/SKILL.md",
-          "sourceSha": "97f9710d68cb34bf6d7aeddcd59907a71373d68baff8c426b71c603082452af1"
+          "sourceSha": "02941de13de521119c774c5725bfd577c05d769b87e82070459fb1da684f2b04"
         }
       ]
     },
