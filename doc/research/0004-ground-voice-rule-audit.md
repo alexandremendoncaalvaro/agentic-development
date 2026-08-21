@@ -28,8 +28,8 @@ Anthropic's skill guidance recommends a checklist for complex workflows and a
 review-revise-review loop before finalization. The public Humanizer skill applies
 the same shape through a dedicated self-audit after rewriting. Locally,
 `ad-audit` demonstrates the stronger invariant: every selected rule receives a
-verdict so a silent omission cannot look like success. The current `ad-voice`
-checks only its factual ledger and generic final conditions, leaving active
+verdict so a silent omission cannot look like success. The base-tree `ad-voice`
+checked only its factual ledger and generic final conditions, leaving active
 profile patterns without equivalent coverage.
 
 ### E2 — Relational warmth should be operationalized through specific appreciation and respect, not generic praise
@@ -89,7 +89,7 @@ one person's identity into the shipped kit.
 - **A5:** [Nielsen Norman Group, Be Succinct](https://www.nngroup.com/articles/be-succinct-writing-for-the-web/), scannability, inverse-pyramid conclusions, and optional depth (accessed 2026-08-21 via web browser).
 - **B1:** [`ymeiri/voice-layer`](https://github.com/ymeiri/voice-layer), inspectable local voice profile, channel-aware application, and explicit checks (accessed 2026-08-21 via GitHub).
 - **B2:** [`milock/humanizer:SKILL.md`](https://github.com/milock/humanizer/blob/main/SKILL.md), six-stage writing pipeline ending in a self-audit (accessed 2026-08-21 via GitHub).
-- **C1:** [`src/skills/codex/ad-voice/SKILL.md:56`](../../src/skills/codex/ad-voice/SKILL.md), current draft-and-verify step checks the invariant ledger but does not enumerate active profile rules (accessed 2026-08-21 via repository read).
+- **C1:** [`ad-voice` at the base tree](https://github.com/alexandremendoncaalvaro/agentic-development/blob/5a602c32bd0bb2e4f710c025fa5f4707559e09c3/src/skills/codex/ad-voice/SKILL.md#L56-L60), whose draft-and-verify step checks the invariant ledger but does not enumerate active profile rules (accessed 2026-08-21 via repository read).
 - **C2:** [`src/skills/codex/ad-audit/SKILL.md:72`](../../src/skills/codex/ad-audit/SKILL.md), existing exhaustive per-rule verdict and coverage pattern (accessed 2026-08-21 via repository read).
 - **C3:** [`doc/specs/0004-personal-voice-layer.md:99`](../specs/0004-personal-voice-layer.md), factual preservation, precedence, and silent normal output contract (accessed 2026-08-21 via repository read).
 - **D1:** `git log origin/main --oneline -- src/skills/codex/ad-voice/SKILL.md` found `f692af6`, which introduced the current invariant-ledger application flow (accessed 2026-08-21 via git).

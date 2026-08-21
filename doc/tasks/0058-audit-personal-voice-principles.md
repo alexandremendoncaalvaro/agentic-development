@@ -12,11 +12,10 @@
 ## Context
 
 `ad-voice` preserves facts and applies a selected profile slice, but its final
-check does not account for every active pattern individually. A draft can
-therefore pass the generic check while silently missing an owner-approved
-principle. The application flow needs a rule-by-rule audit, while the new personal
-principles themselves remain machine-local and require the existing
-`ad-voice-tune` approval gate.
+check does not explicitly account for every active pattern individually. The
+application contract therefore cannot demonstrate rule-complete coverage. It
+needs a rule-by-rule audit, while the new personal principles themselves remain
+machine-local and require the existing `ad-voice-tune` approval gate.
 
 ## Acceptance Criteria
 
@@ -64,6 +63,16 @@ atomic writer replaced the machine-local profile, and the validator observed 12
 approved patterns, zero exact examples, and zero errors. Temporary candidate
 material was removed. No raw sample
 or profile content entered the repository.
+
+The release-gate audit independently exercised the shipped behavior on Codex and
+Claude Code with the same validated two-pattern synthetic profile outside the
+repository. Both fresh runs began from a source whose order violated both active
+patterns, revised it, reported both pattern IDs as satisfied, preserved the name,
+version, measurement, technical identifier, and uncertainty marker, and observed
+the same profile SHA-256 before and after. A separate validation of the current
+machine-local owner profile reported 12 patterns, zero retained examples, and zero
+errors. Only these aggregate results were recorded; the synthetic material was
+removed after the audit.
 
 ## Definition of Done
 
