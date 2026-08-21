@@ -6,6 +6,13 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- `/ad-voice` now silently audits every active personal-voice pattern before
+  returning a draft, revising unmet instructions while preserving factual and
+  destination constraints. The audit remains private unless an override would
+  otherwise make the result misleading.
+
 ## [0.20.0-beta.6] - 2026-08-19
 
 ### Added

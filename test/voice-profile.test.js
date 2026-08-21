@@ -507,6 +507,24 @@ test('voice profile references remain byte-identical across hosts and consumers'
   }
 });
 
+test('ad-voice audits every active profile pattern before returning a draft', () => {
+  const root = join(__dirname, '..', 'src', 'skills');
+
+  for (const agent of ['claude-code', 'codex']) {
+    const skill = readFileSync(join(root, agent, 'ad-voice', 'SKILL.md'), 'utf8');
+    const application = readFileSync(
+      join(root, agent, 'ad-voice', 'references', 'application.md'),
+      'utf8'
+    );
+
+    assert.match(skill, /audit every active profile pattern/i);
+    assert.match(skill, /revise every unmet pattern/i);
+    assert.match(application, /satisfied.*higher-priority override/is);
+    assert.match(application, /repeat the audit/i);
+    assert.match(application, /audit remains silent/i);
+  }
+});
+
 test('voice profile validate: rejects incomplete examples, duplicate ids, and malformed scopes', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-structural-'));
   try {

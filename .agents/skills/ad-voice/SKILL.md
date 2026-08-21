@@ -55,9 +55,9 @@ A matching rule does not force a rewrite. When the input already satisfies the r
 
 ## Step 4: Draft and verify
 
-Use the generic baseline to remove model-writing artifacts, then apply the selected profile slice. Compare the result to the silent invariant ledger. Restore any changed or omitted invariant before returning.
+Use the generic baseline to remove model-writing artifacts, then apply the selected profile slice. Audit every active profile pattern before returning: account for each pattern by ID, revise every unmet pattern, and repeat until each instruction is satisfied or has a concrete higher-priority override. Then compare the result to the silent invariant ledger and restore any changed or omitted invariant. Re-run the pattern audit after any restoration.
 
-Normal output is one usable draft and nothing else. Show analysis, active rules, confidence, or a Portuguese pragmatic gloss only when the user asks or when a material limitation prevents an honest result.
+The audit is a private quality gate, not an output score. Normal output is one usable draft and nothing else. Show analysis, active rules, audit details, confidence, or a Portuguese pragmatic gloss only when the user asks or when a material override prevents an honest result.
 
 ## Boundary
 
