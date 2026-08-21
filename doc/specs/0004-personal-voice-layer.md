@@ -131,6 +131,11 @@ is reversible while learning the wrong pattern compounds across future writing.
   through a Portuguese pragmatic gloss. Target-language evidence judges English
   naturalness and community fit. Fluency uncertainty never counts as evidence that
   the owner's communicative identity is absent.
+- R19: Before returning a draft, `ad-voice` silently accounts for every pattern in
+  the active profile slice. It revises any unmet pattern and repeats the check
+  until every active instruction is satisfied or has a concrete override from an
+  earlier factual, safety, destination, or hard-format constraint. A material
+  override follows R15's disclosure boundary; ordinary audit state stays internal.
 
 ### Non-functional
 
@@ -154,6 +159,8 @@ is reversible while learning the wrong pattern compounds across future writing.
   natural and contextually appropriate, without reducing factual preservation.
 - Every held-out rewrite preserves all fixture-marked facts, identifiers,
   commitments, uncertainty, and requested actions.
+- Every pattern selected for a held-out rewrite receives an internal satisfied or
+  higher-priority-override verdict; no unmet pattern reaches the returned draft.
 - A same-content evaluation across two audiences produces the expected contextual
   difference while reviewers still identify both drafts as the same user's voice.
 - A Portuguese-only owner corpus does not emit English surface rules as
@@ -224,8 +231,10 @@ silently inferred from the initial corpus.
 
 - ADRs: [ADR-0068](../adr/0068-layer-personal-voice-evidence.md).
 - Tasks: [Task 0053](../tasks/0053-implement-personal-voice-layer.md),
-  [Task 0054](../tasks/0054-calibrate-personal-voice.md).
+  [Task 0054](../tasks/0054-calibrate-personal-voice.md),
+  [Task 0058](../tasks/0058-audit-personal-voice-principles.md).
 - Supersedes / Depends on: depends on
   [RESEARCH-0001](../research/0001-personal-voice-model.md),
+  [GROUND-0004](../research/0004-ground-voice-rule-audit.md),
   [ADR-0035](../adr/0035-rules-location-convention.md), and
   [ADR-0037](../adr/0037-ad-level-up-rule-curation.md).

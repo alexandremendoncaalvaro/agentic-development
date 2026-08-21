@@ -18,6 +18,25 @@ First remove generic model-writing artifacts using `human-writing-baseline.md`. 
 
 Do not load unrelated examples or context slices. Context tokens are part of the quality cost.
 
+## Silent rule audit
+
+After drafting, account for every active pattern by its `id`. Give each one an
+internal verdict:
+
+- `satisfied`: the draft follows the instruction, including when the source
+  already did and no rewrite was necessary;
+- `higher-priority override`: a factual, safety, destination, or hard-format
+  constraint prevents application; record the concrete reason.
+
+An unmet pattern is not a final verdict. Revise every unmet pattern, then repeat
+the audit against the complete active slice. Recheck the invariant ledger after
+each revision; if restoring an invariant changes the draft, repeat the audit once
+more. Do not return a draft with an unmet or unaccounted pattern.
+
+The audit remains silent in normal output. Show it only when the user asks, or
+briefly disclose a material higher-priority override when silence would make the
+result misleading. Do not expose a score or add commentary to an ordinary draft.
+
 ## Cross-language rendering
 
 Carry communicative function, not surface form:
@@ -35,6 +54,7 @@ During tuning, a Portuguese pragmatic gloss may help the owner judge stance and 
 ## Final check
 
 - Every invariant survived.
+- Every active pattern is satisfied or has a concrete higher-priority override.
 - No community phrase was copied as an identity marker.
 - No unsupported layer changed the draft.
 - The result fits the destination.
