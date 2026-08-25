@@ -1,0 +1,61 @@
+[
+  {
+    "id": "cache-api-migration",
+    "brief": "Propose migrating 14 consumers from Cache API v1 to Cache API v2 by 2026-09-30. The compatibility guide is https://example.test/cache-v2. Keep v1 available until every consumer reports a successful production read.",
+    "invariants": [
+      "14 consumers",
+      "Cache API v1",
+      "Cache API v2",
+      "2026-09-30",
+      "https://example.test/cache-v2"
+    ],
+    "requiredElements": [
+      "concrete-state",
+      "consequence",
+      "evidence-and-constraints",
+      "observable-completion",
+      "recommended-next-path",
+      "risks-or-trade-offs"
+    ]
+  },
+  {
+    "id": "blocked-parser-upgrade",
+    "brief": "Track support for parser 3.4.0, blocked on upstream issue #812. Do not begin implementation before #812 ships. Completion means Linux and macOS fixtures pass without the compatibility patch.",
+    "invariants": [
+      "parser 3.4.0",
+      "#812",
+      "Linux",
+      "macOS",
+      "compatibility patch"
+    ],
+    "requiredElements": [
+      "concrete-state",
+      "consequence",
+      "evidence-and-constraints",
+      "observable-completion",
+      "recommended-next-path",
+      "explicit-exclusions"
+    ]
+  },
+  {
+    "id": "latency-budget",
+    "brief": "Propose reducing checkout p95 latency from 180 ms to a 120 ms budget. The first change is query batching. Mobile clients are out of scope. Roll back if the payment error rate exceeds 0.2%.",
+    "invariants": [
+      "p95",
+      "180 ms",
+      "120 ms",
+      "query batching",
+      "Mobile clients",
+      "0.2%"
+    ],
+    "requiredElements": [
+      "concrete-state",
+      "consequence",
+      "evidence-and-constraints",
+      "observable-completion",
+      "recommended-next-path",
+      "risks-or-trade-offs",
+      "explicit-exclusions"
+    ]
+  }
+]

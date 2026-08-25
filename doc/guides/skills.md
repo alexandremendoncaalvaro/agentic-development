@@ -56,6 +56,14 @@ Every skill below installs for each selected host. Installation is not a mandate
 | `/ad-voice` | A draft, rewrite, or translation should sound like you in its destination context. | One fact-preserving draft from the confirmed local profile. |
 | `/ad-voice-tune` | Your private voice profile needs creation or one evidence-backed correction. | One human-approved profile delta, with identity and community evidence kept separate. |
 
+## Publish and report
+
+| Skill | Use it when | Outcome |
+| --- | --- | --- |
+| `/ad-publish` | A GitHub proposal issue needs drafting or review against approved structural patterns. | One fact-preserving publication, with exact-target approval before any outward action. |
+| `/ad-report` | Findings and evidence need a standalone analytical report or rendered deliverable. | One audience-led report whose requested artifact capability performs its normal visual and accessibility checks. |
+| `/ad-template-tune` | A recurring publication or report structure should be created or improved from authorized evidence. | One validated, human-approved template delta with provenance and privacy boundaries. |
+
 ## Ship and maintain
 
 | Skill | Use it when | Outcome |

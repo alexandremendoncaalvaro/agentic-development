@@ -1,0 +1,6 @@
+interface:
+  display_name: "Tune artifact templates"
+  short_description: "Curate approved publication and report templates"
+  default_prompt: "Use $ad-template-tune to propose one evidence-backed update to an artifact template."
+policy:
+  allow_implicit_invocation: false

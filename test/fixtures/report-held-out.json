@@ -1,0 +1,56 @@
+[
+  {
+    "id": "checkout-experiment",
+    "brief": "Report an experiment across 1,240 sessions. Conversion moved from 7.8% to 9.1%, with a 95% confidence interval of +0.2 to +2.4 percentage points. Recommend a two-week monitored rollout. The evidence URL is https://example.test/experiment-42.",
+    "requestedFormat": "pdf",
+    "invariants": [
+      "1,240 sessions",
+      "7.8%",
+      "9.1%",
+      "95%",
+      "+0.2",
+      "+2.4",
+      "two-week",
+      "https://example.test/experiment-42"
+    ],
+    "verification": [
+      "visual",
+      "accessibility"
+    ]
+  },
+  {
+    "id": "queue-incident",
+    "brief": "Analyze the queue incident on 2026-07-14. Customer impact lasted 43 minutes and affected 6% of jobs. Estimated credits are USD 12,000. No personal data was exposed. The immediate action is adding saturation alerts by 2026-08-31.",
+    "requestedFormat": "docx",
+    "invariants": [
+      "2026-07-14",
+      "43 minutes",
+      "6%",
+      "USD 12,000",
+      "No personal data was exposed",
+      "2026-08-31"
+    ],
+    "verification": [
+      "visual",
+      "accessibility"
+    ]
+  },
+  {
+    "id": "discovery-synthesis",
+    "brief": "Synthesize 18 interviews: 11 participants could not find audit history, 4 wanted exports, and 3 reported no material gap. Recommend audit-history navigation in Q4 within a USD 80,000 budget. Export automation is out of scope.",
+    "requestedFormat": "presentation",
+    "invariants": [
+      "18 interviews",
+      "11 participants",
+      "4 wanted exports",
+      "3 reported no material gap",
+      "Q4",
+      "USD 80,000",
+      "Export automation is out of scope"
+    ],
+    "verification": [
+      "visual",
+      "accessibility"
+    ]
+  }
+]

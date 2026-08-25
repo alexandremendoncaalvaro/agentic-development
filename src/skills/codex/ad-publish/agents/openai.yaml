@@ -1,0 +1,6 @@
+interface:
+  display_name: "Draft a publication"
+  short_description: "Draft or review a proposal from approved templates"
+  default_prompt: "Use $ad-publish to draft or review this GitHub proposal issue."
+policy:
+  allow_implicit_invocation: true
