@@ -354,8 +354,10 @@ test('project writes default to filename-scoped machine-local exclusion', () => 
     });
     assert.equal(result.visibility, 'machine-local');
     assert.equal(
-      realpathSync(result.templatePath),
-      realpathSync(join(repo, '.agentic', 'templates', 'publication', 'github-proposal-issue.md'))
+      realpathSync.native(result.templatePath),
+      realpathSync.native(
+        join(repo, '.agentic', 'templates', 'publication', 'github-proposal-issue.md')
+      )
     );
     const exclude = readFileSync(join(repo, '.git', 'info', 'exclude'), 'utf8');
     assert.match(exclude, /^\/\.agentic\/templates\/publication\/github-proposal-issue\.md$/m);
