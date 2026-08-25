@@ -6,6 +6,16 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `/ad-publish`, `/ad-report`, and `/ad-template-tune` add example-grounded
+  publication and reporting workflows on both hosts. Drafting resolves approved
+  project-over-machine-over-bundled templates, preserves factual invariants, and
+  composes voice, research, PR, and artifact capabilities through their existing
+  gates. Template curation remains a separate human-approved writer whose atomic
+  changes bind the candidate, layer, and visibility; project templates stay
+  machine-local by default through filename-scoped exclusions.
+
 ## [0.20.0-beta.7] - 2026-08-21
 
 ### Changed

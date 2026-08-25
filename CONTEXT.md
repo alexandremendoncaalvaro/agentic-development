@@ -30,6 +30,29 @@ _Avoid_: "psychological profile" (the feature neither diagnoses nor infers hidde
 
 _Avoid_: "team voice" (the corpus provides conventions, not an identity to imitate); "owner sample" (other authors remain separately attributed); "style target" (distinctive individual phrasing must not be copied).
 
+### Artifact template
+
+**Definition:** a versioned, artifact-type-specific contract for the information,
+ordering, selection conditions, provenance, strengths, trade-offs, and limitations
+that a publication or report must apply. It stores derived structural rules and
+source locators, not raw source artifacts or personal identity.
+
+_Avoid_: "voice template" (personal voice is a separate layer); "prompt" (the
+template is durable state with provenance and validation, not transient model
+instructions); "example library" (authorized examples may ground a template but
+are not retained as the template itself).
+
+**Related code:** curator implementations
+[`src/skills/claude-code/ad-template-tune/`](src/skills/claude-code/ad-template-tune/)
+and
+[`src/skills/codex/ad-template-tune/`](src/skills/codex/ad-template-tune/);
+read-only consumers
+[`src/skills/claude-code/ad-publish/`](src/skills/claude-code/ad-publish/),
+[`src/skills/codex/ad-publish/`](src/skills/codex/ad-publish/),
+[`src/skills/claude-code/ad-report/`](src/skills/claude-code/ad-report/), and
+[`src/skills/codex/ad-report/`](src/skills/codex/ad-report/). Governed by
+[`doc/adr/0071-layer-publication-templates.md`](doc/adr/0071-layer-publication-templates.md).
+
 ### Kit
 
 **Definition:** the `@alexandrealvaro/agentic` npm package — a CLI plus the source-of-truth `src/skills/` tree that installs the `ad-*` skill set (and bundled Claude Code subagents) into a target project's agent surface.
@@ -159,6 +182,7 @@ _Avoid_: "preflight script" as the canonical noun (preflight is a common *role* 
 
 - An **Audience adaptation** changes the expression of a **Personal voice** for a reader or relationship; it never changes whose voice it is.
 - A **Personal voice** carries the user's **Communicative identity** across languages; an **Accommodation corpus** supplies target-community conventions without supplying identity.
+- An **Artifact template** defines the structure of a publication or report; a **Personal voice** defines how the owner communicates through that structure.
 - A **Kit** install materializes every bundled **Workflow-operational skill** and **Spec-driven skill** for each selected agent surface (`.claude/skills/` and `.agents/skills/`).
 - A **Fresh-context review** is implemented as a **Two-axis review** on every kit-supported host; the implementation differs per host but the noun does not.
 - A **Two-axis review** produces one or more **Review handoffs** as its audit trail.
