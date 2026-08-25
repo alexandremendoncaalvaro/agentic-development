@@ -57,7 +57,7 @@ template contract from Task 0059 and does not modify the `ad-template-tune` or
       voice, research, pull requests, and explicit curation.
 - [x] Add synthetic draft, review, missing-source, permission-refusal, factual
       preservation, approval-gate, and composition tests under `test/`.
-- [ ] Run the held-out owner comparison and record aggregate results without
+- [x] Run the held-out owner comparison and record aggregate results without
       private content.
 
 ## Notes
@@ -80,6 +80,19 @@ contracts, synthetic fixtures, dogfood copies, and package coverage are in place
 The implementation review found and closed the final-title and verified-account
 gaps. Focused tests and the full local suite pass; only the owner's held-out
 comparison against an untemplated baseline remains before this task can close.
+
+### 2026-08-24
+
+The blinded owner comparison ran across all three held-out proposal fixtures after
+both options passed invariant and structural checks. The templated result was
+preferred once, tied once, and lost once to the untemplated baseline: two of three
+were no worse, with one strict preference. No private content or owner rationale
+was retained. The acceptance gate therefore failed because the cache-migration
+fixture preferred the shorter baseline. Task 0060 remains in progress. That result
+supports a hypothesis that straightforward, reversible proposals need a more
+compact mode; it does not authorize a template change. Any calibration must use
+`ad-template-tune` and then a new, unused held-out brief rather than re-score this
+now-observed fixture.
 
 ## Definition of Done
 

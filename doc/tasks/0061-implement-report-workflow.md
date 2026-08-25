@@ -1,6 +1,6 @@
 # Task `0061`: Implement report workflow
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-08-21
 **Scope ref:** doc/specs/0005-compose-publication-reporting.md
 **Evidence ref:** doc/research/0005-publication-template-system.md
@@ -42,7 +42,7 @@ skill directories.
 - [x] Missing renderers, inaccessible sources, or unavailable connectors degrade
       without fabrication; publishing or exporting beyond the agreed local target
       requires an exact-destination receipt and explicit approval.
-- [ ] Three held-out report fixtures preserve every marked fact and satisfy the
+- [x] Three held-out report fixtures preserve every marked fact and satisfy the
       editorial, composition, rendering, and accessibility criteria; owner
       comparison rates every result no worse than the untemplated baseline and
       strictly prefers at least one.
@@ -59,7 +59,7 @@ skill directories.
       research, curation, rendering, visual verification, and accessibility.
 - [x] Add synthetic draft, review, missing-renderer, permission-refusal, factual
       preservation, export-gate, and composition tests under `test/`.
-- [ ] Render the held-out artifacts, run the owner comparison, and record aggregate
+- [x] Render the held-out artifacts, run the owner comparison, and record aggregate
       results without private content.
 
 ## Notes
@@ -83,6 +83,16 @@ Focused tests and the full local suite pass; only rendering the held-out artifac
 and the owner's comparison against an untemplated baseline remain before this task
 can close.
 
+### 2026-08-24
+
+The blinded owner comparison ran across all three held-out report fixtures after
+both options preserved every marked invariant. The PDF was tagged and visually
+inspected, both DOCX options were rendered page by page, and both presentations
+passed slide inspection and overflow checks. The templated result was preferred
+twice and tied once, so all three were no worse than the untemplated baseline and
+two earned a strict preference. No private content or owner rationale was retained.
+This satisfies the remaining acceptance criterion and closes Task 0061.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -90,4 +100,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
