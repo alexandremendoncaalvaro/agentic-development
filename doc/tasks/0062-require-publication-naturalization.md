@@ -92,6 +92,14 @@ Spec concerns. The maximum rules audit covered all 35 changed files; two isolate
 CV passes in opposite rule and hunk order agreed with matching anchors and no
 implementation blocker.
 
+### 2026-08-26
+
+PR #122 did not enqueue the required GitHub Actions matrix on either its `opened`
+or `reopened` event. This append-only receipt was committed to produce a genuine
+`synchronize` event without changing the audited implementation. Merge remains
+gated on all four required Node 20/22 and Ubuntu/Windows checks passing on the new
+head, followed by exact-head closure verification.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
