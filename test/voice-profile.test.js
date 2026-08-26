@@ -541,13 +541,77 @@ test('ad-voice always naturalizes through humanizer or its bundled fallback', ()
 
     assert.match(skill, /humanizer.*discoverable/is);
     assert.match(skill, /bundled.*human-writing baseline/is);
+    assert.match(skill, /read.*human-writing-baseline\.md.*before.*humanizer/is);
     assert.match(skill, /naturalization pass is mandatory/i);
     assert.match(application, /repeat.*invariant.*profile.*naturalness/is);
+    assert.match(baseline, /scope and process equivalence/i);
+    assert.match(baseline, /does not claim identical wording/i);
+    assert.match(baseline, /## False-positive guard/i);
+    assert.match(baseline, /## Preserve human signals/i);
+    assert.match(
+      baseline,
+      /## Embedded process[\s\S]*invariant ledger[\s\S]*repeat the failure-class and invariant audits/i
+    );
     assert.match(baseline, /unsupported significance/i);
     assert.match(baseline, /vague attribution/i);
     assert.match(baseline, /forced groups of three/i);
     assert.match(baseline, /chatbot correspondence/i);
     assert.match(baseline, /generic positive conclusion/i);
+    assert.deepEqual(
+      [...baseline.matchAll(/^- \*\*HW\.(\d+)\b/gm)].map((match) => Number(match[1])),
+      Array.from({ length: 33 }, (_, index) => index + 1)
+    );
+  }
+});
+
+test('naturalization held-out fixtures exercise both branches and preserve invariants', () => {
+  const fixtures = JSON.parse(
+    readFileSync(join(__dirname, 'fixtures', 'naturalization-held-out.json'), 'utf8')
+  );
+
+  assert.ok(fixtures.length >= 4);
+  assert.equal(new Set(fixtures.map(({ id }) => id)).size, fixtures.length);
+  for (const fixture of fixtures) {
+    assert.deepEqual(fixture.branches, ['humanizer', 'fallback']);
+    assert.ok(fixture.invariants.length >= 2);
+    assert.ok(['rewrite', 'unchanged'].includes(fixture.expectedDisposition));
+    for (const invariant of fixture.invariants) {
+      assert.ok(fixture.source.includes(invariant), `${fixture.id} lost source invariant ${invariant}`);
+    }
+    for (const failureClass of fixture.failureClasses) {
+      assert.match(failureClass, /^HW\.(?:[1-9]|[12]\d|3[0-3])$/);
+    }
+    for (const phrase of fixture.remove) {
+      assert.ok(fixture.source.includes(phrase), `${fixture.id} lacks removal probe ${phrase}`);
+    }
+    for (const branch of fixture.branches) {
+      const run = fixture.branchRuns[branch];
+      const output = run.output;
+      assert.equal(
+        run.contract,
+        branch === 'humanizer' ? 'humanizer@2.9.1:embedded' : 'human-writing-baseline@1:embedded'
+      );
+      assert.deepEqual(run.applicableFailureClasses, fixture.failureClasses);
+      assert.deepEqual(run.invariantsVerified, fixture.invariants);
+      assert.ok(run.auditRounds >= (fixture.expectedDisposition === 'rewrite' ? 2 : 1));
+      assert.deepEqual(run.activeProfileRules, fixture.activeProfileRules);
+      assert.equal(run.profileRulesVerified, true);
+      assert.equal(typeof output, 'string', `${fixture.id} lacks ${branch} golden output`);
+      for (const invariant of fixture.invariants) {
+        assert.ok(
+          output.toLowerCase().includes(invariant.toLowerCase()),
+          `${fixture.id}/${branch} lost invariant ${invariant}`
+        );
+      }
+      for (const phrase of fixture.remove) {
+        assert.ok(!output.includes(phrase), `${fixture.id}/${branch} retained ${phrase}`);
+      }
+      assert.equal(
+        output === fixture.source,
+        fixture.expectedDisposition === 'unchanged',
+        `${fixture.id}/${branch} has the wrong disposition`
+      );
+    }
   }
 });
 

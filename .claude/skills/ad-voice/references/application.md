@@ -6,12 +6,16 @@ Before rewriting, record every claim, name, number, date, citation, URL, technic
 
 ## Mandatory naturalization
 
-If `humanizer`, including a namespaced installation, is discoverable in the host,
-invoke it through its public contract before applying personal rules. Pass the
-settled text and active destination, audience, language, and invariant constraints.
-Otherwise apply `human-writing-baseline.md` as the bundled equivalent. Do not claim
-that the external capability ran when the fallback handled the pass. This layer is
-generic writing quality, not the owner's identity.
+Always read `human-writing-baseline.md` first. It is the common checklist and makes
+the fallback equivalent in covered failure classes and audit process, not in exact
+wording. If `humanizer`, including a namespaced installation, is discoverable in
+the host, invoke it through its public contract before applying personal rules.
+Pass the settled text and active destination, audience, language, and invariant
+constraints. Otherwise apply the bundled compatibility baseline directly. Do not
+claim that the external capability ran when the fallback handled the pass. In
+either branch, account privately for every applicable `HW.<id>`, correct remaining
+failures, and repeat both that audit and the invariant check. This layer is generic
+writing quality, not the owner's identity.
 
 ## Active profile slice
 
@@ -66,4 +70,5 @@ During tuning, a Portuguese pragmatic gloss may help the owner judge stance and 
 - The profile remained unchanged.
 - The output contains one draft, without agent commentary.
 
-After any corrective edit, repeat the invariant, profile, and naturalness audits.
+After any corrective edit, repeat the invariant, profile, applicable `HW.<id>`, and
+naturalness audits.

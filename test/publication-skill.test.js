@@ -85,6 +85,21 @@ test('publication workflow keeps drafting, composition, curation, and outward ga
     assert.match(skill, /ad-template-tune/i);
     assert.match(skill, /never mutate/i);
     assert.match(skill, /every final title and body.*ad-voice/is);
+    assert.match(
+      skill,
+      /verify privately[\s\S]*after any textual revision[\s\S]*repeat[\s\S]*ad-voice[\s\S]*before return/i
+    );
+    assert.match(skill, /any later change[\s\S]*invalidates that voice pass/i);
+    assert.match(
+      skill,
+      /do not[\s\S]*return text that changed after the most recent `ad-voice` output/i
+    );
+    const verificationStep = skill.match(/## Step 5: Verify privately([\s\S]*?)## Step 6:/i)?.[1];
+    assert.ok(verificationStep);
+    assert.match(
+      verificationStep.trim(),
+      /Do not return text that changed after the most recent `ad-voice` output\.$/i
+    );
 
     const composition = readFileSync(join(root, 'references', 'composition.md'), 'utf8');
     assert.match(composition, /public contract/i);

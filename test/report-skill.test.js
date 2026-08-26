@@ -86,6 +86,21 @@ test('report workflow owns editorial judgment and composes renderers with their 
     assert.match(skill, /pasted text.*artifact attached.*supplied\s+public URL/is);
     assert.doesNotMatch(skill, /user-supplied material/i);
     assert.match(skill, /every final editorial report.*ad-voice/is);
+    assert.match(
+      skill,
+      /verify privately[\s\S]*after any textual revision[\s\S]*repeat[\s\S]*ad-voice[\s\S]*before return/i
+    );
+    assert.match(skill, /any later[\s\S]*text change invalidates both the voice pass/i);
+    assert.match(
+      skill,
+      /do not[\s\S]*return an artifact whose text changed after the most recent `ad-voice` output/i
+    );
+    const verificationStep = skill.match(/## Step 5: Verify privately([\s\S]*?)## Step 6:/i)?.[1];
+    assert.ok(verificationStep);
+    assert.match(
+      verificationStep.trim(),
+      /Do not return an artifact whose text changed after the most recent `ad-voice` output\.$/i
+    );
 
     const composition = readFileSync(join(root, 'references', 'composition.md'), 'utf8');
     assert.match(composition, /public\s+contract/i);

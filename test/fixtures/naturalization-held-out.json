@@ -1,0 +1,162 @@
+[
+  {
+    "id": "proposal-diff-punchline",
+    "source": "Here's the thing: we added a robust migration proposal for 14 consumers by 2026-09-30. This isn't just a cache upgrade. It's velocity. Alignment. Impact. See https://example.test/cache-v2.",
+    "branches": ["humanizer", "fallback"],
+    "invariants": [
+      "14 consumers",
+      "2026-09-30",
+      "cache upgrade",
+      "https://example.test/cache-v2"
+    ],
+    "activeProfileRules": [
+      {
+        "id": "TEST.DIRECT",
+        "instruction": "State the proposed action directly."
+      }
+    ],
+    "failureClasses": ["HW.4", "HW.9", "HW.30", "HW.31", "HW.33"],
+    "remove": ["Here's the thing", "we added", "It's velocity. Alignment. Impact."],
+    "expectedDisposition": "rewrite",
+    "branchRuns": {
+      "humanizer": {
+        "contract": "humanizer@2.9.1:embedded",
+        "applicableFailureClasses": ["HW.4", "HW.9", "HW.30", "HW.31", "HW.33"],
+        "invariantsVerified": ["14 consumers", "2026-09-30", "cache upgrade", "https://example.test/cache-v2"],
+        "activeProfileRules": [{"id": "TEST.DIRECT", "instruction": "State the proposed action directly."}],
+        "profileRulesVerified": true,
+        "auditRounds": 2,
+        "output": "The cache upgrade proposal migrates 14 consumers by 2026-09-30. Details: https://example.test/cache-v2."
+      },
+      "fallback": {
+        "contract": "human-writing-baseline@1:embedded",
+        "applicableFailureClasses": ["HW.4", "HW.9", "HW.30", "HW.31", "HW.33"],
+        "invariantsVerified": ["14 consumers", "2026-09-30", "cache upgrade", "https://example.test/cache-v2"],
+        "activeProfileRules": [{"id": "TEST.DIRECT", "instruction": "State the proposed action directly."}],
+        "profileRulesVerified": true,
+        "auditRounds": 2,
+        "output": "The cache upgrade migrates 14 consumers by 2026-09-30. Details: https://example.test/cache-v2."
+      }
+    }
+  },
+  {
+    "id": "report-aphorism-conclusion",
+    "source": "The queue is the heartbeat of the platform. What really matters is resilience. The incident affected 6% of jobs for 43 minutes. In conclusion, the future is bright.",
+    "branches": ["humanizer", "fallback"],
+    "invariants": ["queue", "platform", "resilience", "6% of jobs", "43 minutes"],
+    "activeProfileRules": [],
+    "failureClasses": ["HW.25", "HW.27", "HW.32"],
+    "remove": ["heartbeat of the platform", "What really matters", "the future is bright"],
+    "expectedDisposition": "rewrite",
+    "branchRuns": {
+      "humanizer": {
+        "contract": "humanizer@2.9.1:embedded",
+        "applicableFailureClasses": ["HW.25", "HW.27", "HW.32"],
+        "invariantsVerified": ["queue", "platform", "resilience", "6% of jobs", "43 minutes"],
+        "activeProfileRules": [],
+        "profileRulesVerified": true,
+        "auditRounds": 2,
+        "output": "The platform depends on the queue. The incident affected 6% of jobs for 43 minutes. Resilience is the decision criterion."
+      },
+      "fallback": {
+        "contract": "human-writing-baseline@1:embedded",
+        "applicableFailureClasses": ["HW.25", "HW.27", "HW.32"],
+        "invariantsVerified": ["queue", "platform", "resilience", "6% of jobs", "43 minutes"],
+        "activeProfileRules": [],
+        "profileRulesVerified": true,
+        "auditRounds": 2,
+        "output": "The platform depends on the queue. The incident affected 6% of jobs for 43 minutes. The report uses resilience as the decision criterion."
+      }
+    }
+  },
+  {
+    "id": "vague-authority-and-forced-three",
+    "source": "In this section, we will explore the result. Experts agree that parser 3.4.0 delivers speed, scale, and success, unlocking a transformative future. Upstream issue #812 is still open.",
+    "branches": ["humanizer", "fallback"],
+    "invariants": ["parser 3.4.0", "#812", "still open"],
+    "activeProfileRules": [],
+    "failureClasses": ["HW.4", "HW.5", "HW.10", "HW.28"],
+    "remove": ["we will explore", "Experts agree", "speed, scale, and success", "transformative future"],
+    "expectedDisposition": "rewrite",
+    "branchRuns": {
+      "humanizer": {
+        "contract": "humanizer@2.9.1:embedded",
+        "applicableFailureClasses": ["HW.4", "HW.5", "HW.10", "HW.28"],
+        "invariantsVerified": ["parser 3.4.0", "#812", "still open"],
+        "activeProfileRules": [],
+        "profileRulesVerified": true,
+        "auditRounds": 2,
+        "output": "Upstream issue #812 is still open for parser 3.4.0."
+      },
+      "fallback": {
+        "contract": "human-writing-baseline@1:embedded",
+        "applicableFailureClasses": ["HW.4", "HW.5", "HW.10", "HW.28"],
+        "invariantsVerified": ["parser 3.4.0", "#812", "still open"],
+        "activeProfileRules": [],
+        "profileRulesVerified": true,
+        "auditRounds": 2,
+        "output": "For parser 3.4.0, upstream issue #812 is still open."
+      }
+    }
+  },
+  {
+    "id": "chatbot-wrapper",
+    "source": "Absolutely! I'd be happy to help. The rollout budget is USD 80,000 and export automation is out of scope. Let me know if you'd like me to expand on this.",
+    "branches": ["humanizer", "fallback"],
+    "invariants": ["rollout budget", "USD 80,000", "export automation is out of scope"],
+    "activeProfileRules": [],
+    "failureClasses": ["HW.20", "HW.22"],
+    "remove": ["Absolutely! I'd be happy to help.", "Let me know if you'd like me to expand on this."],
+    "expectedDisposition": "rewrite",
+    "branchRuns": {
+      "humanizer": {
+        "contract": "humanizer@2.9.1:embedded",
+        "applicableFailureClasses": ["HW.20", "HW.22"],
+        "invariantsVerified": ["rollout budget", "USD 80,000", "export automation is out of scope"],
+        "activeProfileRules": [],
+        "profileRulesVerified": true,
+        "auditRounds": 2,
+        "output": "The rollout budget is USD 80,000; export automation is out of scope."
+      },
+      "fallback": {
+        "contract": "human-writing-baseline@1:embedded",
+        "applicableFailureClasses": ["HW.20", "HW.22"],
+        "invariantsVerified": ["rollout budget", "USD 80,000", "export automation is out of scope"],
+        "activeProfileRules": [],
+        "profileRulesVerified": true,
+        "auditRounds": 2,
+        "output": "The rollout budget is USD 80,000, and export automation is out of scope."
+      }
+    }
+  },
+  {
+    "id": "natural-human-control",
+    "source": "I expected the retry to help, but the second run still took 180 ms. That surprised me because the same query took 120 ms yesterday; for now, I would keep mobile clients out of scope.",
+    "branches": ["humanizer", "fallback"],
+    "invariants": ["retry", "180 ms", "120 ms", "yesterday", "mobile clients out of scope"],
+    "activeProfileRules": [],
+    "failureClasses": [],
+    "remove": [],
+    "expectedDisposition": "unchanged",
+    "branchRuns": {
+      "humanizer": {
+        "contract": "humanizer@2.9.1:embedded",
+        "applicableFailureClasses": [],
+        "invariantsVerified": ["retry", "180 ms", "120 ms", "yesterday", "mobile clients out of scope"],
+        "activeProfileRules": [],
+        "profileRulesVerified": true,
+        "auditRounds": 1,
+        "output": "I expected the retry to help, but the second run still took 180 ms. That surprised me because the same query took 120 ms yesterday; for now, I would keep mobile clients out of scope."
+      },
+      "fallback": {
+        "contract": "human-writing-baseline@1:embedded",
+        "applicableFailureClasses": [],
+        "invariantsVerified": ["retry", "180 ms", "120 ms", "yesterday", "mobile clients out of scope"],
+        "activeProfileRules": [],
+        "profileRulesVerified": true,
+        "auditRounds": 1,
+        "output": "I expected the retry to help, but the second run still took 180 ms. That surprised me because the same query took 120 ms yesterday; for now, I would keep mobile clients out of scope."
+      }
+    }
+  }
+]

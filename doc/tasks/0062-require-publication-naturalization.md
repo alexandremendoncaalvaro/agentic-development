@@ -65,6 +65,41 @@ and zero errors. Focused tests passed 31 of 31, the complete suite passed 702 of
 byte-identical for the shared files. Inline review found no remaining Standards or
 Spec concern.
 
+### 2026-08-26
+
+A post-merge maximum-gate audit invalidated the completion claim above. It found
+that a Step 5 rewrite could bypass the final `ad-voice` result, the fallback did
+not yet expose all 33 Humanizer 2.9.1 failure classes or its repeated audit loop,
+and the tests did not include observed draft-to-final branch fixtures. The task is
+reopened until the correction passes focused and full tests, fresh-context review,
+and a new rules-anchored audit.
+
+### 2026-08-26
+
+The correction now makes the final no-return-after-change clause the terminal
+verification instruction in both consumers. The bundled compatibility baseline
+covers `HW.1` through `HW.33`, false-positive protection, human-signal
+preservation, and the repeated invariant audit. Five held-out cases record both
+Humanizer 2.9.1 and fallback branch runs with invariant and profile-rule ledgers,
+audit rounds, and final outputs.
+
+Focused consumer tests passed 10 of 10 and the complete local CI gate passed 703
+of 703. `npm pack --dry-run` produced the expected package. A disposable-clone
+mutation added a post-gate formulaic rewrite to all four publication skill copies;
+the focused test failed 1 of 5 at the terminal-gate assertion, closing the prior
+negative-coverage finding. Fresh-context review ended with zero Standards and zero
+Spec concerns. The maximum rules audit covered all 35 changed files; two isolated
+CV passes in opposite rule and hunk order agreed with matching anchors and no
+implementation blocker.
+
+### 2026-08-26
+
+PR #122 did not enqueue the required GitHub Actions matrix on either its `opened`
+or `reopened` event. This append-only receipt was committed to produce a genuine
+`synchronize` event without changing the audited implementation. Merge remains
+gated on all four required Node 20/22 and Ubuntu/Windows checks passing on the new
+head, followed by exact-head closure verification.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

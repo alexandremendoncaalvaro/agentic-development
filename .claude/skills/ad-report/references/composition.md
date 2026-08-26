@@ -14,8 +14,9 @@ approval does not imply another approval. The stricter gate wins.
 - `ad-voice` receives settled facts, evidence limits, and structure for every final
   editorial report before rendering. It owns the confirmed personal profile and
   mandatory naturalization pass, preferring an installed `humanizer` and using its
-  bundled equivalent otherwise. It may adjust expression but not alter the
-  editorial contract or evidence.
+  bundled compatibility baseline otherwise. The fallback matches failure-class
+  coverage and audit process, not exact wording. It may adjust expression but not
+  alter the editorial contract or evidence.
 - `ad-template-tune` owns all template mutation and runs only when explicitly
   requested. Ordinary reporting remains read-only.
 

@@ -102,9 +102,15 @@ internal verdict: `satisfied`, `improved`, `not applicable`, or `higher-priority
 override`. Revise unmet material items and re-run the composed renderer's checks
 after any content change that affects layout.
 
+After any textual revision in this step, repeat `ad-voice`, then render and repeat
+the invariant, template, visual, and accessibility checks before return. Any later
+text change invalidates both the voice pass and the rendered verification.
+
 An unresolved material gap is disclosed outside the usable report. "Same or
 better" is allowed only as traceable coverage plus a named target-specific
 improvement, never as a score based on length, recency, or visual polish.
+
+Do not return an artifact whose text changed after the most recent `ad-voice` output.
 
 ## Step 6: Return or export
 
