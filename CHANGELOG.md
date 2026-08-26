@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [0.20.0-beta.8] - 2026-08-26
+
 ### Added
 
 - `/ad-publish`, `/ad-report`, and `/ad-template-tune` add example-grounded
@@ -15,6 +17,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   gates. Template curation remains a separate human-approved writer whose atomic
   changes bind the candidate, layer, and visibility; project templates stay
   machine-local by default through filename-scoped exclusions.
+
+### Changed
+
+- `/ad-publish` and `/ad-report` now repeat `/ad-voice` after every text change
+  and return only the final naturalized result. `/ad-voice` always applies the
+  confirmed personal profile plus either the installed Humanizer or a bundled
+  compatibility baseline covering all 33 Humanizer 2.9.1 failure classes, with
+  held-out receipts for both execution paths.
 
 ## [0.20.0-beta.7] - 2026-08-21
 
