@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [0.20.0-beta.8] - 2026-08-26
+
 ### Added
 
 - `/ad-publish`, `/ad-report`, and `/ad-template-tune` add example-grounded
