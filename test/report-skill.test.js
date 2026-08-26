@@ -85,10 +85,12 @@ test('report workflow owns editorial judgment and composes renderers with their 
     assert.match(skill, /never implement.*renderer/is);
     assert.match(skill, /pasted text.*artifact attached.*supplied\s+public URL/is);
     assert.doesNotMatch(skill, /user-supplied material/i);
+    assert.match(skill, /every final editorial report.*ad-voice/is);
 
     const composition = readFileSync(join(root, 'references', 'composition.md'), 'utf8');
     assert.match(composition, /public\s+contract/i);
     assert.match(composition, /stricter gate wins/i);
+    assert.match(composition, /mandatory naturalization pass/i);
     const evaluation = readFileSync(join(root, 'references', 'evaluation.md'), 'utf8');
     assert.match(evaluation, /invariant ledger/i);
     assert.match(evaluation, /same or better/i);

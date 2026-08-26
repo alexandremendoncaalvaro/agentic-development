@@ -61,7 +61,8 @@ only when its public contract owns a necessary step:
 
 - `ad-ground` for a bounded implementation or method gap;
 - `ad-research` for an open question needing a durable study;
-- `ad-voice` after facts, constraints, and structure are settled;
+- `ad-voice` for the mandatory personal-voice and naturalization pass after facts,
+  constraints, and structure are settled;
 - `ad-pr` when the requested outward artifact is a pull request;
 - `ad-template-tune` only when the user explicitly asks to curate a template.
 
@@ -81,6 +82,10 @@ For a brief, create the smallest self-contained proposal that lets the reader
 understand the state, consequence, evidence, completion test, and next decision.
 For a GitHub proposal issue, produce both a concise actionable title and the final
 body; treat both as factual and approval invariants.
+
+Every final title and body must then pass through `ad-voice`, even when no
+confirmed profile or external `humanizer` is available. Its public contract owns
+both the confirmed profile and the bundled naturalization fallback.
 
 ## Step 5: Verify privately
 

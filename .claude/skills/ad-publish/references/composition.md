@@ -7,8 +7,11 @@ does not imply any other approval.
 
 ## Skill boundaries
 
-- `ad-voice` receives settled facts and structure. It may change expression but
-  not template requirements, destination constraints, or invariant facts.
+- `ad-voice` receives settled facts and structure for every final title and body.
+  It owns the confirmed personal profile and mandatory naturalization pass,
+  preferring an installed `humanizer` and using its bundled equivalent otherwise.
+  It may change expression but not template requirements, destination constraints,
+  or invariant facts.
 - `ad-ground` retires a bounded factual or implementation-method gap. Keep its
   citations and limitations intact.
 - `ad-research` owns an open question and durable research record. Do not collapse
@@ -29,4 +32,3 @@ is created, show the exact final text, target service, owner/repository and issu
 destination, selected template, material limitations, and command or action. Any
 revision creates a new receipt. Execute only after explicit approval and report
 the resulting URL or exact failure.
-

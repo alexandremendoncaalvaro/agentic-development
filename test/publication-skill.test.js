@@ -84,10 +84,12 @@ test('publication workflow keeps drafting, composition, curation, and outward ga
     assert.match(skill, /ad-pr/i);
     assert.match(skill, /ad-template-tune/i);
     assert.match(skill, /never mutate/i);
+    assert.match(skill, /every final title and body.*ad-voice/is);
 
     const composition = readFileSync(join(root, 'references', 'composition.md'), 'utf8');
     assert.match(composition, /public contract/i);
     assert.match(composition, /does not imply/i);
+    assert.match(composition, /mandatory naturalization pass/i);
     const evaluation = readFileSync(join(root, 'references', 'evaluation.md'), 'utf8');
     assert.match(evaluation, /invariant ledger/i);
     assert.match(evaluation, /same or better/i);

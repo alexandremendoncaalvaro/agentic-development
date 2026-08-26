@@ -4,9 +4,14 @@
 
 Before rewriting, record every claim, name, number, date, citation, URL, technical identifier, commitment, uncertainty marker, and requested action. After drafting, compare each item against the result. Style never authorizes factual loss or invention.
 
-## Generic baseline
+## Mandatory naturalization
 
-First remove generic model-writing artifacts using `human-writing-baseline.md`. This is the comparison baseline, not the owner's identity.
+If `humanizer`, including a namespaced installation, is discoverable in the host,
+invoke it through its public contract before applying personal rules. Pass the
+settled text and active destination, audience, language, and invariant constraints.
+Otherwise apply `human-writing-baseline.md` as the bundled equivalent. Do not claim
+that the external capability ran when the fallback handled the pass. This layer is
+generic writing quality, not the owner's identity.
 
 ## Active profile slice
 
@@ -60,3 +65,5 @@ During tuning, a Portuguese pragmatic gloss may help the owner judge stance and 
 - The result fits the destination.
 - The profile remained unchanged.
 - The output contains one draft, without agent commentary.
+
+After any corrective edit, repeat the invariant, profile, and naturalness audits.

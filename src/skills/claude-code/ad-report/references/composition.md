@@ -11,8 +11,11 @@ approval does not imply another approval. The stricter gate wins.
   grades, deviations, and limitations.
 - `ad-research` owns an open question and durable study. Do not convert uncertainty
   into a stronger report conclusion.
-- `ad-voice` receives settled facts, evidence limits, and structure. It may adjust
-  expression but not alter the editorial contract or evidence.
+- `ad-voice` receives settled facts, evidence limits, and structure for every final
+  editorial report before rendering. It owns the confirmed personal profile and
+  mandatory naturalization pass, preferring an installed `humanizer` and using its
+  bundled equivalent otherwise. It may adjust expression but not alter the
+  editorial contract or evidence.
 - `ad-template-tune` owns all template mutation and runs only when explicitly
   requested. Ordinary reporting remains read-only.
 
@@ -37,4 +40,3 @@ form and name the missing renderer. Do not fabricate the artifact or verificatio
 The agreed local target is part of framing. A different path, service, recipient,
 published URL, or exported format requires a new receipt showing the final artifact
 and exact destination. Execute only after explicit approval.
-
