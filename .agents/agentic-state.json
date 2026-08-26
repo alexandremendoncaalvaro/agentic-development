@@ -448,7 +448,7 @@
         },
         {
           "path": ".agents/skills/ad-publish/references/composition.md",
-          "sourceSha": "39fab7f6b8394f624ce40052a13c355e080a169b59d4261e9c27941fe3d512c7"
+          "sourceSha": "7115b18eefdcb4562a6d489a876cdc1fceb2e09a7cecd113a3cdcb248393d42c"
         },
         {
           "path": ".agents/skills/ad-publish/references/evaluation.md",
@@ -472,7 +472,7 @@
         },
         {
           "path": ".agents/skills/ad-publish/SKILL.md",
-          "sourceSha": "3f7be4302073dcc53d80788a040f663774063602ebc1f19525daceb607bb4ffc"
+          "sourceSha": "4cbafad41c442381162520af760500f84ca118af136014cc2a0c90dd0d0f3c63"
         }
       ]
     },
@@ -523,7 +523,7 @@
         },
         {
           "path": ".agents/skills/ad-report/references/composition.md",
-          "sourceSha": "31f931d544165f2ab99dd5937e952caec897133c8fbab7d1ec6d4616aa8695f6"
+          "sourceSha": "f89393bd44eab83e907205314d5c180f827633d4dd63f958348a830a898d8a0b"
         },
         {
           "path": ".agents/skills/ad-report/references/evaluation.md",
@@ -547,7 +547,7 @@
         },
         {
           "path": ".agents/skills/ad-report/SKILL.md",
-          "sourceSha": "4a40d33669c22dc98ddca91fc7ff1c6492b59313f03eece160d2799413b34b7b"
+          "sourceSha": "219a878bca7e64298047d13785c516ca5658b05ac3d50cbad4178dcec2435c5f"
         }
       ]
     },
@@ -789,11 +789,11 @@
         },
         {
           "path": ".agents/skills/ad-voice/references/application.md",
-          "sourceSha": "9c9dfe3736f03e3ce49a6dff63ec84512dc4cd3f9c1eb56a995dc897f9a13cc3"
+          "sourceSha": "5d6cb0a2640eda444d316570c9b105fd73c94591ca86dbc4f8f102d8ce0a4df4"
         },
         {
           "path": ".agents/skills/ad-voice/references/human-writing-baseline.md",
-          "sourceSha": "0d6672bab0dc12fffb4c45b2744061f442e9bf02f542a12ddc372f4fcc4d8cb6"
+          "sourceSha": "60b2a0464e7edea4197633ac7f67d09e6d959026b9ee069a77084cc38d721744"
         },
         {
           "path": ".agents/skills/ad-voice/references/profile-contract.md",
@@ -805,7 +805,7 @@
         },
         {
           "path": ".agents/skills/ad-voice/SKILL.md",
-          "sourceSha": "1d4d3d44fa67de7d7e01a39d38c950b2d858355f025e8ea9e5004b68fb827733"
+          "sourceSha": "46ecc7bdf0ddffe9bd652d07bf60617b21a0d08e911f20116bac18c6372f621f"
         }
       ]
     },

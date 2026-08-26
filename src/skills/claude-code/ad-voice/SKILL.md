@@ -55,20 +55,29 @@ A matching rule does not force a rewrite. When the input already satisfies the r
 
 ## Step 4: Draft and verify
 
+Read [references/human-writing-baseline.md](references/human-writing-baseline.md)
+before resolving or invoking `humanizer`. It defines the mandatory naturalness
+checklist and the bundled human-writing baseline's scope-and-process compatibility
+contract.
+
 Run the naturalization pass before applying personal rules. If `humanizer`,
 including a namespaced installation, is discoverable in the current host, invoke
 it through its public contract with the settled text, destination, audience,
 language, and invariant ledger. Otherwise apply the bundled human-writing baseline
-in [references/human-writing-baseline.md](references/human-writing-baseline.md).
-Never claim that the external skill ran when using the fallback.
-The naturalization pass is mandatory; an unavailable optional skill never skips it.
+directly. Never claim that the external skill ran when using the fallback. The
+naturalization pass is mandatory; an unavailable optional skill never skips it.
+
+In either branch, account privately for every applicable `HW.<id>` failure class.
+Revise any remaining failure, then repeat that audit and the invariant check before
+applying personal rules.
 
 Apply the selected profile slice after naturalization.
 Audit every active profile pattern before returning. Account for each pattern by
 ID. Revise every unmet pattern, then repeat until each instruction is satisfied or
 has a concrete higher-priority override. Then compare the result to the silent invariant ledger
 and the naturalness checklist. Restore any changed or omitted invariant. After any
-corrective rewrite, repeat the invariant, profile-pattern, and naturalness audits.
+corrective rewrite, repeat the invariant, profile-pattern, applicable `HW.<id>`, and
+naturalness audits.
 
 The audit is a private quality gate, not an output score. Normal output is one usable draft and nothing else. Show analysis, active rules, audit details, confidence, or a Portuguese pragmatic gloss only when the user asks or when a material override prevents an honest result.
 

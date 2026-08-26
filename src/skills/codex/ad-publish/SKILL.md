@@ -95,9 +95,15 @@ internal verdict: `satisfied`, `improved`, `not applicable`, or `higher-priority
 override`. Revise an unmet material item. Disclose any unresolved material gap
 outside the usable draft, never inside it as workflow narration.
 
+After any textual revision in this step, repeat `ad-voice`, then repeat the
+invariant and template checks before return. Any later change to the title or body
+invalidates that voice pass and loops through the same sequence again.
+
 Do not report "same or better" as a score. Use that phrase only when traceable
 coverage preserves every applicable strength and identifies a target-specific
 improvement.
+
+Do not return text that changed after the most recent `ad-voice` output.
 
 ## Step 6: Return or act
 

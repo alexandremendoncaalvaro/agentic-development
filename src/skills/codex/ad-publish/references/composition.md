@@ -9,7 +9,9 @@ does not imply any other approval.
 
 - `ad-voice` receives settled facts and structure for every final title and body.
   It owns the confirmed personal profile and mandatory naturalization pass,
-  preferring an installed `humanizer` and using its bundled equivalent otherwise.
+  preferring an installed `humanizer` and using its bundled compatibility baseline
+  otherwise. The fallback matches failure-class coverage and audit process, not
+  exact wording.
   It may change expression but not template requirements, destination constraints,
   or invariant facts.
 - `ad-ground` retires a bounded factual or implementation-method gap. Keep its
