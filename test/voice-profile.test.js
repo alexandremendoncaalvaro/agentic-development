@@ -525,6 +525,32 @@ test('ad-voice audits every active profile pattern before returning a draft', ()
   }
 });
 
+test('ad-voice always naturalizes through humanizer or its bundled fallback', () => {
+  const root = join(__dirname, '..', 'src', 'skills');
+
+  for (const agent of ['claude-code', 'codex']) {
+    const skill = readFileSync(join(root, agent, 'ad-voice', 'SKILL.md'), 'utf8');
+    const application = readFileSync(
+      join(root, agent, 'ad-voice', 'references', 'application.md'),
+      'utf8'
+    );
+    const baseline = readFileSync(
+      join(root, agent, 'ad-voice', 'references', 'human-writing-baseline.md'),
+      'utf8'
+    );
+
+    assert.match(skill, /humanizer.*discoverable/is);
+    assert.match(skill, /bundled.*human-writing baseline/is);
+    assert.match(skill, /naturalization pass is mandatory/i);
+    assert.match(application, /repeat.*invariant.*profile.*naturalness/is);
+    assert.match(baseline, /unsupported significance/i);
+    assert.match(baseline, /vague attribution/i);
+    assert.match(baseline, /forced groups of three/i);
+    assert.match(baseline, /chatbot correspondence/i);
+    assert.match(baseline, /generic positive conclusion/i);
+  }
+});
+
 test('voice profile validate: rejects incomplete examples, duplicate ids, and malformed scopes', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-structural-'));
   try {

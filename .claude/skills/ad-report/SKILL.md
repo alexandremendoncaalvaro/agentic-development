@@ -74,10 +74,16 @@ only through its public contract:
 
 - `ad-ground` for a bounded method or implementation gap;
 - `ad-research` for an open question needing a durable study;
-- `ad-voice` after facts, evidence limits, and structure are settled;
+- `ad-voice` for the mandatory personal-voice and naturalization pass after facts,
+  evidence limits, and structure are settled and before rendering;
 - `ad-template-tune` only on an explicit curation request;
 - the available DOCX, PDF, presentation, visualization, site, HTML, Markdown, or
   other artifact capability for the requested format.
+
+Every final editorial report must pass through `ad-voice`, even when no confirmed
+profile or external `humanizer` is available. Its public contract owns both the
+confirmed profile and the bundled naturalization fallback. Render only after this
+pass; a later textual correction must repeat it before re-rendering.
 
 Pass the settled editorial plan and content to the renderer. Respect every callee
 authorization, limitation, output, and gate; the stricter gate wins. Require its

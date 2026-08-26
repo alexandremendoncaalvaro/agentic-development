@@ -31,7 +31,10 @@ node <skill-base-dir>/scripts/voice-profile.mjs validate [--profile <path>]
 
 Resolution order is an explicit `--profile` path, `$AGENTIC_VOICE_DIR/profile.md`, then `~/.agentic/voice/profile.md`. A path inside any Git repository is invalid. Read [references/profile-contract.md](references/profile-contract.md) before selecting profile rules.
 
-If the profile is absent or invalid, do not load it partially. Apply the generic baseline in [references/human-writing-baseline.md](references/human-writing-baseline.md), state briefly that personal matching was unavailable when that limitation matters, and route calibration to `/ad-voice-tune`. Never claim the result matches the user.
+If the profile is absent or invalid, do not load it partially. Continue with no
+personal rules; the mandatory naturalization fallback in Step 4 still applies.
+State briefly that personal matching was unavailable when that limitation matters,
+and route calibration to `/ad-voice-tune`. Never claim the result matches the user.
 
 ## Step 3: Select the active slice
 
@@ -52,7 +55,20 @@ A matching rule does not force a rewrite. When the input already satisfies the r
 
 ## Step 4: Draft and verify
 
-Use the generic baseline to remove model-writing artifacts, then apply the selected profile slice. Audit every active profile pattern before returning: account for each pattern by ID, revise every unmet pattern, and repeat until each instruction is satisfied or has a concrete higher-priority override. Then compare the result to the silent invariant ledger and restore any changed or omitted invariant. Re-run the pattern audit after any restoration.
+Run the naturalization pass before applying personal rules. If `humanizer`,
+including a namespaced installation, is discoverable in the current host, invoke
+it through its public contract with the settled text, destination, audience,
+language, and invariant ledger. Otherwise apply the bundled human-writing baseline
+in [references/human-writing-baseline.md](references/human-writing-baseline.md).
+Never claim that the external skill ran when using the fallback.
+The naturalization pass is mandatory; an unavailable optional skill never skips it.
+
+Apply the selected profile slice after naturalization.
+Audit every active profile pattern before returning. Account for each pattern by
+ID. Revise every unmet pattern, then repeat until each instruction is satisfied or
+has a concrete higher-priority override. Then compare the result to the silent invariant ledger
+and the naturalness checklist. Restore any changed or omitted invariant. After any
+corrective rewrite, repeat the invariant, profile-pattern, and naturalness audits.
 
 The audit is a private quality gate, not an output score. Normal output is one usable draft and nothing else. Show analysis, active rules, audit details, confidence, or a Portuguese pragmatic gloss only when the user asks or when a material override prevents an honest result.
 
