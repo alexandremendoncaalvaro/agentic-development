@@ -1,0 +1,44 @@
+[
+  {
+    "id": "slack-config-answer",
+    "destination": "slack-thread",
+    "targetThread": "Sam asked whether the gate reads the repository configuration.",
+    "settledContext": ["The team already develops with agents."],
+    "privateDeliberation": ["I first thought this belonged inside Agentic Development."],
+    "intendedInvariants": ["SLIM", "repository configuration", "before each completion"],
+    "directAnswer": "Yes.",
+    "expectedOutput": "Yes. I would keep this in SLIM: read the repository configuration and run the required gates before each completion."
+  },
+  {
+    "id": "github-pr-test-result",
+    "destination": "github-pr-comment",
+    "targetThread": "The reviewer asked whether the Windows failure still reproduces.",
+    "settledContext": ["The original failure happened on Node 20."],
+    "privateDeliberation": ["We considered replacing the test runner."],
+    "intendedInvariants": ["Node 20", "Windows", "42 tests passed"],
+    "directAnswer": "It no longer reproduces.",
+    "expectedOutput": "It no longer reproduces. On Node 20 for Windows, all 42 tests passed."
+  },
+  {
+    "id": "discord-uncertain-evidence",
+    "destination": "discord-thread",
+    "targetThread": "A maintainer asked whether the remote flag is enabled.",
+    "settledContext": ["The flag controls the new parser."],
+    "privateDeliberation": ["It is probably enabled in production."],
+    "intendedInvariants": ["cannot verify", "remote environment"],
+    "directAnswer": "I cannot verify that yet.",
+    "expectedOutput": "I cannot verify that yet. I do not have access to the remote environment."
+  },
+  {
+    "id": "slack-peer-bridge-practical-conclusion",
+    "destination": "slack-thread",
+    "targetThread": "A teammate asked what must be included before enabling a timeout change for everyone.",
+    "settledContext": ["The cohort already uses the guarded request path."],
+    "privateDeliberation": ["The service records the timeout choice in a metadata field but does not enforce it at the transport layer."],
+    "supportingMechanism": "The metadata field steers selection but is not an enforcement boundary.",
+    "intendedInvariants": ["30-second timeout", "guarded request path", "tested together", "helps", "does not prevent every failure"],
+    "directAnswer": "Quick addition: include the 30-second timeout.",
+    "forbiddenPhrases": ["One caveat before rollout", "metadata field", "enforcement boundary"],
+    "expectedOutput": "Quick addition: include the 30-second timeout. The timeout and guarded request path were tested together. It helps, but it does not prevent every failure."
+  }
+]

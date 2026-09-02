@@ -22,10 +22,10 @@ already own part of the workflow. It must not duplicate personal voice, research
 pull-request, or artifact-rendering behavior, and it must never read private
 sources, change templates, publish, or export without the corresponding approval.
 
-The first release supports two artifact types: GitHub proposal issues through
-`ad-publish`, and standalone analytical reports through `ad-report`. Additional
-types enter through the same human-gated curation contract after evidence shows
-that their recurring structure is worth retaining.
+The first release supports GitHub proposal issues and compact collaboration
+replies through `ad-publish`, and standalone analytical reports through
+`ad-report`. Additional types enter through the same human-gated curation contract
+after evidence shows that their recurring structure is worth retaining.
 
 ## User Scenarios
 
@@ -77,10 +77,12 @@ that their recurring structure is worth retaining.
   `ad-publish` owns collaboration publications; `ad-report` owns standalone
   analytical deliverables. They share a single template contract and a single,
   explicitly invoked curation operation.
-- R2: `ad-publish` initially supports GitHub proposal issues. `ad-report` initially
-  supports standalone analytical reports. An unsupported artifact type uses a
-  clearly identified generic baseline or stops when using that baseline would
-  materially change the result; it never claims a historical standard exists.
+- R2: `ad-publish` initially supports GitHub proposal issues and compact
+  collaboration replies for Slack, Discord, and GitHub issue or pull-request
+  conversations. `ad-report` initially supports standalone analytical reports.
+  An unsupported artifact type uses a clearly identified generic baseline or
+  stops when using that baseline would materially change the result; it never
+  claims a historical standard exists.
 - R3: Each drafting workflow accepts either a brief or an existing draft and
   resolves artifact type, destination, audience, purpose, language, requested
   action, and hard constraints from available context. It asks only about a value
@@ -161,6 +163,26 @@ that their recurring structure is worth retaining.
   destination require explicit approval of the final artifact and exact target.
   Approval for source access, template mutation, content, one destination, or one
   format does not imply approval for another.
+- R21: Before drafting a collaboration reply, the workflow classifies the target
+  thread, intended outward content, supporting evidence, private owner-agent
+  deliberation, and constraints. It preserves only intended-content invariants,
+  answers the unresolved question or requested action first, and includes only
+  net-new context needed for the conversation to continue.
+- R22: Every material factual claim in a collaboration reply is supported by the
+  supplied thread or by authorized evidence the workflow can inspect, including
+  local or remote configuration, CLI output, tests, logs, data, and cited sources.
+  An unsupported claim is omitted, qualified, or disclosed as a gap; evidence is
+  not dumped into the reply unless the recipient needs it.
+- R23: Before using tables, collapsed sections, diagrams, images, embeds, or other
+  rich formatting, the workflow verifies support in the exact destination and
+  posting surface. It uses rich content only when it improves comprehension and
+  otherwise returns concise plain text. When a destination cannot render diagram
+  source, a useful visual is delivered as an actual supported image attachment.
+- R24: A collaboration reply may use a brief peer-to-peer opener only when the
+  same first sentence carries the answer or concrete delta. It replaces abstract
+  editorial framing with the useful detail and keeps mechanism-level evidence out
+  when that detail would not change the recipient's understanding, decision, or
+  next action.
 
 ### Non-functional
 
@@ -197,6 +219,10 @@ Per-criterion progress tracking lives in per-Spec tasks.
   supporting depth and retain every applicable element in R15. The report fixtures
   produce a self-contained executive conclusion and retain every applicable
   element in R16.
+- Collaboration-reply fixtures begin with the direct answer, preserve every
+  intended-content invariant, exclude private deliberation and settled context,
+  use only destination-supported formatting, and reject article-like openings or
+  decision-irrelevant mechanism explanations.
 - A composition fixture for each applicable dependency demonstrates that the
   caller respects the callee's authorization and verification contract and does
   not create a second voice profile, research artifact type, pull-request flow, or
@@ -286,8 +312,9 @@ evidence justifies the interruption.
   [ADR-0068](../adr/0068-layer-personal-voice-evidence.md). Proposed realization:
   [ADR-0071](../adr/0071-layer-publication-templates.md).
 - Tasks: [Task 0059](../tasks/0059-implement-template-curation.md),
-  [Task 0060](../tasks/0060-implement-publication-workflow.md), and
-  [Task 0061](../tasks/0061-implement-report-workflow.md).
+  [Task 0060](../tasks/0060-implement-publication-workflow.md),
+  [Task 0061](../tasks/0061-implement-report-workflow.md), and
+  [Task 0063](../tasks/0063-bound-collaboration-replies.md).
 - Supersedes / Depends on: depends on
   [RESEARCH-0005](../research/0005-publication-template-system.md),
   [Spec 0004](0004-personal-voice-layer.md), and

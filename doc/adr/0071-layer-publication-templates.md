@@ -129,3 +129,12 @@ Spec 0005 without copying those skills' state or specialized behavior.
 - **Store one JSON catalog without Markdown** - rejected because deterministic
   parsing would improve slightly at the cost of human reviewability and useful
   explanatory instructions.
+
+## Addendum: Collaboration-reply baseline (2026-09-02)
+
+The bundled `ad-publish` layer also includes a `collaboration-reply` baseline for
+active Slack, Discord, GitHub issue, and pull-request threads. This is a second
+artifact type under the existing resolution, provenance, validation, read-only
+drafting, and approval contracts. It does not add a store, writer, or precedence
+rule. Unlike a proposal, the reply inherits settled thread context and therefore
+contains only the grounded, net-new answer or action participants need next.

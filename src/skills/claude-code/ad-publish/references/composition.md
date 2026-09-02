@@ -7,7 +7,8 @@ does not imply any other approval.
 
 ## Skill boundaries
 
-- `ad-voice` receives settled facts and structure for every final title and body.
+- `ad-voice` receives settled intended outward content and structure, not private
+  deliberation or unused background, for every final title, body, or reply.
   It owns the confirmed personal profile and mandatory naturalization pass,
   preferring an installed `humanizer` and using its bundled compatibility baseline
   otherwise. The fallback matches failure-class coverage and audit process, not

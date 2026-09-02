@@ -525,6 +525,30 @@ test('ad-voice audits every active profile pattern before returning a draft', ()
   }
 });
 
+test('ad-voice keeps private context out of collaboration replies', () => {
+  const root = join(__dirname, '..', 'src', 'skills');
+
+  for (const agent of ['claude-code', 'codex']) {
+    const skill = readFileSync(join(root, agent, 'ad-voice', 'SKILL.md'), 'utf8');
+    const application = readFileSync(
+      join(root, agent, 'ad-voice', 'references', 'application.md'),
+      'utf8'
+    );
+
+    assert.match(skill, /source-role ledger/i);
+    assert.match(skill, /target-thread context.*intended outward content.*supporting evidence/is);
+    assert.match(skill, /private.*deliberation/is);
+    assert.match(skill, /unresolved question or requested action.*first/is);
+    assert.match(skill, /short peer opener.*same sentence/is);
+    assert.match(skill, /supporting mechanism.*understand, decide, or do next/is);
+    assert.match(application, /context and evidence.*do not become draft\s+content/is);
+    assert.match(application, /settled.*thread/i);
+    assert.match(application, /net-new/i);
+    assert.match(application, /brief human opener.*same sentence/is);
+    assert.match(application, /mechanism detail.*understand, decide, or do next/is);
+  }
+});
+
 test('ad-voice always naturalizes through humanizer or its bundled fallback', () => {
   const root = join(__dirname, '..', 'src', 'skills');
 
