@@ -1,8 +1,32 @@
 # Applying a personal voice
 
+## Source-role boundary
+
+Before rewriting, classify supplied material as target-thread context, intended
+outward content, supporting evidence, private owner-agent deliberation, or a
+constraint. Context and evidence may guide the draft but do not become draft
+content automatically. Private deliberation stays out unless the owner explicitly
+promotes a specific item. When a role is ambiguous, exclude it unless doing so
+would prevent an honest answer.
+
+For a collaboration reply, identify the unresolved question or requested action
+and the net-new information needed to continue. Do not repeat settled thread
+context or explain concepts the active participants have already demonstrated they
+understand. A correction, necessary contrast, safety warning, or explicit recap
+request may justify repetition.
+
+In a live peer conversation, a brief human opener may precede the grammar of the
+answer only when the same sentence immediately delivers the useful detail. Avoid
+article-like labels for a caveat, topic, or context. Turn supporting technical
+reasoning into its practical conclusion, and omit mechanism detail that does not
+change what the recipient should understand, decide, or do next.
+
 ## Invariant ledger
 
-Before rewriting, record every claim, name, number, date, citation, URL, technical identifier, commitment, uncertainty marker, and requested action. After drafting, compare each item against the result. Style never authorizes factual loss or invention.
+From intended outward content only, record every claim, name, number, date,
+citation, URL, technical identifier, commitment, uncertainty marker, and requested
+action. After drafting, compare each item against the result. Style never
+authorizes factual loss, invention, or promotion of background into the draft.
 
 ## Mandatory naturalization
 
@@ -63,6 +87,11 @@ During tuning, a Portuguese pragmatic gloss may help the owner judge stance and 
 ## Final check
 
 - Every invariant survived.
+- No context, evidence, or private deliberation was promoted without a content need.
+- A collaboration reply starts with the direct answer and contains only useful
+  net-new information.
+- Any peer opener shares its sentence with the concrete answer or delta; no
+  article-like framing or decision-irrelevant mechanism remains.
 - Every active pattern is satisfied or has a concrete higher-priority override.
 - No community phrase was copied as an identity marker.
 - No unsupported layer changed the draft.

@@ -6,6 +6,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- `/ad-publish` now supports compact Slack, Discord, GitHub issue, and pull-request
+  replies. It separates private owner-agent deliberation from publishable content,
+  grounds material claims, answers the pending thread delta first, and selects
+  only formatting supported by the exact posting surface. `/ad-voice` enforces the
+  same context boundary and brevity after naturalization.
+
 ## [0.20.0-beta.8] - 2026-08-26
 
 ### Added

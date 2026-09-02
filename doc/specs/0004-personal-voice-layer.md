@@ -136,6 +136,20 @@ is reversible while learning the wrong pattern compounds across future writing.
   until every active instruction is satisfied or has a concrete override from an
   earlier factual, safety, destination, or hard-format constraint. A material
   override follows R15's disclosure boundary; ordinary audit state stays internal.
+- R20: Before building the invariant ledger, `ad-voice` classifies supplied
+  material as target-thread context, intended outward content, supporting
+  evidence, private owner-agent deliberation, or constraints. Only intended
+  outward content contributes preservation invariants. Context and evidence may
+  constrain a draft but do not become draft content automatically; private
+  deliberation stays out unless the owner explicitly promotes it.
+- R21: For a reply in an active collaboration thread, `ad-voice` answers the
+  unresolved question or requested action first and includes only the net-new
+  context needed to continue. It does not paraphrase or endorse what participants
+  already established unless correction, contrast, or explicit recap is required.
+- R22: In a live peer reply, a brief social opener is allowed only when the same
+  sentence delivers the concrete answer or delta. `ad-voice` removes abstract
+  editorial framing and mechanism-level explanation that does not change what the
+  recipient should understand, decide, or do next.
 
 ### Non-functional
 
@@ -159,6 +173,8 @@ is reversible while learning the wrong pattern compounds across future writing.
   natural and contextually appropriate, without reducing factual preservation.
 - Every held-out rewrite preserves all fixture-marked facts, identifiers,
   commitments, uncertainty, and requested actions.
+- A held-out reply set excludes fixture-marked private deliberation and settled
+  thread context while preserving every intended-content invariant.
 - Every pattern selected for a held-out rewrite receives an internal satisfied or
   higher-priority-override verdict; no unmet pattern reaches the returned draft.
 - A same-content evaluation across two audiences produces the expected contextual

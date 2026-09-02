@@ -14,14 +14,28 @@ Codex applies this workflow inline. Profile resolution and validation use the bu
 Apply a confirmed personal voice without changing it. The profile is machine-local; the draft may come from the conversation or an explicitly named file.
 
 <prime-directive>
-Preserve meaning before style. Keep every claim, name, number, date, citation, URL, identifier, commitment, uncertainty, and requested action. Never invent a detail to make the result sound personal. This skill is read-only: ordinary use and user reactions do not update the profile.
+Preserve intended meaning before style. Keep every intended outward claim, name,
+number, date, citation, URL, identifier, commitment, uncertainty, and requested
+action. Context can guide expression without becoming draft content. Never expose
+private owner-agent deliberation or invent a detail to make the result sound
+personal. This skill is read-only: ordinary use and user reactions do not update
+the profile.
 </prime-directive>
 
 ## Step 1: Frame the draft
 
-Determine the source text or brief, destination, audience, relationship, language, intent, and any hard length or format limit. Infer values already clear from context. Ask only when a missing value would materially change the draft and cannot be grounded.
+Determine the source text or brief, destination, exact posting surface, audience,
+relationship, language, intent, and any hard length or format limit. Infer values
+already clear from context. Ask only when a missing value would materially change
+the draft and cannot be grounded.
 
-Build a silent invariant ledger before rewriting. The ledger is for self-checking and does not appear in normal output.
+Build a silent source-role ledger before rewriting. Separate target-thread context,
+intended outward content, supporting evidence, private owner-agent deliberation,
+and constraints. Build the invariant ledger only from intended outward content.
+Context and evidence may constrain the draft but do not enter it automatically;
+private deliberation stays out unless the owner explicitly promotes it. When a
+role is ambiguous, exclude it and ask only if omission prevents an honest result.
+Both ledgers are for self-checking and do not appear in normal output.
 
 ## Step 2: Resolve and validate the profile
 
@@ -81,6 +95,16 @@ has a concrete higher-priority override. Then compare the result to the silent i
 and the naturalness checklist. Restore any changed or omitted invariant. After any
 corrective rewrite, repeat the invariant, profile-pattern, applicable `HW.<id>`, and
 naturalness audits.
+
+For a reply in an active collaboration thread, run a final relevance check: answer
+the unresolved question or requested action first, retain only the net-new context
+needed to continue, and remove any paraphrase of settled thread content. Repetition
+is allowed only for a correction, necessary contrast, safety warning, or explicitly
+requested recap. A short peer opener is allowed only when the same sentence carries
+the concrete answer or delta. Remove article-like framing and supporting mechanism
+that does not change what the recipient should understand, decide, or do next. If
+this check changes the draft, repeat the invariant,
+profile-pattern, applicable `HW.<id>`, and naturalness audits.
 
 The audit is a private quality gate, not an output score. Normal output is one usable draft and nothing else. Show analysis, active rules, audit details, confidence, or a Portuguese pragmatic gloss only when the user asks or when a material override prevents an honest result.
 

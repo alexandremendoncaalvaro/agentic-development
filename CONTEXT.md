@@ -53,6 +53,38 @@ read-only consumers
 [`src/skills/codex/ad-report/`](src/skills/codex/ad-report/). Governed by
 [`doc/adr/0071-layer-publication-templates.md`](doc/adr/0071-layer-publication-templates.md).
 
+### Collaboration reply
+
+**Definition:** a compact publication inside an active Slack, Discord, GitHub
+issue, or pull-request thread. It answers the unresolved question or action with
+the smallest grounded, net-new delta the current participants need; it is not
+required to stand alone outside that thread.
+
+_Avoid_: "short report" (a reply inherits shared thread context rather than
+rebuilding it); "summary" (recapping settled discussion is normally a defect);
+"message" alone (too broad to express the active-thread contract).
+
+**Related code:** bundled template
+[`src/skills/codex/ad-publish/references/templates/publication/collaboration-reply.md`](src/skills/codex/ad-publish/references/templates/publication/collaboration-reply.md)
+and its Claude Code twin; governed by
+[`doc/specs/0005-compose-publication-reporting.md`](doc/specs/0005-compose-publication-reporting.md).
+
+### Source-role ledger
+
+**Definition:** the private pre-draft classification of supplied material as
+target-thread context, intended outward content, supporting evidence, private
+owner-agent deliberation, or constraints. The role determines whether an item may
+appear in a publication; only intended outward content creates preservation
+invariants.
+
+_Avoid_: "context ledger" (context is only one role); "source list" (a list does
+not control inclusion); "publication outline" (the ledger is private selection
+state, not visible structure).
+
+**Related code:** [`src/skills/codex/ad-publish/references/evaluation.md`](src/skills/codex/ad-publish/references/evaluation.md)
+and [`src/skills/codex/ad-voice/references/application.md`](src/skills/codex/ad-voice/references/application.md),
+with byte-identical Claude Code counterparts.
+
 ### Kit
 
 **Definition:** the `@alexandrealvaro/agentic` npm package — a CLI plus the source-of-truth `src/skills/` tree that installs the `ad-*` skill set (and bundled Claude Code subagents) into a target project's agent surface.
@@ -183,6 +215,9 @@ _Avoid_: "preflight script" as the canonical noun (preflight is a common *role* 
 - An **Audience adaptation** changes the expression of a **Personal voice** for a reader or relationship; it never changes whose voice it is.
 - A **Personal voice** carries the user's **Communicative identity** across languages; an **Accommodation corpus** supplies target-community conventions without supplying identity.
 - An **Artifact template** defines the structure of a publication or report; a **Personal voice** defines how the owner communicates through that structure.
+- A **Collaboration reply** is selected through an **Artifact template**; its
+  **Source-role ledger** keeps shared context and private reasoning out of the
+  intended outward content before **Personal voice** is applied.
 - A **Kit** install materializes every bundled **Workflow-operational skill** and **Spec-driven skill** for each selected agent surface (`.claude/skills/` and `.agents/skills/`).
 - A **Fresh-context review** is implemented as a **Two-axis review** on every kit-supported host; the implementation differs per host but the noun does not.
 - A **Two-axis review** produces one or more **Review handoffs** as its audit trail.
