@@ -597,6 +597,153 @@ test('release-plan: branch and tag pushes use isolated exact refs', () => {
   ]);
 });
 
+test('release-plan: one digest-bound approval authorizes every unchanged stage', () => {
+  const context = {
+    releaseKind: 'patch',
+    packageName: '@example/package',
+    packageVersion: '1.2.3',
+    publishTag: 'latest',
+    branch: 'chore/release-v1.2.3',
+    baseBranch: 'main',
+    tag: 'v1.2.3',
+    prTitle: 'chore(release): v1.2.3',
+    prBody: '## Summary\n\n- Release v1.2.3\n',
+    prerelease: false,
+  };
+  const preview = runReleasePlan({ ...context, completed: [], merged: false });
+
+  assert.equal(preview.execution, null);
+  assert.match(preview.planApproval.digest, /^[a-f0-9]{64}$/);
+  assert.equal(preview.planApproval.effects.length, 7);
+
+  const approved = { scope: 'release-plan', digest: preview.planApproval.digest, approved: true };
+  const local = runReleasePlan({
+    ...context,
+    completed: [],
+    merged: false,
+    confirmation: approved,
+  });
+  const publish = runReleasePlan({
+    ...context,
+    completed: ['local-release', 'branch-push', 'tag-push'],
+    merged: true,
+    confirmation: approved,
+  });
+
+  assert.deepEqual(local.execution, ['npm', 'run', 'release', '--', 'patch']);
+  assert.deepEqual(publish.execution, ['npm', 'publish']);
+  assert.equal(local.planAuthorized, true);
+  assert.equal(publish.planAuthorized, true);
+  assert.equal(local.next.requiresConfirmation, false);
+  assert.equal(publish.next.requiresConfirmation, false);
+});
+
+test('release-plan: a changed target invalidates a plan-wide approval', () => {
+  const context = {
+    releaseKind: 'patch',
+    packageName: '@example/package',
+    packageVersion: '1.2.3',
+    publishTag: 'latest',
+    branch: 'chore/release-v1.2.3',
+    baseBranch: 'main',
+    tag: 'v1.2.3',
+    prTitle: 'chore(release): v1.2.3',
+    prBody: '## Summary\n\n- Release v1.2.3\n',
+    prerelease: false,
+  };
+  const preview = runReleasePlan({ ...context, completed: [], merged: false });
+  const changed = runReleasePlan({
+    ...context,
+    packageVersion: '1.2.4',
+    completed: [],
+    merged: false,
+    confirmation: {
+      scope: 'release-plan',
+      digest: preview.planApproval.digest,
+      approved: true,
+    },
+  });
+
+  assert.equal(changed.execution, null);
+  assert.equal(changed.planAuthorized, false);
+  assert.equal(changed.next.requiresConfirmation, true);
+  assert.match(changed.blocked, /approval digest does not match/);
+});
+
+test('release-plan: a changed PR draft invalidates a plan-wide approval', () => {
+  const context = {
+    releaseKind: 'patch',
+    packageName: '@example/package',
+    packageVersion: '1.2.3',
+    publishTag: 'latest',
+    branch: 'chore/release-v1.2.3',
+    baseBranch: 'main',
+    tag: 'v1.2.3',
+    prTitle: 'chore(release): v1.2.3',
+    prBody: '## Summary\n\n- Release v1.2.3\n',
+    prerelease: false,
+  };
+  const preview = runReleasePlan({ ...context, completed: [], merged: false });
+  const changed = runReleasePlan({
+    ...context,
+    prBody: '## Summary\n\n- Release something else\n',
+    completed: [],
+    merged: false,
+    confirmation: {
+      scope: 'release-plan',
+      digest: preview.planApproval.digest,
+      approved: true,
+    },
+  });
+
+  assert.equal(changed.execution, null);
+  assert.equal(changed.planAuthorized, false);
+  assert.match(changed.blocked, /approval digest does not match/);
+});
+
+test('release-plan: a resumed release can approve only its remaining effects', () => {
+  const context = {
+    packageName: '@example/package',
+    packageVersion: '1.2.3',
+    publishTag: 'latest',
+    branch: 'chore/release-v1.2.3',
+    baseBranch: 'main',
+    tag: 'v1.2.3',
+    prTitle: 'chore(release): v1.2.3',
+    prBody: '## Summary\n\n- Release v1.2.3\n',
+    prerelease: false,
+    completed: ['local-release', 'branch-push', 'tag-push'],
+    merged: true,
+  };
+  const preview = runReleasePlan(context);
+  const approved = runReleasePlan({
+    ...context,
+    confirmation: {
+      scope: 'release-plan',
+      digest: preview.planApproval.digest,
+      approved: true,
+    },
+  });
+
+  assert.equal(preview.planApproval.target.releaseKind, null);
+  assert.equal(preview.planApproval.effects[0].completed, true);
+  assert.deepEqual(approved.execution, ['npm', 'publish']);
+});
+
+test('release plan authorization composes through release PR and merge skills', () => {
+  for (const host of ['claude-code', 'codex']) {
+    const root = join(__dirname, '..', 'src', 'skills', host);
+    const release = readFileSync(join(root, 'ad-release', 'SKILL.md'), 'utf8');
+    const pr = readFileSync(join(root, 'ad-pr', 'SKILL.md'), 'utf8');
+    const merge = readFileSync(join(root, 'ad-merge', 'SKILL.md'), 'utf8');
+
+    assert.match(release, /Do not ask again for an unchanged approved plan/);
+    assert.match(release, /Reuse the same plan approval/);
+    assert.match(pr, /continue\s+without another\s+question/);
+    assert.match(merge, /never authorizes a failing-CI override/);
+  }
+});
+
 test('release-plan: every direct release effect remains unexecuted when refused', () => {
   const context = {
     releaseKind: 'patch',

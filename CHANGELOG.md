@@ -6,6 +6,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- `/ad-release` now accepts one SHA-256-bound approval for the complete release
+  plan. Unchanged direct steps and delegated PR/merge actions proceed without
+  repeated confirmation, while target drift, technical gate failures, and
+  irreversible-state ambiguity still stop execution. Per-stage approval remains
+  available as a fallback.
+
 ## [0.20.0-beta.9] - 2026-09-02
 
 ### Changed

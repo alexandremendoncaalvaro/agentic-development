@@ -23,6 +23,12 @@ Route elsewhere when:
 
 **Release-only mode.** `/ad-release` first invokes `/ad-merge --release --preflight` before opening its release PR. This preflight requires a repository that allows merge commits; reject a repository that permits only squash or rebase, because its tagged release commit would not remain an ancestor of the base branch. After the PR exists, `/ad-release` invokes `/ad-merge --release <PR>`; that mode forces `--merge` and never offers a merge-mode choice.
 
+When release-only mode receives a valid `release-plan` approval receipt, require
+the current `release-plan.mjs` output to carry the same digest and
+`planAuthorized: true`. The receipt satisfies the merge confirmation
+for that release only. It never authorizes a failing-CI override or bypasses any
+preflight, review, mergeability, or merge-commit requirement.
+
 ## Phase 1 — Preflight
 
 Resolve the target before probing: if the user passed a PR number / URL, preserve it; otherwise omit the optional argument. Then run the deterministic preflight from the consumer repository root:
@@ -69,8 +75,9 @@ Unresolved comments — count entries from `gh api` that lack a `resolved` flag 
 Apply the bar:
 
 - **CI failing** → **Hard stop.** Refuse to merge until CI is green, *unless* the user explicitly overrides ("merge anyway"). On override, log a loud warning that this is a deliberate CI-failing merge and the responsibility is the user's. Per ADR-0025 §3, even the hard gate yields to explicit user authorization, but the override is surfaced visibly.
-- **CI pending** → Ask the user: wait for CI, or proceed anyway? Default = wait.
-- **CI green + warnings** (no fresh-context review / no linked task / unresolved comments) → Surface each warning, ask the user to confirm the merge, proceed on confirm.
+- **CI pending** → Wait by default. Ask whether to proceed only when no valid
+  release-plan receipt exists and the user requests a decision before CI finishes.
+- **CI green + warnings** (no fresh-context review / no linked task / unresolved comments) → Surface each warning. Ask the user to confirm the merge under the normal flow; under a valid release-plan receipt, continue without another question unless a warning changes the approved release target or effect.
 - **All green** → Proceed.
 
 State the decision back to the user before Phase 4 so they can interject.

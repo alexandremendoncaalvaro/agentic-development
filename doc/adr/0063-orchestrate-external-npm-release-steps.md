@@ -4,6 +4,7 @@
 **Date:** 2026-08-10
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0048 — its manually performed post-local-release tail steps.
+**Amended by:** ADR-0072 — replaces five mandatory confirmations with one digest-bound plan approval while retaining per-stage fallback.
 
 ## Context
 

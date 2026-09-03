@@ -8,23 +8,23 @@
 
 The kit already makes the local half of a release deterministic: its `scripts/release.sh` validates the tree, bumps the version, rotates `CHANGELOG.md`, creates a DCO-signed-off release commit and an annotated tag. The maintainer must still remember the cross-system sequence after that local step: open and merge the release PR, publish the exact package to npm, verify its dist-tag, and create the matching GitHub Release. Missing or reordering one of those steps risks an unrecoverable npm version, a published package without an auditable GitHub release, or an accidental external write.
 
-`ad-release` turns that fragmented runbook into one workflow-operational skill for maintainers of a single npm package released through GitHub. It invokes the root package's configured `release` script as the only implementation of version, changelog, commit, and tag mutation; for this kit, that script is `scripts/release.sh`. The skill orchestrates the surrounding checks and handoffs. The user remains the explicit authorizer for every effect the skill performs.
+`ad-release` turns that fragmented runbook into one workflow-operational skill for maintainers of a single npm package released through GitHub. It invokes the root package's configured `release` script as the only implementation of version, changelog, commit, and tag mutation; for this kit, that script is `scripts/release.sh`. The skill orchestrates the surrounding checks and handoffs. The user explicitly authorizes either the complete digest-bound plan or one effect at a time.
 
 ## User Scenarios
 
 - **Scenario 1: Prepare a release safely**
   - Given a maintainer has a release-ready npm package with an intentional non-empty `[Unreleased]` section
   - When they invoke `/ad-release` with a requested bump kind
-  - Then the skill validates prerequisites, shows the computed version and release plan, and requires confirmation before it runs the local release script.
+  - Then the skill validates prerequisites, shows the computed version and complete digest-bound release plan, and requires one confirmation before it runs the local release script.
 
 - **Scenario 2: Land the release commit through review**
   - Given the local release script created its commit and annotated tag on a release branch
-  - When the maintainer confirms the release-branch push
-  - Then the skill pushes that branch, hands it to `/ad-pr`, and waits for `/ad-merge` to land it on the base branch; those two skills retain their own confirmation gates.
+  - When the maintainer approved the unchanged complete release plan
+  - Then the skill pushes that branch, hands it to `/ad-pr`, and waits for `/ad-merge` to land it on the base branch without duplicate approval prompts; both delegated skills retain their technical gates and surface their result before acting.
 
 - **Scenario 3: Publish the merged version and create its release record**
   - Given the release commit is reachable from the merged base branch
-  - When the maintainer separately confirms the post-merge tag push, npm publication, and GitHub Release creation
+  - When the unchanged plan-wide approval covers the post-merge tag push, npm publication, and GitHub Release creation
   - Then the skill pushes the exact annotated tag, creates a disposable checkout pinned to that tag, tests and publishes the verified package content from that checkout, verifies the expected npm dist-tag, and creates one GitHub Release from that remote tag.
 
 - **Scenario 4: Recover from a partial external release**
@@ -40,7 +40,7 @@ The kit already makes the local half of a release deterministic: its `scripts/re
 - R2: The skill supports one root npm package with GitHub as its release host. It refuses to proceed when `package.json`, `package-lock.json`, `CHANGELOG.md`, the repository remote, `package.json#scripts.release`, or an explicit `package.json#publishConfig.tag` is absent. The configured script must accept one of `patch | minor | major | prerelease` plus `--dry-run`; a repository without that contract is out of scope. For this kit, implementation adds `"release": "./scripts/release.sh"` as a thin wrapper around ADR-0048's only release path.
 - R3: A new release starts from one requested bump kind; a resume starts from an explicit existing release tag, never a bump kind. Before any mutation, the skill reports the current branch, working-tree state, computed version from `npm run release -- <kind> --dry-run` for a new release, `[Unreleased]` readiness, local tag collision, npm package name, configured publish tag, and remote release/tag state. It invokes `npm pack --dry-run` to show the publish surface. For a resume, it verifies that the explicit tag is annotated and identifies the release commit and its package version; it refuses an ambiguous or mismatched tag instead of calculating another version.
 - R4: The only path that mutates the local version, changelog, release commit, and annotated tag is the configured `npm run release -- <kind>` script. That script is an allowed wrapper only when it delegates solely to the repository's existing release path; in this kit it delegates to `scripts/release.sh`. The skill first runs its dry-run, then requires explicit confirmation before the real invocation. It never reimplements version calculation or changelog rotation.
-- R5: The skill has exactly five direct confirmation boundaries. Before each it shows the exact command, effect, and postcondition, then awaits explicit user approval:
+- R5: The skill shows one complete plan containing the exact release target, PR draft, effects, and postconditions. The planner binds the package name and version, configured dist-tag, release kind for a new release or verified existing tag for a resume, base and release branches, tag, prerelease flag, exact PR title and body, and direct or delegated effects into a SHA-256 digest. One explicit approval of that digest authorizes every unchanged effect. The following effect boundaries remain independently checked, and each may still use per-stage approval when the owner declines the complete plan:
 
   | Confirmation | Effect | Required postcondition |
   | --- | --- | --- |
@@ -50,11 +50,11 @@ The kit already makes the local half of a release deterministic: its `scripts/re
   | npm publish | Run `npm publish` from a disposable checkout pinned to the annotated tag | Registry reports the tag's exact name-and-version and its configured dist-tag |
   | GitHub Release | Create the release from the remote annotated tag | One release URL with notes from that tag, marked prerelease only for a prerelease version |
 
-  `ad-release` never directly opens or merges a PR: it hands those actions to `ad-pr` and `ad-merge`, whose existing confirmation gates remain authoritative. It never changes global GitHub authentication, runs `gh auth switch`, reads credential files, or exposes tokens or OTP values.
+  `ad-release` never directly opens or merges a PR: it hands those actions to `ad-pr` and `ad-merge`. A valid release-plan receipt satisfies their outward-action approval boundary, but not their local-gate, CI, review, mergeability, or merge-mode checks. They surface the exact draft or decision before acting so the owner can interject. The receipt becomes invalid if its target or effects change. The skill never changes global GitHub authentication, runs `gh auth switch`, reads credential files, or exposes tokens or OTP values.
 - R6: The skill delegates PR creation to `ad-pr` and merge evaluation to `ad-merge`. A release-only mode in `ad-merge` must force `--merge` and reject squash or rebase, preserving the tagged release commit as an ancestor of the base branch; `ad-release` invokes that mode for a release PR. The skill checks that merge commits are allowed before the PR opens and stops if the repository permits only squash or rebase. For its release-specific GitHub checks and release creation, it uses the repository's documented GitHub CLI frontend; in this repository that is `ghp`. It never assumes or switches a machine-global account.
 - R7: Before npm publication, the skill verifies that the release tag is already remote and that the tagged release commit is reachable from the merged base branch. It creates a disposable detached worktree at that exact annotated tag; within that checkout it runs `npm ci` from the committed lockfile, verifies the package version named by the tag, runs the package test gate and `npm pack --dry-run`, and runs `npm publish`. It removes the disposable worktree after a verified result or reports it for recovery after an interrupted run. It stops if the registry already contains the target name-and-version.
-- R8: The skill runs `npm publish` only after explicit confirmation and lets npm request its own OTP. After success, it verifies the exact published version and reports the package's configured dist-tag. Changing any dist-tag, including `latest`, is out of scope.
-- R9: The skill creates the GitHub Release only after its tag is remote, using the annotated tag as release notes (`ghp release create <tag> --verify-tag --notes-from-tag` in this repository). It adds `--prerelease` only when the target version is a SemVer prerelease. It requires a distinct explicit confirmation and reports the resulting URL.
+- R8: The skill runs `npm publish` only after an explicit plan-wide or per-stage approval and lets npm request its own OTP. After a non-mutating authentication interruption, it inspects the registry and may reuse the same unchanged plan receipt; it never retries blindly. After success, it verifies the exact published version and reports the package's configured dist-tag. Changing any dist-tag, including `latest`, is out of scope.
+- R9: The skill creates the GitHub Release only after its tag is remote, using the annotated tag as release notes (`ghp release create <tag> --verify-tag --notes-from-tag` in this repository). It adds `--prerelease` only when the target version is a SemVer prerelease. A valid plan-wide or per-stage approval authorizes it, and the skill reports the resulting URL.
 - R10: A rerun is state-aware: it detects an existing local or remote tag, merged release commit, published npm version, and GitHub Release, then reports the next unfinished step. It never retries an already-successful irreversible operation.
 
 ### Non-functional
@@ -66,9 +66,9 @@ The kit already makes the local half of a release deterministic: its `scripts/re
 ## Success Criteria
 
 - A dry-run on a fixture release branch reports the same target version as the configured release script's `--dry-run` and leaves the working tree, index, tags, remote, registry, and GitHub state unchanged.
-- The skill cannot start its local release, remote-sync, npm-publish, or GitHub-Release action without that action's preceding confirmation; PR creation and merge remain delegated to the independently confirmation-gated `ad-pr` and `ad-merge` workflows.
+- The skill cannot start its local release, remote-sync, npm-publish, or GitHub-Release action without a matching plan-wide or per-stage approval. PR creation and merge remain delegated to `ad-pr` and `ad-merge`; a matching plan receipt prevents a duplicate approval prompt without bypassing their checks.
 - A successful release has one DCO-signed-off release commit preserved as an ancestor of the base branch, one annotated remote tag, one matching npm package version built from that tag under its configured dist-tag, and one GitHub Release whose notes come from that tag.
-- A fixture proves the five direct confirmation boundaries independently: refusing each confirmation leaves the corresponding local release, release-branch push, post-merge tag push, npm publish, or GitHub Release action unstarted; PR creation and merge remain delegated to the separately gated `ad-pr` and `ad-merge` workflows.
+- Fixtures prove that refusing approval leaves every effect unstarted, one matching digest authorizes every unchanged stage, and changing any bound target field invalidates the receipt. PR creation and merge remain delegated while consuming the same receipt.
 - A rerun after each injected partial-failure boundary names the already-complete steps and offers no command that republishes the same npm version or recreates a tag/release blindly.
 - Both hosts install the same release contract and all skill, script, and fixture tests pass.
 
@@ -88,11 +88,11 @@ The kit already makes the local half of a release deterministic: its `scripts/re
 - Monorepos, workspaces, non-npm registries, non-GitHub forges, release assets, and CI trusted publishing.
 - Changing repository merge policy or supporting a release PR merged by squash or rebase.
 - Changing any npm dist-tag, npm access/ownership, or package permissions.
-- Automatically pushing, merging, publishing, tagging, or creating a GitHub Release without an explicit user approval at that step.
+- Automatically pushing, merging, publishing, tagging, or creating a GitHub Release without an explicit matching plan-wide or per-stage approval.
 
 ## Open Questions
 
-- Resolved — [ADR-0063](../adr/0063-orchestrate-external-npm-release-steps.md) accepts the five separately confirmed effects and the state-aware recovery contract.
+- Resolved — [ADR-0072](../adr/0072-bind-one-approval-to-the-release-plan.md) replaces five mandatory confirmations with one digest-bound plan approval while retaining per-stage fallback and the state-aware recovery contract.
 - Resolved — [ADR-0066](../adr/0066-publish-prereleases-on-latest.md) sets
   `latest` as the configured dist-tag for the kit's `-beta.N` releases. The
   observed `latest` assignment of `0.20.0-beta.2` is intentional; the release
