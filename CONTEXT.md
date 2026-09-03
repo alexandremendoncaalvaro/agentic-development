@@ -210,6 +210,23 @@ _Avoid_: "preflight script" as the canonical noun (preflight is a common *role* 
 
 **Related code:** [`src/skills/claude-code/ad-audit/scripts/resolve-rules.mjs`](src/skills/claude-code/ad-audit/scripts/resolve-rules.mjs), [`src/lib/install.js`](src/lib/install.js), [`test/skills.test.js`](test/skills.test.js), [`test/skill-scripts.test.js`](test/skill-scripts.test.js).
 
+### Release-plan approval
+
+**Definition:** one explicit authorization bound by SHA-256 to a release's
+package name and version, dist-tag, release kind or resume tag, base and release
+branches, exact PR draft, prerelease flag, and complete direct or delegated
+effect list. It remains valid across unchanged stages and non-mutating
+interruptions; any target or effect change invalidates it.
+
+_Avoid_: "approve everything" (not bound to a target); "release permission"
+(does not express the exact-plan constraint); "bypass" (technical gates remain
+mandatory).
+
+**Related code:**
+[`src/skills/codex/ad-release/scripts/release-plan.mjs`](src/skills/codex/ad-release/scripts/release-plan.mjs)
+and its Claude Code twin; governed by
+[`doc/adr/0072-bind-one-approval-to-the-release-plan.md`](doc/adr/0072-bind-one-approval-to-the-release-plan.md).
+
 ## Relationships
 
 - An **Audience adaptation** changes the expression of a **Personal voice** for a reader or relationship; it never changes whose voice it is.
@@ -224,6 +241,9 @@ _Avoid_: "preflight script" as the canonical noun (preflight is a common *role* 
 - A **Session handoff** and a **Review handoff** are sibling flavours of **Handoff**; they share neither path nor lifecycle. Each is owned by exactly one skill (`ad-handoff` and `ad-review` respectively).
 - An **Audit handoff** is the maximum-gate sibling flavour, owned by `ad-audit`. It shares the `.agentic/reviews/` directory with the **Review handoff** but differs in producer and shape (per rule-group, not per axis).
 - An `ad-audit` run resolves its rule-set as the union of the three **Rule-set layers**; `ad-level-up` writes to exactly one curated layer per accepted rule (machine store or project rules — binding docs belong to their own skills).
+- A **Release-plan approval** authorizes the unchanged release effects that
+  `ad-release` delegates to `ad-pr` and release-only `ad-merge`; it never replaces
+  their technical gates.
 
 ## Flagged ambiguities
 

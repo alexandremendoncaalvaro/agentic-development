@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const STAGES = [
   'local-release',
@@ -69,14 +70,130 @@ function commandFor(stage, state) {
   throw new Error(`unknown release stage ${stage}`);
 }
 
+function buildPlanApproval(state) {
+  const required = [
+    'packageName',
+    'packageVersion',
+    'publishTag',
+    'branch',
+    'baseBranch',
+    'tag',
+    'prTitle',
+    'prBody',
+  ];
+  if (required.some((key) => typeof state[key] !== 'string' || state[key].length === 0)) {
+    return null;
+  }
+  const isNewRelease = !state.completed.includes('local-release');
+  const hasReleaseKind = typeof state.releaseKind === 'string' && state.releaseKind.length > 0;
+  if (isNewRelease && !hasReleaseKind) return null;
+
+  const effects = [
+    hasReleaseKind
+      ? {
+          id: 'local-release',
+          command: commandFor('local-release', state),
+          postcondition: 'one DCO-signed release commit and one annotated local tag',
+        }
+      : {
+          id: 'local-release',
+          completed: true,
+          postcondition: 'verified existing release commit and annotated local tag',
+        },
+    {
+      id: 'branch-push',
+      command: commandFor('branch-push', state),
+      postcondition: 'remote release branch resolves to the release commit',
+    },
+    {
+      id: 'pr-create',
+      delegate: 'ad-pr',
+      artifact: {
+        base: state.baseBranch,
+        head: state.branch,
+        title: state.prTitle,
+        body: state.prBody,
+      },
+      postcondition: 'one open release PR against the base branch',
+    },
+    {
+      id: 'pr-merge',
+      delegate: 'ad-merge --release',
+      constraint: 'green CI and merge commit only',
+      postcondition: 'release commit is an ancestor of the base branch',
+    },
+    {
+      id: 'tag-push',
+      command: commandFor('tag-push', state),
+      postcondition: 'remote annotated tag resolves to the release commit',
+    },
+    {
+      id: 'npm-publish',
+      command: commandFor('npm-publish', state),
+      postcondition: 'registry contains the exact version under the configured dist-tag',
+    },
+    {
+      id: 'github-release',
+      command: commandFor('github-release', state),
+      postcondition: 'GitHub Release exists with notes from the annotated tag',
+    },
+  ];
+  const target = {
+    packageName: state.packageName,
+    packageVersion: state.packageVersion,
+    publishTag: state.publishTag,
+    releaseKind: hasReleaseKind ? state.releaseKind : null,
+    branch: state.branch,
+    baseBranch: state.baseBranch,
+    tag: state.tag,
+    prTitle: state.prTitle,
+    prBody: state.prBody,
+    prerelease: state.prerelease === true,
+  };
+  const digest = createHash('sha256')
+    .update(JSON.stringify({ schemaVersion: 1, target, effects }))
+    .digest('hex');
+
+  return { schemaVersion: 1, digest, target, effects };
+}
+
 function plan(state) {
   const completed = validateCompleted(state.completed);
+  const planApproval = buildPlanApproval(state);
+  const requestedPlanApproval = state.confirmation?.scope === 'release-plan';
+  const approvedPlan =
+    requestedPlanApproval &&
+    state.confirmation.approved === true &&
+    planApproval !== null &&
+    state.confirmation.digest === planApproval.digest;
   const stage = STAGES[completed.length] ?? null;
   if (stage === null) {
-    return { next: null, execution: null, complete: true, blocked: null, unreadable: [] };
+    return {
+      next: null,
+      execution: null,
+      complete: true,
+      blocked: null,
+      unreadable: [],
+      planApproval,
+      planAuthorized: approvedPlan,
+    };
   }
 
-  const next = { id: stage, requiresConfirmation: true };
+  const next = { id: stage, requiresConfirmation: !approvedPlan };
+  if (requestedPlanApproval && !approvedPlan) {
+    return {
+      next,
+      execution: null,
+      complete: false,
+      blocked:
+        planApproval === null
+          ? 'plan-wide approval requires the complete release target'
+          : 'plan-wide approval digest does not match the current release target and effects',
+      unreadable: [],
+      planApproval,
+      planAuthorized: false,
+    };
+  }
   if (['tag-push', 'npm-publish'].includes(stage) && state.merged !== true) {
     return {
       next,
@@ -84,16 +201,21 @@ function plan(state) {
       complete: false,
       blocked: `${stage} requires the merged release commit to be on the base branch`,
       unreadable: [],
+      planApproval,
+      planAuthorized: approvedPlan,
     };
   }
 
-  const approved = state.confirmation?.stage === stage && state.confirmation.approved === true;
+  const approvedStage =
+    state.confirmation?.stage === stage && state.confirmation.approved === true;
   return {
     next,
-    execution: approved ? commandFor(stage, state) : null,
+    execution: approvedPlan || approvedStage ? commandFor(stage, state) : null,
     complete: false,
     blocked: null,
     unreadable: [],
+    planApproval,
+    planAuthorized: approvedPlan,
   };
 }
 

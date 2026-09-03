@@ -21,6 +21,12 @@ Route elsewhere when:
 - The branch has uncommitted or unsplit work → `/ad-commit` first.
 - The user wants to merge an already-open PR → `/ad-merge`.
 
+**Release-plan authorization.** When `/ad-release` delegates with a
+`release-plan` approval receipt, require its current `release-plan.mjs` output to
+carry the same digest and `planAuthorized: true`. This receipt
+satisfies this skill's outward-action approval only for the release target named
+by that plan. All preflight and local quality gates below still apply.
+
 ## Phase 1 — Preflight
 
 Run the deterministic preflight from the consumer repository root:
@@ -99,7 +105,10 @@ Rules:
 - **Test plan:** concrete steps a reviewer can run. `npm test`, manual smoke, integration check. Skip the section if there is genuinely nothing to test (a pure docs PR). **Never fabricate test items.**
 - **Links:** every detected back-link from Phase 2. Skip the section if there are none. **Never invent links.**
 
-Surface the draft to the user for approval before opening. The user may edit or accept.
+Surface the draft to the user for approval before opening. The user may edit or
+accept. Under a valid release-plan receipt, surface the exact draft and continue
+without another question when it matches the approved release target; a material
+target or body change invalidates the receipt and returns to normal approval.
 
 ## Phase 4 — Open + report
 

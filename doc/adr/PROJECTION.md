@@ -6,7 +6,7 @@ Without this file, learning which architectural decisions still bind costs one p
 
 ## Default
 
-All 47 accepted ADRs bind in full, except the thirteen below, which bind except for the named part.
+All 48 accepted ADRs bind in full, except the fourteen below, which bind except for the named part.
 
 No ADR in this directory has been deprecated or superseded as a whole document. A `proposed` ADR is not counted here and does not appear until it is accepted — it binds nothing until then, and its acceptance is the change to what binds that adds it (see *The rule that keeps it true*).
 
@@ -19,6 +19,7 @@ No ADR in this directory has been deprecated or superseded as a whole document. 
 | [0030](0030-single-responsibility-per-document.md) | The absolute reading of directory-as-index, for a layer's *own* directory only | The single-responsibility-per-document principle, and the ban on any *other* document digesting a layer's index | [ADR-0049](0049-append-only-layers-own-a-state-projection.md) — the decision that created this page |
 | [0047](0047-absorb-team-practices-determinism-reaudit.md) | Decision 1's *realization* as inline shell copied into two skill files — not Decision 1 itself | The deterministic resolution probe as a requirement, and Decisions 2 through 4 | Its own addendum, after task-0031 shipped the probe as a skill script |
 | [0048](0048-kit-release-discipline-gates.md) | Decision 2's manually performed post-local-release tail steps | The configured release script as the sole local mutation path, plus every other decision in the record | [ADR-0063](0063-orchestrate-external-npm-release-steps.md) |
+| [0063](0063-orchestrate-external-npm-release-steps.md) | Five mandatory direct confirmations and independently gated release PR handoffs | The checked release sequence, exact-tag publication, merge-commit preservation, and state-aware recovery contract | [ADR-0072](0072-bind-one-approval-to-the-release-plan.md) |
 | [0020](0020-deep-modules-vocabulary.md) | Profile-based installation scope for `ad-deepen` | The architectural vocabulary, regime, and process | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |
 | [0021](0021-diagnose-discipline.md) | The four-profile framing of `ad-diagnose` registration | The diagnosis discipline and its dual-host behavior | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |
 | [0036](0036-ad-audit-maximum-gate.md) | Profile-based installation scope for `ad-audit` | The maximum-gate audit process and evidence requirements | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |
