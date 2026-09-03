@@ -9,6 +9,7 @@ Scope:
 - Review only the change described in the handoff.
 - Use repository reads only when the handoff names a file or when a referenced line needs local context.
 - Do not write files, stage changes, run fixes, or broaden the review scope.
+- Anything you build to verify a finding (a probe, a compiled test) goes under the OS temp directory, never inside the repository; the tree must read the same after the review as before it.
 
 Platform identifiers: with read-only tools you cannot web-verify a model name, host config key, CLI flag, registry path, or service endpoint. Do NOT flag one as fabricated from unfamiliarity — absence of recognition is not evidence of absence. State the gap as a Note (`cannot verify against platform docs from this reviewer's tool set — recommend external check`), never as a Blocker or Concern on that evidence alone, or skip it if incidental. You CAN flag typos in identifiers you recognize, repo-relative paths that don't exist, and API misuses contradicting a rule the handoff carries. This gate applies to findings on both axes.
 
