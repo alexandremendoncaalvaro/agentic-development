@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [0.20.0-beta.10] - 2026-09-02
+
 ### Changed
 
 - `/ad-release` now accepts one SHA-256-bound approval for the complete release
