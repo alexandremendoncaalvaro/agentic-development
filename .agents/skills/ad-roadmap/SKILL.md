@@ -1,80 +1,121 @@
 ---
 name: ad-roadmap
-description: Read-only progress rollup — reconciles the roadmap tiers against specs and tasks into an overall percentage and per-tier done, in progress, blocked, remaining. Use on "how much is done", "are we on track", "progress report", "percent complete", "what's shipped".
-summary: Read-only completion rollup that reconciles the product roadmap against implementing specs and tasks into an overall percentage plus a per-tier done / in progress / blocked / remaining breakdown for a decision-maker.
+description: Read-only roadmap report — reconciles roadmap tiers against specs and tasks, then explains the main delivery front, current work, next front, blockers, and progress as a plain-language Markdown checklist. Use on "how much is done", "are we on track", "progress report", "percent complete", "what's shipped".
+summary: Read-only roadmap report with a thirty-second plain-language overview, focused current-front explanation, and checklist of delivered and remaining work backed by specs and tasks.
 ---
 
 <background_information>
-Read-only completion rollup for a decision-maker. Answers one question: how much of the plan is done, how much is left, and are we on track. Reconciles the product roadmap against its implementing specs and tasks, returns a scannable percentage plus a per-tier breakdown. Writes nothing.
+Read-only progress report for a decision-maker or newcomer. It answers: what are we delivering, what is happening now, what comes next, how much is done, and what is blocked? It reconciles the product roadmap against specs and tasks, then translates that evidence into plain language and a standard Markdown checklist. It writes nothing.
 
-Complements `ad-next`, a different question: `ad-next` answers "what should I do next" (a forward-looking action list for the practitioner); `ad-roadmap` answers "how much is done vs left" (a completion rollup for the boss). Route to `ad-next` for next actions and `ad-prd` for authoring or changing the roadmap — never reimplement either.
+`ad-next` answers a different question: what the practitioner should do next. `ad-prd` authors or changes the roadmap. Do not absorb either responsibility.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user asks about roadmap progress, invoke this skill manually.
+Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire for a roadmap-progress question, invoke this skill manually.
 </background_information>
 
 <instructions>
 Rules (read first):
-- Read-only. Write no file, mutate no state.
-- Read ONLY frontmatter and the `## Roadmap` section. Never read full document bodies.
-- No emoji anywhere (WORKFLOW §2 / ADR-0008). Status is words: `done`, `in progress`, `blocked`, `remaining`.
-- Degrade gracefully. PRD, `doc/specs/`, and `doc/tasks/` may each be absent — never error on a missing directory; report what is missing and roll up what exists. An empty or absent `## Roadmap` with a PRD present → headline `N/A (no roadmap lines)`; compute no percentage (no divide-by-zero) — fall back to the task-based rollup and say so.
-- One rollup, not a menu. Headline percentage = `done roadmap lines / total roadmap lines`.
+- Read-only. Write no file and mutate no state.
+- Keep the broad scan bounded: read roadmap sections, frontmatter, artifact references, and checkbox lines. Do not read full document bodies.
+- Only for a task marked `in-progress`, read its `## Context` and `## Acceptance Criteria` to explain the active front. Do not read its Plan, Notes, or unrelated sections.
+- Use plain language that someone joining the project can understand without opening another file. Translate artifact labels into outcomes; explain an acronym on first use; do not paste source prose.
+- Use standard Markdown task-list syntax only: `- [x]` means delivered and `- [ ]` means work remains. An in-progress parent stays open and uses nested checked and open steps. Do not invent a third checkbox state.
+- No emoji (WORKFLOW §2 / ADR-0008). Write status words where needed: `in progress`, `blocked`, `remaining`.
+- Degrade gracefully. A missing PRD, `doc/specs/`, or `doc/tasks/` directory is reported, never treated as an error. An empty or absent PRD roadmap produces `N/A (no roadmap lines)`, falls back to the task ledger, and computes no roadmap percentage.
+- Produce one report, not a menu. Overall percentage remains `done roadmap lines / total roadmap lines`.
 
-Step 1 — load the plan (the spine).
-- `doc/product/PRD.md` → read `Status:` and the `## Roadmap` section only. The tiers (MVP / Next / Later) are the spine: each line is one feature to classify.
-- Multi-product: `doc/product/PRODUCT-MAP.md` plus per-product `<slug>.md` — roll up each, then combine.
-- No PRD → no product-framed plan. Fall back to `doc/tasks/` and say so (task-based, not roadmap-based); recommend `/ad-prd`.
+Step 1 — load the plan.
+- Read `Status:` and `## Roadmap` from `doc/product/PRD.md`. MVP / Next / Later tiers are the spine; each roadmap line is one item to classify.
+- In a multi-product repo, use `doc/product/PRODUCT-MAP.md` and each product file, then combine their rollups.
+- With no PRD, use `doc/tasks/` as the plan, label the result task-based, and recommend `/ad-prd`.
 
-Step 2 — gather implementation evidence (frontmatter only).
-- `doc/tasks/*.md` → `**Status:**` per task (`done` vs `proposed` / `in-progress` / `blocked`); within a task, count `- [x]` vs `- [ ]` for a per-task percentage; read `**Spec ref:**` to tie a task to its spec.
-- `doc/specs/*.md` → `Status:` (`draft` / `accepted` / `shipped` / `superseded`) plus child-task rollup. Defensive: this directory often does not exist — report "no specs" and reconcile from tasks.
-- `doc/adr/*.md` → `proposed` ADRs are open decisions that can block a line; surface by slug. Read `doc/adr/PROJECTION.md` (if present) for what still binds.
+Step 2 — gather implementation evidence.
+- From `doc/tasks/*.md`, collect `**Status:**`, `**Spec ref:**`, and checkbox lines. Count checked and open boxes for task progress.
+- From `doc/specs/*.md`, collect `Status:` and child-task references. If there are no specs, say so and reconcile from tasks.
+- From `doc/adr/*.md`, collect proposed decisions that actually gate a roadmap item. Read `doc/adr/PROJECTION.md`, when present, to distinguish what still binds.
+- After the broad scan identifies tasks marked `in-progress`, make the focused exception: read only their `## Context` and `## Acceptance Criteria`. Use Context for what and why; use acceptance checkboxes for done and remaining steps.
 
-Step 3 — reconcile each roadmap line. Map it to implementing specs/tasks (by feature name and `Spec ref`), then classify:
-- `done` — implementing spec `shipped`, or every implementing task `done`.
-- `in progress` — a task is `in-progress`, or some but not all tasks are `done`, or the spec is `accepted` with tasks open.
-- `blocked` — a task is `blocked`, or a `proposed` ADR gates the line.
-- `remaining` — no work started. No matching artifact → `remaining (untracked)`; recommend `/ad-task` to backfill.
-When repo state plainly contradicts the tracking, report by artifact evidence and flag the gap — do not silently upgrade.
+Step 3 — reconcile the roadmap.
+Map each roadmap item to its specs and tasks by feature name and `Spec ref`, then classify it:
+- `done` — the implementing spec is `shipped`, or every implementing task is `done`.
+- `in progress` — a task is `in-progress`, some but not all tasks are done, or the spec is accepted with tasks open.
+- `blocked` — a blocked task or proposed ADR gates the item.
+- `remaining` — work has not started. With no matching artifact, write `remaining, untracked` and recommend `/ad-task`.
+When code and tracking plainly disagree, use the strongest artifact evidence and flag the gap. Never silently upgrade an item.
 
-Step 4 — compute the rollup.
-- Headline: `done / total` roadmap lines as a percentage; state in-progress, blocked, remaining as counts.
-- On-track vs at-risk: `at-risk` when any MVP-tier line is `blocked` or `remaining` while later tiers show progress, or any `proposed` ADR / `blocked` task gates a line. Otherwise `on-track`.
+Choose the report's fronts in roadmap order:
+1. Main delivery front: the earliest unfinished item with active or blocked work; otherwise the first remaining item. Explain the outcome, not merely its task title.
+2. Current front: choose among tasks explicitly marked `in-progress`. If several qualify, prefer one changed in the working tree, then one touched by the most recent commit. If that still ties, say that several tasks are marked in progress, name them, and explain the earliest one in roadmap order; never hide the ambiguity.
+3. Next front: the first unfinished item after the current front. When no task is in progress, say so and use the first remaining roadmap item as the next front. If everything is done, say the roadmap is complete and there is no next front.
+4. Blocker: the blocker that most directly gates the main or next front. If none is recorded, say `No blocker recorded`.
+
+Step 4 — compute supporting evidence.
+- Overall: done roadmap items divided by total roadmap items, plus counts for in progress, blocked, and remaining.
+- Per tier: the same done / total count and percentage.
+- Risk: `at risk` when an MVP item is blocked or remaining while a later tier has progress, or a blocked task or proposed ADR gates a roadmap item. Otherwise `on track`.
 </instructions>
 
 <output_contract>
-One Markdown message: a BLUF line (overall percentage + on-track / at-risk), then the per-tier breakdown, then a two-line "so what". Words for status, no emoji. Example:
+Return one Markdown message in this order:
+1. `30-second overview` — main delivery, now, next, progress, and blocker in plain sentences.
+2. `Current front` — only when an explicit in-progress task exists; one short what-and-why paragraph plus its checked and open acceptance steps.
+3. `Roadmap checklist` — every roadmap item, grouped by tier. Checked means delivered; open means unfinished. An in-progress item has nested checked and open steps.
+4. `Supporting evidence` — plan status, task/spec counts, percentages, risk, and identifiers. These support the story; they do not lead it.
 
+Example:
+
+```markdown
+## Roadmap — @acme/widget
+
+### 30-second overview
+
+- **Main delivery:** Make the core workflow safe enough for the first release.
+- **Now:** The team is connecting feature decisions to tested implementation work.
+- **Next:** Package the release flow so a maintainer can ship without manual guesswork.
+- **Progress:** 4 of 11 roadmap items are delivered (36%); the plan is at risk.
+- **Blocker:** The team still needs to decide how failed workflow runs recover.
+
+### Current front — Connect decisions to implementation
+
+This work turns an accepted feature decision into small, testable delivery steps so contributors can build it consistently.
+
+- [x] Define the feature outcome and acceptance checks.
+- [ ] Implement the first end-to-end behavior.
+- [ ] Verify the remaining edge cases.
+
+### Roadmap checklist
+
+#### MVP — 3 of 5 delivered (60%)
+
+- [x] Give every project a clear engineering foundation. (tasks 0001–0003)
+- [ ] In progress — Connect feature decisions to tested implementation. (task 0007)
+  - [x] Define the feature outcome and acceptance checks.
+  - [ ] Implement and verify the behavior.
+- [ ] Blocked — Make workflow failures recoverable. (task 0009; proposed ADR-0012)
+
+#### Next — 1 of 3 delivered (33%)
+
+- [x] Automate contribution hand-offs.
+- [ ] Add a repeatable release flow. (untracked; use `/ad-task`)
+- [ ] Add contributor-facing project docs.
+
+#### Later — 0 of 3 delivered (0%)
+
+- [ ] Add language presets.
+- [ ] Add an evaluation harness.
+- [ ] Prepare the 1.0 release.
+
+### Supporting evidence
+
+- **Plan:** PRD accepted; 8 tasks (5 done, 2 in progress, 1 blocked); no specs.
+- **Risk:** At risk because proposed ADR-0012 blocks an MVP item.
 ```
-## ad-roadmap — @acme/widget
 
-**Overall:** 4 of 11 roadmap items done (36%) — at-risk
-**Plan:** PRD accepted · 8 tasks (5 done, 2 in progress, 1 blocked) · no specs
-
-### MVP tier — 3 of 5 done (60%)
-- done — Layer 1 Constitution trinity (tasks 0001, 0002 done)
-- done — Layer 2 Domain
-- done — Layer 3 Product
-- in progress — Layer 4 Spec (task 0007 in-progress, 2 of 4 steps)
-- blocked — Workflow core (task 0009 blocked on proposed ADR-0012)
-
-### Next tier — 1 of 3 done (33%)
-- done — Reciprocity automation
-- remaining — Release skill (untracked — no task; /ad-task to plan)
-- remaining — Community docs
-
-### Later tier — 0 of 3 done (0%)
-- remaining — Per-language presets, eval harness, 1.0 promotion
-
-**So what:** MVP is one blocked line and one in-progress line from complete — clearing proposed ADR-0012 unblocks task 0009. The Later tier is unstarted and not yet at risk.
-```
-
-No file written. No state mutation.
+When no explicit in-progress task exists, omit `Current front` and write `No task is currently marked in progress` under `Now`; the first remaining item becomes `Next`. No file is written and no state is mutated.
 </output_contract>
 
 ## Next
 
-- To act on what is left: `/ad-next` (prioritized next actions — a different question).
-- To change the plan itself: `/ad-prd` (roadmap authoring).
-- To backfill tracking for an untracked line: `/ad-task`.
-- To reconcile docs against code: `/ad-drift`.
+- To act on what is left: `/ad-next`.
+- To change the plan itself: `/ad-prd`.
+- To backfill an untracked item: `/ad-task`.
+- To reconcile documentation against code: `/ad-drift`.

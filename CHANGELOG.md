@@ -18,6 +18,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Changed
 
+- `/ad-roadmap` now opens with a plain-language thirty-second overview of the
+  main delivery front, current work, next front, progress, and blockers. Its
+  full roadmap uses standard checked and open Markdown tasks, expands active
+  work into nested completed and remaining steps, and keeps tiers,
+  percentages, and artifact identifiers as supporting evidence.
 - Personal voice profiles can now define a closed pair of BCP 47 language
   preferences: `conversation` for direct owner communication and approval
   previews, and `publication` for outward text. `/ad-voice`, `/ad-publish`, and

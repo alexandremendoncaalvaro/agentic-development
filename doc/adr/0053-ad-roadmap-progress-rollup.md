@@ -19,8 +19,8 @@ We will ship `ad-roadmap` as a read-only, workflow-operational skill that answer
 Its contract:
 
 1. **The roadmap is the spine.** Read `doc/product/PRD.md` `Status:` and its `## Roadmap` tiers (MVP / Next / Later). Each roadmap line is one feature to classify.
-2. **Reconcile from the implementation ledger, frontmatter only.** Tie each line to implementing `doc/specs/` and `doc/tasks/` via feature name and `Spec ref`; classify `done` / `in progress` / `blocked` / `remaining`. Surface `proposed` ADRs as line blockers. Read only frontmatter and the roadmap section — never full bodies.
-3. **One rollup, not a menu.** Headline percentage is `done / total` roadmap lines; in-progress, blocked, and remaining reported as counts; `at-risk` when an MVP line is blocked/remaining while later tiers progress, or a proposed ADR / blocked task gates a line.
+2. **Reconcile from the implementation ledger, frontmatter only.** Tie each line to implementing `doc/specs/` and `doc/tasks/` via feature name and `Spec ref`; classify `done` / `in progress` / `blocked` / `remaining`. Surface `proposed` ADRs as line blockers. Read only frontmatter and the roadmap section — never full bodies. **(The absolute frontmatter-only read is superseded by the 2026-09-09 Addendum's narrow active-task exception.)**
+3. **One rollup, not a menu.** Headline percentage is `done / total` roadmap lines; in-progress, blocked, and remaining reported as counts; `at-risk` when an MVP line is blocked/remaining while later tiers progress, or a proposed ADR / blocked task gates a line. **(The percentage-first presentation is superseded by the 2026-09-09 Addendum; the calculation and one-rollup boundary still bind.)**
 4. **Read-only.** `allowed-tools` omits Write; the skill writes no file and mutates no state.
 5. **Degrade gracefully.** PRD, `doc/specs/`, and `doc/tasks/` may each be absent; a missing directory is reported, never an error. No PRD falls back to a task-based rollup and recommends `/ad-prd`.
 6. **Route out, do not absorb.** Cross-reference `ad-next` (next actions — a different question) and `ad-prd` (roadmap authoring); reimplement neither.
@@ -47,3 +47,14 @@ Negative / trade-offs:
 * **Fold the rollup into `ad-prd`** — rejected. `ad-prd` authors and mutates the roadmap; a progress report is read-only and would put a reporting responsibility inside an authoring skill.
 * **Fold it into `ad-drift`** — rejected. `ad-drift` reports doc-vs-code inconsistency, not plan completion; "how much is left" is not a drift finding.
 * **Do nothing (leave it to manual reconciliation)** — rejected. The manual roadmap-to-ledger reconciliation is exactly the per-session, drift-prone work the kit removes elsewhere.
+
+## Addendum (2026-09-09) — Plain-language checklist and focused active-task read
+
+Task 0071 refines how the existing rollup reaches a decision-maker without changing what it computes or creating another planning surface:
+
+1. **Meaning before metrics.** The report opens with a plain-language, thirty-second overview of the main delivery front, current work, next front, overall progress, and blockers. MVP / Next / Later tiers, percentages, and artifact identifiers remain supporting evidence rather than the explanation a newcomer must decode.
+2. **One standard checklist.** Delivered roadmap items use `- [x]`; anything unfinished uses `- [ ]`. An in-progress item carries nested checked and open steps so the same visual grammar shows both completed and remaining work. No custom checkbox state is introduced.
+3. **Explain the active front.** When a task is explicitly `in-progress`, the report says what is being delivered, why it matters, what is done, and what remains. For that purpose only, the skill may read the task's `## Context` and `## Acceptance Criteria`; broad reconciliation remains limited to roadmap sections, frontmatter, references, checkbox counts, and read-only git evidence used to disambiguate current work. It does not read unrelated task sections or full document bodies. When several tasks claim `in-progress`, a working-tree change wins, followed by the most recently committed task; any remaining tie is disclosed rather than guessed away.
+4. **Never manufacture activity.** When no task is marked `in-progress`, the report says so and identifies the first remaining roadmap item as the next front. When the plan is complete, it says there is no next front.
+
+The read-only boundary, roadmap-as-spine model, classifications, risk rules, graceful fallbacks, and separation from `ad-next` and `ad-prd` remain unchanged.

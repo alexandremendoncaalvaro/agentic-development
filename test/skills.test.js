@@ -135,6 +135,43 @@ test('skill routing keeps every workflow hand-off discoverable on both hosts', (
   }
 });
 
+test('ad-roadmap explains the delivery story as a newcomer-readable checklist on both hosts', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-roadmap', 'SKILL.md'), 'utf8');
+    const example = body.match(/```(?:markdown)?\n([\s\S]*?)```/)?.[1] ?? '';
+
+    assert.match(body, /30-second overview/i, `${agent} must lead with a thirty-second overview`);
+    assert.match(body, /main delivery front/i, `${agent} must name the main delivery front`);
+    assert.match(body, /next front/i, `${agent} must name the next delivery front`);
+    assert.match(
+      body,
+      /working tree[^\n]*most recent commit/i,
+      `${agent} must prefer live repository evidence when several tasks are marked in progress`
+    );
+    assert.match(
+      body,
+      /only[^\n]*in-progress[^\n]*`## Context`[^\n]*`## Acceptance Criteria`/i,
+      `${agent} may deepen only the active task's purpose and acceptance criteria`
+    );
+    assert.match(
+      body,
+      /no (?:task|work)[^\n]*in progress[^\n]*first remaining/i,
+      `${agent} must not invent current work when nothing is in progress`
+    );
+    assert.match(example, /^- \[x\] .+/m, `${agent} example must show delivered work as checked`);
+    assert.match(example, /^- \[ \] .+/m, `${agent} example must show remaining work as open`);
+    assert.match(
+      example,
+      /^- \[ \] .*in progress[\s\S]*?^  - \[x\] .+[\s\S]*?^  - \[ \] .+/mi,
+      `${agent} example must explain in-progress work through nested checked and open steps`
+    );
+    assert.ok(
+      example.indexOf('### 30-second overview') < example.indexOf('### Roadmap checklist'),
+      `${agent} must explain the delivery story before showing tier evidence`
+    );
+  }
+});
+
 test('ad-merge has a release-only mode that preserves the tagged commit', () => {
   for (const agent of ['claude-code', 'codex']) {
     const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-merge', 'SKILL.md'), 'utf8');
