@@ -38,6 +38,12 @@ node <skill-base-dir>/scripts/voice-profile.mjs resolve [--profile <path>]
 
 If a profile exists, validate it before use. A path inside any Git repository is invalid. Never repair an invalid profile silently. If none exists, use the smallest empty schema from [references/profile-contract.md](references/profile-contract.md) as the proposed starting state; creation still requires approval.
 
+When the user asks to set language preferences, treat the complete `languages`
+object as one reviewable delta: `conversation` for direct communication and
+publication previews, and `publication` for outward text. Both values are required
+BCP 47 tags. Use the user's explicit choices as preference evidence; do not encode
+them as voice patterns or infer a third review language.
+
 ## Step 3: Curate evidence
 
 Work in an OS temporary directory outside every repository. Filter quoted replies, signatures, boilerplate, code, logs, copied material, assistant output, and unaccepted generated drafts.

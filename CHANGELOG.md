@@ -18,6 +18,13 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Changed
 
+- Personal voice profiles can now define a closed pair of BCP 47 language
+  preferences: `conversation` for direct owner communication and approval
+  previews, and `publication` for outward text. `/ad-voice`, `/ad-publish`, and
+  `/ad-report` honor one-request overrides, adapt across languages with a
+  meaning-preservation check, and require approval of the exact final outward
+  text. Private owner-agent deliberation remains excluded unless explicitly
+  promoted for publication.
 - Every skill now declares its invocation class (ADR-0073). Twenty
   user-invocable skills set `disable-model-invocation: true` (Claude Code) and
   `allow_implicit_invocation: false` (Codex), so their descriptions leave the

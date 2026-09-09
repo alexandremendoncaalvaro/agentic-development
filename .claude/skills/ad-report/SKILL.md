@@ -32,6 +32,12 @@ objective, audience, purpose, language, requested format, agreed local target,
 requested action, and hard constraints. Ask only for an ungroundable value that
 would materially change the report.
 
+Resolve optional language preferences through `ad-voice`. The conversation language
+controls direct owner communication and the first approval preview. The publication
+language is the default for outward text. An explicit language in the current request
+overrides the corresponding preference for that request only. When no language
+preferences exist, preserve the existing contextual inference.
+
 Build a silent invariant ledger. Read
 [references/source-policy.md](references/source-policy.md) before accessing any
 evidence beyond pasted text, an artifact attached for this report, a supplied
@@ -57,6 +63,10 @@ bundled baseline and state outside the report, when material, that no private ow
 or team report corpus was authorized.
 
 ## Step 3: Build the editorial plan
+
+When the conversation language and publication language differ, build the complete
+initial report in the conversation language. Do not adapt it to the publication
+language before passing it through `ad-voice` in Step 4.
 
 Own the information hierarchy: self-contained executive conclusion, question or
 objective, method and evidence provenance, material findings, conclusions,
@@ -86,6 +96,11 @@ profile or external `humanizer` is available. Its public contract owns both the
 confirmed profile and the bundled naturalization fallback. Render only after this
 pass; a later textual correction must repeat it before re-rendering.
 
+For differing languages, `ad-voice` owns the two-stage language approval flow,
+including the first conversation-language preview, contextual adaptation, and final
+publication-language approval. Resume the same composed flow after the first approval;
+do not start a second voice pass or render the report between its two gates.
+
 Pass the settled editorial plan and content to the renderer. Respect every callee
 authorization, limitation, output, and gate; the stricter gate wins. Require its
 normal render, visual inspection, and accessibility verification. Return here for
@@ -96,6 +111,12 @@ format and disclose the missing requested capability. Never fabricate a rendered
 file, screenshot, visual check, or accessibility result.
 
 ## Step 5: Verify privately
+
+After `ad-voice` returns the publication-language adaptation, independently run a
+meaning-preservation check against the approved conversation-language draft. List
+every changed, omitted, or added claim in the conversation language, then return the
+exact final publication-language text for approval before any outward export or
+publication.
 
 Read [references/evaluation.md](references/evaluation.md). Check the invariant
 ledger. Assign every applicable template rule and selected exemplar strength one

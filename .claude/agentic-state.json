@@ -388,7 +388,7 @@
         },
         {
           "path": ".claude/skills/ad-publish/SKILL.md",
-          "sourceSha": "aa04e0c31d4578e2379ba69dd9f3820837678383878a9aa894d07353b124b5fc"
+          "sourceSha": "2b331c3520fb63eedd14d17011d1fa1546ed2bef0d291c0d888c56f8b0749c31"
         }
       ]
     },
@@ -451,7 +451,7 @@
         },
         {
           "path": ".claude/skills/ad-report/SKILL.md",
-          "sourceSha": "eeda84a9533c1b2e8d434e41be4796f991712521241292291d3f45a2d044a7df"
+          "sourceSha": "d1306df91404885c3c1f15efeb7944abba69fa8728870b98dd686a7a79fbbd13"
         }
       ]
     },
@@ -649,15 +649,15 @@
         },
         {
           "path": ".claude/skills/ad-voice/references/profile-contract.md",
-          "sourceSha": "733cc7d424b5db62679411c4bed63357d5e2bf191335d46ad82a7b80775a16cf"
+          "sourceSha": "b5c84e5621746d73757771f7fdc1ee4583daa6ecd67a587bd88c063ac1fc225f"
         },
         {
           "path": ".claude/skills/ad-voice/scripts/voice-profile.mjs",
-          "sourceSha": "17517c1306b15ae48caf96a29f9a000fc5b40776c0160c37ecf2f73d559376db"
+          "sourceSha": "770630714283890c8bf6a5d95ece960ef3b4bb866d8cacbbe6a1e5494365de23"
         },
         {
           "path": ".claude/skills/ad-voice/SKILL.md",
-          "sourceSha": "4ba4f5f9921dccebfc2da29bf756efff0f488abbe76dc74a1059fe34b78df757"
+          "sourceSha": "c23ca258f3d8c5fda9fab465f5ddfd17e2045e40ba1a5e3b6d7db676e76ef8e3"
         }
       ]
     },
@@ -670,15 +670,15 @@
         },
         {
           "path": ".claude/skills/ad-voice-tune/references/profile-contract.md",
-          "sourceSha": "733cc7d424b5db62679411c4bed63357d5e2bf191335d46ad82a7b80775a16cf"
+          "sourceSha": "b5c84e5621746d73757771f7fdc1ee4583daa6ecd67a587bd88c063ac1fc225f"
         },
         {
           "path": ".claude/skills/ad-voice-tune/scripts/voice-profile.mjs",
-          "sourceSha": "17517c1306b15ae48caf96a29f9a000fc5b40776c0160c37ecf2f73d559376db"
+          "sourceSha": "770630714283890c8bf6a5d95ece960ef3b4bb866d8cacbbe6a1e5494365de23"
         },
         {
           "path": ".claude/skills/ad-voice-tune/SKILL.md",
-          "sourceSha": "f312ab9f3f378baca7dbbce5d308420a21a497bcc87cd98a75e4c215c6efb1ad"
+          "sourceSha": "0f85f9a4eb4d34a7f4b373b666640d60a005f1def035de48722e07987a10e7cc"
         }
       ]
     }
