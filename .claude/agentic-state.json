@@ -33,7 +33,7 @@
         },
         {
           "path": ".claude/skills/ad-architecture/SKILL.md",
-          "sourceSha": "9f068e768ade7d9e66412711ce36c028dc90f5cc33d0789d6a4c8de8222a2e56"
+          "sourceSha": "6a663ad52a04ca2334b16392e8ff84d358c90d28698ea2256eb33e4055c8c57e"
         }
       ]
     },
@@ -80,7 +80,7 @@
         },
         {
           "path": ".claude/skills/ad-bootstrap/SKILL.md",
-          "sourceSha": "4c60ee611a1ecdc357ec6a1c36948d325bc2cbb4f9eb7c4ce4c512c6ec3e506a"
+          "sourceSha": "45e52bafbfe8de8f0aff596fd9eb041e6ce354bc1d80a350f54d46b7f9599194"
         }
       ]
     },
@@ -114,7 +114,7 @@
         },
         {
           "path": ".claude/skills/ad-community-docs/SKILL.md",
-          "sourceSha": "ac969fdfe9940cd0d9efcb46442ec1de2c8dfcef9246bcbc3061f8ad885b7d59"
+          "sourceSha": "f9ae34453a8d9ef0234172521074709bbe66da07f54d8961d0e41429aa60b7d7"
         }
       ]
     },
@@ -162,7 +162,7 @@
         },
         {
           "path": ".claude/skills/ad-diagnose/SKILL.md",
-          "sourceSha": "3e1ea5c6e0e69db71c4c8fae6a49bf9075cc80d6b6a2103f1857137205926406"
+          "sourceSha": "d5a819e69f35c8735de3b7d73777fdd595c7bdd8eb7efec8e2eb6f2c2591dc8b"
         }
       ]
     },
@@ -218,7 +218,7 @@
         },
         {
           "path": ".claude/skills/ad-ground/SKILL.md",
-          "sourceSha": "447ade6476fac1c4d7a13e6b1d025fc18e8cfe0707ad8b7b67ebcd1cc0589f1c"
+          "sourceSha": "f04bb514bd341275e821242368695e539fe2a2f6b3e8dddaa5dbe4b15587771b"
         }
       ]
     },
@@ -235,7 +235,7 @@
         },
         {
           "path": ".claude/skills/ad-guidelines/SKILL.md",
-          "sourceSha": "05fee43b7d359ecd3d743508231fc7adf791f3e875f854bd6c17a2d07ab29435"
+          "sourceSha": "cf146fd1358fdf05df2323d4c4eecda3ae44dacc65736dc5e6cc380e4e8cfadc"
         }
       ]
     },
@@ -268,8 +268,12 @@
           "sourceSha": "aa381a001366c562fd4e0230d9121380f677dd88cec9df5e4b6f1af554145731"
         },
         {
+          "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
+          "sourceSha": "8c9f2ab3088755ae4b72ae03f7fefeed17c758c99d5ce71584709cd679f91ada"
+        },
+        {
           "path": ".claude/skills/ad-hooks/SKILL.md",
-          "sourceSha": "55cb69feaae61a01fb755d930609b605fdba2a1c3fc2f0d79c3da15bfbaf1c9d"
+          "sourceSha": "e4c289bdb7ec6fca153460d5388aa646bb41ba573416c5b44cd4659626dc9684"
         }
       ]
     },

@@ -6,6 +6,16 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `/ad-hooks` session-lifecycle tier gains a `UserPromptSubmit` workflow
+  checkpoint (ADR-0074): a zero-dependency script that prints the kit's
+  pipeline as a short imperative checklist on every prompt (de-risk or
+  sharpen, ground, TDD, review per slice, audit per block, commit, `/ad-handoff`),
+  always exits 0, and is silenced with `AD_WORKFLOW_CHECKPOINT=0`. The
+  scaffold now resolves hook script paths from the skill's installed directory
+  instead of a project-relative constant that a user-scope install lacks.
+
 ### Changed
 
 - Every skill now declares its invocation class (ADR-0073). Twenty

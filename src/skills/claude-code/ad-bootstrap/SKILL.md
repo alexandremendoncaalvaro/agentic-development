@@ -18,6 +18,8 @@ Run from the consumer repo root before inspecting it:
 node .claude/skills/ad-bootstrap/scripts/project-signals.mjs AGENTS.md
 ```
 
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it.
+
 Parse its JSON. Its `mode` selects the branch below; use `stacks` to focus the manifest scan and surface every `unreadable[]` entry as a scan gap, never as an absent path. Then inspect the repo:
 
 * `AGENTS.md` exists at the repo root → **audit** mode. **Do not rewrite it.** Stop after producing a drift list (see Step 4).

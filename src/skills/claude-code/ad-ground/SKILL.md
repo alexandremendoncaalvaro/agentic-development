@@ -78,6 +78,8 @@ From the consumer root, determine the next number with the installed shared prob
 node .claude/skills/ad-adr/scripts/next-number.mjs doc/research
 ```
 
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute the sibling `ad-adr` install beside it — the probe lives at `scripts/next-number.mjs` inside `ad-adr`.
+
 Use JSON `next`. Stop until access is resolved if `unreadable` is non-empty, or for a numbering decision if `exhausted` is true. Write `doc/research/<NNNN>-ground-<slug>.md` from [references/record-template.md](references/record-template.md). Every load-bearing claim gets an `E<N>` section with a §17 strength and one or more source IDs; the source register carries at least one `A`, `B`, `C`, and `D` source, each with citation, access date, and access method. Record an empty git-history search as `D1`, including the command and its `no prior attempt found` result — absence is evidence only when the search is reproducible.
 
 Set `Decision ref` to the task, spec, ADR, or other durable project artifact the record supports. Add the ground record's repository-relative path to that artifact's `Evidence ref` field; when a task tracks the work, update that field or append the path to its dated Notes entry. Do not create a new planning artifact solely to hold a trivial decision.
@@ -88,6 +90,8 @@ Validate the completed receipt before implementation:
 node .claude/skills/ad-ground/scripts/validate-record.mjs \
   doc/research/<NNNN>-ground-<slug>.md
 ```
+
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/validate-record.mjs` inside it.
 
 Proceed only when `valid` is `true` and `unreadable` is empty. The offline checker proves the claim-to-source map is structurally complete; it does not prove an external source's content. Reopen every cited source during review or audit. A receipt without that re-check is a trace, not proof.
 

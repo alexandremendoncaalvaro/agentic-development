@@ -39,6 +39,8 @@ First run from the consumer repo root:
 node .claude/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md
 ```
 
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it.
+
 Parse its JSON. `stacks` narrows the manifest reads below. Surface every `unreadable[]` entry as a scan gap, never as an absent path.
 
 ### Language and toolchain

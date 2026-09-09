@@ -1,7 +1,7 @@
 ---
 name: ad-hooks
-description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Also scaffolds Claude Code session-lifecycle hooks — currently a Stop hook that nudges /ad-handoff when context runs low (ADR-0055). Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, wire a session-lifecycle / Stop hook, nudge ad-handoff before context is lost, or close the WORKFLOW §11 advisory-vs-deterministic gap. Opt-in skill; not auto-installed in the universal set.
-summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals — plus a Claude Code session-lifecycle tier (a Stop hook that nudges /ad-handoff when context runs low).
+description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Also scaffolds Claude Code session-lifecycle hooks — a Stop hook that nudges /ad-handoff when context runs low (ADR-0055) and a UserPromptSubmit hook that injects the kit's workflow checkpoint on every prompt (ADR-0074). Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, wire a session-lifecycle / Stop hook, nudge ad-handoff before context is lost, or close the WORKFLOW §11 advisory-vs-deterministic gap. Opt-in skill; not auto-installed in the universal set.
+summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals — plus a Claude Code session-lifecycle tier (a Stop handoff nudge and a UserPromptSubmit workflow checkpoint).
 disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Bash
 ---
@@ -90,7 +90,7 @@ If the user is wiring CI alongside hooks (GitHub Actions / GitLab CI / Circle), 
 
 ## Session-lifecycle hooks (Claude Code only)
 
-Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; today it has one member. Claude Code only — Codex's compact hooks exist but context-injection parity is undocumented, so this tier is out of scope on Codex (do not invent Codex behavior).
+Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; it has two members. Claude Code only — Codex's compact hooks exist but context-injection parity is undocumented, so this tier is out of scope on Codex (do not invent Codex behavior).
 
 ### Handoff-nudge `Stop` hook (ADR-0055)
 
@@ -102,8 +102,8 @@ Nudges the user to run `/ad-handoff` before a long session's context is compacte
 
 Scaffold it in two parts:
 
-1. **The script** ships with this skill at `scripts/handoff-nudge.mjs` (Node, zero-dependency). In a consuming project the installed copy is `${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks/scripts/handoff-nudge.mjs`.
-2. **The wiring** — merge (never clobber) a `Stop` block into `.claude/settings.json`:
+1. **The script** ships with this skill at `scripts/handoff-nudge.mjs` (Node, zero-dependency).
+2. **The wiring** — merge (never clobber) a `Stop` block into `.claude/settings.json` (see *Resolving the script path* below for `<ad-hooks-dir>`):
 
    ```json
    {
@@ -112,7 +112,7 @@ Scaffold it in two parts:
          {
            "matcher": "*",
            "hooks": [
-             { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks/scripts/handoff-nudge.mjs\"" }
+             { "type": "command", "command": "node \"<ad-hooks-dir>/scripts/handoff-nudge.mjs\"" }
            ]
          }
        ]
@@ -124,6 +124,37 @@ Scaffold it in two parts:
 
 Tunable via environment: `AD_HANDOFF_NUDGE_THRESHOLD_BYTES` (default `750000` — chosen from measured transcript sizes; lower it to nudge earlier) and `AD_HANDOFF_NUDGE_STATE_DIR` (flag-file directory; default the OS temp dir).
 
+### Workflow-checkpoint `UserPromptSubmit` hook (ADR-0074)
+
+Puts the kit's pipeline in front of the model on every prompt. Skills and `AGENTS.md` are advisory; this hook is the deterministic delivery that replaces the owner repeating "follow the workflow" by hand. Key facts (verified against the official hooks docs):
+
+* It hangs off **`UserPromptSubmit`**, one of the events whose plain-text stdout on exit 0 is added as context the model can act on. The event has no matcher and fires on every prompt.
+* The checkpoint is **static** (about 700 characters, imperative): skip when trivial; open with a three-line summary and a checklist roadmap without reciting the rules; `/ad-derisk` or `/ad-grill-me` for unknowns; `/ad-ground` before code; `/ad-tdd` (or `/ad-tdg`); `/ad-review` after each slice and `/ad-audit` after each large block; `/ad-commit` to land; `/ad-handoff` at the end for a chip or a fresh-session prompt.
+* It **always exits 0** and never emits a JSON decision, so it cannot block or erase a prompt. Empty or malformed stdin is silent. `AD_WORKFLOW_CHECKPOINT=0` silences it.
+
+Scaffold it in two parts:
+
+1. **The script** ships with this skill at `scripts/workflow-checkpoint.mjs` (Node, zero-dependency, byte-identical across hosts).
+2. **The wiring** — merge a `UserPromptSubmit` block into `.claude/settings.json`, beside any existing `Stop` block:
+
+   ```json
+   {
+     "hooks": {
+       "UserPromptSubmit": [
+         {
+           "hooks": [
+             { "type": "command", "command": "node \"<ad-hooks-dir>/scripts/workflow-checkpoint.mjs\"" }
+           ]
+         }
+       ]
+     }
+   }
+   ```
+
+### Resolving the script path
+
+Both hooks run from `.claude/settings.json`, which is read at session start; the command needs a path that exists wherever the kit was installed. Do not hard-code `${CLAUDE_PROJECT_DIR}/.claude/skills/...`: the installer defaults to the user scope (`~/.claude/skills/ad-hooks`), where that path does not exist. Resolve `<ad-hooks-dir>` from the base directory stated at the top of this skill load and write it as an absolute path (or `${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks` only when the skill actually loaded from the project install). State the resolved path to the user before writing; hook edits take effect in the next session.
+
 ## Output contract
 
 Filesystem changes:
@@ -132,7 +163,7 @@ Filesystem changes:
 - An updated `AGENTS.md` Quality Gates section (or appended if absent), naming the runner, the gates wired, the bootstrap command, and the no-bypass policy.
 - For the native-hooks fallback only: a `setup-hooks.sh` script the user runs after every clone.
 
-The skill does not execute the runner's install command. The skill does not write CI config. The git-hooks flow (Steps 0–6) does not configure agent-side session hooks — the separate Session-lifecycle hooks tier does that (`.claude/settings.json` `Stop`, currently the handoff-nudge hook — ADR-0055). Other agent events (`PreToolUse` / `PostToolUse`) remain future scope.
+The skill does not execute the runner's install command. The skill does not write CI config. The git-hooks flow (Steps 0–6) does not configure agent-side session hooks — the separate Session-lifecycle hooks tier does that (`.claude/settings.json` `Stop` handoff nudge — ADR-0055 — and `UserPromptSubmit` workflow checkpoint — ADR-0074). Other agent events (`PreToolUse` / `PostToolUse`) remain future scope.
 
 A narrative document, so the documentation discipline rules apply at write time:
 

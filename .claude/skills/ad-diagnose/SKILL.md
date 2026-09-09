@@ -111,6 +111,8 @@ To pick the right routing branch below, run from the consumer repo root:
 node .claude/skills/ad-diagnose/scripts/project-signals.mjs AGENTS.md
 ```
 
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it.
+
 Use `mode` and `stacks` only to choose relevant repo evidence and test infrastructure. Surface every `unreadable[]` entry as a diagnosis constraint rather than silently assuming the file is absent.
 
 - If the missing seam exposes load-bearing design friction: hand off to `/ad-deepen` (ADR-0020) with the specifics — the "test surface impact" line in the candidate template was made for this case.

@@ -48,3 +48,8 @@ Revisit trigger: Claude Code documents a way to inject context once per task ins
 - **Blocking with exit 2 until the pipeline is acknowledged** — rejected. It fights the user, and the kit's posture (ADR-0047, ADR-0055) is deterministic delivery, not coercion.
 - **More text in `AGENTS.md` or `WORKFLOW.md`** — rejected. The same rules are already in context three times; a fourth advisory copy does not change the mechanism that fails.
 - **Do nothing** — rejected. It keeps the owner as the deterministic layer, which is the cost this decision removes.
+
+## Addendum 2026-09-09
+
+Before implementation the owner described the flow they run by hand: risk analysis first, then ground, then TDD with a review after each slice and an audit after each large block, a three-line summary plus a checklist roadmap (done / remaining) at the start of every session without reciting the rules, and a resume chip (or a fresh-session prompt where chips are unavailable) at the end. The checkpoint carries exactly that sequence, so its size is about 700 characters rather than the 600 estimated above; the test caps it at 900. The static, exit-0, kill-switch, and Claude-Code-only decisions are unchanged.
+

@@ -10,6 +10,16 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/src/skills/claude-code/ad-hooks/scripts/workflow-checkpoint.mjs\""
+          }
+        ]
+      }
     ]
   }
 }

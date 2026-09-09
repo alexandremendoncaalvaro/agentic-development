@@ -18,6 +18,8 @@ Run from the consumer repository root:
 node .claude/skills/ad-community-docs/scripts/community-doc-signals.mjs
 ```
 
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/community-doc-signals.mjs` inside it.
+
 Parse its JSON. Surface every `unreadable[]` entry as a blocker; an unreadable document is not absent. The detector lists the conventional root, `.github/`, and `docs/` locations in `documents.contributing` and `documents.security`.
 
 When either list is non-empty, enter audit mode for that document: read it, report only concrete gaps against its purpose, and do not overwrite it. A local security policy always wins over the kit template.
