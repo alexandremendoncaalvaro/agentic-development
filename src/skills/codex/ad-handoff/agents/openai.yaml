@@ -2,4 +2,4 @@ interface:
   display_name: ad-handoff
   short_description: Compact the session into a full temporary handoff while the next session opens with a short preparation receipt and executive brief. Preserves rules, roadmap, live state, referenced artifacts, and lost asks; redacts secrets and never commits.
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

@@ -1,6 +1,6 @@
 ---
 name: ad-ground
-description: Four-source pre-implementation research — official docs, validated implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists), in-repo patterns, and git history — then synthesize a happy path, persist its claim-to-source evidence as an auditable project record, and gate any deviation before code is written. Grades evidence and confidence per WORKFLOW §17; routes insufficient evidence to ad-spike. Auto-invokes on non-trivial work, refactors, library or pattern selection, "research before coding", "before implementing", "which library", "which pattern", "how to approach", "ground before coding". Workflow-operational counterpart to WORKFLOW.md §4 + §5.
+description: Four-source research before non-trivial code — official docs, validated references, in-repo patterns, git history; synthesizes the happy path, persists an evidence record, gates deviations. Use before implementing, choosing a library or pattern, or on "ground this", "research before coding", "how to approach".
 summary: Four-source pre-implementation research + versioned claim-to-source evidence record, happy-path synthesis, deviation gate, and proportional evidence grading. WORKFLOW §4 + §5 + §17.
 ---
 

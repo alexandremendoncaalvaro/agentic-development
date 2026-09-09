@@ -2,6 +2,7 @@
 name: ad-report
 description: Draft, review, render, or verify a standalone analytical report through approved artifact templates. Use when the user invokes /ad-report, asks for a report from findings and evidence, wants an existing analysis restructured for an audience, or requests a DOCX, PDF, presentation, visualization, site, HTML, or Markdown analytical deliverable. Owns editorial hierarchy, composes available artifact capabilities through their public contracts, preserves facts, and gates export beyond the agreed local target. Ordinary use never tunes templates.
 summary: Draft or review standalone analytical reports from approved templates, then compose the available renderer and its visual and accessibility verification workflow.
+disable-model-invocation: true
 ---
 
 <background_information>

@@ -2,6 +2,7 @@
 name: ad-template-tune
 description: Curate durable publication and report templates behind explicit source-read and write approvals. Use only when the user invokes /ad-template-tune, asks to create or improve a publication/report template, or explicitly asks to learn reusable structure from authorized examples. Separates owner, community, external, and official provenance; stores derived rules rather than raw sources; proposes one delta at a time; and writes only the exact approved candidate. Distinct from ad-publish and ad-report, which apply templates read-only.
 summary: Curate publication and report templates from authorized evidence. Keeps author classes separate and writes one explicitly approved, validated delta at a time.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch
 ---
 

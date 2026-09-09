@@ -2,6 +2,7 @@
 name: ad-community-docs
 description: Scaffold or audit GitHub-conventional CONTRIBUTING.md and SECURITY.md without inventing maintainer policy or overwriting existing documents. Use when a maintainer needs contributor guidance, a security-reporting policy, community health files, contribution docs, or security docs.
 summary: Scaffold or audit `CONTRIBUTING.md` and `SECURITY.md` without overwriting local policy.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 

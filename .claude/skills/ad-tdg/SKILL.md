@@ -1,6 +1,6 @@
 ---
 name: ad-tdg
-description: Outcome-based prompting per WORKFLOW.md §9. Give the agent the finish line first, not the path. Five steps — confirm regime, ground truth pair, Test Dependency Map, three approaches, pick by one criterion, implement and verify. Triggers on "outcome-based", "TDG", "ground truth", "expected output", "three approaches", "pick by criterion", "test dependency map", "TDM", "before modifying", "tests covering this file", "give the finish line". Routes to `ad-spike` if the technique itself is uncertain. No file written; output is the verified implementation that lands through normal commits.
+description: Outcome-based implementation — given input and expected output, generate three strategies and pick one by a single criterion; Test Dependency Map before modifying. Use when the outcome is known but the strategy is not; "TDG", "three approaches", "pick by criterion", "which tests cover this".
 summary: Outcome-based prompting per WORKFLOW §9. Ground truth pair + Test Dependency Map + three approaches + single-criterion selection, when the technique is known but the implementation strategy is uncertain.
 allowed-tools: Read, Glob, Grep, Bash
 ---

@@ -1,6 +1,6 @@
 ---
 name: ad-review
-description: Two-axis fresh-context code review per WORKFLOW §10. Splits the review into Standards (does the diff conform to AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs?) and Spec (does the diff match the originating task / spec / PRD?), runs them as parallel sub-agent passes so neither axis masks the other, then aggregates findings side-by-side. Use when the user wants to review a diff, branch, PR, or recent commits against the project's spec, audit for bugs / coupling / edge cases / spec drift, or run a §10 senior-reviewing-junior pass. Adversarial framing — never emits an "approve" verdict.
+description: Two-axis fresh-context code review (Standards against AGENTS.md and ADRs; Spec against the originating task) run as parallel subagents, findings side by side, never an approve verdict. Use before merging a diff, branch, or PR; "review this", "review main..HEAD", "senior review".
 summary: Two-axis code review per WORKFLOW §10. Claude Code uses fresh-context subagents; Codex writes an audit trail, reviews inline by default, and ships a reviewer subagent for explicit escalation.
 allowed-tools: Read, Glob, Grep, Bash, Task
 ---

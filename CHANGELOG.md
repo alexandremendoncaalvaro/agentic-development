@@ -6,6 +6,22 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- Every skill now declares its invocation class (ADR-0073). Twenty
+  user-invocable skills set `disable-model-invocation: true` (Claude Code) and
+  `allow_implicit_invocation: false` (Codex), so their descriptions leave the
+  host's skill listing; the twenty-three model-invocable skills carry trigger-first
+  descriptions capped at 350 characters and about 6,500 characters in total, inside the
+  8,000-character listing budget that previously truncated a third of the kit.
+  Descriptions are held to the 1,024-character specification maximum.
+
+### Fixed
+
+- The skill enumerator (`bundledSkills` and the test helper) ignores
+  dot-directories under `src/skills/<host>/`; a plugin's `.slim/` state directory
+  no longer installs or tests as a skill.
+
 ## [0.20.0-beta.10] - 2026-09-02
 
 ### Changed

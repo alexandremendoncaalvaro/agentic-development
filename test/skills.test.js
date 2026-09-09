@@ -4,15 +4,47 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
+import { bundledSkills } from '../src/lib/install.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SKILLS_ROOT = join(__dirname, '..', 'src', 'skills');
 
+// ADR-0073: every kit skill belongs to one invocation class. User-invocable
+// skills are outward-facing or setup human verbs; their descriptions leave the host
+// listing (`disable-model-invocation` / `allow_implicit_invocation: false`).
+// The remaining skills are model-invocable and must fit the smallest
+// documented listing budget (8,000 chars) at ≤350 chars each.
+const USER_INVOCABLE_SKILLS = new Set([
+  'ad-archive',
+  'ad-architecture',
+  'ad-bootstrap',
+  'ad-community-docs',
+  'ad-design',
+  'ad-guidelines',
+  'ad-hooks',
+  'ad-level-up',
+  'ad-merge',
+  'ad-pr',
+  'ad-publish',
+  'ad-release',
+  'ad-report',
+  'ad-rules',
+  'ad-skill',
+  'ad-subagent',
+  'ad-template-tune',
+  'ad-update',
+  'ad-voice',
+  'ad-voice-tune',
+]);
+const SPEC_DESCRIPTION_CAP = 1024;
+const MODEL_DESCRIPTION_CAP = 350;
+const MODEL_LISTING_BUDGET = 8000;
+
+// The tests enumerate skills through the installer's own enumerator, so the
+// dot-directory exclusion (task-0065) has one implementation and one test.
 function listSkills(agent) {
   const root = join(SKILLS_ROOT, agent);
-  return readdirSync(root)
-    .filter((name) => statSync(join(root, name)).isDirectory())
-    .map((name) => ({ name, dir: join(root, name) }));
+  return bundledSkills(agent).map((name) => ({ name, dir: join(root, name) }));
 }
 
 function parseFrontmatter(filePath) {
@@ -35,9 +67,11 @@ for (const agent of ['claude-code', 'codex']) {
       assert.equal(fm.name, name, `name (${fm.name}) must match dir (${name})`);
       assert.equal(typeof fm.description, 'string', 'description must be a string');
       assert.ok(fm.description.length > 0, 'description must not be empty');
+      // 1,024 is the Agent Skills specification maximum (agentskills.io);
+      // 1,536 is only where Claude Code truncates the listing text (ADR-0073).
       assert.ok(
-        fm.description.length <= 1536,
-        `description must be ≤1536 chars (Anthropic Skills spec); got ${fm.description.length}`
+        fm.description.length <= SPEC_DESCRIPTION_CAP,
+        `description must be ≤${SPEC_DESCRIPTION_CAP} chars (Agent Skills spec); got ${fm.description.length}`
       );
       // Per task-0029, every kit skill carries a kit-specific `summary:`
       // field for the managed AGENTS.md table cell. Without it, rootdoc.js
@@ -872,3 +906,59 @@ test('the ADR projection states the number of ACCEPTED records the directory hol
       'Merely proposing one does not.'
   );
 });
+
+// ADR-0073 — invocation class and listing budget, per host.
+for (const agent of ['claude-code', 'codex']) {
+  const skills = listSkills(agent);
+  const names = new Set(skills.map((s) => s.name));
+
+  test(`${agent}: every ADR-0073 user-invocable skill exists`, () => {
+    for (const name of USER_INVOCABLE_SKILLS) {
+      assert.ok(names.has(name), `ADR-0073 names ${name}, but no such ${agent} skill exists`);
+    }
+  });
+
+  let modelListingChars = 0;
+  for (const { name, dir } of skills) {
+    const fm = parseFrontmatter(join(dir, 'SKILL.md'));
+    const userOnly = USER_INVOCABLE_SKILLS.has(name);
+
+    test(`skill ${agent}/${name}: invocation class matches ADR-0073`, () => {
+      if (agent === 'claude-code') {
+        assert.equal(
+          fm['disable-model-invocation'],
+          userOnly ? true : undefined,
+          userOnly
+            ? 'user-invocable skill must set disable-model-invocation: true'
+            : 'model-invocable skill must not set disable-model-invocation'
+        );
+      } else {
+        const doc = yaml.load(readFileSync(join(dir, 'agents', 'openai.yaml'), 'utf8'));
+        assert.equal(
+          doc?.policy?.allow_implicit_invocation,
+          !userOnly,
+          `allow_implicit_invocation must be ${!userOnly} for a ${
+            userOnly ? 'user-invocable' : 'model-invocable'
+          } skill`
+        );
+      }
+    });
+
+    if (!userOnly) {
+      modelListingChars += fm.description.length;
+      test(`skill ${agent}/${name}: model-invocable description fits ${MODEL_DESCRIPTION_CAP} chars`, () => {
+        assert.ok(
+          fm.description.length <= MODEL_DESCRIPTION_CAP,
+          `model-invocable description must be ≤${MODEL_DESCRIPTION_CAP} chars (ADR-0073); got ${fm.description.length}`
+        );
+      });
+    }
+  }
+
+  test(`${agent}: model-invocable descriptions fit the ${MODEL_LISTING_BUDGET}-char listing budget`, () => {
+    assert.ok(
+      modelListingChars <= MODEL_LISTING_BUDGET,
+      `model-invocable descriptions total ${modelListingChars} chars; budget is ${MODEL_LISTING_BUDGET} (ADR-0073)`
+    );
+  });
+}

@@ -1,7 +1,6 @@
 ---
 name: ad-audit
-description: |
-  Run this skill when the user explicitly invokes `/ad-audit` or names it ("run ad-audit", "audit against the rules"), or asks for the maximum quality gate before work reaches the team ("adversarial audit", "rules audit", "maximum gate", "verify before I post", "exhaustive review"). Heavier and more exhaustive than `ad-review` (light two-axis diff review); distinct from `ad-drift` (documentation-drift only). Auto-trigger note: `allow_implicit_invocation: true` is set, so audit-language can fire the skill; if a request is ambiguous, confirm scope before invoking.
+description: Maximum-gate adversarial audit of a diff, branch, PR, or drafted claims against the repo's rule-set — on Codex one inline pass producing a combined audit trail, every rule given a verdict. Use before posting to the team, opening a PR, or handing off; "audit against the rules", "maximum gate", "verify before I post". Heavier than ad-review.
 summary: Maximum-gate rules-anchored audit. Walks every rule-group as a checklist with structural separation, exhaustive per-rule verdicts (coverage matrix), evidence-gated, never approves. Codex reviews inline; ships an audit-group-reviewer subagent for user-initiated isolated + cross-model escalation. Heavier than ad-review.
 ---
 

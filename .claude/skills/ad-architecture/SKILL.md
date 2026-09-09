@@ -2,6 +2,7 @@
 name: ad-architecture
 description: Generate ARCHITECTURE.md at the repo root by scanning the code first, pre-filling layers/patterns/observability/deployment from observed signals, then asking only the genuine gaps. Use when the user wants to bootstrap, scaffold, generate, document, or audit ARCHITECTURE.md (system-level patterns and boundaries, paired with ADRs in doc/adr/). Covers brownfield (code exists) and audit (drift report against existing ARCHITECTURE.md).
 summary: Generate or audit `ARCHITECTURE.md` at the repo root.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 

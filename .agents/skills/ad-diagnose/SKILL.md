@@ -1,6 +1,6 @@
 ---
 name: ad-diagnose
-description: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop, reproduce, hypothesise (3-5 ranked falsifiable), instrument, fix + regression-test. The feedback loop is the skill; everything else is mechanical. Triggers on "diagnose this", "debug this", "this is broken", "this is throwing", "performance regression", "find the bug", "build a repro", "feedback loop", "ranked hypotheses", "falsifiable", "/ad-diagnose". Routes to `ad-spike` when the technique is uncertain across approaches, `ad-grill-me` when the spec is unclear, `ad-tdg` when the bug is a clean ground-truth-pair regression.
+description: Disciplined diagnosis for hard bugs and performance regressions — build a feedback loop, reproduce, rank 3-5 falsifiable hypotheses, instrument, fix with a regression test. Use on "this is broken", "debug this", "find the bug", "performance regression", "build a repro".
 summary: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.
 ---
 

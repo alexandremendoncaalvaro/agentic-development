@@ -1,6 +1,6 @@
 ---
 name: ad-drift
-description: Read-only drift audit — compare AGENTS.md, ARCHITECTURE.md, ADR statuses, feature specs in doc/specs/, and documentation discipline against what the code actually does. Outputs a drift list, never writes files. Use when the user wants to audit, review for drift, sanity-check, or report inconsistencies between the repo's docs and its code.
+description: Read-only drift audit of AGENTS.md, ARCHITECTURE.md, ADR statuses, specs, and documentation discipline against what the code does. Use on "audit the docs", "check for drift", "are the docs stale", "sanity-check the ADRs". Reports a drift list; writes nothing.
 summary: Read-only drift report comparing AGENTS.md / ARCHITECTURE.md / ADRs against the code.
 allowed-tools: Read, Glob, Grep, Bash
 ---

@@ -1,6 +1,6 @@
 ---
 name: ad-roadmap
-description: Read-only progress rollup for a decision-maker — reconciles the product roadmap (MVP / Next / Later tiers) against its implementing specs and tasks to report how much of the plan is done, how much is left, and whether the project is on track, as an overall percentage plus a per-tier done / in progress / blocked / remaining breakdown. Use when the user asks "how much is done", "how much is left", "how much remains", "are we on track", "roadmap status", "progress report", "percent complete", "what's shipped vs pending", or "/ad-roadmap". Read-only — writes nothing. Complements `ad-next`, which recommends what to do next (a different question), and `ad-prd`, which authors the roadmap; routes to them instead of duplicating either.
+description: Read-only progress rollup — reconciles the roadmap tiers against specs and tasks into an overall percentage and per-tier done, in progress, blocked, remaining. Use on "how much is done", "are we on track", "progress report", "percent complete", "what's shipped".
 summary: Read-only completion rollup that reconciles the product roadmap against implementing specs and tasks into an overall percentage plus a per-tier done / in progress / blocked / remaining breakdown for a decision-maker.
 allowed-tools: Read, Glob, Grep, Bash
 ---

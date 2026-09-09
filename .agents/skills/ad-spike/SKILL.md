@@ -1,6 +1,6 @@
 ---
 name: ad-spike
-description: Scaffold a staged spike with golden fixtures per WORKFLOW.md §14, for cases where the spec is clear but the technique is uncertain across multiple plausible approaches. Four stages — discovery, golden fixture, pipeline with gates, two-layer evaluation. Use when the unknown is *how*, not *what*. Triggers on "spike", "uncertain technique", "which library", "CV pipeline", "evaluate approaches", "ground truth", "golden fixture", "staged pipeline", "debug per stage". Routes to `ad-ground` if the *how* is routine and a single happy path is obvious.
+description: Scaffold a staged spike with golden fixtures when the spec is clear but the technique is uncertain — discovery, fixture, gated pipeline with per-stage debug artifacts, two-layer evaluation. Use on "spike", "which library", "evaluate approaches", "golden fixture", "uncertain technique".
 summary: Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.
 ---
 
