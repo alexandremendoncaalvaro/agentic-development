@@ -77,6 +77,8 @@ Priority heuristic:
 5. **Feature pipeline gaps.** Accepted PRD without specs → `/ad-spec`; accepted spec without tasks → `/ad-task`; missing research before implementation → `/ad-ground`.
 6. **Quality gates and drift.** Missing gates for a project that needs them → `/ad-hooks`; orphan tasks/spec mismatches → `/ad-drift`; kit drift → `agentic update`.
 
+When the user asks for a completion rollup rather than prioritized next actions, route to `/ad-roadmap`.
+
 If nothing actionable surfaces, say so explicitly — empty output is real signal, not a gap. Phrase: "No urgent next action. Continue current work or invoke `/ad-drift` for a full drift check."
 
 ## Step 5 — Contextual relevance

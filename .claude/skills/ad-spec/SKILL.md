@@ -77,5 +77,6 @@ The spec is a narrative document but is exempt from ADR-0008's no-dates rule for
 
 - `/ad-ground` for the four-source research pass before code (WORKFLOW §4 + §5).
 - `/ad-task` to break the spec into work units; each task carries a `Spec ref` field pointing back to this file.
+- `/ad-domain` when scoping resolves vocabulary that must stay canonical across the spec and code.
 - `/ad-adr` if scoping the spec surfaced a binding architectural decision worth recording (one decision per ADR).
 - Flip Status to `accepted` once you sign off and tasks start being created. Flip to `shipped` after release.

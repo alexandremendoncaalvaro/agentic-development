@@ -62,7 +62,7 @@ Task files are decision-record artifacts and are exempt from the no-dates rule (
 
 ## Next
 
-- Implement. Toggle Acceptance Criteria checkboxes and append to `Notes` as work lands.
+- Run `/ad-ground` before non-trivial implementation, then use `/ad-tdd` when behavior is test-expressible. Toggle Acceptance Criteria checkboxes and append to `Notes` as work lands.
 - `/ad-review main..HEAD` (or current scope) before merge — the task DoD requires a fresh-context §10 review.
 - Flip Status to `done` once every Acceptance Criterion and Definition-of-Done item is checked.
 - If the task implements a spec, the spec's `Related → Tasks` list should reciprocate the link.

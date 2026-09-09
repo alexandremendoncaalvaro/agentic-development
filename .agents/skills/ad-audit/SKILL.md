@@ -97,4 +97,5 @@ For the §10 ideal (true fresh context) on a CRITICAL group, spawn the bundled `
 - Resolve every blocker with the evidence artifact it named, then re-run `/ad-audit` on the fix.
 - Route any rule gap to `/ad-level-up`.
 - For a lighter routine diff review, use `/ad-review`. For documentation-vs-code drift only, use `/ad-drift`.
+- Once the audit is clear: `/ad-commit` to land the change, then `/ad-pr` to open the PR.
 </next>

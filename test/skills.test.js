@@ -59,6 +59,21 @@ function parseFrontmatter(filePath) {
   return yaml.load(text.slice(4, end));
 }
 
+function routingSurface(body, agent, skill) {
+  if (skill === 'ad-next') {
+    return body.split('\n').find((line) => line.includes('completion rollup')) ?? '';
+  }
+  if (agent === 'codex' && skill === 'ad-audit') {
+    return body.match(/<next>\n([\s\S]*?)\n<\/next>/)?.[1] ?? '';
+  }
+  if (agent === 'codex' && skill === 'ad-tdd') {
+    return body.match(/^Next: .+$/m)?.[0] ?? '';
+  }
+  const marker = '\n## Next\n';
+  const start = body.lastIndexOf(marker);
+  return start === -1 ? '' : body.slice(start + marker.length);
+}
+
 for (const agent of ['claude-code', 'codex']) {
   for (const { name, dir } of listSkills(agent)) {
     test(`skill ${agent}/${name}: SKILL.md frontmatter parses with required fields`, () => {
@@ -88,6 +103,37 @@ for (const agent of ['claude-code', 'codex']) {
     });
   }
 }
+
+test('skill routing keeps every workflow hand-off discoverable on both hosts', () => {
+  const edges = [
+    ['ad-ground', ['/ad-tdd', '/ad-tdg']],
+    ['ad-task', ['/ad-ground', '/ad-tdd']],
+    ['ad-tdd', ['/ad-commit']],
+    ['ad-tdg', ['/ad-tdd', '/ad-diagnose', '/ad-commit']],
+    ['ad-review', ['/ad-question-me', '/ad-audit', '/ad-commit', '/ad-merge']],
+    ['ad-audit', ['/ad-commit', '/ad-pr']],
+    ['ad-philosophy', ['/ad-tdd', '/ad-tdg', '/ad-diagnose', '/ad-commit']],
+    ['ad-spec', ['/ad-domain']],
+    ['ad-architecture', ['/ad-domain']],
+    ['ad-drift', ['/ad-domain']],
+    ['ad-next', ['/ad-roadmap']],
+    ['ad-grill-me', ['/ad-question-me']],
+  ];
+
+  for (const agent of ['claude-code', 'codex']) {
+    for (const [skill, successors] of edges) {
+      const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+      const routing = routingSurface(body, agent, skill);
+      assert.ok(routing, `${agent}/${skill} must expose its routing surface`);
+      for (const successor of successors) {
+        assert.ok(
+          routing.includes(successor),
+          `${agent}/${skill} must route to ${successor}`
+        );
+      }
+    }
+  }
+});
 
 test('ad-merge has a release-only mode that preserves the tagged commit', () => {
   for (const agent of ['claude-code', 'codex']) {

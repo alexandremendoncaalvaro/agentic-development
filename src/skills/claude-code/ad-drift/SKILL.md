@@ -106,6 +106,7 @@ A drift list, no file written. Read-only operation. Empty result is reported exp
 ## Next
 
 - Address each finding with one of the three resolutions named in the format ("change spec / change code / discuss").
+- For a finding that resolves or corrects project vocabulary: `/ad-domain`.
 - For findings that require implementation: `/ad-task` to scaffold the fix.
 - For workflow drift (where am I, what's stuck): `/ad-next`.
 - For kit-version drift (state file behind current kit): `agentic update`.

@@ -115,5 +115,6 @@ Each turn:
 - When the technique is known and the ask is implementation-strategy choice: `/ad-tdg` (WORKFLOW §9).
 - When the technique itself is uncertain: `/ad-spike` (WORKFLOW §14).
 - When the ask turned out to be "fix this bug": `/ad-diagnose` (WORKFLOW §15).
+- When the ask is understood but its intended value still needs challenge before a verdict: `/ad-question-me`.
 - After capture: stay in `/ad-grill-me` to walk the next branch of the decision tree, or route out per above.
 - If the session spans multiple working days: `/ad-task` to capture the open branches as a tracked task.

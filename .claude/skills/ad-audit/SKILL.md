@@ -145,3 +145,4 @@ If the audit surfaced a defect pattern no rule covers, or a rule that misled or 
 - Route any surfaced rule gap to `/ad-level-up`.
 - For a lighter, faster pass on a routine diff, use `/ad-review` instead.
 - For documentation-vs-code drift only, use `/ad-drift`.
+- Once the audit is clear: `/ad-commit` to land the change, then `/ad-pr` to open the PR.

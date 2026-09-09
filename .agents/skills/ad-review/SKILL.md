@@ -209,6 +209,8 @@ Do not silently spawn the agent yourself. The user must explicitly request the e
 - Address Spec Blockers next — implementation-vs-spec drift is the second hard gate.
 - Each Concern (from either axis) becomes a follow-up `ad-task`; do not let them silently accumulate.
 - Notes are informational; close them out in the original task's `Notes` log if relevant.
+- If the review exposes uncertainty about the intended value: `/ad-question-me` before acting on findings.
 - If the Spec axis was skipped, decide whether an `ad-spec` is overdue — work without a spec means future reviews are Standards-only.
 - For maximum §10 fidelity on Codex, escalate to a user-spawned reviewer subagent against the persisted audit-trail file.
-- Once both axes are clear: merge per project conventions.
+- For team-bound work that needs exhaustive rules coverage: `/ad-audit`.
+- Once both axes are clear: `/ad-commit` to land the change; `/ad-merge` after its PR is ready.

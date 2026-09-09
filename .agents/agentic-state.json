@@ -41,7 +41,7 @@
         },
         {
           "path": ".agents/skills/ad-architecture/SKILL.md",
-          "sourceSha": "0a9c5d1a1f27d593553ebe3a2fa95a1fb96abd51def99570e6fd0b0984a2b181"
+          "sourceSha": "155763aef876288d563f2b30c5fd3c389e05df05ece18b2175464f0aa6a152d2"
         }
       ]
     },
@@ -75,7 +75,7 @@
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "a16b7c10cf633264ff4d3abf1b3c4f35108c636c7bafa190b802f98fe3749b65"
+          "sourceSha": "347865c5e6cb76e3b3898e73503d5179dac9bd5bf534166e0f0e811f6d685f66"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
@@ -236,7 +236,7 @@
         },
         {
           "path": ".agents/skills/ad-drift/SKILL.md",
-          "sourceSha": "dd539e4ab25bb7fc9a333c3717a42bb26b32ca7666521d8d82eb324b55c23de8"
+          "sourceSha": "a8526cb5d660e363a56d8245061b8da018e98d209903404f757eb70ccc944ea8"
         }
       ]
     },
@@ -249,7 +249,7 @@
         },
         {
           "path": ".agents/skills/ad-grill-me/SKILL.md",
-          "sourceSha": "60acbcfd27a103c91c8a46a44eab0a9c84218eba273a6b73dc6c576c8076e23f"
+          "sourceSha": "3fafe995debdc4275c0cfe5953d175ad75af3320f0fe90468a04f3192fbaeba6"
         }
       ]
     },
@@ -274,7 +274,7 @@
         },
         {
           "path": ".agents/skills/ad-ground/SKILL.md",
-          "sourceSha": "622ae9532829c8bde08026c08e1c5660cd6f89a7d14811072788cb5978c8d8fa"
+          "sourceSha": "607460f75363430cace18c383fcfd0d7e7a6a9faa7d7979df4b9e73d72698580"
         }
       ]
     },
@@ -392,7 +392,7 @@
         },
         {
           "path": ".agents/skills/ad-next/SKILL.md",
-          "sourceSha": "4d9d1d5d24034ace666534fb9b00232a9fafb61b385e817919fa8d658aef93a0"
+          "sourceSha": "be6afda8f0a51d9574a426399f5bb534a983ee1bd545a98f11f33910f8b8d330"
         }
       ]
     },
@@ -405,7 +405,7 @@
         },
         {
           "path": ".agents/skills/ad-philosophy/SKILL.md",
-          "sourceSha": "a9390f7039347eac07aa7f2094cd50e26ecb2b7d4d6d3154199c90f64db51ae0"
+          "sourceSha": "ce7d373965d0f0a6c39c82e5682da5df4ad5a27d836d74ebccb9cbe516765ec9"
         }
       ]
     },
@@ -593,7 +593,7 @@
         },
         {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "98269d93eacb2752781e6de84a8db435780dc82c4bbcdf2a1e1d22eddf93c44e"
+          "sourceSha": "b3e029ad28eb7c666f113b00dc8b7ede2c803f04e64868af07409b5676853154"
         },
         {
           "path": ".codex/agents/fresh-context-reviewer.toml",
@@ -661,7 +661,7 @@
         },
         {
           "path": ".agents/skills/ad-spec/SKILL.md",
-          "sourceSha": "21016cf112971b9bf1cdff5f22413549c24456dcef5a2ab1dea3f9542f293a8b"
+          "sourceSha": "6797cf0d05178725827694f0a9d1b3ed552cc1edc8aaf0ee417238976ff3bc47"
         }
       ]
     },
@@ -724,7 +724,7 @@
         },
         {
           "path": ".agents/skills/ad-task/SKILL.md",
-          "sourceSha": "8cc8a37722a1961bd3b5da344d144824e8b0ce02f2fd8bcc5c5147e40f132e89"
+          "sourceSha": "d6716f7d356d568010beb70814ae42fda61c90a050715338841ffdef6047cb46"
         }
       ]
     },
@@ -737,7 +737,7 @@
         },
         {
           "path": ".agents/skills/ad-tdd/SKILL.md",
-          "sourceSha": "b15ba501c730bac4e5390e0fac9c5c53ac4d72c361c192af5500a15347a82c60"
+          "sourceSha": "2234bf684beef772e13400316e5c29181c76f97bc90457012fe4c78021a71ca4"
         }
       ]
     },
@@ -750,7 +750,7 @@
         },
         {
           "path": ".agents/skills/ad-tdg/SKILL.md",
-          "sourceSha": "dfb5efa12bf2cb99b8bdb89503ff99ba55d8eb5b145bdaa597dd381e9a8be1c2"
+          "sourceSha": "74739e650f358a914531a2dd1efadee0f8cf41204721bc1aa8136ee977966768"
         }
       ]
     },

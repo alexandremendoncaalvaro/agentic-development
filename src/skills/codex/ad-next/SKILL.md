@@ -69,6 +69,8 @@ Priority heuristic:
 5. Feature pipeline gaps: accepted PRD without specs → `/ad-spec`; accepted spec without tasks → `/ad-task`; missing research before implementation → `/ad-ground`.
 6. Quality gates and drift: missing gates for a project that needs them → `/ad-hooks`; orphan tasks/spec mismatches → `/ad-drift`; kit drift → `agentic update`.
 
+When the user asks for a completion rollup rather than prioritized next actions, route to `/ad-roadmap`.
+
 If nothing actionable surfaces, say so: "No urgent next action. Continue current work or invoke `/ad-drift` for a full drift check."
 
 Step 5 — contextual relevance. All skills are installed. Do not turn a missing lazy artifact into a finding merely because it is absent; relate the recommendation to the work at hand:

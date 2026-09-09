@@ -59,5 +59,6 @@ A single `ARCHITECTURE.md` at the repo root. Every line locks a binding pattern.
 ## Next
 
 - `/ad-spec` when starting a feature whose scope spans the patterns this document records.
+- `/ad-domain` when writing or auditing the architecture resolves project vocabulary.
 - `/ad-adr` for any binding decision that surfaced while writing or auditing this file (one decision per ADR).
 - `/ad-drift` periodically to check pattern drift between this document and the code.

@@ -106,7 +106,8 @@ When the change is committed, the ground-truth pair, criterion, and rejection no
 
 ## Next
 
-- After Step 5 verification passes: commit the change with the ground-truth pair + criterion + rejection notes in the body.
+- After Step 5 verification passes: use `/ad-commit` with the ground-truth pair + criterion + rejection notes in the body.
+- When `/ad-diagnose` hands off a behavior-known regression, use `/ad-tdd` as the outer loop and TDG only inside a GREEN phase where strategy remains uncertain.
 - `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10. The TDM tests verify the implementation matches ground truth; §10 review checks coupling, edge cases, spec drift the pair did not cover.
 - If the work spans multiple sessions: `/ad-task` for explicit decomposition (Spec ref the original spec; cite this TDG run in the task `Notes`).
 - If iteration stalled at Step 5 and routing back was needed: `/ad-ground` (re-research) or `/ad-spike` (technique uncertain).

@@ -28,6 +28,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- Skill `Next` breadcrumbs now expose the complete workflow routing chain on
+  both hosts: grounding and tasks lead into TDD or TDG, implementation and
+  review lead into commit, PR, audit, and merge, and domain, roadmap,
+  diagnosis, and value-challenge hand-offs are reciprocal. A table-driven
+  source test keeps every required edge present for Claude Code and Codex.
 - The skill enumerator (`bundledSkills` and the test helper) ignores
   dot-directories under `src/skills/<host>/`; a plugin's `.slim/` state directory
   no longer installs or tests as a skill.

@@ -56,5 +56,8 @@ This skill emits no file. Its job is to set the agent's working posture for the 
 
 - Continue current work with the eight behaviors active. This skill is posture, not a one-shot task.
 - `/ad-ground` for non-trivial research before code.
+- `/ad-tdd` when behavior is test-expressible; `/ad-tdg` when the outcome is known but strategy choice remains.
+- `/ad-diagnose` for hard bugs or regressions that need a feedback loop before implementation.
 - `/ad-next` when uncertain where to go in the workflow.
 - `/ad-review` before merging non-trivial diffs.
+- `/ad-commit` once the change and its review gates are green.
