@@ -2,6 +2,7 @@
 name: ad-architecture
 description: Generate ARCHITECTURE.md at the repo root by scanning the code first, pre-filling layers/patterns/observability/deployment from observed signals, then asking only the genuine gaps. Use when the user wants to bootstrap, scaffold, generate, document, or audit ARCHITECTURE.md (system-level patterns and boundaries, paired with ADRs in doc/adr/). Covers brownfield (code exists) and audit (drift report against existing ARCHITECTURE.md).
 summary: Generate or audit `ARCHITECTURE.md` at the repo root.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
@@ -16,6 +17,8 @@ Run from the consumer repo root before inspecting it:
 ```bash
 node .claude/skills/ad-architecture/scripts/project-signals.mjs ARCHITECTURE.md --host claude-code
 ```
+
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it.
 
 Parse its JSON. Its `mode` selects the branch below; use `stacks` to focus the code scan and surface every `unreadable[]` entry as a scan gap, never as an absent path. Then inspect the repo:
 
@@ -82,5 +85,6 @@ A single `ARCHITECTURE.md` at the repo root. Every line locks a binding pattern.
 ## Next
 
 - `/ad-spec` when starting a feature whose scope spans the patterns this document records.
+- `/ad-domain` when writing or auditing the architecture resolves project vocabulary.
 - `/ad-adr` for any binding decision that surfaced while writing or auditing this file (one decision per ADR).
 - `/ad-drift` periodically to check pattern drift between this document and the code.

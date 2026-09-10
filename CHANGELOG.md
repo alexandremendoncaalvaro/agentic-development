@@ -6,6 +6,51 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `/ad-hooks` session-lifecycle tier gains a `UserPromptSubmit` workflow
+  checkpoint (ADR-0074): a zero-dependency script that prints the kit's
+  pipeline as a short imperative checklist on every prompt (de-risk or
+  sharpen, ground, TDD, review per slice, audit per block, commit, `/ad-handoff`),
+  always exits 0, and is silenced with `AD_WORKFLOW_CHECKPOINT=0`. The
+  scaffold now resolves hook script paths from the skill's installed directory
+  instead of a project-relative constant that a user-scope install lacks.
+
+### Changed
+
+- `/ad-roadmap` now opens with a plain-language thirty-second overview of the
+  main delivery front, current work, next front, progress, and blockers. Its
+  full roadmap uses standard checked and open Markdown tasks, expands active
+  work into nested completed and remaining steps, and keeps tiers,
+  percentages, and artifact identifiers as supporting evidence. Unqualified
+  requests use the project-wide roadmap; an explicit task request uses a
+  separate task-and-subtask template without mixing in the rest of the plan.
+- Personal voice profiles can now define a closed pair of BCP 47 language
+  preferences: `conversation` for direct owner communication and approval
+  previews, and `publication` for outward text. `/ad-voice`, `/ad-publish`, and
+  `/ad-report` honor one-request overrides, adapt across languages with a
+  meaning-preservation check, and require approval of the exact final outward
+  text. Private owner-agent deliberation remains excluded unless explicitly
+  promoted for publication.
+- Every skill now declares its invocation class (ADR-0073). Twenty
+  user-invocable skills set `disable-model-invocation: true` (Claude Code) and
+  `allow_implicit_invocation: false` (Codex), so their descriptions leave the
+  host's skill listing; the twenty-three model-invocable skills carry trigger-first
+  descriptions capped at 350 characters and about 6,500 characters in total, inside the
+  8,000-character listing budget that previously truncated a third of the kit.
+  Descriptions are held to the 1,024-character specification maximum.
+
+### Fixed
+
+- Skill `Next` breadcrumbs now expose the complete workflow routing chain on
+  both hosts: grounding and tasks lead into TDD or TDG, implementation and
+  review lead into commit, PR, audit, and merge, and domain, roadmap,
+  diagnosis, and value-challenge hand-offs are reciprocal. A table-driven
+  source test keeps every required edge present for Claude Code and Codex.
+- The skill enumerator (`bundledSkills` and the test helper) ignores
+  dot-directories under `src/skills/<host>/`; a plugin's `.slim/` state directory
+  no longer installs or tests as a skill.
+
 ## [0.20.0-beta.10] - 2026-09-02
 
 ### Changed

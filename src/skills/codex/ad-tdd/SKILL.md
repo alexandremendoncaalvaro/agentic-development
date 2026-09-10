@@ -1,6 +1,6 @@
 ---
 name: ad-tdd
-description: Test-Driven Development per WORKFLOW.md §16 — red-green-refactor as deterministic LLM guardrail. Five phases — confirm regime, plan vertically, tracer bullet (one test → red → minimum code → green), incremental loop, refactor while green. Tests verify behavior through public interfaces; horizontal slicing (bulk-write tests then bulk-write code) is rejected as the named anti-pattern. Triggers on "TDD", "test-driven", "red-green-refactor", "test first", "write a failing test", "tracer bullet", "behavior not implementation", "vertical slice tests", "/ad-tdd". Distinct from `ad-tdg` (outcome-based prompting — pick implementation strategy when technique is known); routes to `ad-tdg` for strategy selection inside the GREEN phase, `ad-spike` for technique uncertainty, `ad-diagnose` for debugging. No file written; output is the verified implementation that lands through normal commits.
+description: Test-driven implementation — red, green, refactor with one behavior per test through public interfaces; tracer bullet first, horizontal slicing rejected. Use when implementing behavior that is test-expressible; "TDD", "test first", "write a failing test", "tracer bullet".
 summary: Test-Driven Development per WORKFLOW §16. Red-green-refactor as deterministic LLM guardrail. Five phases — confirm regime, plan, tracer bullet, incremental loop, refactor. Tests verify behavior through public interfaces. Horizontal slicing rejected.
 ---
 
@@ -82,5 +82,5 @@ No file written. Output is structured conversation: regime confirmation, vertica
 
 When the change is committed, the behaviors covered, the deepening that surfaced, and the rejected couplings (if any) go into the commit message body. When a task file exists, the same content lands in the task's `Notes` log under a dated entry.
 
-Next: commit the change atomically per behavior cluster; `/ad-review` (WORKFLOW §10) before merge; route to `/ad-deepen` if a refactor surfaces larger than GREEN-phase scope allows and the design friction is load-bearing; route to `/ad-diagnose` if unexpected test regressions appear during the cycle.
+Next: use `/ad-commit` to land the change atomically per behavior cluster; `/ad-review` (WORKFLOW §10) before merge; route to `/ad-deepen` if a refactor surfaces larger than GREEN-phase scope allows and the design friction is load-bearing; route to `/ad-diagnose` if unexpected test regressions appear during the cycle.
 </output_contract>

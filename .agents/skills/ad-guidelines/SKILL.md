@@ -23,7 +23,7 @@ Route elsewhere when:
 - Scope is one binding decision → `ad-adr`.
 - Scope is wiring the gates → `ad-hooks`.
 
-Step 1 — codebase-first scan. From the consumer repo root, first run `node .agents/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md` and parse its JSON. `stacks` narrows the manifest reads below. Surface every `unreadable[]` entry as a scan gap, never as an absent path. Before any preference question, detect:
+Step 1 — codebase-first scan. From the consumer repo root, first run `node .agents/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md` and parse its JSON. `stacks` narrows the manifest reads below. Surface every `unreadable[]` entry as a scan gap, never as an absent path. If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it. Before any preference question, detect:
 
 Language and toolchain:
 - `package.json` → JS/TS; read engines, scripts, deps, devDeps.

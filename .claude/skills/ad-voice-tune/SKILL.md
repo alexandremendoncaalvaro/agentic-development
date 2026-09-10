@@ -2,6 +2,7 @@
 name: ad-voice-tune
 description: Create or evolve the user's machine-local personal voice profile behind an explicit human gate. Use only when the user invokes /ad-voice-tune, asks to calibrate or refine their voice, supplies owner samples or authorized team conversations, or asks the system to learn from a correction. Separates owner communicative identity from target-community accommodation, negotiates source and retention before private reads, stores derived patterns by default, proposes one profile delta at a time, and writes only after explicit approval. Distinct from ad-voice, which applies a profile read-only.
 summary: Calibrate the local personal-voice profile from authorized owner and community evidence. Separates identity from accommodation, retains derived patterns by default, and writes one explicitly approved delta at a time.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch
 ---
 
@@ -36,6 +37,12 @@ node <skill-base-dir>/scripts/voice-profile.mjs resolve [--profile <path>]
 ```
 
 If a profile exists, validate it before use. A path inside any Git repository is invalid. Never repair an invalid profile silently. If none exists, use the smallest empty schema from [references/profile-contract.md](references/profile-contract.md) as the proposed starting state; creation still requires approval.
+
+When the user asks to set language preferences, treat the complete `languages`
+object as one reviewable delta: `conversation` for direct communication and
+publication previews, and `publication` for outward text. Both values are required
+BCP 47 tags. Use the user's explicit choices as preference evidence; do not encode
+them as voice patterns or infer a third review language.
 
 ## Step 3: Curate evidence
 

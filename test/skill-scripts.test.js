@@ -3049,3 +3049,67 @@ test('resolve-global-rules: an unreadable global file is not selected as primary
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// --- ad-hooks session-lifecycle workflow-checkpoint hook (ADR-0074) ---
+// UserPromptSubmit: plain-text stdout on exit 0 is added to the model's
+// context. The claude-code copy is executed; byte-parity covers the codex twin.
+const CHECKPOINT = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-hooks',
+  'scripts',
+  'workflow-checkpoint.mjs'
+);
+
+// execFileSync throws on a non-zero exit, so every call below also asserts
+// the "always exit 0, never block the prompt" contract.
+function runCheckpoint(input, env = {}) {
+  return execFileSync('node', [CHECKPOINT], {
+    input,
+    encoding: 'utf8',
+    env: { ...process.env, AD_WORKFLOW_CHECKPOINT: '', ...env },
+  });
+}
+
+const PROMPT_EVENT = JSON.stringify({
+  hook_event_name: 'UserPromptSubmit',
+  session_id: 'sess-cp',
+  cwd: '/tmp',
+  prompt: 'add a feature',
+});
+
+test('workflow-checkpoint: valid prompt event → short imperative checkpoint naming the pipeline skills', () => {
+  const out = runCheckpoint(PROMPT_EVENT);
+  assert.ok(out.length > 0, 'checkpoint must not be silent on a valid event');
+  assert.ok(out.length <= 900, `checkpoint must stay under 900 chars; got ${out.length}`);
+  for (const cmd of ['/ad-derisk', '/ad-grill-me', '/ad-ground', '/ad-tdd', '/ad-tdg', '/ad-review', '/ad-audit', '/ad-commit', '/ad-handoff']) {
+    assert.ok(out.includes(cmd), `checkpoint names ${cmd}`);
+  }
+  assert.match(out, /trivial/i, 'checkpoint tells the model when to skip');
+  assert.match(out, /summary/i, 'checkpoint asks for the session-opening summary');
+  assert.match(out, /roadmap/i, 'checkpoint asks for the checklist roadmap');
+  assert.ok(!out.trimStart().startsWith('{'), 'plain text, not a JSON decision object');
+});
+
+test('workflow-checkpoint: identical output for any prompt (static, no prompt-dependent branching)', () => {
+  const a = runCheckpoint(PROMPT_EVENT);
+  const b = runCheckpoint(JSON.stringify({ hook_event_name: 'UserPromptSubmit', prompt: 'fix the typo in README' }));
+  assert.equal(a, b);
+});
+
+test('workflow-checkpoint: empty stdin → silent exit 0', () => {
+  assert.equal(runCheckpoint(''), '');
+});
+
+test('workflow-checkpoint: malformed or non-object stdin → silent exit 0, never crashes', () => {
+  assert.equal(runCheckpoint('{not json'), '');
+  assert.equal(runCheckpoint('null'), '');
+  assert.equal(runCheckpoint('[1,2]'), '');
+});
+
+test('workflow-checkpoint: AD_WORKFLOW_CHECKPOINT=0 kill switch → silent exit 0', () => {
+  assert.equal(runCheckpoint(PROMPT_EVENT, { AD_WORKFLOW_CHECKPOINT: '0' }), '');
+});

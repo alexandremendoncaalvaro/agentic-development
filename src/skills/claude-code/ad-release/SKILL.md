@@ -2,6 +2,7 @@
 name: ad-release
 description: Safely orchestrate a single npm package release through its configured local release script, release PR, tag, npm publish, and GitHub Release. Uses one digest-bound plan approval with per-stage fallback and state-aware recovery; preserves the tagged release commit with release-only merge mode. Use when preparing, resuming, publishing, or creating a GitHub Release for an npm package; triggers on "release this package", "publish to npm", "prepare a release", "resume release", "GitHub Release", or "/ad-release".
 summary: Safely orchestrate a single npm package release through its configured release script, PR, tag, npm publish, and GitHub Release with one digest-bound approval and state-aware recovery.
+disable-model-invocation: true
 allowed-tools: Read, Bash, Grep
 ---
 

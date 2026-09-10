@@ -1,6 +1,6 @@
 ---
 name: ad-handoff
-description: Compact the current session into a handoff document a fresh agent can pick up from. Saves to the OS temp dir (never the repo). Captures live state — current branch, open artifacts, unresolved decisions, in-progress diff, recent errors — references existing artifacts (PRD / spec / task / ADR) by path instead of duplicating them, and lists suggested next skills. Redacts secrets before writing. Triggers on "handoff", "hand off this session", "compact this conversation", "save context for next session", "pass to another agent", "wrap up the session", "context exhausted", "/clear", "/ad-handoff".
+description: Compact the session into a handoff a fresh agent can resume from, saved to the OS temp dir with live state, open decisions, and next skills. Use when context runs low or on "handoff", "wrap up the session", "save context for next session", "pass to another agent".
 summary: Compact current session into a handoff doc in the OS temp dir. Preserves a full agent packet while the next session opens with a short preparation receipt and executive brief. Rebuilds the roadmap, catches lost asks, reports hygiene, references artifacts, redacts secrets. Never commits.
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---

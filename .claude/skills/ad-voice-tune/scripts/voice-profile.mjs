@@ -64,6 +64,16 @@ function rejectUnknownFields(value, allowed, prefix, errors) {
   }
 }
 
+function isValidLanguageTag(value) {
+  if (typeof value !== 'string' || !value.trim()) return false;
+  try {
+    new Intl.Locale(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function assertPathOutsideRepository(path, label = 'profile') {
   const resolvedPath = absolute(path);
   let cursor = existsSync(resolvedPath)
@@ -98,6 +108,7 @@ export function validateProfile(profile) {
       'status',
       'retention',
       'rawSamplesRetained',
+      'languages',
       'patterns',
       'examples',
       'limitations',
@@ -113,6 +124,26 @@ export function validateProfile(profile) {
   }
   if (profile.rawSamplesRetained !== false) {
     errors.push('rawSamplesRetained must be false');
+  }
+  if (
+    profile.languages !== undefined &&
+    (!profile.languages || typeof profile.languages !== 'object' || Array.isArray(profile.languages))
+  ) {
+    errors.push('languages must be an object');
+  } else if (profile.languages) {
+    rejectUnknownFields(
+      profile.languages,
+      ['conversation', 'publication'],
+      'languages',
+      errors
+    );
+    for (const field of ['conversation', 'publication']) {
+      if (!(field in profile.languages)) {
+        errors.push(`languages.${field} is required`);
+      } else if (!isValidLanguageTag(profile.languages[field])) {
+        errors.push(`languages.${field} must be a valid BCP 47 tag`);
+      }
+    }
   }
   for (const field of ['patterns', 'examples', 'limitations']) {
     if (!Array.isArray(profile[field])) errors.push(`${field} must be an array`);

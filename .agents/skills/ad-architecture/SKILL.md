@@ -13,7 +13,7 @@ Two modes detected from filesystem state:
 </background_information>
 
 <instructions>
-Step 0 — from the consumer repo root, run `node .agents/skills/ad-architecture/scripts/project-signals.mjs ARCHITECTURE.md --host codex` and parse its JSON. Its `mode` selects the filesystem-state branch above; use `stacks` to focus the code scan and surface every `unreadable[]` entry as a scan gap, never as an absent path.
+Step 0 — from the consumer repo root, run `node .agents/skills/ad-architecture/scripts/project-signals.mjs ARCHITECTURE.md --host codex` and parse its JSON. Its `mode` selects the filesystem-state branch above; use `stacks` to focus the code scan and surface every `unreadable[]` entry as a scan gap, never as an absent path. If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it.
 
 Step 1 — scan the code. Read in this order, taking the first that exists for each category:
 - Top-level directory listing — infer the layered/hexagonal/clean structure.
@@ -59,5 +59,6 @@ A single `ARCHITECTURE.md` at the repo root. Every line locks a binding pattern.
 ## Next
 
 - `/ad-spec` when starting a feature whose scope spans the patterns this document records.
+- `/ad-domain` when writing or auditing the architecture resolves project vocabulary.
 - `/ad-adr` for any binding decision that surfaced while writing or auditing this file (one decision per ADR).
 - `/ad-drift` periodically to check pattern drift between this document and the code.

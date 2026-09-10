@@ -1,6 +1,6 @@
 ---
 name: ad-spec
-description: Draft a feature-level specification at doc/specs/NNNN-<slug>.md following the six-layer artifact stack (Constitution → Domain → Product → Spec → Plan/Decisions → Code). Adapts GitHub Spec Kit's mandatory sections (User Scenarios, Requirements, Success Criteria) to the kit's documentation discipline. Use when the user wants to write, draft, scaffold, or open a feature spec, feature brief, user stories, or success criteria for one feature. Product-level scoping (PRD, multi-feature roadmap, target user, product success metrics) belongs to `ad-prd` (Layer 3). Status starts at draft.
+description: Draft a feature specification at doc/specs/NNNN-<slug>.md (Spec Kit-aligned — who, what, measurable success criteria, non-goals), inheriting scope from the PRD. Use when a feature needs a contract before tasks; "write a spec", "feature spec", "acceptance criteria", "define the feature".
 summary: Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 4 of the six-layer artifact stack. References parent PRD (`ad-prd`, Layer 3) for product-scope inheritance.
 ---
 
@@ -54,5 +54,6 @@ Spec is a narrative document but is exempt from ADR-0008's no-dates rule for the
 
 - `/ad-ground` for the four-source research pass before code (WORKFLOW §4 + §5).
 - `/ad-task` to break the spec into work units; each task carries a `Spec ref` field pointing back to this file.
+- `/ad-domain` when scoping resolves vocabulary that must stay canonical across the spec and code.
 - `/ad-adr` if scoping the spec surfaced a binding architectural decision.
 - Flip Status to `accepted` once you sign off and tasks start being created. Flip to `shipped` after release.

@@ -1,6 +1,6 @@
 ---
 name: ad-audit
-description: Maximum-gate, rules-anchored adversarial audit — the strongest quality gate before work reaches the team. Audits a target (diff, branch, PR, or drafted claims/artifacts about to be posted) against the project's rule-set (repo binding docs plus optional machine and project rule layers), fanning out one isolated fresh-context reviewer per rule-group, giving every rule an explicit verdict (coverage is a matrix, not a hope), grounding every finding on the actual code/output, and gating every teammate-visible claim on a real evidence artifact. Critical rule-groups get a second cross-model pass; never emits an "approve" verdict. Use before posting to the team, opening a PR, or handing off, or on "audit against the rules", "adversarial audit", "maximum gate", "rules audit", "verify before I post", "exhaustive review", "/ad-audit". Heavier than `ad-review` (light two-axis diff review); distinct from `ad-drift` (documentation-drift only).
+description: Maximum-gate adversarial audit of a diff, branch, PR, or drafted claims against the repo's rule-set — one fresh reviewer per rule-group, every rule given a verdict. Use before posting to the team, opening a PR, or handing off; "audit against the rules", "maximum gate", "verify before I post". Heavier than ad-review.
 summary: Maximum-gate rules-anchored audit. Fans out one fresh-context reviewer per rule-group, exhaustive per-rule verdicts (coverage matrix), cross-model on critical groups via the dual-host split, evidence-gated, never approves. Heavier than ad-review; hands rule gaps to ad-level-up.
 allowed-tools: Read, Glob, Grep, Bash, Task
 ---
@@ -145,3 +145,4 @@ If the audit surfaced a defect pattern no rule covers, or a rule that misled or 
 - Route any surfaced rule gap to `/ad-level-up`.
 - For a lighter, faster pass on a routine diff, use `/ad-review` instead.
 - For documentation-vs-code drift only, use `/ad-drift`.
+- Once the audit is clear: `/ad-commit` to land the change, then `/ad-pr` to open the PR.

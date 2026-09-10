@@ -124,7 +124,7 @@ _Avoid_: "clean-context review" (non-standard); "independent review" (ambiguous 
 - **Standards axis** — does the diff conform to AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs? Bugs, coupling, edge cases, vocabulary drift.
 - **Spec axis** — does the diff match what the originating task / spec / PRD asked for? Missing requirements, scope creep, wrong implementation against quoted spec line.
 
-On Claude Code, the two axes run as parallel `Task` sub-agent calls with axis-bounded handoffs. On Codex, they run as a single-session pass with axis-separated output (Codex skills cannot programmatically spawn sub-agents — see ADR-0007 Addendum 2026-05-24). Each axis ends with its own verdict; no cross-axis re-ranking; no synthesized "approve".
+On Claude Code, the two axes run as parallel `Task` subagent calls with axis-bounded handoffs. On Codex, they run as a single-session pass with axis-separated output (Codex skills cannot programmatically spawn sub-agents — see ADR-0007 Addendum 2026-05-24). Each axis ends with its own verdict; no cross-axis re-ranking; no synthesized "approve".
 
 _Avoid_: "dual review" (ambiguous — could mean two reviewers of the same axis); "Standards/Spec split" (clumsy as a noun phrase); "split review" (unclear what's split).
 

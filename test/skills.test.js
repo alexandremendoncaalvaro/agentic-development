@@ -4,15 +4,47 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
+import { bundledSkills } from '../src/lib/install.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SKILLS_ROOT = join(__dirname, '..', 'src', 'skills');
 
+// ADR-0073: every kit skill belongs to one invocation class. User-invocable
+// skills are outward-facing or setup human verbs; their descriptions leave the host
+// listing (`disable-model-invocation` / `allow_implicit_invocation: false`).
+// The remaining skills are model-invocable and must fit the smallest
+// documented listing budget (8,000 chars) at ≤350 chars each.
+const USER_INVOCABLE_SKILLS = new Set([
+  'ad-archive',
+  'ad-architecture',
+  'ad-bootstrap',
+  'ad-community-docs',
+  'ad-design',
+  'ad-guidelines',
+  'ad-hooks',
+  'ad-level-up',
+  'ad-merge',
+  'ad-pr',
+  'ad-publish',
+  'ad-release',
+  'ad-report',
+  'ad-rules',
+  'ad-skill',
+  'ad-subagent',
+  'ad-template-tune',
+  'ad-update',
+  'ad-voice',
+  'ad-voice-tune',
+]);
+const SPEC_DESCRIPTION_CAP = 1024;
+const MODEL_DESCRIPTION_CAP = 350;
+const MODEL_LISTING_BUDGET = 8000;
+
+// The tests enumerate skills through the installer's own enumerator, so the
+// dot-directory exclusion (task-0065) has one implementation and one test.
 function listSkills(agent) {
   const root = join(SKILLS_ROOT, agent);
-  return readdirSync(root)
-    .filter((name) => statSync(join(root, name)).isDirectory())
-    .map((name) => ({ name, dir: join(root, name) }));
+  return bundledSkills(agent).map((name) => ({ name, dir: join(root, name) }));
 }
 
 function parseFrontmatter(filePath) {
@@ -27,6 +59,21 @@ function parseFrontmatter(filePath) {
   return yaml.load(text.slice(4, end));
 }
 
+function routingSurface(body, agent, skill) {
+  if (skill === 'ad-next') {
+    return body.split('\n').find((line) => line.includes('completion rollup')) ?? '';
+  }
+  if (agent === 'codex' && skill === 'ad-audit') {
+    return body.match(/<next>\n([\s\S]*?)\n<\/next>/)?.[1] ?? '';
+  }
+  if (agent === 'codex' && skill === 'ad-tdd') {
+    return body.match(/^Next: .+$/m)?.[0] ?? '';
+  }
+  const marker = '\n## Next\n';
+  const start = body.lastIndexOf(marker);
+  return start === -1 ? '' : body.slice(start + marker.length);
+}
+
 for (const agent of ['claude-code', 'codex']) {
   for (const { name, dir } of listSkills(agent)) {
     test(`skill ${agent}/${name}: SKILL.md frontmatter parses with required fields`, () => {
@@ -35,9 +82,11 @@ for (const agent of ['claude-code', 'codex']) {
       assert.equal(fm.name, name, `name (${fm.name}) must match dir (${name})`);
       assert.equal(typeof fm.description, 'string', 'description must be a string');
       assert.ok(fm.description.length > 0, 'description must not be empty');
+      // 1,024 is the Agent Skills specification maximum (agentskills.io);
+      // 1,536 is only where Claude Code truncates the listing text (ADR-0073).
       assert.ok(
-        fm.description.length <= 1536,
-        `description must be ≤1536 chars (Anthropic Skills spec); got ${fm.description.length}`
+        fm.description.length <= SPEC_DESCRIPTION_CAP,
+        `description must be ≤${SPEC_DESCRIPTION_CAP} chars (Agent Skills spec); got ${fm.description.length}`
       );
       // Per task-0029, every kit skill carries a kit-specific `summary:`
       // field for the managed AGENTS.md table cell. Without it, rootdoc.js
@@ -54,6 +103,114 @@ for (const agent of ['claude-code', 'codex']) {
     });
   }
 }
+
+test('skill routing keeps every workflow hand-off discoverable on both hosts', () => {
+  const edges = [
+    ['ad-ground', ['/ad-tdd', '/ad-tdg']],
+    ['ad-task', ['/ad-ground', '/ad-tdd']],
+    ['ad-tdd', ['/ad-commit']],
+    ['ad-tdg', ['/ad-tdd', '/ad-diagnose', '/ad-commit']],
+    ['ad-review', ['/ad-question-me', '/ad-audit', '/ad-commit', '/ad-merge']],
+    ['ad-audit', ['/ad-commit', '/ad-pr']],
+    ['ad-philosophy', ['/ad-tdd', '/ad-tdg', '/ad-diagnose', '/ad-commit']],
+    ['ad-spec', ['/ad-domain']],
+    ['ad-architecture', ['/ad-domain']],
+    ['ad-drift', ['/ad-domain']],
+    ['ad-next', ['/ad-roadmap']],
+    ['ad-grill-me', ['/ad-question-me']],
+  ];
+
+  for (const agent of ['claude-code', 'codex']) {
+    for (const [skill, successors] of edges) {
+      const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+      const routing = routingSurface(body, agent, skill);
+      assert.ok(routing, `${agent}/${skill} must expose its routing surface`);
+      for (const successor of successors) {
+        assert.ok(
+          routing.includes(successor),
+          `${agent}/${skill} must route to ${successor}`
+        );
+      }
+    }
+  }
+});
+
+test('ad-roadmap explains the delivery story as a newcomer-readable checklist on both hosts', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-roadmap');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const templates = readFileSync(join(skillDir, 'references', 'output-templates.md'), 'utf8');
+    const projectSection = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
+    const example = projectSection.match(/```(?:markdown)?\n([\s\S]*?)```/)?.[1] ?? '';
+
+    assert.match(body, /30-second overview/i, `${agent} must lead with a thirty-second overview`);
+    assert.match(body, /main delivery front/i, `${agent} must name the main delivery front`);
+    assert.match(body, /next front/i, `${agent} must name the next delivery front`);
+    assert.match(
+      body,
+      /working tree[^\n]*most recent commit/i,
+      `${agent} must prefer live repository evidence when several tasks are marked in progress`
+    );
+    assert.match(
+      body,
+      /only[^\n]*in-progress[^\n]*`## Context`[^\n]*`## Acceptance Criteria`/i,
+      `${agent} may deepen only the active task's purpose and acceptance criteria`
+    );
+    assert.match(
+      body,
+      /no (?:task|work)[^\n]*in progress[^\n]*first remaining/i,
+      `${agent} must not invent current work when nothing is in progress`
+    );
+    assert.match(example, /^- \[x\] .+/m, `${agent} example must show delivered work as checked`);
+    assert.match(example, /^- \[ \] .+/m, `${agent} example must show remaining work as open`);
+    assert.match(
+      example,
+      /^- \[ \] .*in progress[\s\S]*?^  - \[x\] .+[\s\S]*?^  - \[ \] .+/mi,
+      `${agent} example must explain in-progress work through nested checked and open steps`
+    );
+    assert.ok(
+      example.indexOf('### 30-second overview') < example.indexOf('### Roadmap checklist'),
+      `${agent} must explain the delivery story before showing tier evidence`
+    );
+  }
+});
+
+test('ad-roadmap defaults to project scope and uses a separate task template only when asked', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-roadmap');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const templates = readFileSync(join(skillDir, 'references', 'output-templates.md'), 'utf8');
+
+    assert.match(body, /project(?:-wide)? scope[^\n]*default/i, `${agent} must default to the project roadmap`);
+    assert.match(
+      body,
+      /task scope[^\n]*only[^\n]*explicit/i,
+      `${agent} must enter task scope only on an explicit request`
+    );
+    assert.match(body, /references\/output-templates\.md/, `${agent} must route rendering to the shared templates`);
+    assert.match(templates, /^## Project roadmap template$/m, `${agent} needs a project-level template`);
+    assert.match(templates, /^## Task roadmap template$/m, `${agent} needs a task-level template`);
+    const projectTemplate = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
+    const taskTemplate = templates.match(/^## Task roadmap template$([\s\S]*)/m)?.[1] ?? '';
+    assert.equal(
+      [...templates.matchAll(/^### 30-second overview$/gm)].length,
+      2,
+      `${agent} templates must share the same quick overview`
+    );
+    assert.match(templates, /^### Roadmap checklist$/m, `${agent} project template needs the whole roadmap checklist`);
+    assert.match(templates, /^### Task checklist$/m, `${agent} task template needs its own step checklist`);
+    assert.match(
+      projectTemplate,
+      /^- \[ \] .+\n  - \[[ x]\] .+/m,
+      `${agent} project checklist must make tasks and subtasks visible`
+    );
+    assert.match(
+      taskTemplate,
+      /^- \[ \] .+\n  - \[[ x]\] .+/m,
+      `${agent} task checklist must make tasks and subtasks visible`
+    );
+  }
+});
 
 test('ad-merge has a release-only mode that preserves the tagged commit', () => {
   for (const agent of ['claude-code', 'codex']) {
@@ -872,3 +1029,59 @@ test('the ADR projection states the number of ACCEPTED records the directory hol
       'Merely proposing one does not.'
   );
 });
+
+// ADR-0073 — invocation class and listing budget, per host.
+for (const agent of ['claude-code', 'codex']) {
+  const skills = listSkills(agent);
+  const names = new Set(skills.map((s) => s.name));
+
+  test(`${agent}: every ADR-0073 user-invocable skill exists`, () => {
+    for (const name of USER_INVOCABLE_SKILLS) {
+      assert.ok(names.has(name), `ADR-0073 names ${name}, but no such ${agent} skill exists`);
+    }
+  });
+
+  let modelListingChars = 0;
+  for (const { name, dir } of skills) {
+    const fm = parseFrontmatter(join(dir, 'SKILL.md'));
+    const userOnly = USER_INVOCABLE_SKILLS.has(name);
+
+    test(`skill ${agent}/${name}: invocation class matches ADR-0073`, () => {
+      if (agent === 'claude-code') {
+        assert.equal(
+          fm['disable-model-invocation'],
+          userOnly ? true : undefined,
+          userOnly
+            ? 'user-invocable skill must set disable-model-invocation: true'
+            : 'model-invocable skill must not set disable-model-invocation'
+        );
+      } else {
+        const doc = yaml.load(readFileSync(join(dir, 'agents', 'openai.yaml'), 'utf8'));
+        assert.equal(
+          doc?.policy?.allow_implicit_invocation,
+          !userOnly,
+          `allow_implicit_invocation must be ${!userOnly} for a ${
+            userOnly ? 'user-invocable' : 'model-invocable'
+          } skill`
+        );
+      }
+    });
+
+    if (!userOnly) {
+      modelListingChars += fm.description.length;
+      test(`skill ${agent}/${name}: model-invocable description fits ${MODEL_DESCRIPTION_CAP} chars`, () => {
+        assert.ok(
+          fm.description.length <= MODEL_DESCRIPTION_CAP,
+          `model-invocable description must be ≤${MODEL_DESCRIPTION_CAP} chars (ADR-0073); got ${fm.description.length}`
+        );
+      });
+    }
+  }
+
+  test(`${agent}: model-invocable descriptions fit the ${MODEL_LISTING_BUDGET}-char listing budget`, () => {
+    assert.ok(
+      modelListingChars <= MODEL_LISTING_BUDGET,
+      `model-invocable descriptions total ${modelListingChars} chars; budget is ${MODEL_LISTING_BUDGET} (ADR-0073)`
+    );
+  });
+}

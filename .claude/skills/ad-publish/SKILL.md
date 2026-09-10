@@ -2,6 +2,7 @@
 name: ad-publish
 description: Draft or review collaboration publications through approved artifact templates. Use when the user invokes /ad-publish, asks to draft or improve a GitHub proposal issue, asks for a concise Slack, Discord, GitHub issue, or pull-request reply, wants a proposal publication checked against prior approved patterns, or asks to publish that final text. Resolves layered templates, separates private context from outward content, grounds claims, composes personal voice and research skills through their public contracts, and requires an exact-target approval receipt before any outward action. Ordinary use is read-only and never tunes templates.
 summary: Draft or review collaboration publications from approved templates and authorized evidence. Preserves facts, composes existing skills, and gates every outward action.
+disable-model-invocation: true
 ---
 
 <background_information>
@@ -32,6 +33,12 @@ Accept a brief or an existing draft. Resolve artifact type, destination and exac
 posting surface, audience, purpose, language, requested action, and hard
 constraints from context. Ask only for an ungroundable value that would materially
 change the result.
+
+Resolve optional language preferences through `ad-voice`. The conversation language
+controls direct owner communication and the first approval preview. The publication
+language is the default for outward text. An explicit language in the current request
+overrides the corresponding preference for that request only. When no language
+preferences exist, preserve the existing contextual inference.
 
 Supported types are `github-proposal-issue` and `collaboration-reply`. The latter
 covers Slack and Discord threads plus GitHub issue and pull-request comments. For
@@ -103,6 +110,11 @@ publication unless the recipient needs it.
 
 ## Step 4: Draft or review
 
+When the conversation language and publication language differ, draft the complete
+initial publication in the conversation language. Do not adapt it to the publication
+language before passing it through `ad-voice`; `ad-voice` owns the two-stage language
+approval flow, including the first preview, contextual adaptation, and final approval.
+
 Apply the template's required information, ordering rules, instructions, and
 load-bearing strengths. Use the smallest useful set of authorized examples. Omit
 a section when it adds no information.
@@ -137,6 +149,12 @@ available. Its public contract owns both the confirmed profile and the bundled
 naturalization fallback.
 
 ## Step 5: Verify privately
+
+After `ad-voice` returns the publication-language adaptation, independently run a
+meaning-preservation check against the approved conversation-language draft. List
+every changed, omitted, or added claim in the conversation language, then return the
+exact final publication-language text for approval. No outward action may use a
+merely summarized or silently revised draft.
 
 Read [references/evaluation.md](references/evaluation.md). Check the source-role
 and invariant ledgers, then assign every applicable template rule and exemplar strength one

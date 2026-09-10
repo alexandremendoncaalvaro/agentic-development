@@ -329,7 +329,7 @@ No `--no-verify`, no skipped hooks, no deleted failing tests (per [WORKFLOW.md �
 Every document in this repo follows these rules:
 
 1. **Definitions and decisions only.** No speculation, history, or unfounded plans.
-2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are exempt — their lifecycle fields are the auditability primitive. `CHANGELOG.md` at the repo root is exempt on the same ground ([ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)): it is the release record, and dated version headings are its auditability primitive.
+2. **No dates, version stamps, `DRAFT` markers, or changelogs in narrative documents.** Decision-record artifacts under `doc/adr/`, `doc/tasks/`, `doc/specs/`, `doc/product/` are exempt — their lifecycle fields are the auditability primitive — and so are evidence records under `doc/research/`, whose per-source access dates are what make a claim reproducible ([ADR-0070](doc/adr/0070-persist-grounded-decision-evidence.md)). `CHANGELOG.md` at the repo root is exempt on the same ground ([ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)): it is the release record, and dated version headings are its auditability primitive.
 3. **No emoji anywhere.** Docs, code, comments, commits, PR bodies.
 4. **Business context first.** Open every document with *why* — the problem, the constraint, the user.
 5. **One scope per document. No duplication.** Canonical location owns the content; cross-references load-bearing only.
@@ -352,6 +352,7 @@ Every document in this repo follows these rules:
 | `GUIDELINES.md` (this document) | Project-specific engineering standards | Engineers |
 | `ARCHITECTURE.md` | Source structure and dependency rules | Engineers |
 | `doc/product/PRD.md` | Product-level scope (target user, success metrics, roadmap) | Product + engineering |
+| `doc/research/NNNN-<slug>.md` | Evidence records: studies and grounded implementation receipts, with graded claims and dated sources | Engineering + agents |
 | `doc/specs/NNNN-*.md` | Feature-level specifications | Engineers |
 | `doc/adr/NNNN-*.md` | Binding architectural decisions (Nygard format) | Engineers, future maintainers |
 | `doc/tasks/NNNN-*.md` | Per-work-unit plan + acceptance criteria | Engineers |

@@ -2,6 +2,7 @@
 name: ad-rules
 description: Load the practitioner's global rules — the host's `CLAUDE.md` or `AGENTS.md`, symlinks resolved — and reinforce them by listing their topics in the conversation, alongside whatever the repo and the kit's rule-set layers add. Use when the user says "read my global CLAUDE.md / AGENTS.md and bring the topics", asks what rules or conventions are in force, wants the rules refreshed mid-session, or starts in a repo whose conventions they have not read. Read-only — never edits a rule, never audits, never approves.
 summary: Load the host's global rules file (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, symlinks resolved) and reinforce it by listing topics in the conversation, plus the repo's binding docs and the kit's rule-set layers by reference. Read-only; audits nothing.
+disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Bash
 ---
 

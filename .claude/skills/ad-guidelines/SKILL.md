@@ -2,6 +2,7 @@
 name: ad-guidelines
 description: Draft or update `GUIDELINES.md` at the repo root — the project's full engineering reference. Layer 1 Constitution trinity member (alongside `WORKFLOW.md` universal philosophy and `AGENTS.md` distilled rules), covering design principles, code standards, complexity, API, build, static analysis, quality gates, testing, git workflow, documentation, and security. Scan-first — reads the language toolchain, existing test/lint/format config, and existing AGENTS.md sections, pre-fills every placeholder it can verify, then asks only the genuine gaps. Use when the user wants to draft, scaffold, audit, or update engineering guidelines / code standards / coding conventions / SOLID adoption / Object Calisthenics / testing strategy / security policy / build conventions for the project. Skill is lazy — the file only exists when the project needs engineering standards.
 summary: Lazy lifecycle owner of `GUIDELINES.md` (Layer 1 Constitution, full engineering reference). Twelve sections — design principles, code standards, complexity, API, performance, build, static analysis, quality gates, testing, git, documentation, security. Pre-suggested defaults from canon + scan-first detection.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
@@ -37,6 +38,8 @@ First run from the consumer repo root:
 ```bash
 node .claude/skills/ad-guidelines/scripts/project-signals.mjs AGENTS.md
 ```
+
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it.
 
 Parse its JSON. `stacks` narrows the manifest reads below. Surface every `unreadable[]` entry as a scan gap, never as an absent path.
 

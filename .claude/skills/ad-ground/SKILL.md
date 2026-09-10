@@ -1,6 +1,6 @@
 ---
 name: ad-ground
-description: Four-source pre-implementation research — official docs, validated implementation references (open-source repos, Stack Overflow / forum answers, blog posts, gists), in-repo patterns, and git history — then synthesize a happy path, persist its claim-to-source evidence as an auditable project record, and gate any deviation before code is written. Grades evidence and confidence per WORKFLOW §17; routes insufficient evidence to ad-spike. Auto-invokes on non-trivial work, refactors, library or pattern selection, "research before coding", "before implementing", "which library", "which pattern", "how to approach", "ground before coding". Workflow-operational counterpart to WORKFLOW.md §4 + §5.
+description: Four-source research before non-trivial code — official docs, validated references, in-repo patterns, git history; synthesizes the happy path, persists an evidence record, gates deviations. Use before implementing, choosing a library or pattern, or on "ground this", "research before coding", "how to approach".
 summary: Four-source pre-implementation research + versioned claim-to-source evidence record, happy-path synthesis, deviation gate, and proportional evidence grading. WORKFLOW §4 + §5 + §17.
 allowed-tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
 ---
@@ -78,6 +78,8 @@ From the consumer root, determine the next number with the installed shared prob
 node .claude/skills/ad-adr/scripts/next-number.mjs doc/research
 ```
 
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute the sibling `ad-adr` install beside it — the probe lives at `scripts/next-number.mjs` inside `ad-adr`.
+
 Use JSON `next`. Stop until access is resolved if `unreadable` is non-empty, or for a numbering decision if `exhausted` is true. Write `doc/research/<NNNN>-ground-<slug>.md` from [references/record-template.md](references/record-template.md). Every load-bearing claim gets an `E<N>` section with a §17 strength and one or more source IDs; the source register carries at least one `A`, `B`, `C`, and `D` source, each with citation, access date, and access method. Record an empty git-history search as `D1`, including the command and its `no prior attempt found` result — absence is evidence only when the search is reproducible.
 
 Set `Decision ref` to the task, spec, ADR, or other durable project artifact the record supports. Add the ground record's repository-relative path to that artifact's `Evidence ref` field; when a task tracks the work, update that field or append the path to its dated Notes entry. Do not create a new planning artifact solely to hold a trivial decision.
@@ -89,6 +91,8 @@ node .claude/skills/ad-ground/scripts/validate-record.mjs \
   doc/research/<NNNN>-ground-<slug>.md
 ```
 
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/validate-record.mjs` inside it.
+
 Proceed only when `valid` is `true` and `unreadable` is empty. The offline checker proves the claim-to-source map is structurally complete; it does not prove an external source's content. Reopen every cited source during review or audit. A receipt without that re-check is a trace, not proof.
 
 ## Output contract
@@ -99,7 +103,7 @@ No production code is written by this skill. The durable ground record feeds the
 
 ## Next
 
-- Implement per the synthesized happy path and link the validated ground record from the governing task, spec, or ADR.
+- Implement per the synthesized happy path with `/ad-tdd` when behavior is test-expressible or `/ad-tdg` when strategy choice remains; link the validated ground record from the governing task, spec, or ADR.
 - `/ad-task` if the work needs explicit decomposition into checkbox-toggle work units.
 - `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10.
 - `/ad-adr` if the deviation gate surfaced a binding architectural decision.

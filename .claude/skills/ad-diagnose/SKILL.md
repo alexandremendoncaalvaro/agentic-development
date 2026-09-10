@@ -1,6 +1,6 @@
 ---
 name: ad-diagnose
-description: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop, reproduce, hypothesise (3-5 ranked falsifiable), instrument, fix + regression-test. The feedback loop is the skill; everything else is mechanical. Triggers on "diagnose this", "debug this", "this is broken", "this is throwing", "performance regression", "find the bug", "build a repro", "feedback loop", "ranked hypotheses", "falsifiable", "/ad-diagnose". Routes to `ad-spike` when the technique is uncertain across approaches, `ad-grill-me` when the spec is unclear, `ad-tdg` when the bug is a clean ground-truth-pair regression.
+description: Disciplined diagnosis for hard bugs and performance regressions — build a feedback loop, reproduce, rank 3-5 falsifiable hypotheses, instrument, fix with a regression test. Use on "this is broken", "debug this", "find the bug", "performance regression", "build a repro".
 summary: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.
 allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 ---
@@ -110,6 +110,8 @@ To pick the right routing branch below, run from the consumer repo root:
 ```bash
 node .claude/skills/ad-diagnose/scripts/project-signals.mjs AGENTS.md
 ```
+
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it.
 
 Use `mode` and `stacks` only to choose relevant repo evidence and test infrastructure. Surface every `unreadable[]` entry as a diagnosis constraint rather than silently assuming the file is absent.
 

@@ -2,6 +2,7 @@
 name: ad-subagent
 description: Draft a new Claude Code subagent at .claude/agents/<name>.md, using the official subagents format. Use when the user wants to create, write, draft, or scaffold a custom Claude Code subagent for delegated work (fresh-context reviewer, codebase researcher, docs researcher, test designer, bug reproducer, bounded implementation worker). Asks one question per missing field; never invents roles or tool sets.
 summary: Draft a host-specific custom subagent for bounded delegated work — Claude Code `.claude/agents/<name>.md`, Codex `.codex/agents/<name>.toml`.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Bash
 ---
 

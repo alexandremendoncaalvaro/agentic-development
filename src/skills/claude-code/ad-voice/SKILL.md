@@ -3,6 +3,7 @@ name: ad-voice
 description: |
   Apply a confirmed machine-local personal voice profile when drafting, rewriting, or translating text. Use when the user asks "write like me", "make this sound like me", "use my voice", "adjust this for Slack/Discord/docs/email", "translate this but keep my personality", or invokes /ad-voice. Preserves facts first, carries owner communicative identity through functional language equivalents, applies separately attributed team/community accommodation, and returns one usable draft. Read-only: never learns from the request or changes the profile. Routes profile creation and corrections to ad-voice-tune.
 summary: Draft, rewrite, or translate through a confirmed local personal-voice profile. Preserves facts; layers owner identity, community accommodation, and context; never changes the profile. Falls back honestly when evidence is missing.
+disable-model-invocation: true
 allowed-tools: Read, Bash
 ---
 
@@ -49,6 +50,12 @@ If the profile is absent or invalid, do not load it partially. Continue with no
 personal rules; the mandatory naturalization fallback in Step 4 still applies.
 State briefly that personal matching was unavailable when that limitation matters,
 and route calibration to `/ad-voice-tune`. Never claim the result matches the user.
+
+Resolve optional language preferences before drafting. The conversation language
+controls direct owner communication and the first approval preview. The publication
+language is the default for outward text. An explicit language in the current
+request overrides the corresponding preference for that request only. When the
+profile has no `languages` object, preserve the existing contextual inference.
 
 ## Step 3: Select the active slice
 
@@ -102,6 +109,18 @@ the concrete answer or delta. Remove article-like framing and supporting mechani
 that does not change what the recipient should understand, decide, or do next. If
 this check changes the draft, repeat the invariant,
 profile-pattern, applicable `HW.<id>`, and naturalness audits.
+
+For outward text when the conversation language and publication language differ,
+`ad-voice` owns the two-stage language approval flow. Complete the naturalization,
+personal-rule application, and every audit above before returning the
+conversation-language draft for approval. After approval, adapt that exact draft to
+the publication language and destination rather than translating it literally, then
+repeat the naturalization, personal-rule, invariant, and relevance checks in the new
+language. Run a meaning-preservation check against the approved draft, listing any
+changed, omitted, or added claim in the conversation language. Return the exact final
+publication-language text for approval; this skill never performs the outward action.
+When another skill composes `ad-voice`, it resumes this same flow with the approved
+conversation-language draft instead of creating a second approval sequence.
 
 The audit is a private quality gate, not an output score. Normal output is one usable draft and nothing else. Show analysis, active rules, audit details, confidence, or a Portuguese pragmatic gloss only when the user asks or when a material override prevents an honest result.
 

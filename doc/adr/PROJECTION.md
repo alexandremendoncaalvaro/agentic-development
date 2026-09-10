@@ -6,7 +6,7 @@ Without this file, learning which architectural decisions still bind costs one p
 
 ## Default
 
-All 48 accepted ADRs bind in full, except the fourteen below, which bind except for the named part.
+All 51 accepted ADRs bind in full, except the fourteen below, which bind except for the named part.
 
 No ADR in this directory has been deprecated or superseded as a whole document. A `proposed` ADR is not counted here and does not appear until it is accepted — it binds nothing until then, and its acceptance is the change to what binds that adds it (see *The rule that keeps it true*).
 
@@ -23,7 +23,7 @@ No ADR in this directory has been deprecated or superseded as a whole document. 
 | [0020](0020-deep-modules-vocabulary.md) | Profile-based installation scope for `ad-deepen` | The architectural vocabulary, regime, and process | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |
 | [0021](0021-diagnose-discipline.md) | The four-profile framing of `ad-diagnose` registration | The diagnosis discipline and its dual-host behavior | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |
 | [0036](0036-ad-audit-maximum-gate.md) | Profile-based installation scope for `ad-audit` | The maximum-gate audit process and evidence requirements | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |
-| [0053](0053-ad-roadmap-progress-rollup.md) | Profile-based installation scope for `ad-roadmap` | The roadmap rollup operation and output contract | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |
+| [0053](0053-ad-roadmap-progress-rollup.md) | Profile-based installation scope; the absolute frontmatter-only read; percentage-first presentation | The read-only roadmap rollup, calculation and classification rules, with project-default and explicit task scopes, a narrow active-task read, and separate plain-language task-and-subtask checklist templates | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md); its own 2026-09-09 addendum |
 | [0054](0054-ad-question-me-value-first-questioner.md) | Profile-based installation scope for `ad-question-me` | The value-first questioner behavior | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |
 | [0060](0060-ad-research-evidence-graded-studies.md) | Profile-based installation scope for `ad-research`, and the absolute artifact-free boundary for `ad-ground` | The evidence-graded study process, distinct from `ad-ground`'s implementation receipt | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md); [ADR-0070](0070-persist-grounded-decision-evidence.md) |
 | [0061](0061-ad-derisk-orchestrator.md) | Profile-based installation scope for `ad-derisk` | The uncertainty-retirement orchestrator | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |

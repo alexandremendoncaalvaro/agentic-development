@@ -1,6 +1,6 @@
 ---
 name: ad-tdg
-description: Outcome-based prompting per WORKFLOW.md §9. Give the agent the finish line first, not the path. Five steps — confirm regime, ground truth pair, Test Dependency Map, three approaches, pick by one criterion, implement and verify. Triggers on "outcome-based", "TDG", "ground truth", "expected output", "three approaches", "pick by criterion", "test dependency map", "TDM", "before modifying", "tests covering this file", "give the finish line". Routes to `ad-spike` if the technique itself is uncertain. No file written; output is the verified implementation that lands through normal commits.
+description: Outcome-based implementation — given input and expected output, generate three strategies and pick one by a single criterion; Test Dependency Map before modifying. Use when the outcome is known but the strategy is not; "TDG", "three approaches", "pick by criterion", "which tests cover this".
 summary: Outcome-based prompting per WORKFLOW §9. Ground truth pair + Test Dependency Map + three approaches + single-criterion selection, when the technique is known but the implementation strategy is uncertain.
 allowed-tools: Read, Glob, Grep, Bash
 ---
@@ -126,7 +126,8 @@ When the change is committed, the ground-truth pair, criterion, and rejection no
 
 ## Next
 
-- After Step 5 verification passes: commit the change with the ground-truth pair + criterion + rejection notes in the body.
+- After Step 5 verification passes: use `/ad-commit` with the ground-truth pair + criterion + rejection notes in the body.
+- When `/ad-diagnose` hands off a behavior-known regression, use `/ad-tdd` as the outer loop and TDG only inside a GREEN phase where strategy remains uncertain.
 - `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10. The TDM tests verify the implementation matches ground truth; §10 review checks coupling, edge cases, spec drift the pair did not cover.
 - If the work spans multiple sessions: `/ad-task` for explicit decomposition (Spec ref the original spec; cite this TDG run in the task `Notes`).
 - If iteration stalled at Step 5 and routing back was needed: `/ad-ground` (re-research) or `/ad-spike` (technique uncertain).
