@@ -52,6 +52,15 @@ Use this when code already defines most of the product behavior.
 
 Use `/ad-hooks` when the repository needs executable quality gates, not simply because the skill exists.
 
+## Return to active work
+
+- `/ad-brief` is the default when you just arrived and need the project, final objective, recent result, current direction, next move, completion condition, blockers, and any real owner decision explained in plain language.
+- `/ad-roadmap` adds a reconciled project-wide checklist by default; name the current task when you want only that task and its subtasks.
+- `/ad-rules` inventory mode answers which rules exist. `/ad-rules`, “The Rules”, or an equivalent correction gesture reapplies `/ad-philosophy`, repairs an incompatible next action, and returns the corrected context through `/ad-brief`.
+- `/ad-handoff` is for durable session transfer. Its resume protocol reconciles live state, composes `/ad-brief`, and retains persistence, redaction, lost asks, and repository hygiene.
+
+These calls are one-way: specialists pass settled facts to `/ad-brief` and regain control. A private brief is not publication content. Publishing a specific conclusion starts a separate `/ad-publish` → `/ad-voice` → exact-text-and-target approval flow.
+
 ## Session and maintenance
 
 - `/ad-handoff` writes a compact OS-temp handoff when a session must continue with fresh context.

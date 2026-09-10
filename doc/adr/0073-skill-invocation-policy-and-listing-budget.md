@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-09-09
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0076 — reclassifies `ad-rules` as model-invocable so natural correction gestures can reach it; the classification rule remains unchanged.
 
 ## Context
 

@@ -28,7 +28,6 @@ const USER_INVOCABLE_SKILLS = new Set([
   'ad-publish',
   'ad-release',
   'ad-report',
-  'ad-rules',
   'ad-skill',
   'ad-subagent',
   'ad-template-tune',
@@ -135,6 +134,49 @@ test('skill routing keeps every workflow hand-off discoverable on both hosts', (
   }
 });
 
+test('decision-maker briefing composition is one-way and visible in the workflow map', () => {
+  const flows = readFileSync(join(__dirname, '..', 'WORKFLOW-FLOWS.md'), 'utf8');
+  const section = flows.match(/^## Return To Active Work$([\s\S]*?)(?=^## )/m)?.[1] ?? '';
+
+  assert.ok(section, 'WORKFLOW-FLOWS.md must map the return-to-session use case');
+  for (const edge of [
+    /Roadmap --> Brief/,
+    /Handoff --> Brief/,
+    /Rules --> Philosophy/,
+    /Philosophy --> Corrected/,
+    /Corrected --> Brief/,
+    /Publish --> Voice/,
+  ]) {
+    assert.match(section, edge, `workflow map is missing ${edge}`);
+  }
+
+  for (const agent of ['claude-code', 'codex']) {
+    const read = (skill) => readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+    assert.match(read('ad-roadmap'), /settled roadmap fact packet[\s\S]*`\/?ad-brief`/i);
+    assert.match(read('ad-handoff'), /settled resume fact packet[\s\S]*`\/?ad-brief`/i);
+    assert.match(
+      read('ad-rules'),
+      /`\/?ad-philosophy`[\s\S]*settled correction fact packet[\s\S]*`\/?ad-brief`/i
+    );
+    assert.match(read('ad-publish'), /Every final title and body[\s\S]*`\/?ad-voice`/i);
+    assert.doesNotMatch(
+      read('ad-brief'),
+      /(?:invoke|pass (?:a |the )?fact packet to) `\/?ad-(?:roadmap|handoff|rules|philosophy|publish|voice)`/i,
+      `${agent} ad-brief must not call back into a specialist`
+    );
+  }
+});
+
+test('the canonical skill guide lists every bundled skill exactly once', () => {
+  const guide = readFileSync(join(__dirname, '..', 'doc', 'guides', 'skills.md'), 'utf8');
+  const names = bundledSkills('claude-code');
+
+  for (const name of names) {
+    const rows = guide.split('\n').filter((line) => line.startsWith(`| \`/${name}\` |`));
+    assert.equal(rows.length, 1, `doc/guides/skills.md must list /${name} exactly once`);
+  }
+});
+
 test('ad-roadmap explains the delivery story as a newcomer-readable checklist on both hosts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-roadmap');
@@ -143,7 +185,7 @@ test('ad-roadmap explains the delivery story as a newcomer-readable checklist on
     const projectSection = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
     const example = projectSection.match(/```(?:markdown)?\n([\s\S]*?)```/)?.[1] ?? '';
 
-    assert.match(body, /30-second overview/i, `${agent} must lead with a thirty-second overview`);
+    assert.match(body, /decision-maker brief returned by `ad-brief`/i, `${agent} must lead with the canonical brief`);
     assert.match(body, /main delivery front/i, `${agent} must name the main delivery front`);
     assert.match(body, /next front/i, `${agent} must name the next delivery front`);
     assert.match(
@@ -169,7 +211,7 @@ test('ad-roadmap explains the delivery story as a newcomer-readable checklist on
       `${agent} example must explain in-progress work through nested checked and open steps`
     );
     assert.ok(
-      example.indexOf('### 30-second overview') < example.indexOf('### Roadmap checklist'),
+      example.indexOf('<decision-maker brief returned by `ad-brief`>') < example.indexOf('### Roadmap checklist'),
       `${agent} must explain the delivery story before showing tier evidence`
     );
   }
@@ -193,9 +235,9 @@ test('ad-roadmap defaults to project scope and uses a separate task template onl
     const projectTemplate = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
     const taskTemplate = templates.match(/^## Task roadmap template$([\s\S]*)/m)?.[1] ?? '';
     assert.equal(
-      [...templates.matchAll(/^### 30-second overview$/gm)].length,
+      [...templates.matchAll(/^<decision-maker brief returned by `ad-brief`>$/gm)].length,
       2,
-      `${agent} templates must share the same quick overview`
+      `${agent} templates must compose the same canonical brief`
     );
     assert.match(templates, /^### Roadmap checklist$/m, `${agent} project template needs the whole roadmap checklist`);
     assert.match(templates, /^### Task checklist$/m, `${agent} task template needs its own step checklist`);
@@ -208,6 +250,122 @@ test('ad-roadmap defaults to project scope and uses a separate task template onl
       taskTemplate,
       /^- \[ \] .+\n  - \[[ x]\] .+/m,
       `${agent} task checklist must make tasks and subtasks visible`
+    );
+  }
+});
+
+test('ad-roadmap delegates the decision-maker brief and retains its checklist', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const briefDir = join(SKILLS_ROOT, agent, 'ad-brief');
+    assert.ok(existsSync(briefDir), `${agent} must ship the ad-brief specialist`);
+
+    const brief = readFileSync(join(briefDir, 'SKILL.md'), 'utf8');
+    const roadmap = readFileSync(join(SKILLS_ROOT, agent, 'ad-roadmap', 'SKILL.md'), 'utf8');
+
+    assert.match(
+      roadmap,
+      /pass(?:es)? (?:a |the )?settled roadmap fact packet to `ad-brief`/i,
+      `${agent} roadmap must pass already-reconciled facts to ad-brief`
+    );
+    assert.match(
+      roadmap,
+      /regain(?:s)? control[\s\S]*append(?:s)? (?:the )?(?:project- or task-scoped )?nested checklist/i,
+      `${agent} roadmap must regain control and append its specialist checklist`
+    );
+    assert.match(
+      roadmap,
+      /project scope[\s\S]*pass[^\n]*material confidence limits[^\n]*to `ad-brief`/i,
+      `${agent} project roadmap must pass material confidence limits to ad-brief`
+    );
+    assert.match(
+      roadmap,
+      /task scope[\s\S]*pass[^\n]*material confidence limits[^\n]*to `ad-brief`/i,
+      `${agent} task roadmap must pass material confidence limits to ad-brief`
+    );
+    assert.match(
+      brief,
+      /settled fact packet/i,
+      `${agent} brief must accept facts supplied by a specialist caller`
+    );
+    assert.match(
+      brief,
+      /do not (?:reconcile|reinterpret)[^\n]*specialist/i,
+      `${agent} brief must not absorb the caller's specialist reasoning`
+    );
+  }
+});
+
+test('ad-roadmap templates place the canonical brief before specialist checklists', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const templates = readFileSync(
+      join(SKILLS_ROOT, agent, 'ad-roadmap', 'references', 'output-templates.md'),
+      'utf8'
+    );
+    const project = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
+    const task = templates.match(/^## Task roadmap template$([\s\S]*)/m)?.[1] ?? '';
+
+    for (const [scope, template, checklist] of [
+      ['project', project, '### Roadmap checklist'],
+      ['task', task, '### Task checklist'],
+    ]) {
+      assert.match(template, /<decision-maker brief returned by `ad-brief`>/i, `${agent} ${scope} template must compose ad-brief`);
+      assert.ok(
+        template.indexOf('<decision-maker brief returned by `ad-brief`>') < template.indexOf(checklist),
+        `${agent} ${scope} template must explain the work before its checklist`
+      );
+      assert.doesNotMatch(
+        template,
+        /### (?:30-second overview|Current front|Current step)/i,
+        `${agent} ${scope} template must not keep a second briefing presentation`
+      );
+    }
+  }
+});
+
+test('ad-brief restores live session context and escalates only genuine judgment', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const briefDir = join(SKILLS_ROOT, agent, 'ad-brief');
+    const body = readFileSync(join(briefDir, 'SKILL.md'), 'utf8');
+    const template = readFileSync(join(briefDir, 'references', 'output-template.md'), 'utf8');
+
+    assert.match(
+      body,
+      /git status[\s\S]*current branch[\s\S]*recent commit/i,
+      `${agent} brief must ground itself in live repository state`
+    );
+    assert.match(
+      body,
+      /active task[\s\S]*spec[\s\S]*(?:ADR|decision)[\s\S]*(?:PRD|product)/i,
+      `${agent} brief must recover the governing project artifacts`
+    );
+    assert.match(
+      body,
+      /live (?:repository )?(?:evidence|state)[^\n]*outranks[^\n]*conversation/i,
+      `${agent} brief must not trust stale conversational state over the repository`
+    );
+    assert.match(
+      body,
+      /one screen[\s\S]*expand only when clarity\s+requires/i,
+      `${agent} brief must be concise without sacrificing comprehension`
+    );
+    for (const label of [
+      'Project',
+      'Final objective',
+      'Recent result',
+      'Now',
+      'Why it matters',
+      'Next',
+      'Done when',
+      'Blocker',
+      'Confidence',
+      'Your attention',
+    ]) {
+      assert.match(template, new RegExp(`\\*\\*${label}:\\*\\*`), `${agent} brief needs ${label}`);
+    }
+    assert.match(
+      body,
+      /no decision needed[\s\S]*one question[\s\S]*recommendation first[\s\S]*value[\s\S]*risk[\s\S]*reversibility/i,
+      `${agent} brief must separate autonomous progress from genuine owner judgment`
     );
   }
 });
@@ -324,17 +482,10 @@ test('ad-handoff keeps preparation exhaustive but makes the resume brief concise
         `${agent} resume receipt must cover ${label.toLowerCase()}`
       );
     }
-    for (const label of ['Final objective', 'Roadmap', 'This session', 'Done when', 'Your attention']) {
-      assert.match(
-        template,
-        new RegExp(`- \\*\\*${label}:\\*\\*`),
-        `${agent} executive brief must include ${label.toLowerCase()}`
-      );
-    }
     assert.match(
       template,
-      /only viable competing options/i,
-      `${agent} must exclude dominated decision options`
+      /At resume time, print the decision-maker brief returned by `\/?ad-brief`/i,
+      `${agent} resume must use the canonical decision-maker brief`
     );
     assert.match(
       template,
@@ -358,6 +509,111 @@ test('ad-handoff keeps preparation exhaustive but makes the resume brief concise
         'Claude handoff chip must not restore the verbose explicit-invocation path'
       );
     }
+  }
+});
+
+test('ad-handoff delegates the resume brief and retains the durable handoff protocol', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-handoff');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const template = readFileSync(join(skillDir, 'references', 'handoff-template.md'), 'utf8');
+
+    assert.match(
+      body,
+      /pass(?:es)?[\s\S]*settled resume fact packet[\s\S]*`\/?ad-brief`/i,
+      `${agent} handoff must pass settled resume facts to ad-brief`
+    );
+    assert.match(
+      body,
+      /regain control[\s\S]*(?:write|persist)[\s\S]*handoff/i,
+      `${agent} handoff must retain ownership of the durable artifact`
+    );
+    assert.match(
+      template,
+      /At resume time, print the decision-maker brief returned by `\/?ad-brief`/i,
+      `${agent} resume protocol must defer the canonical brief until resume time`
+    );
+    assert.match(
+      body,
+      /keep[\s\S]*runtime instruction[\s\S]*verbatim[\s\S]*do not replace[\s\S]*handoff creation/i,
+      `${agent} handoff creation must not freeze a stale decision-maker brief`
+    );
+    assert.match(template, /^### Preparation$/m, `${agent} must retain the preparation receipt`);
+    assert.match(template, /^## Working rules$/m, `${agent} must retain the handoff rules`);
+    assert.match(template, /^## Roadmap$/m, `${agent} must retain the durable roadmap`);
+    assert.match(template, /^## Asks that never landed$/m, `${agent} must retain the lost-ask sweep`);
+    assert.match(body, /redact/i, `${agent} must retain secret redaction`);
+  }
+});
+
+test('ad-rules separates inventory from correction and reports the corrected plan', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-rules');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+
+    assert.match(
+      body,
+      /inventory mode[\s\S]*correction mode/i,
+      `${agent} rules must distinguish inspection from a correction gesture`
+    );
+    assert.match(
+      body,
+      /(?:the rules|rules correction)[\s\S]*(?:invoke|apply)[\s\S]*`\/?ad-philosophy`[\s\S]*applied-binding/i,
+      `${agent} correction mode must apply the existing philosophy recommitment`
+    );
+    assert.match(
+      body,
+      /correct[\s\S]*(?:conflicting|incompatible)[\s\S]*(?:plan|next action)/i,
+      `${agent} correction mode must repair the active plan`
+    );
+    assert.match(
+      body,
+      /settled[\s\S]*(?:correction|session) fact packet[\s\S]*`\/?ad-brief`[\s\S]*regain control/i,
+      `${agent} correction mode must return a canonical briefing before rules regains control`
+    );
+    assert.match(
+      body,
+      /which rules|list[\s\S]*topics[\s\S]*inventory mode/i,
+      `${agent} explicit information requests must remain inventory-only`
+    );
+  }
+});
+
+test('ad-brief stays private while ad-publish retains every outward-language gate', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const brief = readFileSync(join(SKILLS_ROOT, agent, 'ad-brief', 'SKILL.md'), 'utf8');
+    const publish = readFileSync(join(SKILLS_ROOT, agent, 'ad-publish', 'SKILL.md'), 'utf8');
+    const composition = readFileSync(
+      join(SKILLS_ROOT, agent, 'ad-publish', 'references', 'composition.md'),
+      'utf8'
+    );
+
+    assert.match(
+      brief,
+      /private owner-agent context[\s\S]*not[\s\S]*intended outward content/i,
+      `${agent} briefing must not become publication input by implication`
+    );
+    assert.match(
+      brief,
+      /never (?:pass|send)[\s\S]*(?:brief|briefing)[\s\S]*`\/?ad-(?:publish|voice)`/i,
+      `${agent} briefing must route no private packet into publication skills`
+    );
+    assert.match(publish, /silent source-role ledger/i, `${agent} publish must classify every source role`);
+    assert.match(
+      publish,
+      /conversation language[\s\S]*first approval preview[\s\S]*publication language/i,
+      `${agent} publish must retain the two-language approval boundary`
+    );
+    assert.match(
+      publish,
+      /Every final title and body[\s\S]*every final collaboration reply[\s\S]*`\/?ad-voice`/i,
+      `${agent} publish must route every outward text through voice`
+    );
+    assert.match(
+      composition,
+      /not private[\s\S]*deliberation[\s\S]*every final title, body, or reply/i,
+      `${agent} publish-to-voice packet must exclude private deliberation`
+    );
   }
 });
 

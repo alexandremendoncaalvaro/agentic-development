@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-08-07
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0076 — moves the shared thirty-second decision-maker presentation to `ad-brief`; roadmap reconciliation, scopes, metrics, and checklists remain unchanged.
 
 ## Context
 

@@ -84,6 +84,19 @@
         }
       ]
     },
+    "ad-brief": {
+      "version": "0.20.0-beta.10",
+      "files": [
+        {
+          "path": ".claude/skills/ad-brief/references/output-template.md",
+          "sourceSha": "874c3c17deb988f9b669b37dfe7ddbc0d226ab688a3e01d2888f61f18a8ec8e4"
+        },
+        {
+          "path": ".claude/skills/ad-brief/SKILL.md",
+          "sourceSha": "44af30973b797855be5942cbc588e9ca88dd53d09effbc54850ed6523756c13a"
+        }
+      ]
+    },
     "ad-commit": {
       "version": "0.20.0-beta.10",
       "files": [
@@ -244,11 +257,11 @@
       "files": [
         {
           "path": ".claude/skills/ad-handoff/references/handoff-template.md",
-          "sourceSha": "5a471ad235f7fca128e1e6ed7a54504c3590a74b65bb161e51e07ab0bf9cd402"
+          "sourceSha": "3561defb177444828faf8d47af4d9d30f3b89c49c00620642d4d6513429af7bf"
         },
         {
           "path": ".claude/skills/ad-handoff/SKILL.md",
-          "sourceSha": "c8233ae277bf47968867d031e80678f4cb5abc8698a52357fa38e07aed8c3d30"
+          "sourceSha": "f77ac9b5f3bcd9717008b739bda4b0dd7d35165019b8d3cfa3180ecdc2cf6416"
         }
       ]
     },
@@ -486,11 +499,11 @@
       "files": [
         {
           "path": ".claude/skills/ad-roadmap/references/output-templates.md",
-          "sourceSha": "30b18e59423c165ab3b4f54e206f03385342a531c6fc55ae92c647b42792a77c"
+          "sourceSha": "7b6ca1c0fa68f724562b551cdeb60dc2a57ecf22a7237daedf3c3800970a2049"
         },
         {
           "path": ".claude/skills/ad-roadmap/SKILL.md",
-          "sourceSha": "babfab7baf270a87c57bb5d5b9f9900b2e7a36cdac1b0853066bcd45a0c5fd4c"
+          "sourceSha": "4285e50f985b6e42d2f9c266b1b7e17ab6afb9e59ae16bf8d0acf7e2f77ce7c8"
         }
       ]
     },
@@ -503,7 +516,7 @@
         },
         {
           "path": ".claude/skills/ad-rules/SKILL.md",
-          "sourceSha": "4402e2a3c2f6113339ed8d16b667b1e2205f787f7b1d0f92803ef285356eb38e"
+          "sourceSha": "67563e8584f1d2e0e9e289624ca2837d838d5e5a1df850ac5a9d65295b10842c"
         }
       ]
     },

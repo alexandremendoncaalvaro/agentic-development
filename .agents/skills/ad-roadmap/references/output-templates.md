@@ -7,22 +7,7 @@ Use exactly one template per response. Keep the headings and order; replace ever
 ```markdown
 ## Project roadmap — <project name>
 
-### 30-second overview
-
-- **Main delivery:** <the main outcome the project is moving toward>
-- **Now:** <the current project front, or “No task is currently marked in progress”>
-- **Next:** <the next unfinished front>
-- **Progress:** <done of total and percentage in one plain sentence>
-- **Blocker:** <the blocker that gates now or next, or “No blocker recorded”>
-
-### Current front — <plain outcome>
-
-<One short paragraph: what this front delivers and why it matters. Omit this section when no task is explicitly in progress.>
-
-- [ ] In progress — <current task or compound delivery item>
-  - [x] <completed subtask>
-  - [ ] <remaining subtask>
-  - [ ] <remaining subtask>
+<decision-maker brief returned by `ad-brief`>
 
 ### Roadmap checklist
 
@@ -60,8 +45,8 @@ Project-scope rules:
 
 - Keep every product-roadmap item visible, grouped by its source tier.
 - Tasks and subtasks are both checklist items. Nest subtasks whenever a roadmap item has tracked internal steps; do not flatten meaningful decomposition into prose.
-- If several tasks are marked `in-progress`, use live repository evidence to choose the Current front and disclose unresolved ambiguity.
-- When no task is in progress, omit `Current front`, say so under `Now`, and make the first remaining roadmap item `Next`.
+- If several tasks are marked `in-progress`, use live repository evidence to choose the current-front fact passed to `ad-brief` and disclose unresolved ambiguity.
+- When no task is in progress, pass that fact to `ad-brief` and make the first remaining roadmap item the next front.
 - Percentages, tiers, and identifiers support the explanation; they do not replace it.
 
 ## Task roadmap template
@@ -69,17 +54,7 @@ Project-scope rules:
 ```markdown
 ## Task roadmap — <plain task outcome> (task <id>)
 
-### 30-second overview
-
-- **Goal:** <what this task changes and why it matters>
-- **Now:** <the current open task step, or “This task has not started”>
-- **Next:** <the next open step after Now, or “No next step; the task is complete”>
-- **Progress:** <completed of total task steps and percentage>
-- **Blocker:** <the task blocker, or “No blocker recorded”>
-
-### Current step — <plain step name>
-
-<One short paragraph: what this step delivers and why it is the right step now. Omit when the task is proposed, blocked before work, or done.>
+<decision-maker brief returned by `ad-brief`>
 
 ### Task checklist
 

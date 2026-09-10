@@ -104,6 +104,23 @@
         }
       ]
     },
+    "ad-brief": {
+      "version": "0.20.0-beta.10",
+      "files": [
+        {
+          "path": ".agents/skills/ad-brief/agents/openai.yaml",
+          "sourceSha": "72a1b344c10f9d7deae4039291cd1244c19eb602cd846f0989bdb2b1f5e98473"
+        },
+        {
+          "path": ".agents/skills/ad-brief/references/output-template.md",
+          "sourceSha": "874c3c17deb988f9b669b37dfe7ddbc0d226ab688a3e01d2888f61f18a8ec8e4"
+        },
+        {
+          "path": ".agents/skills/ad-brief/SKILL.md",
+          "sourceSha": "f0ffc268c74dccab699cad5e07416273dacf6b9b764416b083f5fb024220acc4"
+        }
+      ]
+    },
     "ad-commit": {
       "version": "0.20.0-beta.10",
       "files": [
@@ -304,15 +321,15 @@
       "files": [
         {
           "path": ".agents/skills/ad-handoff/agents/openai.yaml",
-          "sourceSha": "197380c5778d0cf7d5eb4cf006975ed82fe85880f412d728dcec4bc8fe8b1668"
+          "sourceSha": "76c411036fdcc3aecda430244bcec353f69160bc33f9dd7e248cde05efac0f89"
         },
         {
           "path": ".agents/skills/ad-handoff/references/handoff-template.md",
-          "sourceSha": "060071c5a151e91e943ef9b2a451727834ec29eaeecf48113e1fa1c247c33108"
+          "sourceSha": "233be727abffa96ecae757ff4b9700d6423c911244cd71c2cf82588473fb2843"
         },
         {
           "path": ".agents/skills/ad-handoff/SKILL.md",
-          "sourceSha": "faaf789f0a44333d25cb99f026dcaf7e2b2ee1e40985aaec448fa3b5debcf0ff"
+          "sourceSha": "993bc9346ed5ada185623cf92cee6dfcfe585008463391262aa9c8dc4aa8bf2c"
         }
       ]
     },
@@ -606,15 +623,15 @@
       "files": [
         {
           "path": ".agents/skills/ad-roadmap/agents/openai.yaml",
-          "sourceSha": "51ea91ca562bcad6a8e5db561792727b0a98d7733f076943f467ad3dda139f33"
+          "sourceSha": "9730f8935e8f64cee04a94f5b976edb1e40605cd1cfdd75ee593a55d8274d955"
         },
         {
           "path": ".agents/skills/ad-roadmap/references/output-templates.md",
-          "sourceSha": "30b18e59423c165ab3b4f54e206f03385342a531c6fc55ae92c647b42792a77c"
+          "sourceSha": "7b6ca1c0fa68f724562b551cdeb60dc2a57ecf22a7237daedf3c3800970a2049"
         },
         {
           "path": ".agents/skills/ad-roadmap/SKILL.md",
-          "sourceSha": "3602d93c66546e7c6c9209bc146881c3dc8fdd160bfc1b3c59d5ef3fe42a7ab8"
+          "sourceSha": "a6ea5baf05ae57b8d959036b7b4ea0690739baf105c9d9aabd69ff264d881b5d"
         }
       ]
     },
@@ -623,7 +640,7 @@
       "files": [
         {
           "path": ".agents/skills/ad-rules/agents/openai.yaml",
-          "sourceSha": "cc65316c26fb5a41ed5e6b5a1847dab62483d83b4161787783460835c31ce12d"
+          "sourceSha": "daded8a9c353bf5751f2441bfede3daa57cd5184cb9c8232cb4458592843ac11"
         },
         {
           "path": ".agents/skills/ad-rules/scripts/resolve-global-rules.mjs",
@@ -631,7 +648,7 @@
         },
         {
           "path": ".agents/skills/ad-rules/SKILL.md",
-          "sourceSha": "e1cf05eaa9f94448bdac0b893ae3c422e5782835884236af382821233972fa8b"
+          "sourceSha": "bcaf84bd0c3bad89f6b27132fdd23b2c7233b112991bb119b043ef8dcb9f5c49"
         }
       ]
     },

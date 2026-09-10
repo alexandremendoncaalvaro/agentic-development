@@ -1,7 +1,7 @@
 ---
 name: ad-roadmap
 description: Read-only roadmap report — reconciles roadmap tiers against specs and tasks, then explains the main delivery front, current work, next front, blockers, and progress as a plain-language Markdown checklist. Use on "how much is done", "are we on track", "progress report", "percent complete", "what's shipped".
-summary: Read-only roadmap report with a thirty-second plain-language overview, focused current-front explanation, and checklist of delivered and remaining work backed by specs and tasks.
+summary: Read-only roadmap report that reconciles specs and tasks, composes the canonical decision-maker brief, then adds a project- or task-scoped checklist of delivered and remaining work.
 ---
 
 <background_information>
@@ -55,6 +55,8 @@ Project scope — compute supporting evidence.
 - Per tier: the same done / total count and percentage.
 - Risk: `at risk` when an MVP item is blocked or remaining while a later tier has progress, or a blocked task or proposed ADR gates a roadmap item. Otherwise `on track`.
 
+Pass the settled roadmap fact packet to `ad-brief`. Include any material confidence limits exposed by incomplete tracking, contradictory artifacts, or unresolved reconciliation; when none are material, say so explicitly. After it returns, regain control and append the project- or task-scoped nested checklist. `ad-brief` presents the overview; this skill retains reconciliation, scope selection, progress calculations, and checklist rendering.
+
 Task scope — build the selected task roadmap.
 - Read the selected task's frontmatter, `## Context`, `## Plan`, `## Acceptance Criteria`, and `## Definition of Done`. Read a blocker from `## Notes` only when the task status or open steps indicate one but do not name it elsewhere.
 - Explain the task's outcome and why it matters from Context. Keep parent project, spec, and ADR references as supporting evidence only.
@@ -67,11 +69,11 @@ Task scope — build the selected task roadmap.
 <output_contract>
 Read `references/output-templates.md`, select the project or task template from the request, and return one Markdown message in that exact heading order. Replace every placeholder with evidence-backed, plain-language text.
 
-Both templates start with `30-second overview`, followed by the scope's current work and nested checklist.
+Both templates place the decision-maker brief returned by `ad-brief` after the roadmap title, followed by the scope's nested checklist and supporting evidence.
 
-For project scope, lead with the main delivery front and next front, then show every roadmap task with meaningful tracked subtasks nested beneath it. When no task is in progress, omit `Current front`, write `No task is currently marked in progress` under `Now`, and use the first remaining item as `Next`.
+For project scope, pass the main delivery front, current front, next front, progress, blocker, and material confidence limits to `ad-brief`, then show every roadmap task with meaningful tracked subtasks nested beneath it. When no task is in progress, pass `No task is currently marked in progress` as the current state and use the first remaining item as the next front.
 
-For task scope, lead with the task goal, current step, next step, progress, and blocker, then show the task's steps and subtasks in dependency order. Stay within the selected task. In both scopes, checked means evidence-backed completion and open means unfinished. No file is written and no state is mutated.
+For task scope, pass the task goal, current step, next step, progress, blocker, and material confidence limits to `ad-brief`, then show the task's steps and subtasks in dependency order. Stay within the selected task. In both scopes, checked means evidence-backed completion and open means unfinished. No file is written and no state is mutated.
 </output_contract>
 
 ## Next
@@ -80,3 +82,4 @@ For task scope, lead with the task goal, current step, next step, progress, and 
 - To change the plan itself: `/ad-prd`.
 - To backfill an untracked item: `/ad-task`.
 - To reconcile documentation against code: `/ad-drift`.
+- To get only the live context and direction without a roadmap checklist: `/ad-brief`.

@@ -16,7 +16,7 @@ Before doing any work, complete a private preparation pass:
 
 Do not narrate that pass. Do not print the full applied-binding statement, rule excerpts, raw file inventory, or command log. If a rule changes the inherited plan, a source is unreadable, or a prerequisite is unmet, surface that consequence under `Your attention` instead of hiding it.
 
-Then print only the following, in the user's language. Keep it to one screen and prefer a second plain sentence over compressed jargon:
+Then build a settled resume fact packet from the reconciled handoff state and pass it to `ad-brief`. Print only the following, in the user's language. Keep it to one screen and prefer a second plain sentence over compressed jargon:
 
 ### Preparation
 
@@ -27,15 +27,9 @@ Then print only the following, in the user's language. Keep it to one screen and
 
 Use `[ ]` instead of `[x]` for anything not verified. Never turn an assumption into a checked box.
 
-### Brief
+At resume time, print the decision-maker brief returned by `ad-brief` for the settled resume fact packet here.
 
-- **Final objective:** <the end outcome and why it matters, in product or business terms>
-- **Roadmap:** <Done — the meaningful progress; Now — the current phase; Next — the remaining arc. Summarize the whole front in at most three short lines, not the full checklist.>
-- **This session:** <what you are doing now and why this is the right next move>
-- **Done when:** <the governing acceptance criteria, definition of done, or scope boundary translated into one plain outcome>
-- **Your attention:** <"None now" when no judgment call remains, otherwise one decision with the recommendation first, only viable competing options, and value-level trade-offs>
-
-Do not manufacture a decision to make the brief look complete. Exclude dominated options; if grounding leaves one clear winner, choose it and report `None now`. After printing the brief, continue immediately with <one imperative sentence naming the concrete next move>, unless `Your attention` contains a decision that genuinely blocks it.
+After printing the returned brief, continue immediately with <one imperative sentence naming the concrete next move>, unless its `Your attention` field contains a decision that genuinely blocks it.
 
 ## Working rules
 

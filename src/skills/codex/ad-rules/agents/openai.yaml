@@ -1,5 +1,5 @@
 interface:
   display_name: ad-rules
-  short_description: Load the host's global rules file (CLAUDE.md / AGENTS.md, symlinks resolved) and reinforce it by listing topics in the conversation, plus repo binding docs and kit rule-set layers by reference. Read-only.
+  short_description: Resolve global and project rules. Inventory mode lists topics; correction mode reapplies ad-philosophy, repairs the active plan, and returns the canonical decision-maker brief.
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true
