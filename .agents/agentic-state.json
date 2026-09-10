@@ -609,8 +609,12 @@
           "sourceSha": "51ea91ca562bcad6a8e5db561792727b0a98d7733f076943f467ad3dda139f33"
         },
         {
+          "path": ".agents/skills/ad-roadmap/references/output-templates.md",
+          "sourceSha": "30b18e59423c165ab3b4f54e206f03385342a531c6fc55ae92c647b42792a77c"
+        },
+        {
           "path": ".agents/skills/ad-roadmap/SKILL.md",
-          "sourceSha": "6d77bb996d31ce4da2f38096ad35b175cd9b67c33b1f206467c28b828b995331"
+          "sourceSha": "3602d93c66546e7c6c9209bc146881c3dc8fdd160bfc1b3c59d5ef3fe42a7ab8"
         }
       ]
     },

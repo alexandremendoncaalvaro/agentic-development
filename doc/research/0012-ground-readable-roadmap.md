@@ -1,13 +1,13 @@
 # GROUND-0012: Make the roadmap readable at a glance
 
 **Status:** recorded
-**Decision:** Keep `ad-roadmap`'s artifact reconciliation and percentage calculation, but present the result in plain language: a thirty-second overview, a focused explanation of the active delivery front, and a standard Markdown checklist whose nested checked and open steps show in-progress work.
+**Decision:** Keep `ad-roadmap`'s artifact reconciliation and percentage calculation, default unqualified requests to a project-wide report, add an explicit task-scoped report when requested, and render either scope through its own plain-language thirty-second checklist template.
 **Decision ref:** doc/tasks/0071-make-roadmap-readable-at-a-glance.md
 **Confidence:** Strong
 
 ## Decision and confidence
 
-The happy path is a presentation refinement, not a new planning system. The skill should continue to derive status from the PRD, specs, tasks, and ADRs, then lead with the main delivery front, current work, next front, overall progress, and blockers in words a newcomer can understand. It should render delivered work as `- [x]` and remaining work as `- [ ]`; an in-progress item stays open and gains nested completed and open steps. Broad collection remains cheap and bounded to roadmap sections, frontmatter, references, checkbox counts, and read-only git evidence that disambiguates several tasks marked in progress. Only tasks actually marked `in-progress` receive a focused read of `## Context` and `## Acceptance Criteria`, solely to explain what is being delivered, why it matters, what is done, and what remains. Axis-2 verdict: Strong; the change is reversible, reuses the existing evidence ledger, follows established public and in-repo patterns, and is protectable with one dual-host source contract test.
+The happy path is a presentation refinement, not a new planning system. An unqualified request should keep the product roadmap as its spine and report the whole project; task scope should activate only when the user asks for one task and should stay within that task's outcome, plan, acceptance checks, and definition of done. Each scope gets a stable template, while both lead with the same thirty-second overview and use the same `- [x]` / `- [ ]` grammar. Broad project collection remains cheap and bounded to roadmap sections, frontmatter, references, checkbox counts, and read-only git evidence that disambiguates several tasks marked in progress. Only tasks actually marked `in-progress` receive a focused read of `## Context` and `## Acceptance Criteria` in project scope; explicit task scope may read the selected task sections needed to render its own plan. Axis-2 verdict: Strong; the change is reversible, reuses the existing evidence ledger, follows established public and in-repo patterns, and is protectable with dual-host source contract tests.
 
 ## Evidence
 
@@ -39,6 +39,13 @@ The existing skill deliberately limits broad reconciliation to the roadmap and i
 
 The current output leads with a percentage and tier labels, which answers the calculation but makes a newcomer reconstruct the delivery story. Public guidance favors context, direction, user need, and necessary detail. The refined hierarchy therefore opens with the main front, current state, next front, progress, and blocker; explains the active front; then shows the complete tiered checklist with counts and artifact identifiers as supporting evidence. When nothing is marked in progress, honesty requires saying so and selecting the first remaining item as next rather than inventing current work.
 
+### E5 — Project and task roadmaps should be explicit scopes with separate templates
+
+**Strength:** High
+**Provenance:** A1, A3, A4, B1, C2, C3
+
+Product-roadmap guidance treats the roadmap as the project-level direction and priority spine, while task-list guidance treats checkboxes as the decomposition of one unit of work. The public GitHub roadmap keeps those levels linked but distinct: the roadmap exposes product direction and each issue carries its own delivery detail. The repository's handoff template likewise separates its compressed whole-front roadmap from detailed open artifacts. Defaulting to the project view preserves the skill's original decision-maker question; entering task scope only on an explicit request prevents a current task from silently replacing the product plan. Separate bundled templates make that boundary deterministic without creating a new state artifact.
+
 ## Source register
 
 - **A1:** Atlassian, "Product roadmaps", https://www.atlassian.com/agile/product-management/product-roadmaps, roadmap as shared source of truth; importance of why, audience comprehension, and necessary detail (accessed 2026-09-09 via Web open)
@@ -53,7 +60,7 @@ The current output leads with a percentage and tier labels, which answers the ca
 
 ## Limitations and reversal
 
-This receipt establishes a grounded output contract, not measured comprehension across a representative user sample. If usage shows that the overview cannot be understood without opening artifacts, that nested checklists obscure rather than clarify active work, or that focused section reads create material latency or context pressure, revisit the hierarchy and measure it against representative repositories before widening the read scope.
+This receipt establishes a grounded output contract, not measured comprehension across a representative user sample. If usage shows that the overview cannot be understood without opening artifacts, that nested checklists obscure rather than clarify active work, that users regularly expect task scope from unqualified requests, or that focused section reads create material latency or context pressure, revisit the hierarchy and measure it against representative repositories before widening the read scope.
 
 ## Audit path
 

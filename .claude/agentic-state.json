@@ -485,8 +485,12 @@
       "version": "0.20.0-beta.10",
       "files": [
         {
+          "path": ".claude/skills/ad-roadmap/references/output-templates.md",
+          "sourceSha": "30b18e59423c165ab3b4f54e206f03385342a531c6fc55ae92c647b42792a77c"
+        },
+        {
           "path": ".claude/skills/ad-roadmap/SKILL.md",
-          "sourceSha": "2ca0c1fc7e0aea4a9c06f7624d27377829745821b499983fc08325f2434ed27f"
+          "sourceSha": "babfab7baf270a87c57bb5d5b9f9900b2e7a36cdac1b0853066bcd45a0c5fd4c"
         }
       ]
     },

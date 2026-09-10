@@ -137,8 +137,11 @@ test('skill routing keeps every workflow hand-off discoverable on both hosts', (
 
 test('ad-roadmap explains the delivery story as a newcomer-readable checklist on both hosts', () => {
   for (const agent of ['claude-code', 'codex']) {
-    const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-roadmap', 'SKILL.md'), 'utf8');
-    const example = body.match(/```(?:markdown)?\n([\s\S]*?)```/)?.[1] ?? '';
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-roadmap');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const templates = readFileSync(join(skillDir, 'references', 'output-templates.md'), 'utf8');
+    const projectSection = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
+    const example = projectSection.match(/```(?:markdown)?\n([\s\S]*?)```/)?.[1] ?? '';
 
     assert.match(body, /30-second overview/i, `${agent} must lead with a thirty-second overview`);
     assert.match(body, /main delivery front/i, `${agent} must name the main delivery front`);
@@ -168,6 +171,43 @@ test('ad-roadmap explains the delivery story as a newcomer-readable checklist on
     assert.ok(
       example.indexOf('### 30-second overview') < example.indexOf('### Roadmap checklist'),
       `${agent} must explain the delivery story before showing tier evidence`
+    );
+  }
+});
+
+test('ad-roadmap defaults to project scope and uses a separate task template only when asked', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-roadmap');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const templates = readFileSync(join(skillDir, 'references', 'output-templates.md'), 'utf8');
+
+    assert.match(body, /project(?:-wide)? scope[^\n]*default/i, `${agent} must default to the project roadmap`);
+    assert.match(
+      body,
+      /task scope[^\n]*only[^\n]*explicit/i,
+      `${agent} must enter task scope only on an explicit request`
+    );
+    assert.match(body, /references\/output-templates\.md/, `${agent} must route rendering to the shared templates`);
+    assert.match(templates, /^## Project roadmap template$/m, `${agent} needs a project-level template`);
+    assert.match(templates, /^## Task roadmap template$/m, `${agent} needs a task-level template`);
+    const projectTemplate = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
+    const taskTemplate = templates.match(/^## Task roadmap template$([\s\S]*)/m)?.[1] ?? '';
+    assert.equal(
+      [...templates.matchAll(/^### 30-second overview$/gm)].length,
+      2,
+      `${agent} templates must share the same quick overview`
+    );
+    assert.match(templates, /^### Roadmap checklist$/m, `${agent} project template needs the whole roadmap checklist`);
+    assert.match(templates, /^### Task checklist$/m, `${agent} task template needs its own step checklist`);
+    assert.match(
+      projectTemplate,
+      /^- \[ \] .+\n  - \[[ x]\] .+/m,
+      `${agent} project checklist must make tasks and subtasks visible`
+    );
+    assert.match(
+      taskTemplate,
+      /^- \[ \] .+\n  - \[[ x]\] .+/m,
+      `${agent} task checklist must make tasks and subtasks visible`
     );
   }
 });
