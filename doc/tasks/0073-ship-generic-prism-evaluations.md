@@ -1,6 +1,6 @@
 # Task `0073`: Ship generic Prism evaluations
 
-**Status:** `done`
+**Status:** done
 **Created:** `2026-09-11`
 **Scope ref:** doc/adr/0077-adopt-generic-prism-evaluations.md
 **Evidence ref:** doc/research/0014-adopt-generic-prism.md

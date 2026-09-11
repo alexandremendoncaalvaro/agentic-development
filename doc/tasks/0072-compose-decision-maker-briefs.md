@@ -1,6 +1,6 @@
 # Task `0072`: Compose decision-maker briefs across skills
 
-**Status:** `done`
+**Status:** done
 **Created:** `2026-09-10`
 **Scope ref:** doc/adr/0076-compose-a-canonical-decision-maker-brief.md
 **Evidence ref:** doc/research/0013-ground-decision-maker-brief-composition.md

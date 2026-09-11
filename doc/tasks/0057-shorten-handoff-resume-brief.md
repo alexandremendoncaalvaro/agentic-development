@@ -1,9 +1,9 @@
 # Task `0057`: Shorten the handoff resume brief
 
-**Status:** `done`
+**Status:** done
 **Created:** `2026-08-19`
-**Scope ref:** `doc/adr/0040-report-for-a-decision-maker-behavior.md`
-**Evidence ref:** `doc/research/0003-ground-handoff-resume-brief.md`
+**Scope ref:** doc/adr/0040-report-for-a-decision-maker-behavior.md
+**Evidence ref:** doc/research/0003-ground-handoff-resume-brief.md
 **Owner:** `Codex`
 **Execution:** `AFK`
 **Spec ref:**
