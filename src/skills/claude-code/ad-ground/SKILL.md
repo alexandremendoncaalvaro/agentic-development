@@ -2,7 +2,7 @@
 name: ad-ground
 description: Four-source research before non-trivial code — official docs, validated references, in-repo patterns, git history; synthesizes the happy path, persists an evidence record, gates deviations. Use before implementing, choosing a library or pattern, or on "ground this", "research before coding", "how to approach".
 summary: Four-source pre-implementation research + versioned claim-to-source evidence record, happy-path synthesis, deviation gate, and proportional evidence grading. WORKFLOW §4 + §5 + §17.
-allowed-tools: Read, Glob, Grep, Bash, WebFetch, WebSearch
+allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch, WebSearch
 ---
 
 # /ad-ground

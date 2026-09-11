@@ -127,3 +127,10 @@ A single Markdown message structured as:
 No file written. No state mutation. Recommendations are advisory; the user decides whether to invoke. Cross-references `ad-drift` (drift detection) and `agentic update` (kit drift — CLI subcommand) where they apply.
 
 When the host exposes `AskUserQuestion` and the user follows up with a confirmation question after seeing the recommendations, prefer the structured prompt over inline text.
+
+## Next
+
+- Use the highest-leverage recommended skill to continue the work.
+- Use `/ad-roadmap` when the user wants a completion rollup rather than next-action
+  recommendations.
+- Use `/ad-drift` when the survey exposes inconsistent artifacts.

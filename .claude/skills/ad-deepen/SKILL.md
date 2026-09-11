@@ -50,7 +50,7 @@ For each deepening opportunity, produce a short numbered entry:
 ```markdown
 ### Candidate N: <one-line title using domain + architectural vocabulary>
 
-**Files involved:** [`src/foo.ts:42`](../src/foo.ts:42), [`src/bar.ts`](../src/bar.ts).
+**Files involved:** `src/foo.ts:42`, `src/bar.ts`.
 
 **Friction:** <one-paragraph plain English — what hurts today, who feels it, when>.
 

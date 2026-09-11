@@ -103,6 +103,88 @@ for (const agent of ['claude-code', 'codex']) {
   }
 }
 
+test('Claude Code skills follow the local closing-section contract', () => {
+  for (const { name, dir } of listSkills('claude-code')) {
+    if (name === 'ad-philosophy') continue;
+    const body = readFileSync(join(dir, 'SKILL.md'), 'utf8');
+    assert.match(body, /^## Output contract$/m, `${name} must declare ## Output contract`);
+    assert.match(body, /^## Next$/m, `${name} must declare ## Next`);
+  }
+});
+
+test('normalized Claude Code editorial skills expose numbered workflow steps', () => {
+  for (const name of [
+    'ad-publish',
+    'ad-report',
+    'ad-template-tune',
+    'ad-voice',
+    'ad-voice-tune',
+    'ad-prism',
+  ]) {
+    const body = readFileSync(join(SKILLS_ROOT, 'claude-code', name, 'SKILL.md'), 'utf8');
+    assert.match(body, /^## Step 1\b/m, `${name} must start a numbered workflow`);
+  }
+});
+
+test('Claude Code orchestration skills pre-approve their direct tool surface', () => {
+  const expected = new Map([
+    ['ad-ground', 'Read, Write, Glob, Grep, Bash, WebFetch, WebSearch'],
+    ['ad-review', 'Read, Write, Glob, Grep, Bash, Task'],
+    ['ad-audit', 'Read, Write, Glob, Grep, Bash, Task'],
+    ['ad-tdg', 'Read, Write, Edit, Glob, Grep, Bash'],
+    ['ad-derisk', 'Read, Edit, Glob, Grep, Bash'],
+    ['ad-publish', 'Read, Bash'],
+    ['ad-report', 'Read, Write, Bash'],
+  ]);
+
+  for (const [name, tools] of expected) {
+    const fm = parseFrontmatter(join(SKILLS_ROOT, 'claude-code', name, 'SKILL.md'));
+    assert.equal(fm['allowed-tools'], tools, `${name} direct tool surface drifted`);
+  }
+});
+
+test('Claude Code numbered workflow headings use one vocabulary per skill', () => {
+  for (const { name, dir } of listSkills('claude-code')) {
+    const body = readFileSync(join(dir, 'SKILL.md'), 'utf8');
+    const usesSteps = /^## Step \d+/m.test(body);
+    const usesPhases = /^## Phase \d+/m.test(body);
+    assert.equal(usesSteps && usesPhases, false, `${name} mixes Step and Phase headings`);
+  }
+});
+
+test('skill authoring and hand-off instructions preserve host and commit contracts', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const read = (skill) => readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+    const spike = read('ad-spike');
+    const authoring = read('ad-skill');
+    const subagent = parseFrontmatter(join(SKILLS_ROOT, agent, 'ad-subagent', 'SKILL.md'));
+
+    assert.doesNotMatch(spike, /git commit -m/);
+    assert.match(spike, /`\/ad-commit`/);
+    assert.match(authoring, /1,024/);
+    assert.match(authoring, /1,536[\s\S]*Claude Code listing/i);
+    assert.match(authoring, /`when_to_use`[\s\S]*Claude Code/i);
+    assert.match(authoring, /disable-model-invocation/);
+    assert.match(authoring, /allow_implicit_invocation/);
+
+    if (agent === 'claude-code') {
+      assert.match(subagent.summary, /\.claude\/agents\/.*\.md/);
+      assert.doesNotMatch(subagent.summary, /\.codex\/agents/);
+    } else {
+      assert.match(subagent.summary, /\.codex\/agents\/.*\.toml/);
+      assert.doesNotMatch(subagent.summary, /\.claude\/agents/);
+    }
+  }
+
+  const diagnose = readFileSync(
+    join(SKILLS_ROOT, 'claude-code', 'ad-diagnose', 'SKILL.md'),
+    'utf8'
+  );
+  const deepen = readFileSync(join(SKILLS_ROOT, 'claude-code', 'ad-deepen', 'SKILL.md'), 'utf8');
+  assert.doesNotMatch(diagnose, /\[`CONTEXT\.md`\]\(CONTEXT\.md\)/);
+  assert.doesNotMatch(deepen, /\[`src\/foo\.ts:42`\]\([^)]*\)/);
+});
+
 test('skill routing keeps every workflow hand-off discoverable on both hosts', () => {
   const edges = [
     ['ad-ground', ['/ad-tdd', '/ad-tdg']],

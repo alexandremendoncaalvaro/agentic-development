@@ -45,3 +45,15 @@ Then apply the reviewed plan without `--dry-run`. The migration removes state-re
 Report the command's concrete result: created, updated, preserved, skipped, and migrated files. State whether the global kit was changed; never call it "latest" merely because the command ran. If a local edit was preserved, name the path and offer the user's actual choices: keep it, reconcile it manually, or re-run with explicit `--force`.
 
 The CLI's state-aware comparison and named migrations are authoritative. Do not delete skill directories manually to make an update appear clean; use the explicit legacy migration when the user wants to remove a former project installation.
+
+## Output contract
+
+- A read-only preview when the user asked only to inspect.
+- For an authorized update, the concrete created, updated, preserved, skipped,
+  and migrated paths, including any unresolved local edits.
+- No claim that the kit is current without evidence from the update result.
+
+## Next
+
+- Keep or reconcile any preserved local edit before forcing replacement.
+- Run `/ad-next` when the refreshed kit should be followed by a project-state survey.

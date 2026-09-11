@@ -249,7 +249,7 @@
         },
         {
           "path": ".agents/skills/ad-drift/scripts/drift-scan.mjs",
-          "sourceSha": "b4d5d870acdfbbee190664c7480bd90550c1a7d569c87b789c941acc1478adbe"
+          "sourceSha": "1dd9929f46b9e575f8eb126a7dc7cc21afdd6fa3f68dff9a927e1d83bdaf1c00"
         },
         {
           "path": ".agents/skills/ad-drift/SKILL.md",
@@ -718,7 +718,7 @@
         },
         {
           "path": ".agents/skills/ad-skill/SKILL.md",
-          "sourceSha": "45aa9ab9ce8f38d29b41e843af3e781567bd459befa1b096dc7dd499645437bf"
+          "sourceSha": "afe68dc7439f316d3fb2f842162e319067f6244024af79704fa8cef2ad75ffca"
         }
       ]
     },
@@ -764,7 +764,7 @@
         },
         {
           "path": ".agents/skills/ad-spike/SKILL.md",
-          "sourceSha": "ffffdd7f9ef12b9394aaed3573797e2a2bb25255eef595a59912620759f1b35e"
+          "sourceSha": "00b72726ffd7cdff47516b3160ae21a944cb15d0c6ef3ed26f1c0f9269aad06f"
         }
       ]
     },
@@ -777,7 +777,7 @@
         },
         {
           "path": ".agents/skills/ad-subagent/SKILL.md",
-          "sourceSha": "72d984be13c03286a5af8b5e94211da1bbddc3dacb5a214c2288d106a15f1ac5"
+          "sourceSha": "7ae2f6ca3ab340f0dcedb1a6c0cf456b5f124546f7d527ac7f6d39214d03e03f"
         }
       ]
     },

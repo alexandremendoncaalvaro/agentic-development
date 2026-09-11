@@ -14,7 +14,7 @@ Implements ADR-0023. Drafts atomic Conventional Commits with DCO `Signed-off-by`
 - **DCO `Signed-off-by` on every commit — never a `Co-Authored-By` trailer** (ADR-0023 §Decision 1: DCO only).
 - **Never bypass the hooks** — no `--no-verify`, no `--no-gpg-sign`. A failing hook stops the commit; fix the cause, don't skip it.
 
-## Step 0 — Confirm regime
+## Phase 0 — Confirm regime
 
 Run when the user wants to land changes as commits and at least one holds:
 

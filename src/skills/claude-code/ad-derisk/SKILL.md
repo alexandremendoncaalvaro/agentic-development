@@ -2,7 +2,7 @@
 name: ad-derisk
 description: De-risk a defined task before building — list unknowns in a risk register, retire each with ad-ground, ad-spike, ad-tdg, or ad-grill-me, stop when technical risk falls below non-technical risk. Use on "de-risk", "before I build", "is this safe to build", "unknowns", "reduce uncertainty".
 summary: Pre-construction de-risking — enumerate a task's unknowns, retire each with the right skill (ad-ground / ad-spike / ad-tdg / ad-grill-me), grade per WORKFLOW §17, and stop when residual technical risk falls below the non-technical risks. Orchestrates existing skills; hands a de-risked design to ad-tdd.
-allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch, WebSearch
+allowed-tools: Read, Edit, Glob, Grep, Bash
 ---
 
 # /ad-derisk

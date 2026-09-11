@@ -113,13 +113,10 @@ When the spike concludes — either the picked technique works or it does not �
 
 For the spike-outcome ADR template, see [references/spike-adr-template.md](references/spike-adr-template.md).
 
-Then:
-
-```bash
-rm -rf spikes/NNNN-<slug>/
-git add doc/adr/NNNN-<slug>.md
-git commit -m "feat: adopt technique X for <focus> per spike NNNN"
-```
+After the ADR captures the outcome, delete only the exact
+`spikes/NNNN-<slug>/` directory and route the ADR plus deletion to `/ad-commit`.
+That skill owns staging, the Conventional Commit message, and the DCO sign-off;
+do not commit directly from the spike workflow.
 
 Spikes that conclude inconclusively get an ADR too — `Decision: defer; the spike at NNNN inconclusive because Y` — and the directory is deleted. Inconclusive spikes are real signal; preserving the framing in an ADR prevents re-litigation.
 

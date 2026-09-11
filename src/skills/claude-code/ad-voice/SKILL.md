@@ -11,14 +11,14 @@ allowed-tools: Read, Bash
 
 Apply a confirmed personal voice without changing it. The profile is machine-local; the draft may come from the conversation or an explicitly named file.
 
-<prime-directive>
+## Prime directive
+
 Preserve intended meaning before style. Keep every intended outward claim, name,
 number, date, citation, URL, identifier, commitment, uncertainty, and requested
 action. Context can guide expression without becoming draft content. Never expose
 private owner-agent deliberation or invent a detail to make the result sound
 personal. This skill is read-only: ordinary use and user reactions do not update
 the profile.
-</prime-directive>
 
 ## Step 1: Frame the draft
 
@@ -129,3 +129,16 @@ The audit is a private quality gate, not an output score. Normal output is one u
 - `ad-voice` applies confirmed state and never writes it.
 - `ad-voice-tune` negotiates sources, proposes corrections, and owns every profile write.
 - A request to imitate another person is outside this skill. A team corpus informs accommodation only.
+
+## Output contract
+
+- One usable draft that preserves the settled facts and applies the confirmed
+  profile or the disclosed natural-writing fallback.
+- When languages differ, a conversation-language preview followed by the exact
+  publication-language text for approval.
+- No outward action and no profile mutation.
+
+## Next
+
+- Return the draft to the caller or user for approval or revision.
+- Use `/ad-voice-tune` only when the owner asks to change the durable profile.

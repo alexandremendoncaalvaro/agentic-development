@@ -6,15 +6,14 @@ summary: Decision-focused evaluation design, interpretation, refinement, and met
 
 # /ad-prism
 
-<background_information>
 Owns the methodology between a decision and the evidence needed to support it.
 Use it to design an evaluation, interpret its results, refine a weak design, or
 audit whether its claims are supported and fit for purpose. It does not replace
 research, implementation spikes, repository-rule audits, report rendering, or
 publication approval. Governed by ADR-0077.
-</background_information>
 
-<instructions>
+## Step 1 — Route and frame
+
 Determine the route silently: design a new evaluation, explain a method or
 result, answer a bounded methodology question, refine only the requested part
 of an existing design, or audit a settled material artifact. Do not ask the user
@@ -29,6 +28,8 @@ Read [methodology.md](references/methodology.md) when designing, explaining,
 refining, interpreting, or auditing an evaluation. Use
 [evaluation-brief.md](assets/evaluation-brief.md) when a durable plan is needed,
 then run `node <skill-dir>/scripts/validate-plan.mjs <evaluation-plan.md>`.
+
+## Step 2 — Resolve domain and evidence
 
 Read the optional project domain adapter at `.agentic/prism/domain.md` when it
 exists. Its absence is valid and not an error: continue with the generic method
@@ -49,6 +50,8 @@ support and explain each contribution. Do not transfer sample sizes, thresholds,
 margins, rubrics, or power claims from another study without a justified mapping
 to the current decision and population.
 
+## Step 3 — Match assurance
+
 For a material evaluation, read
 [assurance.md](references/assurance.md) and use
 [audit.md](assets/audit.md). Settle and validate the candidate, freeze it with
@@ -59,6 +62,8 @@ sources. Correct confirmed findings, rerun
 and freeze the final artifact. Record separate verification and fit-for-purpose
 validation verdicts. Hashing the local package does not preserve external
 sources.
+
+## Step 4 — Compose and return
 
 Compose other capabilities through their public contracts. Pass an open
 knowledge question to `ad-research`, a bounded implementation fact gap to
@@ -73,14 +78,13 @@ to the requesting skill or user; do not invoke the caller or treat the packet as
 publication approval. `ad-publish` remains responsible for private-context
 separation, voice, language adaptation, exact-text approval, target approval,
 and the outward action.
-</instructions>
 
-<output_contract>
+## Output contract
+
 - A decision-linked evaluation design, interpretation, refinement, or audit.
 - Claims remain traceable to evidence, measures, decision rules, and limits.
 - Missing domain context is disclosed without making the adapter mandatory.
 - No outward action is authorized by this skill.
-</output_contract>
 
 ## Next
 

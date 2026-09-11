@@ -59,6 +59,8 @@ Per-stage layer is what makes the spike actionable.
 Step 5 — conclude (promote or delete). When the spike concludes:
 - Record outcome via `/ad-adr` (ADR is the persistent artifact).
 - Delete the spike directory: `rm -rf spikes/NNNN-<slug>/`.
+- Route the ADR plus deletion to `/ad-commit`; that skill owns staging, the
+  Conventional Commit message, and DCO sign-off. Do not commit directly here.
 
 ADR captures: which technique picked, alternatives held in reserve, end-to-end pass rate, failures and root causes, mitigation. Inconclusive spikes get ADRs too — preserves framing, prevents re-litigation.
 </instructions>

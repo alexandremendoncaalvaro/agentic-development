@@ -10,7 +10,7 @@ allowed-tools: Read, Bash, Glob, Grep
 
 Implements ADR-0024 and ADR-0032. Opens a PR via `gh pr create` with a uniform body shape (Summary / Test plan / Links). Helper posture on scope, links, and body drafting — warnings surface without refusing. Hard gate on local quality: the skill refuses to open a PR when pre-push / CI-mirror gates exit non-zero (WORKFLOW §11 — CI failure is a local gate gap). No `--no-verify` symmetric bypass; users who need to open a red draft invoke `<github-command> pr create --draft` directly.
 
-## Step 0 — Confirm regime
+## Phase 0 — Confirm regime
 
 Run when:
 

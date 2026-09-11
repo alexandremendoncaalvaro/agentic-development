@@ -10,7 +10,7 @@ allowed-tools: Read, Bash, Grep
 
 Implements ADR-0025. Evaluates a PR's mergeability and performs the merge via `gh pr merge`. CI green is the only hard gate; everything else surfaces as a warning the senior engineer decides on.
 
-## Step 0 — Confirm regime
+## Phase 0 — Confirm regime
 
 Run when:
 

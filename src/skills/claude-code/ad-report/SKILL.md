@@ -3,27 +3,26 @@ name: ad-report
 description: Draft, review, render, or verify a standalone analytical report through approved artifact templates. Use when the user invokes /ad-report, asks for a report from findings and evidence, wants an existing analysis restructured for an audience, or requests a DOCX, PDF, presentation, visualization, site, HTML, or Markdown analytical deliverable. Owns editorial hierarchy, composes available artifact capabilities through their public contracts, preserves facts, and gates export beyond the agreed local target. Ordinary use never tunes templates.
 summary: Draft or review standalone analytical reports from approved templates, then compose the available renderer and its visual and accessibility verification workflow.
 disable-model-invocation: true
+allowed-tools: Read, Write, Bash
 ---
 
-<background_information>
+# /ad-report
+
 Codex and Claude Code apply this editorial workflow inline. The bundled script
 resolves and validates templates. Format-specific rendering remains with the
 available artifact capability rather than this skill.
-</background_information>
-
-# /ad-report
 
 Create or review one standalone analytical report from findings, evidence, and an
 audience. Normal use may write to an agreed local target but never mutates the
 template store or exports elsewhere without approval.
 
-<prime-directive>
+## Prime directive
+
 Return a self-contained decision artifact. Preserve every claim, name, number,
 date, citation, URL, identifier, commitment, uncertainty, exclusion, and requested
 action. Own the editorial plan, then compose the requested renderer and its normal
 verification contract. Never implement a parallel renderer or claim verification
 that did not run.
-</prime-directive>
 
 ## Step 1: Frame the report
 
@@ -148,3 +147,16 @@ artifact, exact destination, selected template ID and layer, format, completed a
 missing verification, material limitations, and exact action. Wait for explicit
 approval. Any content, format, or destination change invalidates the receipt.
 Report the resulting location or exact failure without retrying blindly.
+
+## Output contract
+
+- One usable report or verified local artifact with material limitations disclosed.
+- A meaning-preservation check when conversation and publication languages differ.
+- An exact-artifact and exact-destination approval receipt before any export beyond
+  the agreed local target.
+
+## Next
+
+- Return the report for approval, revision, or local use.
+- After exact-artifact and exact-destination approval, perform only the authorized
+  export and report its location or exact failure.

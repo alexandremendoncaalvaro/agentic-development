@@ -1740,6 +1740,31 @@ test('drift-scan: amendment pairs flags an unpaired Amends / Amended-by relation
   }
 });
 
+test('drift-scan: amendment pairs accepts every repeated relation on one ADR', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-amend-many-'));
+  try {
+    mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0010-a.md'),
+      '# ADR\n\n**Status:** accepted\n**Amends:** ADR-0011\n**Amends:** ADR-0012\n'
+    );
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0011-b.md'),
+      '# ADR\n\n**Status:** accepted\n**Amended by:** ADR-0010\n'
+    );
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0012-c.md'),
+      '# ADR\n\n**Status:** accepted\n**Amended by:** ADR-0010\n'
+    );
+
+    const s = runScan(dir);
+
+    assert.deepEqual(s.amendmentPairs, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('drift-scan: emoji flags emoji in narrative docs, with the line number', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-emoji-'));
   try {

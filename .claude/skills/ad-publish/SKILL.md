@@ -3,21 +3,21 @@ name: ad-publish
 description: Draft or review collaboration publications through approved artifact templates. Use when the user invokes /ad-publish, asks to draft or improve a GitHub proposal issue, asks for a concise Slack, Discord, GitHub issue, or pull-request reply, wants a proposal publication checked against prior approved patterns, or asks to publish that final text. Resolves layered templates, separates private context from outward content, grounds claims, composes personal voice and research skills through their public contracts, and requires an exact-target approval receipt before any outward action. Ordinary use is read-only and never tunes templates.
 summary: Draft or review collaboration publications from approved templates and authorized evidence. Preserves facts, composes existing skills, and gates every outward action.
 disable-model-invocation: true
+allowed-tools: Read, Bash
 ---
 
-<background_information>
+# /ad-publish
+
 Codex and Claude Code apply this editorial workflow inline. The bundled script
 resolves and validates templates; prose judgment stays in the current session.
 GitHub proposal issues and compact collaboration replies are supported publication
 types.
-</background_information>
-
-# /ad-publish
 
 Draft or review one collaboration publication. Normal use returns text and never
 mutates templates or publishes anything.
 
-<prime-directive>
+## Prime directive
+
 Preserve every intended outward claim, name, number, date, citation, URL,
 identifier, commitment, uncertainty, exclusion, and requested action. Context and
 evidence constrain the publication but do not enter it automatically; private
@@ -25,7 +25,6 @@ owner-agent deliberation stays private. Put the direct answer or decision-releva
 information first. Never mutate a template during drafting, invent a historical
 pattern, or perform an outward action without approval of the final text and exact
 target.
-</prime-directive>
 
 ## Step 1: Frame the publication
 
@@ -195,3 +194,17 @@ Wait for explicit approval of that receipt. Any text, account, or destination
 change invalidates approval. After approval, use only the verified capability for
 that target and do not expand scope. Report the returned URL or the exact failure
 without retrying blindly.
+
+## Output contract
+
+- One usable publication draft, with material limitations outside the draft.
+- For outward action, an exact-text and exact-target approval receipt before the
+  verified capability is invoked.
+- No private conversation detail enters the publication unless the owner explicitly
+  promotes that detail as source content.
+
+## Next
+
+- Return the draft for approval or revision.
+- After exact-text and exact-target approval, perform only the authorized outward
+  action and report its URL or exact failure.

@@ -10,9 +10,9 @@ allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch
 
 Create or refine the machine-local personal voice profile. The profile represents its owner; target-community material supplies accommodation conventions only.
 
-<prime-directive>
+## Prime directive
+
 HARD human gate: never read a private source before the user approves its exact scope, and never write a profile delta before the user approves that exact change. Present one consequential decision at a time. No batch ranking and no silent learning from ordinary `ad-voice` use.
-</prime-directive>
 
 ## Step 1: Establish the source boundary
 
@@ -81,3 +81,14 @@ node <skill-base-dir>/scripts/voice-profile.mjs validate [--profile <path>]
 The script validates before writing and atomically replaces the profile. Never hand-edit around a validation failure. Delete raw samples and candidate temporary files after the operation, including on refusal or interruption when cleanup is still possible. The persisted profile contains derived patterns and non-identifying source summaries; exact owner examples require separate retention approval.
 
 Stop after one accepted or rejected delta. Further changes require another explicit invocation or user request.
+
+## Output contract
+
+- One reviewable profile delta with provenance, scope, conflicts, and limitations.
+- No profile mutation before explicit approval of that exact delta.
+- One validated atomic profile write, or an unchanged profile after rejection.
+
+## Next
+
+- Use `/ad-voice` to apply the confirmed profile.
+- Run another `/ad-voice-tune` invocation for any further profile change.

@@ -11,7 +11,7 @@ Implements WORKFLOW.md §15 per ADR-0021. Disciplined diagnosis for hard bugs an
 
 The shape is grounded in Kernighan & Pike, *The Practice of Programming* (1999, ch. 5–6) and Karl Popper's falsifiability framing. The Phase-1 framing ("the loop is the skill — everything else is mechanical") is borrowed from [`mattpocock/skills`](https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnose/SKILL.md) with attribution.
 
-## Step 0 — Confirm regime
+## Phase 0 — Confirm regime
 
 Diagnose is for *hard bugs and performance regressions where the cause is unclear*. Run when at least one holds:
 
@@ -79,7 +79,7 @@ If you cannot state the prediction, the hypothesis is a vibe — discard or shar
 
 **Show the ranked list to the user before testing.** They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they have already ruled out. Cheap checkpoint, big time saver. Don't block on it — proceed with your ranking if the user is AFK.
 
-Read [`CONTEXT.md`](CONTEXT.md) if it exists and ADRs in `doc/adr/` covering the surface — domain vocabulary and prior decisions sharpen the hypotheses.
+Read `CONTEXT.md` if it exists and ADRs in `doc/adr/` covering the surface — domain vocabulary and prior decisions sharpen the hypotheses.
 
 ## Phase 4 — Instrument
 
