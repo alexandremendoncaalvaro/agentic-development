@@ -1,6 +1,6 @@
 # Task `0066`: Ship the `UserPromptSubmit` workflow-checkpoint hook
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-09
 **Scope ref:** doc/adr/0074-user-prompt-submit-workflow-checkpoint-hook.md
 **Evidence ref:** doc/research/0009-ground-user-prompt-submit-hook.md
@@ -33,7 +33,7 @@ Skills and CLAUDE.md are advisory; the owner currently supplies the deterministi
 - [x] Update `ad-hooks/SKILL.md` on both hosts (tier member, wiring block, base-path resolution) and the six skills missing the base-path sentence.
 - [x] Wire this repository's `.claude/settings.json`; refresh dogfood installs; run the full suite.
 - [x] Verify live: send a prompt, confirm the checkpoint appears, retain the transcript extract.
-- [ ] `CHANGELOG.md`; `/ad-review`, `/ad-audit`, `/ad-commit`, `/ad-pr`.
+- [x] `CHANGELOG.md`; `/ad-review`, `/ad-audit`, `/ad-commit`, `/ad-pr`.
 
 ## Notes
 
@@ -47,11 +47,17 @@ Ground record `doc/research/0009-ground-user-prompt-submit-hook.md` validated; l
 
 Fresh-context review (two axes) found one Standards blocker, now fixed: the base-path sentence in the Codex `ad-guidelines` body had landed after the colon that introduces the detection list; it now closes the preceding sentence. The acceptance criterion text was synced to the shipped size and command list, and the CHANGELOG names `/ad-handoff` instead of a bare "handoff". The audit fan-out was interrupted by a host restart and re-dispatched on the corrected tree. `/ad-audit` (six groups plus two cross-model runs on the critical claims group; trail at `.agentic/reviews/2026-09-09T14-18-34Z-audit-*.md`): the three claims runs converged on one blocker, the live-verification claim without a retained artifact, closed by extracting the transcript records (C5) and the red run (C6) into `.agentic/reviews/evidence/`. Also applied: the contract test asserts all nine commands plus the summary and roadmap lines; GUIDELINES §11 now lists `doc/research/` among the dated-artifact exemptions. Rejected with evidence: the silent `readStdin` catch is the host's never-crash hook contract and the established `handoff-nudge.mjs` idiom; the branch-name prefix is inherited from the workspace tool, not this change.
 
+### 2026-09-11
+
+Task closed after the implementation, live evidence, fresh-context review,
+maximum-gate audit, DCO commit `ba6315f`, and PR #130 were all present. The
+final local gate passes 924/924.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task

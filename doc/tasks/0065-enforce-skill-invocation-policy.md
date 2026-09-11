@@ -1,6 +1,6 @@
 # Task `0065`: Enforce the skill invocation policy and listing budget
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-09
 **Scope ref:** doc/adr/0073-skill-invocation-policy-and-listing-budget.md
 **Evidence ref:** doc/research/0008-ground-skill-invocation-policy.md
@@ -11,14 +11,20 @@
 
 ## Context
 
-The kit's 43 skill descriptions total 26,274 characters against an 8,000-character Claude Code listing budget; in one observed session 12 skills were listed without a description and could not be auto-invoked (single observation; the reproducible fact is the total against the budget). ADR-0073 classifies every skill by invoker and bounds the model-invocable descriptions. This task implements the decision on both hosts and turns it into tests.
+At task creation, the kit's 43 skill descriptions totalled 26,274 characters
+against an 8,000-character Claude Code listing budget; in one observed session
+12 skills were listed without a description and could not be auto-invoked
+(single observation; the reproducible fact is the total against the budget).
+ADR-0073, as projected through ADR-0076, classifies every skill by invoker and
+bounds the model-invocable descriptions. This task implements the decision on
+both hosts and turns it into tests.
 
 A stray dot-directory (`.slim/eval`, created by a plugin inside `src/skills/claude-code/`) also made 14 tests fail because the skill enumerator treats every directory as a skill. The same enumerator hardening belongs here because the new tests iterate the same set.
 
 ## Acceptance Criteria
 
-- [x] The 20 user-invocable skills named in ADR-0073 carry `disable-model-invocation: true` (Claude Code) and `policy.allow_implicit_invocation: false` (Codex `agents/openai.yaml`).
-- [x] The 23 model-invocable skills carry no `disable-model-invocation` field (Claude Code) and `policy.allow_implicit_invocation: true` (Codex).
+- [x] The 19 current user-invocable skills carry `disable-model-invocation: true` (Claude Code) and `policy.allow_implicit_invocation: false` (Codex `agents/openai.yaml`).
+- [x] The 26 current model-invocable skills carry no `disable-model-invocation` field (Claude Code) and `policy.allow_implicit_invocation: true` (Codex).
 - [x] Every model-invocable `description` is at most 350 characters and opens with its use case and trigger phrases.
 - [x] The sum of model-invocable `description` lengths is at most 8,000 characters per host.
 - [x] Every `description` on both hosts is at most 1,024 characters.
@@ -36,7 +42,7 @@ A stray dot-directory (`.slim/eval`, created by a plugin inside `src/skills/clau
 - [x] Green: rewrite the 23 model-invocable descriptions to at most 350 characters, trigger-first; trim the two over 1,024 (`ad-derisk`, `ad-research`).
 - [x] Refresh dogfood installs; run the full suite; `npm pack --dry-run`.
 - [x] Update `AGENTS.md` Gotchas and `CHANGELOG.md`.
-- [ ] `/ad-review`, then `/ad-audit` (ADR-bearing change), `/ad-commit`, `/ad-pr`.
+- [x] `/ad-review`, then `/ad-audit` (ADR-bearing change), `/ad-commit`, `/ad-pr`.
 
 ## Notes
 
@@ -52,11 +58,19 @@ Ground record `doc/research/0008-ground-skill-invocation-policy.md` validated (`
 
 Owner decision after the first dogfood commit attempt: the host refused `/ad-commit` because the skill was user-invocable, and forbids the model from reproducing its workflow by other means. The owner chose to reclassify `ad-commit` as model-invocable ("make life easier, not harder; security is one thing, bureaucracy is another"): a commit is local and reversible, while `ad-pr`, `ad-merge`, `ad-release`, and `ad-publish` stay human-fired. Classes are now 20 user-invocable and 23 model-invocable; ADR-0073, the test set, AGENTS.md, and CHANGELOG.md updated accordingly.
 
+### 2026-09-11
+
+Task closed after the accepted ADR-0076 amendment reclassified `ad-rules` and
+the additions of `ad-brief` and `ad-prism` brought the live inventory to 45
+skills: 19 user-invocable and 26 model-invocable. The test suite derives and
+enforces the current projection. Implementation and audit commits are included
+in PR #130; the final local gate passes 924/924.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task

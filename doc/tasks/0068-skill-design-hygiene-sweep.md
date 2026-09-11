@@ -1,6 +1,6 @@
 # Task `0068`: Skill design hygiene sweep
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-09
 **Scope ref:** src/skills/claude-code/ad-skill/SKILL.md
 **Evidence ref:** doc/research/0015-ground-skill-authoring-hygiene.md
@@ -30,8 +30,8 @@ The skill-by-skill audit found the kit above the usual bar (names match director
 - [x] Green: apply the edits skill by skill, both hosts.
 - [x] Refresh dogfood; full suite; `CHANGELOG.md`.
 - [x] `/ad-review`.
-- [ ] `/ad-commit`.
-- [ ] `/ad-pr`.
+- [x] `/ad-commit`.
+- [x] `/ad-pr`.
 
 ## Notes
 
@@ -64,6 +64,10 @@ tool-surface regression returning red then green. The final review reported no
 Standards or Spec findings; its ephemeral audit trail is under
 `.agentic/reviews/20260911T141306Z-working-tree-canonical-rerun.md`.
 
+Task closed with DCO commits `5ab03f2` and `0ab4ca8`; PR #130 is the existing
+delivery vehicle. The final 924-test gate is green and the working tree was clean
+after both commits.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -71,4 +75,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
