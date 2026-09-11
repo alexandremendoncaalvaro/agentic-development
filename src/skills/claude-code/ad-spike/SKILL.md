@@ -131,6 +131,8 @@ When the host exposes `AskUserQuestion`, use it for the Step 1 selection criteri
 
 ## Next
 
+- `/ad-prism` when the validated technique must now be evaluated against a
+  product or system decision.
 - After Step 1 (discovery output reviewed): proceed to Step 2 to create the spike directory + fixture, or abort if the discovery surfaced a single happy path (route to `ad-ground`).
 - After Step 4 (eval results): `/ad-adr` to record the outcome, then delete the spike directory.
 - If the spike succeeds and production work follows: `/ad-task` for the work units to apply the spike's findings to production code (Spec ref the original spec if applicable; cite the ADR in the task `Notes`).

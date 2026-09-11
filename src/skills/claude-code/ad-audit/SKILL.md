@@ -141,6 +141,8 @@ If the audit surfaced a defect pattern no rule covers, or a rule that misled or 
 
 ## Next
 
+- When the unresolved question is evaluation methodology rather than repository-rule
+  conformance, route it to `/ad-prism`.
 - Resolve every blocker with the evidence artifact it named, then re-run `/ad-audit` on the fix.
 - Route any surfaced rule gap to `/ad-level-up`.
 - For a lighter, faster pass on a routine diff, use `/ad-review` instead.

@@ -315,6 +315,66 @@ flowchart TD
 
 Source: `WORKFLOW.md` sections 4-5, 9, 14, 16, 17; `ad-research`, `ad-derisk`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-ground` skill contracts.
 
+## Evaluation Design And Assurance
+
+Use this when the question is not merely “does the code pass?” but “what evidence
+would support this decision, and how far may the result be trusted?” Prism owns
+that method. Adjacent skills keep their existing evidence, technique, rule,
+rendering, voice, and authorization boundaries.
+
+```mermaid
+flowchart TD
+    Request["Evaluation design, interpretation, refinement, or method audit"]
+    Prism["/ad-prism<br>decision-to-evidence method"]
+    Need{"What uncertainty must be retired?"}
+    Research["/ad-research<br>open knowledge question"]
+    Ground["/ad-ground<br>bounded fact or implementation gap"]
+    Spike["/ad-spike<br>uncertain implementation technique"]
+    Design["Settle evaluation design and claims"]
+    Material{"Material evaluation artifact or public claim?"}
+    Freeze["Validate and freeze candidate"]
+    MethodAudit["Skeptical method pass<br>verify every finding"]
+    Final["Correct, revalidate, and freeze final"]
+    Packet["Settled claims, limits, and source references"]
+    Report["/ad-report<br>standalone analytical artifact when requested"]
+    Publish["/ad-publish<br>privacy, target, and exact-text approval"]
+    Voice["/ad-voice<br>conversation-language preview and publication language"]
+    Ordinary["Ordinary comment, reply, or thread"]
+    Done["Return evaluation result<br>no outward action"]
+
+    Request --> Prism
+    Prism --> Need
+    Need -->|open knowledge| Research
+    Need -->|bounded fact| Ground
+    Need -->|uncertain technique| Spike
+    Prism --> Research
+    Prism --> Ground
+    Prism --> Spike
+    Research --> Design
+    Ground --> Design
+    Spike --> Design
+    Design --> Material
+    Prism --> Material
+    Material -->|yes| Freeze
+    Freeze --> MethodAudit
+    MethodAudit --> Final
+    Final --> Packet
+    Packet --> Report
+    Packet --> Publish
+    Material -->|no| Done
+    Ordinary --> Publish
+    Publish --> Voice
+```
+
+The freeze receipt covers the settled local artifact package, not immutable
+copies of external sources. `ad-publish` verifies its final outward claims and
+protects private context, but it does not perform Prism's methodology audit.
+Ordinary collaboration continues directly through publication and voice gates.
+
+Source: `WORKFLOW.md` sections 4, 5, 10, and 17; ADR-0077; `ad-prism`,
+`ad-research`, `ad-ground`, `ad-spike`, `ad-audit`, `ad-report`,
+`ad-publish`, and `ad-voice` contracts.
+
 ## Delegation Gate
 
 Use this before asking for a subagent. The question is not "can an agent do it?", it is "can the work be handed over with a bounded packet and a clear stop condition?"

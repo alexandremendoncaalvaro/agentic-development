@@ -53,6 +53,42 @@ read-only consumers
 [`src/skills/codex/ad-report/`](src/skills/codex/ad-report/). Governed by
 [`doc/adr/0071-layer-publication-templates.md`](doc/adr/0071-layer-publication-templates.md).
 
+### Evaluation domain adapter
+
+**Definition:** the optional project-local Markdown contract at
+`.agentic/prism/domain.md` that supplies recurring product scope, decision
+owners, evidence surfaces, constraints, measures, guardrails, vocabulary, and
+rollout controls to the otherwise domain-agnostic `ad-prism` method. Its absence
+is valid; live inspected evidence outranks its defaults.
+
+_Avoid_: "company profile" (the adapter is project-scoped and contains no
+secrets, personal data, or broad organizational handbook); "Prism config"
+(suggests mandatory machine configuration rather than optional evaluation
+context); "source store" (it records locators and provenance, not source bodies).
+
+**Related code:**
+[`src/skills/codex/ad-prism/references/domain-adapter.md`](src/skills/codex/ad-prism/references/domain-adapter.md)
+and its Claude Code twin; governed by
+[`doc/adr/0077-adopt-generic-prism-evaluations.md`](doc/adr/0077-adopt-generic-prism-evaluations.md).
+
+### Material evaluation
+
+**Definition:** an evaluation whose result will support a rollout, a
+consequential or hard-to-reverse decision, a durable analytical artifact, or a
+public material claim. It requires a settled artifact receipt and methodology
+audit before its claims enter reporting or publication; ordinary tests and
+routine collaboration replies do not.
+
+_Avoid_: "important test" (does not express the decision and publication
+consequences); "published evaluation" (materiality applies before publication);
+"validated result" (collapses technical verification and fit-for-purpose
+validation into one ambiguous verdict).
+
+**Related code:**
+[`src/skills/codex/ad-prism/references/assurance.md`](src/skills/codex/ad-prism/references/assurance.md)
+and its Claude Code twin; governed by
+[`doc/adr/0077-adopt-generic-prism-evaluations.md`](doc/adr/0077-adopt-generic-prism-evaluations.md).
+
 ### Collaboration reply
 
 **Definition:** a compact publication inside an active Slack, Discord, GitHub

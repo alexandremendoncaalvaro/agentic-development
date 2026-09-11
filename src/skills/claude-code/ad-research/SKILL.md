@@ -57,6 +57,8 @@ A single new file at `doc/research/<NNNN>-<slug>.md`, status `draft`. Conclusion
 
 ## Next
 
+- `/ad-prism` when the concluded study now needs an evaluation design,
+  interpretation, or fit-for-purpose methodology audit.
 - `/ad-adr` if the conclusion is a binding architectural decision — the ADR references this study by path.
 - `/ad-derisk` if the conclusion feeds a pre-construction build — the study hands to Front B, which de-risks the build before implementation.
 - `/ad-spike` if the conclusion is Insufficient / spike-first — run the experiment that settles the open claim.

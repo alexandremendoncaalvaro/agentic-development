@@ -19,6 +19,13 @@ does not imply any other approval.
   citations and limitations intact.
 - `ad-research` owns an open question and durable research record. Do not collapse
   its uncertainty into a stronger publication claim.
+- An ordinary collaboration reply or comment does not require `ad-prism`.
+  When a material evaluation claim is not already backed by a frozen and audited
+  evaluation packet, `ad-publish` calls `ad-prism` with only the decision,
+  proposed claim, authorized evidence, and intended use. `ad-prism` returns
+  settled claims, material limits, and source references; `ad-publish` regains
+  control for privacy, voice, language, exact-text approval, target approval,
+  and the outward action. The evaluation audit is not publication permission.
 - `ad-pr` owns pull-request preflight, local gates, body shape, GitHub account
   frontend, approval, and creation. `ad-publish` may supply prepared text only.
 - `ad-template-tune` owns every template mutation. Ordinary publication drafting

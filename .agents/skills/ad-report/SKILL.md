@@ -84,6 +84,8 @@ only through its public contract:
 
 - `ad-ground` for a bounded method or implementation gap;
 - `ad-research` for an open question needing a durable study;
+- `ad-prism` when evaluation methodology, interpretation, or fit-for-purpose
+  assurance is not already settled in the supplied findings;
 - `ad-voice` for the mandatory personal-voice and naturalization pass after facts,
   evidence limits, and structure are settled and before rendering;
 - `ad-template-tune` only on an explicit curation request;

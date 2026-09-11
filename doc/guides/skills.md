@@ -36,6 +36,7 @@ Every skill below installs for each selected host. Installation is not a mandate
 | --- | --- | --- |
 | `/ad-derisk` | A defined task has several unknowns. | Risk register and the right uncertainty-reduction path. |
 | `/ad-research` | A question needs an evidence-graded durable study. | Research record under `doc/research/`. |
+| `/ad-prism` | A product or system decision needs an evaluation design, result interpretation, or methodology audit. | Decision-linked evidence plan or audited claims with explicit limits. |
 | `/ad-spike` | The technique is uncertain. | Staged experiment against golden fixtures. |
 | `/ad-tdg` | Several implementation strategies are plausible. | Ground-truth pair and selected strategy. |
 | `/ad-tdd` | Behavior can be expressed in a test before implementation. | Red-green-refactor loop. |

@@ -69,6 +69,8 @@ A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout (dis
 
 ## Next
 
+- `/ad-prism` when the validated technique must now be evaluated against a
+  product or system decision.
 - After Step 1: proceed to Step 2, or abort if discovery surfaced a single happy path (route to `ad-ground`).
 - After Step 4: `/ad-adr` to record the outcome, then delete the spike directory.
 - If spike succeeds and production work follows: `/ad-task` for work units (Spec ref the original spec; cite the ADR in task Notes).

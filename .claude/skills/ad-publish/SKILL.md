@@ -90,6 +90,8 @@ only when its public contract owns a necessary step:
 
 - `ad-ground` for a bounded implementation or method gap;
 - `ad-research` for an open question needing a durable study;
+- `ad-prism` when a material evaluation claim is not already backed by a
+  frozen, methodologically audited artifact and settled claim packet;
 - `ad-voice` for the mandatory personal-voice and naturalization pass after facts,
   constraints, and structure are settled;
 - `ad-pr` when the requested outward artifact is a pull request;

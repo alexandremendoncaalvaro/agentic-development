@@ -63,6 +63,8 @@ No production code is written by this skill. The durable ground record feeds the
 
 ## Next
 
+- `/ad-prism` when the grounded facts must become a decision-linked evaluation
+  design, interpretation, or methodology audit.
 - Implement per the synthesized happy path with `/ad-tdd` when behavior is test-expressible or `/ad-tdg` when strategy choice remains; link the validated ground record from the governing task, spec, or ADR.
 - `/ad-task` if the work needs explicit decomposition into checkbox-toggle work units.
 - `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10.

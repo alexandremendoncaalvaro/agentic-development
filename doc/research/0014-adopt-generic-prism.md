@@ -1,6 +1,6 @@
 # RESEARCH-0014: Should Agentic Development adopt Prism?
 
-**Status:** draft
+**Status:** recorded
 **Created:** 2026-09-10
 **Question:** Should Agentic Development ship a domain-agnostic evaluation skill derived from a private, product-specific local Prism, and what boundary and configuration model would preserve its rigor without publishing organization-specific knowledge?
 **Stakes:** medium times reversible
@@ -145,4 +145,4 @@ Reverse adoption if a tracer implementation cannot outperform the existing skill
 
 ## Derived decision
 
-None yet. If the owner accepts this conclusion, graduate it to an ADR that defines `ad-prism`, its invocation class, the optional project adapter, composition edges, generic validator set, and the boundary that prevents organization-specific material from entering the package.
+Accepted as [ADR-0077](../adr/0077-adopt-generic-prism-evaluations.md), which defines `ad-prism`, its invocation class, optional project adapter, composition edges, generic validator set, and publication boundary.

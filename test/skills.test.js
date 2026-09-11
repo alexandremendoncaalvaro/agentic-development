@@ -167,6 +167,203 @@ test('decision-maker briefing composition is one-way and visible in the workflow
   }
 });
 
+test('ad-prism is a discoverable generic evaluation skill on both hosts', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
+    assert.ok(existsSync(skillDir), `${agent} must ship ad-prism`);
+
+    const skillPath = join(skillDir, 'SKILL.md');
+    const frontmatter = parseFrontmatter(skillPath);
+    const body = readFileSync(skillPath, 'utf8');
+
+    assert.equal(frontmatter.name, 'ad-prism');
+    assert.match(frontmatter.description, /evaluat/i);
+    assert.match(body, /optional project (?:domain )?adapter/i);
+    assert.match(body, /\.agentic\/prism\/domain\.md/);
+    assert.match(body, /absence[^\n]*(?:valid|not an error)/i);
+
+    if (agent === 'claude-code') {
+      assert.notEqual(frontmatter['disable-model-invocation'], true);
+    } else {
+      const metadata = yaml.load(readFileSync(join(skillDir, 'agents', 'openai.yaml'), 'utf8'));
+      assert.equal(metadata.policy.allow_implicit_invocation, true);
+    }
+  }
+});
+
+test('ad-prism separates portable evaluation method from optional project context', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const methodology = readFileSync(join(skillDir, 'references', 'methodology.md'), 'utf8');
+    const adapter = readFileSync(join(skillDir, 'references', 'domain-adapter.md'), 'utf8');
+    const brief = readFileSync(join(skillDir, 'assets', 'evaluation-brief.md'), 'utf8');
+
+    assert.match(body, /read \[methodology\.md\].*design|design.*read \[methodology\.md\]/is);
+    assert.match(body, /read \[domain-adapter\.md\].*adapter|adapter.*read \[domain-adapter\.md\]/is);
+    assert.match(
+      methodology,
+      /decision[\s\S]*objective[\s\S]*evaluation question[\s\S]*claim[\s\S]*evidence[\s\S]*task[\s\S]*measure[\s\S]*data source[\s\S]*decision rule[\s\S]*next gate/i
+    );
+    assert.match(methodology, /technical verification[\s\S]*human smoke test[\s\S]*exploratory comparison[\s\S]*confirmatory study[\s\S]*limited field validation/i);
+    assert.match(adapter, /absence[\s\S]*(?:valid|not an error)/i);
+    assert.match(adapter, /live inspected evidence[\s\S]*(?:precedence|outranks)/i);
+    assert.match(adapter, /no secrets[\s\S]*no personal data/i);
+    for (const heading of [
+      'Decision',
+      'Objective',
+      'Evaluation question',
+      'Claim',
+      'Evidence',
+      'Tasks',
+      'Measures',
+      'Data sources',
+      'Decision rule',
+      'Limits',
+      'Sources',
+    ]) {
+      assert.match(brief, new RegExp(`^## ${heading}$`, 'm'), `${agent} brief needs ${heading}`);
+    }
+  }
+});
+
+test('ad-prism freezes and audits material evaluations without collapsing its verdicts', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const assurance = readFileSync(join(skillDir, 'references', 'assurance.md'), 'utf8');
+    const audit = readFileSync(join(skillDir, 'assets', 'audit.md'), 'utf8');
+
+    assert.match(
+      body,
+      /material evaluation[\s\S]*freeze[\s\S]*skeptical[\s\S]*verify every finding[\s\S]*correct[\s\S]*freeze the final/i
+    );
+    assert.match(body, /validate-report\.mjs/);
+    assert.match(body, /freeze-artifact\.mjs/);
+    assert.match(assurance, /verification verdict[\s\S]*fit-for-purpose validation verdict/i);
+    assert.match(assurance, /confirmed[\s\S]*rejected with\s+evidence[\s\S]*reserved for owner judgment/i);
+    assert.match(assurance, /does not[\s\S]*(?:freeze|preserve)[\s\S]*external source/i);
+    for (const heading of [
+      'Artifact receipt',
+      'Grounding and access',
+      'Verification verdict',
+      'Fit-for-purpose validation verdict',
+      'Findings and dispositions',
+      'Claims and limits for publication',
+    ]) {
+      assert.match(audit, new RegExp(`^## ${heading}$`, 'm'), `${agent} audit needs ${heading}`);
+    }
+    assert.match(audit, /^- SHA-256: /m);
+    assert.match(audit, /^- Included paths: /m);
+  }
+});
+
+test('ad-prism keeps methodological recommendations grounded in portable sources', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const sources = readFileSync(join(skillDir, 'references', 'sources.md'), 'utf8');
+
+    assert.match(body, /read \[sources\.md\][\s\S]*methodological\s+recommendation/i);
+    assert.match(body, /one to three essential sources/i);
+    assert.match(body, /do not transfer[\s\S]*(?:sample sizes|thresholds|margins)/i);
+    assert.match(sources, /Goal\/Question\/Metric/i);
+    assert.match(sources, /Evidence-Centered\s+Design/i);
+    assert.match(sources, /Evaluation best\s+practices/i);
+    assert.match(sources, /Aqua Book[\s\S]*Magenta\s+Book/i);
+  }
+});
+
+test('material evaluation claims compose through ad-prism while ordinary publishing stays light', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const prism = readFileSync(join(SKILLS_ROOT, agent, 'ad-prism', 'SKILL.md'), 'utf8');
+    const publish = readFileSync(join(SKILLS_ROOT, agent, 'ad-publish', 'SKILL.md'), 'utf8');
+    const composition = readFileSync(
+      join(SKILLS_ROOT, agent, 'ad-publish', 'references', 'composition.md'),
+      'utf8'
+    );
+    const sourcePolicy = readFileSync(
+      join(SKILLS_ROOT, agent, 'ad-publish', 'references', 'source-policy.md'),
+      'utf8'
+    );
+
+    assert.match(
+      prism,
+      /publication packet[\s\S]*settled claims[\s\S]*material limits[\s\S]*source references/i
+    );
+    assert.match(prism, /return control[\s\S]*do not invoke[\s\S]*caller/i);
+    assert.doesNotMatch(prism, /invoke `\/?ad-publish`/i);
+    assert.match(publish, /`ad-prism`[\s\S]*material evaluation claim/i);
+    assert.match(
+      composition,
+      /ordinary (?:comment|collaboration reply)[\s\S]*does not require `ad-prism`/i
+    );
+    assert.match(
+      composition,
+      /material evaluation claim[\s\S]*`ad-prism`[\s\S]*regains\s+control/i
+    );
+    assert.match(sourcePolicy, /does not[\s\S]*(?:freeze|cryptographic)[\s\S]*source/i);
+    assert.match(sourcePolicy, /`ad-prism`[\s\S]*settled evaluation artifact/i);
+  }
+});
+
+test('evaluation methodology routing is visible from adjacent skills and the workflow map', () => {
+  const flows = readFileSync(join(__dirname, '..', 'WORKFLOW-FLOWS.md'), 'utf8');
+  const section = flows.match(/^## Evaluation Design And Assurance$([\s\S]*?)(?=^## )/m)?.[1] ?? '';
+
+  assert.ok(section, 'WORKFLOW-FLOWS.md must map evaluation design and assurance');
+  for (const edge of [
+    /Request --> Prism/,
+    /Prism --> Research/,
+    /Prism --> Ground/,
+    /Prism --> Spike/,
+    /Prism --> Material/,
+    /Material -->\|yes\| Freeze/,
+    /Freeze --> MethodAudit/,
+    /MethodAudit --> Final/,
+    /Final --> Packet/,
+    /Packet --> Publish/,
+    /Ordinary --> Publish/,
+    /Publish --> Voice/,
+  ]) {
+    assert.match(section, edge, `evaluation workflow is missing ${edge}`);
+  }
+  assert.doesNotMatch(
+    section,
+    /MethodAudit --> Packet/,
+    'a material evaluation may not bypass correction, revalidation, and the final freeze'
+  );
+
+  for (const agent of ['claude-code', 'codex']) {
+    for (const skill of ['ad-ground', 'ad-research', 'ad-spike', 'ad-audit']) {
+      const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+      assert.match(routingSurface(body, agent, skill), /\/ad-prism/, `${agent}/${skill} must route evaluation methodology to ad-prism`);
+    }
+    const report = readFileSync(join(SKILLS_ROOT, agent, 'ad-report', 'SKILL.md'), 'utf8');
+    assert.match(report, /`ad-prism`[\s\S]*evaluation methodology/i);
+  }
+});
+
+test('ad-prism ships cross-domain positive and close-negative dogfood cases', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const cases = JSON.parse(
+      readFileSync(join(SKILLS_ROOT, agent, 'ad-prism', 'evals', 'evals.json'), 'utf8')
+    ).cases;
+    const positives = cases.filter((entry) => entry.expected_route === 'ad-prism');
+    const negativeRoutes = new Set(
+      cases
+        .filter((entry) => entry.expected_route !== 'ad-prism')
+        .map((entry) => entry.expected_route)
+    );
+
+    assert.ok(new Set(positives.map((entry) => entry.domain)).size >= 3);
+    assert.ok(positives.every((entry) => entry.expected_outcomes.length >= 4));
+    for (const route of ['ad-research', 'ad-spike', 'ad-audit', 'ordinary-tests']) {
+      assert.ok(negativeRoutes.has(route), `${agent} needs a close negative for ${route}`);
+    }
+  }
+});
+
 test('the canonical skill guide lists every bundled skill exactly once', () => {
   const guide = readFileSync(join(__dirname, '..', 'doc', 'guides', 'skills.md'), 'utf8');
   const names = bundledSkills('claude-code');
