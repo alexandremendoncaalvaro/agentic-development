@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [0.20.0-beta.11] - 2026-09-14
+
 ### Added
 
 - `/ad-brief` provides a private, read-only decision-maker briefing for someone
@@ -60,6 +62,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- Updated the test suite's `js-yaml` development dependency to 4.3.2, the first
+  patched release for GHSA-2883-xcg3-v3hh.
 - Skill `Next` breadcrumbs now expose the complete workflow routing chain on
   both hosts: grounding and tasks lead into TDD or TDG, implementation and
   review lead into commit, PR, audit, and merge, and domain, roadmap,
