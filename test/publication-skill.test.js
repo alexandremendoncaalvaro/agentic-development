@@ -47,6 +47,7 @@ test('publication baseline is a valid approved proposal template grounded in own
       'https://github.com/nikopueringer/CorridorKey/issues/244',
       'https://github.com/nikopueringer/CorridorKey/issues/245',
       'https://github.com/nikopueringer/CorridorKey/issues/246',
+      'owner-evaluation:held-out-publication-comparisons-2026-08-24-through-2026-09-14',
     ]);
     assert.equal(template.retainedExcerpts.length, 0);
     assert.deepEqual(
@@ -61,6 +62,24 @@ test('publication baseline is a valid approved proposal template grounded in own
         'Explicit exclusions when material',
       ])
     );
+  }
+});
+
+test('straightforward reversible proposals stay complete without ceremonial structure', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const root = skillRoot('src/skills', agent);
+    const template = parseTemplateMarkdown(
+      readFileSync(
+        join(root, 'references', 'templates', 'publication', 'github-proposal-issue.md'),
+        'utf8'
+      )
+    );
+    const compactGuidance = [...template.orderingRules, ...template.instructions].join('\n');
+    assert.match(compactGuidance, /straightforward.*reversible/is);
+    assert.match(compactGuidance, /short prose|one or two short paragraphs/is);
+    assert.match(compactGuidance, /headings.*checklists.*only when.*improve/is);
+    assert.match(compactGuidance, /already.*complete.*(do not|never).*expand/is);
+    assert.match(compactGuidance, /authorization.*only when.*material/is);
   }
 });
 
@@ -174,8 +193,8 @@ test('publication held-out fixtures carry facts and structural expectations', ()
   const fixtures = JSON.parse(
     readFileSync(join(ROOT, 'test', 'fixtures', 'publication-held-out.json'), 'utf8')
   );
-  assert.equal(fixtures.length, 3);
-  assert.equal(new Set(fixtures.map(({ id }) => id)).size, 3);
+  assert.equal(fixtures.length, 6);
+  assert.equal(new Set(fixtures.map(({ id }) => id)).size, 6);
   for (const fixture of fixtures) {
     assert.ok(fixture.invariants.length >= 5);
     assert.ok(fixture.requiredElements.includes('concrete-state'));

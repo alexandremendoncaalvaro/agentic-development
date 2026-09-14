@@ -1,6 +1,6 @@
 # Spec `0005`: Compose publication and reporting workflows
 
-**Status:** accepted
+**Status:** shipped
 **Created:** 2026-08-21
 **Owner:** Alexandre Alvaro
 
@@ -297,10 +297,11 @@ names the shared operation `ad-template-tune`, resolves templates from bundled,
 machine, and project layers, and defines the store paths, precedence, Markdown
 contract, visibility choice, validation, and atomic write boundary.
 
-The owner-authorized analytical report corpus remains open for the implementation
-task because neither the research approval nor this specification authorizes a
-private report source. Contextual curation suggestions remain deferred until usage
-evidence justifies the interruption.
+Task 0061 resolved the report evidence question with an official-method baseline;
+no private report corpus was read or retained. Contextual curation suggestions
+remain deferred until usage evidence justifies the interruption. Tasks 0059–0063
+implemented and verified the template store, publication and report consumers,
+mandatory naturalization, and private-context boundary.
 
 ## Related
 
@@ -313,7 +314,8 @@ evidence justifies the interruption.
   [ADR-0071](../adr/0071-layer-publication-templates.md).
 - Tasks: [Task 0059](../tasks/0059-implement-template-curation.md),
   [Task 0060](../tasks/0060-implement-publication-workflow.md),
-  [Task 0061](../tasks/0061-implement-report-workflow.md), and
+  [Task 0061](../tasks/0061-implement-report-workflow.md),
+  [Task 0062](../tasks/0062-require-publication-naturalization.md), and
   [Task 0063](../tasks/0063-bound-collaboration-replies.md).
 - Supersedes / Depends on: depends on
   [RESEARCH-0005](../research/0005-publication-template-system.md),

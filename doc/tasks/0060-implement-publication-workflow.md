@@ -1,6 +1,6 @@
 # Task `0060`: Implement publication workflow
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-08-21
 **Scope ref:** doc/specs/0005-compose-publication-reporting.md
 **Evidence ref:** doc/research/0005-publication-template-system.md
@@ -41,7 +41,7 @@ template contract from Task 0059 and does not modify the `ad-template-tune` or
 - [x] The normal result is one usable publication, while any outward publication
       requires a receipt naming the final text, exact destination, selected
       template, limitations, and requested action followed by explicit approval.
-- [ ] Three held-out proposal fixtures preserve every marked fact and satisfy the
+- [x] Three held-out proposal fixtures preserve every marked fact and satisfy the
       structural and composition criteria; owner comparison rates every result no
       worse than the untemplated baseline and strictly prefers at least one.
 - [x] Dogfood installation, managed skill metadata, full tests, and
@@ -94,6 +94,41 @@ compact mode; it does not authorize a template change. Any calibration must use
 `ad-template-tune` and then a new, unused held-out brief rather than re-score this
 now-observed fixture.
 
+### 2026-09-11
+
+The approved machine template's compact mode was tested on a new synthetic brief
+about controlled patch dependency updates. Both blinded drafts preserved the
+fixture invariants, but the owner preferred the untemplated two-paragraph version
+over the templated version with intermediate headings and a checklist. No owner
+rationale was requested or retained. Together with the earlier cache-migration
+result, this rejects sectioned compact mode for straightforward reversible
+proposals. A red regression now requires the bundled baseline to default to one
+or two short paragraphs and to add headings or checklists only when they improve
+scanning. The revised portable rule still needs one new unused comparison before
+the quality gate can close.
+
+### 2026-09-14
+
+A second new synthetic comparison tested reversible CI cache compression after
+the prose-first rule passed its regression and the full 925-test suite. The owner
+again preferred the untemplated draft. Both variants preserved every invariant,
+but the templated version added authorization framing and paraphrased a supplied
+control even though the brief already bounded the action. No owner rationale was
+requested or retained. A new red regression therefore makes the template a
+silent coverage check for already-complete short prose and permits authorization
+language only when ambiguity could materially broaden the action. The resulting
+portable baseline remains subject to one unused held-out comparison.
+
+### 2026-09-14
+
+The invisible-template rule passed a final unused synthetic comparison for a
+bounded documentation-link retry. The templated and untemplated drafts converged
+to the same decision-complete text, and the owner rated them tied. Every marked
+fact and structural element was preserved. The qualifying three-result set is
+therefore one strict template preference and two ties; the two failed calibration
+trials remain recorded rather than being erased. Focused tests pass on both hosts
+and dogfood copies. The publication quality gate is closed and Task 0060 is done.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -101,4 +136,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

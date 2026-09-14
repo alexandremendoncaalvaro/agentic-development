@@ -550,7 +550,7 @@
         },
         {
           "path": ".agents/skills/ad-publish/references/templates/publication/github-proposal-issue.md",
-          "sourceSha": "0fc3225fb0892dc020d33b1b7b2a8ac95883a06d8fcaab718da4103efeb3afe4"
+          "sourceSha": "098a28b04778c4ffc33457dfe67f29ab954566dfb2bb0ae50c74080e9b262b12"
         },
         {
           "path": ".agents/skills/ad-publish/scripts/template-store.mjs",

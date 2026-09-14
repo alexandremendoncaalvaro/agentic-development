@@ -53,6 +53,10 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   and direct-tool pre-approvals that match the instructions. The authoring skill
   also distinguishes the 1,024-character specification limit from Claude Code's
   1,536-character listing cut and records both invocation classes.
+- The bundled GitHub proposal template now treats its structure as a silent
+  coverage check for straightforward reversible decisions. Already-complete
+  short prose is preserved; headings, checklists, and explicit authorization
+  framing appear only when they add decision-relevant clarity.
 
 ### Fixed
 

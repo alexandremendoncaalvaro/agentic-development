@@ -39,7 +39,10 @@
   "orderingRules": [
     "Put the concrete conclusion or current state before supporting depth.",
     "Place the consequence and evidence before implementation detail.",
-    "End the decision path with observable completion and the recommended next action."
+    "End the decision path with observable completion and the recommended next action.",
+    "For a straightforward reversible proposal, default to one or two short paragraphs; add headings or checklists only when they materially improve scanning.",
+    "When supplied short prose is already decision-complete, do not expand it merely to expose template fields.",
+    "Add explicit authorization framing only when an ambiguity could materially broaden the approved action."
   ],
   "provenance": {
     "derivedOnly": true,
@@ -61,6 +64,11 @@
           {
             "locator": "https://github.com/nikopueringer/CorridorKey/issues/246",
             "summary": "Owner-authored proposal that front-loads state, evidence, constraints, and a recommended path.",
+            "approved": true
+          },
+          {
+            "locator": "owner-evaluation:held-out-publication-comparisons-2026-08-24-through-2026-09-14",
+            "summary": "Three blinded owner comparisons preferred concise prose over extra sections or editorial framing for straightforward reversible proposals; no private rationale was retained.",
             "approved": true
           }
         ]
@@ -94,19 +102,28 @@
         "https://github.com/nikopueringer/CorridorKey/issues/245",
         "https://github.com/nikopueringer/CorridorKey/issues/246"
       ]
+    },
+    {
+      "id": "right-size-simple-proposals",
+      "description": "Keeps a straightforward reversible proposal decision-complete without ceremonial headings or checklist structure.",
+      "sourceLocators": [
+        "owner-evaluation:held-out-publication-comparisons-2026-08-24-through-2026-09-14"
+      ]
     }
   ],
   "tradeOffs": [
     "The shape asks for evidence and completion criteria before implementation detail.",
+    "Concise prose is the default for simple reversible decisions, but separate structure remains useful when it materially improves scanning or separates competing paths.",
     "Optional sections must be omitted when they add no decision-relevant information."
   ],
   "approval": {
     "status": "approved",
     "approvedBy": "owner"
   },
-  "version": 1,
+  "version": 3,
   "limitations": [
     "The source issues have no independent outcome signal proving which readers found most useful.",
+    "The invisible-template threshold was validated on one unused proposal brief after three blinded comparisons exposed over-structuring; broader artifact types still require their own evidence.",
     "No private team corpus was authorized for this baseline."
   ],
   "retainedExcerpts": []
@@ -120,4 +137,7 @@
 - Define observable completion even when implementation is currently blocked.
 - Recommend the next action or name the exact event that unlocks it.
 - State material risks, trade-offs, and exclusions; omit headings that add no information.
-
+- For a straightforward reversible proposal, use a title and one or two short paragraphs that retain the decision, constraints, control, completion test, and next action.
+- Add headings and checklists only when they materially improve scanning; never use them merely to display the template's internal fields.
+- Treat the template as a silent coverage check: when supplied short prose is already decision-complete, do not expand or reframe it.
+- Add authorization language only when an ambiguity could materially broaden the approved action; an existing explicit scope or exclusion is sufficient.
