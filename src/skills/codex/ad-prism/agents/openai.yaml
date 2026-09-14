@@ -1,0 +1,6 @@
+interface:
+  display_name: ad-prism
+  short_description: Design and audit decision-focused evaluations
+  default_prompt: Use $ad-prism to design or audit an evaluation that connects a decision to claims, evidence, measures, and an honest next gate.
+policy:
+  allow_implicit_invocation: true

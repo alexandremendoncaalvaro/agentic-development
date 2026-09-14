@@ -1,6 +1,6 @@
 ---
 name: ad-spike
-description: Scaffold a staged spike with golden fixtures per WORKFLOW.md §14, for cases where the spec is clear but the technique is uncertain across multiple plausible approaches. Four stages — discovery, golden fixture, pipeline with gates, two-layer evaluation. Use when the unknown is *how*, not *what*. Triggers on "spike", "uncertain technique", "which library", "CV pipeline", "evaluate approaches", "ground truth", "golden fixture", "staged pipeline", "debug per stage". Routes to `ad-ground` if the *how* is routine and a single happy path is obvious. Read-and-write — creates `spikes/NNNN-<slug>/` with fixtures, debug per-stage artifacts, eval results.
+description: Scaffold a staged spike with golden fixtures when the spec is clear but the technique is uncertain — discovery, fixture, gated pipeline with per-stage debug artifacts, two-layer evaluation. Use on "spike", "which library", "evaluate approaches", "golden fixture", "uncertain technique".
 summary: Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.
 allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch, WebSearch
 ---
@@ -113,13 +113,10 @@ When the spike concludes — either the picked technique works or it does not �
 
 For the spike-outcome ADR template, see [references/spike-adr-template.md](references/spike-adr-template.md).
 
-Then:
-
-```bash
-rm -rf spikes/NNNN-<slug>/
-git add doc/adr/NNNN-<slug>.md
-git commit -m "feat: adopt technique X for <focus> per spike NNNN"
-```
+After the ADR captures the outcome, delete only the exact
+`spikes/NNNN-<slug>/` directory and route the ADR plus deletion to `/ad-commit`.
+That skill owns staging, the Conventional Commit message, and the DCO sign-off;
+do not commit directly from the spike workflow.
 
 Spikes that conclude inconclusively get an ADR too — `Decision: defer; the spike at NNNN inconclusive because Y` — and the directory is deleted. Inconclusive spikes are real signal; preserving the framing in an ADR prevents re-litigation.
 
@@ -131,6 +128,8 @@ When the host exposes `AskUserQuestion`, use it for the Step 1 selection criteri
 
 ## Next
 
+- `/ad-prism` when the validated technique must now be evaluated against a
+  product or system decision.
 - After Step 1 (discovery output reviewed): proceed to Step 2 to create the spike directory + fixture, or abort if the discovery surfaced a single happy path (route to `ad-ground`).
 - After Step 4 (eval results): `/ad-adr` to record the outcome, then delete the spike directory.
 - If the spike succeeds and production work follows: `/ad-task` for the work units to apply the spike's findings to production code (Spec ref the original spec if applicable; cite the ADR in the task `Notes`).

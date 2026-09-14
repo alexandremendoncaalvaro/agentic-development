@@ -7,12 +7,13 @@ Every skill below installs for each selected host. Installation is not a mandate
 | Skill | Use it when | Outcome |
 | --- | --- | --- |
 | `/ad-next` | You do not know the next useful action. | State survey and prioritized recommendations. |
+| `/ad-brief` | You returned to a session and need the project, result, current direction, and any real decision explained plainly. | One read-only decision-maker brief from live state or settled specialist facts. |
 | `/ad-philosophy` | Work is non-trivial or needs an explicit engineering posture. | Grounded, decisive, verifiable working rules. |
 | `/ad-ground` | You are about to implement a non-trivial change. | Evidence-backed happy path and a versioned audit record before code. |
 | `/ad-grill-me` | The ask is fuzzy. | The minimum owner decisions and sharper vocabulary. |
 | `/ad-question-me` | You want only genuine owner decisions challenged. | Ranked questions without re-asking groundable facts. |
 | `/ad-domain` | A project term needs a stable meaning. | `CONTEXT.md` or a context map. |
-| `/ad-rules` | You need the active host and project rules loaded. | Read-only rule references. |
+| `/ad-rules` | You need a rules inventory, or say “The Rules” to correct execution against them. | Read-only topic inventory, or a corrected active plan explained through the canonical brief. |
 | `/ad-drift` | Docs may no longer match code. | Read-only documentation-drift report. |
 
 ## Frame the work
@@ -24,6 +25,7 @@ Every skill below installs for each selected host. Installation is not a mandate
 | `/ad-task` | A scoped work unit needs tracked acceptance criteria. | Task under `doc/tasks/`. |
 | `/ad-adr` | A decision is consequential, hard to reverse, and has a real trade-off. | Binding ADR under `doc/adr/`. |
 | `/ad-bootstrap` | The operational guide is missing or stale. | Generated or audited `AGENTS.md`. |
+| `/ad-community-docs` | A public repository needs contributor and security guidance. | `CONTRIBUTING.md` and `SECURITY.md` without overwriting local policy. |
 | `/ad-guidelines` | Engineering standards need a full reference. | `GUIDELINES.md`. |
 | `/ad-architecture` | System patterns and boundaries need a shared model. | `ARCHITECTURE.md`. |
 | `/ad-design` | A UI needs a durable visual contract. | `DESIGN.md`. |
@@ -34,6 +36,7 @@ Every skill below installs for each selected host. Installation is not a mandate
 | --- | --- | --- |
 | `/ad-derisk` | A defined task has several unknowns. | Risk register and the right uncertainty-reduction path. |
 | `/ad-research` | A question needs an evidence-graded durable study. | Research record under `doc/research/`. |
+| `/ad-prism` | A product or system decision needs an evaluation design, result interpretation, or methodology audit. | Decision-linked evidence plan or audited claims with explicit limits. |
 | `/ad-spike` | The technique is uncertain. | Staged experiment against golden fixtures. |
 | `/ad-tdg` | Several implementation strategies are plausible. | Ground-truth pair and selected strategy. |
 | `/ad-tdd` | Behavior can be expressed in a test before implementation. | Red-green-refactor loop. |
@@ -73,8 +76,8 @@ Every skill below installs for each selected host. Installation is not a mandate
 | `/ad-merge` | A PR is ready for merge evaluation. | CI-aware merge decision and merge. |
 | `/ad-release` | A supported npm package is ready to release. | Confirmed release, publish, and GitHub Release workflow. |
 | `/ad-update` | You want to inspect or apply the current kit update from the agent session. | Safe project-local update plan, then an explicit apply when requested. |
-| `/ad-handoff` | A session must continue with fresh context. | Compact handoff in the OS temp directory. |
-| `/ad-roadmap` | You need a product-roadmap completion rollup. | Tiered done / in-progress / remaining report. |
+| `/ad-handoff` | A session must continue with fresh context. | Temporary resumable packet whose preparation composes the canonical brief and retains roadmap, lost asks, hygiene, and redaction. |
+| `/ad-roadmap` | You need a project-wide or explicitly task-scoped progress view. | Canonical decision-maker brief followed by a nested checklist of done and remaining work. |
 | `/ad-archive` | Completed planning artifacts have been absorbed. | Safe deletion into Git history. |
 
 ## Extend the kit

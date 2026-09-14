@@ -32,3 +32,11 @@ rules. A request to preserve a reusable improvement routes explicitly to
 `ad-template-tune`, including its source authorization, exact-excerpt retention,
 one-delta, and write-approval gates.
 
+## Verification is not freezing
+
+Publication drafting verifies material claims from the smallest authorized
+source, but it does not create a cryptographic receipt for that source set or
+preserve remote source bodies. When a publication depends on a material
+evaluation claim whose method is not yet settled, compose `ad-prism` first. It
+freezes the settled evaluation artifact and records source locators and access
+gaps; it still does not make external source pages immutable.

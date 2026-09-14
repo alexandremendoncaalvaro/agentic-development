@@ -1,6 +1,6 @@
 ---
 name: ad-drift
-description: Read-only drift audit — compare AGENTS.md, ARCHITECTURE.md, and ADR statuses against what the code actually does. Outputs a drift list, never writes files. Use when the user wants to audit, review for drift, sanity-check, or report inconsistencies between the repo's docs and its code.
+description: Read-only drift audit of AGENTS.md, ARCHITECTURE.md, ADR statuses, specs, and documentation discipline against what the code does. Use on "audit the docs", "check for drift", "are the docs stale", "sanity-check the ADRs". Reports a drift list; writes nothing.
 summary: Read-only drift report comparing AGENTS.md / ARCHITECTURE.md / ADRs against the code.
 ---
 
@@ -83,6 +83,7 @@ A drift list, no file written. Read-only operation. Empty result is reported exp
 ## Next
 
 - Address each finding with one of the three resolutions named in the format ("change spec / change code / discuss").
+- For a finding that resolves or corrects project vocabulary: `/ad-domain`.
 - For findings that require implementation: `/ad-task` to scaffold the fix.
 - For workflow drift (where am I, what's stuck): `/ad-next`.
 - For kit-version drift (state file behind current kit): `agentic update`.

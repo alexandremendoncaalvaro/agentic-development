@@ -1,6 +1,6 @@
 ---
 name: ad-research
-description: Research-to-conclusion methodology (WORKFLOW §17 + §4-5) — turn an open question ("should we adopt X?", "is approach A better than B?", "what is the state of the art on Y?") into an evidence-graded study at doc/research/NNNN-<slug>.md whose output is a defensible conclusion, not code. Runs the Evidence-Based loop (Ask, Acquire, Appraise, Apply, Assess) plus the scientific method (falsifiable hypothesis, experiment) when the question is measurable; reuses ad-ground's four-source pass for Acquire, grades each claim's evidence strength and the confidence to proceed (WORKFLOW §17), and graduates a binding conclusion into an ADR. Triggers on "research", "study", "investigate", "reach a conclusion", "should we adopt", "A vs B", "state of the art", "evaluate options", "literature review", "evidence for", "/ad-research". Distinct from ad-ground (records the path for an already-decided implementation) and ad-spike (validates one uncertain technique); routes to ad-spike when evidence is insufficient and to ad-adr when the conclusion binds.
+description: Turn an open question into an evidence-graded study at doc/research/NNNN-<slug>.md with a defensible conclusion, not code. Use on "should we adopt X", "A vs B", "state of the art", "evaluate options", "literature review", "research this". Graduates binding conclusions to an ADR.
 summary: Research-to-conclusion — turn an open question into an evidence-graded study at doc/research/NNNN-<slug>.md via the Evidence-Based loop + WORKFLOW §17 grading + the scientific method when measurable. Reuses ad-ground for Acquire; graduates a binding conclusion to an ADR. WORKFLOW §17 + §4-5.
 allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch, WebSearch
 ---
@@ -57,6 +57,8 @@ A single new file at `doc/research/<NNNN>-<slug>.md`, status `draft`. Conclusion
 
 ## Next
 
+- `/ad-prism` when the concluded study now needs an evaluation design,
+  interpretation, or fit-for-purpose methodology audit.
 - `/ad-adr` if the conclusion is a binding architectural decision — the ADR references this study by path.
 - `/ad-derisk` if the conclusion feeds a pre-construction build — the study hands to Front B, which de-risks the build before implementation.
 - `/ad-spike` if the conclusion is Insufficient / spike-first — run the experiment that settles the open claim.

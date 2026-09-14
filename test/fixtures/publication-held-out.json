@@ -57,5 +57,72 @@
       "risks-or-trade-offs",
       "explicit-exclusions"
     ]
+  },
+  {
+    "id": "patch-dependency-updates",
+    "brief": "Propose enabling automated dependency update pull requests for 8 internal packages starting 2026-10-01. Allow patch releases only and cap the bot at 2 open pull requests per package. Pause it if its pull requests cause the CI failure rate to exceed 5%. Completion means every package has received and merged one valid patch-update pull request. Minor and major updates are out of scope.",
+    "invariants": [
+      "8 internal packages",
+      "2026-10-01",
+      "patch releases only",
+      "2 open pull requests per package",
+      "5%",
+      "Minor and major updates"
+    ],
+    "requiredElements": [
+      "concrete-state",
+      "consequence",
+      "evidence-and-constraints",
+      "observable-completion",
+      "recommended-next-path",
+      "risks-or-trade-offs",
+      "explicit-exclusions"
+    ]
+  },
+  {
+    "id": "ci-cache-compression",
+    "brief": "Propose enabling zstd compression for CI caches in 6 repositories on 2026-10-15, with an expected 30% reduction in cache upload size. Use the reversible CI_CACHE_ZSTD flag and disable it if median build time worsens by more than 3%. Completion means each repository records 20 successful cached builds. Release jobs are out of scope.",
+    "invariants": [
+      "zstd",
+      "6 repositories",
+      "2026-10-15",
+      "30%",
+      "CI_CACHE_ZSTD",
+      "3%",
+      "20 successful cached builds",
+      "Release jobs"
+    ],
+    "requiredElements": [
+      "concrete-state",
+      "consequence",
+      "evidence-and-constraints",
+      "observable-completion",
+      "recommended-next-path",
+      "risks-or-trade-offs",
+      "explicit-exclusions"
+    ]
+  },
+  {
+    "id": "documentation-link-retry",
+    "brief": "Propose enabling one automatic retry for network-timeout failures in documentation link checks across 5 repositories starting 2026-10-20 to reduce false failures. Do not retry HTTP errors. Disable the retry if median job duration increases by more than 10%. Completion means each repository records 50 runs without masking a genuinely broken link. Security scans are out of scope.",
+    "invariants": [
+      "network-timeout failures",
+      "5 repositories",
+      "2026-10-20",
+      "HTTP errors",
+      "10%",
+      "50 runs",
+      "genuinely broken link",
+      "Security scans"
+    ],
+    "requiredElements": [
+      "concrete-state",
+      "consequence",
+      "evidence-and-constraints",
+      "observable-completion",
+      "recommended-next-path",
+      "risks-or-trade-offs",
+      "explicit-exclusions"
+    ]
   }
 ]

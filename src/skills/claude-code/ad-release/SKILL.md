@@ -2,6 +2,7 @@
 name: ad-release
 description: Safely orchestrate a single npm package release through its configured local release script, release PR, tag, npm publish, and GitHub Release. Uses one digest-bound plan approval with per-stage fallback and state-aware recovery; preserves the tagged release commit with release-only merge mode. Use when preparing, resuming, publishing, or creating a GitHub Release for an npm package; triggers on "release this package", "publish to npm", "prepare a release", "resume release", "GitHub Release", or "/ad-release".
 summary: Safely orchestrate a single npm package release through its configured release script, PR, tag, npm publish, and GitHub Release with one digest-bound approval and state-aware recovery.
+disable-model-invocation: true
 allowed-tools: Read, Bash, Grep
 ---
 
@@ -11,7 +12,7 @@ Implements ADR-0063 as amended by ADR-0072 and amends ADR-0048's manually perfor
 
 Only one root npm package released through GitHub is supported. It never switches GitHub authentication, reads credential files, surfaces tokens or OTP values, changes npm dist-tags, or retries an irreversible operation blindly.
 
-## Step 0 — Confirm regime
+## Phase 0 — Confirm regime
 
 Run for a release-ready root npm package when the user asks to prepare a release, publish a tagged version, create its GitHub Release, or resume a partial release.
 
@@ -70,3 +71,10 @@ On every rerun, inspect the explicit tag, remote tag, merged release commit, reg
 ## Output contract
 
 The output is either a checked release plan with no side effect, or the next plan-wide or per-stage authorized effect and its verified postcondition. A completed release has a DCO-signed release commit preserved as an ancestor of the base branch, an annotated remote tag, an npm package built from that tag under its configured dist-tag, and a GitHub Release whose notes come from that tag.
+
+## Next
+
+- Continue the next unfinished release stage only while the approved plan digest
+  still matches.
+- Use `/ad-diagnose` when release state is ambiguous or a gate fails unexpectedly.
+- Report the verified npm version, dist-tag, and GitHub Release URL when complete.

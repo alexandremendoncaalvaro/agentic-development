@@ -1,6 +1,6 @@
 ---
 name: ad-next
-description: Survey the project's state across the six-layer artifact stack and recommend prioritized next actions, modeled on `flutter doctor`. Use when the user asks "what's next", "next step", "where am I", "project status", "doctor", "what should I do", "audit my workflow". Read-only; complements `ad-drift` (drift detection, a different question).
+description: Survey the project's artifact stack and recommend prioritized next actions, like flutter doctor. Use when unsure where the work stands; "what's next", "where am I", "project status", "doctor", "what should I do". Read-only.
 summary: State survey + prioritized next-action recommendations across the six-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).
 ---
 
@@ -68,6 +68,8 @@ Priority heuristic:
 4. Brownfield: if meaningful code exists and the operational guide is missing, recommend `/ad-bootstrap` scan-first. Then recommend `/ad-guidelines` for standards, `/ad-architecture` when system patterns need a shared model, or `/ad-prd` only when product scope is being backfilled or changed.
 5. Feature pipeline gaps: accepted PRD without specs → `/ad-spec`; accepted spec without tasks → `/ad-task`; missing research before implementation → `/ad-ground`.
 6. Quality gates and drift: missing gates for a project that needs them → `/ad-hooks`; orphan tasks/spec mismatches → `/ad-drift`; kit drift → `agentic update`.
+
+When the user asks for a completion rollup rather than prioritized next actions, route to `/ad-roadmap`.
 
 If nothing actionable surfaces, say so: "No urgent next action. Continue current work or invoke `/ad-drift` for a full drift check."
 

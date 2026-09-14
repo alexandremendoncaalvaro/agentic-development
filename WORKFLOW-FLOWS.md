@@ -47,6 +47,56 @@ flowchart TD
 
 Source: `WORKFLOW.md` sections 1, 4-6, 10-12, 15-16; `ad-next` skill contract.
 
+## Return To Active Work
+
+Use this when you reopen a session and need the situation explained before work
+continues. The brief is the shared presentation layer; each specialist still owns
+its facts, persistence, checklist, or outward-action gates.
+
+```mermaid
+flowchart TD
+    Arrive["I just arrived in this session"]
+    Need{"What do I need?"}
+    Brief["/ad-brief<br>plain-language context and direction"]
+    Roadmap["/ad-roadmap<br>reconcile project or task progress"]
+    Checklist["Roadmap regains control<br>and appends its nested checklist"]
+    Handoff["/ad-handoff<br>collect resumable state and reconcile live facts"]
+    Persist["Handoff regains control<br>and retains persistence, redaction, asks, and hygiene"]
+    Rules["/ad-rules correction mode<br>resolve the rules in force"]
+    Philosophy["/ad-philosophy<br>apply the existing recommitment"]
+    Corrected["Correct the active plan<br>and settle the changed facts"]
+    Continue["Continue autonomously<br>unless genuine owner judgment remains"]
+    Publish["/ad-publish<br>only explicitly intended outward content"]
+    Voice["/ad-voice<br>conversation-language preview and publication-language adaptation"]
+    Approve["Approve exact final text and target<br>before any outward action"]
+
+    Arrive --> Need
+    Need -->|context only| Brief
+    Need -->|plan and checklist| Roadmap
+    Need -->|durable session transfer| Handoff
+    Need -->|The Rules correction| Rules
+    Roadmap --> Brief
+    Roadmap --> Checklist
+    Handoff --> Brief
+    Handoff --> Persist
+    Rules --> Philosophy
+    Philosophy --> Corrected
+    Corrected --> Brief
+    Brief --> Continue
+    Need -->|publish a specific conclusion| Publish
+    Publish --> Voice
+    Voice --> Approve
+```
+
+Composition is one-way and packet-based. `ad-brief` never calls back into
+`ad-roadmap`, `ad-handoff`, `ad-rules`, `ad-philosophy`, `ad-publish`, or
+`ad-voice`. A private brief does not become publication content: the owner must
+explicitly promote the specific conclusion, after which the complete
+`ad-publish` approval flow applies.
+
+Source: `WORKFLOW.md` sections 7, 10, and 12; ADR-0076; `ad-brief`, `ad-roadmap`,
+`ad-handoff`, `ad-rules`, `ad-philosophy`, `ad-publish`, and `ad-voice` contracts.
+
 ## Context Gate
 
 ```mermaid
@@ -264,6 +314,66 @@ flowchart TD
 ```
 
 Source: `WORKFLOW.md` sections 4-5, 9, 14, 16, 17; `ad-research`, `ad-derisk`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-ground` skill contracts.
+
+## Evaluation Design And Assurance
+
+Use this when the question is not merely “does the code pass?” but “what evidence
+would support this decision, and how far may the result be trusted?” Prism owns
+that method. Adjacent skills keep their existing evidence, technique, rule,
+rendering, voice, and authorization boundaries.
+
+```mermaid
+flowchart TD
+    Request["Evaluation design, interpretation, refinement, or method audit"]
+    Prism["/ad-prism<br>decision-to-evidence method"]
+    Need{"What uncertainty must be retired?"}
+    Research["/ad-research<br>open knowledge question"]
+    Ground["/ad-ground<br>bounded fact or implementation gap"]
+    Spike["/ad-spike<br>uncertain implementation technique"]
+    Design["Settle evaluation design and claims"]
+    Material{"Material evaluation artifact or public claim?"}
+    Freeze["Validate and freeze candidate"]
+    MethodAudit["Skeptical method pass<br>verify every finding"]
+    Final["Correct, revalidate, and freeze final"]
+    Packet["Settled claims, limits, and source references"]
+    Report["/ad-report<br>standalone analytical artifact when requested"]
+    Publish["/ad-publish<br>privacy, target, and exact-text approval"]
+    Voice["/ad-voice<br>conversation-language preview and publication language"]
+    Ordinary["Ordinary comment, reply, or thread"]
+    Done["Return evaluation result<br>no outward action"]
+
+    Request --> Prism
+    Prism --> Need
+    Need -->|open knowledge| Research
+    Need -->|bounded fact| Ground
+    Need -->|uncertain technique| Spike
+    Prism --> Research
+    Prism --> Ground
+    Prism --> Spike
+    Research --> Design
+    Ground --> Design
+    Spike --> Design
+    Design --> Material
+    Prism --> Material
+    Material -->|yes| Freeze
+    Freeze --> MethodAudit
+    MethodAudit --> Final
+    Final --> Packet
+    Packet --> Report
+    Packet --> Publish
+    Material -->|no| Done
+    Ordinary --> Publish
+    Publish --> Voice
+```
+
+The freeze receipt covers the settled local artifact package, not immutable
+copies of external sources. `ad-publish` verifies its final outward claims and
+protects private context, but it does not perform Prism's methodology audit.
+Ordinary collaboration continues directly through publication and voice gates.
+
+Source: `WORKFLOW.md` sections 4, 5, 10, and 17; ADR-0077; `ad-prism`,
+`ad-research`, `ad-ground`, `ad-spike`, `ad-audit`, `ad-report`,
+`ad-publish`, and `ad-voice` contracts.
 
 ## Delegation Gate
 

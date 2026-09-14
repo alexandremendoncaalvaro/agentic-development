@@ -52,11 +52,20 @@ export function agentLayout(agent) {
 /**
  * List the skills bundled for one host. Source directories are canonical, so
  * a new dual-host skill automatically joins the default install set.
+ *
+ * @param {string} agent - `claude-code` or `codex`.
+ * @param {object} [opts]
+ * @param {string} [opts.kitRoot] - kit root to enumerate; defaults to this
+ *   package's root and exists so tests can point at a scratch tree.
+ * @returns {string[]} sorted skill directory names, dot-directories excluded.
  */
-export function bundledSkills(agent) {
+export function bundledSkills(agent, { kitRoot = KIT_ROOT } = {}) {
   const { sourceDir } = agentLayout(agent);
-  const root = join(KIT_ROOT, sourceDir);
+  const root = join(kitRoot, sourceDir);
+  // A dot-directory is never a skill: neither host resolves `.name/SKILL.md`,
+  // and plugins drop state such as `.slim/` into the tree (task-0065).
   return readdirSync(root)
+    .filter((name) => !name.startsWith('.'))
     .filter((name) => statSync(join(root, name)).isDirectory())
     .sort();
 }

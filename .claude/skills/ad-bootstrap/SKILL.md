@@ -2,6 +2,7 @@
 name: ad-bootstrap
 description: Generate AGENTS.md at the repo root by scanning the codebase first, pre-filling placeholders from observed signals, and asking only the genuine gaps. Use whenever the user wants to bootstrap, scaffold, generate, create, set up, or audit AGENTS.md / agents.md / CLAUDE.md (the operational guide for agents working on this project). Covers greenfield (empty repo), brownfield (code exists, no AGENTS.md), and audit (drift report against existing AGENTS.md).
 summary: Generate or audit `AGENTS.md` at the repo root.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
@@ -16,6 +17,8 @@ Run from the consumer repo root before inspecting it:
 ```bash
 node .claude/skills/ad-bootstrap/scripts/project-signals.mjs AGENTS.md
 ```
+
+If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it.
 
 Parse its JSON. Its `mode` selects the branch below; use `stacks` to focus the manifest scan and surface every `unreadable[]` entry as a scan gap, never as an absent path. Then inspect the repo:
 

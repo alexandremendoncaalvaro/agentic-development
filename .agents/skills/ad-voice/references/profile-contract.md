@@ -33,6 +33,10 @@ material cannot hide outside the derived-only contract.
   "status": "confirmed",
   "retention": "derived-only",
   "rawSamplesRetained": false,
+  "languages": {
+    "conversation": "es",
+    "publication": "en"
+  },
   "patterns": [],
   "examples": [],
   "limitations": []
@@ -41,6 +45,23 @@ material cannot hide outside the derived-only contract.
 ```
 
 Only schema version `1` is supported. A profile used by `ad-voice` is always `confirmed`, retains derived material only, and declares that raw samples were not retained.
+
+## Language preferences
+
+`languages` is optional. When present, it is a closed object with exactly two
+required fields:
+
+- `conversation`: the BCP 47 language tag for direct owner conversation and
+  publication approval previews;
+- `publication`: the BCP 47 language tag used by default for outward text.
+
+Both values must be well-formed BCP 47 tags. The examples above illustrate the
+shape; they are not product defaults. An explicit language request overrides the
+matching preference for that request only. When `languages` is absent, infer
+language from the request and destination as before. When the two values differ,
+draft first in the conversation language, then adapt to the publication language
+and require approval of the exact final text. Language preferences are structured
+profile settings, not evidence-derived voice patterns.
 
 ## Pattern shape
 

@@ -113,15 +113,13 @@ function parseStatus(body) {
   return m ? m[1].toLowerCase() : null;
 }
 
-// A bold-or-plain reference field value, or '' when absent / blank / a
-// placeholder (opening with a backtick or angle bracket).
-function parseRef(body, label) {
-  const re = new RegExp(`^\\*{0,2}${label}:\\*{0,2}[ \\t]*(.*)$`, 'mi');
-  const m = body.match(re);
-  if (!m) return '';
-  const value = m[1].trim();
-  if (value === '' || value.startsWith('`') || value.startsWith('<')) return '';
-  return value;
+// Every bold-or-plain reference field value, excluding blank values and
+// placeholders (opening with a backtick or angle bracket).
+function parseRefs(body, label) {
+  const re = new RegExp(`^\\*{0,2}${label}:\\*{0,2}[ \\t]*(.*)$`, 'gmi');
+  return [...body.matchAll(re)]
+    .map((match) => match[1].trim())
+    .filter((value) => value !== '' && !value.startsWith('`') && !value.startsWith('<'));
 }
 
 function artifactNumber(text) {
@@ -207,11 +205,13 @@ function scanLayer(repoRoot, key, layer, unreadable) {
     }
 
     if (key === 'adr') {
-      const am = parseRef(body, 'Amends');
-      const ab = parseRef(body, 'Amended by');
       const recordNum = artifactNumber(name);
-      if (am) amends.push({ slug: slugOf(name), recordNum, targetNum: artifactNumber(am), value: am });
-      if (ab) amendedBy.push({ slug: slugOf(name), recordNum, targetNum: artifactNumber(ab), value: ab });
+      for (const value of parseRefs(body, 'Amends')) {
+        amends.push({ slug: slugOf(name), recordNum, targetNum: artifactNumber(value), value });
+      }
+      for (const value of parseRefs(body, 'Amended by')) {
+        amendedBy.push({ slug: slugOf(name), recordNum, targetNum: artifactNumber(value), value });
+      }
     }
   }
   return { numbering, status, supersession, amends, amendedBy };

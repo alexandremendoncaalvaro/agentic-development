@@ -3,4 +3,4 @@ interface:
   short_description: "Draft, render, or review a verified analytical report"
   default_prompt: "Use $ad-report to turn these findings and evidence into a verified report."
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

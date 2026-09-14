@@ -1,6 +1,6 @@
 ---
 name: ad-question-me
-description: The value-first questioner — first absorbs what the author is building and the value intended, then raises the questions the author cannot see from inside the work, and renders no verdict. Triggers on "question me", "ask me the killer question", "challenge this before I commit", "what am I missing", "am I still on track", "am I grounded on this", "look at this from another angle", "/ad-question-me". Surfaces a question ONLY when it is the owner's judgment call or genuinely un-groundable after a real code / docs / references pass; anything answerable from the code, docs, or spec it resolves itself instead of asking. Complements ad-grill-me (pre-work, sharpening a fuzzy ask — a different question) and ad-review (which renders a verdict); this renders none and feeds them. Routes out to ad-review / ad-audit for a verdict, ad-ground for weak grounding, ad-adr for a drift decision.
+description: Value-first challenger for work in progress — absorbs the intended value, then raises only the questions that are the owner's call or genuinely un-groundable; renders no verdict. Use on "question me", "what am I missing", "am I still on track", "challenge this before I commit".
 summary: Value-first challenger — absorbs the value intended, then raises only questions that are the owner's call or genuinely un-groundable, resolving anything answerable from code / docs itself. Ranked questions, killer first, why-it-matters, no verdict. Complements ad-grill-me; feeds ad-review.
 ---
 

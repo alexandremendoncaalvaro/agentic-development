@@ -1,6 +1,6 @@
 ---
 name: ad-next
-description: Survey the project's state across the six-layer artifact stack and recommend prioritized next actions, modeled on `flutter doctor`. Use when the user asks "what's next", "next step", "where am I", "project status", "doctor", "what should I do", "audit my workflow", or whenever a navigation aid is needed mid-flow. Read-only; complements `ad-drift` (drift detection, a different question).
+description: Survey the project's artifact stack and recommend prioritized next actions, like flutter doctor. Use when unsure where the work stands; "what's next", "where am I", "project status", "doctor", "what should I do". Read-only.
 summary: State survey + prioritized next-action recommendations across the six-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).
 allowed-tools: Read, Glob, Grep, Bash
 ---
@@ -77,6 +77,8 @@ Priority heuristic:
 5. **Feature pipeline gaps.** Accepted PRD without specs → `/ad-spec`; accepted spec without tasks → `/ad-task`; missing research before implementation → `/ad-ground`.
 6. **Quality gates and drift.** Missing gates for a project that needs them → `/ad-hooks`; orphan tasks/spec mismatches → `/ad-drift`; kit drift → `agentic update`.
 
+When the user asks for a completion rollup rather than prioritized next actions, route to `/ad-roadmap`.
+
 If nothing actionable surfaces, say so explicitly — empty output is real signal, not a gap. Phrase: "No urgent next action. Continue current work or invoke `/ad-drift` for a full drift check."
 
 ## Step 5 — Contextual relevance
@@ -125,3 +127,10 @@ A single Markdown message structured as:
 No file written. No state mutation. Recommendations are advisory; the user decides whether to invoke. Cross-references `ad-drift` (drift detection) and `agentic update` (kit drift — CLI subcommand) where they apply.
 
 When the host exposes `AskUserQuestion` and the user follows up with a confirmation question after seeing the recommendations, prefer the structured prompt over inline text.
+
+## Next
+
+- Use the highest-leverage recommended skill to continue the work.
+- Use `/ad-roadmap` when the user wants a completion rollup rather than next-action
+  recommendations.
+- Use `/ad-drift` when the survey exposes inconsistent artifacts.

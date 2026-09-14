@@ -1,6 +1,6 @@
 ---
 name: ad-philosophy
-description: Universal agent behavior and documentation discipline — think before coding, decide when grounded (only ask on judgment calls), ground in real patterns, prefer simplicity, make surgical changes, define verifiable goals, verify before claiming done, report for a decision-maker (conclusion first, self-contained, translate-not-dump), and write documentation that captures only definitions and decisions. Auto-invokes on non-trivial changes, refactors, debugging, "think before coding", "ground before coding", "verify done", "decide when grounded", "employee not co-pilot", "report for a decision-maker", "before implementing", on documentation work — "writing docs", "writing readme", "writing architecture", "writing adr", "writing task", "audit docs" — or whenever the task is ambiguous enough that guardrails matter.
+description: Universal posture for non-trivial work — think before coding, decide when grounded, ground in real patterns, simplicity, surgical changes, verifiable goals, verify before claiming done, report for a decision-maker, documentation discipline. Auto-loads on non-trivial changes, refactors, debugging, and any document writing; "think before coding".
 summary: Universal agent guardrails (think, decide when grounded, verify done, report for a decision-maker). Auto-loads as posture on non-trivial work; an explicit `/ad-philosophy` additionally forces a binding statement applying all eight behaviors to the current task.
 ---
 
@@ -56,5 +56,8 @@ This skill emits no file. Its job is to set the agent's working posture for the 
 
 - Continue current work with the eight behaviors active. This skill is posture, not a one-shot task.
 - `/ad-ground` for non-trivial research before code.
+- `/ad-tdd` when behavior is test-expressible; `/ad-tdg` when the outcome is known but strategy choice remains.
+- `/ad-diagnose` for hard bugs or regressions that need a feedback loop before implementation.
 - `/ad-next` when uncertain where to go in the workflow.
 - `/ad-review` before merging non-trivial diffs.
+- `/ad-commit` once the change and its review gates are green.

@@ -6,6 +6,75 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `/ad-brief` provides a private, read-only decision-maker briefing for someone
+  returning to a session. `/ad-roadmap`, `/ad-rules`, and `/ad-handoff` compose
+  the same brief contract so project state, direction, blockers, and genuine
+  owner decisions are explained consistently without turning private context
+  into publication source material.
+- `/ad-prism` adds a host-neutral, decision-focused evaluation method with
+  explicit claims, evidence, measures, decision rules, assurance levels, and
+  fit-for-purpose validation. Projects may add an optional local domain adapter;
+  the generic method remains usable when no adapter exists.
+- `/ad-hooks` session-lifecycle tier gains a `UserPromptSubmit` workflow
+  checkpoint (ADR-0074): a zero-dependency script that prints the kit's
+  pipeline as a short imperative checklist on every prompt (de-risk or
+  sharpen, ground, TDD, review per slice, audit per block, commit, `/ad-handoff`),
+  always exits 0, and is silenced with `AD_WORKFLOW_CHECKPOINT=0`. The
+  scaffold now resolves hook script paths from the skill's installed directory
+  instead of a project-relative constant that a user-scope install lacks.
+
+### Changed
+
+- `/ad-roadmap` now opens with a plain-language thirty-second overview of the
+  main delivery front, current work, next front, progress, and blockers. Its
+  full roadmap uses standard checked and open Markdown tasks, expands active
+  work into nested completed and remaining steps, and keeps tiers,
+  percentages, and artifact identifiers as supporting evidence. Unqualified
+  requests use the project-wide roadmap; an explicit task request uses a
+  separate task-and-subtask template without mixing in the rest of the plan.
+- Personal voice profiles can now define a closed pair of BCP 47 language
+  preferences: `conversation` for direct owner communication and approval
+  previews, and `publication` for outward text. `/ad-voice`, `/ad-publish`, and
+  `/ad-report` honor one-request overrides, adapt across languages with a
+  meaning-preservation check, and require approval of the exact final outward
+  text. Private owner-agent deliberation remains excluded unless explicitly
+  promoted for publication.
+- Every skill now declares its invocation class (ADR-0073). Nineteen
+  user-invocable skills set `disable-model-invocation: true` (Claude Code) and
+  `allow_implicit_invocation: false` (Codex), so their descriptions leave the
+  host's skill listing; the twenty-six model-invocable skills carry trigger-first
+  descriptions capped at 350 characters and about 7,500 characters in total, inside the
+  8,000-character listing budget that previously truncated a third of the kit.
+  Descriptions are held to the 1,024-character specification maximum.
+- Claude Code skills now share the kit's Markdown workflow skeleton, explicit
+  output and next-stage contracts, one numbered heading vocabulary per skill,
+  and direct-tool pre-approvals that match the instructions. The authoring skill
+  also distinguishes the 1,024-character specification limit from Claude Code's
+  1,536-character listing cut and records both invocation classes.
+- The bundled GitHub proposal template now treats its structure as a silent
+  coverage check for straightforward reversible decisions. Already-complete
+  short prose is preserved; headings, checklists, and explicit authorization
+  framing appear only when they add decision-relevant clarity.
+
+### Fixed
+
+- Skill `Next` breadcrumbs now expose the complete workflow routing chain on
+  both hosts: grounding and tasks lead into TDD or TDG, implementation and
+  review lead into commit, PR, audit, and merge, and domain, roadmap,
+  diagnosis, and value-challenge hand-offs are reciprocal. A table-driven
+  source test keeps every required edge present for Claude Code and Codex.
+- The skill enumerator (`bundledSkills` and the test helper) ignores
+  dot-directories under `src/skills/<host>/`; a plugin's `.slim/` state directory
+  no longer installs or tests as a skill.
+- `/ad-drift` now reads every repeated `Amends` and `Amended by` field on an ADR,
+  avoiding false unpaired-relation findings when one decision amends multiple
+  records.
+- `/ad-spike` hands staging and DCO-signed commits to `/ad-commit`; host-specific
+  subagent summaries, inline documentation references, and authoring metadata no
+  longer advertise the wrong host or bypass the kit's commit discipline.
+
 ## [0.20.0-beta.10] - 2026-09-02
 
 ### Changed

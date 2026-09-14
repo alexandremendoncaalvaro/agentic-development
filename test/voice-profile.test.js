@@ -109,6 +109,191 @@ test('voice profile validate: accepts the smallest confirmed derived-only profil
   }
 });
 
+test('voice profile validate: accepts conversation and publication languages', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-languages-'));
+  try {
+    const profile = join(dir, 'profile.md');
+    writeFileSync(
+      profile,
+      `# Personal voice profile
+
+## Profile data
+
+\`\`\`json
+{
+  "schemaVersion": 1,
+  "owner": "self",
+  "status": "confirmed",
+  "retention": "derived-only",
+  "rawSamplesRetained": false,
+  "languages": {
+    "conversation": "pt-BR",
+    "publication": "en"
+  },
+  "patterns": [],
+  "examples": [],
+  "limitations": []
+}
+\`\`\`
+`
+    );
+
+    const output = JSON.parse(run(['validate', '--profile', profile], { cwd: dir }));
+    assert.equal(output.valid, true);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('voice profile validate: rejects malformed language tags', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-language-tags-'));
+  try {
+    const profile = join(dir, 'profile.md');
+    writeFileSync(
+      profile,
+      `# Personal voice profile
+
+## Profile data
+
+\`\`\`json
+{
+  "schemaVersion": 1,
+  "owner": "self",
+  "status": "confirmed",
+  "retention": "derived-only",
+  "rawSamplesRetained": false,
+  "languages": {
+    "conversation": "not_a_tag",
+    "publication": "en"
+  },
+  "patterns": [],
+  "examples": [],
+  "limitations": []
+}
+\`\`\`
+`
+    );
+
+    const result = runResult(['validate', '--profile', profile], { cwd: dir });
+    assert.equal(result.status, 1);
+    const output = JSON.parse(result.stdout);
+    assert.ok(output.errors.includes('languages.conversation must be a valid BCP 47 tag'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('voice profile validate: rejects partial language preferences', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-partial-languages-'));
+  try {
+    const profile = join(dir, 'profile.md');
+    writeFileSync(
+      profile,
+      `# Personal voice profile
+
+## Profile data
+
+\`\`\`json
+{
+  "schemaVersion": 1,
+  "owner": "self",
+  "status": "confirmed",
+  "retention": "derived-only",
+  "rawSamplesRetained": false,
+  "languages": {
+    "conversation": "pt-BR"
+  },
+  "patterns": [],
+  "examples": [],
+  "limitations": []
+}
+\`\`\`
+`
+    );
+
+    const result = runResult(['validate', '--profile', profile], { cwd: dir });
+    assert.equal(result.status, 1);
+    const output = JSON.parse(result.stdout);
+    assert.ok(output.errors.includes('languages.publication is required'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('voice profile validate: rejects unknown language preferences', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-unknown-language-'));
+  try {
+    const profile = join(dir, 'profile.md');
+    writeFileSync(
+      profile,
+      `# Personal voice profile
+
+## Profile data
+
+\`\`\`json
+{
+  "schemaVersion": 1,
+  "owner": "self",
+  "status": "confirmed",
+  "retention": "derived-only",
+  "rawSamplesRetained": false,
+  "languages": {
+    "conversation": "pt-BR",
+    "publication": "en",
+    "review": "pt-BR"
+  },
+  "patterns": [],
+  "examples": [],
+  "limitations": []
+}
+\`\`\`
+`
+    );
+
+    const result = runResult(['validate', '--profile', profile], { cwd: dir });
+    assert.equal(result.status, 1);
+    const output = JSON.parse(result.stdout);
+    assert.ok(output.errors.includes('languages.review is unsupported'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('voice profile validate: rejects a non-object language preference value', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-language-shape-'));
+  try {
+    const profile = join(dir, 'profile.md');
+    writeFileSync(
+      profile,
+      `# Personal voice profile
+
+## Profile data
+
+\`\`\`json
+{
+  "schemaVersion": 1,
+  "owner": "self",
+  "status": "confirmed",
+  "retention": "derived-only",
+  "rawSamplesRetained": false,
+  "languages": "pt-BR",
+  "patterns": [],
+  "examples": [],
+  "limitations": []
+}
+\`\`\`
+`
+    );
+
+    const result = runResult(['validate', '--profile', profile], { cwd: dir });
+    assert.equal(result.status, 1);
+    const output = JSON.parse(result.stdout);
+    assert.ok(output.errors.includes('languages must be an object'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('voice profile validate: rejects unapproved patterns and retained examples', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-approval-'));
   try {
@@ -503,6 +688,46 @@ test('voice profile references remain byte-identical across hosts and consumers'
     const expected = readFileSync(paths[0]);
     for (const path of paths.slice(1)) {
       assert.ok(expected.equals(readFileSync(path)), `${path} diverged from ${paths[0]}`);
+    }
+  }
+});
+
+test('language preferences drive conversation, preview, and publication across the workflow', () => {
+  const root = join(__dirname, '..');
+  const workflow = readFileSync(join(root, 'WORKFLOW.md'), 'utf8');
+  assert.match(workflow, /languages\.conversation[\s\S]*direct.*conversation/is);
+  assert.match(workflow, /languages\.publication[\s\S]*outward/is);
+
+  for (const agent of ['claude-code', 'codex']) {
+    const skillRoot = join(root, 'src', 'skills', agent);
+    const voice = readFileSync(join(skillRoot, 'ad-voice', 'SKILL.md'), 'utf8');
+    const tune = readFileSync(join(skillRoot, 'ad-voice-tune', 'SKILL.md'), 'utf8');
+    const publish = readFileSync(join(skillRoot, 'ad-publish', 'SKILL.md'), 'utf8');
+    const report = readFileSync(join(skillRoot, 'ad-report', 'SKILL.md'), 'utf8');
+    const contract = readFileSync(
+      join(skillRoot, 'ad-voice', 'references', 'profile-contract.md'),
+      'utf8'
+    );
+
+    assert.match(contract, /"languages"[\s\S]*"conversation"[\s\S]*"publication"/i);
+    assert.match(tune, /language preferences[\s\S]*one reviewable delta/is);
+    assert.match(
+      voice,
+      /complete the naturalization[\s\S]*before returning the\s+conversation-language draft/is
+    );
+    for (const caller of [publish, report]) {
+      assert.match(
+        caller,
+        /ad-voice[\s\S]{0,80}owns the two-stage language\s+approval flow/i
+      );
+      assert.match(caller, /do not adapt[\s\S]*before[\s\S]*ad-voice/is);
+    }
+    for (const body of [voice, publish, report]) {
+      assert.match(body, /conversation language[\s\S]*approval/is);
+      assert.match(body, /publication language[\s\S]*outward/is);
+      assert.match(body, /explicit.*language.*request[\s\S]*override/is);
+      assert.match(body, /meaning[\s-]*preservation/is);
+      assert.match(body, /exact final[\s\S]*approval/is);
     }
   }
 });

@@ -1,7 +1,6 @@
 ---
 name: ad-review
-description: |
-  Run this skill when the user explicitly invokes `/ad-review` or names it ("run ad-review", "use the ad-review skill"), or when the user asks for a code review with an explicit scope ("review this branch", "review main..HEAD", "revisa esse diff <range>"). Auto-trigger note: `allow_implicit_invocation: true` is set so review-language can fire the skill, but this also means broad review-adjacent conversation may auto-invoke a multi-step file-writing workflow. If a request is ambiguous, ask the user to confirm scope before invoking.
+description: Two-axis fresh-context code review (Standards against AGENTS.md and ADRs; Spec against the originating task) run on Codex as one inline pass with an audit trail, findings side by side, never an approve verdict. Use before merging a diff, branch, or PR; "review this", "review main..HEAD", "senior review".
 summary: Two-axis code review per WORKFLOW §10. Claude Code uses fresh-context subagents; Codex writes an audit trail, reviews inline by default, and ships a reviewer subagent for explicit escalation.
 ---
 
@@ -210,6 +209,8 @@ Do not silently spawn the agent yourself. The user must explicitly request the e
 - Address Spec Blockers next — implementation-vs-spec drift is the second hard gate.
 - Each Concern (from either axis) becomes a follow-up `ad-task`; do not let them silently accumulate.
 - Notes are informational; close them out in the original task's `Notes` log if relevant.
+- If the review exposes uncertainty about the intended value: `/ad-question-me` before acting on findings.
 - If the Spec axis was skipped, decide whether an `ad-spec` is overdue — work without a spec means future reviews are Standards-only.
 - For maximum §10 fidelity on Codex, escalate to a user-spawned reviewer subagent against the persisted audit-trail file.
-- Once both axes are clear: merge per project conventions.
+- For team-bound work that needs exhaustive rules coverage: `/ad-audit`.
+- Once both axes are clear: `/ad-commit` to land the change; `/ad-merge` after its PR is ready.

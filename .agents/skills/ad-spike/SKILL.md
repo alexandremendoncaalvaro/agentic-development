@@ -1,6 +1,6 @@
 ---
 name: ad-spike
-description: Scaffold a staged spike with golden fixtures per WORKFLOW.md §14, for cases where the spec is clear but the technique is uncertain across multiple plausible approaches. Four stages — discovery, golden fixture, pipeline with gates, two-layer evaluation. Use when the unknown is *how*, not *what*. Triggers on "spike", "uncertain technique", "which library", "CV pipeline", "evaluate approaches", "ground truth", "golden fixture", "staged pipeline", "debug per stage". Routes to `ad-ground` if the *how* is routine and a single happy path is obvious.
+description: Scaffold a staged spike with golden fixtures when the spec is clear but the technique is uncertain — discovery, fixture, gated pipeline with per-stage debug artifacts, two-layer evaluation. Use on "spike", "which library", "evaluate approaches", "golden fixture", "uncertain technique".
 summary: Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.
 ---
 
@@ -59,6 +59,8 @@ Per-stage layer is what makes the spike actionable.
 Step 5 — conclude (promote or delete). When the spike concludes:
 - Record outcome via `/ad-adr` (ADR is the persistent artifact).
 - Delete the spike directory: `rm -rf spikes/NNNN-<slug>/`.
+- Route the ADR plus deletion to `/ad-commit`; that skill owns staging, the
+  Conventional Commit message, and DCO sign-off. Do not commit directly here.
 
 ADR captures: which technique picked, alternatives held in reserve, end-to-end pass rate, failures and root causes, mitigation. Inconclusive spikes get ADRs too — preserves framing, prevents re-litigation.
 </instructions>
@@ -69,6 +71,8 @@ A spike directory at `spikes/NNNN-<short-slug>/` with the four-stage layout (dis
 
 ## Next
 
+- `/ad-prism` when the validated technique must now be evaluated against a
+  product or system decision.
 - After Step 1: proceed to Step 2, or abort if discovery surfaced a single happy path (route to `ad-ground`).
 - After Step 4: `/ad-adr` to record the outcome, then delete the spike directory.
 - If spike succeeds and production work follows: `/ad-task` for work units (Spec ref the original spec; cite the ADR in task Notes).

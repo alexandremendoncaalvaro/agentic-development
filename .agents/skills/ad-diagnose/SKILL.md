@@ -1,6 +1,6 @@
 ---
 name: ad-diagnose
-description: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop, reproduce, hypothesise (3-5 ranked falsifiable), instrument, fix + regression-test. The feedback loop is the skill; everything else is mechanical. Triggers on "diagnose this", "debug this", "this is broken", "this is throwing", "performance regression", "find the bug", "build a repro", "feedback loop", "ranked hypotheses", "falsifiable", "/ad-diagnose". Routes to `ad-spike` when the technique is uncertain across approaches, `ad-grill-me` when the spec is unclear, `ad-tdg` when the bug is a clean ground-truth-pair regression.
+description: Disciplined diagnosis for hard bugs and performance regressions — build a feedback loop, reproduce, rank 3-5 falsifiable hypotheses, instrument, fix with a regression test. Use on "this is broken", "debug this", "find the bug", "performance regression", "build a repro".
 summary: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.
 ---
 
@@ -84,7 +84,7 @@ A correct seam is one where the test exercises the real bug pattern as it occurs
 
 If no correct seam exists, that itself is the finding.
 
-To pick the right routing branch below, run from the consumer repo root: `node .agents/skills/ad-diagnose/scripts/project-signals.mjs AGENTS.md`. Use `mode` and `stacks` only to choose relevant repo evidence and test infrastructure. Surface every `unreadable[]` entry as a diagnosis constraint rather than silently assuming the file is absent.
+To pick the right routing branch below, run from the consumer repo root: `node .agents/skills/ad-diagnose/scripts/project-signals.mjs AGENTS.md`. Use `mode` and `stacks` only to choose relevant repo evidence and test infrastructure. Surface every `unreadable[]` entry as a diagnosis constraint rather than silently assuming the file is absent. If this skill loaded from a different base directory (stated at the top of the skill load), substitute it — the script lives at `scripts/project-signals.mjs` inside it.
 
 - If the missing seam exposes load-bearing design friction: hand off to `ad-deepen` (ADR-0020) with the specifics — the "test surface impact" line in the candidate template was made for this case.
 - If the code is a one-off with no callers: capture the seam gap in the commit message body and the task `Notes` log; do not force an architectural refactor.

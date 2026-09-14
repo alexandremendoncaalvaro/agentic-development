@@ -2,6 +2,7 @@
 name: ad-template-tune
 description: Curate durable publication and report templates behind explicit source-read and write approvals. Use only when the user invokes /ad-template-tune, asks to create or improve a publication/report template, or explicitly asks to learn reusable structure from authorized examples. Separates owner, community, external, and official provenance; stores derived rules rather than raw sources; proposes one delta at a time; and writes only the exact approved candidate. Distinct from ad-publish and ad-report, which apply templates read-only.
 summary: Curate publication and report templates from authorized evidence. Keeps author classes separate and writes one explicitly approved, validated delta at a time.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch
 ---
 
@@ -11,12 +12,12 @@ Create or refine one durable publication or report template. This is the only
 runtime writer to the shared template stores. `ad-publish` and `ad-report` remain
 read-only consumers.
 
-<prime-directive>
+## Prime directive
+
 HARD human gates: never read a private source before the user approves its exact
 scope, never retain an exact excerpt without separate approval, and never write a
 template before the user approves the exact candidate digest. Handle one template
 delta per invocation. Ordinary drafting never trains or tunes the store.
-</prime-directive>
 
 ## Step 1: Establish the curation boundary
 
@@ -121,3 +122,14 @@ Run `validate` on the returned path, then rerun `resolve` and confirm the expect
 layer and shadowing. Delete temporary source, candidate, and approval files even
 after rejection or a failed write when cleanup is possible. Stop after this one
 accepted or rejected delta.
+
+## Output contract
+
+- One reviewable template delta with provenance, scope, limits, and target layer.
+- No store mutation before approval bound to the exact candidate digest.
+- One verified atomic write, or an unchanged store after rejection or failure.
+
+## Next
+
+- Use `/ad-publish` or `/ad-report` to apply an approved template.
+- Run another `/ad-template-tune` invocation for any further template change.

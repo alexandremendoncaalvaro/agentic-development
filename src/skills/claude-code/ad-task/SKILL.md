@@ -1,6 +1,6 @@
 ---
 name: ad-task
-description: Draft a new task tracking file at doc/tasks/NNNN-<short-slug>.md, using a checkbox-toggle + append-only-Notes format optimized for LLM editing. Use when the user wants to create, draft, scaffold, or open a task, ticket, work item, or backlog entry tracked in the repo. Status starts at proposed; the file is the source of truth, not a board.
+description: Draft a task file at doc/tasks/NNNN-<slug>.md with checkbox acceptance criteria and an append-only Notes log. Use when work needs a tracked unit; "create a task", "open a ticket", "work item", "backlog entry", "plan this as a task". Status starts proposed.
 summary: Draft a new task at `doc/tasks/NNNN-<slug>.md`.
 allowed-tools: Read, Write, Glob, Bash
 ---
@@ -95,7 +95,7 @@ Task files are decision-record artifacts and are **exempt** from the no-dates ru
 
 ## Next
 
-- Implement. Toggle Acceptance Criteria checkboxes and append to `Notes` as work lands.
+- Run `/ad-ground` before non-trivial implementation, then use `/ad-tdd` when behavior is test-expressible. Toggle Acceptance Criteria checkboxes and append to `Notes` as work lands.
 - `/ad-review main..HEAD` (or current scope) before merge — the task DoD requires a fresh-context §10 review.
 - Flip Status to `done` once every Acceptance Criterion and Definition-of-Done item is checked.
 - If the task implements a spec, the spec's `Related → Tasks` list should reciprocate the link.

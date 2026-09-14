@@ -11,6 +11,10 @@ approval does not imply another approval. The stricter gate wins.
   grades, deviations, and limitations.
 - `ad-research` owns an open question and durable study. Do not convert uncertainty
   into a stronger report conclusion.
+- `ad-prism` owns evaluation design, interpretation, and fit-for-purpose
+  methodology audit. Give it only the decision, proposed claims, and authorized
+  evidence; after it returns settled claims and limits, `ad-report` regains
+  control over editorial hierarchy, rendering, and report verification.
 - `ad-voice` receives settled facts, evidence limits, and structure for every final
   editorial report before rendering. It owns the confirmed personal profile and
   mandatory naturalization pass, preferring an installed `humanizer` and using its

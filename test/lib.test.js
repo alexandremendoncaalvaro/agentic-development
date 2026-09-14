@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { detectAgents, detectMode } from '../src/lib/detect.js';
-import { installSkills } from '../src/lib/install.js';
+import { bundledSkills, installSkills } from '../src/lib/install.js';
 import {
   updateRootDoc,
   rootDocAppendPrompt,
@@ -779,5 +779,21 @@ test('writeExcludeEntries: fail-open outside a git repository — writes nothing
     assert.ok(!existsSync(join(dir, '.git')));
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// task-0065: a plugin dropped `.slim/eval/` inside `src/skills/claude-code/`
+// and the enumerator installed (and tested) it as a skill. A dot-directory is
+// never a skill in either host's layout.
+test('regression: bundledSkills ignores dot-directories in the skill source tree (task-0065)', () => {
+  const kitRoot = mkdtempSync(join(tmpdir(), 'agentic-bundled-'));
+  try {
+    mkdirSync(join(kitRoot, 'src', 'skills', 'claude-code', 'ad-real'), { recursive: true });
+    mkdirSync(join(kitRoot, 'src', 'skills', 'claude-code', '.stray', 'eval'), { recursive: true });
+    writeFileSync(join(kitRoot, 'src', 'skills', 'claude-code', '.stray', 'eval', 'usage.jsonl'), '{}\n');
+
+    assert.deepEqual(bundledSkills('claude-code', { kitRoot }), ['ad-real']);
+  } finally {
+    rmSync(kitRoot, { recursive: true, force: true });
   }
 });

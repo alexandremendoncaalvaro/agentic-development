@@ -1,19 +1,26 @@
 ---
 name: ad-rules
-description: Load the practitioner's global rules — the host's `CLAUDE.md` or `AGENTS.md`, symlinks resolved — and reinforce them by listing their topics in the conversation, alongside whatever the repo and the kit's rule-set layers add. Use when the user says "read my global CLAUDE.md / AGENTS.md and bring the topics", asks what rules or conventions are in force, wants the rules refreshed mid-session, or starts in a repo whose conventions they have not read. Read-only — never edits a rule, never audits, never approves.
-summary: Load the host's global rules file (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, symlinks resolved) and reinforce it by listing topics in the conversation, plus the repo's binding docs and the kit's rule-set layers by reference. Read-only; audits nothing.
+description: Resolve the host's global and project rules for inspection or correction. Use when the user asks which rules apply, says "The Rules", asks to refresh the rules, or corrects workflow discipline. Inventory mode lists topics; correction mode reapplies ad-philosophy, repairs the active plan, and returns a plain-language brief. Read-only.
+summary: Resolve global, repository, and kit rules using two read-only modes. Inventory lists their topics; correction reapplies the existing philosophy commitment, repairs a conflicting active plan, and returns a decision-maker brief.
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
 # /ad-rules
 
-Loads the rules in force and reinforces them by listing their topics in the conversation. Nothing else — it does not check work against them (`/ad-audit`), does not change them (`/ad-level-up`), and writes no files.
+Resolves the rules in force for one of two operations. **Inventory mode** lists their topics. **Correction mode** reapplies the existing `/ad-philosophy` recommitment to the current task, repairs a conflicting plan, and explains the result through `/ad-brief`. It does not check completed work against the rules (`/ad-audit`), change the rules (`/ad-level-up`), or write files.
 
 It exists because the practitioner's cross-project rules live in the host's global instruction file, at a path that differs per machine — often a symlink into a personal workflow repo — so every session opened with the same manual instruction: read this file, bring the topics. Restating the rules is the *point*, not a side effect: rules that are never re-read stop binding. What should not repeat is the path archaeology.
 
 ## Step 0 — Confirm regime
 
-Run when the user asks to load, see, list, or refresh the rules in force, asks what governs the current work, or is starting in a repo whose conventions they have not read yet.
+Run when the user asks to load, see, list, or refresh the rules in force, asks what governs the current work, says "The Rules" or an equivalent rules correction, or is starting in a repo whose conventions they have not read yet.
+
+Classify the request before reporting:
+
+- **Inventory mode:** the user explicitly asks which rules exist, to list the topics, show the sources, or explain what governs the work.
+- **Correction mode:** the user invokes `/ad-rules`, says "The Rules", asks for a rules refresh without requesting an inventory, or points out that the current execution is violating the expected workflow.
+
+When phrasing is ambiguous, prefer correction mode if it refers to the active execution and inventory mode if it asks for information about the rule set.
 
 Route elsewhere when:
 
@@ -72,7 +79,9 @@ Flag two things inline:
 - **Conflicts** — a project rule shadowing a machine-store rule, with both texts quoted.
 - **Staleness signals** — a rule naming a file, flag, or command that no longer exists. Report it; do not fix it. Fixing is `/ad-level-up`'s job and requires the human gate.
 
-## Step 4 — Report
+## Step 4 — Report in inventory mode
+
+When the user asked which rules apply or asked to list their topics, render this inventory and stop:
 
 ```
 ## Rules in force — <repo name>
@@ -100,12 +109,22 @@ Flag two things inline:
 
 Close with one line naming what the user most likely wanted: the single topic most relevant to the work in progress, or the symlink fix when the global file resolved only by search.
 
+## Step 5 — Apply correction mode
+
+For "The Rules", `/ad-rules`, or an equivalent rules correction, do not dump the inventory unless the user also asked for it.
+
+1. Invoke `/ad-philosophy` as the explicit recommitment for the current task and use its task-specific applied-binding statement. Do not copy or paraphrase the eight behaviors here; `/ad-philosophy` remains their owner.
+2. Compare the immediate plan and next action with that applied binding and the resolved rule sources. Correct any conflicting or incompatible plan or next action in the same pass. Name the concrete correction and its source. This is plan correction, not an audit verdict about completed work.
+3. Build a settled correction fact packet with the project, final objective, recent result, corrected current target and rationale, next direction, done condition, blockers, confidence limits, and any genuine owner decision. Pass the settled correction fact packet to `/ad-brief`.
+4. When `/ad-brief` returns, regain control. Name the rule source that caused a material correction, or say that the current plan already conformed, then continue immediately unless the returned brief contains a genuine blocking decision.
+
 ## Output contract
 
 - Writes nothing. Reads only.
 - Every source is reported, including absent ones — absent and empty are distinguishable.
 - The global file's real path is reported, with the symlink it was reached through when there was one.
 - Topics carry their source file; contents are not dumped.
+- Inventory mode answers explicit requests to see which rules or topics exist; correction mode applies the existing `/ad-philosophy` recommitment and returns the corrected plan through `/ad-brief`.
 - Conflicts and staleness are reported, never resolved.
 - The kit's three-layer resolution is referenced (ADR-0035 / ADR-0043 / `CONTEXT.md` / `/ad-audit` Step 1), never re-derived here.
 - When the global file resolves only by search, the `ln -s` command is printed and never run.
@@ -116,3 +135,4 @@ Close with one line naming what the user most likely wanted: the single topic mo
 - Check the work against what surfaced → `/ad-audit`.
 - A rule that is wrong, duplicated, or missing → `/ad-level-up` (human-gated; it never writes unapproved).
 - A rule citing something that no longer exists → `/ad-drift` for the full documentation-vs-code sweep.
+- Need the corrected project context without the rules inventory → `/ad-brief` is the presentation contract correction mode already composes.

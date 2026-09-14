@@ -33,6 +33,12 @@ posting surface, audience, purpose, language, requested action, and hard
 constraints from context. Ask only for an ungroundable value that would materially
 change the result.
 
+Resolve optional language preferences through `ad-voice`. The conversation language
+controls direct owner communication and the first approval preview. The publication
+language is the default for outward text. An explicit language in the current request
+overrides the corresponding preference for that request only. When no language
+preferences exist, preserve the existing contextual inference.
+
 Supported types are `github-proposal-issue` and `collaboration-reply`. The latter
 covers Slack and Discord threads plus GitHub issue and pull-request comments. For
 another type, identify a generic baseline explicitly and use it only when it will
@@ -83,6 +89,8 @@ only when its public contract owns a necessary step:
 
 - `ad-ground` for a bounded implementation or method gap;
 - `ad-research` for an open question needing a durable study;
+- `ad-prism` when a material evaluation claim is not already backed by a
+  frozen, methodologically audited artifact and settled claim packet;
 - `ad-voice` for the mandatory personal-voice and naturalization pass after facts,
   constraints, and structure are settled;
 - `ad-pr` when the requested outward artifact is a pull request;
@@ -102,6 +110,11 @@ gap instead of guessing. Evidence supports the answer; it is not pasted into the
 publication unless the recipient needs it.
 
 ## Step 4: Draft or review
+
+When the conversation language and publication language differ, draft the complete
+initial publication in the conversation language. Do not adapt it to the publication
+language before passing it through `ad-voice`; `ad-voice` owns the two-stage language
+approval flow, including the first preview, contextual adaptation, and final approval.
 
 Apply the template's required information, ordering rules, instructions, and
 load-bearing strengths. Use the smallest useful set of authorized examples. Omit
@@ -137,6 +150,12 @@ available. Its public contract owns both the confirmed profile and the bundled
 naturalization fallback.
 
 ## Step 5: Verify privately
+
+After `ad-voice` returns the publication-language adaptation, independently run a
+meaning-preservation check against the approved conversation-language draft. List
+every changed, omitted, or added claim in the conversation language, then return the
+exact final publication-language text for approval. No outward action may use a
+merely summarized or silently revised draft.
 
 Read [references/evaluation.md](references/evaluation.md). Check the source-role
 and invariant ledgers, then assign every applicable template rule and exemplar strength one

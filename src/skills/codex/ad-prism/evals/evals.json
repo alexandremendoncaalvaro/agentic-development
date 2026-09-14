@@ -1,0 +1,96 @@
+{
+  "cases": [
+    {
+      "id": "software-rollout-design",
+      "domain": "software delivery",
+      "prompt": "We changed checkout request routing. Design the smallest evaluation that can decide whether a guarded rollout is justified without hiding completion-rate risk.",
+      "expected_route": "ad-prism",
+      "expected_outcomes": [
+        "states the rollout decision before metrics",
+        "connects the latency claim to replay and staging evidence",
+        "keeps purchase completion as a guardrail",
+        "defines a prespecified proceed or stop rule",
+        "limits the claim to the tested traffic mix"
+      ]
+    },
+    {
+      "id": "document-extraction-comparison",
+      "domain": "document processing",
+      "prompt": "Design an evaluation comparing two invoice-extraction configurations across different layouts. We need to know whether one is ready for limited use, not just which has the higher average score.",
+      "expected_route": "ad-prism",
+      "expected_outcomes": [
+        "identifies documents rather than fields as the independent unit",
+        "separates exploratory from confirmatory claims",
+        "requires representative layout coverage",
+        "defines accuracy and operational guardrails",
+        "does not invent a sample size or margin"
+      ]
+    },
+    {
+      "id": "support-workflow-interpretation",
+      "domain": "service operations",
+      "prompt": "A pilot changed how support cases are triaged. Interpret the agent ratings and routing telemetry, explain what they can establish, and recommend the next evidence gate.",
+      "expected_route": "ad-prism",
+      "expected_outcomes": [
+        "separates subjective experience from runtime evidence",
+        "reconstructs the operational decision",
+        "keeps repeated ratings grouped by independent unit",
+        "states material access or attribution gaps",
+        "names what the pilot cannot generalize"
+      ]
+    },
+    {
+      "id": "material-claim-audit",
+      "domain": "public policy",
+      "prompt": "Audit this evaluation report before we publish its claim that a new intake form improved completion. Freeze the settled package and give separate verification and fit-for-purpose verdicts.",
+      "expected_route": "ad-prism",
+      "expected_outcomes": [
+        "uses the material-evaluation assurance route",
+        "freezes candidate and final artifacts",
+        "verifies skeptical findings before correction",
+        "emits separate verification and fit-for-purpose verdicts",
+        "hands only settled claims and limits to publishing"
+      ]
+    },
+    {
+      "id": "open-adoption-question",
+      "domain": "software architecture",
+      "prompt": "Should this project adopt a vector database or keep the current relational search? Research the state of the art and reach an evidence-graded conclusion.",
+      "expected_route": "ad-research",
+      "expected_outcomes": [
+        "treats the output as an open-question study",
+        "does not invent an evaluation program before the adoption question is answered"
+      ]
+    },
+    {
+      "id": "uncertain-ocr-technique",
+      "domain": "document processing",
+      "prompt": "Two OCR libraries might parse our handwritten fixtures, but documentation does not settle which technique works. Build a staged golden-fixture experiment to choose one.",
+      "expected_route": "ad-spike",
+      "expected_outcomes": [
+        "routes technique uncertainty to a spike",
+        "uses per-stage debug artifacts rather than a product evaluation"
+      ]
+    },
+    {
+      "id": "repository-rule-conformance",
+      "domain": "software delivery",
+      "prompt": "Audit this branch exhaustively against AGENTS.md, GUIDELINES.md, and the accepted ADRs, with a verdict for every rule.",
+      "expected_route": "ad-audit",
+      "expected_outcomes": [
+        "routes repository-rule conformance to ad-audit",
+        "does not substitute a methodology audit"
+      ]
+    },
+    {
+      "id": "ordinary-unit-test",
+      "domain": "software implementation",
+      "prompt": "Write a unit test that proves parseCurrency rejects malformed decimal input, then implement the smallest fix.",
+      "expected_route": "ordinary-tests",
+      "expected_outcomes": [
+        "uses the ordinary TDD path",
+        "does not create an evaluation brief or audit receipt"
+      ]
+    }
+  ]
+}

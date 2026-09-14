@@ -1,5 +1,5 @@
 interface:
   display_name: ad-roadmap
-  short_description: Read-only completion rollup — reconciles the product roadmap against implementing specs and tasks into an overall percentage plus a per-tier done / in progress / blocked / remaining breakdown, for a decision-maker.
+  short_description: Reconcile project or task progress, compose the canonical decision-maker brief, then append a nested checklist with evidence-backed completion and blockers.
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: ad-brief
+  short_description: Decision-maker briefing from live state or settled facts
+  default_prompt: Use $ad-brief to explain the current project and session state in plain language for a decision-maker who just arrived.
+policy:
+  allow_implicit_invocation: true

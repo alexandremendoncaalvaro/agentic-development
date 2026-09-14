@@ -1,6 +1,6 @@
 ---
 name: ad-commit
-description: Atomic Conventional Commits with DCO `Signed-off-by` sign-off. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Stage-split is interactive; identity comes from `git config user.name` / `user.email`. No `Co-Authored-By`. Helper posture, not blocker. Triggers on "commit this", "stage and commit", "atomic commit", "Conventional Commit", "sign off", "DCO", "split this commit", "/ad-commit".
+description: Land the current work as atomic Conventional Commits with a DCO Signed-off-by trailer — scope intake, stage-split when concerns mix, message draft, sign and write. Use when a verified change is ready to land or on "commit this", "stage and commit", "split this commit", "sign off". Never bypasses hooks.
 summary: Atomic Conventional Commits with DCO `Signed-off-by` sign-off. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.
 allowed-tools: Read, Bash
 ---
@@ -14,7 +14,7 @@ Implements ADR-0023. Drafts atomic Conventional Commits with DCO `Signed-off-by`
 - **DCO `Signed-off-by` on every commit — never a `Co-Authored-By` trailer** (ADR-0023 §Decision 1: DCO only).
 - **Never bypass the hooks** — no `--no-verify`, no `--no-gpg-sign`. A failing hook stops the commit; fix the cause, don't skip it.
 
-## Step 0 — Confirm regime
+## Phase 0 — Confirm regime
 
 Run when the user wants to land changes as commits and at least one holds:
 

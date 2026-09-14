@@ -2,6 +2,7 @@
 name: ad-skill
 description: Draft a new Claude Code or Codex skill at .claude/skills/<name>/SKILL.md (or .agents/skills/<name>/SKILL.md for Codex), using the Anthropic Skills format. Use when the user wants to create, write, draft, or scaffold a custom skill for an agentic coding tool. Asks one question per missing field; never invents skill names or triggers.
 summary: Draft a new Claude Code or Codex skill at the appropriate path.
+disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Bash
 ---
 
@@ -22,7 +23,15 @@ Ask the user:
 Ask one question per missing field, in this order:
 
 * **What it does** — one sentence, primary triggering signal.
-* **When to invoke** — common task framings the user would say. Combined `description` + `when_to_use` is capped at 1,536 chars per the Anthropic spec.
+* **When to invoke** — common task framings the user would say. Put what the
+  skill does and when to use it in `description`; its specification maximum is
+  1,024 characters. Claude Code alone also supports `when_to_use`, and cuts the
+  combined discovery text at 1,536 characters in its Claude Code listing; this
+  is not the cross-host specification limit.
+* **Invocation class** — user-invocable for outward-facing, irreversible, or
+  setup verbs; model-invocable for posture and reversible pipeline stages. Apply
+  the host flags below from that classification instead of asking the user when
+  the blast radius makes the answer clear.
 * **Tools needed** — `Read, Write, Glob, Grep, Bash, Task, ...` Restrict to what the skill actually uses; an audit skill with `Write` access stops being read-only.
 * **Body shape** — instructions, optional template, output contract. Keep ≤500 lines; move long material to sibling files (`reference.md`, `examples.md`, `scripts/`).
 
@@ -38,8 +47,15 @@ Path:
 
 Frontmatter shape per agent:
 
-* **Claude Code:** `name`, `description`, `allowed-tools` (and any other field from the spec the user asked for).
-* **Codex:** minimal frontmatter — `name`, `description`. Body uses XML tags (`<background_information>`, `<instructions>`, `<template>`, `<output_contract>`). The `agents/openai.yaml` carries `interface.display_name`, `interface.short_description`, `policy.allow_implicit_invocation`.
+* **Claude Code:** `name`, `description`, `allowed-tools` (and any other field
+  from the spec the user asked for). Add `disable-model-invocation: true` only
+  for the user-invocable class; omit it for model-invocable skills.
+* **Codex:** minimal frontmatter — `name`, `description`. Body uses XML tags
+  (`<background_information>`, `<instructions>`, `<template>`,
+  `<output_contract>`). The `agents/openai.yaml` carries
+  `interface.display_name`, `interface.short_description`, and
+  `policy.allow_implicit_invocation`: `false` for user-invocable skills and
+  `true` for model-invocable skills.
 
 Body: imperative instructions ("do X", not "this skill does X"). Every line is recurring token cost once the skill loads — be terse. Don't restate AGENTS.md.
 

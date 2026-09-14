@@ -1,7 +1,7 @@
 ---
 name: ad-subagent
 description: Draft a new Codex custom subagent at .codex/agents/<name>.toml, using the official Codex subagents format. Use when the user wants to create, write, draft, or scaffold a custom Codex subagent for delegated work (fresh-context reviewer, codebase explorer, docs researcher, test designer, bug reproducer, bounded implementation worker). Asks one question per missing field; never invents roles or tool sets.
-summary: Draft a host-specific custom subagent for bounded delegated work — Claude Code `.claude/agents/<name>.md`, Codex `.codex/agents/<name>.toml`.
+summary: Draft a Codex custom subagent for bounded delegated work at `.codex/agents/<name>.toml`.
 ---
 
 <background_information>

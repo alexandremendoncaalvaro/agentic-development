@@ -53,6 +53,42 @@ read-only consumers
 [`src/skills/codex/ad-report/`](src/skills/codex/ad-report/). Governed by
 [`doc/adr/0071-layer-publication-templates.md`](doc/adr/0071-layer-publication-templates.md).
 
+### Evaluation domain adapter
+
+**Definition:** the optional project-local Markdown contract at
+`.agentic/prism/domain.md` that supplies recurring product scope, decision
+owners, evidence surfaces, constraints, measures, guardrails, vocabulary, and
+rollout controls to the otherwise domain-agnostic `ad-prism` method. Its absence
+is valid; live inspected evidence outranks its defaults.
+
+_Avoid_: "company profile" (the adapter is project-scoped and contains no
+secrets, personal data, or broad organizational handbook); "Prism config"
+(suggests mandatory machine configuration rather than optional evaluation
+context); "source store" (it records locators and provenance, not source bodies).
+
+**Related code:**
+[`src/skills/codex/ad-prism/references/domain-adapter.md`](src/skills/codex/ad-prism/references/domain-adapter.md)
+and its Claude Code twin; governed by
+[`doc/adr/0077-adopt-generic-prism-evaluations.md`](doc/adr/0077-adopt-generic-prism-evaluations.md).
+
+### Material evaluation
+
+**Definition:** an evaluation whose result will support a rollout, a
+consequential or hard-to-reverse decision, a durable analytical artifact, or a
+public material claim. It requires a settled artifact receipt and methodology
+audit before its claims enter reporting or publication; ordinary tests and
+routine collaboration replies do not.
+
+_Avoid_: "important test" (does not express the decision and publication
+consequences); "published evaluation" (materiality applies before publication);
+"validated result" (collapses technical verification and fit-for-purpose
+validation into one ambiguous verdict).
+
+**Related code:**
+[`src/skills/codex/ad-prism/references/assurance.md`](src/skills/codex/ad-prism/references/assurance.md)
+and its Claude Code twin; governed by
+[`doc/adr/0077-adopt-generic-prism-evaluations.md`](doc/adr/0077-adopt-generic-prism-evaluations.md).
+
 ### Collaboration reply
 
 **Definition:** a compact publication inside an active Slack, Discord, GitHub
@@ -124,7 +160,7 @@ _Avoid_: "clean-context review" (non-standard); "independent review" (ambiguous 
 - **Standards axis** — does the diff conform to AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs? Bugs, coupling, edge cases, vocabulary drift.
 - **Spec axis** — does the diff match what the originating task / spec / PRD asked for? Missing requirements, scope creep, wrong implementation against quoted spec line.
 
-On Claude Code, the two axes run as parallel `Task` sub-agent calls with axis-bounded handoffs. On Codex, they run as a single-session pass with axis-separated output (Codex skills cannot programmatically spawn sub-agents — see ADR-0007 Addendum 2026-05-24). Each axis ends with its own verdict; no cross-axis re-ranking; no synthesized "approve".
+On Claude Code, the two axes run as parallel `Task` subagent calls with axis-bounded handoffs. On Codex, they run as a single-session pass with axis-separated output (Codex skills cannot programmatically spawn sub-agents — see ADR-0007 Addendum 2026-05-24). Each axis ends with its own verdict; no cross-axis re-ranking; no synthesized "approve".
 
 _Avoid_: "dual review" (ambiguous — could mean two reviewers of the same axis); "Standards/Spec split" (clumsy as a noun phrase); "split review" (unclear what's split).
 
