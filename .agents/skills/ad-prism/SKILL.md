@@ -22,13 +22,16 @@ to select a route when the request establishes it.
 
 Start from the decision the evaluation must support. State the objective,
 evaluation question, claim, required evidence, evidence-producing task, measure,
-data source, decision rule, and next gate. Choose the smallest assurance level
-that can safely support that decision. Separate technical verification from
-fit-for-purpose validation and evidence strength from confidence to proceed.
+data source, decision rule, and disposition. Select the evaluation setting,
+claim type, study design, evidence source, and assurance rigor independently for
+that decision. Separate technical verification from fit-for-purpose validation
+and evidence strength from confidence to proceed.
 Read [methodology.md](references/methodology.md) when designing, explaining,
 refining, interpreting, or auditing an evaluation. Use
 [evaluation-brief.md](assets/evaluation-brief.md) when a durable plan is needed,
 then run `node <skill-dir>/scripts/validate-plan.mjs <evaluation-plan.md>`.
+Read [skill-comparison.md](references/skill-comparison.md) when you compare
+evaluation skills or decide whether one can replace another.
 
 Read the optional project domain adapter at `.agentic/prism/domain.md` when it
 exists. Its absence is valid and not an error: continue with the generic method
@@ -45,9 +48,13 @@ evaluation establishes more than its evidence supports.
 
 Read [sources.md](references/sources.md) whenever making a methodological
 recommendation. Cite one to three essential sources beside the claims they
-support and explain each contribution. Do not transfer sample sizes, thresholds,
-margins, rubrics, or power claims from another study without a justified mapping
-to the current decision and population.
+support and explain each contribution. In a durable evaluation plan, record the
+method or framework, source locator, supported choice or claim, contribution,
+adaptation to the current context, and retained limit. The validator checks that
+this map is complete; it does not establish that a source is true or applicable.
+Do not transfer sample sizes, thresholds, margins, rubrics, or power claims from
+another study without a justified mapping to the current decision and
+population.
 
 For a material evaluation, read
 [assurance.md](references/assurance.md) and use

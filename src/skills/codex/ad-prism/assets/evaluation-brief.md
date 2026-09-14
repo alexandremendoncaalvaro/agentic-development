@@ -42,4 +42,11 @@
 
 ## Sources
 
-<essential methodological and domain sources>
+Repeat this record for each load-bearing methodological choice:
+
+### M1 — <method or framework>
+- Source: <URL or stable locator>
+- Supports: <methodological choice or claim>
+- Contribution: <what this source adds>
+- Adaptation: <how it maps to this context>
+- Retained limit: <what the source or adaptation does not establish>

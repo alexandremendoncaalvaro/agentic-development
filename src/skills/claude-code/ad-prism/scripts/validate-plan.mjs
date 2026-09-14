@@ -38,6 +38,13 @@ const ANGLE_PLACEHOLDER_WORDS = new Set([
   'task',
   'verdict',
 ]);
+const METHOD_SOURCE_FIELDS = [
+  'Source',
+  'Supports',
+  'Contribution',
+  'Adaptation',
+  'Retained limit',
+];
 
 function hasPlaceholder(line) {
   if (TEXT_PLACEHOLDER.test(line)) return true;
@@ -77,6 +84,39 @@ function parseSections(text) {
   };
 }
 
+function validateMethodSources(sourceText) {
+  const headings = [...sourceText.matchAll(/^###\s+(M\d+)\s+(?:—|-|:)\s+.+?\s*$/gim)];
+  if (headings.length === 0) {
+    return {
+      errors: ['Sources must contain at least one method record (### M1 — <method>)'],
+      ids: [],
+    };
+  }
+
+  const errors = [];
+  const ids = [];
+  const seenIds = new Set();
+  for (const [index, heading] of headings.entries()) {
+    const id = heading[1].toLocaleUpperCase('en-US');
+    const start = heading.index + heading[0].length;
+    const end = headings[index + 1]?.index ?? sourceText.length;
+    const body = sourceText.slice(start, end);
+    const missing = METHOD_SOURCE_FIELDS.filter((field) =>
+      !new RegExp(`^-\\s+${field.replace(' ', '\\s+')}\\s*:\\s*\\S`, 'im').test(body)
+    );
+    ids.push(id);
+    if (seenIds.has(id)) {
+      errors.push(`Duplicate method source identifier: ${id}`);
+    }
+    seenIds.add(id);
+    if (missing.length > 0) {
+      errors.push(`Method source ${id} is missing: ${missing.join(', ')}`);
+    }
+  }
+
+  return { errors, ids };
+}
+
 export function validatePlan(path) {
   const resolvedPath = resolve(path);
   let text;
@@ -91,6 +131,7 @@ export function validatePlan(path) {
       warnings: [],
       missing_sections: [...REQUIRED_SECTIONS],
       duplicate_sections: [],
+      method_sources: [],
       present_sections: [],
     };
   }
@@ -110,6 +151,11 @@ export function validatePlan(path) {
     }
   }
 
+  const methodSources = sections.has('sources')
+    ? validateMethodSources(sections.get('sources'))
+    : { errors: [], ids: [] };
+  errors.push(...methodSources.errors);
+
   for (const [index, line] of structuralText.split(/\r?\n/).entries()) {
     if (hasPlaceholder(line)) {
       errors.push(`Unresolved placeholder at line ${index + 1}`);
@@ -123,6 +169,7 @@ export function validatePlan(path) {
     warnings: /^#\s+\S/m.test(structuralText) ? [] : ['Plan has no level-one title'],
     missing_sections: missing,
     duplicate_sections: duplicates,
+    method_sources: methodSources.ids,
     present_sections: REQUIRED_SECTIONS.filter((section) =>
       sections.has(section.toLocaleLowerCase('en-US'))
     ),

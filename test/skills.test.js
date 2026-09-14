@@ -287,7 +287,6 @@ test('ad-prism separates portable evaluation method from optional project contex
       methodology,
       /decision[\s\S]*objective[\s\S]*evaluation question[\s\S]*claim[\s\S]*evidence[\s\S]*task[\s\S]*measure[\s\S]*data source[\s\S]*decision rule[\s\S]*next gate/i
     );
-    assert.match(methodology, /technical verification[\s\S]*human smoke test[\s\S]*exploratory comparison[\s\S]*confirmatory study[\s\S]*limited field validation/i);
     assert.match(adapter, /absence[\s\S]*(?:valid|not an error)/i);
     assert.match(adapter, /live inspected evidence[\s\S]*(?:precedence|outranks)/i);
     assert.match(adapter, /no secrets[\s\S]*no personal data/i);
@@ -305,6 +304,127 @@ test('ad-prism separates portable evaluation method from optional project contex
       'Sources',
     ]) {
       assert.match(brief, new RegExp(`^## ${heading}$`, 'm'), `${agent} brief needs ${heading}`);
+    }
+  }
+});
+
+test('ad-prism keeps evaluation settings independent and bounded to the requested context', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const methodology = readFileSync(join(skillDir, 'references', 'methodology.md'), 'utf8');
+    const cases = JSON.parse(
+      readFileSync(join(skillDir, 'evals', 'evals.json'), 'utf8')
+    ).cases;
+    const localOnly = cases.find((entry) => entry.id === 'bounded-local-bench');
+
+    assert.match(methodology, /setting[\s\S]*claim type[\s\S]*study design[\s\S]*evidence source[\s\S]*assurance rigor/i);
+    assert.match(body, /setting[\s\S]*claim type[\s\S]*study design[\s\S]*evidence source[\s\S]*assurance rigor[\s\S]*independent/i);
+    assert.doesNotMatch(body, /smallest assurance level/i);
+    assert.match(methodology, /not (?:a|required as) (?:maturity )?(?:ladder|sequence)/i);
+    assert.match(methodology, /(?:stop|complete)[\s\S]*requested (?:setting|context)/i);
+    assert.ok(localOnly, `${agent} needs a bounded local-only behavior case`);
+    assert.equal(localOnly.expected_route, 'ad-prism');
+    assert.ok(
+      localOnly.expected_outcomes.some((outcome) =>
+        /does not (?:add|require|recommend)[\s\S]*(?:staging|pilot|production|A\/B)/i.test(outcome)
+      ),
+      `${agent} local-only case must reject an unnecessary environment sequence`
+    );
+  }
+});
+
+test('ad-prism separates contextual methodology judgment from deterministic gates', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const methodology = readFileSync(
+      join(SKILLS_ROOT, agent, 'ad-prism', 'references', 'methodology.md'),
+      'utf8'
+    );
+
+    assert.match(methodology, /model[\s\S]*method fit[\s\S]*source applicability[\s\S]*fit-for-purpose/i);
+    assert.match(methodology, /deterministic[\s\S]*structure[\s\S]*provenance[\s\S]*arithmetic[\s\S]*artifact integrity/i);
+    assert.match(methodology, /(?:script|validator)[\s\S]*does not[\s\S]*methodological validity/i);
+  }
+});
+
+test('ad-prism does not infer assurance rigor from the evidence environment', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const cases = JSON.parse(
+      readFileSync(join(SKILLS_ROOT, agent, 'ad-prism', 'evals', 'evals.json'), 'utf8')
+    ).cases;
+    const environmentCase = cases.find((entry) => entry.id === 'production-observation-is-not-confirmation');
+
+    assert.ok(environmentCase, `${agent} needs an environment-versus-rigor behavior case`);
+    assert.equal(environmentCase.expected_route, 'ad-prism');
+    assert.ok(
+      environmentCase.expected_outcomes.some((outcome) =>
+        /production[\s\S]*(?:does not|cannot)[\s\S]*(?:confirmatory|causal)/i.test(outcome)
+      ),
+      `${agent} must keep a production setting from inflating the claim`
+    );
+    assert.ok(
+      environmentCase.expected_outcomes.some((outcome) =>
+        /observational[\s\S]*(?:evidence|design|claim)/i.test(outcome)
+      ),
+      `${agent} must classify the evidence independently of its setting`
+    );
+  }
+});
+
+test('ad-prism behavior cases require auditable method-source traceability', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const cases = JSON.parse(
+      readFileSync(join(SKILLS_ROOT, agent, 'ad-prism', 'evals', 'evals.json'), 'utf8')
+    ).cases;
+    const sourceCase = cases.find((entry) => entry.id === 'method-source-traceability');
+
+    assert.ok(sourceCase, `${agent} needs a method-source traceability behavior case`);
+    assert.equal(sourceCase.expected_route, 'ad-prism');
+    for (const term of ['source', 'contribution', 'adaptation', 'retained limit']) {
+      assert.ok(
+        sourceCase.expected_outcomes.some((outcome) =>
+          new RegExp(term, 'i').test(outcome)
+        ),
+        `${agent} traceability case must require ${term}`
+      );
+    }
+    assert.ok(
+      sourceCase.expected_outcomes.some((outcome) =>
+        /does not (?:copy|transfer|invent)[\s\S]*(?:sample size|threshold|margin)/i.test(outcome)
+      ),
+      `${agent} traceability case must reject unsupported borrowed values`
+    );
+  }
+});
+
+test('ad-prism ships a privacy-bounded three-arm replacement protocol', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const protocol = readFileSync(
+      join(skillDir, 'references', 'skill-comparison.md'),
+      'utf8'
+    );
+
+    assert.match(body, /skill-comparison\.md[\s\S]*(?:compare|replacement)/i);
+    assert.match(protocol, /private (?:or reference )?Prism[\s\S]*generic `?ad-prism`?[\s\S]*(?:minimal )?domain adapter/i);
+    assert.match(protocol, /(?:reference|private)[\s\S]*(?:not|never)[\s\S]*(?:ground truth|automatically correct)/i);
+    assert.match(protocol, /freeze[\s\S]*(?:case|input)[\s\S]*(?:skill version|model)[\s\S]*(?:host|tools)/i);
+    assert.match(protocol, /natural prompts[\s\S]*(?:do not|must not)[\s\S]*(?:skill|route)/i);
+    assert.match(protocol, /outcome-shaped[\s\S]*(?:not|rather than)[\s\S]*(?:vocabulary|path)/i);
+    assert.match(protocol, /randomi[sz][\s\S]*(?:repeated|multiple) trials[\s\S]*(?:blind|blinded)/i);
+    assert.match(protocol, /private fixtures[\s\S]*outside (?:the )?repository[\s\S]*(?:saniti[sz]ed|aggregate)/i);
+    assert.match(protocol, /pilot[\s\S]*(?:decision rule|tolerance|margin)[\s\S]*before[\s\S]*(?:comparison|candidate)/i);
+
+    const methodRecords = [...protocol.matchAll(/^###\s+(M\d+)\s+(?:—|-|:)\s+.+$/gm)];
+    assert.ok(methodRecords.length >= 2, `${agent} comparison protocol needs load-bearing method sources`);
+    for (const [index, record] of methodRecords.entries()) {
+      const start = record.index + record[0].length;
+      const end = methodRecords[index + 1]?.index ?? protocol.length;
+      const sourceMap = protocol.slice(start, end);
+      for (const field of ['Source', 'Supports', 'Contribution', 'Adaptation', 'Retained limit']) {
+        assert.match(sourceMap, new RegExp(`^- ${field}: \\S`, 'm'), `${agent} ${record[1]} needs ${field}`);
+      }
     }
   }
 });

@@ -51,7 +51,12 @@ Proceed only when latency improves and the completion guardrail holds.
 The result does not establish production performance outside the tested mix.
 
 ## Sources
-The versioned corpus, run manifest, and telemetry export.
+### M1 — Goal-Question-Metric
+- Source: https://ntrs.nasa.gov/api/citations/19920010178/downloads/19920010178.pdf
+- Supports: deriving measures from an explicit evaluation objective.
+- Contribution: keeps the latency and completion measures tied to the checkout decision.
+- Adaptation: applies the method to one versioned replay corpus and staging traffic mix.
+- Retained limit: does not supply the decision threshold or establish production performance.
 `;
 
 function runScript(name, args, cwd) {
@@ -73,6 +78,47 @@ test('validate-plan accepts a complete decision-linked evaluation brief', () => 
     assert.equal(payload.valid, true);
     assert.deepEqual(payload.errors, []);
     assert.equal(payload.present_sections.length, 11);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-plan rejects a methodological source without an auditable mapping', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-prism-plan-source-map-'));
+  try {
+    const plan = join(dir, 'evaluation.md');
+    writeFileSync(
+      plan,
+      COMPLETE_PLAN.replace(
+        /- Supports:[\s\S]*?- Retained limit:[^\n]*\n/,
+        ''
+      )
+    );
+
+    const result = runScript('validate-plan.mjs', [plan], dir);
+    assert.equal(result.status, 1);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.valid, false);
+    assert.match(payload.errors.join('\n'), /Method source M1 is missing: Supports, Contribution, Adaptation, Retained limit/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-plan rejects duplicate method-source identifiers', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-prism-plan-source-id-'));
+  try {
+    const plan = join(dir, 'evaluation.md');
+    writeFileSync(
+      plan,
+      `${COMPLETE_PLAN}\n### M1 — Evidence-Centered Design\n- Source: https://www.ets.org/Media/Research/pdf/TC-10-07.pdf\n- Supports: linking claims to evidence-producing tasks.\n- Contribution: checks that the replay task can support the latency claim.\n- Adaptation: maps the evidence chain to this checkout comparison.\n- Retained limit: does not establish the decision threshold.\n`
+    );
+
+    const result = runScript('validate-plan.mjs', [plan], dir);
+    assert.equal(result.status, 1);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.valid, false);
+    assert.match(payload.errors.join('\n'), /Duplicate method source identifier: M1/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
