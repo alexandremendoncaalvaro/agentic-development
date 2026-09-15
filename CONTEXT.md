@@ -71,6 +71,39 @@ context); "source store" (it records locators and provenance, not source bodies)
 and its Claude Code twin; governed by
 [`doc/adr/0077-adopt-generic-prism-evaluations.md`](doc/adr/0077-adopt-generic-prism-evaluations.md).
 
+### Project evidence source
+
+**Definition:** an explicitly resolved place from which a state-reading skill
+gathers current project facts. The repository is always available; an optional
+GitHub source may contribute bounded issue and pull-request metadata as primary
+or supporting evidence, with provenance, freshness, and failures retained.
+
+_Avoid_: "documentation source" (active evidence can be GitHub work metadata,
+not only documents); "project adapter" (conflicts with the evaluation domain
+adapter); "source of truth" (authority is expressed by primary and supporting
+roles rather than an absolute claim).
+
+**Related code:**
+[`src/skills/codex/ad-project-state/`](src/skills/codex/ad-project-state/) and its
+Claude Code twin; governed by
+[`doc/adr/0079-compose-configurable-project-evidence.md`](doc/adr/0079-compose-configurable-project-evidence.md).
+
+### Project-state packet
+
+**Definition:** the bounded, read-only snapshot produced from resolved project
+evidence sources. It carries configuration provenance, observation time, source
+roles and status, selected work metadata, and independent failures for a
+consumer such as `ad-next`, project-scoped `ad-roadmap`, or standalone
+`ad-brief`.
+
+_Avoid_: "roadmap packet" (the collector does not reconcile a roadmap);
+"GitHub state" (the repository remains part of the packet); "project summary"
+(presentation belongs to the consuming skill).
+
+**Related code:**
+[`src/skills/codex/ad-project-state/scripts/project-state.mjs`](src/skills/codex/ad-project-state/scripts/project-state.mjs)
+and its Claude Code twin.
+
 ### Material evaluation
 
 **Definition:** an evaluation whose result will support a rollout, a
@@ -271,6 +304,9 @@ and its Claude Code twin; governed by
 - A **Collaboration reply** is selected through an **Artifact template**; its
   **Source-role ledger** keeps shared context and private reasoning out of the
   intended outward content before **Personal voice** is applied.
+- A **Project evidence source** contributes facts to a **Project-state packet**;
+  state-reading consumers interpret that packet without moving collection or
+  provider rules into their own contracts.
 - A **Kit** install materializes every bundled **Workflow-operational skill** and **Spec-driven skill** for each selected agent surface (`.claude/skills/` and `.agents/skills/`).
 - A **Fresh-context review** is implemented as a **Two-axis review** on every kit-supported host; the implementation differs per host but the noun does not.
 - A **Two-axis review** produces one or more **Review handoffs** as its audit trail.

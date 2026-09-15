@@ -18,7 +18,14 @@ Then open the project in Claude Code or Codex and invoke:
 /ad-next
 ```
 
-`/ad-next` reads the repository and recommends the next useful action. All skills are installed; it does not make you choose a maturity level or remember a catalog before you can start.
+`/ad-next` reads the repository and recommends the next useful action. When a
+project keeps active work in GitHub instead of local planning files, an optional
+machine or project configuration lets it include bounded issue and pull-request
+metadata through `/ad-project-state`. With no configuration, behavior stays
+repository-only. See the
+[project-source contract](src/skills/codex/ad-project-state/references/configuration.md).
+All skills are installed; you do not need to choose a maturity level or remember
+a catalog before starting.
 
 Requires Node.js 22.13 or newer. Claude Code skills install under `.claude/skills/`; Codex skills install under `.agents/skills/`.
 

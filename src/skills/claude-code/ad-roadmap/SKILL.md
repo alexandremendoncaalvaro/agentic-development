@@ -25,10 +25,19 @@ Read-only progress report for a decision-maker or newcomer. It answers: what are
 
 ## Project scope — Load the plan
 
+- In project scope, invoke `/ad-project-state` before choosing the plan evidence.
+  Preserve its primary/supporting roles, observation time, provenance, and any
+  failure as reconciliation inputs. Task scope stays anchored to the explicitly
+  selected repository task and does not recollect project sources.
 - Keep the broad scan bounded: read roadmap sections, frontmatter, artifact references, and checkbox lines. Do not read full document bodies.
 - Read `Status:` and `## Roadmap` from `doc/product/PRD.md`. MVP / Next / Later tiers are the spine; each roadmap line is one item to classify.
 - In a multi-product repo, use `doc/product/PRODUCT-MAP.md` and each product file, then combine their rollups.
-- With no PRD, use `doc/tasks/` as the plan, label the result task-based, and recommend `/ad-prd`.
+- With no PRD, use a configured primary source's bounded work items as the plan
+  spine. Prefer issues when available and treat pull requests as delivery
+  evidence; otherwise use pull requests as the spine. If the configured primary
+  source has no usable items, fall back to `doc/tasks/`. Label either fallback
+  honestly and recommend `/ad-prd` only when a durable repository roadmap would
+  improve the work rather than because a lazy artifact is absent.
 
 ## Project scope — Gather implementation evidence
 
@@ -60,6 +69,9 @@ Choose the report's fronts in roadmap order:
 - Overall: done roadmap items divided by total roadmap items, plus counts for in progress, blocked, and remaining.
 - Per tier: the same done / total count and percentage.
 - Risk: `at risk` when an MVP item is blocked or remaining while a later tier has progress, or a blocked task or proposed ADR gates a roadmap item. Otherwise `on track`.
+- A bounded provider query is a current-work view, not proof of the entire plan.
+  When it supplies the spine, report item counts and `N/A` for overall/tier
+  percentages unless the configured evidence exposes a complete denominator.
 
 Pass the settled roadmap fact packet to `ad-brief`. Include any material confidence limits exposed by incomplete tracking, contradictory artifacts, or unresolved reconciliation; when none are material, say so explicitly. After it returns, regain control and append the project- or task-scoped nested checklist. `ad-brief` presents the overview; this skill retains reconciliation, scope selection, progress calculations, and checklist rendering.
 
@@ -85,6 +97,7 @@ For task scope, pass the task goal, current step, next step, progress, blocker, 
 ## Next
 
 - To act on what is left: `/ad-next`.
+- To inspect why a repository or GitHub source was selected: `/ad-project-state`.
 - To change the plan itself: `/ad-prd`.
 - To backfill an untracked item: `/ad-task`.
 - To reconcile documentation against code: `/ad-drift`.

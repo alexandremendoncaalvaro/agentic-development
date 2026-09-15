@@ -25,6 +25,13 @@ Every field is an objective fact, and the survey never crashes: a missing direct
 
 The survey targets the single-product / single-context layout. For a multi-product (`product.productMap: true`) or multi-context (`domain.contextMap: true`) repo it reports the index file's presence but does not enumerate the per-product / per-context files — read those yourself when the map is present.
 
+Then invoke `/ad-project-state` and read its provenance-bearing fact packet
+before any scenario classification. The deterministic survey remains the
+repository-detail source; the shared resolver adds the configured evidence role,
+freshness, GitHub issue or pull-request summaries, and independent failures. Do
+not query a provider directly or treat an unavailable external source as an empty
+work queue.
+
 The survey gives you the facts; Steps 1-5 are the judgment the script deliberately leaves to you. Work them from the JSON, not from a re-scan. You still read a file's body only when a judgment call needs it — the two that always need a read: (a) is the code meaningful (non-trivial files under `src/`, `app/`, `lib/`, `test/`, `tests/`, `packages/`, framework entrypoints, or a manifest with real scripts/dependencies — treat README/LICENSE/gitignore, agentic state, empty artifact dirs, and empty manifests as trivial), and (b) can you summarize the product (target user, problem, current behavior) from the README/code? Both feed Step 1.
 
 Step 1 — classify scenario before ranking. Layer status is evidence; scenario determines the right next step.
@@ -34,6 +41,10 @@ Step 1 — classify scenario before ranking. Layer status is evidence; scenario 
 - Brownfield: meaningful code exists and the scan can summarize the current product behavior. Existing code can supply product and architecture evidence; `/ad-bootstrap` is scan-first here and may precede PRD backfill.
 - Feature planning: PRD/spec artifacts exist and have downstream gaps (accepted PRD with no specs, accepted spec with no tasks).
 - Implementation in progress: dirty tree, branch ahead of `main`, in-progress tasks, blocked tasks, or proposed ADRs.
+- Configured implementation in progress: the primary project-state source
+  reports open work, or a returned pull request names the current branch. This
+  remains implementation in progress even when repository-local task artifacts
+  are absent.
 - Maintenance / install hygiene: stale kit state or an incomplete skill installation.
 
 Durable product framing is a judgment call the survey does not make: `product.prd` and `specs` tell you the artifacts exist, but whether the README / code lets you summarize the target user, problem, and current product behavior is something you read for. If scenarios overlap, report the strongest active scenario in this order: implementation in progress, maintenance/install hygiene, feature planning, product-framed greenfield, brownfield, fresh/unframed greenfield. If code exists but product behavior cannot be summarized, choose fresh/unframed greenfield rather than brownfield.
@@ -58,6 +69,9 @@ Step 3 — cross-cut signals:
 - Root-doc freshness: if `product.prd` is true but `rootDocReferencesProduct` is false, the operational guide never names the product contract — mark it possibly stale and recommend a `/ad-bootstrap` refresh after the product contract.
 - Install / stale state: the survey reports `kitVersion`, but the CLI owns the installed-file comparison. Detect divergence with `agentic update --dry-run`; then recommend `agentic update` to close it.
 - Unreadable files: a non-empty `unreadable[]` means those artifact files could not be read, so any count or status that would have come from them is missing — report the gap and its paths rather than treating the survey as complete.
+- Source confidence: name the primary evidence source and observation time. If
+  `ad-project-state` reports a partial or unavailable source, retain local
+  recommendations but state exactly which evidence class could not be observed.
 
 Step 4 — prioritize next actions. Rank by workflow leverage, not by document layer number. Return 3-5 concrete invocations, each as one-line "do X next" with slug / path.
 
@@ -88,6 +102,7 @@ A single Markdown message structured as:
 **Kit:** v<X.Y.Z> (or not installed)
 **Branch:** <name> (<n> commits ahead of main)
 **Scenario:** <detected scenario>
+**Evidence:** <primary source, observed time, and material source failure or none>
 
 ### Layer 1 — Constitution
 <one-line status per artifact>

@@ -1,0 +1,6 @@
+interface:
+  display_name: "ad-project-state"
+  short_description: "Resolve local and GitHub project evidence"
+  default_prompt: "Use $ad-project-state to resolve the current project's configured evidence sources into a provenance-bearing fact packet."
+policy:
+  allow_implicit_invocation: true

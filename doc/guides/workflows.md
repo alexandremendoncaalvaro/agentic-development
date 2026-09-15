@@ -2,7 +2,8 @@
 
 The kit installs every skill. Do not choose a mode first; choose the smallest route that makes the next decision safer or clearer.
 
-When unsure, start with `/ad-next`. It surveys the repository and prioritizes the next useful action.
+When unsure, start with `/ad-next`. It surveys the repository plus any configured
+project evidence source and prioritizes the next useful action.
 
 ## New product
 

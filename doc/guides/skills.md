@@ -7,6 +7,7 @@ Every skill below installs for each selected host. Installation is not a mandate
 | Skill | Use it when | Outcome |
 | --- | --- | --- |
 | `/ad-next` | You do not know the next useful action. | State survey and prioritized recommendations. |
+| `/ad-project-state` | A state reader needs repository facts plus configured GitHub issues or pull requests. | One bounded fact packet with source roles, provenance, freshness, and partial failures. |
 | `/ad-brief` | You returned to a session and need the project, result, current direction, and any real decision explained plainly. | One read-only decision-maker brief from live state or settled specialist facts. |
 | `/ad-philosophy` | Work is non-trivial or needs an explicit engineering posture. | Grounded, decisive, verifiable working rules. |
 | `/ad-ground` | You are about to implement a non-trivial change. | Evidence-backed happy path and a versioned audit record before code. |
