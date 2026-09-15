@@ -66,9 +66,7 @@ function main() {
     process.exit(2);
   }
   const message = readFileSync(messageFile, 'utf8');
-  const subject = message
-    .split('\n')
-    .find((line) => line.trim() !== '' && !line.startsWith('#'));
+  const subject = message.split('\n').find((line) => line.trim() !== '' && !line.startsWith('#'));
   if (subject === undefined) process.exit(0);
   const { errors, warnings } = checkSubject(subject.trim());
   for (const warning of warnings) console.error(`subject-check (advisory): ${warning}`);

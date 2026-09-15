@@ -2,24 +2,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import {
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-  readFileSync,
-  existsSync,
-  mkdirSync,
-} from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  installSkills,
-  removeOrphanSkills,
-  removeRetiredSkills,
-} from '../src/lib/install.js';
+import { installSkills, removeOrphanSkills, removeRetiredSkills } from '../src/lib/install.js';
 import { retiredSkillsForAgent } from '../src/lib/skill-migrations.js';
-import { loadState, saveState, emptyState, statePath, STATE_DIRS } from '../src/lib/state.js';
+import { loadState, saveState, emptyState, statePath } from '../src/lib/state.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BIN = join(__dirname, '..', 'bin', 'agentic.js');
@@ -73,10 +62,14 @@ test('project update leaves a legacy workflow file untouched, even with --force'
     const edited = '# Legacy workflow\n\n## Local addition\n';
     writeFileSync(join(dir, 'WORKFLOW.md'), edited);
 
-    const run = spawnSync('node', [BIN, 'update', '--scope', 'project', '--agent', 'claude-code', '--yes', '--force'], {
-      cwd: dir,
-      encoding: 'utf8',
-    });
+    const run = spawnSync(
+      'node',
+      [BIN, 'update', '--scope', 'project', '--agent', 'claude-code', '--yes', '--force'],
+      {
+        cwd: dir,
+        encoding: 'utf8',
+      }
+    );
 
     assert.equal(
       readFileSync(join(dir, 'WORKFLOW.md'), 'utf8'),
@@ -100,15 +93,11 @@ test('legacy project migration previews then removes only known kit artifacts', 
     writeFileSync(join(dir, 'WORKFLOW-FLOWS.md'), flows);
     const rootBefore = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
 
-    const preview = spawnSync('node', [
-      BIN,
-      'update',
-      '--scope',
-      'project',
-      '--migrate-legacy',
-      '--dry-run',
-      '--yes',
-    ], { cwd: dir, encoding: 'utf8' });
+    const preview = spawnSync(
+      'node',
+      [BIN, 'update', '--scope', 'project', '--migrate-legacy', '--dry-run', '--yes'],
+      { cwd: dir, encoding: 'utf8' }
+    );
 
     assert.equal(preview.status, 0, `${preview.stdout}${preview.stderr}`);
     assert.ok(existsSync(join(dir, 'WORKFLOW.md')), 'preview must not remove WORKFLOW.md');
@@ -116,14 +105,11 @@ test('legacy project migration previews then removes only known kit artifacts', 
     assert.match(`${preview.stdout}${preview.stderr}`, /- WORKFLOW\.md/);
     assert.match(`${preview.stdout}${preview.stderr}`, /- AGENTS\.md/);
 
-    const apply = spawnSync('node', [
-      BIN,
-      'update',
-      '--scope',
-      'project',
-      '--migrate-legacy',
-      '--yes',
-    ], { cwd: dir, encoding: 'utf8' });
+    const apply = spawnSync(
+      'node',
+      [BIN, 'update', '--scope', 'project', '--migrate-legacy', '--yes'],
+      { cwd: dir, encoding: 'utf8' }
+    );
 
     assert.equal(apply.status, 0, `${apply.stdout}${apply.stderr}`);
     assert.equal(existsSync(join(dir, 'WORKFLOW.md')), false);
@@ -132,14 +118,11 @@ test('legacy project migration previews then removes only known kit artifacts', 
     assert.equal(existsSync(statePath(dir, 'claude-code')), false);
     assert.doesNotMatch(readFileSync(join(dir, 'AGENTS.md'), 'utf8'), /agentic-managed-skills/);
 
-    const repeat = spawnSync('node', [
-      BIN,
-      'update',
-      '--scope',
-      'project',
-      '--migrate-legacy',
-      '--yes',
-    ], { cwd: dir, encoding: 'utf8' });
+    const repeat = spawnSync(
+      'node',
+      [BIN, 'update', '--scope', 'project', '--migrate-legacy', '--yes'],
+      { cwd: dir, encoding: 'utf8' }
+    );
     assert.equal(repeat.status, 0, `${repeat.stdout}${repeat.stderr}`);
     assert.equal(`${repeat.stdout}${repeat.stderr}`, '', 'migration must settle after one apply');
   } finally {
@@ -156,14 +139,11 @@ test('legacy project migration preserves edited skills and unknown workflow docu
     const workflow = '# Project-owned workflow\n';
     writeFileSync(join(dir, 'WORKFLOW.md'), workflow);
 
-    const run = spawnSync('node', [
-      BIN,
-      'update',
-      '--scope',
-      'project',
-      '--migrate-legacy',
-      '--yes',
-    ], { cwd: dir, encoding: 'utf8' });
+    const run = spawnSync(
+      'node',
+      [BIN, 'update', '--scope', 'project', '--migrate-legacy', '--yes'],
+      { cwd: dir, encoding: 'utf8' }
+    );
 
     assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
     assert.equal(readFileSync(editedPath, 'utf8'), 'Project-owned skill edit\n');
@@ -297,7 +277,11 @@ test('update -y --force regenerates a hand-edited section in an UNTRACKED root d
     runUpdate(dir, ['--agent', 'claude-code', '-y', '--force']);
 
     const body = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
-    assert.doesNotMatch(body, /MY HAND EDIT/, '--force still overwrites a diverged section (unchanged behaviour)');
+    assert.doesNotMatch(
+      body,
+      /MY HAND EDIT/,
+      '--force still overwrites a diverged section (unchanged behaviour)'
+    );
     assert.match(body, /ad-bootstrap/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -331,12 +315,14 @@ test('init writes state.json for claude-code', () => {
     const state = loadState(dir, 'claude-code');
     assert.ok(state, 'state file must exist after init');
     assert.equal(state.agent, 'claude-code');
-    assert.equal('profile' in state, false, 'installation state does not classify project maturity');
+    assert.equal(
+      'profile' in state,
+      false,
+      'installation state does not classify project maturity'
+    );
     assert.ok(state.skills['ad-bootstrap']);
     assert.ok(
-      state.skills['ad-bootstrap'].files.some((f) =>
-        f.path.endsWith('ad-bootstrap/SKILL.md')
-      )
+      state.skills['ad-bootstrap'].files.some((f) => f.path.endsWith('ad-bootstrap/SKILL.md'))
     );
     assert.ok(state.skills['ad-bootstrap'].files[0].sourceSha.match(/^[a-f0-9]{64}$/));
   } finally {
@@ -437,9 +423,7 @@ test('installSkills: kit changed + user untouched → kit-changed-update silent'
       previousStates: { 'claude-code': state },
       kitVersion: '0.3.0',
     });
-    const skillAction = result.actions.find((a) =>
-      a.path.endsWith('ad-bootstrap/SKILL.md')
-    );
+    const skillAction = result.actions.find((a) => a.path.endsWith('ad-bootstrap/SKILL.md'));
     assert.equal(skillAction.type, 'updated');
     assert.notEqual(
       readFileSync(target, 'utf8'),
@@ -473,9 +457,7 @@ test('installSkills: kit unchanged + user edited → kept (silent, preserves use
       previousStates: { 'claude-code': loadState(dir, 'claude-code') },
       kitVersion: '0.3.0-test',
     });
-    const skillAction = result.actions.find((a) =>
-      a.path.endsWith('ad-bootstrap/SKILL.md')
-    );
+    const skillAction = result.actions.find((a) => a.path.endsWith('ad-bootstrap/SKILL.md'));
     assert.equal(skillAction.type, 'kept');
     assert.equal(readFileSync(target, 'utf8'), 'USER LOCAL CHANGES\n');
   } finally {
@@ -512,9 +494,7 @@ test('installSkills: kit changed + user changed + force=false → conflict-promp
       kitVersion: '0.3.0',
       confirmReplace: async () => false,
     });
-    const skillAction = result.actions.find((a) =>
-      a.path.endsWith('ad-bootstrap/SKILL.md')
-    );
+    const skillAction = result.actions.find((a) => a.path.endsWith('ad-bootstrap/SKILL.md'));
     assert.equal(skillAction.type, 'skipped');
     assert.equal(readFileSync(target, 'utf8'), 'USER LOCAL CHANGES\n');
   } finally {
@@ -551,9 +531,7 @@ test('installSkills: kit changed + user changed + force=true → replaced', asyn
       kitVersion: '0.3.0',
       force: true,
     });
-    const skillAction = result.actions.find((a) =>
-      a.path.endsWith('ad-bootstrap/SKILL.md')
-    );
+    const skillAction = result.actions.find((a) => a.path.endsWith('ad-bootstrap/SKILL.md'));
     assert.equal(skillAction.type, 'replaced');
     assert.notEqual(readFileSync(target, 'utf8'), 'USER LOCAL CHANGES\n');
   } finally {
@@ -571,9 +549,7 @@ test('installSkills: dry-run writes nothing, returns plan', async () => {
       kitVersion: '0.3.0-test',
       dryRun: true,
     });
-    const skillAction = result.actions.find((a) =>
-      a.path.endsWith('ad-bootstrap/SKILL.md')
-    );
+    const skillAction = result.actions.find((a) => a.path.endsWith('ad-bootstrap/SKILL.md'));
     assert.equal(skillAction.type, 'created');
     assert.ok(
       !existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')),
@@ -688,36 +664,26 @@ test('regression: a known legacy fingerprint migrates without state or deleting 
 });
 
 test('retiredSkillsForAgent records the verified ad-grill source fingerprints', () => {
-  const claudeGrill = retiredSkillsForAgent('claude-code').find(
-    ({ from }) => from === 'ad-grill'
-  );
+  const claudeGrill = retiredSkillsForAgent('claude-code').find(({ from }) => from === 'ad-grill');
   assert.deepEqual(claudeGrill, {
     from: 'ad-grill',
     to: 'ad-grill-me',
     files: [
       {
         path: '.claude/skills/ad-grill/SKILL.md',
-        knownShas: [
-          '0df4dcd35113f75ff82e76ea2dc63f341256977ef12a09e51b756bf09b1f3e2e',
-        ],
+        knownShas: ['0df4dcd35113f75ff82e76ea2dc63f341256977ef12a09e51b756bf09b1f3e2e'],
       },
     ],
   });
-  const codexGrill = retiredSkillsForAgent('codex').find(
-    ({ from }) => from === 'ad-grill'
-  );
+  const codexGrill = retiredSkillsForAgent('codex').find(({ from }) => from === 'ad-grill');
   assert.deepEqual(codexGrill.files, [
     {
       path: '.agents/skills/ad-grill/SKILL.md',
-      knownShas: [
-        '7bb9a87fae699f1e7f5e468f5419027560f84587a7bfefea8df7822438b8ca79',
-      ],
+      knownShas: ['7bb9a87fae699f1e7f5e468f5419027560f84587a7bfefea8df7822438b8ca79'],
     },
     {
       path: '.agents/skills/ad-grill/agents/openai.yaml',
-      knownShas: [
-        'cff51605a057a12be162116d2b8a7c885e72e407df642f807d6b6b38e2f1824d',
-      ],
+      knownShas: ['cff51605a057a12be162116d2b8a7c885e72e407df642f807d6b6b38e2f1824d'],
     },
   ]);
 });
@@ -751,18 +717,14 @@ test('regression: a state-recorded agentic-prefix skill is migrated by name', ()
 });
 
 test('retiredSkillsForAgent records the verified ad-clean source fingerprint', () => {
-  const claudeClean = retiredSkillsForAgent('claude-code').find(
-    ({ from }) => from === 'ad-clean'
-  );
+  const claudeClean = retiredSkillsForAgent('claude-code').find(({ from }) => from === 'ad-clean');
   assert.deepEqual(claudeClean, {
     from: 'ad-clean',
     to: 'ad-archive',
     files: [
       {
         path: '.claude/skills/ad-clean/SKILL.md',
-        knownShas: [
-          'bb315007e059943dd230b8b5c264d7efad0abe88aad2ec1b01ddc915976bc642',
-        ],
+        knownShas: ['bb315007e059943dd230b8b5c264d7efad0abe88aad2ec1b01ddc915976bc642'],
       },
     ],
   });
@@ -819,10 +781,14 @@ test('regression: update --yes migrates a pristine ad-grill install to ad-grill-
     };
     saveState(dir, 'claude-code', state);
 
-    const run = spawnSync('node', [BIN, 'update', '--scope', 'project', '--agent', 'claude-code', '--yes'], {
-      cwd: dir,
-      encoding: 'utf8',
-    });
+    const run = spawnSync(
+      'node',
+      [BIN, 'update', '--scope', 'project', '--agent', 'claude-code', '--yes'],
+      {
+        cwd: dir,
+        encoding: 'utf8',
+      }
+    );
 
     assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
     assert.equal(existsSync(join(dir, legacyPath)), false);
@@ -857,10 +823,14 @@ test('regression: update --yes migrates the Codex ad-grill files together', () =
     };
     saveState(dir, 'codex', state);
 
-    const run = spawnSync('node', [BIN, 'update', '--scope', 'project', '--agent', 'codex', '--yes'], {
-      cwd: dir,
-      encoding: 'utf8',
-    });
+    const run = spawnSync(
+      'node',
+      [BIN, 'update', '--scope', 'project', '--agent', 'codex', '--yes'],
+      {
+        cwd: dir,
+        encoding: 'utf8',
+      }
+    );
 
     assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
     assert.equal(existsSync(join(dir, skillPath)), false);
@@ -929,9 +899,7 @@ test('removeOrphanSkills: an edited orphan stays even when removal is confirmed'
 
     assert.equal(readFileSync(join(dir, path), 'utf8'), 'local edit\n');
     assert.deepEqual(result.removedSkills, []);
-    assert.deepEqual(result.actions, [
-      { type: 'orphan-kept', path, agent: 'claude-code' },
-    ]);
+    assert.deepEqual(result.actions, [{ type: 'orphan-kept', path, agent: 'claude-code' }]);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -997,9 +965,7 @@ test('update --yes after a kit-changed file → silent update, target replaced w
     const oldSha = createHash('sha256').update(oldBody).digest('hex');
 
     const state = loadState(dir, 'claude-code');
-    state.skills['ad-bootstrap'].files = state.skills[
-      'ad-bootstrap'
-    ].files.map((f) =>
+    state.skills['ad-bootstrap'].files = state.skills['ad-bootstrap'].files.map((f) =>
       f.path.endsWith('SKILL.md') ? { ...f, sourceSha: oldSha } : f
     );
     saveState(dir, 'claude-code', state);
@@ -1058,17 +1024,16 @@ test('installSkills: skip on conflict records current sourceSha so a re-run with
       kitVersion: '0.3.0',
       confirmReplace: async () => false,
     });
-    const skipAction = skipResult.actions.find((a) =>
-      a.path.endsWith('ad-bootstrap/SKILL.md')
-    );
+    const skipAction = skipResult.actions.find((a) => a.path.endsWith('ad-bootstrap/SKILL.md'));
     assert.equal(skipAction.type, 'skipped');
 
     // Skip must record the *current* kit sourceSha so the next run with kit
     // unchanged classifies the file as user-edited-keep (silent), not a
     // repeated conflict-prompt. Recording prevSha would re-prompt every run.
     saveState(dir, 'claude-code', skipResult.nextStates['claude-code']);
-    const recordedSha = loadState(dir, 'claude-code').skills['ad-bootstrap']
-      .files.find((f) => f.path.endsWith('SKILL.md')).sourceSha;
+    const recordedSha = loadState(dir, 'claude-code').skills['ad-bootstrap'].files.find((f) =>
+      f.path.endsWith('SKILL.md')
+    ).sourceSha;
     assert.match(recordedSha, /^[a-f0-9]{64}$/);
     assert.notEqual(recordedSha, 'stale-prev-sha-from-an-older-kit');
 
@@ -1083,9 +1048,7 @@ test('installSkills: skip on conflict records current sourceSha so a re-run with
         throw new Error('confirmReplace must NOT fire when kit unchanged after skip');
       },
     });
-    const rerunAction = rerun.actions.find((a) =>
-      a.path.endsWith('ad-bootstrap/SKILL.md')
-    );
+    const rerunAction = rerun.actions.find((a) => a.path.endsWith('ad-bootstrap/SKILL.md'));
     assert.equal(rerunAction.type, 'kept');
     assert.equal(readFileSync(target, 'utf8'), 'USER LOCAL EDITS\n');
   } finally {

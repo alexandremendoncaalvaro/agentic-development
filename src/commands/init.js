@@ -18,11 +18,8 @@ import { configureGlobalConstitution, globalKitPath } from '../lib/global-rules.
 import { resolveScope, targetForScope } from '../lib/scope.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkg = JSON.parse(
-  readFileSync(join(__dirname, '..', '..', 'package.json'), 'utf8')
-);
+const pkg = JSON.parse(readFileSync(join(__dirname, '..', '..', 'package.json'), 'utf8'));
 
-const VALID_AGENTS = ['claude-code', 'codex'];
 const AGENT_FLAG_VALUES = ['claude-code', 'codex', 'both'];
 
 const MODE_LABEL = {
@@ -62,9 +59,7 @@ function resolveAgents(flagValue) {
 
 export async function initCommand(opts) {
   if (opts.agent && !AGENT_FLAG_VALUES.includes(opts.agent)) {
-    throw new Error(
-      `invalid agent "${opts.agent}". Use one of: ${AGENT_FLAG_VALUES.join(', ')}`
-    );
+    throw new Error(`invalid agent "${opts.agent}". Use one of: ${AGENT_FLAG_VALUES.join(', ')}`);
   }
 
   const invocationCwd = process.cwd();
@@ -81,9 +76,7 @@ export async function initCommand(opts) {
     p.note(
       `Mode: ${MODE_LABEL[detectedMode]}\n` +
         `Agents detected: ${
-          detectedAgents.length
-            ? detectedAgents.map((a) => AGENT_LABEL[a]).join(', ')
-            : 'none'
+          detectedAgents.length ? detectedAgents.map((a) => AGENT_LABEL[a]).join(', ') : 'none'
         }\n` +
         'All bundled skills install by default.',
       'Detected context'
@@ -96,10 +89,7 @@ export async function initCommand(opts) {
         { value: ['codex'], label: 'Codex' },
         { value: ['claude-code', 'codex'], label: 'Both' },
       ],
-      initialValue:
-        detectedAgents.length === 1
-          ? detectedAgents
-          : ['claude-code', 'codex'],
+      initialValue: detectedAgents.length === 1 ? detectedAgents : ['claude-code', 'codex'],
     });
     if (p.isCancel(choice)) {
       p.cancel('Cancelled.');
@@ -124,7 +114,10 @@ export async function initCommand(opts) {
 
   const confirmReplace = interactive
     ? async (question) => {
-        const answer = await p.confirm({ message: question, initialValue: false });
+        const answer = await p.confirm({
+          message: question,
+          initialValue: false,
+        });
         if (p.isCancel(answer)) return false;
         return answer;
       }
@@ -176,9 +169,7 @@ export async function initCommand(opts) {
     ? async (path) => {
         // Message and default come from rootDocAppendPrompt so the decision is
         // unit-tested; a TTY-less suite cannot drive p.confirm itself.
-        const answer = await p.confirm(
-          rootDocAppendPrompt(path, trackedState(cwd, path))
-        );
+        const answer = await p.confirm(rootDocAppendPrompt(path, trackedState(cwd, path)));
         if (p.isCancel(answer)) return false;
         return answer;
       }
@@ -197,14 +188,15 @@ export async function initCommand(opts) {
       }
     : async (path) => allowUnattendedRootDocWrite(path);
 
-  const rootDocAction = scope === 'project'
-    ? await updateRootDoc({
-        cwd,
-        skills: skillDisplayOrder,
-        confirmAppend,
-        confirmReplace: confirmRootDocReplace,
-      })
-    : { type: 'absent' };
+  const rootDocAction =
+    scope === 'project'
+      ? await updateRootDoc({
+          cwd,
+          skills: skillDisplayOrder,
+          confirmAppend,
+          confirmReplace: confirmRootDocReplace,
+        })
+      : { type: 'absent' };
 
   // Keep freshly-installed kit files out of a shared repo's commits via
   // .git/info/exclude — per-clone and never committed, unlike .gitignore
@@ -212,13 +204,14 @@ export async function initCommand(opts) {
   // says so, holding the refuse-to-guess posture. Files already tracked (the
   // dogfood self-install, a team-owned subagent) are dropped by filename, so a
   // mixed-ownership directory never has a team file hidden from git.
-  const excluded = scope === 'project'
-    ? await offerKitExclude({
-        cwd,
-        paths: [...new Set(allActions.map((a) => a.path))],
-        interactive,
-      })
-    : 0;
+  const excluded =
+    scope === 'project'
+      ? await offerKitExclude({
+          cwd,
+          paths: [...new Set(allActions.map((a) => a.path))],
+          interactive,
+        })
+      : 0;
 
   const lines = allActions.map((a) => `${ACTION_SYMBOL[a.type]} ${a.path}`);
   if (rootDocAction.type !== 'absent') {
@@ -240,7 +233,9 @@ export async function initCommand(opts) {
     p.outro(
       `Done. Installed ${installedSkillSet.size} skills for ${agents
         .map((a) => AGENT_LABEL[a])
-        .join(' + ')} (${scope} scope). Start with /ad-next; ad-philosophy auto-loads on non-trivial work.`
+        .join(
+          ' + '
+        )} (${scope} scope). Start with /ad-next; ad-philosophy auto-loads on non-trivial work.`
     );
   } else {
     for (const line of lines) {

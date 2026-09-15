@@ -1,13 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-  readFileSync,
-  existsSync,
-  mkdirSync,
-} from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -83,10 +76,7 @@ test('loadState: schemaVersion in the future → throws with upgrade hint', () =
         skills: {},
       })
     );
-    assert.throws(
-      () => loadState(dir, 'claude-code'),
-      /schemaVersion .*Upgrade the kit/
-    );
+    assert.throws(() => loadState(dir, 'claude-code'), /schemaVersion .*Upgrade the kit/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

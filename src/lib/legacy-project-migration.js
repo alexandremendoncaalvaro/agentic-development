@@ -45,12 +45,7 @@ function selectedAgents(agentFlag) {
  * removed; any divergent file remains in place and is reported. The function
  * writes no new state, so a second run has no work left to do.
  */
-export async function migrateLegacyProject({
-  cwd,
-  agent,
-  dryRun = false,
-  force = false,
-}) {
+export async function migrateLegacyProject({ cwd, agent, dryRun = false, force = false }) {
   const actions = [];
 
   for (const currentAgent of selectedAgents(agent)) {
@@ -66,14 +61,17 @@ export async function migrateLegacyProject({
       dryRun,
       force,
     });
-    actions.push(...result.actions.map((action) => ({
-      ...action,
-      type: action.type === 'removed'
-        ? 'migration-removed'
-        : action.type === 'orphan-kept'
-          ? 'migration-kept'
-          : action.type,
-    })));
+    actions.push(
+      ...result.actions.map((action) => ({
+        ...action,
+        type:
+          action.type === 'removed'
+            ? 'migration-removed'
+            : action.type === 'orphan-kept'
+              ? 'migration-kept'
+              : action.type,
+      }))
+    );
 
     const removed = new Set(result.removedSkills);
     const remainingSkills = Object.fromEntries(
@@ -82,12 +80,24 @@ export async function migrateLegacyProject({
     const path = relative(cwd, statePath(cwd, currentAgent));
     if (Object.keys(remainingSkills).length === 0) {
       removeState(cwd, currentAgent, dryRun);
-      actions.push({ type: 'migration-state-removed', path, agent: currentAgent });
+      actions.push({
+        type: 'migration-state-removed',
+        path,
+        agent: currentAgent,
+      });
     } else if (!dryRun) {
       saveState(cwd, currentAgent, { ...state, skills: remainingSkills });
-      actions.push({ type: 'migration-state-updated', path, agent: currentAgent });
+      actions.push({
+        type: 'migration-state-updated',
+        path,
+        agent: currentAgent,
+      });
     } else {
-      actions.push({ type: 'migration-state-updated', path, agent: currentAgent });
+      actions.push({
+        type: 'migration-state-updated',
+        path,
+        agent: currentAgent,
+      });
     }
   }
 

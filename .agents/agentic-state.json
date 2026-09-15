@@ -257,7 +257,7 @@
         },
         {
           "path": ".agents/skills/ad-drift/scripts/drift-scan.mjs",
-          "sourceSha": "1dd9929f46b9e575f8eb126a7dc7cc21afdd6fa3f68dff9a927e1d83bdaf1c00"
+          "sourceSha": "da43ee3c240ab1e41721a2ddc608f34c76b4dd28d331e067d38e3575e49af4c6"
         },
         {
           "path": ".agents/skills/ad-drift/SKILL.md",
@@ -566,7 +566,7 @@
         },
         {
           "path": ".agents/skills/ad-publish/scripts/template-store.mjs",
-          "sourceSha": "320c1762ead0fdb494d3536204bec2abf636fe440981b15de54a8ff30edcf7d4"
+          "sourceSha": "4cddb0cc24bd9a2cbf4b27e327471415382647d52643e1fd4c54e364271f1f26"
         },
         {
           "path": ".agents/skills/ad-publish/SKILL.md",
@@ -641,7 +641,7 @@
         },
         {
           "path": ".agents/skills/ad-report/scripts/template-store.mjs",
-          "sourceSha": "320c1762ead0fdb494d3536204bec2abf636fe440981b15de54a8ff30edcf7d4"
+          "sourceSha": "4cddb0cc24bd9a2cbf4b27e327471415382647d52643e1fd4c54e364271f1f26"
         },
         {
           "path": ".agents/skills/ad-report/SKILL.md",
@@ -861,7 +861,7 @@
         },
         {
           "path": ".agents/skills/ad-template-tune/scripts/template-store.mjs",
-          "sourceSha": "320c1762ead0fdb494d3536204bec2abf636fe440981b15de54a8ff30edcf7d4"
+          "sourceSha": "4cddb0cc24bd9a2cbf4b27e327471415382647d52643e1fd4c54e364271f1f26"
         },
         {
           "path": ".agents/skills/ad-template-tune/SKILL.md",
@@ -903,7 +903,7 @@
         },
         {
           "path": ".agents/skills/ad-voice/scripts/voice-profile.mjs",
-          "sourceSha": "770630714283890c8bf6a5d95ece960ef3b4bb866d8cacbbe6a1e5494365de23"
+          "sourceSha": "e6115a26b0b9723eb48a1666749f12d274bb31448f40c72da8d4b3425f0ea4a4"
         },
         {
           "path": ".agents/skills/ad-voice/SKILL.md",
@@ -928,7 +928,7 @@
         },
         {
           "path": ".agents/skills/ad-voice-tune/scripts/voice-profile.mjs",
-          "sourceSha": "770630714283890c8bf6a5d95ece960ef3b4bb866d8cacbbe6a1e5494365de23"
+          "sourceSha": "e6115a26b0b9723eb48a1666749f12d274bb31448f40c72da8d4b3425f0ea4a4"
         },
         {
           "path": ".agents/skills/ad-voice-tune/SKILL.md",

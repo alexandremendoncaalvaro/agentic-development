@@ -21,11 +21,7 @@ export function globalKitPath(home = homedir()) {
  * instruction file remains wholly user-owned; a malformed or hand-edited
  * block is reported instead of being overwritten.
  */
-export function configureGlobalConstitution({
-  agent,
-  home = homedir(),
-  dryRun = false,
-}) {
+export function configureGlobalConstitution({ agent, home = homedir(), dryRun = false }) {
   const relativePath = GLOBAL_RULE_PATHS[agent];
   if (!relativePath) throw new Error(`unknown agent "${agent}"`);
 

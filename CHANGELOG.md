@@ -1,12 +1,15 @@
 # Changelog
 
-Notable changes to `@alexandrealvaro/agentic`, newest first — consumers install the published npm version, not `main`, so an unlogged change is invisible to every install. Format per [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org) on the pre-1.0 `-beta.N` channel. `scripts/release.sh` owns the rotation of `[Unreleased]` into a version heading — do not rotate by hand.
+Notable changes to `@alexandrealvaro/agentic`, newest first — consumers install the published npm version, not `main`, so an unlogged change is invisible to every install. Format per [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org), with `-beta.N` reserved for explicit prereleases. `scripts/release.sh` owns the rotation of `[Unreleased]` into a version heading — do not rotate by hand.
 
 Releases older than 0.19.0-beta.1 predate this file; their record is the annotated git tags and [GitHub Releases](https://github.com/alexandremendoncaalvaro/agentic-development/releases).
 
 ## [Unreleased]
 
 ### Changed
+
+- Define the stable 1.0 quality boundary: Node 22.13+, Node 22/24 CI, supported GitHub Actions, stable SemVer release increments, and one local/CI/prepublish verification command (ADR-0078).
+- Establish ESLint and Prettier as the maintained JavaScript baseline and correct the dead bindings, redundant assignment, and lost error causes that the first lint pass exposed.
 
 - `/ad-prism` now selects evaluation setting, claim type, study design, evidence
   source, and assurance rigor independently, so a bounded local, staging, or
@@ -15,6 +18,10 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   contribution, adaptation, and retained limit, and a frozen three-arm protocol
   can compare replacement readiness without treating a reference skill as
   ground truth.
+
+### Security
+
+- Gate high- and critical-severity dependency advisories through `npm run verify`; record the existing GitHub secret-scanning, push-protection, and local leak-guard boundary (ADR-0078).
 
 ### Fixed
 

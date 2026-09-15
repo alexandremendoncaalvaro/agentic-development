@@ -72,7 +72,10 @@ test('report workflow owns editorial judgment and composes renderers with their 
     const root = skillRoot('src/skills', agent);
     const skill = readFileSync(join(root, 'SKILL.md'), 'utf8');
     assert.match(skill, /findings.*evidence.*audience/is);
-    assert.match(skill, /executive conclusion.*question.*method.*provenance.*findings.*recommendations.*limitations/is);
+    assert.match(
+      skill,
+      /executive conclusion.*question.*method.*provenance.*findings.*recommendations.*limitations/is
+    );
     assert.match(skill, /DOCX.*PDF.*presentation.*visualization.*site/is);
     assert.match(skill, /render.*visual.*accessibility/is);
     assert.match(skill, /satisfied.*improved.*not applicable.*higher-priority\s+override/is);
@@ -165,9 +168,7 @@ test('report shared files, host copies, and dogfood copies remain byte-identical
   }
   assert.ok(
     readFileSync(join(claude, 'scripts/template-store.mjs')).equals(
-      readFileSync(
-        join(ROOT, 'src/skills/claude-code/ad-template-tune/scripts/template-store.mjs')
-      )
+      readFileSync(join(ROOT, 'src/skills/claude-code/ad-template-tune/scripts/template-store.mjs'))
     ),
     'report resolver diverged from the curator'
   );

@@ -6,7 +6,7 @@
 
 **Quality bar:** docs read primarily by agents must be agent-comprehensible (terse, structured, no fluff); docs read by humans must be readable. Code: simple, secure, mature — right-sized for a CLI, no over-engineering.
 
-**Stack:** Node.js ≥20.12.0, ESM, plain JavaScript. Deps: `commander` (CLI), `@clack/prompts` (TUI — requires `node:util` `styleText`, which shipped in Node 20.12.0, not earlier 20.x). No DB, no build step, no framework.
+**Stack:** Node.js ≥22.13.0, ESM, plain JavaScript. Runtime deps: `commander` (CLI), `@clack/prompts` (TUI). No DB, no build step, no framework.
 **Entry points:** `bin/agentic.js` (npm bin) → `src/index.js` (commander wiring) → `src/commands/<verb>.js` (`init`, `update`, `menu`). Skill source under `src/skills/<agent>/<skill>/`, copied into the target's `.claude/skills/` or `.agents/skills/` at install time.
 
 ## Setup, Build, Test
@@ -18,17 +18,17 @@ node bin/agentic.js init --agent both -y  # non-interactive
 npm test                                  # CLI --help smoke + node:test suite under test/
 ```
 
-Lint, formatter: not yet wired. CI runs `npm test` across Node 20 / 22 on every push and PR targeting `main` ([`.github/workflows/test.yml`](.github/workflows/test.yml)).
+`npm run verify` composes ESLint, Prettier check mode, `npm test`, and the high-severity dependency audit. CI runs it on Ubuntu and Windows across Node 22.13 / 24 for every push and PR targeting `main` ([`.github/workflows/test.yml`](.github/workflows/test.yml)).
 
 ## Quality Gates
 
 See [`GUIDELINES.md`](GUIDELINES.md) §8 for the full reference. Non-negotiable subset:
 
-* Pre-commit (`lefthook`): `leak-guard` (ADR-0033, blocks) and `changelog-gate` (ADR-0048, warn-only changelog reminder). Lint/format still not wired.
+* Pre-commit (`lefthook`): `leak-guard` (ADR-0033, blocks) and `changelog-gate` (ADR-0048, warn-only changelog reminder). Lint and format run in the composed pre-push gate, not pre-commit.
 * Commit-msg: `subject-check` (ADR-0048) blocks a subject over 72 chars; imperative-mood heuristics warn only.
-* Pre-push: `branch-guard` (ADR-0048) refuses a push updating `main`/`cli`, then `npm test`; CI (`.github/workflows/test.yml`) mirrors `npm test` across Node 20 / 22.
+* Pre-push: `branch-guard` (ADR-0048) refuses a push updating `main`, then `npm run verify`; CI (`.github/workflows/test.yml`) mirrors the same command across Node 22.13 / 24.
 * Never bypass: no `--no-verify`, no skipped hooks, no deleted failing tests.
-* CI failure is a local gate gap (WORKFLOW.md §11, TL;DR #22). Pre-push mirrors what CI runs — the same effective command (`npm test`; locally via the env-stripping runner `scripts/hook-npm-test.js`), same matrix. `/ad-pr` refuses to open a PR when local gates are red; `/ad-hooks` diffs pre-push against `.github/workflows/*.yml` and warns on drift. If CI catches something pre-push did not, close the gate locally, don't iterate red CI runs.
+* CI failure is a local gate gap (WORKFLOW.md §11, TL;DR #22). Pre-push and CI run the same effective command (`npm run verify`; locally via the env-stripping runner `scripts/hook-npm-test.js`). ADR-0065 records the explicit limitation: local pre-push is a single-machine gate and cannot emulate the required Ubuntu/Windows matrix, so every remote matrix leg remains required. `/ad-pr` refuses to open a PR when local gates are red; `/ad-hooks` reports matrix drift. If CI catches a gap, close it locally where reproducible; don't iterate red CI runs.
 
 ## Code Style
 
@@ -105,7 +105,7 @@ Real traps confirmed in code or ADRs.
 * **Every skill declares its invocation class (ADR-0073).** User-invocable skills (outward-facing or setup human verbs: pr, merge, release, publish, bootstrap, guidelines, ...; `ad-commit` stays model-invocable because a commit is local and reversible) carry `disable-model-invocation: true` on Claude Code and `policy.allow_implicit_invocation: false` in the Codex `agents/openai.yaml`; model-invocable skills carry neither flag and `true`. Model-invocable `description:` text is capped at 350 chars and 8,000 chars in total per host (the smallest documented listing budget), every description at the 1,024-char spec maximum; `test/skills.test.js` names the class list and fails on any drift. A dot-directory under `src/skills/<host>/` is never a skill — `bundledSkills` and the test enumerator skip it (a plugin once dropped `.slim/` there and 14 tests went red).
 * **Skill frontmatter carries two description fields.** Anthropic-spec `description:` is trigger-keyword-rich (drives skill-router auto-load); kit-specific `summary:` is the compressed ≤320-char cell that `rootdoc.js` reads at section-build time into the managed `Skills installed by agentic` table in downstream AGENTS.md. Adding a new skill requires both fields in `src/skills/<agent>/<skill>/SKILL.md`; `test/skills.test.js` enforces presence + ≤320-char cap.
 * **A new lefthook stage needs `lefthook install` re-run.** Declaring a stage in `lefthook.yml` (e.g. `commit-msg`) does nothing until its stub exists under `.git/hooks/` — re-run `lefthook install` after adding or removing a stage, or the gate silently never fires.
-* **The pre-push test gate runs via `scripts/hook-npm-test.js`, not bare `npm test`.** git exports `GIT_DIR` into hook processes; in a linked git worktree that env leaks into the suite's child processes and points their git calls at THIS repo — 13 tests turn red and a leaked `git config` write can even rewrite the real repo's committer identity (observed, task-0033). The runner strips `GIT_DIR`/`GIT_WORK_TREE`/`GIT_INDEX_FILE` before spawning the same `npm test` CI runs; "simplifying" it back to `run: npm test` reopens the leak (a wiring test blocks that). Never run the suite with those vars manually set against the real repo — use a disposable clone for such diagnostics.
+* **The pre-push verification gate runs via `scripts/hook-npm-test.js`, not bare `npm run verify`.** git exports `GIT_DIR` into hook processes; in a linked git worktree that env leaks into the suite's child processes and points their git calls at THIS repo — 13 tests turn red and a leaked `git config` write can even rewrite the real repo's committer identity (observed, task-0033). The runner strips `GIT_DIR`/`GIT_WORK_TREE`/`GIT_INDEX_FILE` before spawning the same `npm run verify` CI runs; bypassing it reopens the leak (a wiring test blocks that). Never run the suite with those vars manually set against the real repo — use a disposable clone for such diagnostics.
 * **Historical naming.** The slash-command prefix renamed from `agentic-` to `ad-`. Live skills, dirs, frontmatter, wiring, and narrative docs use `ad-`. ADRs 0001-0025 and tasks 0001-0027 retain pre-rename `agentic-X` references in their bodies as intentional historical records. The `agentic` brand (CLI binary, npm package, repo, state files, managed-doc marker) is preserved.
 
 <!-- agentic-managed-skills:start -->

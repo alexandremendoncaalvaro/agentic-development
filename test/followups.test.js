@@ -1,16 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  mkdtempSync,
-  rmSync,
-  mkdirSync,
-  writeFileSync,
-  readFileSync,
-  existsSync,
-} from 'node:fs';
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { installSkills, removeOrphanSkills } from '../src/lib/install.js';
+import { removeOrphanSkills } from '../src/lib/install.js';
 import { emptyState, saveState } from '../src/lib/state.js';
 import { updateRootDoc } from '../src/lib/rootdoc.js';
 
@@ -62,9 +55,7 @@ test('removeOrphanSkills: file recorded in state but missing on disk → removed
     const state = emptyState('claude-code', '0.9.4-test');
     state.skills['ad-bootstrap'] = {
       version: '0.9.4-test',
-      files: [
-        { path: '.claude/skills/ad-bootstrap/SKILL.md', sourceSha: 'aaa' },
-      ],
+      files: [{ path: '.claude/skills/ad-bootstrap/SKILL.md', sourceSha: 'aaa' }],
     };
 
     const result = await removeOrphanSkills({
@@ -76,9 +67,7 @@ test('removeOrphanSkills: file recorded in state but missing on disk → removed
     });
 
     assert.equal(result.removedSkills.length, 1);
-    const action = result.actions.find((a) =>
-      a.path.endsWith('ad-bootstrap/SKILL.md')
-    );
+    const action = result.actions.find((a) => a.path.endsWith('ad-bootstrap/SKILL.md'));
     assert.equal(
       action.type,
       'removed-missing',

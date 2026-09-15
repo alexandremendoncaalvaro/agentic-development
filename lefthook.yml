@@ -8,10 +8,9 @@
 #   blocks staged content matching the local `.agentic/leak-denylist.txt`,
 #   any path added under `rules/`, or a symlink whose target escapes the
 #   repo. This repo is public; the guard stops house IP from leaking in.
-# - pre-push: `npm test` is the deterministic gate every commit pushed
-#   to origin must pass. The unit + integration suite covers state,
-#   install, update, frontmatter, and Windows-path regressions;
-#   running it on every push catches regressions before they reach `cli`.
+# - pre-push: `npm run verify` is the release-quality gate every commit pushed
+#   to origin must pass. It composes lint, formatting, the unit + integration
+#   suite, and the high-severity dependency audit (ADR-0078).
 # - pre-commit: `changelog-gate` (task-0032) warns — never blocks — when a
 #   commit touches shipped kit content (src/skills/, src/lib/, src/commands/,
 #   bin/) without staging a CHANGELOG.md entry. Advisory-first debut per
@@ -21,21 +20,17 @@
 #   deterministic, so it may block from day one per the same ad-hooks rule —
 #   and warns on imperative-mood heuristics (trailing period, past-tense
 #   opener). Merge/Revert/fixup!/squash! subjects are exempt.
-# - pre-push: `branch-guard` (ADR-0048) blocks a push that updates main or
-#   cli — the audit of task-0032 measured main as having no GitHub-side
+# - pre-push: `branch-guard` (ADR-0048) blocks a push that updates main —
+#   the audit of task-0032 measured main as having no GitHub-side
 #   protection, so the no-direct-push convention needed a mechanical layer.
 #   Deterministic; blocks from day one.
 #
 # After adding or removing a hook stage here, re-run `lefthook install` so
 # the corresponding .git/hooks stub exists.
 #
-# Lint/format pre-commit gates remain unwired — the kit has no eslint or
-# prettier today. Adding them is a separate decision once those tools are
-# introduced (own ADR + Task per ADR-0007 §6 scrutiny rule).
-#
 # Bootstrap: `lefthook install` (one-time, after cloning the repo).
 # Bypass policy per WORKFLOW §11 — no `--no-verify`. CI mirrors only the
-# pre-push `npm test` gate in `.github/workflows/test.yml` (Node 20 / 22).
+# pre-push `npm run verify` gate in `.github/workflows/test.yml` (Node 22 / 24).
 # The pre-commit leak-guard has no CI equivalent by design: CI runs against
 # already-committed refs, too late to stop a leak (ADR-0033 Alternatives).
 
@@ -56,7 +51,7 @@ commit-msg:
 
 # NOTE: no `piped: true` here — combined with `use_stdin: true` it makes
 # lefthook skip EVERY pre-push command on an empty-diff push ("no matching
-# push files"), silently disabling branch-guard and npm-test. Observed and
+# push files"), silently disabling branch-guard and npm-verify. Observed and
 # pinned by test/lefthook-wiring.test.js.
 pre-push:
   parallel: false
@@ -65,7 +60,7 @@ pre-push:
       run: node scripts/push-branch-guard.js
       use_stdin: true
       stage_fixed: false
-    npm-test:
+    npm-verify:
       # Via the runner script so the hook's git environment (GIT_DIR etc.)
       # never leaks into the suite's child processes — in a linked git
       # worktree that leak alone turns 13 tests red (task-0033).

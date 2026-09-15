@@ -26,9 +26,7 @@ import { migrateLegacyProject } from '../lib/legacy-project-migration.js';
 import { resolveScope, targetForScope } from '../lib/scope.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkg = JSON.parse(
-  readFileSync(join(__dirname, '..', '..', 'package.json'), 'utf8')
-);
+const pkg = JSON.parse(readFileSync(join(__dirname, '..', '..', 'package.json'), 'utf8'));
 
 const VALID_AGENTS = ['claude-code', 'codex'];
 const AGENT_FLAG_VALUES = ['claude-code', 'codex', 'both'];
@@ -93,9 +91,7 @@ function loadStatesOnce(cwd) {
 
 export async function updateCommand(opts) {
   if (opts.agent && !AGENT_FLAG_VALUES.includes(opts.agent)) {
-    throw new Error(
-      `invalid agent "${opts.agent}". Use one of: ${AGENT_FLAG_VALUES.join(', ')}`
-    );
+    throw new Error(`invalid agent "${opts.agent}". Use one of: ${AGENT_FLAG_VALUES.join(', ')}`);
   }
 
   const invocationCwd = process.cwd();
@@ -126,7 +122,10 @@ export async function updateCommand(opts) {
     });
     if (interactive) {
       p.intro(`agentic update — migrate legacy project${dryRun ? ' (dry-run)' : ''}`);
-      p.note(lines.join('\n') || '(no legacy Agentic Development files found)', dryRun ? 'Plan' : 'Result');
+      p.note(
+        lines.join('\n') || '(no legacy Agentic Development files found)',
+        dryRun ? 'Plan' : 'Result'
+      );
       p.outro(
         dryRun
           ? 'Dry-run only — nothing removed. Re-run without --dry-run to apply.'
@@ -166,7 +165,10 @@ export async function updateCommand(opts) {
 
   const confirmReplace = interactive
     ? async (question) => {
-        const answer = await p.confirm({ message: question, initialValue: false });
+        const answer = await p.confirm({
+          message: question,
+          initialValue: false,
+        });
         if (p.isCancel(answer)) return false;
         return answer;
       }
@@ -174,7 +176,10 @@ export async function updateCommand(opts) {
 
   const confirmRemove = interactive
     ? async (question) => {
-        const answer = await p.confirm({ message: question, initialValue: false });
+        const answer = await p.confirm({
+          message: question,
+          initialValue: false,
+        });
         if (p.isCancel(answer)) return false;
         return answer;
       }
@@ -249,9 +254,7 @@ export async function updateCommand(opts) {
 
   const confirmAppend = interactive
     ? async (path) => {
-        const answer = await p.confirm(
-          rootDocAppendPrompt(path, trackedState(cwd, path))
-        );
+        const answer = await p.confirm(rootDocAppendPrompt(path, trackedState(cwd, path)));
         if (p.isCancel(answer)) return false;
         return answer;
       }
@@ -286,25 +289,27 @@ export async function updateCommand(opts) {
         return Boolean(force);
       };
 
-  const rootDocAction = scope === 'project'
-    ? await updateRootDoc({
-        cwd,
-        skills: skillDisplayOrder,
-        confirmAppend,
-        confirmReplace: confirmRootDocReplace,
-        dryRun,
-      })
-    : { type: 'absent' };
+  const rootDocAction =
+    scope === 'project'
+      ? await updateRootDoc({
+          cwd,
+          skills: skillDisplayOrder,
+          confirmAppend,
+          confirmReplace: confirmRootDocReplace,
+          dryRun,
+        })
+      : { type: 'absent' };
 
   // Keep freshly-installed kit files out of a shared repo's commits
   // (ADR-0051 Decision 4). Skipped on a dry-run, which writes nothing.
-  const excluded = scope === 'user' || dryRun
-    ? 0
-    : await offerKitExclude({
-        cwd,
-        paths: [...new Set(allActions.map((a) => a.path))],
-        interactive,
-      });
+  const excluded =
+    scope === 'user' || dryRun
+      ? 0
+      : await offerKitExclude({
+          cwd,
+          paths: [...new Set(allActions.map((a) => a.path))],
+          interactive,
+        });
 
   const lines = allActions.map((a) => {
     const sym = ACTION_SYMBOL[a.type] ?? '?';

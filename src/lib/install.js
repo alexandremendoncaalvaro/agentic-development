@@ -97,7 +97,9 @@ function loadManifest(srcRoot) {
   try {
     raw = JSON.parse(readFileSync(path, 'utf8'));
   } catch (err) {
-    throw new Error(`malformed manifest at ${path}: ${err.message}`);
+    throw new Error(`malformed manifest at ${path}: ${err.message}`, {
+      cause: err,
+    });
   }
   return { subagents: Array.isArray(raw.subagents) ? raw.subagents : [] };
 }
@@ -123,9 +125,7 @@ function resolveSkillSource(agent, skill) {
   const layout = agentLayout(agent);
   const srcRoot = join(KIT_ROOT, layout.sourceDir, skill);
   if (!existsSync(srcRoot)) {
-    throw new Error(
-      `skill "${skill}" not found for agent "${agent}" (expected at ${srcRoot})`
-    );
+    throw new Error(`skill "${skill}" not found for agent "${agent}" (expected at ${srcRoot})`);
   }
   const manifest = loadManifest(srcRoot);
   const subagentSet = new Set(manifest.subagents);
@@ -141,14 +141,7 @@ function resolveSkillSource(agent, skill) {
   return { layout, srcRoot, subagentSet, walked };
 }
 
-function planFile({
-  src,
-  rel,
-  target,
-  relForReport,
-  prevSha,
-  force,
-}) {
+function planFile({ src, target, prevSha, force }) {
   const sourceSha = sha256Of(src);
   if (!existsSync(target)) {
     return { type: 'create', sourceSha };
@@ -224,12 +217,10 @@ export async function installSkills({
     const nextSkills = {};
 
     for (const skill of skills) {
-      const { layout, srcRoot, subagentSet, walked } = resolveSkillSource(agent, skill);
+      const { layout, subagentSet, walked } = resolveSkillSource(agent, skill);
       const targetRoot = join(cwd, layout.skillsDir, skill);
       const prevSkill = prev?.skills?.[skill] ?? null;
-      const prevByPath = new Map(
-        (prevSkill?.files ?? []).map((f) => [f.path, f.sourceSha])
-      );
+      const prevByPath = new Map((prevSkill?.files ?? []).map((f) => [f.path, f.sourceSha]));
       const skillFiles = [];
 
       for (const { src, rel } of walked) {
@@ -241,15 +232,11 @@ export async function installSkills({
         // the action log and in the per-agent state file. Windows users
         // sharing a state file with macOS / Linux teammates depend on it.
         const relForReport = toPosix(relative(cwd, target));
-        const prevSha = prevByPath.has(relForReport)
-          ? prevByPath.get(relForReport)
-          : null;
+        const prevSha = prevByPath.has(relForReport) ? prevByPath.get(relForReport) : null;
 
         const decision = planFile({
           src,
-          rel,
           target,
-          relForReport,
           prevSha,
           force,
         });
@@ -442,7 +429,7 @@ export function removeRetiredSkills({
 }) {
   const actions = [];
   const stateShas = new Map();
-  for (const [skill, entry] of Object.entries(previousState?.skills ?? {})) {
+  for (const entry of Object.values(previousState?.skills ?? {})) {
     for (const file of entry.files ?? []) {
       stateShas.set(file.path, file.sourceSha);
     }

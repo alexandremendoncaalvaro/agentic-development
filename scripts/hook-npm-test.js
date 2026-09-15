@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Pre-push test gate runner (task-0033). The npm-test gate itself is the
- * WORKFLOW.md §11 deterministic gate wired in lefthook.yml; this runner is
+ * Pre-push verification runner (task-0033, ADR-0078). The npm-verify gate is
+ * wired in lefthook.yml; this runner is
  * how it survives linked git worktrees.
  *
  * git exports GIT_DIR (and, in some paths, GIT_WORK_TREE / GIT_INDEX_FILE)
@@ -13,8 +13,9 @@
  * the suite; the gate then judges the pushed tree, not the hook's
  * environment.
  *
- * Runs `npm test` by default; argv overrides the command so the wiring
- * test can exercise the real spawn path without recursing into the suite.
+ * Runs the ADR-0078 `npm run verify` quality gate by default; argv overrides
+ * the command so the wiring test can exercise the real spawn path without
+ * recursing into the suite.
  */
 
 import { spawnSync } from 'node:child_process';
@@ -28,6 +29,10 @@ export function sanitizedEnv(env) {
   delete clean.GIT_WORK_TREE;
   delete clean.GIT_INDEX_FILE;
   return clean;
+}
+
+export function defaultGateCommand() {
+  return ['npm', 'run', 'verify'];
 }
 
 // Windows has no single answer for "run this command". `npm` is really
@@ -69,7 +74,7 @@ export function resolveSpawn(cmd, { platform = process.platform, env = process.e
 
 function main() {
   const argv = process.argv.slice(2);
-  const [cmd, ...args] = argv.length > 0 ? argv : ['npm', 'test'];
+  const [cmd, ...args] = argv.length > 0 ? argv : defaultGateCommand();
   const { command, shell } = resolveSpawn(cmd);
   const result = spawnSync(command, args, {
     stdio: 'inherit',

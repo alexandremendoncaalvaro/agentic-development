@@ -120,18 +120,9 @@ test('template contract round-trips the canonical Markdown shape', () => {
 
 test('template validation rejects privacy, provenance, approval, and identifier violations', () => {
   const cases = [
-    [
-      { schemaVersion: 99 },
-      'schemaVersion must be 1',
-    ],
-    [
-      { id: '../escape' },
-      'id must be a kebab-case path-safe identifier',
-    ],
-    [
-      { provenance: undefined },
-      'provenance must be an object',
-    ],
+    [{ schemaVersion: 99 }, 'schemaVersion must be 1'],
+    [{ id: '../escape' }, 'id must be a kebab-case path-safe identifier'],
+    [{ provenance: undefined }, 'provenance must be an object'],
     [
       {
         provenance: {
@@ -164,14 +155,8 @@ test('template validation rejects privacy, provenance, approval, and identifier 
       },
       'retainedExcerpts[0].retentionApproved must be true',
     ],
-    [
-      { approval: { status: 'draft', approvedBy: 'owner' } },
-      'approval.status must be approved',
-    ],
-    [
-      { unknownField: true },
-      'template contains an unsupported field',
-    ],
+    [{ approval: { status: 'draft', approvedBy: 'owner' } }, 'approval.status must be approved'],
+    [{ unknownField: true }, 'template contains an unsupported field'],
   ];
 
   for (const [override, expected] of cases) {
@@ -219,7 +204,10 @@ test('template resolution applies project over machine over bundled with visible
     assert.equal(result.templates.length, 2);
     const selected = result.templates.find(({ id }) => id === 'github-proposal-issue');
     assert.equal(selected.selectedLayer, 'project');
-    assert.deepEqual(selected.shadowed.map(({ layer }) => layer), ['machine', 'bundled']);
+    assert.deepEqual(
+      selected.shadowed.map(({ layer }) => layer),
+      ['machine', 'bundled']
+    );
     assert.deepEqual(result.conflicts, [
       {
         id: 'github-proposal-issue',
@@ -241,7 +229,12 @@ test('template resolution rejects duplicate identifiers inside one layer', () =>
     writeFileSync(join(bundled, 'publication', 'first.md'), renderTemplateMarkdown(template));
     writeFileSync(join(bundled, 'publication', 'second.md'), renderTemplateMarkdown(template));
     assert.throws(
-      () => resolveTemplateCatalog({ cwd: dir, bundledDir: bundled, machineDir: join(dir, 'none') }),
+      () =>
+        resolveTemplateCatalog({
+          cwd: dir,
+          bundledDir: bundled,
+          machineDir: join(dir, 'none'),
+        }),
       /duplicate template id github-proposal-issue in bundled/
     );
   } finally {
@@ -258,7 +251,12 @@ test('template resolution rejects a symlink that escapes a store', () => {
     writeFileSync(outside, renderTemplateMarkdown(validTemplate()));
     symlinkSync(outside, join(bundled, 'publication', 'github-proposal-issue.md'));
     assert.throws(
-      () => resolveTemplateCatalog({ cwd: dir, bundledDir: bundled, machineDir: join(dir, 'none') }),
+      () =>
+        resolveTemplateCatalog({
+          cwd: dir,
+          bundledDir: bundled,
+          machineDir: join(dir, 'none'),
+        }),
       /template store cannot contain symbolic link/
     );
   } finally {
@@ -275,15 +273,17 @@ test('template write requires approval for the exact candidate and preserves pri
     writeFileSync(input, JSON.stringify(validTemplate()));
 
     assert.throws(
-      () => writeTemplateAtomic({ inputPath: input, layer: 'machine', machineDir: machine }),
+      () =>
+        writeTemplateAtomic({
+          inputPath: input,
+          layer: 'machine',
+          machineDir: machine,
+        }),
       /write requires a recorded approval/
     );
 
     const prepared = prepareCandidate(input);
-    writeFileSync(
-      approval,
-      JSON.stringify(approvalFor(prepared))
-    );
+    writeFileSync(approval, JSON.stringify(approvalFor(prepared)));
     const result = writeTemplateAtomic({
       inputPath: input,
       approvalPath: approval,
@@ -295,12 +295,13 @@ test('template write requires approval for the exact candidate and preserves pri
 
     writeFileSync(input, JSON.stringify(validTemplate({ purpose: 'Changed after approval.' })));
     assert.throws(
-      () => writeTemplateAtomic({
-        inputPath: input,
-        approvalPath: approval,
-        layer: 'machine',
-        machineDir: machine,
-      }),
+      () =>
+        writeTemplateAtomic({
+          inputPath: input,
+          approvalPath: approval,
+          layer: 'machine',
+          machineDir: machine,
+        }),
       /approval does not match the exact candidate/
     );
     assert.equal(readFileSync(result.templatePath, 'utf8'), original);
@@ -318,12 +319,13 @@ test('template write requires approval for the exact candidate and preserves pri
       )
     );
     assert.throws(
-      () => writeTemplateAtomic({
-        inputPath: input,
-        approvalPath: approval,
-        layer: 'machine',
-        machineDir: machine,
-      }),
+      () =>
+        writeTemplateAtomic({
+          inputPath: input,
+          approvalPath: approval,
+          layer: 'machine',
+          machineDir: machine,
+        }),
       /approval does not match the target layer and visibility/
     );
   } finally {
@@ -341,10 +343,7 @@ test('project writes default to filename-scoped machine-local exclusion', () => 
     execFileSync('git', ['init', '-q'], { cwd: repo });
     writeFileSync(input, JSON.stringify(validTemplate()));
     const prepared = prepareCandidate(input);
-    writeFileSync(
-      approval,
-      JSON.stringify(approvalFor(prepared, { targetLayer: 'project' }))
-    );
+    writeFileSync(approval, JSON.stringify(approvalFor(prepared, { targetLayer: 'project' })));
 
     const result = writeTemplateAtomic({
       inputPath: input,
@@ -379,10 +378,7 @@ test('project exclusion update preserves unrelated bytes', () => {
     writeFileSync(excludePath, '# retained comment\n\n/existing-entry\n');
     writeFileSync(input, JSON.stringify(validTemplate()));
     const prepared = prepareCandidate(input);
-    writeFileSync(
-      approval,
-      JSON.stringify(approvalFor(prepared, { targetLayer: 'project' }))
-    );
+    writeFileSync(approval, JSON.stringify(approvalFor(prepared, { targetLayer: 'project' })));
 
     writeTemplateAtomic({
       inputPath: input,
@@ -407,11 +403,12 @@ test('interrupted atomic replacement preserves the prior file and cleans the tem
     const target = join(dir, 'template.md');
     writeFileSync(target, 'prior');
     assert.throws(
-      () => atomicWrite(target, 'replacement', 0o600, {
-        replace() {
-          throw new Error('simulated interruption');
-        },
-      }),
+      () =>
+        atomicWrite(target, 'replacement', 0o600, {
+          replace() {
+            throw new Error('simulated interruption');
+          },
+        }),
       /simulated interruption/
     );
     assert.equal(readFileSync(target, 'utf8'), 'prior');
@@ -448,7 +445,10 @@ test('template curator skill makes source, retention, and write gates explicit',
     );
     assert.match(skill, /never read a private source before the user approves/i);
     assert.match(skill, /never retain an exact excerpt without separate approval/i);
-    assert.match(skill, /never write a\s+template before the user approves the exact candidate digest/i);
+    assert.match(
+      skill,
+      /never write a\s+template before the user approves the exact candidate digest/i
+    );
     assert.match(skill, /one template\s+delta per invocation/i);
     assert.match(skill, /defaults to `machine-local`/i);
     assert.match(skill, /exact template filename/i);
@@ -474,7 +474,11 @@ test('template curator shared files and dogfood copies remain byte-identical', (
     ['src/skills/codex/ad-template-tune', '.agents/skills/ad-template-tune'],
   ]) {
     const sourceFiles = filesUnder(join(ROOT, source));
-    assert.deepEqual(filesUnder(join(ROOT, installed)), sourceFiles, `${installed} file set diverged`);
+    assert.deepEqual(
+      filesUnder(join(ROOT, installed)),
+      sourceFiles,
+      `${installed} file set diverged`
+    );
     for (const file of sourceFiles) {
       assert.ok(
         readFileSync(join(ROOT, source, file)).equals(readFileSync(join(ROOT, installed, file))),

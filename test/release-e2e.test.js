@@ -14,8 +14,7 @@ const KIT_ROOT = fileURLToPath(new URL('..', import.meta.url));
 // (no hooks: lefthook is not installed in the fixture).
 function mkReleaseRepo({ publishTag = 'latest' } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-release-e2e-'));
-  const git = (...args) =>
-    execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8' });
+  const git = (...args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8' });
   git('init', '-q', '-b', 'chore/release-test');
   git('config', 'user.name', 'Release E2E');
   git('config', 'user.email', 'release-e2e@example.com');

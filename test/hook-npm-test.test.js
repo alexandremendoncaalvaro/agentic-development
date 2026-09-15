@@ -49,7 +49,10 @@ test('resolveSpawn: a bare name resolving to an .exe is pinned to its full path'
   const dir = mkPathDir(['node.exe']);
   try {
     assert.deepEqual(
-      resolveSpawn('node', { platform: 'win32', env: { PATH: dir, PATHEXT: '.COM;.EXE;.CMD' } }),
+      resolveSpawn('node', {
+        platform: 'win32',
+        env: { PATH: dir, PATHEXT: '.COM;.EXE;.CMD' },
+      }),
       { command: join(dir, 'node.exe'), shell: false }
     );
   } finally {
@@ -61,7 +64,10 @@ test('resolveSpawn: a bare name resolving to a .cmd falls back to the shell', ()
   const dir = mkPathDir(['npm.cmd']);
   try {
     assert.deepEqual(
-      resolveSpawn('npm', { platform: 'win32', env: { PATH: dir, PATHEXT: '.COM;.EXE;.CMD' } }),
+      resolveSpawn('npm', {
+        platform: 'win32',
+        env: { PATH: dir, PATHEXT: '.COM;.EXE;.CMD' },
+      }),
       { command: 'npm', shell: true }
     );
   } finally {
@@ -73,12 +79,18 @@ test('resolveSpawn: PATHEXT order decides which shim wins', () => {
   const dir = mkPathDir(['tool.exe', 'tool.cmd']);
   try {
     assert.deepEqual(
-      resolveSpawn('tool', { platform: 'win32', env: { PATH: dir, PATHEXT: '.CMD;.EXE' } }),
+      resolveSpawn('tool', {
+        platform: 'win32',
+        env: { PATH: dir, PATHEXT: '.CMD;.EXE' },
+      }),
       { command: 'tool', shell: true },
       '.CMD listed first must win, matching how Windows itself resolves'
     );
     assert.deepEqual(
-      resolveSpawn('tool', { platform: 'win32', env: { PATH: dir, PATHEXT: '.EXE;.CMD' } }),
+      resolveSpawn('tool', {
+        platform: 'win32',
+        env: { PATH: dir, PATHEXT: '.EXE;.CMD' },
+      }),
       { command: join(dir, 'tool.exe'), shell: false }
     );
   } finally {
@@ -90,7 +102,10 @@ test('resolveSpawn: an unresolvable command keeps the previous shell behaviour',
   const dir = mkPathDir([]);
   try {
     assert.deepEqual(
-      resolveSpawn('nope', { platform: 'win32', env: { PATH: dir, PATHEXT: '.EXE;.CMD' } }),
+      resolveSpawn('nope', {
+        platform: 'win32',
+        env: { PATH: dir, PATHEXT: '.EXE;.CMD' },
+      }),
       { command: 'nope', shell: true },
       'the shell reports the missing command, as it did before resolution existed'
     );

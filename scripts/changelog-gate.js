@@ -21,12 +21,7 @@ import { pathToFileURL } from 'node:url';
 // Mirrors package.json#files — everything npm ships — minus README.md and
 // LICENSE (meta files, rarely changelog-worthy). src/ is watched whole:
 // src/index.js and src/leak-guard.js are in the tarball too.
-const WATCHED_PREFIXES = [
-  'src/',
-  'bin/',
-  'WORKFLOW.md',
-  'WORKFLOW-FLOWS.md',
-];
+const WATCHED_PREFIXES = ['src/', 'bin/', 'WORKFLOW.md', 'WORKFLOW-FLOWS.md'];
 
 /**
  * Decide whether a staged file set deserves a changelog reminder.

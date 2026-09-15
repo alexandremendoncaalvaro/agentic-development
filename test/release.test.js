@@ -16,18 +16,35 @@ test('package.json publishes prerelease builds to the latest dist-tag (ADR-0066)
   assert.equal(pkg.publishConfig.tag, 'latest');
 });
 
-// --- bumpVersion — house convention: every release is X.Y.Z-beta.N ---
-
-test('bumpVersion: patch resets to -beta.1 on the next patch line', () => {
-  assert.equal(bumpVersion('0.19.0-beta.1', 'patch'), '0.19.1-beta.1');
+test('package.json exposes the ADR-0078 stable runtime and verification contract', () => {
+  const pkg = JSON.parse(readFileSync(PACKAGE_PATH, 'utf8'));
+  assert.equal(pkg.engines.node, '>=22.13.0');
+  assert.equal(pkg.scripts.lint, 'eslint .');
+  assert.match(pkg.scripts['format:check'], /^prettier --check /);
+  assert.match(pkg.scripts['format:check'], /"bin\/\*\*\/\*\.js"/);
+  assert.doesNotMatch(pkg.scripts['format:check'], /'/);
+  assert.equal(pkg.scripts['security:audit'], 'npm audit --audit-level=high');
+  assert.equal(
+    pkg.scripts.verify,
+    'npm run lint && npm run format:check && npm test && npm run security:audit'
+  );
+  assert.equal(pkg.scripts.prepublishOnly, 'npm run verify');
 });
 
-test('bumpVersion: minor resets patch and lands on -beta.1', () => {
-  assert.equal(bumpVersion('0.19.0-beta.1', 'minor'), '0.20.0-beta.1');
+// --- bumpVersion — SemVer releases with an explicit beta continuation ---
+
+test('bumpVersion: patch promotes a beta core and increments a stable patch', () => {
+  assert.equal(bumpVersion('0.19.0-beta.1', 'patch'), '0.19.0');
+  assert.equal(bumpVersion('1.2.3', 'patch'), '1.2.4');
 });
 
-test('bumpVersion: major resets minor and patch and lands on -beta.1', () => {
-  assert.equal(bumpVersion('0.19.0-beta.1', 'major'), '1.0.0-beta.1');
+test('bumpVersion: minor promotes a beta minor core and increments a stable minor', () => {
+  assert.equal(bumpVersion('0.19.0-beta.1', 'minor'), '0.19.0');
+  assert.equal(bumpVersion('1.2.3', 'minor'), '1.3.0');
+});
+
+test('bumpVersion: major promotes the pre-1.0 beta line to stable 1.0.0', () => {
+  assert.equal(bumpVersion('0.20.0-beta.11', 'major'), '1.0.0');
 });
 
 test('bumpVersion: prerelease increments the beta counter only', () => {
@@ -35,12 +52,13 @@ test('bumpVersion: prerelease increments the beta counter only', () => {
   assert.equal(bumpVersion('0.18.0-beta.5', 'prerelease'), '0.18.0-beta.6');
 });
 
-test('bumpVersion: prerelease on a bare version throws (no beta counter)', () => {
-  assert.throws(() => bumpVersion('0.19.0', 'prerelease'), /patch\|minor\|major/);
+test('bumpVersion: prerelease on a stable version starts the next patch beta at one', () => {
+  assert.equal(bumpVersion('1.2.3', 'prerelease'), '1.2.4-beta.1');
 });
 
-test('bumpVersion: bare version accepts patch/minor/major bumps', () => {
-  assert.equal(bumpVersion('0.19.0', 'patch'), '0.19.1-beta.1');
+test('bumpVersion: major follows SemVer for stable and beta versions', () => {
+  assert.equal(bumpVersion('1.2.3', 'major'), '2.0.0');
+  assert.equal(bumpVersion('1.0.0-beta.1', 'major'), '1.0.0');
 });
 
 test('bumpVersion: non-beta prerelease suffix throws', () => {

@@ -1,32 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  mkdirSync,
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-  readFileSync,
-  existsSync,
-} from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { detectAgents, detectMode } from '../src/lib/detect.js';
 import { bundledSkills, installSkills } from '../src/lib/install.js';
-import {
-  updateRootDoc,
-  rootDocAppendPrompt,
-  rootDocReplacePrompt,
-} from '../src/lib/rootdoc.js';
-import {
-  trackedState,
-  writeExcludeEntries,
-  installedPathsToExclude,
-} from '../src/lib/git.js';
-import {
-  offerKitExclude,
-  kitExcludeCandidates,
-} from '../src/commands/kit-exclude.js';
+import { updateRootDoc, rootDocAppendPrompt, rootDocReplacePrompt } from '../src/lib/rootdoc.js';
+import { writeExcludeEntries, installedPathsToExclude } from '../src/lib/git.js';
+import { offerKitExclude, kitExcludeCandidates } from '../src/commands/kit-exclude.js';
 import { userLevelInstallPath } from '../src/lib/state.js';
 
 function mkGitRepo() {
@@ -49,10 +31,7 @@ function mkScratch() {
 // first; look the action up by the path under test instead.
 function actionFor(actions, path) {
   const match = actions.find((action) => action.path.split('\\').join('/') === path);
-  assert.ok(
-    match,
-    `no action for ${path}; got ${actions.map((a) => a.path).join(', ')}`
-  );
+  assert.ok(match, `no action for ${path}; got ${actions.map((a) => a.path).join(', ')}`);
   return match;
 }
 
@@ -492,7 +471,10 @@ test('updateRootDoc: marker strings inside a fenced code block are NOT treated a
     const after = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
     assert.ok(after.startsWith(userBody), 'user content (incl. fenced markers) must be preserved');
     // The user's literal marker text inside the fence is intact:
-    assert.match(after, /```\n<!-- agentic-managed-skills:start -->\n\.\.\. table of skills \.\.\.\n<!-- agentic-managed-skills:end -->\n```/);
+    assert.match(
+      after,
+      /```\n<!-- agentic-managed-skills:start -->\n\.\.\. table of skills \.\.\.\n<!-- agentic-managed-skills:end -->\n```/
+    );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -539,20 +521,12 @@ test('updateRootDoc: ad-philosophy advertises both the slash command and the imp
       confirmAppend: async () => true,
     });
     const updated = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
-    const row = updated
-      .split('\n')
-      .find((line) => line.startsWith('| `ad-philosophy` |'));
+    const row = updated.split('\n').find((line) => line.startsWith('| `ad-philosophy` |'));
     assert.ok(row, 'ad-philosophy row must exist in the managed table');
     assert.match(row, /`\/ad-philosophy`/, 'slash command must be advertised');
     assert.match(row, /implicit/, 'implicit auto-load must still be signalled');
-    const otherRow = updated
-      .split('\n')
-      .find((line) => line.startsWith('| `ad-bootstrap` |'));
-    assert.doesNotMatch(
-      otherRow,
-      /implicit/,
-      'the dual-surface note is specific to ad-philosophy'
-    );
+    const otherRow = updated.split('\n').find((line) => line.startsWith('| `ad-bootstrap` |'));
+    assert.doesNotMatch(otherRow, /implicit/, 'the dual-surface note is specific to ad-philosophy');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -616,7 +590,11 @@ test('rootDocAppendPrompt: unknown tracking state is treated as not shared', () 
 
 test('rootDocReplacePrompt: names the sharing risk and the lost-edits risk, defaults to no', () => {
   const { message, initialValue } = rootDocReplacePrompt('AGENTS.md');
-  assert.equal(initialValue, false, 'regenerating a shared, edited section must not be pre-answered yes');
+  assert.equal(
+    initialValue,
+    false,
+    'regenerating a shared, edited section must not be pre-answered yes'
+  );
   assert.match(message, /tracked by git/);
   assert.match(message, /everyone who clones the repo/);
   assert.match(message, /lost/);
@@ -657,10 +635,7 @@ test('writeExcludeEntries: idempotent — a second run adds nothing already pres
     assert.deepEqual(res.added, ['/.claude/skills/ad-review/SKILL.md']);
     const second = readFileSync(join(dir, '.git/info/exclude'), 'utf8');
     // The already-present entry appears exactly once.
-    assert.equal(
-      (second.match(/\/\.claude\/skills\/ad-audit\/SKILL\.md/g) || []).length,
-      1
-    );
+    assert.equal((second.match(/\/\.claude\/skills\/ad-audit\/SKILL\.md/g) || []).length, 1);
     assert.ok(second.startsWith(first), 'existing content preserved verbatim');
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -706,10 +681,7 @@ test('userLevelInstallPath: finds a user-level state file, null when absent', ()
     assert.equal(userLevelInstallPath(home), null);
     mkdirSync(join(home, '.claude'), { recursive: true });
     writeFileSync(join(home, '.claude/agentic-state.json'), '{}');
-    assert.equal(
-      userLevelInstallPath(home),
-      join(home, '.claude/agentic-state.json')
-    );
+    assert.equal(userLevelInstallPath(home), join(home, '.claude/agentic-state.json'));
   } finally {
     rmSync(home, { recursive: true, force: true });
   }
@@ -788,9 +760,16 @@ test('writeExcludeEntries: fail-open outside a git repository — writes nothing
 test('regression: bundledSkills ignores dot-directories in the skill source tree (task-0065)', () => {
   const kitRoot = mkdtempSync(join(tmpdir(), 'agentic-bundled-'));
   try {
-    mkdirSync(join(kitRoot, 'src', 'skills', 'claude-code', 'ad-real'), { recursive: true });
-    mkdirSync(join(kitRoot, 'src', 'skills', 'claude-code', '.stray', 'eval'), { recursive: true });
-    writeFileSync(join(kitRoot, 'src', 'skills', 'claude-code', '.stray', 'eval', 'usage.jsonl'), '{}\n');
+    mkdirSync(join(kitRoot, 'src', 'skills', 'claude-code', 'ad-real'), {
+      recursive: true,
+    });
+    mkdirSync(join(kitRoot, 'src', 'skills', 'claude-code', '.stray', 'eval'), {
+      recursive: true,
+    });
+    writeFileSync(
+      join(kitRoot, 'src', 'skills', 'claude-code', '.stray', 'eval', 'usage.jsonl'),
+      '{}\n'
+    );
 
     assert.deepEqual(bundledSkills('claude-code', { kitRoot }), ['ad-real']);
   } finally {

@@ -14,7 +14,8 @@ const SECTION_END = '<!-- agentic-managed-skills:end -->';
 // these patterns failed to recognize a section the installer had written
 // itself, so it appended a second one instead of replacing the first and the
 // file ended up with two contradictory skill tables.
-const SECTION_START_RE = /^<!-- agentic-managed-skills:start -->\r?\n\r?\n## Skills installed by `agentic`/m;
+const SECTION_START_RE =
+  /^<!-- agentic-managed-skills:start -->\r?\n\r?\n## Skills installed by `agentic`/m;
 const SECTION_END_RE = /^<!-- agentic-managed-skills:end -->\r?$/m;
 
 // Where installed SKILL.md files live per agent. Mirrors the install layout
@@ -59,9 +60,7 @@ function readSkillSummary(cwd, skill) {
       `skill ${skill} is installed but no SKILL.md carries a non-empty \`summary:\` frontmatter field`
     );
   }
-  throw new Error(
-    `skill ${skill} not found at any installed location; cannot read summary`
-  );
+  throw new Error(`skill ${skill} not found at any installed location; cannot read summary`);
 }
 
 /**
@@ -92,10 +91,7 @@ function buildSection(cwd, skills) {
     const note = readSkillSummary(cwd, skill);
     // ad-philosophy auto-loads as posture, but an explicit `/ad-philosophy`
     // is a distinct mode (ADR-0044), so the table must advertise both.
-    const invoke =
-      skill === 'ad-philosophy'
-        ? `\`/${skill}\` _(also implicit)_`
-        : `\`/${skill}\``;
+    const invoke = skill === 'ad-philosophy' ? `\`/${skill}\` _(also implicit)_` : `\`/${skill}\``;
     lines.push(`| \`${skill}\` | ${invoke} | ${note} |`);
   }
   lines.push('');
@@ -138,9 +134,8 @@ export function removeManagedSkillsSection({ cwd, name, dryRun = false }) {
   const after = body.slice(bounds.endIdx + SECTION_END.length);
   // The installer separates an appended section with a blank line and leaves
   // one trailing newline. Drop only that joining newline, never prose around it.
-  const updated = before.endsWith('\n\n') && after.startsWith('\n')
-    ? before + after.slice(1)
-    : before + after;
+  const updated =
+    before.endsWith('\n\n') && after.startsWith('\n') ? before + after.slice(1) : before + after;
   if (!dryRun) writeFileSync(path, updated);
   return { type: 'migration-removed', path: name };
 }

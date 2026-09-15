@@ -8,17 +8,12 @@ import { uninstallCommand } from './commands/uninstall.js';
 import { menuCommand } from './commands/menu.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkg = JSON.parse(
-  readFileSync(join(__dirname, '..', 'package.json'), 'utf8')
-);
+const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'));
 
 export async function run(argv) {
   const program = new Command();
 
-  program
-    .name('agentic')
-    .description(pkg.description)
-    .version(pkg.version);
+  program.name('agentic').description(pkg.description).version(pkg.version);
 
   program
     .command('init')
@@ -34,8 +29,13 @@ export async function run(argv) {
 
   program
     .command('update')
-    .description('Pull upstream kit changes into the global install by default, or an explicit project install')
-    .option('-a, --agent <agent>', 'restrict update to a specific agent: claude-code | codex | both')
+    .description(
+      'Pull upstream kit changes into the global install by default, or an explicit project install'
+    )
+    .option(
+      '-a, --agent <agent>',
+      'restrict update to a specific agent: claude-code | codex | both'
+    )
     .option('--scope <scope>', 'install scope: user (default) | project')
     .option('-y, --yes', 'skip confirmation prompts (non-interactive)')
     .option('--dry-run', 'preview the action plan without writing any files')
@@ -53,7 +53,10 @@ export async function run(argv) {
   program
     .command('uninstall')
     .description('Remove agentic-managed files from this project while preserving local edits')
-    .option('-a, --agent <agent>', 'restrict removal to a specific agent: claude-code | codex | both')
+    .option(
+      '-a, --agent <agent>',
+      'restrict removal to a specific agent: claude-code | codex | both'
+    )
     .option('--scope <scope>', 'removal scope: project (default) | user')
     .option('-y, --yes', 'skip the destructive-action confirmation prompt')
     .option('--dry-run', 'preview the action plan without removing files')

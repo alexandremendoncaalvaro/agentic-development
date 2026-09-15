@@ -158,7 +158,11 @@ Tier is editable as the project matures (append a rationale paragraph; do not de
 ### 4.4 Versioning
 
 - [Semantic Versioning 2.0](https://semver.org). Major.Minor.Patch.
-- Pre-1.0: minor bumps may break CLI flags; document in release notes.
+- The stable public API begins at 1.0.0. Breaking public CLI or skill-contract
+  changes require a major bump; backward-compatible features use minor and
+  fixes use patch.
+- `prerelease` explicitly starts or continues a `-beta.N` line. Stable
+  `patch`, `minor`, and `major` bumps do not gain a beta suffix implicitly.
 
 ---
 
@@ -167,7 +171,8 @@ Tier is editable as the project matures (append a rationale paragraph; do not de
 ### 6.1 Toolchain
 
 - **Language:** JavaScript, ESM (`"type": "module"`).
-- **Node:** ≥20.12.0 (Node 18 EOL; `@clack/prompts` 1.x requires `node:util` `styleText`, which shipped in 20.12.0 — not anywhere earlier in the 20.x line).
+- **Node:** ≥22.13.0. Node 20 is end-of-life; the floor also matches the
+  supported ESLint toolchain used by the release-quality gate.
 - **Build step:** **none.** Source is what ships; no transpilation, no bundling.
 - **Source of truth for scripts:** `package.json` `scripts` field.
 
@@ -186,15 +191,16 @@ Tier is editable as the project matures (append a rationale paragraph; do not de
 
 ## 7. Static Analysis and Formatting
 
-**Current state: none wired.** This is a known gap.
+ESLint and Prettier are blocking release-quality checks under ADR-0078.
 
 | Tool | Status | Action |
 |------|--------|--------|
-| Formatter (Prettier / Biome) | not yet wired | `/ad-hooks` to scaffold; choose Prettier or Biome based on team preference |
-| Linter (ESLint / Biome) | not yet wired | same |
+| Formatter (Prettier) | `npm run format:check` | check executable JavaScript and active configuration; never rewrite historical records as a gate |
+| Linter (ESLint) | `npm run lint` | flat config, recommended rules, Node globals |
 | Type checker (TypeScript / JSDoc) | not yet wired | optional — JSDoc preferred for kit minimality |
 
-Until tooling is wired, manual review per PR enforces §2 Code Standards. Adding lint/format gates is a separate decision per [ADR-0007](doc/adr/0007-workflow-operational-skills.md) §6.
+Formatting changes use the checked-in Prettier configuration. Lint and format
+checks compose with tests and the dependency audit through `npm run verify`.
 
 ---
 
@@ -214,19 +220,19 @@ Developer commits
   Developer pushes
         |
   pre-push (lefthook)     branch-guard (ADR-0048, blocks pushes updating
-                          main/cli), then npm test (full suite)
+                          main), then npm run verify
                           Bootstrap: `lefthook install` after clone AND
                           after any hook-stage change. Config: lefthook.yml
         |
-  GitHub Actions CI       npm test across Node 20 / 22
+  GitHub Actions CI       npm run verify across Node 22.13 / 24
                           .github/workflows/test.yml
 ```
 
-- **Pre-commit / commit-msg hooks:** `leak-guard` ([ADR-0033](doc/adr/0033-house-ip-leak-guard.md)), `changelog-gate` and `subject-check` ([ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)). Lint/format gates remain unwired — adding them stays a separate decision (own ADR + Task per [ADR-0007](doc/adr/0007-workflow-operational-skills.md) §6).
-- **Pre-push hook:** `branch-guard` refuses a push updating `main`/`cli`, then `npm test` runs the full suite. Mandatory before push.
-- **CI:** mirrors pre-push across Node 20 / 22 matrix. Redundant with the local hook; both stay wired so a missing local install does not skip the gate.
+- **Pre-commit / commit-msg hooks:** `leak-guard` ([ADR-0033](doc/adr/0033-house-ip-leak-guard.md)), `changelog-gate` and `subject-check` ([ADR-0048](doc/adr/0048-kit-release-discipline-gates.md)).
+- **Pre-push hook:** `branch-guard` refuses a push updating `main`, then `npm run verify` runs lint, formatting, tests, and the high-severity dependency audit. Mandatory before push.
+- **CI:** runs the same `npm run verify` command across the minimum Node 22.13 and Node 24 matrix on Ubuntu and Windows. Redundant with the local hook; both stay wired so a missing local install does not skip the gate.
 - **Never bypass.** No `--no-verify`, no skipped hooks, no deleted failing tests.
-- **CI failure is a local gate gap** ([WORKFLOW.md §11](WORKFLOW.md), TL;DR #22, [ADR-0032](doc/adr/0032-ci-failure-is-local-gate-gap.md)). Pre-push mirrors what CI runs — same commands, same matrix when it changes the failure surface. If CI catches something pre-push did not, close the gate locally; do not iterate red CI runs. `/ad-pr` refuses to open a PR on local red; `/ad-hooks` diffs pre-push against the CI config and warns on drift.
+- **CI failure is a local gate gap** ([WORKFLOW.md §11](WORKFLOW.md), TL;DR #22, [ADR-0032](doc/adr/0032-ci-failure-is-local-gate-gap.md)). Pre-push and CI use the same command. The explicit [ADR-0065](doc/adr/0065-run-ci-on-windows.md) exception keeps pre-push single-machine because it cannot emulate another OS; every remote matrix leg is therefore required, and `/ad-hooks` reports the remaining matrix difference. If CI exposes a reproducible local gap, close it locally; do not iterate red CI runs. `/ad-pr` refuses to open a PR on local red.
 
 ---
 
@@ -396,8 +402,13 @@ The following do not require permission prompts when invoked by an agent:
 
 ### 12.6 Dependency Audit
 
-- `npm audit` not wired into CI today. Gap — pre-1.0 acceptable; pre-release blocker.
-- Manual audit on dependency bumps.
+- `npm run security:audit` runs `npm audit --audit-level=high` inside the local,
+  CI, and prepublish `npm run verify` gate. High and critical findings block;
+  lower-severity findings remain visible for review.
+- GitHub secret scanning and push protection cover supported credential patterns
+  at the remote boundary. The blocking local `leak-guard` covers the repository's
+  private denylist and unsafe paths. ADR-0078 records why no second generic local
+  secret scanner is currently justified.
 
 ### 12.7 MCP Servers
 

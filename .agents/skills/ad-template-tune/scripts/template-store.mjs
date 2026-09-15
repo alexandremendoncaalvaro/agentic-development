@@ -346,7 +346,9 @@ function readLayer(name, root) {
     try {
       template = parseTemplateMarkdown(markdown);
     } catch (error) {
-      throw new Error(`${name} template ${path} is invalid: ${error.message}`);
+      throw new Error(`${name} template ${path} is invalid: ${error.message}`, {
+        cause: error,
+      });
     }
     const errors = validateTemplate(template);
     if (errors.length) {
@@ -478,7 +480,9 @@ function readApproval(approvalPath, prepared, target) {
   try {
     approval = JSON.parse(readFileSync(absolute(approvalPath), 'utf8'));
   } catch (error) {
-    if (error instanceof SyntaxError) throw new Error('approval data is not valid JSON');
+    if (error instanceof SyntaxError) {
+      throw new Error('approval data is not valid JSON', { cause: error });
+    }
     throw error;
   }
   const allowed = [

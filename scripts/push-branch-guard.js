@@ -2,8 +2,8 @@
 /**
  * Pre-push branch guard (ADR-0048).
  *
- * Blocks a push that updates refs/heads/main or refs/heads/cli — the two
- * branches AGENTS.md and GUIDELINES.md §10.1 say are never pushed directly.
+ * Blocks a push that updates refs/heads/main, which AGENTS.md and
+ * GUIDELINES.md §10.1 say is never pushed directly.
  * Deterministic, so per ad-hooks' advisory-first debut rule it may block
  * from day one. The audited live state (task-0032) showed main has no
  * GitHub-side protection; this is the clone-local layer, and enabling
@@ -22,8 +22,8 @@ import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
-const PROTECTED_REFS = new Set(['refs/heads/main', 'refs/heads/cli']);
-const PROTECTED_BRANCHES = new Set(['main', 'cli']);
+const PROTECTED_REFS = new Set(['refs/heads/main']);
+const PROTECTED_BRANCHES = new Set(['main']);
 
 /**
  * Decide whether a push must be refused.
@@ -50,7 +50,7 @@ export function pushViolation(stdinText, currentBranch) {
 }
 
 function main() {
-  let stdinText = '';
+  let stdinText;
   try {
     stdinText = readFileSync(0, 'utf8');
   } catch {
