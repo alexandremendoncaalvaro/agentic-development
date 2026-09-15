@@ -18,24 +18,46 @@ decision rule follows from the result. Separate observed facts, inferences,
 choices, and open gaps. Do not infer baseline, candidate, winner, or intended
 replacement from ordering or names.
 
-## Choose proportionate assurance
+## Choose evaluation dimensions independently
 
-Start with the smallest level that can support the intended decision:
+Select each dimension from the decision and available evidence:
 
-1. **Technical verification** checks that the system and evidence pipeline work
-   as declared.
-2. **Human smoke test** finds obvious usability or workflow failures with a
-   deliberately limited claim.
-3. **Exploratory comparison** discovers patterns and estimates uncertainty; it
-   does not silently become confirmatory evidence.
-4. **Confirmatory study** tests a prespecified claim and decision rule with
-   justified design assumptions.
-5. **Limited field validation** checks fit in the target context under explicit
-   rollout and stop conditions.
+- **Setting** — where evidence can be produced: local, bench, replay, staging,
+  shadow, pilot, production, or another declared context.
+- **Claim type** — what the result may support: technical operation, diagnosis,
+  exploration, candidate selection, estimation, superiority, parity,
+  equivalence, non-inferiority, causality, or fit for use.
+- **Study design** — how the question will be answered: deterministic check,
+  observational study, paired comparison, randomized or blocked comparison,
+  factorial design, human evaluation, or another justified method.
+- **Evidence source** — what can support the claim: tests, replay, telemetry,
+  corpora, scenarios, human observations, field outcomes, or authorized
+  adjudication material.
+- **Assurance rigor** — how much scrutiny is proportionate to stakes,
+  reversibility, uncertainty, complexity, and the cost of a wrong decision.
 
-Use multiple gates only when each retires a different uncertainty. Do not turn a
-small reversible choice into a research program or under-assure a consequential
-decision.
+These dimensions are not a maturity ladder or required sequence. A bounded
+evaluation may start and stop in the requested setting when it answers the
+decision. A local or bench study may be confirmatory; a production observation
+may remain exploratory. Environment alone establishes neither rigor nor claim
+strength.
+
+Use multiple settings or gates only when each retires a different uncertainty.
+The disposition may be proceed, revise, stop, escalate, or collect one named
+missing piece of evidence. Do not turn a small reversible choice into a research
+program or under-assure a consequential decision.
+
+## Divide judgment from deterministic gates
+
+The model owns contextual method fit, source applicability, and fit-for-purpose
+judgment. A qualified human remains the final authority where domain expertise,
+taste, ethics, policy, or consequential trade-offs determine adequacy.
+
+Deterministic scripts own repeatable checks of structure, provenance
+completeness, arithmetic, identifier consistency, and artifact integrity. Use
+them before interpretation so mechanical defects do not consume judgment. A
+script or validator pass does not establish source truth, source applicability,
+methodological validity, or fitness for the intended decision.
 
 ## Design what answers the question
 

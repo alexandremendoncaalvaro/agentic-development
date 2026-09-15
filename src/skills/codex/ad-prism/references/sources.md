@@ -16,6 +16,10 @@ decision thresholds.
 
 ## Evaluation construction
 
+- NIST/SEMATECH, [Selecting an experimental
+  design](https://www.itl.nist.gov/div898/handbook/pri/section3/pri33.htm) —
+  selects designs from the objective, factors, resources, and validity needs
+  rather than from a fixed environment sequence.
 - OpenAI, [Evaluation best
   practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices)
   — supports task-specific evaluations, representative distributions, edge
@@ -24,6 +28,17 @@ decision thresholds.
   agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)
   — distinguishes tasks, trials, graders, traces, outcomes, and the evaluation
   harness.
+
+## Skill evaluation
+
+- Anthropic, [Skill authoring best
+  practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
+  — supports progressive disclosure, appropriate constraint, executable
+  helpers, and evaluation-driven skill development.
+- .NET Skills, [create-skill-test
+  reference](https://github.com/dotnet/skills/blob/main/.agents/skills/create-skill-test/SKILL.md)
+  — a public implementation reference for natural prompts, baseline-versus-skill
+  comparison, outcome rubrics, deterministic graders, and dormancy cases.
 
 ## Assurance and fit for purpose
 

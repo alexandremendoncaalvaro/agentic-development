@@ -1,6 +1,19 @@
 {
   "cases": [
     {
+      "id": "bounded-local-bench",
+      "domain": "software performance",
+      "prompt": "Design only a local bench evaluation for a parser optimization. We need to decide whether the implementation meets its fixed latency and correctness contract on this machine; do not design a rollout program.",
+      "expected_route": "ad-prism",
+      "expected_outcomes": [
+        "keeps the evaluation bounded to the local bench decision",
+        "treats local as the evidence setting rather than a low assurance level",
+        "uses deterministic correctness and latency evidence with declared machine conditions",
+        "allows stop as the disposition when the contract is answered",
+        "does not add staging, pilot, production, or A/B as a required sequence"
+      ]
+    },
+    {
       "id": "software-rollout-design",
       "domain": "software delivery",
       "prompt": "We changed checkout request routing. Design the smallest evaluation that can decide whether a guarded rollout is justified without hiding completion-rate risk.",
@@ -27,6 +40,32 @@
       ]
     },
     {
+      "id": "out-of-scope-domain-adapter",
+      "domain": "software delivery",
+      "project_context": "The optional project adapter declares document extraction as its scope and contains layout-family vocabulary.",
+      "prompt": "We changed checkout request routing. Design the smallest evaluation that can decide whether a guarded rollout is justified without hiding completion-rate risk.",
+      "expected_route": "ad-prism",
+      "expected_outcomes": [
+        "uses the generic evaluation method and facts supplied by the request",
+        "does not mention or echo irrelevant adapter domain context",
+        "keeps completion rate as a guardrail",
+        "does not ask for adapter details that cannot change this decision"
+      ]
+    },
+    {
+      "id": "method-source-traceability",
+      "domain": "product experimentation",
+      "prompt": "Recommend a method for comparing two onboarding flows, and make the recommendation auditable. Explain exactly what the source contributes, how you adapt it here, and what limitation remains rather than borrowing its numbers.",
+      "expected_route": "ad-prism",
+      "expected_outcomes": [
+        "links the recommended method to a direct source locator",
+        "states the source contribution to this methodological choice",
+        "states the adaptation made for the current population and decision",
+        "records the retained limit after adaptation",
+        "does not copy a sample size, threshold, or margin without a justified mapping"
+      ]
+    },
+    {
       "id": "support-workflow-interpretation",
       "domain": "service operations",
       "prompt": "A pilot changed how support cases are triaged. Interpret the agent ratings and routing telemetry, explain what they can establish, and recommend the next evidence gate.",
@@ -37,6 +76,19 @@
         "keeps repeated ratings grouped by independent unit",
         "states material access or attribution gaps",
         "names what the pilot cannot generalize"
+      ]
+    },
+    {
+      "id": "production-observation-is-not-confirmation",
+      "domain": "service operations",
+      "prompt": "We observed a new support-routing configuration in production, but assignment was not controlled and the telemetry cannot attribute the change. Does the production setting make the result confirmatory? State what decision this evidence can support.",
+      "expected_route": "ad-prism",
+      "expected_outcomes": [
+        "treats production as the evidence setting rather than an assurance level",
+        "states that production observation does not make the result confirmatory or causal",
+        "uses an observational evidence classification",
+        "limits the supported decision to what the observed association can establish",
+        "names attribution or comparison evidence required for a stronger claim"
       ]
     },
     {
