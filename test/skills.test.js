@@ -1328,6 +1328,34 @@ test('every diff-reading reviewer brief carries the platform-identifier guard, o
   }
 });
 
+test('fresh-context reviewers leave the repository unchanged after verification', () => {
+  const briefs = [
+    'claude-code/ad-review/agents/fresh-context-reviewer.md',
+    'codex/ad-review/agents/fresh-context-reviewer.toml',
+  ];
+
+  for (const rel of briefs) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8').toLowerCase();
+    assert.match(
+      body,
+      /(?:operating-system|os)\s+temp(?:orary)? directory/,
+      `${rel} must keep verification artifacts outside the repository`
+    );
+    assert.match(
+      body,
+      /(?:git status --porcelain[\s\S]{0,120}|repository (?:status|tree)[^\n]{0,120})\bsame\b/,
+      `${rel} must require an unchanged repository after review`
+    );
+  }
+
+  const claude = readFileSync(
+    join(SKILLS_ROOT, briefs[0]),
+    'utf8'
+  ).toLowerCase();
+  assert.match(claude, /(?:delete|remove)[\s\S]{0,80}when you are\s+done/);
+  assert.match(claude, /never modify tracked files/);
+});
+
 test('the guard list covers every brief that exists, so a new brief cannot be forgotten', () => {
   const found = [];
   for (const agent of ['claude-code', 'codex']) {

@@ -18,6 +18,9 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- `/ad-review` fresh-context reviewer contracts now direct verification
+  artifacts outside the target repository, require temporary-file cleanup, and
+  require repository status to remain unchanged.
 - Optional Prism domain adapters apply only when an evaluation matches their
   declared scope. Out-of-scope requests use the generic method without echoing
   unrelated project vocabulary.
