@@ -1,6 +1,6 @@
 # Task `0075`: Keep review artifacts outside repositories
 
-**Status:** in-progress
+**Status:** done
 **Created:** `2026-09-15`
 **Scope ref:** doc/adr/0007-workflow-operational-skills.md
 **Evidence ref:** doc/research/0018-ground-reviewer-repository-cleanliness.md
@@ -25,7 +25,7 @@ and verified for both hosts.
 - [x] The Claude Code reviewer explicitly removes temporary artifacts after use and never modifies tracked repository files.
 - [x] A public-contract test fails when either host loses the repository-cleanliness invariant.
 - [x] Canonical host sources, installed reviewer definitions, and package contents remain synchronized.
-- [ ] The stale PR is superseded only after the clean successor is merged.
+- [x] The stale PR is superseded only after the clean successor is merged.
 
 ## Plan
 
@@ -33,7 +33,7 @@ and verified for both hosts.
 - [x] Add one failing public-contract test for both host reviewer definitions and confirm the expected RED result.
 - [x] Add the minimum host-specific instruction text, refresh dogfood, and confirm GREEN.
 - [x] Update the changelog, run focused and full gates, then complete `ad-review` and `ad-audit`.
-- [ ] Commit, open and merge a clean successor PR, then close PR #126 with an exact approved explanation.
+- [x] Commit, open and merge a clean successor PR, then close PR #126 with an exact approved explanation.
 
 ## Notes
 
@@ -66,6 +66,12 @@ questions. Final gates remained green: focused 1/1, full suite 937/937,
 ground validator valid with A1/B2/C2/D1, package dry-run 339 entries, and both
 canonical/install comparisons byte-identical.
 
+PR #134 merged the clean successor into `main` as
+`9b98d51b6afc790a05acd5ea4f5226fab95d9be5` after all four required CI jobs
+passed. Only then was PR #126 closed with the owner's exact approved
+explanation. The implementation, verification, dogfood, merge, and stale-PR
+cleanup are complete.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -73,4 +79,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
