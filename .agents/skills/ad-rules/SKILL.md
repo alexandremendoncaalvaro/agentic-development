@@ -94,7 +94,13 @@ Step 5 — apply correction mode. For "The Rules", `ad-rules`, or an equivalent 
 1. Invoke `ad-philosophy` as the explicit recommitment for the current task and use its task-specific applied-binding statement. Do not copy or paraphrase the eight behaviors here; `ad-philosophy` remains their owner.
 2. Compare the immediate plan and next action with that applied binding and the resolved rule sources. Correct any conflicting or incompatible plan or next action in the same pass. Name the concrete correction and its source. This is plan correction, not an audit verdict about completed work.
 3. Build a settled correction fact packet with the project, final objective, recent result, corrected current target and rationale, next direction, done condition, blockers, confidence limits, and any genuine owner decision. Pass the settled correction fact packet to `ad-brief`.
-4. When `ad-brief` returns, regain control. Name the rule source that caused a material correction, or say that the current plan already conformed, then continue immediately unless the returned brief contains a genuine blocking decision.
+4. When `ad-brief` returns, verify that every output-template field is present and
+   that the rendered meaning passes `ad-brief`'s decision checks. If either
+   condition fails, return the brief to `ad-brief` with the exact missing
+   condition and require it to correct the result before you regain control.
+   Then name the rule source that caused a material correction, or say that the
+   current plan already conformed, and continue immediately unless the corrected
+   brief contains a genuine blocking decision.
 </instructions>
 
 <output_contract>

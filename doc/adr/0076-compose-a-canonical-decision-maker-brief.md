@@ -15,6 +15,8 @@ The maintainer needs one plain-language report that restores enough context to a
 Composition must preserve existing specialist boundaries. Roadmap owns plan reconciliation and task checklists. Handoff owns persistence, redaction, lost asks, and repository hygiene. Rules owns resolution and topic inventory. Philosophy owns the decide-versus-ask and reporting posture. Publish and voice own outward text, language adaptation, privacy, approval, and authorization. Copying any of those contracts into a briefing would make drift and accidental bypass more likely.
 
 Grounding is recorded in `doc/research/0013-ground-decision-maker-brief-composition.md`.
+The behavioral refinement that makes its three decision outcomes explicit is
+grounded in `doc/research/0017-ground-ad-rules-boss-behavior.md`.
 
 ## Decision
 
