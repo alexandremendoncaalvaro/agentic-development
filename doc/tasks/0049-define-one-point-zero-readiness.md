@@ -1,6 +1,6 @@
 # Task `0049`: Define and close 1.0 release readiness
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-08-11
 **Scope ref:** doc/product/PRD.md — Later tier: 1.0 release readiness
 **Owner:** Alexandre Alvaro
@@ -20,16 +20,16 @@ impression rather than a repeatable quality threshold.
 ## Acceptance Criteria
 
 - [x] An ADR records objective 1.0 entrance criteria, including the relationship between product completeness, audit evidence, and external adoption or deliberate non-requirement.
-- [ ] Each accepted technical gate is implemented and runs locally and in CI, or the ADR records why it is deliberately excluded.
-- [ ] The PRD, release contract, and repository protection rules describe the same release path without referring to a discontinued `cli` development branch.
-- [ ] A release-readiness review verifies the criteria against the current repository before any 1.0 publication is proposed.
+- [x] Each accepted technical gate is implemented and runs locally and in CI, or the ADR records why it is deliberately excluded.
+- [x] The PRD, release contract, and repository protection rules describe the same release path without referring to a discontinued `cli` development branch.
+- [x] A release-readiness review verifies the criteria against the current repository before any 1.0 publication is proposed.
 
 ## Plan
 
 - [x] Use `/ad-grill-me` and `/ad-ground` to turn the PRD's open 1.0 question into decision-ready options.
 - [x] Record the selected entrance criteria in an ADR before wiring gates or changing release policy.
 - [x] Implement and verify the chosen gates in small, reviewable tasks; do not fold unrelated quality tooling into one change.
-- [ ] Run the release-readiness review and update the task according to observed evidence.
+- [x] Run the release-readiness review and update the task according to observed evidence.
 
 ## Notes
 
@@ -58,6 +58,13 @@ commit: a duplicated changelog category and an inaccurate claim that local
 pre-push emulates the remote operating-system matrix. Remote CI and the matching
 required-check ruleset remain the final closure evidence.
 
+GitHub Actions run 35006930176 passed all four required legs on PR #136:
+Ubuntu and Windows at Node 22.13.0 and Node 24. The active `protect-main`
+ruleset was read back with those exact four contexts while retaining its
+deletion, non-fast-forward, and pull-request protections. This closes the final
+remote and repository-protection evidence; the 1.0 publication itself remains a
+separate digest-bound `/ad-release` operation.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -65,4 +72,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

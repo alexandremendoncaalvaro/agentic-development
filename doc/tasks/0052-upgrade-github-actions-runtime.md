@@ -1,6 +1,6 @@
 # Task `0052`: Upgrade GitHub Actions runtime
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-08-12
 **Scope ref:** AGENTS.md — Quality Gates
 **Owner:** Alexandre Alvaro
@@ -23,7 +23,7 @@ and the warning cannot be lost in a session transcript.
       workflow are grounded in the publishers' documentation.
 - [x] `.github/workflows/test.yml` uses supported action versions without
       changing its Ubuntu/Windows and Node 20/22 test matrix unexpectedly.
-- [ ] Local gates and the full remote CI matrix pass after the update.
+- [x] Local gates and the full remote CI matrix pass after the update.
 - [x] The changelog explains the consumer-relevant CI maintenance when the
       implementation ships.
 
@@ -33,7 +33,7 @@ and the warning cannot be lost in a session transcript.
       constraint before editing the workflow.
 - [x] Update the workflow under ADR-0078's replacement Node matrix and composed
       verification command while preserving `npm ci`.
-- [ ] Run local gates, review the diff, and confirm all remote matrix legs.
+- [x] Run local gates, review the diff, and confirm all remote matrix legs.
 
 ## Notes
 
@@ -60,6 +60,10 @@ ADR-0078's grounded Node 20 end-of-life decision; the acceptance criterion's
 "unexpectedly" qualifier is satisfied because the replacement matrix is now an
 explicit compatibility contract. Remote matrix evidence is still pending.
 
+GitHub Actions run 35006930176 on PR #136 passed the complete required matrix:
+Ubuntu and Windows at Node 22.13.0 and Node 24. The emitted check names exactly
+match the active `protect-main` ruleset. The runtime upgrade is complete.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -67,4 +71,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
