@@ -551,7 +551,7 @@
       "files": [
         {
           "path": ".claude/agents/fresh-context-reviewer.md",
-          "sourceSha": "f594c733941ce163d1799eb2a5c2b1264880e8a6f53b9eac93fb3e3a6e7dc0b1"
+          "sourceSha": "a4eb56bc58674367f669549958181ddd8079d3859cfc58b0a4cdf5b09cec4bfb"
         },
         {
           "path": ".claude/skills/ad-review/SKILL.md",
