@@ -308,6 +308,35 @@ test('ad-prism separates portable evaluation method from optional project contex
   }
 });
 
+test('ad-prism applies a domain adapter only inside its declared scope', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const adapter = readFileSync(join(skillDir, 'references', 'domain-adapter.md'), 'utf8');
+    const cases = JSON.parse(
+      readFileSync(join(skillDir, 'evals', 'evals.json'), 'utf8')
+    ).cases;
+    const outsideScope = cases.find((entry) => entry.id === 'out-of-scope-domain-adapter');
+
+    assert.match(
+      body,
+      /(?:use|apply) the adapter only when[\s\S]*evaluation[\s\S]*(?:inside|within|matches)[\s\S]*(?:declared )?scope/i
+    );
+    assert.match(
+      adapter,
+      /outside[\s\S]*(?:declared )?scope[\s\S]*(?:ignore|do not use)[\s\S]*(?:do not mention|do not echo)/i
+    );
+    assert.ok(outsideScope, `${agent} needs an out-of-scope adapter behavior case`);
+    assert.equal(outsideScope.expected_route, 'ad-prism');
+    assert.ok(
+      outsideScope.expected_outcomes.some((outcome) =>
+        /does not (?:mention|echo|leak)[\s\S]*(?:adapter|domain|context)/i.test(outcome)
+      ),
+      `${agent} must keep irrelevant adapter context out of the response`
+    );
+  }
+});
+
 test('ad-prism keeps evaluation settings independent and bounded to the requested context', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');

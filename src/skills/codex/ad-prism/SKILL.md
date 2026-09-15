@@ -34,11 +34,15 @@ Read [skill-comparison.md](references/skill-comparison.md) when you compare
 evaluation skills or decide whether one can replace another.
 
 Read the optional project domain adapter at `.agentic/prism/domain.md` when it
-exists. Its absence is valid and not an error: continue with the generic method
-and disclose which domain assumptions remain unknown. Treat adapter values as
-project context, not unquestionable truth. Live inspected evidence outranks
-adapter defaults; surface conflicts instead of silently choosing one. Never ask
-for or place secrets or personal data in the adapter.
+exists. Before using its other entries, compare the current evaluation with the
+adapter's declared scope. Use the adapter only when the evaluation is within
+that scope. When it is outside scope, ignore the adapter and do not mention or
+echo its domain context; continue with the generic method. Its absence is valid
+and not an error: disclose which domain assumptions remain unknown. Treat
+applicable adapter values as project context, not unquestionable truth. Live
+inspected evidence outranks adapter defaults; surface conflicts instead of
+silently choosing one. Never ask for or place secrets or personal data in the
+adapter.
 Read [domain-adapter.md](references/domain-adapter.md) when the adapter exists,
 when proposing one, or when adapter precedence or safety affects the answer.
 

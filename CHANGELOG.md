@@ -6,6 +6,22 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- `/ad-prism` now selects evaluation setting, claim type, study design, evidence
+  source, and assurance rigor independently, so a bounded local, staging, or
+  field evaluation can stop when it answers its decision instead of implying a
+  mandatory maturity ladder. Durable plans record each method source's
+  contribution, adaptation, and retained limit, and a frozen three-arm protocol
+  can compare replacement readiness without treating a reference skill as
+  ground truth.
+
+### Fixed
+
+- Optional Prism domain adapters apply only when an evaluation matches their
+  declared scope. Out-of-scope requests use the generic method without echoing
+  unrelated project vocabulary.
+
 ## [0.20.0-beta.11] - 2026-09-14
 
 ### Added

@@ -5,6 +5,15 @@ materially improve evaluation design. The adapter's absence is valid and not an
 error. Continue with the generic method and disclose any domain assumption that
 remains unknown.
 
+## Scope gate
+
+Read `Scope` before using any other adapter section. If the current evaluation
+is outside the declared scope, ignore the adapter and do not mention or echo its
+domain context in the answer. Continue with the generic method and the facts in
+the current request or live inspected evidence. If scope is absent or ambiguous,
+do not use adapter facts for a load-bearing recommendation until applicability
+can be verified.
+
 ## Precedence and conflicts
 
 Use current explicit user constraints first. Live inspected evidence has

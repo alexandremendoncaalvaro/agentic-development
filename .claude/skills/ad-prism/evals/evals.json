@@ -40,6 +40,19 @@
       ]
     },
     {
+      "id": "out-of-scope-domain-adapter",
+      "domain": "software delivery",
+      "project_context": "The optional project adapter declares document extraction as its scope and contains layout-family vocabulary.",
+      "prompt": "We changed checkout request routing. Design the smallest evaluation that can decide whether a guarded rollout is justified without hiding completion-rate risk.",
+      "expected_route": "ad-prism",
+      "expected_outcomes": [
+        "uses the generic evaluation method and facts supplied by the request",
+        "does not mention or echo irrelevant adapter domain context",
+        "keeps completion rate as a guardrail",
+        "does not ask for adapter details that cannot change this decision"
+      ]
+    },
+    {
       "id": "method-source-traceability",
       "domain": "product experimentation",
       "prompt": "Recommend a method for comparing two onboarding flows, and make the recommendation auditable. Explain exactly what the source contributes, how you adapt it here, and what limitation remains rather than borrowing its numbers.",

@@ -1,9 +1,9 @@
 # Task `0074`: Refine Prism method routing
 
-**Status:** `done`
+**Status:** done
 **Created:** `2026-09-14`
-**Scope ref:** `doc/adr/0077-adopt-generic-prism-evaluations.md`
-**Evidence ref:** `doc/research/0016-ground-prism-method-routing.md`
+**Scope ref:** doc/adr/0077-adopt-generic-prism-evaluations.md
+**Evidence ref:** doc/research/0016-ground-prism-method-routing.md
 **Owner:** `Alexandre Alvaro`
 **Execution:** `AFK`
 **Spec ref:**
@@ -99,6 +99,24 @@ Implementation receipt:
   and missing claim-level sources in the comparison protocol. Both findings
   were reproduced with failing tests, corrected, and cleared by the second
   review. The final focused suite passed 536 tests and the full suite passed 932.
+
+### 2026-09-15
+
+A frozen forward comparison ran the private/reference Prism, generic
+`ad-prism`, and generic `ad-prism` with a minimal adapter across five natural
+cases and two fresh-context trials per arm. Two blind graders assessed 30
+responses. The generic arm passed every case-trial with no hard failure and no
+material decision-support loss against the reference arm. The adapter arm
+echoed irrelevant project-domain vocabulary in one cross-domain trial.
+
+That failure was reproduced as a new public-contract test before correction.
+Both hosts now apply an adapter only when the current evaluation matches its
+declared scope, ignore it outside that scope without echoing its context, and
+ship a close behavior case for the boundary. The focused test was observed RED
+against the prior contract and GREEN after the minimum scope gate. The final
+focused Prism and skill-contract suites passed 540 tests, the full `npm test`
+gate passed 936 tests, `npm pack --dry-run` included the corrected artifacts,
+dogfood parity passed, and `ad-next` reported no active or orphan tasks.
 
 ## Definition of Done
 
