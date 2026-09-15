@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-15
+
 ### Added
 
 - `/ad-project-state` lets state-reading skills combine the repository baseline
