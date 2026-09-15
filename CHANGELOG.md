@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [0.20.0-beta.12] - 2026-09-15
+
 ### Changed
 
 - `/ad-prism` now selects evaluation setting, claim type, study design, evidence
