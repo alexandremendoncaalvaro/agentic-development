@@ -207,10 +207,7 @@ test('skill routing keeps every workflow hand-off discoverable on both hosts', (
       const routing = routingSurface(body, agent, skill);
       assert.ok(routing, `${agent}/${skill} must expose its routing surface`);
       for (const successor of successors) {
-        assert.ok(
-          routing.includes(successor),
-          `${agent}/${skill} must route to ${successor}`
-        );
+        assert.ok(routing.includes(successor), `${agent}/${skill} must route to ${successor}`);
       }
     }
   }
@@ -282,7 +279,10 @@ test('ad-prism separates portable evaluation method from optional project contex
     const brief = readFileSync(join(skillDir, 'assets', 'evaluation-brief.md'), 'utf8');
 
     assert.match(body, /read \[methodology\.md\].*design|design.*read \[methodology\.md\]/is);
-    assert.match(body, /read \[domain-adapter\.md\].*adapter|adapter.*read \[domain-adapter\.md\]/is);
+    assert.match(
+      body,
+      /read \[domain-adapter\.md\].*adapter|adapter.*read \[domain-adapter\.md\]/is
+    );
     assert.match(
       methodology,
       /decision[\s\S]*objective[\s\S]*evaluation question[\s\S]*claim[\s\S]*evidence[\s\S]*task[\s\S]*measure[\s\S]*data source[\s\S]*decision rule[\s\S]*next gate/i
@@ -313,9 +313,7 @@ test('ad-prism applies a domain adapter only inside its declared scope', () => {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
     const adapter = readFileSync(join(skillDir, 'references', 'domain-adapter.md'), 'utf8');
-    const cases = JSON.parse(
-      readFileSync(join(skillDir, 'evals', 'evals.json'), 'utf8')
-    ).cases;
+    const cases = JSON.parse(readFileSync(join(skillDir, 'evals', 'evals.json'), 'utf8')).cases;
     const outsideScope = cases.find((entry) => entry.id === 'out-of-scope-domain-adapter');
 
     assert.match(
@@ -342,13 +340,17 @@ test('ad-prism keeps evaluation settings independent and bounded to the requeste
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
     const methodology = readFileSync(join(skillDir, 'references', 'methodology.md'), 'utf8');
-    const cases = JSON.parse(
-      readFileSync(join(skillDir, 'evals', 'evals.json'), 'utf8')
-    ).cases;
+    const cases = JSON.parse(readFileSync(join(skillDir, 'evals', 'evals.json'), 'utf8')).cases;
     const localOnly = cases.find((entry) => entry.id === 'bounded-local-bench');
 
-    assert.match(methodology, /setting[\s\S]*claim type[\s\S]*study design[\s\S]*evidence source[\s\S]*assurance rigor/i);
-    assert.match(body, /setting[\s\S]*claim type[\s\S]*study design[\s\S]*evidence source[\s\S]*assurance rigor[\s\S]*independent/i);
+    assert.match(
+      methodology,
+      /setting[\s\S]*claim type[\s\S]*study design[\s\S]*evidence source[\s\S]*assurance rigor/i
+    );
+    assert.match(
+      body,
+      /setting[\s\S]*claim type[\s\S]*study design[\s\S]*evidence source[\s\S]*assurance rigor[\s\S]*independent/i
+    );
     assert.doesNotMatch(body, /smallest assurance level/i);
     assert.match(methodology, /not (?:a|required as) (?:maturity )?(?:ladder|sequence)/i);
     assert.match(methodology, /(?:stop|complete)[\s\S]*requested (?:setting|context)/i);
@@ -370,8 +372,14 @@ test('ad-prism separates contextual methodology judgment from deterministic gate
       'utf8'
     );
 
-    assert.match(methodology, /model[\s\S]*method fit[\s\S]*source applicability[\s\S]*fit-for-purpose/i);
-    assert.match(methodology, /deterministic[\s\S]*structure[\s\S]*provenance[\s\S]*arithmetic[\s\S]*artifact integrity/i);
+    assert.match(
+      methodology,
+      /model[\s\S]*method fit[\s\S]*source applicability[\s\S]*fit-for-purpose/i
+    );
+    assert.match(
+      methodology,
+      /deterministic[\s\S]*structure[\s\S]*provenance[\s\S]*arithmetic[\s\S]*artifact integrity/i
+    );
     assert.match(methodology, /(?:script|validator)[\s\S]*does not[\s\S]*methodological validity/i);
   }
 });
@@ -381,7 +389,9 @@ test('ad-prism does not infer assurance rigor from the evidence environment', ()
     const cases = JSON.parse(
       readFileSync(join(SKILLS_ROOT, agent, 'ad-prism', 'evals', 'evals.json'), 'utf8')
     ).cases;
-    const environmentCase = cases.find((entry) => entry.id === 'production-observation-is-not-confirmation');
+    const environmentCase = cases.find(
+      (entry) => entry.id === 'production-observation-is-not-confirmation'
+    );
 
     assert.ok(environmentCase, `${agent} needs an environment-versus-rigor behavior case`);
     assert.equal(environmentCase.expected_route, 'ad-prism');
@@ -411,9 +421,7 @@ test('ad-prism behavior cases require auditable method-source traceability', () 
     assert.equal(sourceCase.expected_route, 'ad-prism');
     for (const term of ['source', 'contribution', 'adaptation', 'retained limit']) {
       assert.ok(
-        sourceCase.expected_outcomes.some((outcome) =>
-          new RegExp(term, 'i').test(outcome)
-        ),
+        sourceCase.expected_outcomes.some((outcome) => new RegExp(term, 'i').test(outcome)),
         `${agent} traceability case must require ${term}`
       );
     }
@@ -430,29 +438,51 @@ test('ad-prism ships a privacy-bounded three-arm replacement protocol', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
-    const protocol = readFileSync(
-      join(skillDir, 'references', 'skill-comparison.md'),
-      'utf8'
-    );
+    const protocol = readFileSync(join(skillDir, 'references', 'skill-comparison.md'), 'utf8');
 
     assert.match(body, /skill-comparison\.md[\s\S]*(?:compare|replacement)/i);
-    assert.match(protocol, /private (?:or reference )?Prism[\s\S]*generic `?ad-prism`?[\s\S]*(?:minimal )?domain adapter/i);
-    assert.match(protocol, /(?:reference|private)[\s\S]*(?:not|never)[\s\S]*(?:ground truth|automatically correct)/i);
-    assert.match(protocol, /freeze[\s\S]*(?:case|input)[\s\S]*(?:skill version|model)[\s\S]*(?:host|tools)/i);
+    assert.match(
+      protocol,
+      /private (?:or reference )?Prism[\s\S]*generic `?ad-prism`?[\s\S]*(?:minimal )?domain adapter/i
+    );
+    assert.match(
+      protocol,
+      /(?:reference|private)[\s\S]*(?:not|never)[\s\S]*(?:ground truth|automatically correct)/i
+    );
+    assert.match(
+      protocol,
+      /freeze[\s\S]*(?:case|input)[\s\S]*(?:skill version|model)[\s\S]*(?:host|tools)/i
+    );
     assert.match(protocol, /natural prompts[\s\S]*(?:do not|must not)[\s\S]*(?:skill|route)/i);
     assert.match(protocol, /outcome-shaped[\s\S]*(?:not|rather than)[\s\S]*(?:vocabulary|path)/i);
-    assert.match(protocol, /randomi[sz][\s\S]*(?:repeated|multiple) trials[\s\S]*(?:blind|blinded)/i);
-    assert.match(protocol, /private fixtures[\s\S]*outside (?:the )?repository[\s\S]*(?:saniti[sz]ed|aggregate)/i);
-    assert.match(protocol, /pilot[\s\S]*(?:decision rule|tolerance|margin)[\s\S]*before[\s\S]*(?:comparison|candidate)/i);
+    assert.match(
+      protocol,
+      /randomi[sz][\s\S]*(?:repeated|multiple) trials[\s\S]*(?:blind|blinded)/i
+    );
+    assert.match(
+      protocol,
+      /private fixtures[\s\S]*outside (?:the )?repository[\s\S]*(?:saniti[sz]ed|aggregate)/i
+    );
+    assert.match(
+      protocol,
+      /pilot[\s\S]*(?:decision rule|tolerance|margin)[\s\S]*before[\s\S]*(?:comparison|candidate)/i
+    );
 
     const methodRecords = [...protocol.matchAll(/^###\s+(M\d+)\s+(?:—|-|:)\s+.+$/gm)];
-    assert.ok(methodRecords.length >= 2, `${agent} comparison protocol needs load-bearing method sources`);
+    assert.ok(
+      methodRecords.length >= 2,
+      `${agent} comparison protocol needs load-bearing method sources`
+    );
     for (const [index, record] of methodRecords.entries()) {
       const start = record.index + record[0].length;
       const end = methodRecords[index + 1]?.index ?? protocol.length;
       const sourceMap = protocol.slice(start, end);
       for (const field of ['Source', 'Supports', 'Contribution', 'Adaptation', 'Retained limit']) {
-        assert.match(sourceMap, new RegExp(`^- ${field}: \\S`, 'm'), `${agent} ${record[1]} needs ${field}`);
+        assert.match(
+          sourceMap,
+          new RegExp(`^- ${field}: \\S`, 'm'),
+          `${agent} ${record[1]} needs ${field}`
+        );
       }
     }
   }
@@ -472,7 +502,10 @@ test('ad-prism freezes and audits material evaluations without collapsing its ve
     assert.match(body, /validate-report\.mjs/);
     assert.match(body, /freeze-artifact\.mjs/);
     assert.match(assurance, /verification verdict[\s\S]*fit-for-purpose validation verdict/i);
-    assert.match(assurance, /confirmed[\s\S]*rejected with\s+evidence[\s\S]*reserved for owner judgment/i);
+    assert.match(
+      assurance,
+      /confirmed[\s\S]*rejected with\s+evidence[\s\S]*reserved for owner judgment/i
+    );
     assert.match(assurance, /does not[\s\S]*(?:freeze|preserve)[\s\S]*external source/i);
     for (const heading of [
       'Artifact receipt',
@@ -568,7 +601,11 @@ test('evaluation methodology routing is visible from adjacent skills and the wor
   for (const agent of ['claude-code', 'codex']) {
     for (const skill of ['ad-ground', 'ad-research', 'ad-spike', 'ad-audit']) {
       const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
-      assert.match(routingSurface(body, agent, skill), /\/ad-prism/, `${agent}/${skill} must route evaluation methodology to ad-prism`);
+      assert.match(
+        routingSurface(body, agent, skill),
+        /\/ad-prism/,
+        `${agent}/${skill} must route evaluation methodology to ad-prism`
+      );
     }
     const report = readFileSync(join(SKILLS_ROOT, agent, 'ad-report', 'SKILL.md'), 'utf8');
     assert.match(report, /`ad-prism`[\s\S]*evaluation methodology/i);
@@ -610,10 +647,16 @@ test('ad-roadmap explains the delivery story as a newcomer-readable checklist on
     const skillDir = join(SKILLS_ROOT, agent, 'ad-roadmap');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
     const templates = readFileSync(join(skillDir, 'references', 'output-templates.md'), 'utf8');
-    const projectSection = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
+    const projectSection =
+      templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ??
+      '';
     const example = projectSection.match(/```(?:markdown)?\n([\s\S]*?)```/)?.[1] ?? '';
 
-    assert.match(body, /decision-maker brief returned by `ad-brief`/i, `${agent} must lead with the canonical brief`);
+    assert.match(
+      body,
+      /decision-maker brief returned by `ad-brief`/i,
+      `${agent} must lead with the canonical brief`
+    );
     assert.match(body, /main delivery front/i, `${agent} must name the main delivery front`);
     assert.match(body, /next front/i, `${agent} must name the next delivery front`);
     assert.match(
@@ -635,11 +678,12 @@ test('ad-roadmap explains the delivery story as a newcomer-readable checklist on
     assert.match(example, /^- \[ \] .+/m, `${agent} example must show remaining work as open`);
     assert.match(
       example,
-      /^- \[ \] .*in progress[\s\S]*?^  - \[x\] .+[\s\S]*?^  - \[ \] .+/mi,
+      /^- \[ \] .*in progress[\s\S]*?^ {2}- \[x\] .+[\s\S]*?^ {2}- \[ \] .+/im,
       `${agent} example must explain in-progress work through nested checked and open steps`
     );
     assert.ok(
-      example.indexOf('<decision-maker brief returned by `ad-brief`>') < example.indexOf('### Roadmap checklist'),
+      example.indexOf('<decision-maker brief returned by `ad-brief`>') <
+        example.indexOf('### Roadmap checklist'),
       `${agent} must explain the delivery story before showing tier evidence`
     );
   }
@@ -651,32 +695,54 @@ test('ad-roadmap defaults to project scope and uses a separate task template onl
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
     const templates = readFileSync(join(skillDir, 'references', 'output-templates.md'), 'utf8');
 
-    assert.match(body, /project(?:-wide)? scope[^\n]*default/i, `${agent} must default to the project roadmap`);
+    assert.match(
+      body,
+      /project(?:-wide)? scope[^\n]*default/i,
+      `${agent} must default to the project roadmap`
+    );
     assert.match(
       body,
       /task scope[^\n]*only[^\n]*explicit/i,
       `${agent} must enter task scope only on an explicit request`
     );
-    assert.match(body, /references\/output-templates\.md/, `${agent} must route rendering to the shared templates`);
-    assert.match(templates, /^## Project roadmap template$/m, `${agent} needs a project-level template`);
+    assert.match(
+      body,
+      /references\/output-templates\.md/,
+      `${agent} must route rendering to the shared templates`
+    );
+    assert.match(
+      templates,
+      /^## Project roadmap template$/m,
+      `${agent} needs a project-level template`
+    );
     assert.match(templates, /^## Task roadmap template$/m, `${agent} needs a task-level template`);
-    const projectTemplate = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
+    const projectTemplate =
+      templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ??
+      '';
     const taskTemplate = templates.match(/^## Task roadmap template$([\s\S]*)/m)?.[1] ?? '';
     assert.equal(
       [...templates.matchAll(/^<decision-maker brief returned by `ad-brief`>$/gm)].length,
       2,
       `${agent} templates must compose the same canonical brief`
     );
-    assert.match(templates, /^### Roadmap checklist$/m, `${agent} project template needs the whole roadmap checklist`);
-    assert.match(templates, /^### Task checklist$/m, `${agent} task template needs its own step checklist`);
+    assert.match(
+      templates,
+      /^### Roadmap checklist$/m,
+      `${agent} project template needs the whole roadmap checklist`
+    );
+    assert.match(
+      templates,
+      /^### Task checklist$/m,
+      `${agent} task template needs its own step checklist`
+    );
     assert.match(
       projectTemplate,
-      /^- \[ \] .+\n  - \[[ x]\] .+/m,
+      /^- \[ \] .+\n {2}- \[[ x]\] .+/m,
       `${agent} project checklist must make tasks and subtasks visible`
     );
     assert.match(
       taskTemplate,
-      /^- \[ \] .+\n  - \[[ x]\] .+/m,
+      /^- \[ \] .+\n {2}- \[[ x]\] .+/m,
       `${agent} task checklist must make tasks and subtasks visible`
     );
   }
@@ -729,16 +795,23 @@ test('ad-roadmap templates place the canonical brief before specialist checklist
       join(SKILLS_ROOT, agent, 'ad-roadmap', 'references', 'output-templates.md'),
       'utf8'
     );
-    const project = templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ?? '';
+    const project =
+      templates.match(/^## Project roadmap template$([\s\S]*?)^## Task roadmap template$/m)?.[1] ??
+      '';
     const task = templates.match(/^## Task roadmap template$([\s\S]*)/m)?.[1] ?? '';
 
     for (const [scope, template, checklist] of [
       ['project', project, '### Roadmap checklist'],
       ['task', task, '### Task checklist'],
     ]) {
-      assert.match(template, /<decision-maker brief returned by `ad-brief`>/i, `${agent} ${scope} template must compose ad-brief`);
+      assert.match(
+        template,
+        /<decision-maker brief returned by `ad-brief`>/i,
+        `${agent} ${scope} template must compose ad-brief`
+      );
       assert.ok(
-        template.indexOf('<decision-maker brief returned by `ad-brief`>') < template.indexOf(checklist),
+        template.indexOf('<decision-maker brief returned by `ad-brief`>') <
+          template.indexOf(checklist),
         `${agent} ${scope} template must explain the work before its checklist`
       );
       assert.doesNotMatch(
@@ -818,7 +891,10 @@ test('ad-brief ships representative evaluations for its three decision outcomes'
 
     for (const scenario of evaluation.cases) {
       assert.equal(scenario.expected_route, 'ad-brief');
-      assert.ok(scenario.expected_outcomes.length >= 4, `${scenario.id} needs an observable rubric`);
+      assert.ok(
+        scenario.expected_outcomes.length >= 4,
+        `${scenario.id} needs an observable rubric`
+      );
     }
   }
 });
@@ -925,8 +1001,16 @@ test('ad-task requires a local scope anchor before creating a task', () => {
     assert.match(body, /current repository/i, `${agent} must anchor the task to its repository`);
     assert.match(body, /scope-anchors\.mjs/, `${agent} must run deterministic anchor discovery`);
     assert.match(body, /do not write/i, `${agent} must stop when no local scope anchor exists`);
-    assert.match(template, /^\*\*Scope ref:\*\*/m, `${agent} task template needs a Scope ref field`);
-    assert.match(template, /^\*\*Evidence ref:\*\*/m, `${agent} task template needs an Evidence ref field`);
+    assert.match(
+      template,
+      /^\*\*Scope ref:\*\*/m,
+      `${agent} task template needs a Scope ref field`
+    );
+    assert.match(
+      template,
+      /^\*\*Evidence ref:\*\*/m,
+      `${agent} task template needs an Evidence ref field`
+    );
   }
 });
 
@@ -937,15 +1021,35 @@ test('ad-ground persists a validated evidence receipt before non-trivial work', 
     const template = readFileSync(join(skillDir, 'references', 'record-template.md'), 'utf8');
     const philosophy = readFileSync(join(SKILLS_ROOT, agent, 'ad-philosophy', 'SKILL.md'), 'utf8');
 
-    assert.match(body, /Persist the evidence receipt|persist the evidence receipt/i, `${agent} must persist ground evidence`);
+    assert.match(
+      body,
+      /Persist the evidence receipt|persist the evidence receipt/i,
+      `${agent} must persist ground evidence`
+    );
     assert.match(body, /validate-record\.mjs/, `${agent} must validate the evidence receipt`);
-    assert.match(body, /chat citations are not an audit trail/i, `${agent} must reject chat-only grounding`);
-    assert.match(body, /reopen every cited source/i, `${agent} must distinguish a source map from source verification`);
+    assert.match(
+      body,
+      /chat citations are not an audit trail/i,
+      `${agent} must reject chat-only grounding`
+    );
+    assert.match(
+      body,
+      /reopen every cited source/i,
+      `${agent} must distinguish a source map from source verification`
+    );
     assert.match(template, /^# GROUND-<NNNN>:/m, `${agent} must ship the ground-record template`);
     assert.match(template, /^## Source register$/m, `${agent} record must register sources`);
     assert.match(template, /^## Audit path$/m, `${agent} record must explain audit replay`);
-    assert.match(philosophy, /durable (project artifact|evidence record)/i, `${agent} philosophy must require durable evidence`);
-    assert.match(philosophy, /chat-only citations|citations exist only in the session/i, `${agent} philosophy must reject chat-only grounding`);
+    assert.match(
+      philosophy,
+      /durable (project artifact|evidence record)/i,
+      `${agent} philosophy must require durable evidence`
+    );
+    assert.match(
+      philosophy,
+      /chat-only citations|citations exist only in the session/i,
+      `${agent} philosophy must reject chat-only grounding`
+    );
   }
 });
 
@@ -955,8 +1059,16 @@ test('ad-handoff keeps preparation exhaustive but makes the resume brief concise
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
     const template = readFileSync(join(skillDir, 'references', 'handoff-template.md'), 'utf8');
 
-    assert.match(body, /preparation receipt/i, `${agent} must require a compact preparation receipt`);
-    assert.match(body, /private preparation pass/i, `${agent} must preserve exhaustive private preparation`);
+    assert.match(
+      body,
+      /preparation receipt/i,
+      `${agent} must require a compact preparation receipt`
+    );
+    assert.match(
+      body,
+      /private preparation pass/i,
+      `${agent} must preserve exhaustive private preparation`
+    );
     assert.match(
       body,
       /do not print the full applied-binding statement/i,
@@ -1029,7 +1141,11 @@ test('ad-handoff delegates the resume brief and retains the durable handoff prot
     assert.match(template, /^### Preparation$/m, `${agent} must retain the preparation receipt`);
     assert.match(template, /^## Working rules$/m, `${agent} must retain the handoff rules`);
     assert.match(template, /^## Roadmap$/m, `${agent} must retain the durable roadmap`);
-    assert.match(template, /^## Asks that never landed$/m, `${agent} must retain the lost-ask sweep`);
+    assert.match(
+      template,
+      /^## Asks that never landed$/m,
+      `${agent} must retain the lost-ask sweep`
+    );
     assert.match(body, /redact/i, `${agent} must retain secret redaction`);
   }
 });
@@ -1086,7 +1202,11 @@ test('ad-brief stays private while ad-publish retains every outward-language gat
       /never (?:pass|send)[\s\S]*(?:brief|briefing)[\s\S]*`\/?ad-(?:publish|voice)`/i,
       `${agent} briefing must route no private packet into publication skills`
     );
-    assert.match(publish, /silent source-role ledger/i, `${agent} publish must classify every source role`);
+    assert.match(
+      publish,
+      /silent source-role ledger/i,
+      `${agent} publish must classify every source role`
+    );
     assert.match(
       publish,
       /conversation language[\s\S]*first approval preview[\s\S]*publication language/i,
@@ -1114,8 +1234,16 @@ test('GitHub workflow skills reuse their preflight frontend for every GitHub com
         /AGENTIC_GH=<wrapper>/,
         `${agent}/${skill} must accept the repository's executable GitHub wrapper`
       );
-      assert.match(body, /`github\.command`/, `${agent}/${skill} must retain the preflight frontend`);
-      assert.match(body, /<github-command>/, `${agent}/${skill} must use the preflight frontend in later phases`);
+      assert.match(
+        body,
+        /`github\.command`/,
+        `${agent}/${skill} must retain the preflight frontend`
+      );
+      assert.match(
+        body,
+        /<github-command>/,
+        `${agent}/${skill} must use the preflight frontend in later phases`
+      );
       assert.match(
         body,
         /<github-command> auth login/,
@@ -1280,7 +1408,11 @@ for (const agent of ['claude-code', 'codex']) {
           assert.equal(typeof fm.name, 'string', 'subagent name must be a string');
           assert.equal(typeof fm.description, 'string', 'subagent description must be a string');
           assert.ok(fm.description.length > 0, 'subagent description must not be empty');
-          assert.equal(typeof fm.tools, 'string', 'subagent tools must be a string (comma-separated)');
+          assert.equal(
+            typeof fm.tools,
+            'string',
+            'subagent tools must be a string (comma-separated)'
+          );
           assert.equal(typeof fm.model, 'string', 'subagent model must be a string');
           return;
         }
@@ -1348,10 +1480,7 @@ test('fresh-context reviewers leave the repository unchanged after verification'
     );
   }
 
-  const claude = readFileSync(
-    join(SKILLS_ROOT, briefs[0]),
-    'utf8'
-  ).toLowerCase();
+  const claude = readFileSync(join(SKILLS_ROOT, briefs[0]), 'utf8').toLowerCase();
   assert.match(claude, /(?:delete|remove)[\s\S]{0,80}when you are\s+done/);
   assert.match(claude, /never modify tracked files/);
 });
@@ -1431,13 +1560,11 @@ test('the ad-audit skill carries the empirical-falsification lane, on both hosts
   for (const rel of ['claude-code/ad-audit/SKILL.md', 'codex/ad-audit/SKILL.md']) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
     assert.ok(
-      body.includes('empirical falsification lane') || body.includes('Empirical falsification lane'),
+      body.includes('empirical falsification lane') ||
+        body.includes('Empirical falsification lane'),
       `${rel} lost the empirical-falsification lane (ADR-0052, C4)`
     );
-    assert.ok(
-      body.includes('ADR-0052'),
-      `${rel} no longer cites ADR-0052 for the lane`
-    );
+    assert.ok(body.includes('ADR-0052'), `${rel} no longer cites ADR-0052 for the lane`);
     // The lane's load-bearing constraints — orchestrator-only + serial — must
     // survive an edit, since ADR-0052 makes them non-negotiable.
     assert.ok(
@@ -1454,10 +1581,7 @@ test('the ad-audit skill carries the empirical-falsification lane, on both hosts
 test('both audit-group-reviewer briefs forbid mutation and hand the lane trigger up (ADR-0052)', () => {
   for (const rel of ANCHOR_ECHO_BRIEFS) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
-    assert.ok(
-      body.includes('ADR-0052'),
-      `${rel} lost the ADR-0052 mutation guard`
-    );
+    assert.ok(body.includes('ADR-0052'), `${rel} lost the ADR-0052 mutation guard`);
     assert.ok(
       body.toLowerCase().includes('cannot fail'),
       `${rel} no longer names the "cannot fail" inference it must hand up`
@@ -1471,9 +1595,7 @@ test('both audit-group-reviewer briefs forbid mutation and hand the lane trigger
 // task-0031 (inline probe blocks maintained per host) cannot re-enter through
 // the scripts/ door. ADR-0057 Decision 3 permits one named exception: global
 // rules resolution is host-divergent because each host's own path must win.
-const HOST_DIVERGENT_SCRIPTS = new Set([
-  'ad-rules/scripts/resolve-global-rules.mjs',
-]);
+const HOST_DIVERGENT_SCRIPTS = new Set(['ad-rules/scripts/resolve-global-rules.mjs']);
 
 function listSkillScripts(agent) {
   const out = new Map();
@@ -1643,9 +1765,7 @@ function workflowSectionNumbers(text) {
 }
 
 test('every WORKFLOW.md section cited by a skill exists in WORKFLOW.md', () => {
-  const sections = workflowSectionNumbers(
-    readFileSync(join(REPO_ROOT, 'WORKFLOW.md'), 'utf8')
-  );
+  const sections = workflowSectionNumbers(readFileSync(join(REPO_ROOT, 'WORKFLOW.md'), 'utf8'));
   assert.ok(sections.size > 0, 'no numbered sections parsed out of WORKFLOW.md');
 
   const dangling = [];
@@ -1689,7 +1809,9 @@ function disciplineRuleNumbers(text) {
   // "Documentation Discipline" in prose before the rules begin, and anchoring on
   // the first mention slices a region that holds none of them. The three sources
   // open the section three ways — `### `, `## `, and a bold lead-in.
-  const opener = text.match(/^(#{2,3} Documentation Discipline|\*\*Documentation Discipline\.\*\*)/m);
+  const opener = text.match(
+    /^(#{2,3} Documentation Discipline|\*\*Documentation Discipline\.\*\*)/m
+  );
   assert.ok(opener, 'no Documentation Discipline section opener found');
   const after = text.slice(opener.index);
   // WORKFLOW.md carries later numbered lists (§15's loop-construction ladder),
@@ -1702,9 +1824,7 @@ function disciplineRuleNumbers(text) {
 }
 
 test('regression: task 0034 — ad-philosophy delivers every rule WORKFLOW.md declares', () => {
-  const declared = disciplineRuleNumbers(
-    readFileSync(join(REPO_ROOT, 'WORKFLOW.md'), 'utf8')
-  );
+  const declared = disciplineRuleNumbers(readFileSync(join(REPO_ROOT, 'WORKFLOW.md'), 'utf8'));
   assert.ok(declared.size >= 13, `parsed only ${declared.size} rules out of WORKFLOW.md`);
 
   for (const agent of ['claude-code', 'codex']) {
@@ -1756,13 +1876,17 @@ test('every ADR amendment declares both sides of the pair', () => {
   for (const edge of amends) {
     const [from, to] = edge.split('>');
     if (!amendedBy.has(`${to}>${from}`)) {
-      unpaired.push(`ADR-${from} declares Amends: ADR-${to}, but ADR-${to} has no matching Amended by:`);
+      unpaired.push(
+        `ADR-${from} declares Amends: ADR-${to}, but ADR-${to} has no matching Amended by:`
+      );
     }
   }
   for (const edge of amendedBy) {
     const [from, to] = edge.split('>');
     if (!amends.has(`${to}>${from}`)) {
-      unpaired.push(`ADR-${from} declares Amended by: ADR-${to}, but ADR-${to} has no matching Amends:`);
+      unpaired.push(
+        `ADR-${from} declares Amended by: ADR-${to}, but ADR-${to} has no matching Amends:`
+      );
     }
   }
 
@@ -1789,10 +1913,14 @@ test('the ADR projection states the number of ACCEPTED records the directory hol
   // test against its own stated principle.
   const accepted = readdirSync(adrDir)
     .filter((f) => /^\d{4}-.*\.md$/.test(f))
-    .filter((f) => /^\*\*Status:\*\*\s*accepted\b/im.test(readFileSync(join(adrDir, f), 'utf8')))
-    .length;
+    .filter((f) =>
+      /^\*\*Status:\*\*\s*accepted\b/im.test(readFileSync(join(adrDir, f), 'utf8'))
+    ).length;
   const claimed = readFileSync(projection, 'utf8').match(/All (\d+) accepted ADRs/);
-  assert.ok(claimed, 'PROJECTION.md no longer states an accepted total in the form "All N accepted ADRs"');
+  assert.ok(
+    claimed,
+    'PROJECTION.md no longer states an accepted total in the form "All N accepted ADRs"'
+  );
   assert.equal(
     Number(claimed[1]),
     accepted,

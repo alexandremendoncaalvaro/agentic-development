@@ -446,9 +446,7 @@ test('voice profile write: atomically creates a validated Markdown profile', () 
       })
     );
 
-    const output = JSON.parse(
-      run(['write', '--profile', profile, '--input', input], { cwd: dir })
-    );
+    const output = JSON.parse(run(['write', '--profile', profile, '--input', input], { cwd: dir }));
     assert.equal(output.written, true);
     assert.equal(output.profilePath, profile);
     assert.match(readFileSync(profile, 'utf8'), /^# Personal voice profile$/m);
@@ -651,10 +649,37 @@ test('voice profile write: invalid input leaves an existing profile unchanged', 
 
 test('voice profile scripts remain byte-identical across skills and hosts', () => {
   const paths = [
-    join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-voice', 'scripts', 'voice-profile.mjs'),
+    join(
+      __dirname,
+      '..',
+      'src',
+      'skills',
+      'claude-code',
+      'ad-voice',
+      'scripts',
+      'voice-profile.mjs'
+    ),
     join(__dirname, '..', 'src', 'skills', 'codex', 'ad-voice', 'scripts', 'voice-profile.mjs'),
-    join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-voice-tune', 'scripts', 'voice-profile.mjs'),
-    join(__dirname, '..', 'src', 'skills', 'codex', 'ad-voice-tune', 'scripts', 'voice-profile.mjs'),
+    join(
+      __dirname,
+      '..',
+      'src',
+      'skills',
+      'claude-code',
+      'ad-voice-tune',
+      'scripts',
+      'voice-profile.mjs'
+    ),
+    join(
+      __dirname,
+      '..',
+      'src',
+      'skills',
+      'codex',
+      'ad-voice-tune',
+      'scripts',
+      'voice-profile.mjs'
+    ),
   ];
   const expected = readFileSync(paths[0]);
   for (const path of paths.slice(1)) {
@@ -665,22 +690,103 @@ test('voice profile scripts remain byte-identical across skills and hosts', () =
 test('voice profile references remain byte-identical across hosts and consumers', () => {
   const sharedGroups = [
     [
-      join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-voice', 'references', 'profile-contract.md'),
-      join(__dirname, '..', 'src', 'skills', 'codex', 'ad-voice', 'references', 'profile-contract.md'),
-      join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-voice-tune', 'references', 'profile-contract.md'),
-      join(__dirname, '..', 'src', 'skills', 'codex', 'ad-voice-tune', 'references', 'profile-contract.md'),
+      join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        'claude-code',
+        'ad-voice',
+        'references',
+        'profile-contract.md'
+      ),
+      join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        'codex',
+        'ad-voice',
+        'references',
+        'profile-contract.md'
+      ),
+      join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        'claude-code',
+        'ad-voice-tune',
+        'references',
+        'profile-contract.md'
+      ),
+      join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        'codex',
+        'ad-voice-tune',
+        'references',
+        'profile-contract.md'
+      ),
     ],
     [
-      join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-voice', 'references', 'application.md'),
+      join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        'claude-code',
+        'ad-voice',
+        'references',
+        'application.md'
+      ),
       join(__dirname, '..', 'src', 'skills', 'codex', 'ad-voice', 'references', 'application.md'),
     ],
     [
-      join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-voice', 'references', 'human-writing-baseline.md'),
-      join(__dirname, '..', 'src', 'skills', 'codex', 'ad-voice', 'references', 'human-writing-baseline.md'),
+      join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        'claude-code',
+        'ad-voice',
+        'references',
+        'human-writing-baseline.md'
+      ),
+      join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        'codex',
+        'ad-voice',
+        'references',
+        'human-writing-baseline.md'
+      ),
     ],
     [
-      join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-voice-tune', 'references', 'calibration.md'),
-      join(__dirname, '..', 'src', 'skills', 'codex', 'ad-voice-tune', 'references', 'calibration.md'),
+      join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        'claude-code',
+        'ad-voice-tune',
+        'references',
+        'calibration.md'
+      ),
+      join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        'codex',
+        'ad-voice-tune',
+        'references',
+        'calibration.md'
+      ),
     ],
   ];
 
@@ -716,10 +822,7 @@ test('language preferences drive conversation, preview, and publication across t
       /complete the naturalization[\s\S]*before returning the\s+conversation-language draft/is
     );
     for (const caller of [publish, report]) {
-      assert.match(
-        caller,
-        /ad-voice[\s\S]{0,80}owns the two-stage language\s+approval flow/i
-      );
+      assert.match(caller, /ad-voice[\s\S]{0,80}owns the two-stage language\s+approval flow/i);
       assert.match(caller, /do not adapt[\s\S]*before[\s\S]*ad-voice/is);
     }
     for (const body of [voice, publish, report]) {
@@ -825,7 +928,10 @@ test('naturalization held-out fixtures exercise both branches and preserve invar
     assert.ok(fixture.invariants.length >= 2);
     assert.ok(['rewrite', 'unchanged'].includes(fixture.expectedDisposition));
     for (const invariant of fixture.invariants) {
-      assert.ok(fixture.source.includes(invariant), `${fixture.id} lost source invariant ${invariant}`);
+      assert.ok(
+        fixture.source.includes(invariant),
+        `${fixture.id} lost source invariant ${invariant}`
+      );
     }
     for (const failureClass of fixture.failureClasses) {
       assert.match(failureClass, /^HW\.(?:[1-9]|[12]\d|3[0-3])$/);
@@ -962,25 +1068,26 @@ test('voice profile validate: requires one canonical data block and accepts CRLF
   const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-markdown-'));
   try {
     const profile = join(dir, 'profile.md');
-    const data = JSON.stringify({
-      schemaVersion: 1,
-      owner: 'self',
-      status: 'confirmed',
-      retention: 'derived-only',
-      rawSamplesRetained: false,
-      patterns: [],
-      examples: [],
-      limitations: [],
-    }, null, 2);
+    const data = JSON.stringify(
+      {
+        schemaVersion: 1,
+        owner: 'self',
+        status: 'confirmed',
+        retention: 'derived-only',
+        rawSamplesRetained: false,
+        patterns: [],
+        examples: [],
+        limitations: [],
+      },
+      null,
+      2
+    );
 
     writeFileSync(
       profile,
       `# Personal voice profile\r\n\r\n## Profile data\r\n\r\n\`\`\`json\r\n${data.replaceAll('\n', '\r\n')}\r\n\`\`\`\r\n`
     );
-    assert.equal(
-      JSON.parse(run(['validate', '--profile', profile], { cwd: dir })).valid,
-      true
-    );
+    assert.equal(JSON.parse(run(['validate', '--profile', profile], { cwd: dir })).valid, true);
 
     writeFileSync(profile, `# Wrong title\n\n## Profile data\n\n\`\`\`json\n${data}\n\`\`\`\n`);
     let result = runResult(['validate', '--profile', profile], { cwd: dir });
@@ -1025,45 +1132,52 @@ test('voice profile validate: rejects incompatible layer provenance', () => {
     };
     writeFileSync(
       profile,
-      `# Personal voice profile\n\n## Profile data\n\n\`\`\`json\n${JSON.stringify({
-        schemaVersion: 1,
-        owner: 'self',
-        status: 'confirmed',
-        retention: 'derived-only',
-        rawSamplesRetained: false,
-        patterns: [
-          {
-            ...base,
-            id: 'translated-accommodation',
-            layer: 'accommodation',
-            provenance: { ...base.provenance, basis: 'functional-equivalent' },
-          },
-          {
-            ...base,
-            id: 'community-identity',
-            layer: 'identity',
-            provenance: {
-              ...base.provenance,
-              basis: 'community-observed',
-              authorClass: 'owner',
-              evidenceLanguages: ['en'],
+      `# Personal voice profile\n\n## Profile data\n\n\`\`\`json\n${JSON.stringify(
+        {
+          schemaVersion: 1,
+          owner: 'self',
+          status: 'confirmed',
+          retention: 'derived-only',
+          rawSamplesRetained: false,
+          patterns: [
+            {
+              ...base,
+              id: 'translated-accommodation',
+              layer: 'accommodation',
+              provenance: {
+                ...base.provenance,
+                basis: 'functional-equivalent',
+              },
             },
-          },
-          {
-            ...base,
-            id: 'community-context',
-            layer: 'context',
-            scope: { languages: ['en'] },
-            provenance: {
-              ...base.provenance,
-              basis: 'observed',
-              evidenceLanguages: ['en'],
+            {
+              ...base,
+              id: 'community-identity',
+              layer: 'identity',
+              provenance: {
+                ...base.provenance,
+                basis: 'community-observed',
+                authorClass: 'owner',
+                evidenceLanguages: ['en'],
+              },
             },
-          },
-        ],
-        examples: [],
-        limitations: [],
-      }, null, 2)}\n\`\`\`\n`
+            {
+              ...base,
+              id: 'community-context',
+              layer: 'context',
+              scope: { languages: ['en'] },
+              provenance: {
+                ...base.provenance,
+                basis: 'observed',
+                evidenceLanguages: ['en'],
+              },
+            },
+          ],
+          examples: [],
+          limitations: [],
+        },
+        null,
+        2
+      )}\n\`\`\`\n`
     );
 
     const result = runResult(['validate', '--profile', profile], { cwd: dir });
@@ -1075,18 +1189,12 @@ test('voice profile validate: rejects incompatible layer provenance', () => {
       )
     );
     assert.ok(
-      output.errors.includes(
-        'patterns[0] accommodation evidence must cover every target language'
-      )
+      output.errors.includes('patterns[0] accommodation evidence must cover every target language')
     );
     assert.ok(
-      output.errors.includes(
-        'patterns[1] identity provenance cannot use basis community-observed'
-      )
+      output.errors.includes('patterns[1] identity provenance cannot use basis community-observed')
     );
-    assert.ok(
-      output.errors.includes('patterns[2] context provenance must use authorClass owner')
-    );
+    assert.ok(output.errors.includes('patterns[2] context provenance must use authorClass owner'));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -1110,7 +1218,10 @@ test('voice profile validate and write reject profile paths inside a Git reposit
       limitations: [],
     };
     mkdirSync(dirname(profile), { recursive: true });
-    writeFileSync(profile, `# Personal voice profile\n\n## Profile data\n\n\`\`\`json\n${JSON.stringify(candidate)}\n\`\`\`\n`);
+    writeFileSync(
+      profile,
+      `# Personal voice profile\n\n## Profile data\n\n\`\`\`json\n${JSON.stringify(candidate)}\n\`\`\`\n`
+    );
     writeFileSync(input, JSON.stringify(candidate));
 
     for (const command of [
@@ -1165,31 +1276,35 @@ test('voice profile validate: exact retained examples stay short', () => {
     const profile = join(dir, 'profile.md');
     writeFileSync(
       profile,
-      `# Personal voice profile\n\n## Profile data\n\n\`\`\`json\n${JSON.stringify({
-        schemaVersion: 1,
-        owner: 'self',
-        status: 'confirmed',
-        retention: 'derived-only',
-        rawSamplesRetained: false,
-        patterns: [],
-        examples: [{
-          id: 'too-long',
-          text: 'x'.repeat(281),
-          language: 'pt-BR',
-          authorClass: 'owner',
-          approved: true,
-          retentionApproved: true,
-        }],
-        limitations: [],
-      }, null, 2)}\n\`\`\`\n`
+      `# Personal voice profile\n\n## Profile data\n\n\`\`\`json\n${JSON.stringify(
+        {
+          schemaVersion: 1,
+          owner: 'self',
+          status: 'confirmed',
+          retention: 'derived-only',
+          rawSamplesRetained: false,
+          patterns: [],
+          examples: [
+            {
+              id: 'too-long',
+              text: 'x'.repeat(281),
+              language: 'pt-BR',
+              authorClass: 'owner',
+              approved: true,
+              retentionApproved: true,
+            },
+          ],
+          limitations: [],
+        },
+        null,
+        2
+      )}\n\`\`\`\n`
     );
 
     const result = runResult(['validate', '--profile', profile], { cwd: dir });
     assert.equal(result.status, 1);
     assert.ok(
-      JSON.parse(result.stdout).errors.includes(
-        'examples[0].text must be at most 280 characters'
-      )
+      JSON.parse(result.stdout).errors.includes('examples[0].text must be at most 280 characters')
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });

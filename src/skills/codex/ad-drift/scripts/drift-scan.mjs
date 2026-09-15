@@ -49,8 +49,16 @@ const H2 = /^##[ \t]+(.+?)(?:[ \t]+#+)?[ \t]*$/;
 // task-status category (tasks appear only under spec reciprocity, which stays
 // judgment prose), so computing them here would emit facts nothing narrates.
 const LAYERS = {
-  adr: { dir: ['doc', 'adr'], statuses: ['proposed', 'accepted', 'deprecated', 'superseded'], supersede: 'ADR' },
-  specs: { dir: ['doc', 'specs'], statuses: ['draft', 'accepted', 'shipped', 'superseded'], supersede: 'SPEC' },
+  adr: {
+    dir: ['doc', 'adr'],
+    statuses: ['proposed', 'accepted', 'deprecated', 'superseded'],
+    supersede: 'ADR',
+  },
+  specs: {
+    dir: ['doc', 'specs'],
+    statuses: ['draft', 'accepted', 'shipped', 'superseded'],
+    supersede: 'SPEC',
+  },
 };
 
 // Narrative docs (Rule 3 bans emoji anywhere; the audit scans these).
@@ -68,7 +76,13 @@ const EMOJI_DOCS = [
 // Definition-layer docs that must not carry checkbox tracking UI (ADR-0030 §1,
 // Rule #9). Specs are added below; tasks are excluded — checkboxes are their
 // legitimate tracking UI.
-const DEFINITION_DOCS = ['AGENTS.md', 'WORKFLOW.md', 'ARCHITECTURE.md', 'GUIDELINES.md', 'CONTEXT.md'];
+const DEFINITION_DOCS = [
+  'AGENTS.md',
+  'WORKFLOW.md',
+  'ARCHITECTURE.md',
+  'GUIDELINES.md',
+  'CONTEXT.md',
+];
 const CONSTITUTION_POINTERS = [
   { section: 'Code Style', guidelinesSection: 2 },
   { section: 'Quality Gates', guidelinesSection: 8 },
@@ -109,7 +123,7 @@ function readContent(repoRoot, rel, unreadable) {
 // First status token, lowercased (`superseded by ADR-0002` → `superseded`).
 // `[ \t]*` so a blank status line never captures the next line's word.
 function parseStatus(body) {
-  const m = body.match(/^\*{0,2}Status:\*{0,2}[ \t]*([A-Za-z][A-Za-z-]*)/mi);
+  const m = body.match(/^\*{0,2}Status:\*{0,2}[ \t]*([A-Za-z][A-Za-z-]*)/im);
   return m ? m[1].toLowerCase() : null;
 }
 
@@ -161,7 +175,9 @@ function scanNumbering(files) {
     .filter(([, c]) => c > 1)
     .map(([n]) => n)
     .sort();
-  const ints = [...new Set([...counts.keys()].map((n) => Number.parseInt(n, 10)))].sort((a, b) => a - b);
+  const ints = [...new Set([...counts.keys()].map((n) => Number.parseInt(n, 10)))].sort(
+    (a, b) => a - b
+  );
   const gaps = [];
   if (ints.length) {
     const present = new Set(ints);
@@ -190,7 +206,7 @@ function scanLayer(repoRoot, key, layer, unreadable) {
     if (!st || !layer.statuses.includes(st)) status.push({ slug: slugOf(name), status: st });
 
     if (layer.supersede) {
-      const statusLine = (body.match(/^\*{0,2}Status:.*$/mi) ?? [''])[0];
+      const statusLine = (body.match(/^\*{0,2}Status:.*$/im) ?? [''])[0];
       if (/superseded by/i.test(statusLine)) {
         const m = statusLine.match(new RegExp(`${layer.supersede}-(\\d{4})`, 'i'));
         if (m && !files.some((f) => artifactNumber(f) === m[1])) {

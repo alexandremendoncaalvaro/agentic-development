@@ -33,7 +33,10 @@ test('changelog-gate: kit content plus a staged CHANGELOG.md entry passes', () =
 });
 
 test('changelog-gate: commits outside npm-shipped content pass silently', () => {
-  assert.equal(changelogWarning(['doc/tasks/0032-kit-release-discipline.md', 'lefthook.yml']), null);
+  assert.equal(
+    changelogWarning(['doc/tasks/0032-kit-release-discipline.md', 'lefthook.yml']),
+    null
+  );
   assert.equal(changelogWarning(['test/release.test.js', 'scripts/release.sh']), null);
 });
 
@@ -45,7 +48,7 @@ test('changelog-gate: empty staging area passes silently', () => {
   assert.equal(changelogWarning([]), null);
 });
 
-// --- push-branch-guard (blocks pushes that update main or cli) ---
+// --- push-branch-guard (blocks pushes that update main) ---
 
 test('push-guard: a push updating refs/heads/main is blocked', () => {
   const stdin = 'refs/heads/main abc123 refs/heads/main def456\n';
@@ -54,9 +57,9 @@ test('push-guard: a push updating refs/heads/main is blocked', () => {
   assert.match(violation, /main/);
 });
 
-test('push-guard: a push updating refs/heads/cli is blocked', () => {
+test('push-guard: the retired cli branch is not treated as protected', () => {
   const stdin = 'refs/heads/cli abc123 refs/heads/cli def456\n';
-  assert.ok(pushViolation(stdin, 'cli') !== null);
+  assert.equal(pushViolation(stdin, 'cli'), null);
 });
 
 test('push-guard: a feature-branch push passes', () => {

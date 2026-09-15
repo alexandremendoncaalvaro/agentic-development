@@ -2,7 +2,7 @@
 
 Status: accepted
 Created: 2026-05-11
-Updated: 2026-08-13
+Updated: 2026-09-15
 Owner: Alexandre Alvaro
 
 ## Product
@@ -46,10 +46,10 @@ Definitional. Tracking of whether each goal is met lives in per-feature tasks.
 
 Definitional. Product-level KPIs that count, and the measurement source for each. Current values are not tracked here.
 
-- **Idempotent complete install on both hosts.** Source: `npm test` integration suite + `.github/workflows/test.yml` matrix (Node 20 / 22).
+- **Idempotent complete install on both hosts.** Source: `npm test` integration suite + `.github/workflows/test.yml` matrix (Node 22.13 / 24).
 - **Cross-host parity.** Source: `test/skills.test.js` frontmatter + manifest validation; every shipped skill installs identically for Claude Code and Codex.
 - **Documentation discipline holds in the kit itself.** Source: `/ad-drift` runs at release boundaries; zero rule-1 / rule-2 / rule-5 / rule-9 / rule-10 violations.
-- **External adoption signal.** Source: `npm view @alexandrealvaro/agentic` + GitHub Insights. No internal target before 1.0 — pre-1.0 is dogfood-mode.
+- **External adoption signal.** Source: `npm view @alexandrealvaro/agentic` + GitHub Insights. Observe reach and feedback; do not use a numeric adoption threshold as a proxy for API stability.
 - **Industry-canon coverage breadth.** Source: ADR review (manual); every new layer or skill cites the canonical source(s) in its ADR's References section.
 
 ## Roadmap
@@ -67,14 +67,14 @@ Multi-feature scope tiers. Delivered capability is listed once; pending work rem
 - **Later tier — Per-language guideline presets.** `ad-guidelines` ships canned templates for Rust / Python / Go / TypeScript / C++ beyond the current per-language detection.
 - **Later tier — Skill eval harness.** Trajectory eval per `WORKFLOW.md` §13, applied to each shipped skill against a fixture corpus.
 - **Later tier — Example-grounded publication and reporting.** Investigate separate `ad-publish` and `ad-report` skills that use a shared, human-curated exemplar library to produce audience-aware collaboration posts and standalone reports while preserving the owner's voice through `ad-voice`.
-- **Later tier — 1.0 release readiness.** `main` is the sole development branch. A 1.0 release requires the MVP feature surface, clean own-dogfood audit reports, and closure of the pre-1.0 gaps (lint/format wiring, secret-scan, dep-audit per `GUIDELINES.md` §7 and §12).
+- **Current tier — 1.0 release readiness.** `main` is the sole development branch. ADR-0078 requires the MVP feature surface, the Node 22.13 / 24 compatibility matrix, one shared lint/format/test/dependency-audit gate, verified repository secret controls, and clean own-dogfood review, audit, drift, and package evidence before publication.
 
 ## Constraints
 
 What binds across the entire product. Skip the section if none.
 
-- **Technical:** Node ≥20 (ESM, `node:util` `styleText`). Supports Claude Code and Codex today through their native skill locations. No framework dependency in the kit (`commander` + `@clack/prompts` only).
-- **Business:** Solo maintainer; pre-1.0 beta. License: MIT. No paid tier, no telemetry, no account.
+- **Technical:** Node ≥22.13 (ESM). Supports Claude Code and Codex today through their native skill locations. No framework dependency in the kit (`commander` + `@clack/prompts` only).
+- **Business:** Solo maintainer; stable SemVer public API begins at 1.0.0. License: MIT. No paid tier, no telemetry, no account.
 - **Regulatory:** None today. Future hosted variants (if any) would need their own posture.
 - **Operational:** Kit content ships via `package.json#files`. Every shipped skill must pass `test/skills.test.js` (frontmatter, summary cap, manifest). No skill ships without an accepted ADR.
 
@@ -84,6 +84,7 @@ Deferred decisions. Each becomes a future ADR, a spec-time decision, or an expli
 
 - **When does `cli` promote to `main` and tag 1.0?** Criteria not yet locked. Candidates: (a) all MVP roadmap items shipped + own-dogfood audit clean; (b) external adoption threshold reached. Decision needs ADR.
   - **Partial resolution (2026-05-24):** the `cli` branch was consolidated into `main` — `main` is now the single source of truth for kit + CLI; npm prereleases publish from `main` and resolve through `latest` (ADR-0066). The 1.0-tag criterion remains open; this only collapses the prior two-branch model.
+  - **Resolution (2026-09-15):** ADR-0078 makes product completeness and repeatable quality evidence the entrance criterion. External adoption remains an observed signal, not a threshold. Stable 1.0 is the next release once its local/CI gates and final readiness audits pass.
 - **Should the kit ship IDE-native integrations** (VS Code extension, JetBrains plugin) or stay agents.md-based? Current posture is the latter — keep the kit small, let host integrations be community contributions. Reconsider if adoption stalls on host-onboarding friction.
 - **Telemetry policy when going hosted.** If a hosted variant ships, opt-in telemetry vs strict offline. Decision deferred until a hosted variant is on the roadmap (not currently).
 - **How to measure "kit landed correctly" without telemetry.** Indirect signals (test green at install, audit clean) cover *correctness*; do not cover *fit*. Survey or community-channel signal is the open question.

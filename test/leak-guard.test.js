@@ -30,19 +30,32 @@ const NUL = '\0';
 
 test('parseRawDiff reads status, destination mode/sha, and path (-z NUL format)', () => {
   const raw =
-    ':000000 100644 0000000 abc1234 A' + NUL + 'src/new.js' + NUL +
-    ':100644 000000 def5678 0000000 D' + NUL + 'gone.js' + NUL +
-    ':000000 120000 0000000 aaa1111 A' + NUL + 'link-to-elsewhere' + NUL;
+    ':000000 100644 0000000 abc1234 A' +
+    NUL +
+    'src/new.js' +
+    NUL +
+    ':100644 000000 def5678 0000000 D' +
+    NUL +
+    'gone.js' +
+    NUL +
+    ':000000 120000 0000000 aaa1111 A' +
+    NUL +
+    'link-to-elsewhere' +
+    NUL;
   assert.deepEqual(parseRawDiff(raw), [
     { status: 'A', dstMode: '100644', dstSha: 'abc1234', path: 'src/new.js' },
     { status: 'D', dstMode: '000000', dstSha: '0000000', path: 'gone.js' },
-    { status: 'A', dstMode: '120000', dstSha: 'aaa1111', path: 'link-to-elsewhere' },
+    {
+      status: 'A',
+      dstMode: '120000',
+      dstSha: 'aaa1111',
+      path: 'link-to-elsewhere',
+    },
   ]);
 });
 
 test('parseRawDiff uses the destination path for renames (-z NUL format)', () => {
-  const raw =
-    ':100644 100644 aaa2222 bbb3333 R100' + NUL + 'doc/old.md' + NUL + 'doc/new.md' + NUL;
+  const raw = ':100644 100644 aaa2222 bbb3333 R100' + NUL + 'doc/old.md' + NUL + 'doc/new.md' + NUL;
   assert.deepEqual(parseRawDiff(raw), [
     { status: 'R', dstMode: '100644', dstSha: 'bbb3333', path: 'doc/new.md' },
   ]);
@@ -51,7 +64,12 @@ test('parseRawDiff uses the destination path for renames (-z NUL format)', () =>
 test('parseRawDiff keeps a non-ASCII path verbatim (the -z quotepath regression)', () => {
   const raw = ':000000 100644 0000000 c1b0730 A' + NUL + 'rules/内部规则.md' + NUL;
   assert.deepEqual(parseRawDiff(raw), [
-    { status: 'A', dstMode: '100644', dstSha: 'c1b0730', path: 'rules/内部规则.md' },
+    {
+      status: 'A',
+      dstMode: '100644',
+      dstSha: 'c1b0730',
+      path: 'rules/内部规则.md',
+    },
   ]);
 });
 
@@ -174,7 +192,14 @@ test('findViolations flags a denylist match in added content', () => {
 
 test('findViolations flags a denylist match in an added path', () => {
   const violations = findViolations({
-    entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path: 'internal-codename-notes.md' }],
+    entries: [
+      {
+        status: 'A',
+        dstMode: '100644',
+        dstSha: 'x',
+        path: 'internal-codename-notes.md',
+      },
+    ],
     addedLines: [],
     denylistPatterns: ['internal-codename'],
     repoRoot: '/repo',
@@ -186,7 +211,14 @@ test('findViolations flags a denylist match in an added path', () => {
 
 test('findViolations flags any added path under rules/, independent of denylist', () => {
   const violations = findViolations({
-    entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path: 'rules/example-conventions.md' }],
+    entries: [
+      {
+        status: 'A',
+        dstMode: '100644',
+        dstSha: 'x',
+        path: 'rules/example-conventions.md',
+      },
+    ],
     addedLines: [],
     denylistPatterns: [],
     repoRoot: '/repo',
@@ -198,7 +230,14 @@ test('findViolations flags any added path under rules/, independent of denylist'
 
 test('regression: ADR-0043 findViolations flags an added path under .agentic/rules/ (per-project layer must stay machine-local in this repo)', () => {
   const violations = findViolations({
-    entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path: '.agentic/rules/project-conventions.md' }],
+    entries: [
+      {
+        status: 'A',
+        dstMode: '100644',
+        dstSha: 'x',
+        path: '.agentic/rules/project-conventions.md',
+      },
+    ],
     addedLines: [],
     denylistPatterns: [],
     repoRoot: '/repo',
@@ -211,7 +250,14 @@ test('regression: ADR-0043 findViolations flags an added path under .agentic/rul
 
 test('findViolations flags a non-ASCII path under rules/ (quotepath false-negative regression)', () => {
   const violations = findViolations({
-    entries: [{ status: 'A', dstMode: '100644', dstSha: 'x', path: 'rules/内部规则.md' }],
+    entries: [
+      {
+        status: 'A',
+        dstMode: '100644',
+        dstSha: 'x',
+        path: 'rules/内部规则.md',
+      },
+    ],
     addedLines: [],
     denylistPatterns: [],
     repoRoot: '/repo',

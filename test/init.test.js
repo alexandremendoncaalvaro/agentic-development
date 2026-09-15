@@ -1,14 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import {
-  mkdtempSync,
-  mkdirSync,
-  rmSync,
-  writeFileSync,
-  readFileSync,
-  existsSync,
-} from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -89,9 +82,7 @@ test('init --agent codex on brownfield → installs Codex skill + openai.yaml', 
     writeFileSync(join(dir, 'package.json'), '{"name":"x"}\n');
     runInit(dir, ['--agent', 'codex']);
     assert.ok(existsSync(join(dir, '.agents/skills/ad-bootstrap/SKILL.md')));
-    assert.ok(
-      existsSync(join(dir, '.agents/skills/ad-bootstrap/agents/openai.yaml'))
-    );
+    assert.ok(existsSync(join(dir, '.agents/skills/ad-bootstrap/agents/openai.yaml')));
     assert.ok(!existsSync(join(dir, '.claude')));
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -104,9 +95,7 @@ test('init --agent both → installs into both .claude and .agents', () => {
     runInit(dir, ['--agent', 'both']);
     assert.ok(existsSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md')));
     assert.ok(existsSync(join(dir, '.agents/skills/ad-bootstrap/SKILL.md')));
-    assert.ok(
-      existsSync(join(dir, '.agents/skills/ad-bootstrap/agents/openai.yaml'))
-    );
+    assert.ok(existsSync(join(dir, '.agents/skills/ad-bootstrap/agents/openai.yaml')));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -198,7 +187,9 @@ test('init --agent both installs every bundled skill for both agents', () => {
     }
     for (const agent of ['.claude', '.agents']) {
       assert.ok(
-        existsSync(join(dir, `${agent}/skills/ad-community-docs/scripts/community-doc-signals.mjs`)),
+        existsSync(
+          join(dir, `${agent}/skills/ad-community-docs/scripts/community-doc-signals.mjs`)
+        ),
         `${agent} ad-community-docs detector missing`
       );
     }
@@ -244,13 +235,9 @@ test('init: re-running on installed project is idempotent', () => {
   const dir = mkScratch();
   try {
     runInit(dir, ['--agent', 'claude-code']);
-    const before = readFileSync(
-      join(dir, '.claude/skills/ad-bootstrap/SKILL.md')
-    );
+    const before = readFileSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md'));
     runInit(dir, ['--agent', 'claude-code']);
-    const after = readFileSync(
-      join(dir, '.claude/skills/ad-bootstrap/SKILL.md')
-    );
+    const after = readFileSync(join(dir, '.claude/skills/ad-bootstrap/SKILL.md'));
     assert.ok(before.equals(after), 'SKILL.md must be byte-identical after re-run');
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -482,10 +469,7 @@ test('init -y still appends to an untracked root doc inside a git repo', () => {
 
     runInit(dir, ['--agent', 'claude-code', '-y']);
 
-    assert.match(
-      readFileSync(join(dir, 'AGENTS.md'), 'utf8'),
-      /agentic-managed-skills:start/
-    );
+    assert.match(readFileSync(join(dir, 'AGENTS.md'), 'utf8'), /agentic-managed-skills:start/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

@@ -34,7 +34,9 @@ if (files.length === 0) {
   process.exit(1);
 }
 
-const result = spawnSync(process.execPath, ['--test', ...files], { stdio: 'inherit' });
+const result = spawnSync(process.execPath, ['--test', ...files], {
+  stdio: 'inherit',
+});
 if (result.error) {
   console.error(`run-tests: failed to spawn the test runner: ${result.error.message}`);
   process.exit(1);

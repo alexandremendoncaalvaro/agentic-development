@@ -1,7 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync, mkdirSync, existsSync, symlinkSync } from 'node:fs';
+import {
+  chmodSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+  mkdirSync,
+  existsSync,
+  symlinkSync,
+} from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -308,7 +318,10 @@ test('handoff-nudge: fires at most once per session_id (second Stop is silent)',
       transcript_path: transcript,
       stop_hook_active: false,
     };
-    const env = { AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '100', AD_HANDOFF_NUDGE_STATE_DIR: dir };
+    const env = {
+      AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '100',
+      AD_HANDOFF_NUDGE_STATE_DIR: dir,
+    };
     const first = runNudge(event, env);
     const second = runNudge(event, env);
     assert.ok(first.includes('systemMessage'), 'first Stop nudges');
@@ -329,7 +342,10 @@ test('handoff-nudge: stop_hook_active === true → silent, cannot loop', () => {
         transcript_path: transcript,
         stop_hook_active: true,
       },
-      { AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '100', AD_HANDOFF_NUDGE_STATE_DIR: dir }
+      {
+        AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '100',
+        AD_HANDOFF_NUDGE_STATE_DIR: dir,
+      }
     );
     assert.equal(out, '', 're-entrancy guard: stop_hook_active must silence the hook');
   } finally {
@@ -340,7 +356,10 @@ test('handoff-nudge: stop_hook_active === true → silent, cannot loop', () => {
 test('handoff-nudge: missing transcript_path or unparseable stdin → silent, never disrupts', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-nudge-degrade-'));
   try {
-    const env = { AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '1', AD_HANDOFF_NUDGE_STATE_DIR: dir };
+    const env = {
+      AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '1',
+      AD_HANDOFF_NUDGE_STATE_DIR: dir,
+    };
     const noPath = runNudge({ hook_event_name: 'Stop', session_id: 's' }, env);
     assert.equal(noPath, '', 'missing transcript_path → silent');
     const badJson = execFileSync('node', [NUDGE], {
@@ -363,7 +382,10 @@ test('handoff-nudge: parseable-but-non-object stdin → silent exit 0, never cra
   // asserted implicitly, empty stdout explicitly.
   const dir = mkdtempSync(join(tmpdir(), 'agentic-nudge-nonobject-'));
   try {
-    const env = { AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '1', AD_HANDOFF_NUDGE_STATE_DIR: dir };
+    const env = {
+      AD_HANDOFF_NUDGE_THRESHOLD_BYTES: '1',
+      AD_HANDOFF_NUDGE_STATE_DIR: dir,
+    };
     for (const payload of ['null', 'true', '42', '"str"', '[]']) {
       const out = execFileSync('node', [NUDGE], {
         input: payload,
@@ -542,7 +564,10 @@ test('release-state: reports a content-read failure in unreadable', () => {
     const state = runReleaseState(dir);
 
     assert.deepEqual(state.unreadable, ['CHANGELOG.md:EISDIR']);
-    assert.deepEqual(state.files.changelog, { exists: true, hasUnreleased: null });
+    assert.deepEqual(state.files.changelog, {
+      exists: true,
+      hasUnreleased: null,
+    });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -589,12 +614,7 @@ test('release-plan: branch and tag pushes use isolated exact refs', () => {
     'origin',
     'refs/heads/chore/release-v1.2.3:refs/heads/chore/release-v1.2.3',
   ]);
-  assert.deepEqual(tag.execution, [
-    'git',
-    'push',
-    'origin',
-    'refs/tags/v1.2.3:refs/tags/v1.2.3',
-  ]);
+  assert.deepEqual(tag.execution, ['git', 'push', 'origin', 'refs/tags/v1.2.3:refs/tags/v1.2.3']);
 });
 
 test('release-plan: one digest-bound approval authorizes every unchanged stage', () => {
@@ -616,7 +636,11 @@ test('release-plan: one digest-bound approval authorizes every unchanged stage',
   assert.match(preview.planApproval.digest, /^[a-f0-9]{64}$/);
   assert.equal(preview.planApproval.effects.length, 7);
 
-  const approved = { scope: 'release-plan', digest: preview.planApproval.digest, approved: true };
+  const approved = {
+    scope: 'release-plan',
+    digest: preview.planApproval.digest,
+    approved: true,
+  };
   const local = runReleasePlan({
     ...context,
     completed: [],
@@ -754,7 +778,11 @@ test('release-plan: every direct release effect remains unexecuted when refused'
   const cases = [
     { completed: [], merged: false, stage: 'local-release' },
     { completed: ['local-release'], merged: false, stage: 'branch-push' },
-    { completed: ['local-release', 'branch-push'], merged: true, stage: 'tag-push' },
+    {
+      completed: ['local-release', 'branch-push'],
+      merged: true,
+      stage: 'tag-push',
+    },
     {
       completed: ['local-release', 'branch-push', 'tag-push'],
       merged: true,
@@ -832,10 +860,16 @@ test('survey: brownfield repo reports presence, counts, and reciprocity', () => 
     writeFileSync(join(dir, 'GUIDELINES.md'), '# guidelines');
     writeFileSync(join(dir, 'ARCHITECTURE.md'), '# architecture');
     // Layer 2 domain with a populated glossary (an `_Avoid_:` line).
-    writeFileSync(join(dir, 'CONTEXT.md'), '# context\n\n**Term** — a thing.\n_Avoid_: other-name\n');
+    writeFileSync(
+      join(dir, 'CONTEXT.md'),
+      '# context\n\n**Term** — a thing.\n_Avoid_: other-name\n'
+    );
     // Layer 3 product — PRD uses the plain `Status:` shape (not bold).
     mkdirSync(join(dir, 'doc', 'product'), { recursive: true });
-    writeFileSync(join(dir, 'doc', 'product', 'PRD.md'), '# PRD\n\nStatus: accepted\nCreated: 2026-01-01\n');
+    writeFileSync(
+      join(dir, 'doc', 'product', 'PRD.md'),
+      '# PRD\n\nStatus: accepted\nCreated: 2026-01-01\n'
+    );
     // Layer 4 specs — one accepted spec, bold `**Status:**` shape.
     mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
     writeFileSync(
@@ -855,7 +889,10 @@ test('survey: brownfield repo reports presence, counts, and reciprocity', () => 
       join(dir, 'doc', 'tasks', '0001-build-auth.md'),
       '# task-0001\n\n**Status:** in-progress\n**Spec ref:** doc/specs/0001-auth-flow.md\n**Board ref:**\n'
     );
-    writeFileSync(join(dir, 'doc', 'tasks', '0002-shipped.md'), '# task-0002\n\n**Status:** done\n');
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0002-shipped.md'),
+      '# task-0002\n\n**Status:** done\n'
+    );
     writeFileSync(
       join(dir, 'doc', 'tasks', '0003-orphan.md'),
       '# task-0003\n\n**Status:** proposed\n**Spec ref:**\n**Board ref:**\n'
@@ -939,8 +976,18 @@ test('survey: empty repo has no kit version, zero counts, and no crash', () => {
     assert.equal(s.architecture, false);
     assert.equal(s.product.prd, false);
     assert.deepEqual(s.specs, []);
-    assert.deepEqual(s.adrs.counts, { proposed: 0, accepted: 0, deprecated: 0, superseded: 0 });
-    assert.deepEqual(s.tasks.counts, { proposed: 0, 'in-progress': 0, blocked: 0, done: 0 });
+    assert.deepEqual(s.adrs.counts, {
+      proposed: 0,
+      accepted: 0,
+      deprecated: 0,
+      superseded: 0,
+    });
+    assert.deepEqual(s.tasks.counts, {
+      proposed: 0,
+      'in-progress': 0,
+      blocked: 0,
+      done: 0,
+    });
     assert.deepEqual(s.code, { tests: false, hooks: false, ci: false });
     // Not a git repo → git facts are null, never a thrown error.
     assert.equal(s.git.branch, null);
@@ -1405,7 +1452,11 @@ const DRIFT = join(
 );
 
 function runScan(cwd) {
-  const out = execFileSync('node', [DRIFT], { cwd, encoding: 'utf8', env: process.env });
+  const out = execFileSync('node', [DRIFT], {
+    cwd,
+    encoding: 'utf8',
+    env: process.env,
+  });
   return JSON.parse(out);
 }
 
@@ -1493,10 +1544,7 @@ test('drift-scan: detects a mapped heading with optional ATX closing markers', (
   const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-reciprocity-atx-'));
   try {
     writeFileSync(join(dir, 'GUIDELINES.md'), '# Guidelines\n\n## 2. Code standards\n');
-    writeFileSync(
-      join(dir, 'AGENTS.md'),
-      '# Agents\n\n## Code Style ##\n\n- Use named exports.\n'
-    );
+    writeFileSync(join(dir, 'AGENTS.md'), '# Agents\n\n## Code Style ##\n\n- Use named exports.\n');
 
     const s = runScan(dir);
 
@@ -1629,7 +1677,11 @@ test('drift-scan: numbering reports duplicates as drift and gaps as informationa
     writeFileSync(join(dir, 'doc', 'adr', '0004-d.md'), '# ADR\n\n**Status:** accepted\n');
     const s = runScan(dir);
     assert.deepEqual(s.numbering.adr.duplicates, ['0002'], 'duplicate NNNN is drift');
-    assert.deepEqual(s.numbering.adr.gaps, [3], 'a missing number is a gap (archiving-expected, informational)');
+    assert.deepEqual(
+      s.numbering.adr.gaps,
+      [3],
+      'a missing number is a gap (archiving-expected, informational)'
+    );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -1656,7 +1708,10 @@ test('drift-scan: status flags a missing or out-of-enum Status, per artifact lay
       ['0002-bad'],
       'a valid spec status is not flagged; an out-of-enum one is'
     );
-    assert.ok(!('tasks' in s.status), 'tasks are not a scripted numbering/status layer (no task-drift category)');
+    assert.ok(
+      !('tasks' in s.status),
+      'tasks are not a scripted numbering/status layer (no task-drift category)'
+    );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -1685,7 +1740,11 @@ test('drift-scan: supersession flags a superseded-by target that does not exist'
     assert.equal(s.supersession.length, 2, 'the dangling adr and spec supersessions are flagged');
     assert.ok(
       s.supersession.some(
-        (x) => x.kind === 'adr' && x.from === '0002-gone' && x.target === 'ADR-0099' && x.targetExists === false
+        (x) =>
+          x.kind === 'adr' &&
+          x.from === '0002-gone' &&
+          x.target === 'ADR-0099' &&
+          x.targetExists === false
       ),
       'dangling ADR supersession'
     );
@@ -1726,13 +1785,21 @@ test('drift-scan: amendment pairs flags an unpaired Amends / Amended-by relation
     );
     writeFileSync(join(dir, 'doc', 'adr', '0015-f.md'), '# ADR\n\n**Status:** accepted\n');
     const s = runScan(dir);
-    assert.equal(s.amendmentPairs.length, 2, 'both unpaired directions are flagged, the pair is not');
+    assert.equal(
+      s.amendmentPairs.length,
+      2,
+      'both unpaired directions are flagged, the pair is not'
+    );
     assert.ok(
-      s.amendmentPairs.some((f) => f.record === '0010-a' && f.field === 'Amends' && f.value === 'ADR-0011'),
+      s.amendmentPairs.some(
+        (f) => f.record === '0010-a' && f.field === 'Amends' && f.value === 'ADR-0011'
+      ),
       'unpaired Amends'
     );
     assert.ok(
-      s.amendmentPairs.some((f) => f.record === '0014-e' && f.field === 'Amended by' && f.value === 'ADR-0015'),
+      s.amendmentPairs.some(
+        (f) => f.record === '0014-e' && f.field === 'Amended by' && f.value === 'ADR-0015'
+      ),
       'unpaired Amended by (reverse direction)'
     );
   } finally {
@@ -1789,10 +1856,16 @@ test('drift-scan: checkbox flags checkbox UI in definition docs but not in tasks
     );
     // Specs are decision-records — a checkbox in one is drift (ADR-0030 §1).
     mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
-    writeFileSync(join(dir, 'doc', 'specs', '0001-s.md'), '# Spec\n\n**Status:** draft\n\n- [ ] req as checkbox\n');
+    writeFileSync(
+      join(dir, 'doc', 'specs', '0001-s.md'),
+      '# Spec\n\n**Status:** draft\n\n- [ ] req as checkbox\n'
+    );
     // Tasks legitimately use checkbox tracking UI — never flagged.
     mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
-    writeFileSync(join(dir, 'doc', 'tasks', '0001-t.md'), '# task\n\n**Status:** proposed\n\n- [ ] ac\n');
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0001-t.md'),
+      '# task\n\n**Status:** proposed\n\n- [ ] ac\n'
+    );
     const s = runScan(dir);
     assert.deepEqual(
       s.checkbox.map((c) => `${c.path}:${c.line}`).sort(),
@@ -1847,7 +1920,10 @@ test('drift-scan: an empty repo yields all-clear checks and no crash', () => {
     assert.deepEqual(s.amendmentPairs, []);
     assert.deepEqual(s.emoji, []);
     assert.deepEqual(s.checkbox, []);
-    assert.deepEqual(s.constitutionReciprocity, { applicable: false, duplicateSections: [] });
+    assert.deepEqual(s.constitutionReciprocity, {
+      applicable: false,
+      duplicateSections: [],
+    });
     assert.deepEqual(s.unreadable, []);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -1896,7 +1972,11 @@ const TERMINAL = join(
 );
 
 function runTerminal(cwd) {
-  const out = execFileSync('node', [TERMINAL], { cwd, encoding: 'utf8', env: process.env });
+  const out = execFileSync('node', [TERMINAL], {
+    cwd,
+    encoding: 'utf8',
+    env: process.env,
+  });
   return JSON.parse(out);
 }
 
@@ -1910,33 +1990,64 @@ test('find-terminal: includes only terminal artifacts, per category, with metada
       join(dir, 'doc', 'tasks', '0001-shipped.md'),
       '# Task `0001`: Apply the kit\n\n**Status:** done\n**Date:** 2026-05-08\n'
     );
-    writeFileSync(join(dir, 'doc', 'tasks', '0002-wip.md'), '# task-0002\n\n**Status:** in-progress\n');
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0002-wip.md'),
+      '# task-0002\n\n**Status:** in-progress\n'
+    );
     mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
-    writeFileSync(join(dir, 'doc', 'specs', '0001-live.md'), '# Spec 0001\n\n**Status:** shipped\n**Created:** 2026-06-01\n');
-    writeFileSync(join(dir, 'doc', 'specs', '0002-open.md'), '# Spec 0002\n\n**Status:** accepted\n');
+    writeFileSync(
+      join(dir, 'doc', 'specs', '0001-live.md'),
+      '# Spec 0001\n\n**Status:** shipped\n**Created:** 2026-06-01\n'
+    );
+    writeFileSync(
+      join(dir, 'doc', 'specs', '0002-open.md'),
+      '# Spec 0002\n\n**Status:** accepted\n'
+    );
     mkdirSync(join(dir, 'doc', 'product'), { recursive: true });
-    writeFileSync(join(dir, 'doc', 'product', 'PRD.md'), '# PRD\n\nStatus: superseded\nCreated: 2026-01-01\n');
+    writeFileSync(
+      join(dir, 'doc', 'product', 'PRD.md'),
+      '# PRD\n\nStatus: superseded\nCreated: 2026-01-01\n'
+    );
     mkdirSync(join(dir, 'doc', 'adr'), { recursive: true });
     writeFileSync(
       join(dir, 'doc', 'adr', '0019-old.md'),
       '# ADR-0019: Domain layer\n\n**Status:** superseded by ADR-0027\n**Date:** 2026-05-10\n'
     );
-    writeFileSync(join(dir, 'doc', 'adr', '0024-dead.md'), '# ADR-0024\n\n**Status:** deprecated\n');
+    writeFileSync(
+      join(dir, 'doc', 'adr', '0024-dead.md'),
+      '# ADR-0024\n\n**Status:** deprecated\n'
+    );
     writeFileSync(join(dir, 'doc', 'adr', '0027-live.md'), '# ADR-0027\n\n**Status:** accepted\n');
     const t = runTerminal(dir);
 
-    assert.deepEqual(t.tasks.map((x) => x.slug), ['0001-shipped'], 'only done tasks');
+    assert.deepEqual(
+      t.tasks.map((x) => x.slug),
+      ['0001-shipped'],
+      'only done tasks'
+    );
     assert.equal(t.tasks[0].status, 'done');
     assert.equal(t.tasks[0].created, '2026-05-08');
     assert.equal(t.tasks[0].title, 'Apply the kit', 'H1 stripped of the type-NNNN prefix');
     assert.equal(t.tasks[0].path, join('doc', 'tasks', '0001-shipped.md'));
 
-    assert.deepEqual(t.specs.map((x) => x.slug), ['0001-live'], 'only shipped specs');
+    assert.deepEqual(
+      t.specs.map((x) => x.slug),
+      ['0001-live'],
+      'only shipped specs'
+    );
     assert.equal(t.specs[0].created, '2026-06-01');
 
-    assert.deepEqual(t.prds.map((x) => x.slug), ['PRD'], 'only superseded PRDs');
+    assert.deepEqual(
+      t.prds.map((x) => x.slug),
+      ['PRD'],
+      'only superseded PRDs'
+    );
 
-    assert.deepEqual(t.adrs.map((x) => x.slug).sort(), ['0019-old', '0024-dead'], 'superseded + deprecated, NOT accepted');
+    assert.deepEqual(
+      t.adrs.map((x) => x.slug).sort(),
+      ['0019-old', '0024-dead'],
+      'superseded + deprecated, NOT accepted'
+    );
     const superseded = t.adrs.find((x) => x.slug === '0019-old');
     assert.equal(superseded.status, 'superseded');
     assert.equal(superseded.supersededBy, 'ADR-0027', 'supersession target captured for the slate');
@@ -1952,7 +2063,10 @@ test('find-terminal: a spec superseded by another SPEC is excluded (chain target
   const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-super-'));
   try {
     mkdirSync(join(dir, 'doc', 'specs'), { recursive: true });
-    writeFileSync(join(dir, 'doc', 'specs', '0001-old.md'), '# Spec\n\n**Status:** superseded by SPEC-0009\n');
+    writeFileSync(
+      join(dir, 'doc', 'specs', '0001-old.md'),
+      '# Spec\n\n**Status:** superseded by SPEC-0009\n'
+    );
     writeFileSync(join(dir, 'doc', 'specs', '0002-shipped.md'), '# Spec\n\n**Status:** shipped\n');
     const t = runTerminal(dir);
     assert.deepEqual(
@@ -1970,7 +2084,10 @@ test('find-terminal: a prefix-less title carrying a number is preserved (no fals
   try {
     mkdirSync(join(dir, 'doc', 'tasks'), { recursive: true });
     // The H1 has no artifact-type prefix; "Fix 500:" must NOT be stripped.
-    writeFileSync(join(dir, 'doc', 'tasks', '0001-t.md'), '# Fix 500: recover retries\n\n**Status:** done\n');
+    writeFileSync(
+      join(dir, 'doc', 'tasks', '0001-t.md'),
+      '# Fix 500: recover retries\n\n**Status:** done\n'
+    );
     const t = runTerminal(dir);
     assert.equal(t.tasks[0].title, 'Fix 500: recover retries');
   } finally {
@@ -1982,7 +2099,13 @@ test('find-terminal: an empty repo yields empty categories and no crash', () => 
   const dir = mkdtempSync(join(tmpdir(), 'agentic-terminal-empty-'));
   try {
     const t = runTerminal(dir);
-    assert.deepEqual(t, { tasks: [], specs: [], prds: [], adrs: [], unreadable: [] });
+    assert.deepEqual(t, {
+      tasks: [],
+      specs: [],
+      prds: [],
+      adrs: [],
+      unreadable: [],
+    });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -2030,7 +2153,11 @@ const HOOKS = join(
 );
 
 function runHooksDetector(cwd) {
-  const out = execFileSync('node', [HOOKS], { cwd, encoding: 'utf8', env: process.env });
+  const out = execFileSync('node', [HOOKS], {
+    cwd,
+    encoding: 'utf8',
+    env: process.env,
+  });
   return JSON.parse(out);
 }
 
@@ -2040,13 +2167,7 @@ test('detect-hooks: reports stack, runner, CI/pre-push commands, and uncovered C
     writeFileSync(join(dir, 'package.json'), '{"name":"fixture"}\n');
     writeFileSync(
       join(dir, 'lefthook.yml'),
-      [
-        'pre-push:',
-        '  commands:',
-        '    test:',
-        '      run: npm test',
-        '',
-      ].join('\n')
+      ['pre-push:', '  commands:', '    test:', '      run: npm test', ''].join('\n')
     );
     mkdirSync(join(dir, '.github', 'workflows'), { recursive: true });
     writeFileSync(
@@ -2327,7 +2448,12 @@ test('next-number: reports sorted artifact numbers and the slot after the maximu
   try {
     const artifacts = join(dir, 'doc', 'adr');
     mkdirSync(artifacts, { recursive: true });
-    for (const name of ['0001-first.md', '0042-answer.md', 'not-an-artifact.md', '10000-overflow.md']) {
+    for (const name of [
+      '0001-first.md',
+      '0042-answer.md',
+      'not-an-artifact.md',
+      '10000-overflow.md',
+    ]) {
       writeFileSync(join(artifacts, name), 'fixture\n');
     }
 
@@ -2394,7 +2520,11 @@ test('next-number: an unreadable artifact directory blocks numbering', (t) => {
       unreadable: [{ path: 'doc/specs', code: 'EACCES' }],
     });
   } finally {
-    try { chmodSync(join(dir, 'doc', 'specs'), 0o755); } catch { /* ignore */ }
+    try {
+      chmodSync(join(dir, 'doc', 'specs'), 0o755);
+    } catch {
+      /* ignore */
+    }
     rmSync(dir, { recursive: true, force: true });
   }
 });
@@ -2425,9 +2555,29 @@ test('next-number: an archived highest artifact remains reserved from Git histor
     execFileSync('git', ['init', '-q', dir]);
     writeFileSync(join(artifacts, '0042-archived.md'), 'fixture\n');
     execFileSync('git', ['-C', dir, 'add', 'doc/adr/0042-archived.md']);
-    execFileSync('git', ['-C', dir, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'fixture']);
+    execFileSync('git', [
+      '-C',
+      dir,
+      '-c',
+      'user.name=fixture',
+      '-c',
+      'user.email=fixture@example.test',
+      'commit',
+      '-qm',
+      'fixture',
+    ]);
     execFileSync('git', ['-C', dir, 'rm', '-q', 'doc/adr/0042-archived.md']);
-    execFileSync('git', ['-C', dir, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'archive']);
+    execFileSync('git', [
+      '-C',
+      dir,
+      '-c',
+      'user.name=fixture',
+      '-c',
+      'user.email=fixture@example.test',
+      'commit',
+      '-qm',
+      'archive',
+    ]);
 
     assert.equal(runNumberDetector(dir, 'doc/adr').next, '0043');
   } finally {
@@ -2465,8 +2615,21 @@ test('next-number: all four skills ship the same self-contained detector on both
   const source = readFileSync(NUMBER_SCRIPTS[0]);
   for (const skill of NUMBER_SKILLS) {
     for (const host of ['claude-code', 'codex']) {
-      const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'next-number.mjs');
-      assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
+      const path = join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        host,
+        skill,
+        'scripts',
+        'next-number.mjs'
+      );
+      assert.deepEqual(
+        readFileSync(path),
+        source,
+        `${host}/${skill} must share the detector bytes`
+      );
     }
   }
 });
@@ -2492,13 +2655,16 @@ function runGhPreflight(cwd, args, environment = {}) {
 // Node-script wrapper under its own node binary, shell-free, on both platforms.
 function writeFakeGh(dir, responses) {
   const path = join(dir, 'fake-gh.mjs');
-  writeFileSync(path, `if (process.env.AGENTIC_TEST_GH_REQUIRE_CLEAN_GIT_ENV === 'true' && ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE'].some((name) => process.env[name])) process.exit(97);
+  writeFileSync(
+    path,
+    `if (process.env.AGENTIC_TEST_GH_REQUIRE_CLEAN_GIT_ENV === 'true' && ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE'].some((name) => process.env[name])) process.exit(97);
 const responses = JSON.parse(process.env.AGENTIC_TEST_GH_RESPONSES || '{}');
 const response = responses[process.argv.slice(2).join('\\u0000')] || { status: 0, stdout: '' };
 process.stdout.write(response.stdout || '');
 process.stderr.write(response.stderr || '');
 process.exit(response.status || 0);
-`);
+`
+  );
   return {
     AGENTIC_GH: path,
     AGENTIC_TEST_GH_RESPONSES: JSON.stringify(responses),
@@ -2507,7 +2673,17 @@ process.exit(response.status || 0);
 
 function commitFixture(repo, subject) {
   execFileSync('git', ['-C', repo, 'add', '.']);
-  execFileSync('git', ['-C', repo, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', subject]);
+  execFileSync('git', [
+    '-C',
+    repo,
+    '-c',
+    'user.name=fixture',
+    '-c',
+    'user.email=fixture@example.test',
+    'commit',
+    '-qm',
+    subject,
+  ]);
 }
 
 function pushedFeatureFixture(dir) {
@@ -2518,7 +2694,13 @@ function pushedFeatureFixture(dir) {
   execFileSync('git', ['-C', dir, 'checkout', '-qb', 'feat/preflight']);
   execFileSync('git', ['-C', dir, 'remote', 'add', 'origin', 'https://example.test/fixture.git']);
   execFileSync('git', ['-C', dir, 'update-ref', 'refs/remotes/origin/feat/preflight', 'HEAD']);
-  execFileSync('git', ['-C', dir, 'branch', '--set-upstream-to=origin/feat/preflight', 'feat/preflight']);
+  execFileSync('git', [
+    '-C',
+    dir,
+    'branch',
+    '--set-upstream-to=origin/feat/preflight',
+    'feat/preflight',
+  ]);
 }
 
 test('gh-preflight: PR reports authenticated GitHub and a pushed branch', () => {
@@ -2536,7 +2718,11 @@ test('gh-preflight: PR reports authenticated GitHub and a pushed branch', () => 
     assert.deepEqual(runGhPreflight(dir, ['pr'], env), {
       operation: 'pr',
       github: { command: env.AGENTIC_GH, installed: true, authenticated: true },
-      git: { branch: 'feat/preflight', upstream: 'origin/feat/preflight', aheadOfUpstream: 0 },
+      git: {
+        branch: 'feat/preflight',
+        upstream: 'origin/feat/preflight',
+        aheadOfUpstream: 0,
+      },
       baseBranch: 'main',
       pullRequest: null,
       pullRequestState: 'not-requested',
@@ -2586,14 +2772,18 @@ test('gh-preflight: merge reports the PR, checks, and allowed merge methods', ()
       'repo\u0000view\u0000--json\u0000defaultBranchRef': {
         stdout: '{"defaultBranchRef":{"name":"main"}}\n',
       },
-      'pr\u0000view\u000042\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
-        stdout: '{"number":42,"headRefName":"feat/preflight","baseRefName":"main","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviews":[]}\n',
-      },
+      'pr\u0000view\u000042\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews':
+        {
+          stdout:
+            '{"number":42,"headRefName":"feat/preflight","baseRefName":"main","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviews":[]}\n',
+        },
       'pr\u0000checks\u000042\u0000--json\u0000name,bucket,state,link': {
-        stdout: '[{"name":"test","bucket":"pass","state":"SUCCESS","link":"https://example.test/check"}]\n',
+        stdout:
+          '[{"name":"test","bucket":"pass","state":"SUCCESS","link":"https://example.test/check"}]\n',
       },
       'repo\u0000view\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed': {
-        stdout: '{"mergeCommitAllowed":true,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
+        stdout:
+          '{"mergeCommitAllowed":true,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
       },
     });
 
@@ -2602,8 +2792,19 @@ test('gh-preflight: merge reports the PR, checks, and allowed merge methods', ()
     assert.equal(report.pullRequest.number, 42);
     assert.equal(report.pullRequestState, 'present');
     assert.equal(report.pullRequest.mergeStateStatus, 'CLEAN');
-    assert.deepEqual(report.checks, [{ name: 'test', bucket: 'pass', state: 'SUCCESS', link: 'https://example.test/check' }]);
-    assert.deepEqual(report.mergeMethods, { mergeCommitAllowed: true, squashMergeAllowed: true, rebaseMergeAllowed: false });
+    assert.deepEqual(report.checks, [
+      {
+        name: 'test',
+        bucket: 'pass',
+        state: 'SUCCESS',
+        link: 'https://example.test/check',
+      },
+    ]);
+    assert.deepEqual(report.mergeMethods, {
+      mergeCommitAllowed: true,
+      squashMergeAllowed: true,
+      rebaseMergeAllowed: false,
+    });
     assert.deepEqual(report.errors, []);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -2620,20 +2821,31 @@ test('gh-preflight: pending checks retain their JSON despite gh exit code 8', ()
       'repo\u0000view\u0000--json\u0000defaultBranchRef': {
         stdout: '{"defaultBranchRef":{"name":"main"}}\n',
       },
-      'pr\u0000view\u000042\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
-        stdout: '{"number":42,"headRefName":"feat/preflight","baseRefName":"main","mergeable":"UNKNOWN","mergeStateStatus":"UNKNOWN","reviews":[]}\n',
-      },
+      'pr\u0000view\u000042\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews':
+        {
+          stdout:
+            '{"number":42,"headRefName":"feat/preflight","baseRefName":"main","mergeable":"UNKNOWN","mergeStateStatus":"UNKNOWN","reviews":[]}\n',
+        },
       'pr\u0000checks\u000042\u0000--json\u0000name,bucket,state,link': {
         status: 8,
-        stdout: '[{"name":"test","bucket":"pending","state":"IN_PROGRESS","link":"https://example.test/check"}]\n',
+        stdout:
+          '[{"name":"test","bucket":"pending","state":"IN_PROGRESS","link":"https://example.test/check"}]\n',
       },
       'repo\u0000view\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed': {
-        stdout: '{"mergeCommitAllowed":true,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
+        stdout:
+          '{"mergeCommitAllowed":true,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
       },
     });
 
     const report = runGhPreflight(dir, ['merge', '42'], env);
-    assert.deepEqual(report.checks, [{ name: 'test', bucket: 'pending', state: 'IN_PROGRESS', link: 'https://example.test/check' }]);
+    assert.deepEqual(report.checks, [
+      {
+        name: 'test',
+        bucket: 'pending',
+        state: 'IN_PROGRESS',
+        link: 'https://example.test/check',
+      },
+    ]);
     assert.deepEqual(report.errors, []);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -2651,20 +2863,37 @@ test('gh-preflight: a PR URL scopes checks and merge policy to its repository', 
       'repo\u0000view\u0000--json\u0000defaultBranchRef': {
         stdout: '{"defaultBranchRef":{"name":"main"}}\n',
       },
-      'pr\u0000view\u0000https://github.com/acme/other/pull/42\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
-        stdout: '{"number":42,"url":"https://github.com/acme/other/pull/42","headRefName":"feat/preflight","baseRefName":"main","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviews":[]}\n',
-      },
-      'pr\u0000checks\u0000https://github.com/acme/other/pull/42\u0000--json\u0000name,bucket,state,link\u0000--repo\u0000acme/other': {
-        stdout: '[{"name":"test","bucket":"pass","state":"SUCCESS","link":"https://example.test/check"}]\n',
-      },
-      'repo\u0000view\u0000acme/other\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed': {
-        stdout: '{"mergeCommitAllowed":false,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
-      },
+      'pr\u0000view\u0000https://github.com/acme/other/pull/42\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews':
+        {
+          stdout:
+            '{"number":42,"url":"https://github.com/acme/other/pull/42","headRefName":"feat/preflight","baseRefName":"main","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","reviews":[]}\n',
+        },
+      'pr\u0000checks\u0000https://github.com/acme/other/pull/42\u0000--json\u0000name,bucket,state,link\u0000--repo\u0000acme/other':
+        {
+          stdout:
+            '[{"name":"test","bucket":"pass","state":"SUCCESS","link":"https://example.test/check"}]\n',
+        },
+      'repo\u0000view\u0000acme/other\u0000--json\u0000mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed':
+        {
+          stdout:
+            '{"mergeCommitAllowed":false,"squashMergeAllowed":true,"rebaseMergeAllowed":false}\n',
+        },
     });
 
     const report = runGhPreflight(dir, ['merge', url], env);
-    assert.deepEqual(report.checks, [{ name: 'test', bucket: 'pass', state: 'SUCCESS', link: 'https://example.test/check' }]);
-    assert.deepEqual(report.mergeMethods, { mergeCommitAllowed: false, squashMergeAllowed: true, rebaseMergeAllowed: false });
+    assert.deepEqual(report.checks, [
+      {
+        name: 'test',
+        bucket: 'pass',
+        state: 'SUCCESS',
+        link: 'https://example.test/check',
+      },
+    ]);
+    assert.deepEqual(report.mergeMethods, {
+      mergeCommitAllowed: false,
+      squashMergeAllowed: true,
+      rebaseMergeAllowed: false,
+    });
     assert.equal(report.targetRepository, 'acme/other');
     assert.deepEqual(report.errors, []);
   } finally {
@@ -2682,10 +2911,11 @@ test('gh-preflight: a missing PR is distinct from a failed PR probe', () => {
       'repo\u0000view\u0000--json\u0000defaultBranchRef': {
         stdout: '{"defaultBranchRef":{"name":"main"}}\n',
       },
-      'pr\u0000view\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
-        status: 1,
-        stderr: 'no pull requests found for branch "feat/preflight"\n',
-      },
+      'pr\u0000view\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews':
+        {
+          status: 1,
+          stderr: 'no pull requests found for branch "feat/preflight"\n',
+        },
     });
 
     const report = runGhPreflight(dir, ['merge'], env);
@@ -2708,10 +2938,11 @@ test('gh-preflight: a failed PR probe is not reported as an absent PR', () => {
       'repo\u0000view\u0000--json\u0000defaultBranchRef': {
         stdout: '{"defaultBranchRef":{"name":"main"}}\n',
       },
-      'pr\u0000view\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews': {
-        status: 1,
-        stderr: 'network unavailable\n',
-      },
+      'pr\u0000view\u0000--json\u0000number,url,headRefName,baseRefName,mergeable,mergeStateStatus,reviews':
+        {
+          status: 1,
+          stderr: 'network unavailable\n',
+        },
     });
 
     const report = runGhPreflight(dir, ['merge'], env);
@@ -2729,7 +2960,11 @@ test('gh-preflight: an unavailable GitHub CLI is structured rather than thrown',
     pushedFeatureFixture(dir);
     const missing = join(dir, 'missing-gh');
     const report = runGhPreflight(dir, ['pr'], { AGENTIC_GH: missing });
-    assert.deepEqual(report.github, { command: missing, installed: false, authenticated: null });
+    assert.deepEqual(report.github, {
+      command: missing,
+      installed: false,
+      authenticated: null,
+    });
     assert.deepEqual(report.errors, [{ probe: 'gh --version', code: 'ENOENT' }]);
     assert.equal(report.baseBranch, null);
   } finally {
@@ -2741,8 +2976,21 @@ test('gh-preflight: both skills ship the same self-contained detector on both ho
   const source = readFileSync(GH_PREFLIGHT_SCRIPTS[0]);
   for (const skill of GH_PREFLIGHT_SKILLS) {
     for (const host of ['claude-code', 'codex']) {
-      const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'gh-preflight.mjs');
-      assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
+      const path = join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        host,
+        skill,
+        'scripts',
+        'gh-preflight.mjs'
+      );
+      assert.deepEqual(
+        readFileSync(path),
+        source,
+        `${host}/${skill} must share the detector bytes`
+      );
     }
   }
 });
@@ -2841,8 +3089,21 @@ test('project-signals: all four skills ship the same self-contained detector on 
   const source = readFileSync(PROJECT_SIGNAL_SCRIPTS[0]);
   for (const skill of PROJECT_SIGNAL_SKILLS) {
     for (const host of ['claude-code', 'codex']) {
-      const path = join(__dirname, '..', 'src', 'skills', host, skill, 'scripts', 'project-signals.mjs');
-      assert.deepEqual(readFileSync(path), source, `${host}/${skill} must share the detector bytes`);
+      const path = join(
+        __dirname,
+        '..',
+        'src',
+        'skills',
+        host,
+        skill,
+        'scripts',
+        'project-signals.mjs'
+      );
+      assert.deepEqual(
+        readFileSync(path),
+        source,
+        `${host}/${skill} must share the detector bytes`
+      );
     }
   }
 });
@@ -2918,7 +3179,10 @@ test('community-doc-signals: keeps an unreadable document in unreadable instead 
     mkdirSync(join(dir, 'SECURITY.md'));
 
     const report = runCommunityDocSignals(dir);
-    assert.deepEqual(report.documents, { contributing: [], security: ['SECURITY.md'] });
+    assert.deepEqual(report.documents, {
+      contributing: [],
+      security: ['SECURITY.md'],
+    });
     assert.deepEqual(report.unreadable, [{ path: 'SECURITY.md', code: 'EISDIR' }]);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -2933,8 +3197,26 @@ test('community-doc-signals: source copies are byte-identical across hosts', () 
 // This is the sole intentionally host-divergent helper: the host's own global
 // rules path wins, while the other host's paths remain fallback candidates.
 const GLOBAL_RULES_SCRIPTS = {
-  'claude-code': join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-rules', 'scripts', 'resolve-global-rules.mjs'),
-  codex: join(__dirname, '..', 'src', 'skills', 'codex', 'ad-rules', 'scripts', 'resolve-global-rules.mjs'),
+  'claude-code': join(
+    __dirname,
+    '..',
+    'src',
+    'skills',
+    'claude-code',
+    'ad-rules',
+    'scripts',
+    'resolve-global-rules.mjs'
+  ),
+  codex: join(
+    __dirname,
+    '..',
+    'src',
+    'skills',
+    'codex',
+    'ad-rules',
+    'scripts',
+    'resolve-global-rules.mjs'
+  ),
 };
 
 function runGlobalRules(cwd, host, home) {
@@ -2966,12 +3248,14 @@ test('resolve-global-rules: Claude resolves a global symlink and reports both en
         linkTarget: join('..', 'workflow', 'AGENTS.ale.md'),
         resolvedPath: resolvedTarget,
       },
-      sources: [{
-        path: link,
-        state: 'symlink',
-        linkTarget: join('..', 'workflow', 'AGENTS.ale.md'),
-        resolvedPath: resolvedTarget,
-      }],
+      sources: [
+        {
+          path: link,
+          state: 'symlink',
+          linkTarget: join('..', 'workflow', 'AGENTS.ale.md'),
+          resolvedPath: resolvedTarget,
+        },
+      ],
       unreadable: [],
     });
   } finally {
@@ -2997,7 +3281,10 @@ test('resolve-global-rules: Codex prioritizes its own global rules over Claude f
       linkTarget: null,
       resolvedPath: codex,
     });
-    assert.deepEqual(report.sources.map((source) => source.path), [codex, claude]);
+    assert.deepEqual(
+      report.sources.map((source) => source.path),
+      [codex, claude]
+    );
     assert.deepEqual(report.unreadable, []);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -3014,16 +3301,18 @@ test('resolve-global-rules: a broken global link is distinct from an absent laye
 
     const report = runGlobalRules(dir, 'claude-code', home);
     assert.equal(report.primary, null);
-    assert.deepEqual(report.sources, [{
-      path: link,
-      state: 'broken-symlink',
-      // The script reports the target the OS stored, and Windows stores it
-      // with native separators whatever form it was created from. Build the
-      // expectation the same way the other paths here are built, rather than
-      // pinning a POSIX-shaped literal the platform never returns.
-      linkTarget: join('..', 'missing', 'AGENTS.md'),
-      resolvedPath: null,
-    }]);
+    assert.deepEqual(report.sources, [
+      {
+        path: link,
+        state: 'broken-symlink',
+        // The script reports the target the OS stored, and Windows stores it
+        // with native separators whatever form it was created from. Build the
+        // expectation the same way the other paths here are built, rather than
+        // pinning a POSIX-shaped literal the platform never returns.
+        linkTarget: join('..', 'missing', 'AGENTS.md'),
+        resolvedPath: null,
+      },
+    ]);
     assert.deepEqual(report.unreadable, []);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -3062,15 +3351,21 @@ test('resolve-global-rules: an unreadable global file is not selected as primary
 
     const report = runGlobalRules(dir, 'claude-code', home);
     assert.equal(report.primary, null);
-    assert.deepEqual(report.sources, [{
-      path: file,
-      state: 'unreadable',
-      linkTarget: null,
-      resolvedPath: file,
-    }]);
+    assert.deepEqual(report.sources, [
+      {
+        path: file,
+        state: 'unreadable',
+        linkTarget: null,
+        resolvedPath: file,
+      },
+    ]);
     assert.deepEqual(report.unreadable, [{ path: file, code: 'EACCES' }]);
   } finally {
-    try { chmodSync(file, 0o644); } catch { /* ignore */ }
+    try {
+      chmodSync(file, 0o644);
+    } catch {
+      /* ignore */
+    }
     rmSync(dir, { recursive: true, force: true });
   }
 });
@@ -3110,7 +3405,17 @@ test('workflow-checkpoint: valid prompt event → short imperative checkpoint na
   const out = runCheckpoint(PROMPT_EVENT);
   assert.ok(out.length > 0, 'checkpoint must not be silent on a valid event');
   assert.ok(out.length <= 900, `checkpoint must stay under 900 chars; got ${out.length}`);
-  for (const cmd of ['/ad-derisk', '/ad-grill-me', '/ad-ground', '/ad-tdd', '/ad-tdg', '/ad-review', '/ad-audit', '/ad-commit', '/ad-handoff']) {
+  for (const cmd of [
+    '/ad-derisk',
+    '/ad-grill-me',
+    '/ad-ground',
+    '/ad-tdd',
+    '/ad-tdg',
+    '/ad-review',
+    '/ad-audit',
+    '/ad-commit',
+    '/ad-handoff',
+  ]) {
     assert.ok(out.includes(cmd), `checkpoint names ${cmd}`);
   }
   assert.match(out, /trivial/i, 'checkpoint tells the model when to skip');
@@ -3121,7 +3426,12 @@ test('workflow-checkpoint: valid prompt event → short imperative checkpoint na
 
 test('workflow-checkpoint: identical output for any prompt (static, no prompt-dependent branching)', () => {
   const a = runCheckpoint(PROMPT_EVENT);
-  const b = runCheckpoint(JSON.stringify({ hook_event_name: 'UserPromptSubmit', prompt: 'fix the typo in README' }));
+  const b = runCheckpoint(
+    JSON.stringify({
+      hook_event_name: 'UserPromptSubmit',
+      prompt: 'fix the typo in README',
+    })
+  );
   assert.equal(a, b);
 });
 

@@ -20,7 +20,7 @@ Then open the project in Claude Code or Codex and invoke:
 
 `/ad-next` reads the repository and recommends the next useful action. All skills are installed; it does not make you choose a maturity level or remember a catalog before you can start.
 
-Requires Node.js 20.12 or newer. Claude Code skills install under `.claude/skills/`; Codex skills install under `.agents/skills/`.
+Requires Node.js 22.13 or newer. Claude Code skills install under `.claude/skills/`; Codex skills install under `.agents/skills/`.
 
 ## Essential commands
 

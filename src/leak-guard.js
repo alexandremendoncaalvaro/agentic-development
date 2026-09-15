@@ -160,7 +160,11 @@ export function findViolations({
       const haystack = content.toLowerCase();
       for (const pattern of denylistPatterns) {
         if (haystack.includes(pattern)) {
-          violations.push({ kind: 'denylist', path, detail: `content matches "${pattern}"` });
+          violations.push({
+            kind: 'denylist',
+            path,
+            detail: `content matches "${pattern}"`,
+          });
         }
       }
     }
@@ -168,7 +172,11 @@ export function findViolations({
       const haystack = path.toLowerCase();
       for (const pattern of denylistPatterns) {
         if (haystack.includes(pattern)) {
-          violations.push({ kind: 'denylist', path, detail: `path matches "${pattern}"` });
+          violations.push({
+            kind: 'denylist',
+            path,
+            detail: `path matches "${pattern}"`,
+          });
         }
       }
     }
@@ -180,13 +188,21 @@ export function findViolations({
     // case-insensitive filesystem habit or a plain typo is the same leak.
     const probe = path.toLowerCase();
     if (probe === 'rules' || probe.startsWith('rules/')) {
-      violations.push({ kind: 'rules-path', path, detail: 'adds a path under rules/' });
+      violations.push({
+        kind: 'rules-path',
+        path,
+        detail: 'adds a path under rules/',
+      });
     }
     // ADR-0043: the per-project curated layer lives at .agentic/rules/; in this
     // public kit repo, machine-local is the only allowed mode — committed project
     // rules here would be exactly the leak this guard exists to prevent.
     if (probe === '.agentic/rules' || probe.startsWith('.agentic/rules/')) {
-      violations.push({ kind: 'rules-path', path, detail: 'adds a path under .agentic/rules/' });
+      violations.push({
+        kind: 'rules-path',
+        path,
+        detail: 'adds a path under .agentic/rules/',
+      });
     }
   }
 
@@ -194,7 +210,11 @@ export function findViolations({
     if (entry.dstMode !== '120000') continue;
     const target = readSymlinkTarget(entry);
     if (!targetStaysInside(repoRoot, entry.path, target)) {
-      violations.push({ kind: 'symlink-escape', path: entry.path, detail: `target ${target} escapes the repo` });
+      violations.push({
+        kind: 'symlink-escape',
+        path: entry.path,
+        detail: `target ${target} escapes the repo`,
+      });
     }
   }
 
@@ -202,7 +222,11 @@ export function findViolations({
 }
 
 function git(args, repoRoot) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  return execFileSync('git', args, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  });
 }
 
 /** CLI entry: gather staged state from git, apply the policy, print + exit fail-closed. */
@@ -212,7 +236,9 @@ export function main() {
     try {
       repoRoot = git(['rev-parse', '--show-toplevel'], process.cwd()).trim();
     } catch {
-      process.stderr.write('leak-guard: not inside a git repository — blocking commit (fail-closed).\n');
+      process.stderr.write(
+        'leak-guard: not inside a git repository — blocking commit (fail-closed).\n'
+      );
       return 1;
     }
 
@@ -222,7 +248,10 @@ export function main() {
     const entries = parseRawDiff(rawDiff);
     if (entries.length === 0) return 0;
 
-    const contentDiff = git(['-c', 'core.quotepath=false', 'diff', '--cached', '--no-color'], repoRoot);
+    const contentDiff = git(
+      ['-c', 'core.quotepath=false', 'diff', '--cached', '--no-color'],
+      repoRoot
+    );
     const addedLines = extractAddedLines(contentDiff);
 
     const denylistPath = join(repoRoot, DENYLIST_REL);
@@ -242,7 +271,9 @@ export function main() {
 
     if (violations.length === 0) return 0;
 
-    process.stderr.write('leak-guard: commit blocked — staged content would leak protected material:\n');
+    process.stderr.write(
+      'leak-guard: commit blocked — staged content would leak protected material:\n'
+    );
     for (const v of violations) {
       process.stderr.write(`  [${v.kind}] ${v.path} — ${v.detail}\n`);
     }
@@ -254,7 +285,9 @@ export function main() {
   } catch (err) {
     // Any unexpected failure (git error, huge-diff buffer overrun, corrupt object)
     // blocks the commit rather than letting content through unchecked.
-    process.stderr.write(`leak-guard: unexpected error — blocking commit (fail-closed): ${err.message}\n`);
+    process.stderr.write(
+      `leak-guard: unexpected error — blocking commit (fail-closed): ${err.message}\n`
+    );
     return 1;
   }
 }

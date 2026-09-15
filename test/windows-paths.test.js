@@ -1,11 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  mkdtempSync,
-  rmSync,
-  readFileSync,
-  existsSync,
-} from 'node:fs';
+import { mkdtempSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, sep as PATH_SEP } from 'node:path';
 import { installSkills } from '../src/lib/install.js';
@@ -54,16 +49,10 @@ test('installSkills: ad-review manifest validates on every platform (forward-sla
     // macOS / Linux for the same install.
     const reviewSkill = result.nextStates['claude-code'].skills['ad-review'];
     for (const f of reviewSkill.files) {
-      assert.ok(
-        !f.path.includes('\\'),
-        `state path must use forward-slash, got: ${f.path}`
-      );
+      assert.ok(!f.path.includes('\\'), `state path must use forward-slash, got: ${f.path}`);
     }
     for (const a of result.actions) {
-      assert.ok(
-        !a.path.includes('\\'),
-        `action path must use forward-slash, got: ${a.path}`
-      );
+      assert.ok(!a.path.includes('\\'), `action path must use forward-slash, got: ${a.path}`);
     }
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -91,9 +80,7 @@ test('installSkills: a multi-level skill (codex ad-review with agents/openai.yam
       'Codex fresh-context-reviewer subagent must install at .codex/agents/'
     );
     const reviewSkill = result.nextStates.codex.skills['ad-review'];
-    const nested = reviewSkill.files.find((f) =>
-      f.path.endsWith('agents/openai.yaml')
-    );
+    const nested = reviewSkill.files.find((f) => f.path.endsWith('agents/openai.yaml'));
     const subagent = reviewSkill.files.find((f) =>
       f.path.endsWith('.codex/agents/fresh-context-reviewer.toml')
     );

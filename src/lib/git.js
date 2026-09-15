@@ -65,7 +65,12 @@ export function installedPathsToExclude(cwd, relPaths) {
   try {
     git(['rev-parse', '--git-dir'], cwd);
     const out = gitOut(['ls-files', '--', ...relPaths], cwd);
-    tracked = new Set(out.split('\n').map((l) => l.trim()).filter(Boolean));
+    tracked = new Set(
+      out
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean)
+    );
   } catch {
     return [];
   }
@@ -105,11 +110,12 @@ export function writeExcludeEntries(cwd, relPaths) {
     excludeFile = join(cwd, excludeFile);
   }
 
-  const existing = existsSync(excludeFile)
-    ? readFileSync(excludeFile, 'utf8')
-    : '';
+  const existing = existsSync(excludeFile) ? readFileSync(excludeFile, 'utf8') : '';
   const present = new Set(
-    existing.split('\n').map((l) => l.trim()).filter(Boolean)
+    existing
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean)
   );
 
   const wanted = relPaths.map((p) => `/${p.replace(/^\/+/, '')}`);

@@ -119,12 +119,18 @@ test('publication workflow keeps drafting, composition, curation, and outward ga
     assert.match(skill, /technical mechanism.*does not change/is);
     assert.match(skill, /authorized.*configuration.*CLI output.*tests.*logs.*data/is);
     assert.match(skill, /exact destination.*posting surface/is);
-    assert.match(skill, /destination.*audience.*purpose.*language.*requested action.*hard\s+constraints/is);
+    assert.match(
+      skill,
+      /destination.*audience.*purpose.*language.*requested action.*hard\s+constraints/is
+    );
     assert.match(skill, /satisfied.*improved.*not applicable.*higher-priority\s+override/is);
     assert.match(skill, /one usable publication/i);
     assert.match(skill, /final title and body/i);
     assert.match(skill, /outside the usable draft/i);
-    assert.match(skill, /final title and body.*exact\s+destination.*selected\s+template.*limitations.*action/is);
+    assert.match(
+      skill,
+      /final title and body.*exact\s+destination.*selected\s+template.*limitations.*action/is
+    );
     assert.match(skill, /explicit\s+approval/i);
     assert.match(skill, /read-only identity.*destination-target check/is);
     assert.match(skill, /never log in, log out, or switch\s+accounts/i);
@@ -163,10 +169,7 @@ test('publication workflow keeps drafting, composition, curation, and outward ga
     assert.match(evaluation, /short social bridge.*same sentence/is);
     assert.match(evaluation, /mechanism-level explanation.*understand, decide, or do next/is);
     assert.match(evaluation, /same or better/i);
-    const capabilities = readFileSync(
-      join(root, 'references', 'channel-capabilities.md'),
-      'utf8'
-    );
+    const capabilities = readFileSync(join(root, 'references', 'channel-capabilities.md'), 'utf8');
     assert.match(capabilities, /Slack.*mrkdwn/is);
     assert.match(capabilities, /Discord.*2000/is);
     assert.match(capabilities, /GitHub.*Mermaid/is);
@@ -246,9 +249,7 @@ test('publication shared files, host copies, and dogfood copies remain byte-iden
   }
   assert.ok(
     readFileSync(join(claude, 'scripts/template-store.mjs')).equals(
-      readFileSync(
-        join(ROOT, 'src/skills/claude-code/ad-template-tune/scripts/template-store.mjs')
-      )
+      readFileSync(join(ROOT, 'src/skills/claude-code/ad-template-tune/scripts/template-store.mjs'))
     ),
     'publication resolver diverged from the curator'
   );

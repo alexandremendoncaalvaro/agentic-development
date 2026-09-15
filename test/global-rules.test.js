@@ -3,10 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import {
-  configureGlobalConstitution,
-  globalKitPath,
-} from '../src/lib/global-rules.js';
+import { configureGlobalConstitution, globalKitPath } from '../src/lib/global-rules.js';
 
 function mkHome() {
   return mkdtempSync(join(tmpdir(), 'agentic-global-rules-test-'));

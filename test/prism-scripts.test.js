@@ -8,15 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PRISM_SCRIPTS = join(
-  __dirname,
-  '..',
-  'src',
-  'skills',
-  'claude-code',
-  'ad-prism',
-  'scripts'
-);
+const PRISM_SCRIPTS = join(__dirname, '..', 'src', 'skills', 'claude-code', 'ad-prism', 'scripts');
 
 const COMPLETE_PLAN = `# Checkout latency evaluation
 
@@ -87,19 +79,16 @@ test('validate-plan rejects a methodological source without an auditable mapping
   const dir = mkdtempSync(join(tmpdir(), 'agentic-prism-plan-source-map-'));
   try {
     const plan = join(dir, 'evaluation.md');
-    writeFileSync(
-      plan,
-      COMPLETE_PLAN.replace(
-        /- Supports:[\s\S]*?- Retained limit:[^\n]*\n/,
-        ''
-      )
-    );
+    writeFileSync(plan, COMPLETE_PLAN.replace(/- Supports:[\s\S]*?- Retained limit:[^\n]*\n/, ''));
 
     const result = runScript('validate-plan.mjs', [plan], dir);
     assert.equal(result.status, 1);
     const payload = JSON.parse(result.stdout);
     assert.equal(payload.valid, false);
-    assert.match(payload.errors.join('\n'), /Method source M1 is missing: Supports, Contribution, Adaptation, Retained limit/);
+    assert.match(
+      payload.errors.join('\n'),
+      /Method source M1 is missing: Supports, Contribution, Adaptation, Retained limit/
+    );
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -179,9 +168,10 @@ test('validate-plan rejects angle-bracket placeholders without rejecting autolin
     const plan = join(dir, 'evaluation.md');
     writeFileSync(
       plan,
-      COMPLETE_PLAN
-        .replace('The candidate is ready', '<claim>')
-        .replace('The versioned corpus', '<https://example.com/corpus>')
+      COMPLETE_PLAN.replace('The candidate is ready', '<claim>').replace(
+        'The versioned corpus',
+        '<https://example.com/corpus>'
+      )
     );
 
     const result = runScript('validate-plan.mjs', [plan], dir);
@@ -197,7 +187,10 @@ test('validate-plan rejects the evaluation template title placeholder', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-prism-plan-title-placeholder-'));
   try {
     const plan = join(dir, 'evaluation.md');
-    writeFileSync(plan, COMPLETE_PLAN.replace('# Checkout latency evaluation', '# <evaluation title>'));
+    writeFileSync(
+      plan,
+      COMPLETE_PLAN.replace('# Checkout latency evaluation', '# <evaluation title>')
+    );
 
     const result = runScript('validate-plan.mjs', [plan], dir);
     assert.equal(result.status, 1);
@@ -212,13 +205,20 @@ test('validate-report accepts an ordinary report and summarizes visible headings
   const dir = mkdtempSync(join(tmpdir(), 'agentic-prism-report-'));
   try {
     const report = join(dir, 'report.md');
-    writeFileSync(report, '# Rollout evaluation\n\n## Recommendation\nProceed with the guarded rollout.\n');
+    writeFileSync(
+      report,
+      '# Rollout evaluation\n\n## Recommendation\nProceed with the guarded rollout.\n'
+    );
 
     const result = runScript('validate-report.mjs', [report], dir);
     assert.equal(result.status, 0, result.stderr);
     const payload = JSON.parse(result.stdout);
     assert.equal(payload.valid, true);
-    assert.deepEqual(payload.summary, { headings: 2, local_images: 0, remote_images: 0 });
+    assert.deepEqual(payload.summary, {
+      headings: 2,
+      local_images: 0,
+      remote_images: 0,
+    });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -270,7 +270,11 @@ test('validate-report distinguishes packaged images from remote references', () 
     const result = runScript('validate-report.mjs', [report], dir);
     assert.equal(result.status, 0, result.stdout);
     const payload = JSON.parse(result.stdout);
-    assert.deepEqual(payload.summary, { headings: 1, local_images: 1, remote_images: 1 });
+    assert.deepEqual(payload.summary, {
+      headings: 1,
+      local_images: 1,
+      remote_images: 1,
+    });
     assert.match(payload.warnings.join('\n'), /Remote image is not packaged/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -356,11 +360,7 @@ test('freeze-artifact keeps a directory receipt stable when it embeds its own ha
     assert.deepEqual(receipt.included_paths, ['audit.md', 'evidence/results.json']);
 
     writeFileSync(audit, `# Evaluation audit\n\n- SHA-256: ${receipt.sha256}\n`);
-    const verified = runScript(
-      'freeze-artifact.mjs',
-      [dir, '--expect', receipt.sha256],
-      dir
-    );
+    const verified = runScript('freeze-artifact.mjs', [dir, '--expect', receipt.sha256], dir);
     assert.equal(verified.status, 0, verified.stdout);
     const payload = JSON.parse(verified.stdout);
     assert.equal(payload.sha256, receipt.sha256);

@@ -41,9 +41,7 @@ function loadStates(cwd) {
  */
 export async function uninstallCommand(opts) {
   if (opts.agent && !AGENT_FLAG_VALUES.includes(opts.agent)) {
-    throw new Error(
-      `invalid agent "${opts.agent}". Use one of: ${AGENT_FLAG_VALUES.join(', ')}`
-    );
+    throw new Error(`invalid agent "${opts.agent}". Use one of: ${AGENT_FLAG_VALUES.join(', ')}`);
   }
 
   const scope = resolveScope(opts.scope ?? 'project');

@@ -7,8 +7,8 @@
  * tarball (`package.json#files` includes all of `src/`).
  */
 
-// Every release in this repo's tag history is X.Y.Z-beta.N. The suffix marks
-// maturity; publishConfig controls the separate npm install channel (ADR-0066).
+// Releases use stable SemVer plus the repository's explicit -beta.N channel.
+// publishConfig controls the separate npm install channel (ADR-0066/0078).
 const VERSION_RE = /^(\d+)\.(\d+)\.(\d+)(?:-beta\.(\d+))?$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -17,9 +17,12 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
  *
  * @param {string} current - current package.json version (X.Y.Z or X.Y.Z-beta.N)
  * @param {string} kind - one of patch | minor | major | prerelease
- * @returns {string} the next version, always X.Y.Z-beta.N
- * @throws {Error} on an unparseable version, an unknown kind, or a
- *   prerelease bump of a version that has no beta counter
+ * Stable increments follow node-semver's release semantics. The explicit
+ * prerelease kind increments an existing beta or starts the next patch beta
+ * at one (the repository's historical counter convention).
+ *
+ * @returns {string} the next stable or beta version
+ * @throws {Error} on an unparseable version or an unknown kind
  */
 export function bumpVersion(current, kind) {
   const match = VERSION_RE.exec(current);
@@ -32,17 +35,16 @@ export function bumpVersion(current, kind) {
   const beta = match[4] === undefined ? undefined : Number(match[4]);
   switch (kind) {
     case 'major':
-      return `${major + 1}.0.0-beta.1`;
+      if (beta !== undefined && minor === 0 && patch === 0) return `${major}.0.0`;
+      return `${major + 1}.0.0`;
     case 'minor':
-      return `${major}.${minor + 1}.0-beta.1`;
+      if (beta !== undefined && patch === 0) return `${major}.${minor}.0`;
+      return `${major}.${minor + 1}.0`;
     case 'patch':
-      return `${major}.${minor}.${patch + 1}-beta.1`;
+      if (beta !== undefined) return `${major}.${minor}.${patch}`;
+      return `${major}.${minor}.${patch + 1}`;
     case 'prerelease':
-      if (beta === undefined) {
-        throw new Error(
-          `"${current}" has no -beta.N counter to increment — use patch|minor|major`
-        );
-      }
+      if (beta === undefined) return `${major}.${minor}.${patch + 1}-beta.1`;
       return `${major}.${minor}.${patch}-beta.${beta + 1}`;
     default:
       throw new Error(`unknown bump kind "${kind}" — expected patch|minor|major|prerelease`);
@@ -77,7 +79,10 @@ export function rotateChangelog(text, version, date) {
       break;
     }
   }
-  const section = lines.slice(headingIdx + 1, end).join('\n').trim();
+  const section = lines
+    .slice(headingIdx + 1, end)
+    .join('\n')
+    .trim();
   if (section === '') {
     throw new Error('[Unreleased] is empty — nothing to release');
   }

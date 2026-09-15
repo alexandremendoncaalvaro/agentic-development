@@ -1,10 +1,4 @@
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  unlinkSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 export const SCHEMA_VERSION = 1;
@@ -51,7 +45,9 @@ export function loadState(cwd, agent) {
   try {
     raw = JSON.parse(readFileSync(path, 'utf8'));
   } catch (err) {
-    throw new Error(`malformed state at ${path}: ${err.message}`);
+    throw new Error(`malformed state at ${path}: ${err.message}`, {
+      cause: err,
+    });
   }
   if (typeof raw.schemaVersion !== 'number') {
     throw new Error(`state at ${path} missing schemaVersion`);
@@ -62,9 +58,7 @@ export function loadState(cwd, agent) {
     );
   }
   if (raw.agent && raw.agent !== agent) {
-    throw new Error(
-      `state at ${path} declares agent "${raw.agent}" but expected "${agent}"`
-    );
+    throw new Error(`state at ${path} declares agent "${raw.agent}" but expected "${agent}"`);
   }
   return {
     schemaVersion: raw.schemaVersion,
@@ -97,17 +91,13 @@ function orderState(state) {
     throw new Error('orderState: state must be an object');
   }
   if (!state.skills || typeof state.skills !== 'object') {
-    throw new Error(
-      'orderState: state.skills must be an object (got ' + typeof state.skills + ')'
-    );
+    throw new Error('orderState: state.skills must be an object (got ' + typeof state.skills + ')');
   }
   const skills = {};
   for (const skillName of Object.keys(state.skills).sort()) {
     const entry = state.skills[skillName];
     if (!entry || !Array.isArray(entry.files)) {
-      throw new Error(
-        `orderState: state.skills["${skillName}"].files must be an array`
-      );
+      throw new Error(`orderState: state.skills["${skillName}"].files must be an array`);
     }
     const files = [...entry.files].sort((a, b) => a.path.localeCompare(b.path));
     skills[skillName] = {

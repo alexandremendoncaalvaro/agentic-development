@@ -451,7 +451,9 @@ function main() {
     try {
       profile = JSON.parse(readFileSync(absolute(inputPath), 'utf8'));
     } catch (error) {
-      if (error instanceof SyntaxError) throw new Error('candidate data is not valid JSON');
+      if (error instanceof SyntaxError) {
+        throw new Error('candidate data is not valid JSON', { cause: error });
+      }
       throw error;
     }
     writeProfileAtomic(resolved.profilePath, profile);
