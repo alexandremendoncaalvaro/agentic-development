@@ -246,6 +246,67 @@ test('decision-maker briefing composition is one-way and visible in the workflow
   }
 });
 
+test('project-state collection is shared, bounded, and one-way on both hosts', () => {
+  const flows = readFileSync(join(__dirname, '..', 'WORKFLOW-FLOWS.md'), 'utf8');
+  const section = flows.match(/^## Return To Active Work$([\s\S]*?)(?=^## )/m)?.[1] ?? '';
+
+  for (const edge of [
+    /ProjectState --> Next/,
+    /ProjectState --> Roadmap/,
+    /ProjectState --> Brief/,
+  ]) {
+    assert.match(section, edge, `workflow map is missing ${edge}`);
+  }
+
+  for (const agent of ['claude-code', 'codex']) {
+    const read = (skill) => readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+    const projectStateDir = join(SKILLS_ROOT, agent, 'ad-project-state');
+    const projectState = read('ad-project-state');
+    const next = read('ad-next');
+    const roadmap = read('ad-roadmap');
+    const brief = read('ad-brief');
+
+    assert.ok(existsSync(projectStateDir), `${agent} must ship ad-project-state`);
+    assert.match(projectState, /bounded[\s\S]*fact packet/i);
+    assert.match(projectState, /repository baseline/i);
+    assert.doesNotMatch(
+      projectState,
+      /(?:invoke|pass (?:a |the )?fact packet to) `\/?ad-(?:next|roadmap|brief)`/i,
+      `${agent} project-state must not call back into a consumer`
+    );
+    assert.match(
+      next,
+      /`\/?ad-project-state`[\s\S]*before .*scenario classification/i,
+      `${agent} ad-next must collect configured project evidence before classification`
+    );
+    assert.match(
+      roadmap,
+      /project scope[\s\S]*`\/?ad-project-state`[\s\S]*before .*(?:plan|roadmap) evidence/i,
+      `${agent} project roadmap must resolve sources before selecting plan evidence`
+    );
+    assert.match(
+      brief,
+      /no caller supplied a fact packet[\s\S]*`\/?ad-project-state`/i,
+      `${agent} standalone brief must resolve configured project evidence`
+    );
+    for (const consumer of [next, roadmap, brief]) {
+      assert.doesNotMatch(consumer, /gh (?:issue|pr) list/);
+    }
+
+    if (agent === 'claude-code') {
+      assert.notEqual(
+        parseFrontmatter(join(projectStateDir, 'SKILL.md'))['disable-model-invocation'],
+        true
+      );
+    } else {
+      const metadata = yaml.load(
+        readFileSync(join(projectStateDir, 'agents', 'openai.yaml'), 'utf8')
+      );
+      assert.equal(metadata.policy.allow_implicit_invocation, true);
+    }
+  }
+});
+
 test('ad-prism is a discoverable generic evaluation skill on both hosts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');

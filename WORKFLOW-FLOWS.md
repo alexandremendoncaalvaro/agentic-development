@@ -57,6 +57,8 @@ its facts, persistence, checklist, or outward-action gates.
 flowchart TD
     Arrive["I just arrived in this session"]
     Need{"What do I need?"}
+    ProjectState["/ad-project-state<br>local plus configured project evidence"]
+    Next["/ad-next<br>prioritized next actions"]
     Brief["/ad-brief<br>plain-language context and direction"]
     Roadmap["/ad-roadmap<br>reconcile project or task progress"]
     Checklist["Roadmap regains control<br>and appends its nested checklist"]
@@ -71,10 +73,14 @@ flowchart TD
     Approve["Approve exact final text and target<br>before any outward action"]
 
     Arrive --> Need
+    Need -->|what should happen next| Next
     Need -->|context only| Brief
     Need -->|plan and checklist| Roadmap
     Need -->|durable session transfer| Handoff
     Need -->|The Rules correction| Rules
+    ProjectState --> Next
+    ProjectState --> Roadmap
+    ProjectState --> Brief
     Roadmap --> Brief
     Roadmap --> Checklist
     Handoff --> Brief
@@ -88,13 +94,16 @@ flowchart TD
     Voice --> Approve
 ```
 
-Composition is one-way and packet-based. `ad-brief` never calls back into
+Composition is one-way and packet-based. `ad-project-state` collects bounded
+repository and configured-provider evidence but never calls into its consumers.
+`ad-brief` never calls back into
 `ad-roadmap`, `ad-handoff`, `ad-rules`, `ad-philosophy`, `ad-publish`, or
 `ad-voice`. A private brief does not become publication content: the owner must
 explicitly promote the specific conclusion, after which the complete
 `ad-publish` approval flow applies.
 
-Source: `WORKFLOW.md` sections 7, 10, and 12; ADR-0076; `ad-brief`, `ad-roadmap`,
+Source: `WORKFLOW.md` sections 7, 10, and 12; ADR-0076; ADR-0079;
+`ad-project-state`, `ad-next`, `ad-brief`, `ad-roadmap`,
 `ad-handoff`, `ad-rules`, `ad-philosophy`, `ad-publish`, and `ad-voice` contracts.
 
 ## Context Gate

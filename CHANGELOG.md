@@ -6,6 +6,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `/ad-project-state` lets state-reading skills combine the repository baseline
+  with explicitly configured, bounded GitHub issue and pull-request metadata.
+  Machine mappings follow exact Git remotes across worktrees; project contracts
+  may override them. Source roles, provenance, freshness, and partial failures
+  remain visible, while no-configuration projects keep repository-only behavior.
+
 ### Changed
 
 - Define the stable 1.0 quality boundary: Node 22.13+, Node 22/24 CI, supported GitHub Actions, stable SemVer release increments, and one local/CI/prepublish verification command (ADR-0078).

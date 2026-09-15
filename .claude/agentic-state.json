@@ -101,7 +101,7 @@
         },
         {
           "path": ".claude/skills/ad-brief/SKILL.md",
-          "sourceSha": "5bdd44c791f5ce84a8fd609f20ecce27c885410ecd36188b30ee6f97dbc427e9"
+          "sourceSha": "70ebb89273823840a73ec40a43999e27e67e2a2a457af953771ebb2cf6957dbe"
         }
       ]
     },
@@ -333,7 +333,7 @@
         },
         {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "e52c2adf76c67cb9a23fa1ca7a36e56de39cd0b3ce65d50509a61ffff0a7280d"
+          "sourceSha": "85be250f3c2a5f2e501e5c3317aa8a3c1e0fe53ab4f56e07186d4d9d40e1a2d0"
         }
       ]
     },
@@ -426,6 +426,23 @@
         {
           "path": ".claude/skills/ad-prism/SKILL.md",
           "sourceSha": "b453ef1dd6543ebb7b3b5cde22ec2f1e85e2bdeefef79d0a8a4e30e7af73b75b"
+        }
+      ]
+    },
+    "ad-project-state": {
+      "version": "0.20.0-beta.11",
+      "files": [
+        {
+          "path": ".claude/skills/ad-project-state/references/configuration.md",
+          "sourceSha": "bffb1c1627ec1459db5e480464f80ca53253084d8d3188f28581133819780b7c"
+        },
+        {
+          "path": ".claude/skills/ad-project-state/scripts/project-state.mjs",
+          "sourceSha": "5d08d9d4ca16f9e67b37888d48d5083ddcabece17144abf7345492fbb50cbbf5"
+        },
+        {
+          "path": ".claude/skills/ad-project-state/SKILL.md",
+          "sourceSha": "6c15c38ef1ed3497857449417d6770db7d9e4d0272ce166b8a81d31b83bacd17"
         }
       ]
     },
@@ -568,7 +585,7 @@
         },
         {
           "path": ".claude/skills/ad-roadmap/SKILL.md",
-          "sourceSha": "4285e50f985b6e42d2f9c266b1b7e17ab6afb9e59ae16bf8d0acf7e2f77ce7c8"
+          "sourceSha": "f505a5b6adebcb581d9c584e26ea7bd420402ab8bd1c37028687f1ddb4de177e"
         }
       ]
     },

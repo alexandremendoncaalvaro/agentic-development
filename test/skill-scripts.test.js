@@ -429,6 +429,630 @@ function runSurvey(cwd, environment = {}) {
   return JSON.parse(out);
 }
 
+const PROJECT_STATE = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-project-state',
+  'scripts',
+  'project-state.mjs'
+);
+
+function runProjectState(cwd, environment = {}) {
+  const env = { ...process.env, ...environment };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  const out = execFileSync('node', [PROJECT_STATE], { cwd, encoding: 'utf8', env });
+  return JSON.parse(out);
+}
+
+test('project-state: no configuration returns only the repository and never invokes GitHub', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-default-'));
+  try {
+    const fakeGh = join(dir, 'must-not-run.mjs');
+    writeFileSync(fakeGh, 'process.exit(97);\n');
+
+    const report = runProjectState(dir, {
+      AGENTIC_GH: fakeGh,
+      AGENTIC_PROJECT_SOURCES_FILE: join(dir, 'absent.json'),
+      HOME: dir,
+      USERPROFILE: dir,
+    });
+
+    assert.equal(report.schemaVersion, 1);
+    assert.match(report.observedAt, /^\d{4}-\d{2}-\d{2}T/);
+    assert.deepEqual(report.configuration, {
+      layer: 'default',
+      path: null,
+      matchedRemote: null,
+    });
+    assert.deepEqual(report.sources, [
+      {
+        id: 'repository',
+        type: 'repository',
+        role: 'primary',
+        status: 'available',
+        observedAt: report.observedAt,
+        provenance: { kind: 'repository', locator: '.' },
+      },
+    ]);
+    assert.deepEqual(report.failures, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: matching machine configuration follows the exact Git remote', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-machine-'));
+  try {
+    const git = gitInit(dir);
+    const remote = 'git@github.example:acme/widget.git';
+    git('remote', 'add', 'origin', remote);
+    const machineConfig = join(dir, 'project-sources.json');
+    writeFileSync(
+      machineConfig,
+      JSON.stringify({
+        schemaVersion: 1,
+        projects: [
+          {
+            match: { remote },
+            sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+          },
+        ],
+      })
+    );
+
+    const report = runProjectState(dir, {
+      AGENTIC_PROJECT_SOURCES_FILE: machineConfig,
+      HOME: dir,
+      USERPROFILE: dir,
+    });
+
+    assert.deepEqual(report.configuration, {
+      layer: 'machine',
+      path: machineConfig,
+      matchedRemote: remote,
+    });
+    assert.equal(report.sources.length, 1);
+    assert.equal(report.sources[0].id, 'repository');
+    assert.equal(report.sources[0].role, 'primary');
+    assert.deepEqual(report.failures, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: duplicate machine remote matches are rejected as ambiguous', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-duplicate-remote-'));
+  try {
+    const git = gitInit(dir);
+    const remote = 'git@github.example:acme/widget.git';
+    git('remote', 'add', 'origin', remote);
+    const machineConfig = join(dir, 'project-sources.json');
+    writeFileSync(
+      machineConfig,
+      JSON.stringify({
+        schemaVersion: 1,
+        projects: [
+          {
+            match: { remote },
+            sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+          },
+          {
+            match: { remote },
+            sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+          },
+        ],
+      })
+    );
+
+    const report = runProjectState(dir, {
+      AGENTIC_PROJECT_SOURCES_FILE: machineConfig,
+      HOME: dir,
+      USERPROFILE: dir,
+    });
+
+    assert.equal(report.sources[0].role, 'primary');
+    assert.equal(report.failures.length, 1);
+    assert.equal(report.failures[0].code, 'INVALID_CONFIGURATION');
+    assert.match(report.failures[0].message, /duplicates an earlier entry/);
+    assert.ok(!report.failures[0].message.includes(remote));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: unmatched machine configuration is ignored without invoking GitHub', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-unmatched-'));
+  try {
+    const git = gitInit(dir);
+    git('remote', 'add', 'origin', 'git@github.example:acme/current.git');
+    const fakeGh = join(dir, 'must-not-run.mjs');
+    writeFileSync(fakeGh, 'process.exit(96);\n');
+    const machineConfig = join(dir, 'project-sources.json');
+    writeFileSync(
+      machineConfig,
+      JSON.stringify({
+        schemaVersion: 1,
+        projects: [
+          {
+            match: { remote: 'git@github.example:acme/other.git' },
+            sources: [
+              {
+                id: 'github-work',
+                type: 'github',
+                role: 'primary',
+                host: 'github.example',
+                repository: 'acme/other',
+                issues: { state: 'open', limit: 20 },
+              },
+            ],
+          },
+        ],
+      })
+    );
+
+    const report = runProjectState(dir, {
+      AGENTIC_GH: fakeGh,
+      AGENTIC_PROJECT_SOURCES_FILE: machineConfig,
+      HOME: dir,
+      USERPROFILE: dir,
+    });
+
+    assert.equal(report.configuration.layer, 'default');
+    assert.equal(report.sources.length, 1);
+    assert.equal(report.sources[0].id, 'repository');
+    assert.equal(report.sources[0].role, 'primary');
+    assert.deepEqual(report.failures, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: project configuration shadows a matching machine entry', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-project-'));
+  try {
+    const git = gitInit(dir);
+    const remote = 'git@github.example:acme/widget.git';
+    git('remote', 'add', 'origin', remote);
+    const machineConfig = join(dir, 'machine-sources.json');
+    writeFileSync(
+      machineConfig,
+      JSON.stringify({
+        schemaVersion: 1,
+        projects: [
+          {
+            match: { remote },
+            sources: [{ id: 'repository', type: 'repository', role: 'supporting' }],
+          },
+        ],
+      })
+    );
+    mkdirSync(join(dir, '.agentic'));
+    writeFileSync(
+      join(dir, '.agentic', 'project-sources.json'),
+      JSON.stringify({
+        schemaVersion: 1,
+        sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+      })
+    );
+
+    const report = runProjectState(dir, {
+      AGENTIC_PROJECT_SOURCES_FILE: machineConfig,
+      HOME: dir,
+      USERPROFILE: dir,
+    });
+
+    assert.deepEqual(report.configuration, {
+      layer: 'project',
+      path: '.agentic/project-sources.json',
+      matchedRemote: null,
+    });
+    assert.equal(report.sources[0].role, 'primary');
+    assert.deepEqual(report.failures, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: invalid configuration falls back to repository evidence with exact errors', () => {
+  const cases = [
+    ['unsupported schema', { schemaVersion: 2, sources: [] }, /schemaVersion/],
+    [
+      'unknown top-level field',
+      { schemaVersion: 1, sources: [], extra: true },
+      /unknown field extra/,
+    ],
+    [
+      'unknown provider',
+      { schemaVersion: 1, sources: [{ id: 'remote', type: 'url', role: 'primary' }] },
+      /unknown source type url/,
+    ],
+    [
+      'duplicate identifiers',
+      {
+        schemaVersion: 1,
+        sources: [
+          { id: 'repository', type: 'repository', role: 'primary' },
+          { id: 'repository', type: 'repository', role: 'supporting' },
+        ],
+      },
+      /duplicate source id repository/,
+    ],
+    [
+      'embedded command',
+      {
+        schemaVersion: 1,
+        sources: [
+          {
+            id: 'github',
+            type: 'github',
+            role: 'primary',
+            host: 'github.com',
+            repository: 'acme/widget',
+            command: 'anything',
+            issues: { state: 'open', limit: 20 },
+          },
+        ],
+      },
+      /unknown field command/,
+    ],
+    [
+      'unbounded limit',
+      {
+        schemaVersion: 1,
+        sources: [
+          {
+            id: 'github',
+            type: 'github',
+            role: 'primary',
+            host: 'github.com',
+            repository: 'acme/widget',
+            issues: { state: 'open', limit: 101 },
+          },
+        ],
+      },
+      /limit must be an integer from 1 to 100/,
+    ],
+    [
+      'malformed repository',
+      {
+        schemaVersion: 1,
+        sources: [
+          {
+            id: 'github',
+            type: 'github',
+            role: 'primary',
+            host: 'github.com',
+            repository: 'missing-owner',
+            issues: { state: 'open', limit: 20 },
+          },
+        ],
+      },
+      /repository must be OWNER\/REPO/,
+    ],
+    [
+      'multiple primary sources',
+      {
+        schemaVersion: 1,
+        sources: [
+          { id: 'repository', type: 'repository', role: 'primary' },
+          {
+            id: 'github',
+            type: 'github',
+            role: 'primary',
+            host: 'github.com',
+            repository: 'acme/widget',
+            issues: { state: 'open', limit: 20 },
+          },
+        ],
+      },
+      /exactly one primary source is required/,
+    ],
+  ];
+
+  for (const [name, config, message] of cases) {
+    const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-invalid-'));
+    try {
+      mkdirSync(join(dir, '.agentic'));
+      writeFileSync(join(dir, '.agentic', 'project-sources.json'), JSON.stringify(config));
+
+      const report = runProjectState(dir, { HOME: dir, USERPROFILE: dir });
+
+      assert.equal(report.configuration.layer, 'project', name);
+      assert.equal(report.sources.length, 1, name);
+      assert.equal(report.sources[0].id, 'repository', name);
+      assert.equal(report.sources[0].role, 'primary', name);
+      assert.equal(report.failures.length, 1, name);
+      assert.equal(report.failures[0].sourceId, 'configuration', name);
+      assert.equal(report.failures[0].code, 'INVALID_CONFIGURATION', name);
+      assert.match(report.failures[0].message, message, name);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+});
+
+test('project-state: invalid JSON is an explicit configuration failure', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-json-'));
+  try {
+    mkdirSync(join(dir, '.agentic'));
+    writeFileSync(join(dir, '.agentic', 'project-sources.json'), '{not-json');
+
+    const report = runProjectState(dir, { HOME: dir, USERPROFILE: dir });
+
+    assert.equal(report.configuration.layer, 'project');
+    assert.equal(report.sources[0].role, 'primary');
+    assert.equal(report.failures.length, 1);
+    assert.equal(report.failures[0].sourceId, 'configuration');
+    assert.equal(report.failures[0].code, 'INVALID_JSON');
+    assert.equal(report.failures[0].path, '.agentic/project-sources.json');
+    assert.equal(report.failures[0].message, 'configuration is not valid JSON');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: GitHub queries are bounded shell-free arguments with provenance', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-github-'));
+  try {
+    const logPath = join(dir, 'gh-calls.jsonl');
+    const fakeGh = join(dir, 'fake-gh.mjs');
+    writeFileSync(
+      fakeGh,
+      `import { appendFileSync } from 'node:fs';
+const args = process.argv.slice(2);
+appendFileSync(process.env.FAKE_GH_LOG, JSON.stringify({
+  args,
+  host: process.env.GH_HOST || null,
+  gitDir: process.env.GIT_DIR || null,
+  gitWorkTree: process.env.GIT_WORK_TREE || null,
+  gitIndexFile: process.env.GIT_INDEX_FILE || null,
+}) + '\\n');
+if (args[0] === '--version') process.stdout.write('gh version test\\n');
+else if (args[0] === 'auth') process.stdout.write('authenticated\\n');
+else if (args[0] === 'issue') process.stdout.write(JSON.stringify([{
+  number: 17,
+  title: 'Validated issue',
+  url: 'https://github.example/acme/widget/issues/17',
+  state: 'OPEN',
+  updatedAt: '2026-09-14T12:00:00Z',
+  labels: [{ name: 'ready' }],
+  assignees: [{ login: 'owner' }],
+}, {
+  number: 18,
+  title: 'Must be bounded away',
+}]));
+else if (args[0] === 'pr') process.stdout.write(JSON.stringify([{
+  number: 23,
+  title: 'Validated pull request',
+  url: 'https://github.example/acme/widget/pull/23',
+  state: 'OPEN',
+  updatedAt: '2026-09-15T12:00:00Z',
+  isDraft: false,
+  reviewDecision: 'APPROVED',
+  labels: [],
+  assignees: [],
+  headRefName: 'feat/validated',
+}]));
+else process.exit(44);
+`
+    );
+    mkdirSync(join(dir, '.agentic'));
+    writeFileSync(
+      join(dir, '.agentic', 'project-sources.json'),
+      JSON.stringify({
+        schemaVersion: 1,
+        sources: [
+          {
+            id: 'github-work',
+            type: 'github',
+            role: 'primary',
+            host: 'github.example',
+            repository: 'acme/widget',
+            issues: { state: 'open', search: '-label:"blocked now"', limit: 1 },
+            pullRequests: { state: 'open', search: 'review:required "team one"', limit: 10 },
+          },
+        ],
+      })
+    );
+
+    const out = execFileSync('node', [PROJECT_STATE], {
+      cwd: dir,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        AGENTIC_GH: fakeGh,
+        FAKE_GH_LOG: logPath,
+        GH_HOST: 'wrong.example',
+        GIT_DIR: '/must/not/reach/child',
+        GIT_WORK_TREE: '/must/not/reach/child',
+        GIT_INDEX_FILE: '/must/not/reach/child',
+        HOME: dir,
+        USERPROFILE: dir,
+      },
+    });
+    const report = JSON.parse(out);
+    const calls = readFileSync(logPath, 'utf8')
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line));
+
+    assert.deepEqual(
+      calls.map((call) => call.args),
+      [
+        ['--version'],
+        ['auth', 'status', '--hostname', 'github.example'],
+        [
+          'issue',
+          'list',
+          '--repo',
+          'github.example/acme/widget',
+          '--state',
+          'open',
+          '--limit',
+          '1',
+          '--search',
+          '-label:"blocked now"',
+          '--json',
+          'number,title,url,state,updatedAt,labels,assignees',
+        ],
+        [
+          'pr',
+          'list',
+          '--repo',
+          'github.example/acme/widget',
+          '--state',
+          'open',
+          '--limit',
+          '10',
+          '--search',
+          'review:required "team one"',
+          '--json',
+          'number,title,url,state,updatedAt,isDraft,reviewDecision,labels,assignees,headRefName',
+        ],
+      ]
+    );
+    for (const call of calls) {
+      assert.equal(call.host, 'github.example');
+      assert.equal(call.gitDir, null);
+      assert.equal(call.gitWorkTree, null);
+      assert.equal(call.gitIndexFile, null);
+    }
+    assert.equal(report.sources[0].id, 'repository');
+    assert.equal(report.sources[0].role, 'supporting');
+    assert.equal(report.sources[1].id, 'github-work');
+    assert.equal(report.sources[1].role, 'primary');
+    assert.equal(report.sources[1].status, 'available');
+    assert.deepEqual(report.sources[1].provenance, {
+      kind: 'github',
+      host: 'github.example',
+      repository: 'acme/widget',
+    });
+    assert.equal(report.sources[1].issues[0].number, 17);
+    assert.equal(report.sources[1].issues.length, 1);
+    assert.equal(report.sources[1].pullRequests[0].number, 23);
+    assert.deepEqual(report.failures, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: one failed GitHub query preserves repository and successful evidence', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-partial-'));
+  try {
+    const fakeGh = join(dir, 'partial-gh.mjs');
+    writeFileSync(
+      fakeGh,
+      `const args = process.argv.slice(2);
+if (args[0] === '--version' || args[0] === 'auth') process.stdout.write('ok\\n');
+else if (args[0] === 'issue') process.stdout.write(JSON.stringify([{ number: 31, title: 'Still usable' }]));
+else if (args[0] === 'pr') process.stdout.write('{not-json');
+else process.exit(45);
+`
+    );
+    mkdirSync(join(dir, '.agentic'));
+    writeFileSync(
+      join(dir, '.agentic', 'project-sources.json'),
+      JSON.stringify({
+        schemaVersion: 1,
+        sources: [
+          {
+            id: 'github-work',
+            type: 'github',
+            role: 'primary',
+            host: 'github.example',
+            repository: 'acme/widget',
+            issues: { state: 'open', limit: 20 },
+            pullRequests: { state: 'open', limit: 20 },
+          },
+        ],
+      })
+    );
+
+    const report = runProjectState(dir, {
+      AGENTIC_GH: fakeGh,
+      HOME: dir,
+      USERPROFILE: dir,
+    });
+
+    assert.equal(report.sources[0].id, 'repository');
+    assert.equal(report.sources[0].status, 'available');
+    assert.equal(report.sources[1].status, 'partial');
+    assert.equal(report.sources[1].issues[0].number, 31);
+    assert.deepEqual(report.sources[1].pullRequests, []);
+    assert.deepEqual(report.failures, [
+      { sourceId: 'github-work', probe: 'gh pr list', code: 'INVALID_JSON' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: one unavailable GitHub source does not suppress another source', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-source-failure-'));
+  try {
+    const fakeGh = join(dir, 'source-failure-gh.mjs');
+    writeFileSync(
+      fakeGh,
+      `const args = process.argv.slice(2);
+if (args[0] === '--version') process.stdout.write('ok\\n');
+else if (args[0] === 'auth' && process.env.GH_HOST === 'down.example') process.exit(8);
+else if (args[0] === 'auth') process.stdout.write('ok\\n');
+else if (args[0] === 'issue') process.stdout.write(JSON.stringify([{ number: 41, title: 'Available' }]));
+else process.exit(46);
+`
+    );
+    mkdirSync(join(dir, '.agentic'));
+    writeFileSync(
+      join(dir, '.agentic', 'project-sources.json'),
+      JSON.stringify({
+        schemaVersion: 1,
+        sources: [
+          {
+            id: 'github-primary',
+            type: 'github',
+            role: 'primary',
+            host: 'up.example',
+            repository: 'acme/primary',
+            issues: { state: 'open', limit: 20 },
+          },
+          {
+            id: 'github-supporting',
+            type: 'github',
+            role: 'supporting',
+            host: 'down.example',
+            repository: 'acme/supporting',
+            issues: { state: 'open', limit: 20 },
+          },
+        ],
+      })
+    );
+
+    const report = runProjectState(dir, {
+      AGENTIC_GH: fakeGh,
+      HOME: dir,
+      USERPROFILE: dir,
+    });
+
+    assert.equal(report.sources[0].id, 'repository');
+    assert.equal(report.sources[0].status, 'available');
+    assert.equal(report.sources[1].id, 'github-primary');
+    assert.equal(report.sources[1].status, 'available');
+    assert.equal(report.sources[1].issues[0].number, 41);
+    assert.equal(report.sources[2].id, 'github-supporting');
+    assert.equal(report.sources[2].status, 'unavailable');
+    assert.deepEqual(report.failures, [
+      { sourceId: 'github-supporting', probe: 'gh auth status', code: 'AUTH_FAILED' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 // --- ad-release deterministic local release-state probe (ADR-0063) ---
 // The claude-code copy is executed; skills.test.js enforces a byte-identical
 // Codex twin. The probe reports local facts only: it never contacts npm or

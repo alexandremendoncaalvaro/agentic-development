@@ -3,7 +3,8 @@
 **Status:** accepted
 **Date:** 2026-08-07
 **Deciders:** Alexandre Alvaro
-**Amended by:** ADR-0076 — moves the shared thirty-second decision-maker presentation to `ad-brief`; roadmap reconciliation, scopes, metrics, and checklists remain unchanged.
+**Amended by:** ADR-0076 — moves the shared thirty-second decision-maker presentation to `ad-brief`; roadmap reconciliation, scopes, metrics, and checklists remain owned here.
+**Amended by:** ADR-0079 — lets configured primary project evidence supplement or replace missing local planning artifacts while roadmap reconciliation remains owned here.
 
 ## Context
 

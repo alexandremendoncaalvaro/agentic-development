@@ -21,22 +21,26 @@ Build a standalone brief.
 When no caller supplied a fact packet, ground the briefing in the current session
 and the smallest sufficient live project evidence:
 
-1. Run `git status --short`, read the current branch with
+1. Invoke `/ad-project-state` and preserve its selected source roles,
+   provenance, observation time, bounded work summaries, and failures. This
+   supplies project-wide activity; it does not replace the repository checks
+   below or authorize publication.
+2. Run `git status --short`, read the current branch with
    `git branch --show-current`, and inspect the most recent commit with
    `git log -1 --oneline`. Read a focused diff only when it changes the meaning
    of the current result.
-2. Find the active task from a changed task file, then an explicit
+3. Find the active task from a changed task file, then an explicit
    `in-progress` status, then the task touched by the recent commit. Read its
    Context, current plan state, acceptance criteria, and completion gates.
-3. Follow only load-bearing references from that active task to its spec, ADR or
+4. Follow only load-bearing references from that active task to its spec, ADR or
    other governing decision, and PRD or product context. Stop when the project,
    final objective, current target, rationale, and done condition are clear.
-4. Reconstruct recent results and explicit owner corrections from the current
+5. Reconstruct recent results and explicit owner corrections from the current
    conversation. Treat them as claims until live evidence or a durable artifact
    confirms them. Live repository evidence outranks stale conversation state;
    disclose a material mismatch instead of silently choosing the more convenient
    story.
-5. Build the same settled fact packet a specialist caller would provide. Mark an
+6. Build the same settled fact packet a specialist caller would provide. Mark an
    unavailable fact as unknown; never invent activity, completion, or a blocker.
 
 Accept a specialist fact packet.
