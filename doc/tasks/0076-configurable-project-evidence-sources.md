@@ -1,6 +1,6 @@
 # Task `0076`: Resolve configurable project evidence sources
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-15
 **Scope ref:** doc/specs/0006-configurable-project-evidence-sources.md
 **Evidence ref:** doc/research/0020-ground-project-evidence-sources.md
@@ -35,7 +35,7 @@ shared, auditable source resolver before stable 1.0 publication.
 - [x] Route `ad-next`, `ad-roadmap`, and `ad-brief` through the shared fact packet and add static composition tests.
 - [x] Refresh project dogfood, install the machine-local mapping and user-level skills, then verify a private GitHub-primary repository without retaining its output.
 - [x] Run focused and complete gates, package dry-run, drift, fresh-context review, and maximum audit; resolve every verified finding.
-- [ ] Commit atomically, open the feature pull request, and merge only after all required checks pass.
+- [x] Commit atomically, open the feature pull request, and merge only after all required checks pass.
 
 ## Notes
 
@@ -93,6 +93,14 @@ zero Standards and Spec findings; the maximum `ad-audit` was complete with
 zero violations or judgement calls. The remaining work is deliberately external:
 commit, exact PR publication approval, required remote CI, and merge.
 
+PR [#137](https://github.com/alexandremendoncaalvaro/agentic-development/pull/137)
+published the exact approved English draft. Its required Ubuntu and Windows
+matrix passed on Node 22.13 and 24, with no review comments and a clean merge
+state. It merged into `main` as
+`e10734cc37ce504c5bed8c8e95b02b244f449884`; the feature branch was removed.
+The configurable project-evidence front is complete, and stable 1.0 readiness is
+now the next product front.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -100,4 +108,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
