@@ -118,6 +118,13 @@ focused Prism and skill-contract suites passed 540 tests, the full `npm test`
 gate passed 936 tests, `npm pack --dry-run` included the corrected artifacts,
 dogfood parity passed, and `ad-next` reported no active or orphan tasks.
 
+Audit correction: the forward comparison above is local exploratory evidence,
+not durable public decision evidence. Some fixtures contain private context,
+and no established governed evidence channel retains the per-observation
+results, so its exact arm-level outcomes must not support a public equivalence
+claim. The shipping correction is supported independently by the sanitized
+out-of-scope adapter case and its observed RED-to-GREEN regression test.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
