@@ -1,6 +1,6 @@
 # Spec `0006`: Resolve configurable project evidence sources
 
-**Status:** accepted
+**Status:** shipped
 **Created:** 2026-09-15
 **Owner:** Alexandre Alvaro
 

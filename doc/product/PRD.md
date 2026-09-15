@@ -67,8 +67,8 @@ Multi-feature scope tiers. Delivered capability is listed once; pending work rem
 - **Later tier — Per-language guideline presets.** `ad-guidelines` ships canned templates for Rust / Python / Go / TypeScript / C++ beyond the current per-language detection.
 - **Later tier — Skill eval harness.** Trajectory eval per `WORKFLOW.md` §13, applied to each shipped skill against a fixture corpus.
 - **Later tier — Example-grounded publication and reporting.** Investigate separate `ad-publish` and `ad-report` skills that use a shared, human-curated exemplar library to produce audience-aware collaboration posts and standalone reports while preserving the owner's voice through `ad-voice`.
-- **Current tier — Configurable project evidence sources.** State-reading skills keep the repository as the zero-configuration baseline and may reconcile explicitly configured GitHub issues and pull requests through one shared, provenance-bearing fact packet.
-- **Next tier — 1.0 release readiness.** `main` is the sole development branch. ADR-0078 requires the MVP feature surface, the Node 22.13 / 24 compatibility matrix, one shared lint/format/test/dependency-audit gate, verified repository secret controls, and clean own-dogfood review, audit, drift, and package evidence before publication.
+- **Shipped tier — Configurable project evidence sources.** State-reading skills keep the repository as the zero-configuration baseline and may reconcile explicitly configured GitHub issues and pull requests through one shared, provenance-bearing fact packet.
+- **Current tier — 1.0 release readiness.** `main` is the sole development branch. ADR-0078 requires the MVP feature surface, the Node 22.13 / 24 compatibility matrix, one shared lint/format/test/dependency-audit gate, verified repository secret controls, and clean own-dogfood review, audit, drift, and package evidence before publication.
 
 ## Constraints
 
