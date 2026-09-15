@@ -62,6 +62,9 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- `/ad-rules` now validates the composed decision-maker brief before returning,
+  while `/ad-brief` distinguishes evidence-settled choices, genuine owner
+  judgments, and completed decisions with an auditable evidence trail.
 - Updated the test suite's `js-yaml` development dependency to 4.3.2, the first
   patched release for GHSA-2883-xcg3-v3hh.
 - Skill `Next` breadcrumbs now expose the complete workflow routing chain on

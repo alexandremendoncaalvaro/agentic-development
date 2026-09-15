@@ -649,6 +649,66 @@ test('ad-brief restores live session context and escalates only genuine judgment
   }
 });
 
+test('ad-brief ships representative evaluations for its three decision outcomes', () => {
+  const expectedCases = [
+    'evidence-settles-the-path',
+    'owner-judgment-remains',
+    'completed-decision-needs-an-audit-trail',
+  ];
+
+  for (const agent of ['claude-code', 'codex']) {
+    const evalPath = join(SKILLS_ROOT, agent, 'ad-brief', 'evals', 'evals.json');
+    assert.ok(existsSync(evalPath), `${agent} ad-brief must ship behavioral evaluations`);
+
+    const evaluation = JSON.parse(readFileSync(evalPath, 'utf8'));
+    assert.deepEqual(
+      evaluation.cases.map(({ id }) => id),
+      expectedCases,
+      `${agent} ad-brief must cover each owner-decision outcome`
+    );
+
+    for (const scenario of evaluation.cases) {
+      assert.equal(scenario.expected_route, 'ad-brief');
+      assert.ok(scenario.expected_outcomes.length >= 4, `${scenario.id} needs an observable rubric`);
+    }
+  }
+});
+
+test('ad-brief exposes concrete examples for each semantic decision mode', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const briefDir = join(SKILLS_ROOT, agent, 'ad-brief');
+    const body = readFileSync(join(briefDir, 'SKILL.md'), 'utf8');
+    const examplesPath = join(briefDir, 'references', 'decision-examples.md');
+
+    assert.ok(existsSync(examplesPath), `${agent} ad-brief must ship decision examples`);
+    assert.match(
+      body,
+      /references\/decision-examples\.md/,
+      `${agent} ad-brief must route decision shaping through the examples`
+    );
+
+    const examples = readFileSync(examplesPath, 'utf8');
+    for (const mode of ['Settled path', 'Owner judgment', 'Completed decision']) {
+      assert.ok(examples.includes(`## ${mode}`), `${agent} examples need the ${mode} mode`);
+    }
+  }
+});
+
+test('ad-rules validates the composed brief before correction mode returns', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-rules', 'SKILL.md'), 'utf8');
+
+    assert.match(body, /returns, verify that every output-template field/i);
+    assert.match(body, /every output-template field/i);
+    assert.match(body, /rendered meaning[\s\S]*decision checks/i);
+    assert.match(
+      body,
+      /exact missing[\s\S]*correct[\s\S]*before (?:you )?regain control/i,
+      `${agent} ad-rules must repair an invalid decision-maker brief before continuing`
+    );
+  }
+});
+
 test('ad-merge has a release-only mode that preserves the tagged commit', () => {
   for (const agent of ['claude-code', 'codex']) {
     const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-merge', 'SKILL.md'), 'utf8');

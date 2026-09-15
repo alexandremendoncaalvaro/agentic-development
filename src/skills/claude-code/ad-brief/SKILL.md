@@ -63,6 +63,24 @@ irreversibility, insufficient evidence, or a close value trade-off remains, ask
 one question. Put the recommendation first and include only viable competing
 options, explaining each through value, risk, and reversibility.
 
+Read [references/decision-examples.md](references/decision-examples.md) and select
+the matching semantic mode before rendering. Treat one question as one unresolved
+owner decision, not as a punctuation quota. Keep its setup declarative so the same
+decision is not asked in both the framing and `Your attention`. When options are
+needed, put the recommendation first, label it `(Recommended)`, and include only
+competitors that could reasonably win on the unresolved value trade-off.
+
+Before returning, inspect the rendered meaning:
+
+- An evidence-settled choice was decided and reported, not escalated.
+- `Your attention` contains either `No decision needed` or one owner decision.
+- A genuine owner decision has the recommendation first and only viable options.
+- An autonomous or completed decision names what was decided, why, the supporting
+  evidence and its material limit, and the concrete next action.
+
+If any check fails, revise the brief before returning. Do not validate exact prose,
+headings, or punctuation.
+
 ## Render
 
 Read [references/output-template.md](references/output-template.md) and replace

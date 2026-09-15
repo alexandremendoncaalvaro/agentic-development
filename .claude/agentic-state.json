@@ -88,12 +88,20 @@
       "version": "0.20.0-beta.10",
       "files": [
         {
+          "path": ".claude/skills/ad-brief/evals/evals.json",
+          "sourceSha": "4d9be32af619cbb0f32591564d9db94d9b7f6d54d0732d0b6a043fdbebbfbd7b"
+        },
+        {
+          "path": ".claude/skills/ad-brief/references/decision-examples.md",
+          "sourceSha": "3a4a58b8d7e97b16e5211d9cd3022c6e56b0138439e42531e65e2aa57710ba6f"
+        },
+        {
           "path": ".claude/skills/ad-brief/references/output-template.md",
-          "sourceSha": "874c3c17deb988f9b669b37dfe7ddbc0d226ab688a3e01d2888f61f18a8ec8e4"
+          "sourceSha": "8857a3d61cc453d72f359ca9fc37e780b0c39018a790208212e3b40343ed38f4"
         },
         {
           "path": ".claude/skills/ad-brief/SKILL.md",
-          "sourceSha": "44af30973b797855be5942cbc588e9ca88dd53d09effbc54850ed6523756c13a"
+          "sourceSha": "5bdd44c791f5ce84a8fd609f20ecce27c885410ecd36188b30ee6f97dbc427e9"
         }
       ]
     },
@@ -569,7 +577,7 @@
         },
         {
           "path": ".claude/skills/ad-rules/SKILL.md",
-          "sourceSha": "67563e8584f1d2e0e9e289624ca2837d838d5e5a1df850ac5a9d65295b10842c"
+          "sourceSha": "b2ecf6985297b3a6dc676eac7a6497e77a238ccc7f979faa75ff3af6193bf261"
         }
       ]
     },

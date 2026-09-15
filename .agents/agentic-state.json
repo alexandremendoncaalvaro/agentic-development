@@ -112,12 +112,20 @@
           "sourceSha": "72a1b344c10f9d7deae4039291cd1244c19eb602cd846f0989bdb2b1f5e98473"
         },
         {
+          "path": ".agents/skills/ad-brief/evals/evals.json",
+          "sourceSha": "4d9be32af619cbb0f32591564d9db94d9b7f6d54d0732d0b6a043fdbebbfbd7b"
+        },
+        {
+          "path": ".agents/skills/ad-brief/references/decision-examples.md",
+          "sourceSha": "3a4a58b8d7e97b16e5211d9cd3022c6e56b0138439e42531e65e2aa57710ba6f"
+        },
+        {
           "path": ".agents/skills/ad-brief/references/output-template.md",
-          "sourceSha": "874c3c17deb988f9b669b37dfe7ddbc0d226ab688a3e01d2888f61f18a8ec8e4"
+          "sourceSha": "8857a3d61cc453d72f359ca9fc37e780b0c39018a790208212e3b40343ed38f4"
         },
         {
           "path": ".agents/skills/ad-brief/SKILL.md",
-          "sourceSha": "f0ffc268c74dccab699cad5e07416273dacf6b9b764416b083f5fb024220acc4"
+          "sourceSha": "8cc35365ed20f3f37bfd0dfe459729bfc5b5cf35fd6e1e50e01d643f26934aa6"
         }
       ]
     },
@@ -705,7 +713,7 @@
         },
         {
           "path": ".agents/skills/ad-rules/SKILL.md",
-          "sourceSha": "bcaf84bd0c3bad89f6b27132fdd23b2c7233b112991bb119b043ef8dcb9f5c49"
+          "sourceSha": "b3704721bed9654ba3bd3a2e7cfffe9c7006028d51afc938e3f3108f65722262"
         }
       ]
     },

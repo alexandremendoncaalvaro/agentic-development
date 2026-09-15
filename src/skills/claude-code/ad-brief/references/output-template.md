@@ -12,8 +12,10 @@
 - **Done when:** <the evidence-backed completion condition>
 - **Blocker:** <the most direct blocker, or "No blocker recorded">
 - **Confidence:** <the material evidence limit or uncertainty, or "No material confidence limit recorded">
-- **Your attention:** <"No decision needed; work continues with <action>" or one genuine question with recommendation and viable options>
+- **Your attention:** <"No decision needed; work continues with <action>" or one owner-decision block shaped by decision-examples.md>
 ```
 
 Remove no field. Mark an unavailable fact `Unknown — <smallest missing evidence>`.
 Do not add a checklist; a composing specialist adds its own output after the brief.
+Validate the rendered meaning against the decision checks in `SKILL.md`; do not
+use exact wording or punctuation as the test.

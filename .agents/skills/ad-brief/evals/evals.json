@@ -1,0 +1,43 @@
+{
+  "cases": [
+    {
+      "id": "evidence-settles-the-path",
+      "domain": "software delivery",
+      "prompt": "Brief me before implementation. The repository already uses node:test, adjacent regression tests exercise the public interface, Jest would add a dependency without a needed capability, and the change is local and reversible.",
+      "expected_route": "ad-brief",
+      "expected_outcomes": [
+        "chooses the repository-established path without asking the owner",
+        "does not present Jest as a viable alternative",
+        "states why the evidence settles the decision",
+        "reports the verification path and immediate next action",
+        "states that no owner decision is needed"
+      ]
+    },
+    {
+      "id": "owner-judgment-remains",
+      "domain": "product experience",
+      "prompt": "Brief me on the only open issue. We must choose whether first-time users see a compact explanation by default or a detailed walkthrough by default. Both are technically equivalent and reversible, and no product decision settles the audience trade-off.",
+      "expected_route": "ad-brief",
+      "expected_outcomes": [
+        "escalates exactly one owner decision",
+        "puts one recommended option first and labels it Recommended",
+        "includes only the compact and detailed defaults as viable competitors",
+        "explains the options through user value and reversibility",
+        "does not repeat the decision in framing and closing questions"
+      ]
+    },
+    {
+      "id": "completed-decision-needs-an-audit-trail",
+      "domain": "software delivery",
+      "prompt": "Brief me after the fix. A leaked Git environment reproduced the failure 10 of 10 times; increasing the timeout reproduced it 0 of 10 times; an accepted repository rule requires stripping those variables; the minimal fix passed 10 of 10 repetitions and the full local gate.",
+      "expected_route": "ad-brief",
+      "expected_outcomes": [
+        "reports the causal fix as the decision without asking the owner",
+        "states why the timeout alternative was discarded",
+        "preserves the evidence counts and accepted-rule boundary",
+        "names a concrete next delivery action",
+        "states that no owner decision is needed"
+      ]
+    }
+  ]
+}
