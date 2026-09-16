@@ -5,7 +5,8 @@
 **Scope ref:** doc/product/PRD.md — Later tier: Skill eval harness
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
-**Spec ref:**
+**Spec ref:** doc/specs/0007-evaluate-skill-trajectories.md
+**Evidence ref:** doc/research/0021-ground-skill-trajectory-evaluation-harness.md; doc/research/0022-skill-trajectory-evaluation-contract.md
 **Board ref:**
 
 ## Context
@@ -39,6 +40,33 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 Registered from the accepted PRD's Later-tier roadmap. The feature remains
 HITL because the evaluation measure itself is a product and quality decision.
+
+### 2026-09-16
+
+Reconciled the task against the clean `origin/main` baseline and completed the
+pre-spec `ad-grill-me`, four-source `ad-ground`, and `ad-prism` pass. The evidence
+supports a provider-neutral contract with frozen fixtures and inputs,
+outcome-first grading, retained trajectories, invocation-class-specific arms,
+and separate deterministic versus judgment evidence. One owner decision remains
+before `ad-spec`: accept credential-free replay in local/CI gates plus authorized
+live dual-host trials at the HITL gate, or require live model generation in CI
+and explicitly accept credentials, cost, and stochastic gate behavior. No
+harness implementation or Task 0047 work started.
+
+### 2026-09-16 — Owner decision
+
+The owner accepted the recommended hybrid gate: credential-free deterministic
+replay in normal local/CI verification, with newly generated dual-host behavior
+evaluated through an explicitly authorized HITL runner. Drafted
+`doc/specs/0007-evaluate-skill-trajectories.md` from that boundary. Framework
+selection, pilot decision values, implementation, and Task 0047 remain unstarted.
+
+### 2026-09-16 — Spec accepted
+
+The owner accepted `doc/specs/0007-evaluate-skill-trajectories.md`. The next
+session should de-risk the implementation mechanism before code: confirm whether
+the framework question requires a staged spike, then build through test-first
+vertical slices. No implementation or Task 0047 work started in this session.
 
 ## Definition of Done
 
