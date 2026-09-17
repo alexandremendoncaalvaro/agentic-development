@@ -252,6 +252,83 @@ Deferred: approval-stop grader with a user-invocable-only case, recorded
 judgment replay, remaining category-axis representatives, fake runner adapters,
 live lane.
 
+### 2026-09-17 — Maximum-gate audit of the block (ad-audit)
+
+`ad-audit` ran on `origin/main..HEAD` at `9769db6` with eighteen isolated
+reviewers: the four binding documents, the eleven accepted ADRs the block
+touches, and the CRITICAL claims-verification group with two cross-model passes
+in swapped rule and hunk order. Every group and every changed file is accounted
+for in the audit output. Dispositions, in severity order:
+
+- **Corrected, claims-verification.** The slice 1 entry above states "965
+  tests"; the gate at `6d400c9` runs 968, because three boundary tests were
+  added after the measurement and before the commit. Two reviewers reproduced
+  968 in disposable worktrees. The past entry stays as written; this entry is
+  the correction.
+- **Corrected, ADR-0061 and ADR-0059.** The de-risk register recorded impact but
+  not uncertainty or category, so its "impact times uncertainty" order was
+  asserted, not shown, and R9 used a label outside the §17 vocabulary. Re-scored
+  as opened on 2026-09-17, grades unchanged except the R9 label:
+
+  | # | Category | Impact if wrong | Uncertainty at open | Grade |
+  |---|---|---|---|---|
+  | R1 | technique | high | high | Strong |
+  | R2 | integration | high | medium | Conditional |
+  | R3 | integration | medium | low | Strong |
+  | R4 | scope | medium | low | Strong |
+  | R5 | scope | medium | low | Strong |
+  | R6 | technique | high | low | Strong |
+  | R7 | integration | high | medium | Conditional |
+  | R8 | integration | low | medium | Conditional |
+  | R9 | scope | high | high | Insufficient: retirable only by the pilot experiment, owner decision follows it |
+  | R10 | integration | high | medium | Conditional |
+  | R11 | technique | medium | low | Strong |
+
+- **Acknowledged, ADR-0070.** The receipt origin and behavioral claim design
+  of slice 2 exceeded the text of Spec 0007 and was recorded in ADR-0080 only
+  after `e8f363b` landed. R11 grounded the digest half before code; the
+  synthetic-versus-live distinction was not grounded before code. No
+  retroactive record is fabricated. From slice 4 on, a design choice that
+  exceeds Spec 0007 gets its ground receipt or ADR entry before the code.
+- **Clarified, ADR-0077 and ADR-0008.** What ran on `doc/research/0022` on
+  2026-09-16 was the structural plan validator (`validate-plan.mjs`, valid)
+  on top of the four-source ground it rests on. No freeze-and-audit ceremony
+  ran, because ADR-0077 binds that ceremony to material evaluations whose
+  claims are prepared for publication, and 0022 produced a specification, not
+  a publication. The record now carries the layer's numbered title, status
+  header, dated sources, and an audit path; the validator still passes.
+- **Recorded, claims-verification.** The Node 22.13.0 measurement behind the
+  slice 3 matcher decision, captured on 2026-09-17 with `mise exec
+  node@22.13.0`: stderr printed `ExperimentalWarning: glob is an experimental
+  feature and might change at any time` while `matchesGlob` returned
+  `true false true` for the three probes; Node 22.22.3 and 24.16.0 returned the
+  same values with no warning. Two audit reviewers reproduced it with the same
+  three binaries.
+- **Reworded, ADR-0065.** Windows portability is by construction (LF
+  normalization through `.gitattributes`, separator-agnostic matching, array-form
+  spawning); the Windows CI leg on the pull request is the measurement, and no
+  CI run exists for this branch yet. ADR-0080 now says so.
+- **Recorded, claims-verification.** `.agentic/reviews/` is gitignored and held
+  only the reviewers' input handoffs, so "review blocked the slice" rested on
+  this log alone. The reviewer verdicts for slices 1 to 3 are now persisted
+  beside their handoffs on this machine; the in-tree record remains this Notes
+  log. Candidate for `ad-level-up`: `ad-review` should persist reviewer
+  verdicts next to the handoffs it already writes.
+- **Corrected, ARCHITECTURE.md, CONTEXT.md, GUIDELINES.md §4.3.** The
+  architecture document now names `eval/`, the bounded exception to the
+  `src/skills/` boundary for the `freezeArtifact` import, and the new test
+  file. The glossary narrows the "prompt" alias to naming the case and points to
+  ADR-0080 as proposed rather than governing. The bespoke glob matcher carries
+  its why-comment.
+- **Locators.** R11 above cites `AGENTS.md:104`; the sentence is at line 107.
+  GROUND-0023 A6 answered 200 directly on 2026-09-17, without the redirect seen
+  on first access. GROUND-0023 D3 names three sibling branches; nine exist, and
+  an audit reviewer swept the other six with the same empty result.
+- **Accepted as-is, with reason.** GROUND-0023 says "CI lane" once; it predates
+  the glossary and decision records are mostly immutable. `eval/lib/replay.mjs`
+  is under the 400-line hard ceiling and splits when the next grader lands.
+  Exit code 1 covering an evaluation failure is documented in `run.mjs`.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

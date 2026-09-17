@@ -304,7 +304,8 @@ vocabulary, a sanitized fixture, the expected route and outcome, allowed and
 forbidden effects, required approval stops, declared graders, and exclusions.
 
 _Avoid_: "eval" or "test case" (the unit is the frozen case, not one run of it);
-"prompt" (the request is one field of the case, not the case).
+"prompt" as a name for the case (the request is one field of the case; calling
+the model-facing request text a prompt, as Spec 0007 R3 does, is fine).
 
 **Related code:** [`eval/cases/`](eval/cases/),
 [`eval/lib/replay.mjs`](eval/lib/replay.mjs); contract in
@@ -350,8 +351,10 @@ _Avoid_: "lane" (the lane is how a receipt is evaluated; origin is where it came
 from); "real" versus "fake" (a synthetic receipt is a legitimate fixture, not a
 fake result).
 
-**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); governed by
-[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md).
+**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); decision
+proposed in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md),
+binding once accepted.
 
 ### Evidence lane
 

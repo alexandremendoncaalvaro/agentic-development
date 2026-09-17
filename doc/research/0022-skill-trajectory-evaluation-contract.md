@@ -1,4 +1,8 @@
-# Skill trajectory evaluation contract
+# PRISM-0022: Skill trajectory evaluation contract
+
+**Status:** recorded
+**Decision ref:** doc/specs/0007-evaluate-skill-trajectories.md; doc/tasks/0048-build-skill-evaluation-harness.md
+**Evidence ref:** doc/research/0021-ground-skill-trajectory-evaluation-harness.md
 
 ## Decision
 
@@ -150,36 +154,40 @@ service, publish private evidence, define production monitoring, or start Task
 ## Sources
 
 ### M1 — Goal/Question/Metric decision chain
-- Source: https://ntrs.nasa.gov/api/citations/19920010178/downloads/19920010178.pdf
+- Source: https://ntrs.nasa.gov/api/citations/19920010178/downloads/19920010178.pdf (reachability confirmed 2026-09-17 via HTTP HEAD, 200 application/pdf; content read in the 2026-09-16 drafting session)
 - Supports: deriving answerable evaluation questions and measures from the explicit harness decision and objective.
 - Contribution: prevents the implementation mechanism or an available metric from becoming the evaluation goal.
 - Adaptation: maps the Task 0048 gate decision to one question, layered evidence, and named measures.
 - Retained limit: does not choose a corpus, threshold, trial count, or host adapter.
 
 ### M2 — Evidence-Centered Design
-- Source: https://www.ets.org/Media/Research/pdf/TC-10-07.pdf
+- Source: https://www.ets.org/Media/Research/pdf/TC-10-07.pdf (reachability confirmed 2026-09-17 via HTTP HEAD, 200 application/pdf; content read in the 2026-09-16 drafting session)
 - Supports: linking claims to the evidence and tasks capable of producing that evidence.
 - Contribution: keeps fixture tasks, trajectory evidence, and permitted claims traceable instead of treating a score as self-explanatory.
 - Adaptation: uses frozen cases as evidence-producing tasks and separates deterministic evidence from judgment evidence.
 - Retained limit: the assessment framework does not validate this repository's case representativeness or graders.
 
 ### M3 — Agent task/trial/grader/trace/outcome model
-- Source: https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents
+- Source: https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents (accessed 2026-09-16 via official web documentation, GROUND-0021 A2; reachability reconfirmed 2026-09-17)
 - Supports: representative tasks, repeated trials, mixed graders, isolated environments, outcomes, and trajectory inspection.
 - Contribution: supplies the operational vocabulary and preserves path evidence for nondeterministic agents.
 - Adaptation: groups trials by frozen case, makes outcomes primary, and retains routes and effects for diagnosis and hard gates.
 - Retained limit: does not provide Task 0048's categories, acceptance threshold, or credential policy.
 
 ### M4 — Task-specific evaluation and calibrated judgment
-- Source: https://developers.openai.com/api/docs/guides/evaluation-best-practices
+- Source: https://developers.openai.com/api/docs/guides/evaluation-best-practices (accessed 2026-09-16 via official web documentation, GROUND-0021 A1; reachability reconfirmed 2026-09-17)
 - Supports: representative task-specific datasets, edge and adversarial cases, automation, classification-style grading, and human calibration.
 - Contribution: supports natural cases and the split between exact checks and calibrated contextual judgment.
 - Adaptation: uses deterministic assertions first and anchored pass/partial/fail rubrics only for irreducible quality questions.
 - Retained limit: does not make the OpenAI Evals product or API the selected harness framework.
 
 ### M5 — Public skill baseline and dormancy pattern
-- Source: https://github.com/dotnet/skills/blob/main/.agents/skills/create-skill-test/SKILL.md
+- Source: https://github.com/dotnet/skills/blob/main/.agents/skills/create-skill-test/SKILL.md (accessed 2026-09-16 via fetched GitHub source, GROUND-0021 B1; reopened 2026-09-17 by an audit reviewer)
 - Supports: natural prompts, baseline-versus-skill arms, outcome rubrics, fixture integrity, and dormancy guards.
 - Contribution: supplies a real implementation pattern and exposes the identical-arm error for disabled implicit invocation.
 - Adaptation: keeps comparative arms for model-invocable skills and uses explicit invocation plus dormancy for user-invocable-only skills.
 - Retained limit: its repository-specific schema, sample floors, and statistical gate are not transferred.
+
+## Audit path
+
+Run `node .claude/skills/ad-prism/scripts/validate-plan.mjs doc/research/0022-skill-trajectory-evaluation-contract.md`, then reopen every method source. Structural validity proves the sections and method records, not the source content. This plan was not frozen with `freeze-artifact.mjs`: it produced Spec 0007 and no claim from it was prepared for publication, which is the condition ADR-0077 sets for the freeze-and-audit ceremony.

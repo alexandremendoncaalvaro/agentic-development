@@ -29,7 +29,7 @@ Positive:
 
 - The normal gate stays exactly what Spec 0007 requires: offline, deterministic, credential-free, and portable across the CI matrix, with no new runtime or development dependency to justify or audit.
 - The harness inherits the repository's proven patterns, which keeps it small enough to read in one sitting and testable through its public interface.
-- Reusing the freeze scheme gives replay and live receipts the same digest semantics as frozen Prism artifacts, including Windows line-ending safety.
+- Reusing the freeze scheme gives replay and live receipts the same digest semantics as frozen Prism artifacts, and inherits the LF normalization that `.gitattributes` guarantees on every platform; the Windows CI leg, not a single-machine run, is the measurement of that portability.
 - The origin and claim split lets synthetic mechanics fixtures live in the suite indefinitely while live receipts rot on purpose when a skill or grader changes.
 
 Negative / trade-offs:

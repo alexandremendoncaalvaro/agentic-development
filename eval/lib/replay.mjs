@@ -205,6 +205,11 @@ function normalizePath(path) {
   return path.split('\\').join('/').replace(/^\.\//, '');
 }
 
+// Bespoke on purpose: `path.matchesGlob` behaves identically on Node 22.13.0,
+// 22.22.3, and 24.16.0 but prints an ExperimentalWarning on stderr on the
+// 22.13.0 CI floor, and its stability tier allows the semantics to change.
+// Supports `*` (one segment), `**` (any depth), and `?`; nothing else is needed
+// by the case format. Recorded in Task 0048 Notes, slice 3.
 function globToRegExp(glob) {
   let source = '';
   for (let index = 0; index < glob.length; index += 1) {
