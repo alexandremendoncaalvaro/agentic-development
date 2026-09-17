@@ -23,14 +23,14 @@ judgment and must not optimize a skill against a single hand-picked example.
 - [x] A feature specification defines the fixture corpus, evaluation inputs, ground-truth outcomes, scoring, and what can run deterministically in CI.
 - [x] The harness evaluates at least one representative trajectory for every shipped skill category without requiring credentials or hidden local state.
 - [x] Results make failures actionable by naming the fixture, expected outcome, observed outcome, and whether the gap is deterministic or judgment-based.
-- [ ] The harness is documented, tested, dual-host-aware where relevant, and passes the local gate plus fresh-context review.
+- [x] The harness is documented, tested, dual-host-aware where relevant, and passes the local gate plus fresh-context review.
 
 ## Plan
 
 - [x] Use `/ad-grill-me`, `/ad-ground`, and `/ad-spec` to define a measurable evaluation contract before selecting a framework.
 - [x] Build a small, versioned fixture corpus and prove the harness distinguishes a passing trajectory from an intentionally broken one.
 - [x] Extend coverage incrementally by skill category, avoiding scores that cannot be reproduced from declared inputs.
-- [ ] Run the local gate and fresh-context review.
+- [x] Run the local gate and fresh-context review.
 
 ## Notes
 
@@ -626,6 +626,94 @@ tool-use id are flattened into the trial; a stream line that is not JSON, or a
 record the adapter does not know, fails closed with the line number instead of
 producing a partial trial. This entry lands in its own commit before the commit
 that implements it, the forward rule the re-audit left open.
+
+### 2026-09-17 — Slice 6 design correction, from the fresh-context review
+
+The slice 6 design entry above stated two things the code does not do, and the
+review of the code caught both before it landed. First, "a record the adapter
+does not know, fails closed" was wrong as a design: both hosts emit legitimate
+records with no event kind, a `Read` tool call, a `reasoning` item, a
+`system/init` or retry notice, and an adapter that failed on them would fail on
+every real stream. The adapters ignore such records and count them under
+`unmapped` by host shape, so the trial says what it left out (Spec 0007 R16),
+and fail closed only on a non-JSON line, a malformed record they do recognize,
+or a stream without its terminal record. ADR-0080 item 10 and GROUND-0025 now
+say the same. Second, the sample streams do not "carry `origin: synthetic`";
+the receipts built from them do. The entry also omitted one behavior the code
+carries, the failure terminal (`result` with an error subtype, Codex
+`turn.failed` or `error`), which item 10 already named. The review's blocker
+on the code, a denied `Skill` call still recorded as `skill_invoked`, is fixed
+by resolving the denial before any mapping: a denied call of any tool is an
+`approval_denied`, never the event it would have produced, so a blocked skill
+cannot count as fired. This entry corrects the design record without editing
+it; the ordering rule held, and the correction is checkable the same way.
+
+### 2026-09-17 — Slice 6: host stream adapters
+
+Landed under `eval/lib/adapters/`: `common.mjs` (JSON Lines parsing that fails
+closed with the line number, the trial accumulator, the request-derived
+`skill_invoked`, the policy-derived `approval_granted`, platform-independent
+relativization of recorded paths against the run directory, the `unmapped`
+counter, and the outcome), `claude-code.mjs` (`stream-json`: `Skill`, `Bash`,
+and the write tools to events; `permission_denied` joined to its call by id so
+a denied call of any tool is an `approval_denied`; `tool_result` error flags
+kept on the event's native record; subagent records flattened with their parent
+id kept), and `codex.mjs` (`--json`: `command_execution`, `file_change`,
+`agent_message`, `turn.completed`, `turn.failed`, `error`; a declined command
+is an `approval_denied`; a clean-exit read of `SKILL.md` under any documented
+skills root is the activation). Six sample streams under `eval/streams/<host>/`
+are authored from the documented shapes. `test/eval-adapters.test.js` holds
+eleven behaviors, each proved through the public `normalize` and, where a
+tracked case fits, graded through `evaluateReplay` by swapping the normalized
+trial into a tracked receipt: both hosts pass their case; denials and declined
+commands; request-derived invocation and policy-derived grants on both hosts,
+and the same stream without grants raising `bypassed_approval`; subagent
+flattening; a denied `Skill` never counting as fired; every documented Codex
+skills root; failure terminals; out-of-directory writes staying absolute so the
+effects grader rejects them; a failed `SKILL.md` read not counting; fail-closed
+parsing. `ARCHITECTURE.md` and `AGENTS.md` name the modules and the streams.
+The full local gate passed after each review round.
+
+Two fresh-context review rounds preceded this entry. The first found a denied
+`Skill` still recorded as fired, the Codex skills-root regex missing
+`/etc/codex/skills`, a bare `TypeError` on a non-array `changes`, two divergent
+`required()` helpers, and the design-entry wording corrected above; all fixed.
+The second found `trialPath` relying on `node:path` `relative`, which the
+Windows leg could resolve differently for an out-of-directory path, the Codex
+skill read ignoring `exit_code`, a `turn.failed` without a message recorded as
+`null` rather than refused, and `tool_result` records leaving no trace; all
+fixed, with a test for each. One concern is deferred by design and named here:
+`unmapped` is written by the adapters and read by nothing downstream yet. The
+field exists only in adapter-produced trials, and those exist only when the
+live lane runs an adapter; surfacing the counts in the replay result and the
+corpus report is bound to the live-lane slice, which is the first consumer.
+A third review pass follows this entry.
+
+### 2026-09-17 — Slice 6: third review pass and closure
+
+The third fresh-context pass carried every earlier finding as a thread and
+found all of them resolved with evidence; both axes closed with "ship with the
+Concerns logged". The concerns and notes it raised are closed in the same
+change rather than logged: a declined Codex `file_change` is now an
+`approval_denied` for its path, never a write that landed; `unmapped` buckets
+now carry the stream lines of the records they count, so an investigator can
+reach the record the way `native.line` reaches a mapped event; a run policy
+whose `grants` is not an array fails closed; the two hosts now treat their
+structural records alike, the in-progress half of a Codex item landing on the
+completed item's record as `started_at_line` and every other unmapped record
+listed; and the Claude Code `final` reads `is_error === false` as GROUND-0025
+says, with a test for a result that omits the flag. The one deferral stands as
+named in the entry above: nothing downstream reads `unmapped` until the live
+lane produces the first adapter trial. The reviewer's note that it could not
+reopen the cited host documentation offline is the standing limitation of every
+ground record; the audit path of GROUND-0025 says so. Twelve adapter tests and
+the full local gate pass (1,013 tests before this entry's commit). Acceptance
+Criterion 4 and the last Plan item are checked in this commit: the harness is
+documented in `ARCHITECTURE.md`, `AGENTS.md`, and `CONTEXT.md`, tested through
+its public interfaces, dual-host-aware through the two adapters, and every
+slice passed the local gate and a fresh-context review. The live lane, the
+pilot, and ADR-0080 acceptance remain owner-gated and are not acceptance
+criteria of this task.
 
 ## Definition of Done
 

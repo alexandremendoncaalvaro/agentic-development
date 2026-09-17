@@ -233,6 +233,10 @@ which a `permission_denied` message cannot be joined to its `tool_use` block;
 or a host that starts emitting a grant record, which would retire the
 grant-from-policy rule in favor of the observed event.
 
+## Corrections
+
+- 2026-09-17, after the slice 6 fresh-context review: the decision paragraph said the sample streams "carry `origin: synthetic`"; `origin` is a receipt field, so the receipts built from those streams carry it and the streams themselves do not. The Codex skill-read mapping as first coded matched only the `.agents/skills` roots; A6 also documents `/etc/codex/skills`, and the adapter now matches every documented root, which is what E4 always claimed. The design entry in Task 0048 said a record the adapter does not know fails closed; both hosts emit legitimate records with no event kind (a file read, a reasoning item, a retry notice), so the adapters count those under `unmapped` and fail closed only on a malformed recognized record or a missing terminal record. None of the corrections changes a claim's strength.
+
 ## Audit path
 
 Run `node .claude/skills/ad-ground/scripts/validate-record.mjs doc/research/0025-ground-host-stream-adapters.md`, then reopen every source in the register. Structural validity proves the map, not the source content.
