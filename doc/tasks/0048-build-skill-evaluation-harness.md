@@ -311,9 +311,8 @@ for in the audit output. Dispositions, in severity order:
 - **Recorded, claims-verification.** `.agentic/reviews/` is gitignored and held
   only the reviewers' input handoffs, so "review blocked the slice" rested on
   this log alone. The reviewer verdicts for slices 1 to 3 are now persisted
-  beside their handoffs on this machine, reconstructed from the session
-  transcript rather than captured live, so they weigh less than a
-  contemporaneous capture; the in-tree record remains this Notes log. Candidate for `ad-level-up`: `ad-review` should persist reviewer
+  beside their handoffs on this machine; the in-tree record remains this Notes
+  log. Candidate for `ad-level-up`: `ad-review` should persist reviewer
   verdicts next to the handoffs it already writes.
 - **Corrected, ARCHITECTURE.md, CONTEXT.md, GUIDELINES.md §4.3.** The
   architecture document now names `eval/`, the bounded exception to the
@@ -348,6 +347,15 @@ criterion places on the other side of the comparison, so "residual technical
 risk below the non-technical risks" still holds. Its grade `Insufficient` is
 the §17 signal that only an experiment retires the gap; here that experiment is
 the known-good versus intentionally broken pilot, not a spike.
+
+Two further corrections from the same re-audit. The reviewer verdict files
+persisted beside the slice handoffs were reconstructed from the session
+transcript during remediation, not captured live at review time, so they weigh
+less than a contemporaneous capture; the files now say so in their header. And
+the previous commit edited the "Recorded, claims-verification" bullet of the
+maximum-gate audit entry in place to add that caveat; that edit is reverted
+here, and this dated entry carries the caveat instead, as the append-only rule
+requires.
 
 ## Definition of Done
 
