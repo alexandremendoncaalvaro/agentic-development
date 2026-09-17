@@ -435,9 +435,11 @@ stop holding.
 _Avoid_: "permission" (the host's mechanism; the stop is the case's declared
 expectation); "confirmation" (a UI word; the harness grades the recorded event).
 
-**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); grounded in
+**Related code:** [`eval/lib/graders.mjs`](eval/lib/graders.mjs); grounded in
 [`doc/research/0024-ground-approval-stops-and-dormancy-grading.md`](doc/research/0024-ground-approval-stops-and-dormancy-grading.md);
-contract in
+decision proposed in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md),
+binding once accepted; contract in
 [`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R10, R12).
 
 ### Dormant skill
@@ -451,7 +453,10 @@ _Avoid_: "disabled" (the skill stays installed and available to the user);
 "negative case" (a close-negative case may expect a different route, a dormancy
 case expects silence from a named skill).
 
-**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); contract in
+**Related code:** [`eval/lib/graders.mjs`](eval/lib/graders.mjs); decision
+proposed in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md),
+binding once accepted; contract in
 [`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R10, Scenario 5).
 
 ### Request kind
@@ -465,8 +470,9 @@ _Avoid_: "prompt type" (the request is one field of the case); "mode" (a host
 word for permissions, not for how the user asked).
 
 **Related code:** [`eval/cases/`](eval/cases/),
-[`eval/lib/replay.mjs`](eval/lib/replay.mjs); decision proposed in
-[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md).
+[`eval/lib/validate.mjs`](eval/lib/validate.mjs); decision proposed in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md),
+binding once accepted.
 
 ### Hard failure
 

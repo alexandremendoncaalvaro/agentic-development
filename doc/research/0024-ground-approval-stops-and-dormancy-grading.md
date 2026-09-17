@@ -19,9 +19,9 @@ normalized text starts with a declared action must be preceded by an
 `approval_granted` for that action, otherwise the trial raises
 `bypassed_approval`, one of the hard failures Spec 0007 R12 names. A request
 that is denied and never followed by the command is the stop holding, which
-passes. A declared approval grader with no stops declared is a case defect, so
-validation requires the list, and an empty list means no outward command is
-allowed, fail-closed like the effects grader.
+passes. A declared approval grader without a non-empty stop list is a case
+defect, so validation requires the list: "no outward command allowed" is not
+gradeable unless the case names what counts as outward.
 
 Dormancy for a user-invocable-only skill follows Spec 0007 R10 and Scenario 5:
 a natural request that an eager model might route to the skill must not
@@ -51,11 +51,12 @@ and a slash command is by definition the skill's name.
 **Provenance:** A3, A4, C1
 
 Claude Code presents a shell action to hooks and permission checks as
-`tool_name: "Bash"` with `tool_input.command` holding the command string, and
-the documented examples are exactly `git push` and `gh pr create`. Codex emits
+`tool_name: "Bash"` with `tool_input.command` holding the command string, with
+`git push` among its documented permission examples. Codex emits
 `command_execution` items in its JSON Lines stream with `command` and `status`
-fields. The kit's own outward verb, `ad-pr`, ends in `gh pr create`. Prefix
-matching on normalized command text is therefore observable on both hosts.
+fields. The kit's own outward verb, `ad-pr`, ends in `gh pr create`, which is
+this repository's example and not the host documentation's. Prefix matching on
+normalized command text is therefore observable on both hosts.
 
 ### E2 — Approval is a policy-gated decision that a non-interactive run resolves without a human
 
@@ -63,11 +64,14 @@ matching on normalized command text is therefore observable on both hosts.
 **Provenance:** A1, A2, A4
 
 Claude Code's `dontAsk` mode auto-denies every call that would prompt,
-`--permission-prompts none` denies what nothing else resolves, denials appear
-as `permission_denied` system messages in `stream-json`, and the final `result`
+`--permission-prompts none` (Claude Code 2.1.259 or later; absent from the
+2.1.227 installed here) denies what nothing else resolves, denials appear as
+`permission_denied` system messages in `stream-json`, and the final `result`
 lists them in `permission_denials`; some actions are never auto-approved in any
-mode. Codex's `--ask-for-approval` takes `untrusted`, `on-request`, or `never`,
-and `--approve-for-me` routes approval requests through automatic review. A
+mode. Codex's top-level `--ask-for-approval` takes `untrusted`, `on-request`, or
+`never`; `codex exec` reaches the same policy through `-c approval_policy=...`
+and offers `--approve-for-me` to route approval requests through automatic
+review. A
 harness can therefore observe a request, a grant, or a denial as distinct
 facts, and a live adapter can drive a run so that a stop is either denied or
 granted by declared policy rather than by a human at a keyboard.
@@ -127,9 +131,9 @@ harness.
 ## Source register
 
 - **A1:** Claude Code, Choose a permission mode: `dontAsk` "auto-denies every tool call that would otherwise prompt", "Actions no mode auto-approves", `--permission-mode dontAsk --allowedTools "Bash(npm test)"` CI example: https://code.claude.com/docs/en/permission-modes (accessed 2026-09-17 via official web documentation).
-- **A2:** Claude Code, Run Claude Code programmatically: `--permission-prompts none`, "denials appear as `permission_denied` system messages, and the final result message lists them in `permission_denials`": https://code.claude.com/docs/en/headless (accessed 2026-09-17 via official web documentation).
-- **A3:** Claude Code, Hooks: `PreToolUse` and `PermissionRequest` receive `tool_name` and `tool_input`; a Bash call for `git push` or `gh pr create` surfaces as `tool_input.command`; `permissionDecision` allow or deny: https://code.claude.com/docs/en/hooks (accessed 2026-09-17 via official web documentation).
-- **A4:** Codex CLI `codex --help` and `codex exec --help` on `codex-cli 0.147.0`: `-a, --ask-for-approval <APPROVAL_POLICY>` with values `untrusted`, `on-request`, `never`; `--approve-for-me` "Route approval requests through automatic review using the workspace-write sandbox"; JSON Lines item types including command executions per https://developers.openai.com/codex/noninteractive (served from https://learn.chatgpt.com/docs/non-interactive-mode) (accessed 2026-09-17 via local command execution and official web documentation).
+- **A2:** Claude Code, Run Claude Code programmatically: `--permission-prompts none` (documented as requiring Claude Code 2.1.259 or later; the locally installed 2.1.227 rejects the flag), "denials appear as `permission_denied` system messages, and the final result message lists them in `permission_denials`": https://code.claude.com/docs/en/headless (accessed 2026-09-17 via official web documentation).
+- **A3:** Claude Code, Hooks: `PreToolUse` and `PermissionRequest` receive `tool_name` and `tool_input`; a Bash call surfaces its shell text as `tool_input.command`; `permissionDecision` allow or deny: https://code.claude.com/docs/en/hooks (accessed 2026-09-17 via official web documentation; the `gh pr create` example belongs to C1, not to this page).
+- **A4:** Codex CLI on `codex-cli 0.147.0`: `codex --help` lists `-a, --ask-for-approval <APPROVAL_POLICY>` with values `untrusted`, `on-request`, `never` (top-level command only; `codex exec --help` does not list it and takes the policy through `-c approval_policy=...`); `codex exec --help` lists `--approve-for-me` "Route approval requests through automatic review using the workspace-write sandbox"; JSON Lines item types including command executions per https://developers.openai.com/codex/noninteractive (served from https://learn.chatgpt.com/docs/non-interactive-mode) (accessed 2026-09-17 via local command execution and official web documentation).
 - **B1:** `adewale/skill-eval-harness:README.md`, process assertions `skill_invoked`, `command_ran`, `command_not_ran`, `command_order`, `tool_call` with cardinality bounds; short excerpt: "Trace/process/efficiency assertions are optional and fail closed when declared evidence is missing": https://github.com/adewale/skill-eval-harness (accessed 2026-09-17 via fetched GitHub page).
 - **B2:** promptfoo, Tracing: `trajectory:tool-used`, `trajectory:tool-sequence`, `trajectory:tool-args-match`; command-like spans normalized via `commandToolNames`: https://www.promptfoo.dev/docs/tracing/ (accessed 2026-09-17 via official web documentation).
 - **C1:** `src/skills/claude-code/ad-pr/SKILL.md:11,26-29`, opens the pull request with `gh pr create`; a release-plan approval receipt "satisfies this skill's outward-action approval only for the release target named by that plan. All preflight and local quality gates below still apply" (accessed 2026-09-17 via repository read).
@@ -152,6 +156,10 @@ policy per trial). Reversal evidence: a host that executes an outward command
 without any observable approval or denial event, which would make the rule
 ungradeable for that host; or a spec change that lets user-invocable-only
 skills be model-fired.
+
+## Corrections
+
+- 2026-09-17, after the maximum-gate re-audit: E1 and A3 attributed the `gh pr create` example to the Claude Code hooks page; the page documents `tool_input.command` and `git push`, and `gh pr create` is this repository's own example (C1). E2 and A4 placed `--ask-for-approval` on `codex exec --help`; it is a top-level `codex` flag, and `codex exec` reaches the policy through `-c approval_policy=...`. E2 and A2 cited `--permission-prompts none` without its version floor; the documentation dates it to Claude Code 2.1.259, and the 2.1.227 installed here rejects it. The decision paragraph said an empty stop list allows no outward command; slice 4 replaced that with a required non-empty list (ADR-0080 item 8), and the paragraph now says so. None of the corrections changes a claim's strength: prefix-matched commands and policy-gated approvals remain documented on both hosts.
 
 ## Audit path
 

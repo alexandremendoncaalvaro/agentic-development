@@ -502,6 +502,81 @@ Corpus after review: 12 cases, 27 receipts, gate green.
 
 Deferred: recorded judgment replay, fake runner adapters, live lane, pilot.
 
+### 2026-09-17 — Re-audit of the block after slices 4 and 5 (ad-audit, ADR-0047)
+
+`ad-audit` re-ran on `origin/main..HEAD` at `a8fae72` with nineteen isolated
+reviewers: the four binding documents, twelve accepted ADRs the delta touches
+(ADR-0007 and ADR-0073 joined because the corpus encodes skill categories and
+invocation classes), and the CRITICAL claims-verification group with two
+cross-model passes in swapped order. Every prior finding received a
+disposition; the corpus data was audited as a class, mechanically verified by
+the corpus gate and spot-checked by the reviewers. Dispositions, in severity
+order:
+
+- **Acknowledged, ADR-0070, still open for slice 5.** Slice 4 honored the
+  forward rule verifiably: the design commit is a git ancestor of the code
+  commit. Slice 5 recorded its design in the working tree before the tests but
+  landed it in the same commit as the code, which history cannot distinguish
+  from a justification written afterwards. History is not rewritten. The rule
+  is sharpened so it is checkable: a design that exceeds Spec 0007 lands in its
+  own commit before the commit that implements it.
+- **Corrected, ADR-0007.** The Codex-host known-good receipt for the
+  `ad-review` positive case modeled the Claude Code shape (two handoff files,
+  dual subagents). The shipped Codex skill writes one handoff and reviews
+  inline by default, so the receipt now records one file and inline findings:
+  the first real host divergence the corpus carries.
+- **Corrected, ADR-0059 and claims-verification.** GROUND-0024 provenance:
+  `gh pr create` is this repository's example, not the Claude Code hooks
+  page's; `--ask-for-approval` is a top-level `codex` flag, reached from `codex
+  exec` through `-c approval_policy=...`; `--permission-prompts none` requires
+  Claude Code 2.1.259 and the installed 2.1.227 rejects it; the decision
+  paragraph's "empty list allows no outward command" was superseded by slice 4.
+  Recorded in the record's Corrections section; no claim strength changed.
+- **Corrected, GUIDELINES.md §3.3 and §3.4.** `eval/lib/replay.mjs` had grown
+  to 526 lines, past the 400-line ceiling that the slice 3 note named as the
+  split trigger. Split into `shared.mjs` (path helpers, shared with
+  `corpus.mjs`), `validate.mjs` (boundary validation in three functions),
+  `graders.mjs` (graders and the glob matcher, with `gradeApproval` flattened
+  through a `bypassedStops` helper), and a 165-line `replay.mjs`. Behavior
+  pinned by the unchanged 40-test file.
+- **Corrected, ADR-0048, ADR-0032, ADR-0078.** The `npm run eval` alias lived
+  in the published `package.json` and pointed at an unshipped directory, in the
+  same class as the `test` and `lint` scripts; it is removed, and the corpus
+  gate is now a named command inside `npm test`, which `npm run verify` and CI
+  run unchanged, so the ADR-0078 `verify` contract pinned by
+  `test/release.test.js` stays byte-identical and the gate is legible in one
+  script. The changelog gate cannot see `package.json` changes; candidate
+  below.
+- **Corrected, CONTEXT.md, ADR-0049, ARCHITECTURE.md.** "Request kind" gains
+  the "binding once accepted" qualifier; "Approval stop" and "Dormant skill"
+  point to ADR-0080 like their sibling; the architecture document names the
+  new modules and the corpus coverage of the test file.
+- **Recorded, claims-verification.** The reachability line for the NASA source
+  of PRISM-0022 recorded one HTTP 200 observation; a reviewer observed HTTP 503
+  later the same day. The record now states that a reachability note is a
+  dated observation, not a guarantee. The re-audit dispatch text said the
+  slice 4 and 5 verdict files were not persisted; they were persisted after
+  dispatch and before the reviewers read the directory, so that premise was an
+  orchestration sequencing error, not a target defect. The review-narrative
+  claims in this log ("review blocked", "reproduced by the reviewer") rest on
+  reconstructed, machine-local verdict files and remain an OPEN QUESTION under
+  CV.5 until reviewer verdicts are captured durably at review time.
+- **Locator hygiene.** The earlier correction cited `AGENTS.md:107`; the
+  sentence moved again in this delta. Line numbers rot, so the reference is the
+  gotcha titled "Full self-install for dogfood".
+- **Refuted with reason.** The `npm run eval` alias as a consumer-visible
+  defect: the published `package.json` already carries `test`, `lint`, and
+  `release` scripts that reference unshipped paths, and consumers use only
+  `bin/agentic.js`; removed anyway because it added nothing once `verify` names
+  the gate. Test-count premises in the dispatch text (989, 997) matched no
+  commit boundary; the reviewers measured the real counts instead.
+
+Candidates for `ad-level-up`, human-gated and not written: the changelog gate
+should watch `package.json`, which npm always publishes; `ad-review` should
+persist reviewer verdicts beside its handoffs at review time; a design that
+exceeds the spec lands in its own commit before its code; a `doc/research`
+record of any genre carries the layer header and dated sources.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
