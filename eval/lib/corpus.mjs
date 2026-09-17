@@ -1,14 +1,11 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 
 import { evaluateReplay } from './replay.mjs';
+import { repoPath } from './shared.mjs';
 
 const CASES_DIR = join('eval', 'cases');
 const RECEIPTS_DIR = join('eval', 'receipts');
-
-function repoPath(root, path) {
-  return relative(root, resolve(root, path)).split('\\').join('/');
-}
 
 function jsonFiles(directory) {
   if (!existsSync(directory)) return [];
