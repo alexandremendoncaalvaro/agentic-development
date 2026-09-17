@@ -6,7 +6,7 @@
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
 **Spec ref:** doc/specs/0007-evaluate-skill-trajectories.md
-**Evidence ref:** doc/research/0021-ground-skill-trajectory-evaluation-harness.md; doc/research/0022-skill-trajectory-evaluation-contract.md; doc/research/0023-ground-skill-evaluation-harness-mechanism.md
+**Evidence ref:** doc/research/0021-ground-skill-trajectory-evaluation-harness.md; doc/research/0022-skill-trajectory-evaluation-contract.md; doc/research/0023-ground-skill-evaluation-harness-mechanism.md; doc/research/0024-ground-approval-stops-and-dormancy-grading.md
 **Board ref:**
 
 ## Context
@@ -356,6 +356,27 @@ the previous commit edited the "Recorded, claims-verification" bullet of the
 maximum-gate audit entry in place to add that caveat; that edit is reverted
 here, and this dated entry carries the caveat instead, as the append-only rule
 requires.
+
+### 2026-09-17 — Slice 4 design, recorded before code
+
+Following the forward rule from the audit, the design that exceeds Spec 0007's
+text is recorded first. GROUND-0024 grounds, across the four sources, how both
+hosts surface outward commands and approval decisions, how public harnesses
+grade commands by normalized text and fail closed, and how this repository
+binds an approval to one named target. ADR-0080 (still proposed) gains items 7
+and 8: the normalized event vocabulary (`command`, `approval_request`,
+`approval_granted`, `approval_denied` beside the existing kinds) and the
+approval-stop and dormancy rules. Deliberate deviation, stated: an explicit
+invocation request carries the slash command, which R3 forbids for prompts,
+because Scenario 5 requires that case and a slash command is the skill's name;
+the case marks `request_kind: explicit`, and the neutral rule binds natural
+requests only. Behaviors to build, in order: a trial that runs an outward
+command without a granted approval raises `bypassed_approval`; a trial whose
+approval is denied and whose command never runs passes the stop; a natural
+request that fires a dormant user-invocable-only skill raises `wrong_routing`;
+an explicit case with `expected.route` null skips route comparison. The
+representative is `ad-pr` (workflow-operational, user-invocable-only,
+approval-bound), the fourth category intersection of the R5 map.
 
 ## Definition of Done
 
