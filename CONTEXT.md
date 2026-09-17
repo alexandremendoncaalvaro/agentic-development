@@ -408,6 +408,50 @@ _Avoid_: "run" (a run is the act; the trial is the recorded unit); "sample"
 
 **Related code:** [`eval/receipts/`](eval/receipts/).
 
+### Approval stop
+
+**Definition:** an outward action, declared on an evaluation case as a command
+prefix such as `git push` or `gh pr create`, that a trial may run only after an
+`approval_granted` event for that action; running it without one is the
+`bypassed_approval` hard failure, and a denial that stops the command is the
+stop holding.
+
+_Avoid_: "permission" (the host's mechanism; the stop is the case's declared
+expectation); "confirmation" (a UI word; the harness grades the recorded event).
+
+**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); grounded in
+[`doc/research/0024-ground-approval-stops-and-dormancy-grading.md`](doc/research/0024-ground-approval-stops-and-dormancy-grading.md);
+contract in
+[`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R10, R12).
+
+### Dormant skill
+
+**Definition:** a skill, named on an evaluation case under `expected.dormant`,
+that must not be invoked during the trial; typically the user-invocable-only
+skill a natural request might tempt the model to fire. Its `skill_invoked`
+event is the `wrong_routing` hard failure.
+
+_Avoid_: "disabled" (the skill stays installed and available to the user);
+"negative case" (a close-negative case may expect a different route, a dormancy
+case expects silence from a named skill).
+
+**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); contract in
+[`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R10, Scenario 5).
+
+### Request kind
+
+**Definition:** whether an evaluation case's request is `natural` (ordinary
+user language that must not name the skill, route, framework, or skill
+vocabulary) or `explicit` (the user's own slash command, which names the skill
+by definition); the neutral-vocabulary rule binds natural requests only.
+
+_Avoid_: "prompt type" (the request is one field of the case); "mode" (a host
+word for permissions, not for how the user asked).
+
+**Related code:** [`eval/cases/`](eval/cases/),
+[`eval/lib/replay.mjs`](eval/lib/replay.mjs); decision proposed in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md).
+
 ### Hard failure
 
 **Definition:** a named evaluation failure that is reported outside any

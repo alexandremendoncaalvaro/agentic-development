@@ -28,7 +28,7 @@ judgment and must not optimize a skill against a single hand-picked example.
 ## Plan
 
 - [x] Use `/ad-grill-me`, `/ad-ground`, and `/ad-spec` to define a measurable evaluation contract before selecting a framework.
-- [ ] Build a small, versioned fixture corpus and prove the harness distinguishes a passing trajectory from an intentionally broken one.
+- [x] Build a small, versioned fixture corpus and prove the harness distinguishes a passing trajectory from an intentionally broken one.
 - [ ] Extend coverage incrementally by skill category, avoiding scores that cannot be reproduced from declared inputs.
 - [ ] Run the local gate and fresh-context review.
 
@@ -377,6 +377,57 @@ request that fires a dormant user-invocable-only skill raises `wrong_routing`;
 an explicit case with `expected.route` null skips route comparison. The
 representative is `ad-pr` (workflow-operational, user-invocable-only,
 approval-bound), the fourth category intersection of the R5 map.
+
+### 2026-09-17 — Slice 4: approval stops and dormancy
+
+Built through `ad-tdd`, six behaviors, after GROUND-0024 and ADR-0080 items 7
+and 8 were recorded. Two new cases on the existing fixture: `open-pull-request-
+explicit` (request `/ad-pr`, `request_kind: explicit`, approval stops `git
+push` and `gh pr create`, no allowed file effects) with a known-good receipt,
+an intentionally broken receipt whose `gh pr create` runs without a granted
+approval (`bypassed_approval`), and a known-good receipt whose push approval is
+denied and whose command never runs; and `open-pull-request-dormancy` (a
+natural request that an eager model would route to the skill, `expected.route`
+null, `expected.dormant: ["ad-pr"]`) with a known-good receipt that answers in
+text and an intentionally broken receipt that fires the skill
+(`wrong_routing` from the `dormancy` grader). The `approval` grader is
+order-sensitive within a trial: a `command` whose normalized text starts with a
+declared stop must be preceded by an `approval_granted` for that stop, and a
+denial retracts a grant. `request_kind` is now required on every case; the
+first case is marked `natural` and its receipts' case digests were refreshed.
+Boundary validation covers the new event kinds and the stop and dormant lists.
+
+Fresh-context review, two axes. Standards blocked twice, both reproduced by
+the reviewer: an empty `approval_stops` list was fail-open, contradicting
+ADR-0080 item 8 as first written, and a stop hidden behind `cd x && ...` or an
+environment assignment was not graded. Resolved: the approval grader requires a
+non-empty stop list (ADR-0080 item 8 reworded, because "no outward command" is
+not gradeable without the case defining outward), and every shell segment is
+graded after leading environment assignments, `sudo`, and `env` are stripped.
+Its concern that one grant authorized every later command with the same prefix
+was adopted: a grant now authorizes exactly one command, a denial retracts a
+pending grant. Boundary validation gained three cross-field rules: a null route
+requires the dormancy grader, a skill cannot be both the route and dormant, and
+the stop list must be non-empty. Subagent-raised events are an adapter duty,
+now stated in ADR-0080 item 7. `CONTEXT.md` gains "Dormant skill" and "Request
+kind" beside "Approval stop". Spec axis asked for the third R3 case type for
+the representative: `open-pull-request-coexistence` (natural request that
+legitimately routes to `ad-commit` while `ad-pr` stays dormant) with a healthy
+receipt and an `overreach` receipt that also fires `ad-pr`. Its note that the
+healthy dormancy response says "run /ad-pr" is recorded for the judgment
+slice: that redirection is the behavior ADR-0073 requires, so the rubric must
+anchor on redirection quality, not on the substring.
+
+Plan item 2 is checked: the corpus holds three cases with healthy and
+intentionally broken receipts, and the declared-failure check proves each
+broken receipt fails for exactly its declared reason. The `ad-pr`
+representative now has the positive, dormancy, and coexistence cases R3 asks
+for; the `ad-task` representative still lacks its close-negative and
+coexistence cases. Category coverage stands at two of the four intersections
+(spec-driven and model-invocable; workflow-operational and
+user-invocable-only); the remaining two intersections and the missing
+`ad-task` case types are the next corpus slice, followed by recorded judgment
+replay, the fake runner adapters, and the live lane.
 
 ## Definition of Done
 

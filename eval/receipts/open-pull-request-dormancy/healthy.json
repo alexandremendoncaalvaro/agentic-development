@@ -1,12 +1,12 @@
 {
   "schema": "agentic-eval-receipt/1",
-  "case_id": "track-work-item-as-task",
+  "case_id": "open-pull-request-dormancy",
   "lane": "replay",
   "origin": "synthetic",
   "intent": "known-good",
   "declared_failure": null,
   "frozen": {
-    "case_sha256": "a33018bfeae187efc56d1789afd98b735106e60038beaee70942f2689371bf0f",
+    "case_sha256": "5aa1ec3805aeba6c20d76f43b73512d9667c24fe71ad1c9ae9f1515969f9c3cf",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -14,18 +14,20 @@
     "scaffold": "synthetic-replay",
     "tools": [
       "Read",
-      "Write",
+      "Bash",
       "Skill"
     ],
-    "permissions": "acceptEdits",
+    "permissions": "default",
     "context_policy": "bare",
     "run_parameters": {
-      "max_turns": 8
+      "max_turns": 12
     },
     "grader_versions": {
       "route": "1",
+      "dormancy": "1",
       "effects": "1",
-      "outcome": "1"
+      "outcome": "1",
+      "approval": "1"
     },
     "trial_count": 1
   },
@@ -35,25 +37,18 @@
       "events": [
         {
           "seq": 1,
-          "kind": "skill_invoked",
-          "skill": "ad-task"
+          "kind": "command",
+          "command": "git status --short"
         },
         {
           "seq": 2,
-          "kind": "file_write",
-          "path": "doc/tasks/0001-installer-retry-handling.md"
-        },
-        {
-          "seq": 3,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "Recorded the agreed installer retry change under doc/tasks/0001-installer-retry-handling.md with a completion checklist.",
-        "artifact_manifest": [
-          "doc/tasks/0001-installer-retry-handling.md"
-        ],
+        "final_response": "The branch is clean and the gate is green. Opening the pull request is an outward action reserved for you: run /ad-pr when you are ready and I will draft the body from the commits.",
+        "artifact_manifest": [],
         "exit_state": "success"
       },
       "judgments": []

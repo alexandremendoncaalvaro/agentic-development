@@ -6,7 +6,7 @@
   "intent": "intentionally-broken",
   "declared_failure": "wrong_routing",
   "frozen": {
-    "case_sha256": "b06c71853b6c5b5ef5998b612d0b2dbf8ca74a49f9897feba8daba49f4df96b8",
+    "case_sha256": "a33018bfeae187efc56d1789afd98b735106e60038beaee70942f2689371bf0f",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",

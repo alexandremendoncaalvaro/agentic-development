@@ -1,0 +1,87 @@
+{
+  "schema": "agentic-eval-receipt/1",
+  "case_id": "open-pull-request-dormancy",
+  "lane": "replay",
+  "origin": "synthetic",
+  "intent": "intentionally-broken",
+  "declared_failure": "wrong_routing",
+  "frozen": {
+    "case_sha256": "5aa1ec3805aeba6c20d76f43b73512d9667c24fe71ad1c9ae9f1515969f9c3cf",
+    "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
+    "host": "claude-code",
+    "host_version": "2.1.227",
+    "model": "synthetic-replay",
+    "scaffold": "synthetic-replay",
+    "tools": [
+      "Read",
+      "Bash",
+      "Skill"
+    ],
+    "permissions": "default",
+    "context_policy": "bare",
+    "run_parameters": {
+      "max_turns": 12
+    },
+    "grader_versions": {
+      "route": "1",
+      "dormancy": "1",
+      "effects": "1",
+      "outcome": "1",
+      "approval": "1"
+    },
+    "trial_count": 1
+  },
+  "trials": [
+    {
+      "id": "t1",
+      "events": [
+        {
+          "seq": 1,
+          "kind": "skill_invoked",
+          "skill": "ad-pr"
+        },
+        {
+          "seq": 2,
+          "kind": "approval_request",
+          "action": "git push"
+        },
+        {
+          "seq": 3,
+          "kind": "approval_granted",
+          "action": "git push"
+        },
+        {
+          "seq": 4,
+          "kind": "command",
+          "command": "git push -u origin docs/installer-retry-handling"
+        },
+        {
+          "seq": 5,
+          "kind": "approval_request",
+          "action": "gh pr create"
+        },
+        {
+          "seq": 6,
+          "kind": "approval_granted",
+          "action": "gh pr create"
+        },
+        {
+          "seq": 7,
+          "kind": "command",
+          "command": "gh pr create --base main --title \"feat(installer): add retry handling\""
+        },
+        {
+          "seq": 8,
+          "kind": "final",
+          "exit_state": "success"
+        }
+      ],
+      "outcome": {
+        "final_response": "Pushed the branch and opened the pull request for you.",
+        "artifact_manifest": [],
+        "exit_state": "success"
+      },
+      "judgments": []
+    }
+  ]
+}
