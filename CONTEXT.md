@@ -487,6 +487,39 @@ not the named category).
 **Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); contract in
 [`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R12).
 
+### Host stream
+
+**Definition:** the JSON Lines a host CLI prints in its non-interactive mode
+(`claude -p --output-format stream-json --verbose`, `codex exec --json`): the
+native record of a **Trial** before normalization. The kit reads it; it does not
+define it, so a stream's shape is an observation the adapter tests pin.
+
+_Avoid_: "log" (a log is diagnostic prose; the stream is the structured record
+the harness reads); "transcript" (the conversation text; the stream also carries
+tool calls, denials, and the result).
+
+**Related code:** decision proposed in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md)
+(item 10), binding once accepted; grounded in
+[`doc/research/0025-ground-host-stream-adapters.md`](doc/research/0025-ground-host-stream-adapters.md).
+
+### Runner adapter
+
+**Definition:** the harness module that turns one host's **Host stream** into a
+**Trial** in the common receipt shape: normalized events of the ADR-0080
+vocabulary, the outcome, and every native record kept beside its event. A
+*fake* runner adapter is the same module fed a sample stream instead of a
+spawned host; the live runner composes a spawn with the adapter.
+
+_Avoid_: "Evaluation domain adapter" (the `ad-prism` project-local contract, a
+different thing); "parser" (the adapter also derives events the stream cannot
+carry, such as an explicit invocation or a policy grant); "driver" (the spawn
+is the runner's job, not the adapter's).
+
+**Related code:** decision proposed in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md)
+(items 5 and 10), binding once accepted.
+
 ## Relationships
 
 - An **Audience adaptation** changes the expression of a **Personal voice** for a reader or relationship; it never changes whose voice it is.
@@ -515,6 +548,9 @@ not the named category).
   receipts of either origin without regenerating them.
 - A **Grader** failure or a stale **Behavioral claim** may raise a **Hard
   failure**, which no aggregate result can hide.
+- A **Runner adapter** normalizes one **Host stream** into a **Trial**; the
+  **Request kind** and the run policy supply the `skill_invoked` and
+  `approval_granted` events a non-interactive stream cannot carry.
 
 ## Flagged ambiguities
 

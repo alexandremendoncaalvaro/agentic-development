@@ -6,7 +6,7 @@
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
 **Spec ref:** doc/specs/0007-evaluate-skill-trajectories.md
-**Evidence ref:** doc/research/0021-ground-skill-trajectory-evaluation-harness.md; doc/research/0022-skill-trajectory-evaluation-contract.md; doc/research/0023-ground-skill-evaluation-harness-mechanism.md; doc/research/0024-ground-approval-stops-and-dormancy-grading.md
+**Evidence ref:** doc/research/0021-ground-skill-trajectory-evaluation-harness.md; doc/research/0022-skill-trajectory-evaluation-contract.md; doc/research/0023-ground-skill-evaluation-harness-mechanism.md; doc/research/0024-ground-approval-stops-and-dormancy-grading.md; doc/research/0025-ground-host-stream-adapters.md
 **Board ref:**
 
 ## Context
@@ -592,6 +592,40 @@ work item as Documentation Discipline requires. One process note: the fix
 commit for the Codex receipt was rejected by the subject-length hook and its
 staged file rode into the documentation commit `7a79db7`, whose message does
 not name it; the receipt change is described in the entry above and here.
+
+### 2026-09-17 — Slice 6 design, recorded before code
+
+Design that exceeds the spec's text, recorded first as ADR-0080 item 10 and
+grounded in `doc/research/0025-ground-host-stream-adapters.md` (Conditional):
+one adapter module per host under `eval/lib/adapters/` normalizes the host's
+JSON Lines output into the trial shape without spawning anything, so the live
+runner of item 5 is a spawn composed with an adapter and the replay lane can
+test the adapter alone. The mappings are fixed rules from the hosts' published
+record shapes and one measurement on the installed Claude Code 2.1.227 binary:
+its `permission_denied` message carries no tool input, so the denied action is
+recovered by joining the tool-use id. Two rules are host-independent and are the
+design decisions of this slice: an explicit request's `skill_invoked` derives
+from the request, because both hosts expand the mention before the model runs;
+and `approval_granted` events derive from the run policy handed to the adapter,
+one per granted action before any command, because neither host records a grant
+in a non-interactive run. Two mappings stay conditional on the first authorized
+live pilot: implicit Codex activation recognized from a command that reads a
+`SKILL.md` under a skills root, and the grant-from-policy rule itself. The
+sample streams are authored from the documented shapes and carry
+`origin: synthetic`, a stated deviation from the word "captured" in item 5;
+the pilot's captured streams replace them. Vocabulary added to `CONTEXT.md`:
+Host stream, Runner adapter. Behaviors, in order: a Claude Code stream with a
+`Skill` call, a `Write`, a `Bash` command, and a `result` normalizes into a
+trial that the existing validator accepts and the graders pass; a Codex stream
+with `command_execution`, `file_change`, `agent_message`, and `turn.completed`
+normalizes into the same shape; a `permission_denied` message becomes an
+`approval_denied` with the joined action and a Codex `declined` command does the
+same; an explicit request yields `skill_invoked` from the request and a policy
+yields `approval_granted` before the commands; subagent records with a parent
+tool-use id are flattened into the trial; a stream line that is not JSON, or a
+record the adapter does not know, fails closed with the line number instead of
+producing a partial trial. This entry lands in its own commit before the commit
+that implements it, the forward rule the re-audit left open.
 
 ## Definition of Done
 
