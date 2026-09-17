@@ -577,6 +577,22 @@ persist reviewer verdicts beside its handoffs at review time; a design that
 exceeds the spec lands in its own commit before its code; a `doc/research`
 record of any genre carries the layer header and dated sources.
 
+### 2026-09-17 — Re-audit reconfirmed; candidates tracked
+
+The fourteen reviewers whose groups had findings reconfirmed every disposition
+at `7a79db7`. No blocker remains. Three items stay open by their nature and are
+named as such: the ADR-0070 commit-ordering rule, which the ADR-0070 reviewer
+keeps open until a later slice lands an exceeding-spec design in its own prior
+commit, because the rule failed once right after being stated; the Windows CI
+leg, which only the pull request produces; and the durability of review
+narratives under CV.5. The four rule candidates leave this log and become
+`doc/tasks/0077-curate-audit-rule-candidates-from-the-harness-block.md`, a
+tracked work item for the `ad-level-up` session, so the deferral references a
+work item as Documentation Discipline requires. One process note: the fix
+commit for the Codex receipt was rejected by the subject-length hook and its
+staged file rode into the documentation commit `7a79db7`, whose message does
+not name it; the receipt change is described in the entry above and here.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
