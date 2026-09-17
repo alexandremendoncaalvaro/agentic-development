@@ -1,6 +1,6 @@
 # Task `0048`: Build a skill trajectory evaluation harness
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-08-11
 **Scope ref:** doc/product/PRD.md — Later tier: Skill eval harness
 **Owner:** Alexandre Alvaro
@@ -114,6 +114,51 @@ intentionally broken frozen receipt, deterministic validation, and a failure
 record naming the case, expected result, observed result, and
 deterministic-versus-judgment classification. No live runner in the first
 slice. Task 0047 remains untouched.
+
+### 2026-09-17 — Slice 1: replay-lane tracer bullet
+
+Built through `ad-tdd`, one behavior per test, in `test/eval-harness.test.js`
+against the public interface `evaluateReplay({ caseFile, receiptFile, root })`
+in `eval/lib/replay.mjs` and the CLI `node eval/run.mjs replay <case> <receipt>`.
+
+Behaviors covered, in order landed:
+
+1. An intentionally broken replay fails for its declared reason with a failure
+   record naming case, trial, grader, deterministic classification, expected and
+   observed route, evidence locator, frozen digests, and reproduction command;
+   the hard failure `wrong_routing` is reported outside any aggregate.
+2. A known-good replay passes and is reported as `lane: replay`,
+   `evidence: replayed`, never as fresh behavior.
+3. A receipt whose frozen case or fixture digest no longer matches is reported
+   `stale` by verification and is not graded (Spec 0007 R8, R13).
+4. The reproduction command re-runs the replay, prints the result record, and
+   exits non-zero on failure or staleness.
+
+Corpus so far: one case (`track-work-item-as-task`, spec-driven and
+model-invocable, reversible repository write) with a sanitized micro-repository
+fixture and a healthy plus an intentionally broken receipt. Digests reuse the
+`ad-prism` freeze scheme by importing `freezeArtifact` from the canonical skill
+script. Gate wiring: `eval/fixtures/**` ignored by ESLint, `eval/**/*.mjs`
+covered by the Prettier check, `eval/` documented in the `AGENTS.md` layout and
+absent from `npm pack --dry-run`. Full local gate green (lint, format, 965
+tests, audit).
+
+Deferred to later slices: skill content digest and staleness semantics (R11);
+the outcome, allowed-effect, forbidden-effect, and approval-stop graders (only
+`route` grades in this slice, so `expected.outcome` and the effect lists are
+declared but not yet asserted); recorded judgment replay; remaining
+category-axis representatives; the fake runner adapters; and the live lane.
+
+Fresh-context review, two axes. Spec axis blocked the slice once: the natural
+request and the fixture documents used "work item" and "acceptance criteria",
+and "work item" is a literal trigger phrase in the `ad-task` description
+(Spec 0007 R3). Both were rewritten in neutral vocabulary and the frozen
+digests refreshed, which exercised the staleness path for real. Standards axis
+raised two unvalidated-input crash paths (unknown grader id, receipt without
+`frozen`) against `GUIDELINES.md` §2.2 and the CLI exit-code mapping against
+§4.2; all three fixed test-first. The `freezeArtifact` import from one host's
+skill script follows existing test precedent and is pinned by the dual-host
+byte-parity test.
 
 ## Definition of Done
 

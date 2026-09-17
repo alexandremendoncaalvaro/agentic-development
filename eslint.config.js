@@ -3,7 +3,7 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['.agents/**', '.claude/**', '.context/**', 'node_modules/**'],
+    ignores: ['.agents/**', '.claude/**', '.context/**', 'node_modules/**', 'eval/fixtures/**'],
   },
   {
     files: ['**/*.{js,mjs}'],

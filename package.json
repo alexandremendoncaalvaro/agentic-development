@@ -21,7 +21,7 @@
     "start": "node bin/agentic.js",
     "release": "./scripts/release.sh",
     "lint": "eslint .",
-    "format:check": "prettier --check \"bin/**/*.js\" \"src/**/*.js\" \"scripts/**/*.{js,mjs}\" \"test/**/*.js\" \"eslint.config.js\" \".prettierrc.json\" \"package*.json\" \".github/**/*.yml\" \"lefthook.yml\"",
+    "format:check": "prettier --check \"bin/**/*.js\" \"src/**/*.js\" \"scripts/**/*.{js,mjs}\" \"eval/**/*.mjs\" \"test/**/*.js\" \"eslint.config.js\" \".prettierrc.json\" \"package*.json\" \".github/**/*.yml\" \"lefthook.yml\"",
     "security:audit": "npm audit --audit-level=high",
     "test": "node bin/agentic.js --help && node bin/agentic.js init --help && node bin/agentic.js update --help && node bin/agentic.js uninstall --help && node scripts/run-tests.mjs",
     "verify": "npm run lint && npm run format:check && npm test && npm run security:audit",
