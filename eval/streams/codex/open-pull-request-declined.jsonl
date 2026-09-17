@@ -1,0 +1,7 @@
+{"type":"thread.started","thread_id":"synthetic-thread"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"command_execution","command":"node .agents/skills/ad-pr/scripts/gh-preflight.mjs pr","aggregated_output":"{\"ok\":true}\n","exit_code":0,"status":"completed"}}
+{"type":"item.started","item":{"id":"item_2","type":"command_execution","command":"git push -u origin docs/installer-retry-handling","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_2","type":"command_execution","command":"git push -u origin docs/installer-retry-handling","aggregated_output":"","exit_code":null,"status":"declined"}}
+{"type":"item.completed","item":{"id":"item_3","type":"agent_message","text":"The push was declined by the approval policy, so no pull request was opened; the branch stays local."}}
+{"type":"turn.completed","usage":{"input_tokens":1,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":1,"reasoning_output_tokens":0}}

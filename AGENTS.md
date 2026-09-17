@@ -57,7 +57,8 @@ scripts/                             repo-only release + hook tooling (ADR-0048)
 test/*.test.js                       unit + integration suite (node:test)
 eval/                                repo-only skill trajectory evaluation harness
                                      (Spec 0007): cases, sanitized fixtures, frozen
-                                     receipts, `run.mjs replay|corpus` (the corpus gate
+                                     receipts, host stream adapters and their sample
+                                     streams, `run.mjs replay|corpus` (the corpus gate
                                      runs inside `npm test`); never shipped to npm
 CHANGELOG.md                         release record (Keep a Changelog), rotated
                                      only by scripts/release.sh
