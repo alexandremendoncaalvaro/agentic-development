@@ -196,6 +196,19 @@ passed, matching the Prism 0022 decision rule to stop a release claim on any
 stale frozen input. Grading still runs, so the historical replay stays
 auditable. Remaining deferrals from slice 1 stand.
 
+### 2026-09-17 — Decision record and vocabulary
+
+Dogfooding check after two slices found two gaps in the kit's own discipline
+and closed them. The mechanism choice grounded in GROUND-0023 and realized in
+slices 1 and 2 is a binding architectural decision, so it is now recorded as
+`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md` (proposed; owner
+acceptance flips the status, adds the ADR to `ARCHITECTURE.md` and to
+`doc/adr/PROJECTION.md` in the same commit). The harness nouns settled by Spec
+0007 and the two slices (evaluation case, evaluation fixture, evaluation
+receipt, receipt origin, evidence lane, behavioral claim, grader, trial, hard
+failure) are captured in `CONTEXT.md` with aliases to avoid and relationships.
+`ad-audit` runs on the whole block before the pull request.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

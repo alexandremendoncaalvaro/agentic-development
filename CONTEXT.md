@@ -296,6 +296,128 @@ mandatory).
 and its Claude Code twin; governed by
 [`doc/adr/0072-bind-one-approval-to-the-release-plan.md`](doc/adr/0072-bind-one-approval-to-the-release-plan.md).
 
+### Evaluation case
+
+**Definition:** one frozen, versioned unit of skill evaluation: a stable
+identifier, a natural request that never names the target skill or its
+vocabulary, a sanitized fixture, the expected route and outcome, allowed and
+forbidden effects, required approval stops, declared graders, and exclusions.
+
+_Avoid_: "eval" or "test case" (the unit is the frozen case, not one run of it);
+"prompt" (the request is one field of the case, not the case).
+
+**Related code:** [`eval/cases/`](eval/cases/),
+[`eval/lib/replay.mjs`](eval/lib/replay.mjs); contract in
+[`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R1).
+
+### Evaluation fixture
+
+**Definition:** a tracked, sanitized synthetic micro-repository that an
+evaluation case runs against, whose directory digest is frozen into every
+receipt; a healthy fixture satisfies its prerequisites and an intentionally
+broken one fails for exactly its declared reason.
+
+_Avoid_: "sample repo" (fixtures are digest-frozen inputs, not illustrations);
+"test fixture" (the `test/fixtures/` JSON files serve the unit suite, not
+evaluation cases).
+
+**Related code:** [`eval/fixtures/`](eval/fixtures/).
+
+### Evaluation receipt
+
+**Definition:** the frozen record of one evaluation of a case: origin, frozen
+inputs and digests, and one or more trials with their normalized events,
+outcome, and recorded judgments; the replay lane evaluates receipts, it does
+not create them.
+
+_Avoid_: "result" (the result is what evaluating a receipt produces); "trace"
+(a trace is one trial's raw event stream, not the receipt); "freeze receipt"
+(the `ad-prism` artifact receipt is a digest of a settled package, not an
+evaluation record).
+
+**Related code:** [`eval/receipts/`](eval/receipts/),
+[`eval/lib/replay.mjs`](eval/lib/replay.mjs).
+
+### Receipt origin
+
+**Definition:** the declared provenance of an evaluation receipt: `synthetic`
+receipts exercise harness mechanics and never carry a behavioral claim; `live`
+receipts were recorded by an authorized host run, freeze the canonical skill
+digest and grader versions, and are the only receipts that can support a
+behavioral claim.
+
+_Avoid_: "lane" (the lane is how a receipt is evaluated; origin is where it came
+from); "real" versus "fake" (a synthetic receipt is a legitimate fixture, not a
+fake result).
+
+**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); governed by
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md).
+
+### Evidence lane
+
+**Definition:** the way evaluation evidence is produced: the **replay lane**
+verifies and grades tracked receipts offline, without credentials, in the
+normal local and CI gate; the **live lane** generates fresh trajectories through
+an explicitly authorized host runner and records them as live receipts.
+
+_Avoid_: "mode" (lanes make different claims, not different settings); "CI
+lane" (CI runs the replay lane; the lane is defined by what it can claim, not
+where it runs).
+
+**Related code:** [`eval/run.mjs`](eval/run.mjs); contract in
+[`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R6, R7).
+
+### Behavioral claim
+
+**Definition:** the statement a live receipt may support about current skill
+behavior: `current` while its frozen skill digest and grader versions still
+match the canonical sources, `stale` once any of them changed; a synthetic
+receipt carries `none`.
+
+_Avoid_: "pass" (grading can pass while the claim is stale; the two are reported
+separately); "validity" (a stale receipt is still a valid, auditable record of
+what happened).
+
+**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); contract in
+[`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R8, R13).
+
+### Grader
+
+**Definition:** one declared, versioned check applied to every trial of a case:
+deterministic graders assert exact facts such as route, files, effects, and
+approval stops; judgment graders apply anchored rubrics calibrated against
+blind human labels.
+
+_Avoid_: "assertion" (one grader may hold several assertions); "judge" alone
+(only a judgment grader is a judge; a deterministic grader is not).
+
+**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); contract in
+[`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R11).
+
+### Trial
+
+**Definition:** one recorded run of a case inside a receipt, with its own
+normalized event stream, outcome, and judgments; repeated trials stay grouped
+under their case, which remains the independent unit.
+
+_Avoid_: "run" (a run is the act; the trial is the recorded unit); "sample"
+(statistical vocabulary that hides the grouping under the case).
+
+**Related code:** [`eval/receipts/`](eval/receipts/).
+
+### Hard failure
+
+**Definition:** a named evaluation failure that is reported outside any
+aggregate and cannot be overridden by a score: wrong routing, unauthorized
+effects, bypassed approval, unsupported or stale claims, private-context
+leakage, corrupted fixtures, and missing provenance.
+
+_Avoid_: "blocker" (that is review vocabulary); "critical" (a severity word,
+not the named category).
+
+**Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); contract in
+[`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R12).
+
 ## Relationships
 
 - An **Audience adaptation** changes the expression of a **Personal voice** for a reader or relationship; it never changes whose voice it is.
@@ -316,6 +438,14 @@ and its Claude Code twin; governed by
 - A **Release-plan approval** authorizes the unchanged release effects that
   `ad-release` delegates to `ad-pr` and release-only `ad-merge`; it never replaces
   their technical gates.
+- An **Evaluation case** runs against one **Evaluation fixture** and declares
+  the **Graders** applied to every **Trial**; an **Evaluation receipt** records
+  one or more trials of that case.
+- An **Evaluation receipt** declares a **Receipt origin**; only a `live` origin
+  can carry a **Behavioral claim**, and the replay **Evidence lane** evaluates
+  receipts of either origin without regenerating them.
+- A **Grader** failure or a stale **Behavioral claim** may raise a **Hard
+  failure**, which no aggregate result can hide.
 
 ## Flagged ambiguities
 
