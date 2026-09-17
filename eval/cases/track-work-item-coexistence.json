@@ -1,29 +1,29 @@
 {
   "schema": "agentic-eval-case/1",
-  "id": "track-work-item-as-task",
+  "id": "track-work-item-coexistence",
   "category": {
     "kind": "spec-driven",
     "invocation": "model-invocable"
   },
   "representative": "ad-task",
-  "case_type": "positive",
+  "case_type": "coexistence",
   "risk": "reversible-repository-write",
   "request_kind": "natural",
-  "request": "We agreed to add retry handling to the installer next sprint. Make sure that commitment is recorded in this repo's planning docs so whoever picks it up knows what was agreed and how we will judge it finished.",
+  "request": "Get the retry handling onto our planning docs with what done looks like, then start it properly with a failing check that pins the timeout.",
   "fixture": "eval/fixtures/planning-docs-repo",
   "expected": {
     "route": "ad-task",
-    "outcome": "one new file exists under doc/tasks/ recording the agreed change and how completion will be judged",
+    "outcome": "a planning file records the change and its completion checklist, then a failing check for the timeout is written",
     "allowed_effects": [
-      "doc/tasks/*.md"
+      "doc/tasks/*.md",
+      "test/*.test.js"
     ],
     "forbidden_effects": [
-      "AGENTS.md",
-      "README.md"
+      "src/**"
     ],
-    "approval_stops": [],
     "artifacts": [
-      "doc/tasks/*.md"
+      "doc/tasks/*.md",
+      "test/*.test.js"
     ],
     "exit_state": "success"
   },

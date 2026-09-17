@@ -311,6 +311,22 @@ the model-facing request text a prompt, as Spec 0007 R3 does, is fine).
 [`eval/lib/replay.mjs`](eval/lib/replay.mjs); contract in
 [`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R1).
 
+### Evaluation corpus
+
+**Definition:** the tracked set of evaluation cases and their receipts under
+`eval/`, where every case names its **representative** (the skill under
+evaluation) and its **case type** (`positive`, `close-negative`, `dormancy`, or
+`coexistence`); the corpus gate evaluates every tracked pair and fails on any
+uncovered category intersection or representative missing one of its three case
+types.
+
+_Avoid_: "test suite" (the unit suite under `test/` runs the harness; the corpus
+is what the harness evaluates); "benchmark" (no universal score exists).
+
+**Related code:** [`eval/lib/corpus.mjs`](eval/lib/corpus.mjs),
+[`eval/run.mjs`](eval/run.mjs); contract in
+[`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R2, R3, R6).
+
 ### Evaluation fixture
 
 **Definition:** a tracked, sanitized synthetic micro-repository that an

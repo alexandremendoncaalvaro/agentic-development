@@ -57,7 +57,8 @@ scripts/                             repo-only release + hook tooling (ADR-0048)
 test/*.test.js                       unit + integration suite (node:test)
 eval/                                repo-only skill trajectory evaluation harness
                                      (Spec 0007): cases, sanitized fixtures, frozen
-                                     receipts, `run.mjs replay`; never shipped to npm
+                                     receipts, `run.mjs replay|corpus` (`npm run eval`);
+                                     never shipped to npm
 CHANGELOG.md                         release record (Keep a Changelog), rotated
                                      only by scripts/release.sh
 WORKFLOW.md                          Layer 1 Constitution — philosophy doc, shipped to npm

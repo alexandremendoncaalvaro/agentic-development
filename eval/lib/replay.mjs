@@ -12,6 +12,9 @@ const SKILL_HOSTS = new Set(['claude-code', 'codex']);
 const SKILL_NAME = /^[a-z0-9][a-z0-9-]*$/;
 const APPROVAL_EVENTS = new Set(['approval_request', 'approval_granted', 'approval_denied']);
 const REQUEST_KINDS = new Set(['natural', 'explicit']);
+const CASE_TYPES = new Set(['positive', 'close-negative', 'dormancy', 'coexistence']);
+const CATEGORY_KINDS = new Set(['spec-driven', 'workflow-operational']);
+const CATEGORY_INVOCATIONS = new Set(['model-invocable', 'user-invocable-only']);
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -35,6 +38,28 @@ function validateCase(caseRecord, path) {
   const route = caseRecord.expected?.route;
   if (!isRecord(caseRecord.expected) || (typeof route !== 'string' && route !== null)) {
     throw new Error(`case ${path} must declare "expected.route" as a skill name or null`);
+  }
+  const category = caseRecord.category;
+  if (!isRecord(category) || !CATEGORY_KINDS.has(category.kind)) {
+    throw new Error(
+      `case ${path} must declare category.kind "spec-driven" or "workflow-operational"`
+    );
+  }
+  if (!CATEGORY_INVOCATIONS.has(category.invocation)) {
+    throw new Error(
+      `case ${path} must declare category.invocation "model-invocable" or "user-invocable-only"`
+    );
+  }
+  if (
+    typeof caseRecord.representative !== 'string' ||
+    !SKILL_NAME.test(caseRecord.representative)
+  ) {
+    throw new Error(`case ${path} must declare "representative" as the skill under evaluation`);
+  }
+  if (!CASE_TYPES.has(caseRecord.case_type)) {
+    throw new Error(
+      `case ${path} must declare case_type "positive", "close-negative", "dormancy", or "coexistence"`
+    );
   }
   if (!REQUEST_KINDS.has(caseRecord.request_kind) || typeof caseRecord.request !== 'string') {
     throw new Error(
@@ -463,6 +488,7 @@ export function evaluateReplay({ caseFile, receiptFile, root = process.cwd() }) 
       for (const outcome of GRADERS[grader.id]({ caseRecord, trial, trialIndex })) {
         failures.push({
           case_id: caseRecord.id,
+          fixture: caseRecord.fixture,
           trial_id: trial.id,
           grader: grader.id,
           classification: grader.kind,

@@ -21,15 +21,15 @@ judgment and must not optimize a skill against a single hand-picked example.
 ## Acceptance Criteria
 
 - [x] A feature specification defines the fixture corpus, evaluation inputs, ground-truth outcomes, scoring, and what can run deterministically in CI.
-- [ ] The harness evaluates at least one representative trajectory for every shipped skill category without requiring credentials or hidden local state.
-- [ ] Results make failures actionable by naming the fixture, expected outcome, observed outcome, and whether the gap is deterministic or judgment-based.
+- [x] The harness evaluates at least one representative trajectory for every shipped skill category without requiring credentials or hidden local state.
+- [x] Results make failures actionable by naming the fixture, expected outcome, observed outcome, and whether the gap is deterministic or judgment-based.
 - [ ] The harness is documented, tested, dual-host-aware where relevant, and passes the local gate plus fresh-context review.
 
 ## Plan
 
 - [x] Use `/ad-grill-me`, `/ad-ground`, and `/ad-spec` to define a measurable evaluation contract before selecting a framework.
 - [x] Build a small, versioned fixture corpus and prove the harness distinguishes a passing trajectory from an intentionally broken one.
-- [ ] Extend coverage incrementally by skill category, avoiding scores that cannot be reproduced from declared inputs.
+- [x] Extend coverage incrementally by skill category, avoiding scores that cannot be reproduced from declared inputs.
 - [ ] Run the local gate and fresh-context review.
 
 ## Notes
@@ -428,6 +428,79 @@ coexistence cases. Category coverage stands at two of the four intersections
 user-invocable-only); the remaining two intersections and the missing
 `ad-task` case types are the next corpus slice, followed by recorded judgment
 replay, the fake runner adapters, and the live lane.
+
+### 2026-09-17 — Slice 5 design, recorded before code
+
+Design that exceeds the spec's text, recorded first as ADR-0080 item 9: every
+case declares its `representative` skill and a `case_type` (`positive`,
+`close-negative`, `dormancy`, `coexistence`), and `node eval/run.mjs corpus`
+becomes the replay-lane gate for Spec 0007 R6: it evaluates every tracked
+receipt, renders coverage over the category-axis intersections (R2) and the
+case types per representative (R3), and exits non-zero on any hard failure, any
+failing known-good receipt, any declared-failure mismatch, or any coverage gap.
+No new grader is needed; the existing five cover the new cases. Corpus for this
+slice, from the R5 map: `ad-bootstrap` (spec-driven, user-invocable-only:
+explicit positive, natural dormancy, coexistence with `ad-next`), `ad-review`
+(workflow-operational, model-invocable: natural positive, close-negative
+routing to `ad-diagnose`, coexistence with `ad-audit` expected and `ad-review`
+dormant), and the two missing `ad-task` cases (close-negative routing to
+`ad-adr`, coexistence with `ad-tdd`). Natural requests are checked against each
+target skill's trigger phrases before they are frozen. Behaviors, in order: the
+corpus invariant (every tracked synthetic receipt fails for exactly its
+declared reason and known-good receipts pass); the coverage report names each
+populated intersection and each representative's case types and reports gaps;
+the CLI `corpus` command exits non-zero on any failure or gap and prints every
+failing pair's reproduction command.
+
+### 2026-09-17 — Slice 5: corpus gate and category coverage
+
+Built through `ad-tdd`, four behaviors. `eval/lib/corpus.mjs` loads every
+tracked case and its receipts and renders the coverage report; `node
+eval/run.mjs corpus` (also `npm run eval`) is the replay-lane gate: a synthetic
+receipt passes when it verifies and its observed failures match its
+declaration, a known-good or live receipt must also grade clean, and any gap in
+the four intersections or in a representative's three case types fails the
+gate. Every case now declares `representative` and `case_type`, validated at
+the boundary.
+
+Corpus after this slice: 12 cases, 26 receipts, all four category-axis
+intersections covered with one representative each (`ad-task`, `ad-bootstrap`,
+`ad-review`, `ad-pr`), each with its positive, close-negative or dormancy, and
+coexistence cases, each case with a known-good and an intentionally broken
+receipt. A corpus-level test proves R4 for every tracked pair, and a second
+mechanizes part of R3: no natural request contains the name or a quoted
+trigger phrase of its representative or expected route, read from the skill's
+own description. That check is partial by construction, because some
+descriptions (for example `ad-bootstrap`) quote no phrases; the rest of R3's
+vocabulary rule is a manual check recorded here per case, and the fresh-context
+review is the second pair of eyes on it. One generated receipt
+(`track-work-item-close-negative/fired-dormant`) first failed for two reasons
+and was re-cut so it fails for exactly `wrong_routing`.
+
+Fresh-context review, two axes. Standards blocked once, reproduced: a case
+with no receipts counted as covered because the report read only case fields.
+Resolved: the corpus loader now reads receipts, the report reports a gap for a
+case with no receipts, no known-good receipt, or no intentionally broken
+receipt, and for a receipts directory that matches no case; a duplicate case id
+throws at load; category axes are validated against the accepted values. Spec
+axis: "originating task" in the `ad-review` positive request was this kit's own
+vocabulary and was reworded; "one verdict per rule" in the coexistence request
+was reworded as well; the failure record now carries `fixture`, so acceptance
+criterion 3 holds on its literal wording; the mechanical R3 test is described
+above as partial; and the host-divergent stratum, which rested on a label
+alone, gains a first Codex-host known-good receipt for the `ad-review` positive
+case, with the report listing hosts per intersection. Host divergence becomes
+evidence, rather than a receipt field, when the fake runner adapters land.
+
+Acceptance criteria 2 and 3 are checked on this evidence: every category has a
+representative trajectory evaluated without credentials or hidden state, and
+every failure record names the fixture, the expected and observed results, and
+the deterministic-versus-judgment classification. Plan item 3 is checked.
+Acceptance criterion 4 stays open until the fake runner adapters make the
+dual-host claim concrete and the block passes its next review and audit.
+Corpus after review: 12 cases, 27 receipts, gate green.
+
+Deferred: recorded judgment replay, fake runner adapters, live lane, pilot.
 
 ## Definition of Done
 

@@ -19,6 +19,7 @@
   },
   "scripts": {
     "start": "node bin/agentic.js",
+    "eval": "node eval/run.mjs corpus",
     "release": "./scripts/release.sh",
     "lint": "eslint .",
     "format:check": "prettier --check \"bin/**/*.js\" \"src/**/*.js\" \"scripts/**/*.{js,mjs}\" \"eval/**/*.mjs\" \"test/**/*.js\" \"eslint.config.js\" \".prettierrc.json\" \"package*.json\" \".github/**/*.yml\" \"lefthook.yml\"",

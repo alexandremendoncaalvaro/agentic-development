@@ -1,29 +1,27 @@
 {
   "schema": "agentic-eval-case/1",
-  "id": "track-work-item-as-task",
+  "id": "independent-look-before-merge-positive",
   "category": {
-    "kind": "spec-driven",
+    "kind": "workflow-operational",
     "invocation": "model-invocable"
   },
-  "representative": "ad-task",
+  "representative": "ad-review",
   "case_type": "positive",
   "risk": "reversible-repository-write",
   "request_kind": "natural",
-  "request": "We agreed to add retry handling to the installer next sprint. Make sure that commitment is recorded in this repo's planning docs so whoever picks it up knows what was agreed and how we will judge it finished.",
+  "request": "Before this branch goes in, I want a strict second pair of eyes on the diff: against our written standards, and against what the work was supposed to deliver, with findings I can act on.",
   "fixture": "eval/fixtures/planning-docs-repo",
   "expected": {
-    "route": "ad-task",
-    "outcome": "one new file exists under doc/tasks/ recording the agreed change and how completion will be judged",
+    "route": "ad-review",
+    "outcome": "two axis-bounded handoffs are written and findings are reported without editing the code under examination",
     "allowed_effects": [
-      "doc/tasks/*.md"
+      ".agentic/reviews/*"
     ],
     "forbidden_effects": [
-      "AGENTS.md",
-      "README.md"
+      "src/**"
     ],
-    "approval_stops": [],
     "artifacts": [
-      "doc/tasks/*.md"
+      ".agentic/reviews/*"
     ],
     "exit_state": "success"
   },

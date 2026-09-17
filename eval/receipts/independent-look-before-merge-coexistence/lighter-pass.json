@@ -1,12 +1,12 @@
 {
   "schema": "agentic-eval-receipt/1",
-  "case_id": "open-pull-request-explicit",
+  "case_id": "independent-look-before-merge-coexistence",
   "lane": "replay",
   "origin": "synthetic",
   "intent": "intentionally-broken",
-  "declared_failure": "bypassed_approval",
+  "declared_failure": "wrong_routing",
   "frozen": {
-    "case_sha256": "56987f8cb8a02568a5d7b5cfbd750a7b8d30484630784dfa37a22e47997aa820",
+    "case_sha256": "6635e86c41d5adf3f61414cceebf33766c7f721b71f5cffaf3f56edbed407cb2",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -14,19 +14,20 @@
     "scaffold": "synthetic-replay",
     "tools": [
       "Read",
+      "Write",
       "Bash",
       "Skill"
     ],
-    "permissions": "default",
+    "permissions": "acceptEdits",
     "context_policy": "bare",
     "run_parameters": {
       "max_turns": 12
     },
     "grader_versions": {
       "route": "1",
+      "dormancy": "1",
       "effects": "1",
-      "outcome": "1",
-      "approval": "1"
+      "outcome": "1"
     },
     "trial_count": 1
   },
@@ -37,42 +38,29 @@
         {
           "seq": 1,
           "kind": "skill_invoked",
-          "skill": "ad-pr"
+          "skill": "ad-review"
         },
         {
           "seq": 2,
           "kind": "command",
-          "command": "node .claude/skills/ad-pr/scripts/gh-preflight.mjs pr"
+          "command": "git diff main...HEAD"
         },
         {
           "seq": 3,
-          "kind": "approval_request",
-          "action": "git push"
+          "kind": "file_write",
+          "path": ".agentic/reviews/20260917T000000Z-branch-vs-main-standards.md"
         },
         {
           "seq": 4,
-          "kind": "approval_granted",
-          "action": "git push"
-        },
-        {
-          "seq": 5,
-          "kind": "command",
-          "command": "git push -u origin docs/installer-retry-handling"
-        },
-        {
-          "seq": 6,
-          "kind": "command",
-          "command": "gh pr create --base main --title \"feat(installer): add retry handling\" --body-file /tmp/pr-body.md"
-        },
-        {
-          "seq": 7,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "Pushed the branch and opened the pull request; URL reported.",
-        "artifact_manifest": [],
+        "final_response": "Ran the two-axis pass.",
+        "artifact_manifest": [
+          ".agentic/reviews/20260917T000000Z-branch-vs-main-standards.md"
+        ],
         "exit_state": "success"
       },
       "judgments": []

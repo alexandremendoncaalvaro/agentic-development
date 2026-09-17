@@ -1,12 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { evaluateReplay } from '../eval/lib/replay.mjs';
+import { coverageReport, evaluateCorpus, loadCorpus } from '../eval/lib/corpus.mjs';
 import { freezeArtifact } from '../src/skills/claude-code/ad-prism/scripts/freeze-artifact.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -740,4 +741,201 @@ test('a coexistence request lets the expected model-invocable skill run while th
   assert.equal(overreach.failures.length, 1);
   assert.equal(overreach.failures[0].grader, 'dormancy');
   assert.equal(overreach.declared_failure_check.status, 'matched');
+});
+
+test('every tracked synthetic receipt fails for exactly its declared reason and known-good receipts pass', () => {
+  const corpus = evaluateCorpus({ root: ROOT });
+  assert.ok(
+    corpus.results.length >= 8,
+    `expected the tracked corpus, got ${corpus.results.length} results`
+  );
+  for (const entry of corpus.results) {
+    const { result, receipt } = entry;
+    assert.equal(result.verification.status, 'verified', `${entry.receiptFile} is stale`);
+    assert.equal(
+      result.declared_failure_check.status,
+      'matched',
+      `${entry.receiptFile} declared-failure mismatch`
+    );
+    if (receipt.intent === 'known-good') {
+      assert.equal(result.disposition, 'pass', `${entry.receiptFile} should pass`);
+      assert.deepEqual(result.hard_failures, [], `${entry.receiptFile} raised hard failures`);
+    } else {
+      assert.equal(result.disposition, 'fail', `${entry.receiptFile} should fail`);
+    }
+  }
+});
+
+test("the coverage report names every category intersection and every representative's case types, with no gap", () => {
+  const report = coverageReport(loadCorpus({ root: ROOT }));
+  assert.deepEqual(Object.keys(report.intersections).sort(), [
+    'spec-driven/model-invocable',
+    'spec-driven/user-invocable-only',
+    'workflow-operational/model-invocable',
+    'workflow-operational/user-invocable-only',
+  ]);
+  assert.deepEqual(report.intersections['workflow-operational/user-invocable-only'], ['ad-pr']);
+  assert.deepEqual(report.representatives['ad-pr'].case_types, [
+    'coexistence',
+    'dormancy',
+    'positive',
+  ]);
+  assert.deepEqual(report.representatives['ad-review'].case_types, [
+    'close-negative',
+    'coexistence',
+    'positive',
+  ]);
+  assert.deepEqual(report.gaps, []);
+});
+
+test('the corpus command is the replay-lane gate: exit 0 on the tracked corpus, exit 1 with reproduction commands on a corrupted copy', () => {
+  const tracked = spawnSync(process.execPath, ['eval/run.mjs', 'corpus'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  });
+  assert.equal(tracked.status, 0, tracked.stderr);
+  const report = JSON.parse(tracked.stdout);
+  assert.deepEqual(report.coverage.gaps, []);
+  assert.ok(report.receipts >= 26);
+  assert.deepEqual(report.failing, []);
+
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-corpus-'));
+  try {
+    cpSync(join(ROOT, 'eval', 'cases'), join(dir, 'eval', 'cases'), { recursive: true });
+    cpSync(join(ROOT, 'eval', 'fixtures'), join(dir, 'eval', 'fixtures'), { recursive: true });
+    cpSync(join(ROOT, 'eval', 'receipts'), join(dir, 'eval', 'receipts'), { recursive: true });
+    const corrupted = join(dir, 'eval', 'receipts', 'track-work-item-as-task', 'healthy.json');
+    const receipt = JSON.parse(readFileSync(corrupted, 'utf8'));
+    receipt.trials[0].events[0].skill = 'ad-spec';
+    writeFileSync(corrupted, JSON.stringify(receipt));
+
+    const broken = spawnSync(process.execPath, [join(ROOT, 'eval', 'run.mjs'), 'corpus'], {
+      cwd: dir,
+      encoding: 'utf8',
+    });
+    assert.equal(broken.status, 1, broken.stderr);
+    const brokenReport = JSON.parse(broken.stdout);
+    assert.equal(brokenReport.failing.length, 1);
+    assert.equal(
+      brokenReport.failing[0].receipt,
+      'eval/receipts/track-work-item-as-task/healthy.json'
+    );
+    assert.ok(brokenReport.failing[0].hard_failures.includes('corrupted_fixture'));
+    assert.equal(
+      brokenReport.failing[0].reproduction,
+      'node eval/run.mjs replay eval/cases/track-work-item-as-task.json eval/receipts/track-work-item-as-task/healthy.json'
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+function triggerPhrases(skill) {
+  const source = readFileSync(
+    join(ROOT, 'src', 'skills', 'claude-code', skill, 'SKILL.md'),
+    'utf8'
+  );
+  const description = source.split('\n').find((line) => line.startsWith('description:')) ?? '';
+  const quoted = [...description.matchAll(/"([^"]+)"/g)].map((match) => match[1].toLowerCase());
+  return [skill, ...quoted];
+}
+
+test('no natural request names its representative or expected route, nor uses their trigger phrases', () => {
+  for (const { caseRecord, caseFile } of loadCorpus({ root: ROOT })) {
+    if (caseRecord.request_kind !== 'natural') continue;
+    const request = caseRecord.request.toLowerCase();
+    const skills = new Set([caseRecord.representative, caseRecord.expected.route].filter(Boolean));
+    for (const skill of skills) {
+      for (const phrase of triggerPhrases(skill)) {
+        assert.ok(
+          !request.includes(phrase),
+          `${caseFile} request contains "${phrase}" from ${skill}`
+        );
+      }
+    }
+  }
+});
+
+function corpusCopy(dir) {
+  cpSync(join(ROOT, 'eval', 'cases'), join(dir, 'eval', 'cases'), { recursive: true });
+  cpSync(join(ROOT, 'eval', 'fixtures'), join(dir, 'eval', 'fixtures'), { recursive: true });
+  cpSync(join(ROOT, 'eval', 'receipts'), join(dir, 'eval', 'receipts'), { recursive: true });
+}
+
+test('the coverage report treats a case without both receipt intents and an orphan receipts directory as gaps', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-gaps-'));
+  try {
+    corpusCopy(dir);
+    rmSync(join(dir, 'eval', 'receipts', 'open-pull-request-coexistence', 'overreach.json'));
+    rmSync(join(dir, 'eval', 'receipts', 'bootstrap-agents-guide-dormancy'), { recursive: true });
+    cpSync(
+      join(dir, 'eval', 'receipts', 'open-pull-request-explicit'),
+      join(dir, 'eval', 'receipts', 'renamed-away-case'),
+      { recursive: true }
+    );
+
+    const report = coverageReport(loadCorpus({ root: dir }));
+    assert.ok(
+      report.gaps.some((gap) => /open-pull-request-coexistence.*intentionally broken/.test(gap)),
+      report.gaps.join('\n')
+    );
+    assert.ok(
+      report.gaps.some((gap) => /bootstrap-agents-guide-dormancy.*no receipts/.test(gap)),
+      report.gaps.join('\n')
+    );
+    assert.ok(
+      report.gaps.some((gap) => /renamed-away-case.*matches no case/.test(gap)),
+      report.gaps.join('\n')
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('duplicate case ids and unknown category axes are rejected when the corpus loads', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-dup-'));
+  try {
+    corpusCopy(dir);
+    cpSync(
+      join(dir, 'eval', 'cases', 'track-work-item-as-task.json'),
+      join(dir, 'eval', 'cases', 'zz-copy.json')
+    );
+    assert.throws(() => loadCorpus({ root: dir }), /duplicate case id "track-work-item-as-task"/);
+    rmSync(join(dir, 'eval', 'cases', 'zz-copy.json'));
+
+    const caseRecord = JSON.parse(
+      readFileSync(join(dir, 'eval', 'cases', 'track-work-item-as-task.json'), 'utf8')
+    );
+    caseRecord.category.invocation = 'typo-invocation';
+    writeFileSync(
+      join(dir, 'eval', 'cases', 'track-work-item-as-task.json'),
+      JSON.stringify(caseRecord)
+    );
+    assert.throws(
+      () =>
+        evaluateReplay({
+          caseFile: 'eval/cases/track-work-item-as-task.json',
+          receiptFile: 'eval/receipts/track-work-item-as-task/healthy.json',
+          root: dir,
+        }),
+      /category\.invocation/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a failure record names the fixture the case ran against', () => {
+  const result = evaluateReplay({
+    caseFile: CASE,
+    receiptFile: join(RECEIPTS, 'wrong-route.json'),
+    root: ROOT,
+  });
+  assert.equal(result.failures[0].fixture, 'eval/fixtures/planning-docs-repo');
+});
+
+test('the coverage report lists the hosts recorded per intersection, and the host-divergent representative has a Codex receipt', () => {
+  const report = coverageReport(loadCorpus({ root: ROOT }));
+  assert.deepEqual(report.hosts['workflow-operational/model-invocable'], ['claude-code', 'codex']);
+  assert.deepEqual(report.hosts['spec-driven/model-invocable'], ['claude-code']);
 });

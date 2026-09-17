@@ -1,12 +1,12 @@
 {
   "schema": "agentic-eval-receipt/1",
-  "case_id": "track-work-item-as-task",
+  "case_id": "track-work-item-coexistence",
   "lane": "replay",
   "origin": "synthetic",
   "intent": "intentionally-broken",
-  "declared_failure": "wrong_routing",
+  "declared_failure": "outcome",
   "frozen": {
-    "case_sha256": "53216b13e01e4eede4934fa9b9f0725cc10cb7ef4352619b4cab7b1add7884d3",
+    "case_sha256": "7d8f2340ce6ad4e6a7867190591165139b8dcd705d8f3cf929b66f9752cd8428",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -15,12 +15,13 @@
     "tools": [
       "Read",
       "Write",
+      "Bash",
       "Skill"
     ],
     "permissions": "acceptEdits",
     "context_policy": "bare",
     "run_parameters": {
-      "max_turns": 8
+      "max_turns": 12
     },
     "grader_versions": {
       "route": "1",
@@ -36,12 +37,12 @@
         {
           "seq": 1,
           "kind": "skill_invoked",
-          "skill": "ad-grill-me"
+          "skill": "ad-task"
         },
         {
           "seq": 2,
           "kind": "file_write",
-          "path": "doc/tasks/0001-installer-retry-handling.md"
+          "path": "doc/tasks/0002-installer-retry-handling.md"
         },
         {
           "seq": 3,
@@ -50,9 +51,9 @@
         }
       ],
       "outcome": {
-        "final_response": "Interviewed the request, then recorded the agreed change under doc/tasks/0001-installer-retry-handling.md.",
+        "final_response": "Recorded the change with its completion checklist.",
         "artifact_manifest": [
-          "doc/tasks/0001-installer-retry-handling.md"
+          "doc/tasks/0002-installer-retry-handling.md"
         ],
         "exit_state": "success"
       },

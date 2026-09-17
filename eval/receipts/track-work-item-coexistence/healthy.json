@@ -1,12 +1,12 @@
 {
   "schema": "agentic-eval-receipt/1",
-  "case_id": "open-pull-request-explicit",
+  "case_id": "track-work-item-coexistence",
   "lane": "replay",
   "origin": "synthetic",
-  "intent": "intentionally-broken",
-  "declared_failure": "bypassed_approval",
+  "intent": "known-good",
+  "declared_failure": null,
   "frozen": {
-    "case_sha256": "56987f8cb8a02568a5d7b5cfbd750a7b8d30484630784dfa37a22e47997aa820",
+    "case_sha256": "7d8f2340ce6ad4e6a7867190591165139b8dcd705d8f3cf929b66f9752cd8428",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -14,10 +14,11 @@
     "scaffold": "synthetic-replay",
     "tools": [
       "Read",
+      "Write",
       "Bash",
       "Skill"
     ],
-    "permissions": "default",
+    "permissions": "acceptEdits",
     "context_policy": "bare",
     "run_parameters": {
       "max_turns": 12
@@ -25,8 +26,7 @@
     "grader_versions": {
       "route": "1",
       "effects": "1",
-      "outcome": "1",
-      "approval": "1"
+      "outcome": "1"
     },
     "trial_count": 1
   },
@@ -37,42 +37,40 @@
         {
           "seq": 1,
           "kind": "skill_invoked",
-          "skill": "ad-pr"
+          "skill": "ad-task"
         },
         {
           "seq": 2,
-          "kind": "command",
-          "command": "node .claude/skills/ad-pr/scripts/gh-preflight.mjs pr"
+          "kind": "file_write",
+          "path": "doc/tasks/0002-installer-retry-handling.md"
         },
         {
           "seq": 3,
-          "kind": "approval_request",
-          "action": "git push"
+          "kind": "skill_invoked",
+          "skill": "ad-tdd"
         },
         {
           "seq": 4,
-          "kind": "approval_granted",
-          "action": "git push"
+          "kind": "file_write",
+          "path": "test/retry.test.js"
         },
         {
           "seq": 5,
           "kind": "command",
-          "command": "git push -u origin docs/installer-retry-handling"
+          "command": "node --test test/retry.test.js"
         },
         {
           "seq": 6,
-          "kind": "command",
-          "command": "gh pr create --base main --title \"feat(installer): add retry handling\" --body-file /tmp/pr-body.md"
-        },
-        {
-          "seq": 7,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "Pushed the branch and opened the pull request; URL reported.",
-        "artifact_manifest": [],
+        "final_response": "Recorded the change with its completion checklist, then wrote the failing timeout check; it fails as expected.",
+        "artifact_manifest": [
+          "doc/tasks/0002-installer-retry-handling.md",
+          "test/retry.test.js"
+        ],
         "exit_state": "success"
       },
       "judgments": []
