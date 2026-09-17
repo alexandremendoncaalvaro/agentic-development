@@ -311,8 +311,9 @@ for in the audit output. Dispositions, in severity order:
 - **Recorded, claims-verification.** `.agentic/reviews/` is gitignored and held
   only the reviewers' input handoffs, so "review blocked the slice" rested on
   this log alone. The reviewer verdicts for slices 1 to 3 are now persisted
-  beside their handoffs on this machine; the in-tree record remains this Notes
-  log. Candidate for `ad-level-up`: `ad-review` should persist reviewer
+  beside their handoffs on this machine, reconstructed from the session
+  transcript rather than captured live, so they weigh less than a
+  contemporaneous capture; the in-tree record remains this Notes log. Candidate for `ad-level-up`: `ad-review` should persist reviewer
   verdicts next to the handoffs it already writes.
 - **Corrected, ARCHITECTURE.md, CONTEXT.md, GUIDELINES.md §4.3.** The
   architecture document now names `eval/`, the bounded exception to the
@@ -328,6 +329,25 @@ for in the audit output. Dispositions, in severity order:
   the glossary and decision records are mostly immutable. `eval/lib/replay.mjs`
   is under the 400-line hard ceiling and splits when the next grader lands.
   Exit code 1 covering an evaluation failure is documented in `run.mjs`.
+
+### 2026-09-17 — Re-audit correction (ADR-0061 ordering claim)
+
+The re-audit showed that the de-risk entry's sentence "the register is ordered
+by impact times uncertainty" is false once the uncertainty column exists: the
+R1 to R11 numbering is the order of discovery and stays so, because later
+entries cite the numbers. The priority order, by impact times uncertainty as
+opened, is: R1 and R9 (high, high); R2, R7, and R10 (high, medium); R6 (high,
+low); R3, R4, R5, and R11 (medium, low); R8 (low, medium). Work followed that
+order: R1 was retired first (GROUND-0023), R9 is the one item the owner
+decides after the pilot, and the Conditional items R2, R7, and R10 each carry
+a named mitigation and a pilot measurement.
+
+Stop criterion reconciled with the quantified R9: it ties R1 for the highest
+score, but it is the non-technical owner-value risk that ADR-0061's stop
+criterion places on the other side of the comparison, so "residual technical
+risk below the non-technical risks" still holds. Its grade `Insufficient` is
+the §17 signal that only an experiment retires the gap; here that experiment is
+the known-good versus intentionally broken pilot, not a spike.
 
 ## Definition of Done
 
