@@ -6,7 +6,7 @@
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
 **Spec ref:** doc/specs/0007-evaluate-skill-trajectories.md
-**Evidence ref:** doc/research/0021-ground-skill-trajectory-evaluation-harness.md; doc/research/0022-skill-trajectory-evaluation-contract.md
+**Evidence ref:** doc/research/0021-ground-skill-trajectory-evaluation-harness.md; doc/research/0022-skill-trajectory-evaluation-contract.md; doc/research/0023-ground-skill-evaluation-harness-mechanism.md
 **Board ref:**
 
 ## Context
@@ -20,14 +20,14 @@ judgment and must not optimize a skill against a single hand-picked example.
 
 ## Acceptance Criteria
 
-- [ ] A feature specification defines the fixture corpus, evaluation inputs, ground-truth outcomes, scoring, and what can run deterministically in CI.
+- [x] A feature specification defines the fixture corpus, evaluation inputs, ground-truth outcomes, scoring, and what can run deterministically in CI.
 - [ ] The harness evaluates at least one representative trajectory for every shipped skill category without requiring credentials or hidden local state.
 - [ ] Results make failures actionable by naming the fixture, expected outcome, observed outcome, and whether the gap is deterministic or judgment-based.
 - [ ] The harness is documented, tested, dual-host-aware where relevant, and passes the local gate plus fresh-context review.
 
 ## Plan
 
-- [ ] Use `/ad-grill-me`, `/ad-ground`, and `/ad-spec` to define a measurable evaluation contract before selecting a framework.
+- [x] Use `/ad-grill-me`, `/ad-ground`, and `/ad-spec` to define a measurable evaluation contract before selecting a framework.
 - [ ] Build a small, versioned fixture corpus and prove the harness distinguishes a passing trajectory from an intentionally broken one.
 - [ ] Extend coverage incrementally by skill category, avoiding scores that cannot be reproduced from declared inputs.
 - [ ] Run the local gate and fresh-context review.
@@ -67,6 +67,53 @@ The owner accepted `doc/specs/0007-evaluate-skill-trajectories.md`. The next
 session should de-risk the implementation mechanism before code: confirm whether
 the framework question requires a staged spike, then build through test-first
 vertical slices. No implementation or Task 0047 work started in this session.
+
+### 2026-09-17 — De-risk register
+
+Ran `ad-derisk` before any code. The register is ordered by impact times
+uncertainty and graded per `WORKFLOW.md` §17 Axis 2. Retirement evidence lives
+in `doc/research/0023-ground-skill-evaluation-harness-mechanism.md` (GROUND-0023).
+
+| # | Unknown | Impact if wrong | Retired by | Grade |
+|---|---|---|---|---|
+| R1 | Implementation mechanism: evaluation framework versus bespoke in-stack runner | Provider coupling, credentials in CI, or a large dependency tree for a repository-only gate | GROUND-0023, four sources | Strong: bespoke, dependency-free ESM on Node built-ins, repository-only, runner-adapter seam; no framework |
+| R2 | Both host event streams (`claude -p --output-format stream-json`, `codex exec --json`) carry every Spec 0007 failure-record field | Failure records incomplete on one host; R14 and R16 unmet | GROUND-0023 E2 names the documented events; the authorized live pilot is the measurement | Conditional: adapter seam plus fake runner adapters fed with captured sample streams; pilot measures |
+| R3 | Fixture and receipt digests stable across the Ubuntu and Windows CI legs | Replay lane red on one leg only | GROUND-0023 E6: `.gitattributes` LF normalization and the `ad-prism` freeze scheme | Strong: reuse the freeze scheme unchanged |
+| R4 | Harness placement and shipping boundary | npm package, installer contract, or skill parity tests disturbed | GROUND-0023 E5 | Strong: repository-only top-level `eval/` outside `package.json#files`; fixture roots added to the ESLint ignore list |
+| R5 | Corpus representatives for the four category-axis intersections | A populated intersection left uncovered (Spec 0007 R2) | ADR-0007 and ADR-0073 class lists | Strong: candidate map below; final pick at slice planning |
+| R6 | Judgment graders inside the credential-free replay lane | Replay lane silently needs a model | Spec 0007 R6, R11, R13 | Strong: replay re-applies deterministic assertions and reports recorded judgment labels as replayed evidence; it never regenerates them |
+| R7 | Live-lane credential hygiene | Credentials or private session state reach a tracked artifact | Spec 0007 R7 and non-functional requirements state the contract; `GUIDELINES.md` §12.6 names GitHub secret scanning and push protection as the remote boundary; no in-repo mechanism covers credentials locally (ADR-0033 leak-guard is scoped to house IP) | Conditional: the adapter passes the environment through untouched and never reads it, by design; a sanitizer test rejects any receipt carrying a known credential variable value before it is tracked; the live pilot confirms |
+| R8 | Repository gates meeting micro-repo fixtures (ESLint, Prettier, changelog-gate, leak-guard) | Fixture content turns `npm run verify` red or raises false leak alarms | GROUND-0023 C5; `lefthook.yml` | Conditional: ESLint ignore for fixture roots, Prettier globs already exclude them; verify with the full local gate on the first slice |
+| R9 | Pilot decision values: trial count, model-judge agreement rule, acceptance tolerance | Rule tuned on candidate results | Not retirable before the pilot; owner decision by design (Spec 0007 Open Questions) | Accepted and sequenced: one owner approval round after the known-good versus intentionally broken pilot and before any candidate result |
+| R10 | Live-trial isolation: a host CLI writes outside its fixture or leaves state for a later trial | Cross-trial contamination; Spec 0007 edge case unhandled | `test/prism-scripts.test.js:62` pattern (`mkdtempSync` copy per run); host sandbox flags documented in GROUND-0023 A2 and A3 (`codex exec --sandbox`, `-C`; `claude -p --allowedTools`, `--permission-mode`) | Conditional: every trial runs in a fresh temporary copy of the fixture with the host confined to that directory; the post-trial filesystem digest against the fixture digest reports any outside write or leftover state; the pilot measures |
+| R11 | Staleness digest: what is hashed and whether canonical and dogfood skill copies agree | False stale or false current receipts (Spec 0007 R8) | `AGENTS.md:104`, installed copies must stay byte-identical to `src/skills/`; GROUND-0023 C1 freeze scheme | Strong: hash the canonical `src/skills/<host>/<skill>/` directory with the freeze scheme; the installer contract guarantees the dogfood copy yields the same digest; staleness compares the receipt digest to the current one |
+
+Regime: R1 is Strong, so framework versus bespoke runner is not a technique
+uncertainty and `ad-spike` is not warranted. Strategy choices inside the bespoke
+runner, such as the event normalization shape or the receipt validation
+approach, route to `ad-tdg` within `ad-tdd` slices.
+
+Stop criterion: met. The residual technical risk (R2, R7, R8, and R10, each
+Conditional with a named mitigation and a pilot measurement) is below the
+non-technical risks (R9 owner values and corpus representativeness).
+Implementation may proceed through test-first vertical slices.
+
+Fresh-context review (Spec axis) of this register and GROUND-0023 raised the
+R7 grade, R10, and R11 above; its remaining notes were line-anchor precision,
+fixed in the record.
+
+Candidate representatives for R5: spec-driven and model-invocable, `ad-task`
+or `ad-spec`; spec-driven and user-invocable-only, `ad-bootstrap`;
+workflow-operational and model-invocable, `ad-review` or `ad-ground`;
+workflow-operational and user-invocable-only, `ad-pr`. Strata: read-only
+`ad-next`, reversible repository-writing `ad-task`, approval-bound `ad-pr`,
+host-divergent `ad-review`.
+
+First slice: the replay-lane tracer bullet. One case file, one healthy and one
+intentionally broken frozen receipt, deterministic validation, and a failure
+record naming the case, expected result, observed result, and
+deterministic-versus-judgment classification. No live runner in the first
+slice. Task 0047 remains untouched.
 
 ## Definition of Done
 
