@@ -18,11 +18,25 @@
       "AGENTS.md",
       "README.md"
     ],
-    "approval_stops": []
+    "approval_stops": [],
+    "artifacts": [
+      "doc/tasks/*.md"
+    ],
+    "exit_state": "success"
   },
   "graders": [
     {
       "id": "route",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "effects",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "outcome",
       "kind": "deterministic",
       "version": "1"
     }

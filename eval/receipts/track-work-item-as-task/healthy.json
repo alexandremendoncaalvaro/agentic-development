@@ -6,7 +6,7 @@
   "intent": "known-good",
   "declared_failure": null,
   "frozen": {
-    "case_sha256": "5c489766f756e4f2d827011f2474c686e347dadcbb4c44c769cc2a3857dc2bc0",
+    "case_sha256": "b06c71853b6c5b5ef5998b612d0b2dbf8ca74a49f9897feba8daba49f4df96b8",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -23,7 +23,9 @@
       "max_turns": 8
     },
     "grader_versions": {
-      "route": "1"
+      "route": "1",
+      "effects": "1",
+      "outcome": "1"
     },
     "trial_count": 1
   },

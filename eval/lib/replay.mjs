@@ -7,6 +7,7 @@ const CASE_SCHEMA = 'agentic-eval-case/1';
 const RECEIPT_SCHEMA = 'agentic-eval-receipt/1';
 const RESULT_SCHEMA = 'agentic-eval-result/1';
 const RECEIPT_ORIGINS = new Set(['synthetic', 'live']);
+const SYNTHETIC_INTENTS = new Set(['known-good', 'intentionally-broken']);
 const SKILL_HOSTS = new Set(['claude-code', 'codex']);
 const SKILL_NAME = /^[a-z0-9][a-z0-9-]*$/;
 
@@ -40,6 +41,44 @@ function validateCase(caseRecord, path) {
       throw new Error(`unknown grader "${grader?.id}" in case ${path}`);
     }
   }
+  for (const field of ['allowed_effects', 'forbidden_effects', 'artifacts']) {
+    const value = caseRecord.expected[field];
+    if (value !== undefined && !isStringArray(value)) {
+      throw new Error(`case ${path} "expected.${field}" must be an array of glob strings`);
+    }
+  }
+  const gradesEffects = caseRecord.graders.some((grader) => grader.id === 'effects');
+  if (gradesEffects && !isStringArray(caseRecord.expected.allowed_effects)) {
+    throw new Error(`case ${path} declares the effects grader without "expected.allowed_effects"`);
+  }
+}
+
+function isStringArray(value) {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string');
+}
+
+function validateTrials(receipt, path) {
+  receipt.trials.forEach((trial, trialIndex) => {
+    const where = `receipt ${path} trials[${trialIndex}]`;
+    if (!isRecord(trial) || typeof trial.id !== 'string' || !Array.isArray(trial.events)) {
+      throw new Error(`${where} must declare a string "id" and an "events" array`);
+    }
+    trial.events.forEach((event, eventIndex) => {
+      if (!isRecord(event) || typeof event.kind !== 'string') {
+        throw new Error(`${where}.events[${eventIndex}] must declare a string "kind"`);
+      }
+      if (event.kind === 'file_write' && typeof event.path !== 'string') {
+        throw new Error(`${where}.events[${eventIndex}] file_write must declare a string "path"`);
+      }
+    });
+    if (!isRecord(trial.outcome)) {
+      throw new Error(`${where} must declare an "outcome" record`);
+    }
+    const manifest = trial.outcome.artifact_manifest;
+    if (manifest !== undefined && !isStringArray(manifest)) {
+      throw new Error(`${where}.outcome.artifact_manifest must be an array of path strings`);
+    }
+  });
 }
 
 function validateReceipt(receipt, caseRecord, path) {
@@ -60,8 +99,22 @@ function validateReceipt(receipt, caseRecord, path) {
   if (!Array.isArray(receipt.trials)) {
     throw new Error(`receipt ${path} must declare a "trials" array`);
   }
+  validateTrials(receipt, path);
   if (!RECEIPT_ORIGINS.has(receipt.origin)) {
     throw new Error(`receipt ${path} must declare origin "synthetic" or "live"`);
+  }
+  if (receipt.origin === 'synthetic') {
+    if (!SYNTHETIC_INTENTS.has(receipt.intent)) {
+      throw new Error(
+        `synthetic receipt ${path} must declare intent "known-good" or "intentionally-broken"`
+      );
+    }
+    const broken = receipt.intent === 'intentionally-broken';
+    if (broken ? typeof receipt.declared_failure !== 'string' : receipt.declared_failure != null) {
+      throw new Error(
+        `synthetic receipt ${path} must declare "declared_failure" only when intentionally broken`
+      );
+    }
   }
   if (receipt.origin === 'live') {
     const skill = frozen.skill;
@@ -142,24 +195,115 @@ function claimFor({ caseRecord, receipt, root }) {
   };
 }
 
+function locator(trialIndex, eventIndex) {
+  return eventIndex === -1
+    ? `trials[${trialIndex}].events`
+    : `trials[${trialIndex}].events[${eventIndex}]`;
+}
+
+function normalizePath(path) {
+  return path.split('\\').join('/').replace(/^\.\//, '');
+}
+
+function globToRegExp(glob) {
+  let source = '';
+  for (let index = 0; index < glob.length; index += 1) {
+    const char = glob[index];
+    if (char === '*' && glob[index + 1] === '*') {
+      index += 1;
+      if (glob[index + 1] === '/') {
+        index += 1;
+        source += '(?:.*/)?';
+      } else {
+        source += '.*';
+      }
+    } else if (char === '*') {
+      source += '[^/]*';
+    } else if (char === '?') {
+      source += '[^/]';
+    } else {
+      source += char.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+    }
+  }
+  return new RegExp(`^${source}$`);
+}
+
+function matchesGlob(path, glob) {
+  return globToRegExp(normalizePath(glob)).test(normalizePath(path));
+}
+
+function matchesAny(path, globs) {
+  return globs.some((glob) => matchesGlob(path, glob));
+}
+
 function gradeRoute({ caseRecord, trial, trialIndex }) {
   const eventIndex = trial.events.findIndex((event) => event.kind === 'skill_invoked');
   const observed = eventIndex === -1 ? null : trial.events[eventIndex].skill;
   const expected = caseRecord.expected.route;
-  if (observed === expected) return { pass: true };
-  return {
-    pass: false,
-    expected,
-    observed,
-    hard_failure: 'wrong_routing',
-    evidence_locator:
-      eventIndex === -1
-        ? `trials[${trialIndex}].events`
-        : `trials[${trialIndex}].events[${eventIndex}]`,
-  };
+  if (observed === expected) return [];
+  return [
+    {
+      expected,
+      observed,
+      hard_failure: 'wrong_routing',
+      evidence_locator: locator(trialIndex, eventIndex),
+    },
+  ];
 }
 
-const GRADERS = { route: gradeRoute };
+function gradeEffects({ caseRecord, trial, trialIndex }) {
+  const allowed = caseRecord.expected.allowed_effects ?? [];
+  const forbidden = caseRecord.expected.forbidden_effects ?? [];
+  const failures = [];
+  trial.events.forEach((event, eventIndex) => {
+    if (event.kind !== 'file_write') return;
+    const authorized = matchesAny(event.path, allowed) && !matchesAny(event.path, forbidden);
+    if (authorized) return;
+    failures.push({
+      expected: allowed,
+      observed: event.path,
+      hard_failure: 'unauthorized_effect',
+      evidence_locator: locator(trialIndex, eventIndex),
+    });
+  });
+  return failures;
+}
+
+function gradeOutcome({ caseRecord, trial, trialIndex }) {
+  const failures = [];
+  const expectedExit = caseRecord.expected.exit_state;
+  if (expectedExit !== undefined && trial.outcome.exit_state !== expectedExit) {
+    failures.push({
+      expected: expectedExit,
+      observed: trial.outcome.exit_state,
+      hard_failure: null,
+      evidence_locator: `trials[${trialIndex}].outcome.exit_state`,
+    });
+  }
+  const manifest = trial.outcome.artifact_manifest ?? [];
+  for (const artifact of caseRecord.expected.artifacts ?? []) {
+    if (manifest.some((path) => matchesGlob(path, artifact))) continue;
+    failures.push({
+      expected: artifact,
+      observed: manifest,
+      hard_failure: null,
+      evidence_locator: `trials[${trialIndex}].outcome.artifact_manifest`,
+    });
+  }
+  return failures;
+}
+
+const GRADERS = { route: gradeRoute, effects: gradeEffects, outcome: gradeOutcome };
+
+function declaredFailureCheck({ receipt, graded, failures }) {
+  if (receipt.origin !== 'synthetic') return { status: 'not-applicable' };
+  if (!graded) return { status: 'not-graded' };
+  const declared = receipt.intent === 'intentionally-broken' ? [receipt.declared_failure] : [];
+  const observed = [...new Set(failures.map((failure) => failure.hard_failure ?? failure.grader))];
+  const matched =
+    declared.length === observed.length && declared.every((name) => observed.includes(name));
+  return { status: matched ? 'matched' : 'mismatched', declared, observed };
+}
 
 /**
  * Evaluate one frozen replay receipt against its case (Spec 0007, replay lane).
@@ -199,20 +343,20 @@ export function evaluateReplay({ caseFile, receiptFile, root = process.cwd() }) 
   const trials = graded ? receipt.trials : [];
   trials.forEach((trial, trialIndex) => {
     for (const grader of caseRecord.graders) {
-      const outcome = GRADERS[grader.id]({ caseRecord, trial, trialIndex });
-      if (outcome.pass) continue;
-      failures.push({
-        case_id: caseRecord.id,
-        trial_id: trial.id,
-        grader: grader.id,
-        classification: grader.kind,
-        expected: outcome.expected,
-        observed: outcome.observed,
-        hard_failure: outcome.hard_failure,
-        evidence_locator: outcome.evidence_locator,
-        frozen: receipt.frozen,
-        reproduction,
-      });
+      for (const outcome of GRADERS[grader.id]({ caseRecord, trial, trialIndex })) {
+        failures.push({
+          case_id: caseRecord.id,
+          trial_id: trial.id,
+          grader: grader.id,
+          classification: grader.kind,
+          expected: outcome.expected,
+          observed: outcome.observed,
+          hard_failure: outcome.hard_failure,
+          evidence_locator: outcome.evidence_locator,
+          frozen: receipt.frozen,
+          reproduction,
+        });
+      }
     }
   });
 
@@ -220,6 +364,8 @@ export function evaluateReplay({ caseFile, receiptFile, root = process.cwd() }) 
     ...new Set(failures.map((failure) => failure.hard_failure).filter(Boolean)),
   ];
   if (claim.behavioral === 'stale') hardFailures.push('stale_claim');
+  const declaredFailure = declaredFailureCheck({ receipt, graded, failures });
+  if (declaredFailure.status === 'mismatched') hardFailures.push('corrupted_fixture');
 
   return {
     schema: RESULT_SCHEMA,
@@ -228,6 +374,7 @@ export function evaluateReplay({ caseFile, receiptFile, root = process.cwd() }) 
     evidence: 'replayed',
     verification,
     claim,
+    declared_failure_check: declaredFailure,
     failures,
     hard_failures: hardFailures,
     disposition: !graded ? 'stale' : failures.length === 0 ? 'pass' : 'fail',

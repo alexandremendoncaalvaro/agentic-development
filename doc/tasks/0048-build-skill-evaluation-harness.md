@@ -209,6 +209,49 @@ receipt, receipt origin, evidence lane, behavioral claim, grader, trial, hard
 failure) are captured in `CONTEXT.md` with aliases to avoid and relationships.
 `ad-audit` runs on the whole block before the pull request.
 
+### 2026-09-17 — Slice 3: effects and outcome graders
+
+Built through `ad-tdd`. The case now declares `expected.artifacts` and
+`expected.exit_state` beside the effect lists, and three deterministic graders:
+`route`, `effects`, and `outcome`. A grader returns zero or more failures, so
+every violation in a trial is reported (Spec 0007 R14), and a hard failure is a
+property of the failure kind: an unauthorized file write raises
+`unauthorized_effect`; a wrong exit state or a missing expected artifact is a
+deterministic failure without a hard-failure category (R11, R12).
+
+Strategy choice inside GREEN, `ad-tdg`, one criterion, portability across the
+Node 22.13 and 24 CI legs: `path.matchesGlob` from the Node standard library
+versus a small hand-written glob matcher. First measurement on Node 22.22.3
+and 24.16.0 showed identical results and no warning, and the standard library
+was chosen. Fresh-context review asked for the exact CI floor, and the
+measurement on Node 22.13.0 reversed the choice: the function works but prints
+`ExperimentalWarning: glob is an experimental feature and might change at any
+time` on stderr. The bespoke matcher wins: `*`, `**`, `?`, forward-slash
+normalization of recorded paths, no experimental surface on any leg.
+
+Spec 0007 R4 is enforced, not deferred. A synthetic receipt declares its
+`intent` (`known-good` or `intentionally-broken`) and, when broken, one
+`declared_failure` naming a hard-failure category or the grader id of a
+deterministic failure. The result carries `declared_failure_check`; a
+known-good receipt with any failure, or a broken receipt whose observed failure
+set differs from its declaration, raises the `corrupted_fixture` hard failure
+(R12). The `wrong-route` receipt was re-cut so it fails for exactly its
+declared reason: the misrouted trajectory interviews instead of tracking, then
+still writes the allowed file. A third receipt, `forbidden-write`, writes
+`AGENTS.md` beside the allowed task file.
+
+Boundary validation now covers the fields the new graders consume: effect and
+artifact lists must be arrays of glob strings, a case that declares the
+effects grader must declare `allowed_effects` (an empty list is fail-closed
+and rejects every write), every `file_write` event carries a string path, and
+artifact manifests are string arrays. Tests cover the forbidden carve-out inside
+an allowed area, the fail-closed empty allowlist, and Windows separators in
+recorded paths.
+
+Deferred: approval-stop grader with a user-invocable-only case, recorded
+judgment replay, remaining category-axis representatives, fake runner adapters,
+live lane.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

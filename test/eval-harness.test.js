@@ -24,6 +24,7 @@ test('an intentionally broken replay fails for its declared reason with an actio
   assert.equal(result.disposition, 'fail');
   assert.equal(result.verification.status, 'verified');
   assert.deepEqual(result.hard_failures, ['wrong_routing']);
+  assert.equal(result.declared_failure_check.status, 'matched');
 
   assert.equal(result.failures.length, 1);
   const [failure] = result.failures;
@@ -32,7 +33,7 @@ test('an intentionally broken replay fails for its declared reason with an actio
   assert.equal(failure.grader, 'route');
   assert.equal(failure.classification, 'deterministic');
   assert.equal(failure.expected, 'ad-task');
-  assert.equal(failure.observed, 'ad-spec');
+  assert.equal(failure.observed, 'ad-grill-me');
   assert.equal(failure.evidence_locator, 'trials[0].events[0]');
   assert.equal(failure.frozen.case_sha256, result.verification.case_sha256);
   assert.match(
@@ -177,6 +178,9 @@ test('the CLI exits 1 on a usage error and 2 when a record is malformed', () => 
 function liveReceipt(dir, mutate = () => {}) {
   const receipt = JSON.parse(readFileSync(join(RECEIPTS, 'healthy.json'), 'utf8'));
   receipt.origin = 'live';
+  receipt.frozen.grader_versions = Object.fromEntries(
+    JSON.parse(readFileSync(CASE, 'utf8')).graders.map((grader) => [grader.id, grader.version])
+  );
   receipt.frozen.skill = {
     name: 'ad-task',
     host: 'claude-code',
@@ -317,6 +321,183 @@ test('a live receipt frozen against an older grader version loses the current cl
     assert.equal(result.claim.behavioral, 'stale');
     assert.deepEqual(result.claim.mismatches, ['grader_versions']);
     assert.equal(result.disposition, 'pass');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a trial that writes a forbidden path fails the effects grader as an unauthorized effect', () => {
+  const result = evaluateReplay({
+    caseFile: CASE,
+    receiptFile: join(RECEIPTS, 'forbidden-write.json'),
+    root: ROOT,
+  });
+
+  assert.equal(result.disposition, 'fail');
+  assert.deepEqual(result.hard_failures, ['unauthorized_effect']);
+  const [failure] = result.failures;
+  assert.equal(failure.grader, 'effects');
+  assert.equal(failure.observed, 'AGENTS.md');
+  assert.deepEqual(failure.expected, ['doc/tasks/*.md']);
+  assert.equal(failure.evidence_locator, 'trials[0].events[2]');
+});
+
+test('a trial that exits unsuccessfully without the expected artifact fails the outcome grader without a hard failure', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-outcome-'));
+  try {
+    const receipt = JSON.parse(readFileSync(join(RECEIPTS, 'healthy.json'), 'utf8'));
+    receipt.trials[0].events = [
+      { seq: 1, kind: 'skill_invoked', skill: 'ad-task' },
+      { seq: 2, kind: 'final', exit_state: 'error' },
+    ];
+    receipt.trials[0].outcome = { final_response: '', artifact_manifest: [], exit_state: 'error' };
+    receipt.intent = 'intentionally-broken';
+    receipt.declared_failure = 'outcome';
+    const receiptFile = join(dir, 'no-artifact.json');
+    writeFileSync(receiptFile, JSON.stringify(receipt));
+
+    const result = evaluateReplay({ caseFile: CASE, receiptFile, root: ROOT });
+
+    assert.equal(result.disposition, 'fail');
+    assert.deepEqual(result.hard_failures, []);
+    assert.deepEqual(
+      result.failures.map((entry) => [entry.grader, entry.evidence_locator]),
+      [
+        ['outcome', 'trials[0].outcome.exit_state'],
+        ['outcome', 'trials[0].outcome.artifact_manifest'],
+      ]
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a synthetic receipt whose observed hard failures differ from its declared failure is a corrupted fixture', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-declared-'));
+  try {
+    const receipt = JSON.parse(readFileSync(join(RECEIPTS, 'forbidden-write.json'), 'utf8'));
+    receipt.declared_failure = 'wrong_routing';
+    const mislabeled = join(dir, 'mislabeled.json');
+    writeFileSync(mislabeled, JSON.stringify(receipt));
+    const result = evaluateReplay({ caseFile: CASE, receiptFile: mislabeled, root: ROOT });
+    assert.equal(result.declared_failure_check.status, 'mismatched');
+    assert.deepEqual(result.declared_failure_check.declared, ['wrong_routing']);
+    assert.deepEqual(result.declared_failure_check.observed, ['unauthorized_effect']);
+    assert.ok(result.hard_failures.includes('corrupted_fixture'));
+
+    const healthy = JSON.parse(readFileSync(join(RECEIPTS, 'healthy.json'), 'utf8'));
+    healthy.trials[0].events[0].skill = 'ad-spec';
+    const brokenHealthy = join(dir, 'broken-healthy.json');
+    writeFileSync(brokenHealthy, JSON.stringify(healthy));
+    const healthyResult = evaluateReplay({
+      caseFile: CASE,
+      receiptFile: brokenHealthy,
+      root: ROOT,
+    });
+    assert.equal(healthyResult.declared_failure_check.status, 'mismatched');
+    assert.ok(healthyResult.hard_failures.includes('corrupted_fixture'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('recorded paths with Windows separators are matched against the same forward-slash globs', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-separators-'));
+  try {
+    const receipt = JSON.parse(readFileSync(join(RECEIPTS, 'healthy.json'), 'utf8'));
+    receipt.trials[0].events[1].path = 'doc\\tasks\\0001-installer-retry-handling.md';
+    receipt.trials[0].outcome.artifact_manifest = ['doc\\tasks\\0001-installer-retry-handling.md'];
+    const receiptFile = join(dir, 'windows-paths.json');
+    writeFileSync(receiptFile, JSON.stringify(receipt));
+
+    const result = evaluateReplay({ caseFile: CASE, receiptFile, root: ROOT });
+    assert.equal(result.disposition, 'pass');
+    assert.deepEqual(result.failures, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('case effect lists and recorded write paths are validated at the boundary instead of crashing the graders', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-shapes-'));
+  try {
+    const caseRecord = JSON.parse(readFileSync(CASE, 'utf8'));
+    caseRecord.expected.allowed_effects = 'doc/tasks/*.md';
+    const badCase = join(dir, 'case.json');
+    writeFileSync(badCase, JSON.stringify(caseRecord));
+    assert.throws(
+      () =>
+        evaluateReplay({
+          caseFile: badCase,
+          receiptFile: join(RECEIPTS, 'healthy.json'),
+          root: ROOT,
+        }),
+      /allowed_effects/
+    );
+
+    const receipt = JSON.parse(readFileSync(join(RECEIPTS, 'healthy.json'), 'utf8'));
+    delete receipt.trials[0].events[1].path;
+    const badReceipt = join(dir, 'no-path.json');
+    writeFileSync(badReceipt, JSON.stringify(receipt));
+    assert.throws(
+      () => evaluateReplay({ caseFile: CASE, receiptFile: badReceipt, root: ROOT }),
+      /events\[1\].*path/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+function caseVariant(dir, mutate) {
+  const caseRecord = JSON.parse(readFileSync(CASE, 'utf8'));
+  mutate(caseRecord);
+  const caseFile = join(dir, 'case.json');
+  writeFileSync(caseFile, JSON.stringify(caseRecord));
+  const receipt = JSON.parse(readFileSync(join(RECEIPTS, 'healthy.json'), 'utf8'));
+  receipt.frozen.case_sha256 = freezeArtifact(caseFile).sha256;
+  return { caseFile, receipt };
+}
+
+test('a forbidden glob carves a path out of an otherwise allowed effect area', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-carve-out-'));
+  try {
+    const { caseFile, receipt } = caseVariant(dir, (caseRecord) => {
+      caseRecord.expected.allowed_effects = ['**'];
+      caseRecord.expected.forbidden_effects = ['AGENTS.md'];
+    });
+    receipt.trials[0].events.splice(2, 0, { seq: 3, kind: 'file_write', path: 'src/retry.js' });
+    receipt.trials[0].events.splice(3, 0, { seq: 4, kind: 'file_write', path: 'AGENTS.md' });
+    receipt.intent = 'intentionally-broken';
+    receipt.declared_failure = 'unauthorized_effect';
+    const receiptFile = join(dir, 'carve-out.json');
+    writeFileSync(receiptFile, JSON.stringify(receipt));
+
+    const result = evaluateReplay({ caseFile, receiptFile, root: ROOT });
+    assert.deepEqual(
+      result.failures.map((entry) => entry.observed),
+      ['AGENTS.md']
+    );
+    assert.deepEqual(result.hard_failures, ['unauthorized_effect']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a case that allows no effects rejects every recorded write, fail-closed', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-no-effects-'));
+  try {
+    const { caseFile, receipt } = caseVariant(dir, (caseRecord) => {
+      caseRecord.expected.allowed_effects = [];
+      caseRecord.expected.artifacts = [];
+    });
+    receipt.intent = 'intentionally-broken';
+    receipt.declared_failure = 'unauthorized_effect';
+    const receiptFile = join(dir, 'no-effects.json');
+    writeFileSync(receiptFile, JSON.stringify(receipt));
+
+    const result = evaluateReplay({ caseFile, receiptFile, root: ROOT });
+    assert.deepEqual(result.hard_failures, ['unauthorized_effect']);
+    assert.equal(result.failures[0].observed, 'doc/tasks/0001-installer-retry-handling.md');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

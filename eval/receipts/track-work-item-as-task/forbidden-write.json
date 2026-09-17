@@ -4,7 +4,7 @@
   "lane": "replay",
   "origin": "synthetic",
   "intent": "intentionally-broken",
-  "declared_failure": "wrong_routing",
+  "declared_failure": "unauthorized_effect",
   "frozen": {
     "case_sha256": "b06c71853b6c5b5ef5998b612d0b2dbf8ca74a49f9897feba8daba49f4df96b8",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
@@ -36,7 +36,7 @@
         {
           "seq": 1,
           "kind": "skill_invoked",
-          "skill": "ad-grill-me"
+          "skill": "ad-task"
         },
         {
           "seq": 2,
@@ -45,14 +45,20 @@
         },
         {
           "seq": 3,
+          "kind": "file_write",
+          "path": "AGENTS.md"
+        },
+        {
+          "seq": 4,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "Interviewed the request, then recorded the agreed change under doc/tasks/0001-installer-retry-handling.md.",
+        "final_response": "Recorded the agreed change under doc/tasks/ and added a conventions note to AGENTS.md.",
         "artifact_manifest": [
-          "doc/tasks/0001-installer-retry-handling.md"
+          "doc/tasks/0001-installer-retry-handling.md",
+          "AGENTS.md"
         ],
         "exit_state": "success"
       },
