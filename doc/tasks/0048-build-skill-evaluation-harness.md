@@ -160,6 +160,42 @@ raised two unvalidated-input crash paths (unknown grader id, receipt without
 skill script follows existing test precedent and is pinned by the dual-host
 byte-parity test.
 
+### 2026-09-17 — Slice 2: skill digest and staleness semantics (R11)
+
+Built through `ad-tdd`, eight behaviors, same public interface. A receipt now
+declares `origin`: `synthetic` receipts exercise harness mechanics and never
+carry a behavioral claim; `live` receipts, recorded by an authorized run, must
+freeze `skill = { name, host, sha256 }`. The result gains `claim.behavioral`:
+`none`, `current` when the frozen skill digest still matches the canonical
+`src/skills/<host>/<name>/` directory under the freeze scheme, or `stale` when
+the skill changed. Integrity failures (case or fixture digest) still block
+grading; a stale skill claim does not, so historical replay stays auditable
+(Spec 0007 R8, R13, success criterion on stale receipts). Tests build live
+receipts in a temporary directory with the digest computed at run time, so the
+suite does not rot when a skill is edited; no tracked live receipt exists until
+the pilot produces one.
+
+Scope of staleness in this slice, stated so the Notes do not overclaim R8: the
+replay lane can compare only inputs it can observe at replay time, the skill
+content digest and the grader versions declared by the case. Host, model,
+scaffold, and policy staleness can only be detected when the live lane
+regenerates a receipt in a real environment and belong to that slice. Spec
+0007 R5 binds recorded evaluations, which are live receipts; synthetic receipts
+are declared harness-mechanics fixtures (`model: synthetic-replay`) and do not
+claim to be evaluations, so they freeze no skill digest.
+
+Fresh-context review, two axes. Standards blocked twice: receipt-supplied
+`host` and `name` reached the filesystem path unvalidated (traversal), and a
+freeze failure on a missing skill directory was silently read as a digest
+mismatch. Both fixed test-first with a host enumeration, a skill-name pattern,
+and an explicit freeze-result check at every call site. Spec blocked once: a
+stale claim must be reported as a hard failure that no aggregate can hide
+(Spec 0007 R12, unsupported claims). Adopted: `hard_failures` carries
+`stale_claim`, and the CLI exits non-zero on any hard failure even when grading
+passed, matching the Prism 0022 decision rule to stop a release claim on any
+stale frozen input. Grading still runs, so the historical replay stays
+auditable. Remaining deferrals from slice 1 stand.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

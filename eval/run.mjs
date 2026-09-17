@@ -7,9 +7,10 @@
  *   node eval/run.mjs replay <case.json> <receipt.json>
  *
  * Prints the result record as JSON. Exit codes follow GUIDELINES.md §4.2:
- * 0 when the receipt verifies and every declared grader passes; 1 on a usage
- * error, a stale receipt, or any grader failure; 2 when a case or receipt is
- * malformed. The same command is the reproduction step named in every
+ * 0 when the receipt verifies, every declared grader passes, and no hard
+ * failure is raised (a stale behavioral claim is one); 1 on a usage error, a
+ * stale receipt, a grader failure, or a hard failure; 2 when a case or receipt
+ * is malformed. The same command is the reproduction step named in every
  * failure record.
  */
 import { evaluateReplay } from './lib/replay.mjs';
@@ -29,4 +30,4 @@ try {
 }
 
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-process.exit(result.disposition === 'pass' ? 0 : 1);
+process.exit(result.disposition === 'pass' && result.hard_failures.length === 0 ? 0 : 1);

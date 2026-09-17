@@ -6,6 +6,9 @@ import { freezeArtifact } from '../../src/skills/claude-code/ad-prism/scripts/fr
 const CASE_SCHEMA = 'agentic-eval-case/1';
 const RECEIPT_SCHEMA = 'agentic-eval-receipt/1';
 const RESULT_SCHEMA = 'agentic-eval-result/1';
+const RECEIPT_ORIGINS = new Set(['synthetic', 'live']);
+const SKILL_HOSTS = new Set(['claude-code', 'codex']);
+const SKILL_NAME = /^[a-z0-9][a-z0-9-]*$/;
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -57,11 +60,42 @@ function validateReceipt(receipt, caseRecord, path) {
   if (!Array.isArray(receipt.trials)) {
     throw new Error(`receipt ${path} must declare a "trials" array`);
   }
+  if (!RECEIPT_ORIGINS.has(receipt.origin)) {
+    throw new Error(`receipt ${path} must declare origin "synthetic" or "live"`);
+  }
+  if (receipt.origin === 'live') {
+    const skill = frozen.skill;
+    if (
+      !isRecord(skill) ||
+      typeof skill.name !== 'string' ||
+      typeof skill.host !== 'string' ||
+      typeof skill.sha256 !== 'string'
+    ) {
+      throw new Error(
+        `live receipt ${path} must declare frozen "skill" with name, host, and sha256`
+      );
+    }
+    if (!SKILL_HOSTS.has(skill.host)) {
+      throw new Error(`live receipt ${path} names unknown skill host "${skill.host}"`);
+    }
+    if (!SKILL_NAME.test(skill.name)) {
+      throw new Error(`live receipt ${path} names an invalid skill name "${skill.name}"`);
+    }
+  }
+}
+
+function digestOf(path, label) {
+  const frozen = freezeArtifact(path);
+  if (!frozen.valid) throw new Error(`cannot digest ${label}: ${frozen.error}`);
+  return frozen.sha256;
 }
 
 function verifyReceipt({ caseRecord, caseFile, receipt, root }) {
-  const caseDigest = freezeArtifact(resolve(root, caseFile)).sha256;
-  const fixtureDigest = freezeArtifact(resolve(root, caseRecord.fixture)).sha256;
+  const caseDigest = digestOf(resolve(root, caseFile), `case ${repoPath(root, caseFile)}`);
+  const fixtureDigest = digestOf(
+    resolve(root, caseRecord.fixture),
+    `fixture ${caseRecord.fixture} of case ${caseRecord.id}`
+  );
   const mismatches = [];
   if (receipt.frozen.case_sha256 !== caseDigest) mismatches.push('case_sha256');
   if (receipt.frozen.fixture_sha256 !== fixtureDigest) mismatches.push('fixture_sha256');
@@ -71,6 +105,39 @@ function verifyReceipt({ caseRecord, caseFile, receipt, root }) {
     fixture_sha256: fixtureDigest,
     frozen_case_sha256: receipt.frozen.case_sha256,
     frozen_fixture_sha256: receipt.frozen.fixture_sha256,
+    mismatches,
+  };
+}
+
+function graderVersions(caseRecord) {
+  return Object.fromEntries(caseRecord.graders.map((grader) => [grader.id, grader.version]));
+}
+
+function sameVersions(frozen, current) {
+  const keys = new Set([...Object.keys(frozen ?? {}), ...Object.keys(current)]);
+  return [...keys].every((key) => frozen?.[key] === current[key]);
+}
+
+function claimFor({ caseRecord, receipt, root }) {
+  if (receipt.origin !== 'live') return { behavioral: 'none', mismatches: [] };
+  const skill = receipt.frozen.skill;
+  const current = digestOf(
+    resolve(root, 'src', 'skills', skill.host, skill.name),
+    `skill ${skill.host}/${skill.name}`
+  );
+  const currentGraders = graderVersions(caseRecord);
+  const mismatches = [];
+  if (current !== skill.sha256) mismatches.push('skill_sha256');
+  if (!sameVersions(receipt.frozen.grader_versions, currentGraders))
+    mismatches.push('grader_versions');
+  return {
+    behavioral: mismatches.length === 0 ? 'current' : 'stale',
+    skill: skill.name,
+    host: skill.host,
+    skill_sha256: current,
+    frozen_skill_sha256: skill.sha256,
+    grader_versions: currentGraders,
+    frozen_grader_versions: receipt.frozen.grader_versions ?? {},
     mismatches,
   };
 }
@@ -99,16 +166,23 @@ const GRADERS = { route: gradeRoute };
  *
  * Verification (receipt integrity: frozen case and fixture digests still match
  * the tracked inputs) is reported separately from validation (declared graders
- * over the recorded trials). A stale receipt is never graded.
+ * over the recorded trials). A receipt that fails verification is never graded.
+ *
+ * `claim` reports whether the receipt may support a current behavioral claim:
+ * `none` for a synthetic receipt (harness mechanics only), `current` for a
+ * live receipt whose frozen skill digest still matches the canonical
+ * `src/skills/<host>/<name>/` directory, `stale` when the skill changed. A
+ * stale claim does not stop grading, so historical replay stays auditable.
  *
  * @param {{ caseFile: string, receiptFile: string, root?: string }} input
  *   Paths resolve against `root` (default: the current working directory);
  *   the reproduction command in every failure record is relative to `root`.
  * @returns {object} result record (`agentic-eval-result/1`): `disposition` is
- *   `pass`, `fail`, or `stale`; `failures` carry the Spec 0007 R14 fields;
- *   `hard_failures` are listed outside any aggregate.
+ *   `pass`, `fail`, or `stale`; `claim.behavioral` is `none`, `current`, or
+ *   `stale`; `failures` carry the Spec 0007 R14 fields; `hard_failures` are
+ *   listed outside any aggregate.
  * @throws {Error} when the case or receipt is unreadable, declares the wrong
- *   schema, names an unknown grader, or lacks its frozen inputs.
+ *   schema or origin, names an unknown grader, or lacks its frozen inputs.
  */
 export function evaluateReplay({ caseFile, receiptFile, root = process.cwd() }) {
   const caseRecord = readJson(resolve(root, caseFile));
@@ -117,6 +191,7 @@ export function evaluateReplay({ caseFile, receiptFile, root = process.cwd() }) 
   validateReceipt(receipt, caseRecord, repoPath(root, receiptFile));
 
   const verification = verifyReceipt({ caseRecord, caseFile, receipt, root });
+  const claim = claimFor({ caseRecord, receipt, root });
   const reproduction = `node eval/run.mjs replay ${repoPath(root, caseFile)} ${repoPath(root, receiptFile)}`;
 
   const failures = [];
@@ -144,6 +219,7 @@ export function evaluateReplay({ caseFile, receiptFile, root = process.cwd() }) 
   const hardFailures = [
     ...new Set(failures.map((failure) => failure.hard_failure).filter(Boolean)),
   ];
+  if (claim.behavioral === 'stale') hardFailures.push('stale_claim');
 
   return {
     schema: RESULT_SCHEMA,
@@ -151,6 +227,7 @@ export function evaluateReplay({ caseFile, receiptFile, root = process.cwd() }) 
     lane: receipt.lane,
     evidence: 'replayed',
     verification,
+    claim,
     failures,
     hard_failures: hardFailures,
     disposition: !graded ? 'stale' : failures.length === 0 ? 'pass' : 'fail',

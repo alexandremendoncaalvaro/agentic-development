@@ -2,6 +2,7 @@
   "schema": "agentic-eval-receipt/1",
   "case_id": "track-work-item-as-task",
   "lane": "replay",
+  "origin": "synthetic",
   "intent": "known-good",
   "declared_failure": null,
   "frozen": {

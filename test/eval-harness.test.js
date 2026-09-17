@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { evaluateReplay } from '../eval/lib/replay.mjs';
+import { freezeArtifact } from '../src/skills/claude-code/ad-prism/scripts/freeze-artifact.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -168,6 +169,154 @@ test('the CLI exits 1 on a usage error and 2 when a record is malformed', () => 
     assert.equal(malformed.status, 2);
     assert.match(malformed.stderr, /frozen/);
     assert.equal(malformed.stdout, '');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+function liveReceipt(dir, mutate = () => {}) {
+  const receipt = JSON.parse(readFileSync(join(RECEIPTS, 'healthy.json'), 'utf8'));
+  receipt.origin = 'live';
+  receipt.frozen.skill = {
+    name: 'ad-task',
+    host: 'claude-code',
+    sha256: freezeArtifact(join(ROOT, 'src', 'skills', 'claude-code', 'ad-task')).sha256,
+  };
+  mutate(receipt);
+  const receiptFile = join(dir, 'live.json');
+  writeFileSync(receiptFile, JSON.stringify(receipt));
+  return receiptFile;
+}
+
+test('a live receipt whose frozen skill still matches the canonical skill supports a current behavioral claim', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-live-'));
+  try {
+    const result = evaluateReplay({ caseFile: CASE, receiptFile: liveReceipt(dir), root: ROOT });
+
+    assert.equal(result.disposition, 'pass');
+    assert.equal(result.claim.behavioral, 'current');
+    assert.equal(result.claim.skill, 'ad-task');
+    assert.deepEqual(result.claim.mismatches, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a live receipt whose canonical skill changed loses the current claim but stays auditable through grading', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-stale-skill-'));
+  try {
+    const receiptFile = liveReceipt(dir, (receipt) => {
+      receipt.frozen.skill.sha256 = 'f'.repeat(64);
+    });
+    const result = evaluateReplay({ caseFile: CASE, receiptFile, root: ROOT });
+
+    assert.equal(result.claim.behavioral, 'stale');
+    assert.deepEqual(result.claim.mismatches, ['skill_sha256']);
+    assert.equal(result.verification.status, 'verified');
+    assert.equal(result.disposition, 'pass');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a synthetic receipt exercises harness mechanics and never carries a behavioral claim', () => {
+  const result = evaluateReplay({
+    caseFile: CASE,
+    receiptFile: join(RECEIPTS, 'healthy.json'),
+    root: ROOT,
+  });
+
+  assert.equal(result.claim.behavioral, 'none');
+});
+
+test('receipt origin and the frozen skill of a live receipt are validated at the boundary', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-origin-'));
+  try {
+    const noSkill = liveReceipt(dir, (receipt) => {
+      delete receipt.frozen.skill;
+    });
+    assert.throws(
+      () => evaluateReplay({ caseFile: CASE, receiptFile: noSkill, root: ROOT }),
+      /frozen "skill"/
+    );
+
+    const noOrigin = liveReceipt(dir, (receipt) => {
+      delete receipt.origin;
+    });
+    assert.throws(
+      () => evaluateReplay({ caseFile: CASE, receiptFile: noOrigin, root: ROOT }),
+      /origin/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a live receipt cannot point the skill digest outside the canonical skill tree or at a missing skill', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-skill-ref-'));
+  try {
+    const traversal = liveReceipt(dir, (receipt) => {
+      receipt.frozen.skill.host = '..';
+      receipt.frozen.skill.name = '..';
+    });
+    assert.throws(
+      () => evaluateReplay({ caseFile: CASE, receiptFile: traversal, root: ROOT }),
+      /host/
+    );
+
+    const badName = liveReceipt(dir, (receipt) => {
+      receipt.frozen.skill.name = '../ad-task';
+    });
+    assert.throws(
+      () => evaluateReplay({ caseFile: CASE, receiptFile: badName, root: ROOT }),
+      /skill name/
+    );
+
+    const missing = liveReceipt(dir, (receipt) => {
+      receipt.frozen.skill.name = 'ad-does-not-exist';
+    });
+    assert.throws(
+      () => evaluateReplay({ caseFile: CASE, receiptFile: missing, root: ROOT }),
+      /ad-does-not-exist/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a stale behavioral claim is a hard failure that fails the gate even when grading passed', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-stale-gate-'));
+  try {
+    const receiptFile = liveReceipt(dir, (receipt) => {
+      receipt.frozen.skill.sha256 = 'f'.repeat(64);
+    });
+    const result = evaluateReplay({ caseFile: CASE, receiptFile, root: ROOT });
+    assert.equal(result.disposition, 'pass');
+    assert.deepEqual(result.hard_failures, ['stale_claim']);
+
+    const cli = spawnSync(
+      process.execPath,
+      ['eval/run.mjs', 'replay', 'eval/cases/track-work-item-as-task.json', receiptFile],
+      { cwd: ROOT, encoding: 'utf8' }
+    );
+    assert.equal(cli.status, 1, cli.stderr);
+    assert.deepEqual(JSON.parse(cli.stdout).hard_failures, ['stale_claim']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a live receipt frozen against an older grader version loses the current claim', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-grader-version-'));
+  try {
+    const receiptFile = liveReceipt(dir, (receipt) => {
+      receipt.frozen.grader_versions.route = '0';
+    });
+    const result = evaluateReplay({ caseFile: CASE, receiptFile, root: ROOT });
+
+    assert.equal(result.claim.behavioral, 'stale');
+    assert.deepEqual(result.claim.mismatches, ['grader_versions']);
+    assert.equal(result.disposition, 'pass');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
