@@ -169,6 +169,8 @@ Aggregate: <N Standards Blockers, M Standards Concerns> / <P Spec Blockers, Q Sp
 
 Do NOT synthesize an overall "approve" verdict. §10 frames the review as adversarial; the senior engineer weighs the findings.
 
+Before printing, persist the same two sections verbatim to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the audit-trail file. The audit trail proves what the reviewer was given; only the persisted output proves what the review found, and a later "the review found X" claim has no durable evidence without it. Write it at review time, never as a reconstruction afterwards.
+
 Step 7 — recommend escalation when binding-doc findings exist. Scan the Step 6 output. For each Standards-axis finding (Blocker, Concern, or Note), check whether its `file:line` reference resolves to any of:
 
 - `AGENTS.md` or `CLAUDE.md` at the repo root
@@ -197,6 +199,7 @@ Do not silently spawn the agent yourself. The user must explicitly request the e
 
 <output_contract>
 - One audit-trail file at `.agentic/reviews/<ISO-timestamp>-<scope-slug>.md` carrying the diff plus assembled Standards + Spec context.
+- One verdicts file at `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` carrying the two findings sections verbatim, written before the reply.
 - One review reply in the current session with findings under `## Standards Findings` and `## Spec Findings`, each axis with its own end-line verdict (`ship as-is` / `ship with the Concerns logged` / `don't ship until Blockers resolved` / `skipped — no spec source provided`).
 - One aggregate summary line at the end with axis counts, worst finding, and audit-trail path.
 - One Step 7 escalation recommendation line IF any Standards-axis finding touches a binding doc (AGENTS / ARCHITECTURE / GUIDELINES / CONTEXT / ADR). Silent otherwise.

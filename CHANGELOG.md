@@ -6,6 +6,21 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- `/ad-review` now persists both reviewers' reports verbatim to
+  `.agentic/reviews/<ISO>-<scope>-verdicts.md` at review time, beside the
+  handoffs it already wrote, so a "review found X" claim has a contemporaneous
+  artifact instead of a reconstruction (ADR-0007, task-0078).
+- `/ad-prism` durable plans carry the research-layer header (`PRISM-NNNN`
+  title, `Status`, `Decision ref`) and dated sources, the same provenance
+  discipline as `/ad-ground` and `/ad-research` records (ADR-0077, ADR-0008,
+  task-0078).
+- `/ad-ground` record template asks a measurement on a locally installed
+  third-party artifact to name the artifact's public release identity and
+  version and a reproduction command that runs on the CI platforms' shells
+  (ADR-0070, task-0078).
+
 ### Fixed
 
 - The pre-commit `changelog-gate` now watches `package.json`, which npm

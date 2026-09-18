@@ -1,4 +1,7 @@
-# <evaluation title>
+# PRISM-NNNN: <evaluation title>
+
+**Status:** draft
+**Decision ref:** <task, spec, ADR, or other durable project artifact>
 
 ## Decision
 
@@ -45,7 +48,7 @@
 Repeat this record for each load-bearing methodological choice:
 
 ### M1 — <method or framework>
-- Source: <URL or stable locator>
+- Source: <URL or stable locator> (accessed <YYYY-MM-DD> via <method>)
 - Supports: <methodological choice or claim>
 - Contribution: <what this source adds>
 - Adaptation: <how it maps to this context>
