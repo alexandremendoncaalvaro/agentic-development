@@ -700,7 +700,7 @@
         },
         {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "d4e3dfcb4610524030e82e50f4535f9073c3aa1712c29121ddb39f0fdc3d8556"
+          "sourceSha": "207a7247d07198caa06546d12f5c0001aeee3be4d9ac84b34f0a14a25ffca6f8"
         },
         {
           "path": ".codex/agents/fresh-context-reviewer.toml",

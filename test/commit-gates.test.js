@@ -138,7 +138,7 @@ test('subject-check: length error and mood warning can co-occur', () => {
   assert.equal(warnings.length, 1);
 });
 
-test('changelog-gate: package.json ships unconditionally, so a manifest change warns (ADR-0081)', () => {
+test('regression: ADR-0081 package.json ships unconditionally, so a manifest change warns', () => {
   assert.ok(changelogWarning(['package.json']) !== null, 'package.json should warn');
   assert.equal(changelogWarning(['package.json', 'CHANGELOG.md']), null);
   assert.equal(changelogWarning(['package-lock.json']), null, 'the lockfile never ships');

@@ -169,7 +169,7 @@ Aggregate: <N Standards Blockers, M Standards Concerns> / <P Spec Blockers, Q Sp
 
 Do NOT synthesize an overall "approve" verdict. §10 frames the review as adversarial; the senior engineer weighs the findings.
 
-Before printing, persist the same two sections verbatim to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the audit-trail file. The audit trail proves what the reviewer was given; only the persisted output proves what the review found, and a later "the review found X" claim has no durable evidence without it. Write it at review time, never as a reconstruction afterwards.
+Before printing, persist the same two sections verbatim to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the audit-trail file. The audit trail proves what the reviewer was given; only the persisted output proves what the review found. Write it at review time, never as a reconstruction afterwards. The file is a contemporaneous artifact on the reviewing machine, not durable evidence: `.agentic/reviews/` is gitignored by design. A "review found X" claim that must outlive the machine quotes the finding into the tracked record (the task's Notes, the pull request) or carries an OPEN QUESTION label.
 
 Step 7 — recommend escalation when binding-doc findings exist. Scan the Step 6 output. For each Standards-axis finding (Blocker, Concern, or Note), check whether its `file:line` reference resolves to any of:
 

@@ -135,7 +135,7 @@ Present the two sub-agents' reports verbatim, under explicit headings, in this o
 
 Do **not** merge or rerank findings — the two axes are deliberately separate so the user can see them independently. Do **not** synthesize an overall "approve" verdict.
 
-**Persist the verdicts before presenting them.** Write both sub-agents' reports verbatim, under the same two headings, to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the handoffs. A handoff proves what the reviewer was given; only the persisted output proves what the reviewer found, and a later "the review found X" claim has no durable evidence without it. Write the file at review time, in this step, never as a reconstruction afterwards.
+**Persist the verdicts before presenting them.** Write both sub-agents' reports verbatim, under the same two headings, to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the handoffs. A handoff proves what the reviewer was given; only the persisted output proves what the reviewer found. Write the file at review time, in this step, never as a reconstruction afterwards. The file is a contemporaneous artifact on the reviewing machine, not durable evidence: `.agentic/reviews/` is gitignored by design. A "review found X" claim that must outlive the machine quotes the finding into the tracked record (the task's Notes, the pull request) or carries an OPEN QUESTION label.
 
 End with a one-line aggregate summary:
 
