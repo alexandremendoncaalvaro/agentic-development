@@ -5,6 +5,7 @@
 **Deciders:** Alexandre Alvaro
 **Amended by:** ADR-0063 — its manually performed post-local-release tail steps.
 **Amended by:** ADR-0078 — its beta-only version calculation and test-only release gate.
+**Amended by:** ADR-0081 — the watched set of the `changelog-gate`, which now includes `package.json`.
 
 ## Context
 
