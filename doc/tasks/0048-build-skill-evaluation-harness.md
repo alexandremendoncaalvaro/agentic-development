@@ -761,6 +761,17 @@ With this entry every acceptance criterion and Definition of Done item is met.
 The task closes here; the pull request, ADR-0080 acceptance, the live pilot,
 and the Task 0077 curation are owner actions outside this task's criteria.
 
+### 2026-09-18 — Pull request and CI matrix
+
+Pull request #141 opened from `e566762` against `main` with the owner's
+approval. The `test` workflow ran the four required matrix legs and all
+passed: ubuntu-latest and windows-latest, each on Node 22.13.0 and 24.x (run
+35387754345). This is the measurement ADR-0080's consequences named for digest
+portability across platforms and the item both re-audits left open by nature;
+it is now observed, not inferred. The corpus gate and the adapter tests ran
+inside `npm run verify` on every leg. Acceptance of ADR-0080 and the merge
+remain owner actions.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
