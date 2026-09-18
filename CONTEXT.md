@@ -368,9 +368,8 @@ from); "real" versus "fake" (a synthetic receipt is a legitimate fixture, not a
 fake result).
 
 **Related code:** [`eval/lib/replay.mjs`](eval/lib/replay.mjs); decision
-proposed in
-[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md),
-binding once accepted.
+recorded in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md).
 
 ### Evidence lane
 
@@ -437,9 +436,8 @@ expectation); "confirmation" (a UI word; the harness grades the recorded event).
 
 **Related code:** [`eval/lib/graders.mjs`](eval/lib/graders.mjs); grounded in
 [`doc/research/0024-ground-approval-stops-and-dormancy-grading.md`](doc/research/0024-ground-approval-stops-and-dormancy-grading.md);
-decision proposed in
-[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md),
-binding once accepted; contract in
+decision recorded in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md); contract in
 [`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R10, R12).
 
 ### Dormant skill
@@ -454,9 +452,8 @@ _Avoid_: "disabled" (the skill stays installed and available to the user);
 case expects silence from a named skill).
 
 **Related code:** [`eval/lib/graders.mjs`](eval/lib/graders.mjs); decision
-proposed in
-[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md),
-binding once accepted; contract in
+recorded in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md); contract in
 [`doc/specs/0007-evaluate-skill-trajectories.md`](doc/specs/0007-evaluate-skill-trajectories.md) (R10, Scenario 5).
 
 ### Request kind
@@ -470,9 +467,8 @@ _Avoid_: "prompt type" (the request is one field of the case); "mode" (a host
 word for permissions, not for how the user asked).
 
 **Related code:** [`eval/cases/`](eval/cases/),
-[`eval/lib/validate.mjs`](eval/lib/validate.mjs); decision proposed in
-[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md),
-binding once accepted.
+[`eval/lib/validate.mjs`](eval/lib/validate.mjs); decision recorded in
+[`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md).
 
 ### Hard failure
 
@@ -498,9 +494,9 @@ _Avoid_: "log" (a log is diagnostic prose; the stream is the structured record
 the harness reads); "transcript" (the conversation text; the stream also carries
 tool calls, denials, and the result).
 
-**Related code:** decision proposed in
+**Related code:** decision recorded in
 [`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md)
-(item 10), binding once accepted; grounded in
+(item 10); grounded in
 [`doc/research/0025-ground-host-stream-adapters.md`](doc/research/0025-ground-host-stream-adapters.md).
 
 ### Runner adapter
@@ -517,9 +513,9 @@ different thing); "parser" (the adapter also derives events the stream cannot
 carry, such as an explicit invocation or a policy grant); "driver" (the spawn
 is the runner's job, not the adapter's).
 
-**Related code:** decision proposed in
+**Related code:** decision recorded in
 [`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md)
-(items 5 and 10), binding once accepted.
+(items 5 and 10).
 
 ## Relationships
 

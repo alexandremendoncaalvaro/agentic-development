@@ -1,6 +1,6 @@
 # ADR-0080: Build a bespoke skill evaluation harness
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-09-17
 **Deciders:** Alexandre Alvaro
 

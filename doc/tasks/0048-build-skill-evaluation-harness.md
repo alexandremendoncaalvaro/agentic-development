@@ -772,6 +772,14 @@ it is now observed, not inferred. The corpus gate and the adapter tests ran
 inside `npm run verify` on every leg. Acceptance of ADR-0080 and the merge
 remain owner actions.
 
+### 2026-09-18 — ADR-0080 accepted
+
+With the matrix green on pull request #141, the owner accepted ADR-0080. The
+acceptance commit flips the record's status, raises the projection's count of
+fully binding ADRs to fifty-six, and turns the eight "decision proposed in"
+pointers in `ARCHITECTURE.md` and `CONTEXT.md` into "decision recorded in",
+so the definition documents no longer hedge on a decision that now binds.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
