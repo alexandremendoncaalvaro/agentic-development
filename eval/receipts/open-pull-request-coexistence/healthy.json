@@ -1,0 +1,67 @@
+{
+  "schema": "agentic-eval-receipt/1",
+  "case_id": "open-pull-request-coexistence",
+  "lane": "replay",
+  "origin": "synthetic",
+  "intent": "known-good",
+  "declared_failure": null,
+  "frozen": {
+    "case_sha256": "cd6ddeebef8f888db4c7fce1c21c5f471ef264550399edb8b44f7fbe43d762f0",
+    "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
+    "host": "claude-code",
+    "host_version": "2.1.227",
+    "model": "synthetic-replay",
+    "scaffold": "synthetic-replay",
+    "tools": [
+      "Read",
+      "Bash",
+      "Skill"
+    ],
+    "permissions": "default",
+    "context_policy": "bare",
+    "run_parameters": {
+      "max_turns": 12
+    },
+    "grader_versions": {
+      "route": "1",
+      "dormancy": "1",
+      "effects": "1",
+      "outcome": "1",
+      "approval": "1"
+    },
+    "trial_count": 1
+  },
+  "trials": [
+    {
+      "id": "t1",
+      "events": [
+        {
+          "seq": 1,
+          "kind": "skill_invoked",
+          "skill": "ad-commit"
+        },
+        {
+          "seq": 2,
+          "kind": "command",
+          "command": "git diff --staged"
+        },
+        {
+          "seq": 3,
+          "kind": "command",
+          "command": "git commit -q -m \"feat(installer): add retry handling\""
+        },
+        {
+          "seq": 4,
+          "kind": "final",
+          "exit_state": "success"
+        }
+      ],
+      "outcome": {
+        "final_response": "Committed the staged retry handling with a Conventional Commits message. Opening the review is your call: run /ad-pr when ready and I will draft the body from the commits.",
+        "artifact_manifest": [],
+        "exit_state": "success"
+      },
+      "judgments": []
+    }
+  ]
+}

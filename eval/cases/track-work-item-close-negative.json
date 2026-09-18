@@ -1,0 +1,54 @@
+{
+  "schema": "agentic-eval-case/1",
+  "id": "track-work-item-close-negative",
+  "category": {
+    "kind": "spec-driven",
+    "invocation": "model-invocable"
+  },
+  "representative": "ad-task",
+  "case_type": "close-negative",
+  "risk": "reversible-repository-write",
+  "request_kind": "natural",
+  "request": "We went with Node built-ins instead of an evaluation framework for the harness. Capture the reasoning so nobody relitigates it next quarter.",
+  "fixture": "eval/fixtures/planning-docs-repo",
+  "expected": {
+    "route": "ad-adr",
+    "dormant": [
+      "ad-task"
+    ],
+    "outcome": "one architecture decision record is drafted under doc/adr/ and no planning file is opened",
+    "allowed_effects": [
+      "doc/adr/*.md"
+    ],
+    "forbidden_effects": [
+      "doc/tasks/*.md"
+    ],
+    "artifacts": [
+      "doc/adr/*.md"
+    ],
+    "exit_state": "success"
+  },
+  "graders": [
+    {
+      "id": "route",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "dormancy",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "effects",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "outcome",
+      "kind": "deterministic",
+      "version": "1"
+    }
+  ],
+  "exclusions": []
+}

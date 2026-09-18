@@ -1,0 +1,54 @@
+{
+  "schema": "agentic-eval-case/1",
+  "id": "independent-look-before-merge-coexistence",
+  "category": {
+    "kind": "workflow-operational",
+    "invocation": "model-invocable"
+  },
+  "representative": "ad-review",
+  "case_type": "coexistence",
+  "risk": "reversible-repository-write",
+  "request_kind": "natural",
+  "request": "Walk this branch through every rule we have on file and give me a checkable outcome for each one, so I can hand it to the team with proof.",
+  "fixture": "eval/fixtures/planning-docs-repo",
+  "expected": {
+    "route": "ad-audit",
+    "dormant": [
+      "ad-review"
+    ],
+    "outcome": "the exhaustive rule-by-rule pass runs with its own handoffs; the lighter two-axis pass is not what was asked",
+    "allowed_effects": [
+      ".agentic/reviews/*"
+    ],
+    "forbidden_effects": [
+      "src/**"
+    ],
+    "artifacts": [
+      ".agentic/reviews/*"
+    ],
+    "exit_state": "success"
+  },
+  "graders": [
+    {
+      "id": "route",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "dormancy",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "effects",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "outcome",
+      "kind": "deterministic",
+      "version": "1"
+    }
+  ],
+  "exclusions": []
+}

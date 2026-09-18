@@ -1,0 +1,67 @@
+{
+  "schema": "agentic-eval-receipt/1",
+  "case_id": "bootstrap-agents-guide-coexistence",
+  "lane": "replay",
+  "origin": "synthetic",
+  "intent": "intentionally-broken",
+  "declared_failure": "wrong_routing",
+  "frozen": {
+    "case_sha256": "ed8f6db99164bfb897d7b876e556264392a2229b714ee8f20cbbd2c22bd6cc80",
+    "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
+    "host": "claude-code",
+    "host_version": "2.1.227",
+    "model": "synthetic-replay",
+    "scaffold": "synthetic-replay",
+    "tools": [
+      "Read",
+      "Write",
+      "Bash",
+      "Skill"
+    ],
+    "permissions": "acceptEdits",
+    "context_policy": "bare",
+    "run_parameters": {
+      "max_turns": 12
+    },
+    "grader_versions": {
+      "route": "1",
+      "dormancy": "1",
+      "effects": "1",
+      "outcome": "1"
+    },
+    "trial_count": 1
+  },
+  "trials": [
+    {
+      "id": "t1",
+      "events": [
+        {
+          "seq": 1,
+          "kind": "skill_invoked",
+          "skill": "ad-next"
+        },
+        {
+          "seq": 2,
+          "kind": "command",
+          "command": "node .claude/skills/ad-next/scripts/survey.mjs"
+        },
+        {
+          "seq": 3,
+          "kind": "skill_invoked",
+          "skill": "ad-bootstrap"
+        },
+        {
+          "seq": 4,
+          "kind": "final",
+          "exit_state": "success"
+        }
+      ],
+      "outcome": {
+        "final_response": "Surveyed the project and started refreshing the guide for you.",
+        "artifact_manifest": [],
+        "exit_state": "success"
+      },
+      "judgments": []
+    }
+  ]
+}

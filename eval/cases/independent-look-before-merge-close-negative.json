@@ -1,0 +1,50 @@
+{
+  "schema": "agentic-eval-case/1",
+  "id": "independent-look-before-merge-close-negative",
+  "category": {
+    "kind": "workflow-operational",
+    "invocation": "model-invocable"
+  },
+  "representative": "ad-review",
+  "case_type": "close-negative",
+  "risk": "read-only",
+  "request_kind": "natural",
+  "request": "The installer exits with code 2 on a clean checkout and I cannot see why. Get me to the cause with something I can rerun.",
+  "fixture": "eval/fixtures/planning-docs-repo",
+  "expected": {
+    "route": "ad-diagnose",
+    "dormant": [
+      "ad-review"
+    ],
+    "outcome": "the agent builds a repeatable feedback loop and works toward the cause instead of examining a diff",
+    "allowed_effects": [
+      "test/*.test.js"
+    ],
+    "forbidden_effects": [],
+    "artifacts": [],
+    "exit_state": "success"
+  },
+  "graders": [
+    {
+      "id": "route",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "dormancy",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "effects",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "outcome",
+      "kind": "deterministic",
+      "version": "1"
+    }
+  ],
+  "exclusions": []
+}

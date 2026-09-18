@@ -1,0 +1,79 @@
+{
+  "schema": "agentic-eval-receipt/1",
+  "case_id": "track-work-item-coexistence",
+  "lane": "replay",
+  "origin": "synthetic",
+  "intent": "known-good",
+  "declared_failure": null,
+  "frozen": {
+    "case_sha256": "7d8f2340ce6ad4e6a7867190591165139b8dcd705d8f3cf929b66f9752cd8428",
+    "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
+    "host": "claude-code",
+    "host_version": "2.1.227",
+    "model": "synthetic-replay",
+    "scaffold": "synthetic-replay",
+    "tools": [
+      "Read",
+      "Write",
+      "Bash",
+      "Skill"
+    ],
+    "permissions": "acceptEdits",
+    "context_policy": "bare",
+    "run_parameters": {
+      "max_turns": 12
+    },
+    "grader_versions": {
+      "route": "1",
+      "effects": "1",
+      "outcome": "1"
+    },
+    "trial_count": 1
+  },
+  "trials": [
+    {
+      "id": "t1",
+      "events": [
+        {
+          "seq": 1,
+          "kind": "skill_invoked",
+          "skill": "ad-task"
+        },
+        {
+          "seq": 2,
+          "kind": "file_write",
+          "path": "doc/tasks/0002-installer-retry-handling.md"
+        },
+        {
+          "seq": 3,
+          "kind": "skill_invoked",
+          "skill": "ad-tdd"
+        },
+        {
+          "seq": 4,
+          "kind": "file_write",
+          "path": "test/retry.test.js"
+        },
+        {
+          "seq": 5,
+          "kind": "command",
+          "command": "node --test test/retry.test.js"
+        },
+        {
+          "seq": 6,
+          "kind": "final",
+          "exit_state": "success"
+        }
+      ],
+      "outcome": {
+        "final_response": "Recorded the change with its completion checklist, then wrote the failing timeout check; it fails as expected.",
+        "artifact_manifest": [
+          "doc/tasks/0002-installer-retry-handling.md",
+          "test/retry.test.js"
+        ],
+        "exit_state": "success"
+      },
+      "judgments": []
+    }
+  ]
+}

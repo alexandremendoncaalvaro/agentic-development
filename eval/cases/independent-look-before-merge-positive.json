@@ -1,0 +1,46 @@
+{
+  "schema": "agentic-eval-case/1",
+  "id": "independent-look-before-merge-positive",
+  "category": {
+    "kind": "workflow-operational",
+    "invocation": "model-invocable"
+  },
+  "representative": "ad-review",
+  "case_type": "positive",
+  "risk": "reversible-repository-write",
+  "request_kind": "natural",
+  "request": "Before this branch goes in, I want a strict second pair of eyes on the diff: against our written standards, and against what the work was supposed to deliver, with findings I can act on.",
+  "fixture": "eval/fixtures/planning-docs-repo",
+  "expected": {
+    "route": "ad-review",
+    "outcome": "two axis-bounded handoffs are written and findings are reported without editing the code under examination",
+    "allowed_effects": [
+      ".agentic/reviews/*"
+    ],
+    "forbidden_effects": [
+      "src/**"
+    ],
+    "artifacts": [
+      ".agentic/reviews/*"
+    ],
+    "exit_state": "success"
+  },
+  "graders": [
+    {
+      "id": "route",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "effects",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "outcome",
+      "kind": "deterministic",
+      "version": "1"
+    }
+  ],
+  "exclusions": []
+}

@@ -1,0 +1,46 @@
+{
+  "schema": "agentic-eval-case/1",
+  "id": "bootstrap-agents-guide-explicit",
+  "category": {
+    "kind": "spec-driven",
+    "invocation": "user-invocable-only"
+  },
+  "representative": "ad-bootstrap",
+  "case_type": "positive",
+  "risk": "reversible-repository-write",
+  "request_kind": "explicit",
+  "request": "/ad-bootstrap",
+  "fixture": "eval/fixtures/planning-docs-repo",
+  "expected": {
+    "route": "ad-bootstrap",
+    "outcome": "the agent guide at the repository root is regenerated or audited in place and nothing else is written",
+    "allowed_effects": [
+      "AGENTS.md"
+    ],
+    "forbidden_effects": [
+      "README.md"
+    ],
+    "artifacts": [
+      "AGENTS.md"
+    ],
+    "exit_state": "success"
+  },
+  "graders": [
+    {
+      "id": "route",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "effects",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "outcome",
+      "kind": "deterministic",
+      "version": "1"
+    }
+  ],
+  "exclusions": []
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "agentic-eval-receipt/1",
+  "case_id": "independent-look-before-merge-positive",
+  "lane": "replay",
+  "origin": "synthetic",
+  "intent": "known-good",
+  "declared_failure": null,
+  "frozen": {
+    "case_sha256": "6ce3a4907d0e631ca7253e2778ec063bb548bd9f66d31f9b0cfe29fc6e320cc4",
+    "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
+    "host": "claude-code",
+    "host_version": "2.1.227",
+    "model": "synthetic-replay",
+    "scaffold": "synthetic-replay",
+    "tools": [
+      "Read",
+      "Write",
+      "Bash",
+      "Skill"
+    ],
+    "permissions": "acceptEdits",
+    "context_policy": "bare",
+    "run_parameters": {
+      "max_turns": 12
+    },
+    "grader_versions": {
+      "route": "1",
+      "effects": "1",
+      "outcome": "1"
+    },
+    "trial_count": 1
+  },
+  "trials": [
+    {
+      "id": "t1",
+      "events": [
+        {
+          "seq": 1,
+          "kind": "skill_invoked",
+          "skill": "ad-review"
+        },
+        {
+          "seq": 2,
+          "kind": "command",
+          "command": "git diff main...HEAD"
+        },
+        {
+          "seq": 3,
+          "kind": "file_write",
+          "path": ".agentic/reviews/20260917T000000Z-branch-vs-main-standards.md"
+        },
+        {
+          "seq": 4,
+          "kind": "file_write",
+          "path": ".agentic/reviews/20260917T000000Z-branch-vs-main-spec.md"
+        },
+        {
+          "seq": 5,
+          "kind": "final",
+          "exit_state": "success"
+        }
+      ],
+      "outcome": {
+        "final_response": "Two independent passes ran; findings listed side by side, one blocker on the Standards axis.",
+        "artifact_manifest": [
+          ".agentic/reviews/20260917T000000Z-branch-vs-main-standards.md",
+          ".agentic/reviews/20260917T000000Z-branch-vs-main-spec.md"
+        ],
+        "exit_state": "success"
+      },
+      "judgments": []
+    }
+  ]
+}
