@@ -18,10 +18,13 @@
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
-// Mirrors package.json#files — everything npm ships — minus README.md and
-// LICENSE (meta files, rarely changelog-worthy). src/ is watched whole:
-// src/index.js and src/leak-guard.js are in the tarball too.
+// Mirrors what npm ships: package.json#files minus README.md and LICENSE
+// (meta files, rarely changelog-worthy), plus package.json itself, which npm
+// publishes regardless of #files (ADR-0081). src/ is watched whole:
+// src/index.js and src/leak-guard.js are in the tarball too. The lockfile
+// never ships, so it stays unwatched.
 const WATCHED_PREFIXES = ['src/', 'bin/', 'WORKFLOW.md', 'WORKFLOW-FLOWS.md'];
+const WATCHED_FILES = new Set(['package.json']);
 
 /**
  * Decide whether a staged file set deserves a changelog reminder.
@@ -30,8 +33,8 @@ const WATCHED_PREFIXES = ['src/', 'bin/', 'WORKFLOW.md', 'WORKFLOW-FLOWS.md'];
  * @returns {string|null} the warning text, or null when nothing applies
  */
 export function changelogWarning(stagedPaths) {
-  const touched = stagedPaths.filter((path) =>
-    WATCHED_PREFIXES.some((prefix) => path.startsWith(prefix))
+  const touched = stagedPaths.filter(
+    (path) => WATCHED_FILES.has(path) || WATCHED_PREFIXES.some((prefix) => path.startsWith(prefix))
   );
   if (touched.length === 0) return null;
   if (stagedPaths.includes('CHANGELOG.md')) return null;

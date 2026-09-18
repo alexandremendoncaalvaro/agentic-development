@@ -6,6 +6,13 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Fixed
+
+- The pre-commit `changelog-gate` now watches `package.json`, which npm
+  publishes regardless of the `files` field, so a scripts, dependencies,
+  engines, or bin change without a changelog entry gets the reminder
+  (ADR-0081, amending ADR-0048).
+
 ## [1.0.0] - 2026-09-15
 
 ### Added
