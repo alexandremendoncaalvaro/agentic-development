@@ -507,8 +507,9 @@ tool calls, denials, and the result).
 
 **Definition:** the harness module that turns one host's **Host stream** into a
 **Trial** in the common receipt shape: normalized events of the ADR-0080
-vocabulary, the outcome, and every native record kept beside its event. A
-*fake* runner adapter is the same module fed a sample stream instead of a
+vocabulary, the outcome, every native record kept beside its event, and the
+`unmapped` list of records that produced no event, keyed by host shape with
+their stream lines. A *fake* runner adapter is the same module fed a sample stream instead of a
 spawned host; the live runner composes a spawn with the adapter.
 
 _Avoid_: "Evaluation domain adapter" (the `ad-prism` project-local contract, a

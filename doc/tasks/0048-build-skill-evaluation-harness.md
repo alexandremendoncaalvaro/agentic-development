@@ -1,6 +1,6 @@
 # Task `0048`: Build a skill trajectory evaluation harness
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-08-11
 **Scope ref:** doc/product/PRD.md — Later tier: Skill eval harness
 **Owner:** Alexandre Alvaro
@@ -715,11 +715,57 @@ slice passed the local gate and a fresh-context review. The live lane, the
 pilot, and ADR-0080 acceptance remain owner-gated and are not acceptance
 criteria of this task.
 
+### 2026-09-18 — Re-audit of the block after slice 6 (ad-audit, ADR-0047)
+
+Target `origin/main..HEAD` at `08b0ca9`, delta since the prior re-audit
+`7d368bc..08b0ca9`. Nineteen reviewers: the four binding documents, twelve
+accepted ADRs (0007, 0008, 0030, 0032, 0048, 0049, 0059, 0065, 0070, 0073,
+0077, 0078), and the critical claims-verification group with two cross-model
+swap passes; HK, GH, NET, and every other accepted ADR recorded N/A with a
+reason; ADR-0080 remains proposed. Every reviewer echoed the target SHA and the
+rule-file anchor; all matched. Trail and handoffs under
+`.agentic/reviews/20260918T142558Z-reaudit2-*`.
+
+Threads carried from the prior re-audit: the ADR-0070 commit-ordering rule is
+resolved, `ac54537` (design only) precedes `a77db16` (implementation) in
+history; the Windows and Ubuntu CI legs stay open until the pull request; CV.5
+review-narrative durability stays open, and the audit found slice 6 below even
+the earlier baseline: slices 2 to 5 have reconstructed verdict files, slice 6
+had only the handoffs, and its two Notes entries stated the review rounds as
+fact without the OPEN QUESTION label the slice 4 and 5 entry carries. All three
+CV passes agreed. Remediation in this commit: the six reviewer outputs are
+persisted verbatim from the session transcript as
+`.agentic/reviews/20260917T211139Z-working-tree-slice6-verdicts.md`, labelled
+as an after-the-fact copy, not a contemporaneous capture; and the slice 6
+review narrative above is an OPEN QUESTION under CV.5 until the Task 0077 rule
+lands. The entry "Slice 6: host stream adapters" says eleven behaviors; the
+file held twelve at the commit, the twelfth being the declined `file_change`
+test added while closing the third pass; this line corrects it.
+
+Also fixed here: GROUND-0025 A7 named only a machine-local path and a `grep`
+count BSD `grep` rejects (now the public cask identity and a portable command,
+in Corrections); GROUND-0025 D3 stated two commits where the command returns
+five (now exact); `ARCHITECTURE.md` cited a "gotcha §89" that never existed and
+carried a per-item ADR pointer the surrounding bullet does not (both fixed);
+the CONTEXT.md Runner adapter entry omitted `unmapped` (added); ADR-0080 item
+10 now says "Claude Code subagents" as the CONTEXT.md ambiguity asks. Refuted
+with reason: GUIDELINES §9.5 regression naming does not bind the adapter tests,
+because the rule covers fixed bugs with an issue reference and these tests pin
+behaviors of code that never landed. Accepted as-is with reason: the adapter
+test file exceeds the §3.3 ceiling like every other suite file. Out of the
+range and routed to `ad-drift`: the ARCHITECTURE.md test layout omits seven
+pre-existing suite files; ADR-0065's text says Node 20 and 22 while the matrix
+runs 22.13.0 and 24.x; ADR-0007 item 7's install model is superseded elsewhere.
+
+With this entry every acceptance criterion and Definition of Done item is met.
+The task closes here; the pull request, ADR-0080 acceptance, the live pilot,
+and the Task 0077 curation are owner actions outside this task's criteria.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task

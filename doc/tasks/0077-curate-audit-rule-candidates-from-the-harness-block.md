@@ -26,6 +26,7 @@ work item that carries them to a curation session.
 - [ ] Candidate: `ad-review` persists reviewer verdicts beside the handoffs it already writes, at review time, so a "review found X" claim has a contemporaneous artifact instead of a reconstruction.
 - [ ] Candidate: a design that exceeds the governing spec lands in its own commit before the commit that implements it, checkable in git history; the advisory form of this rule was stated after slice 2 of Task 0048, honored by slice 4, and missed by slice 5.
 - [ ] Candidate: every record under `doc/research/`, whatever its genre, carries the layer header and dated sources; the `ad-prism` plan template lacks them today.
+- [ ] Candidate: a ground record that cites a measurement on a locally installed artifact names the artifact's public release identity and version and gives a reproduction command that runs on the CI platforms' shells, so the evidence does not live only on the author's machine.
 
 ## Plan
 
@@ -46,6 +47,15 @@ after being stated, move from an unwritten candidate to a tracked follow-up so
 a third occurrence is not handled as prose again. The four candidates are
 listed as acceptance criteria so the owner can see the whole set in one place;
 none is written into any rule layer until the curation session approves it.
+
+### 2026-09-18
+
+The re-audit of Task 0048 after slice 6 reinforced the second candidate: slice
+6 had no verdict file at all, only the review handoffs, and its Notes stated
+the rounds as fact; the six outputs were persisted after the fact from the
+session transcript. A fifth candidate joins from the same audit: GROUND-0025
+A7 cited a measurement reachable only through a machine-local path and a
+`grep` count that BSD `grep` rejects.
 
 ## Definition of Done
 
