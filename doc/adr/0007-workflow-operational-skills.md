@@ -70,3 +70,20 @@ What this means for the Codex variant of `ad-review`:
 Status of the surrounding decision: the broader workflow-operational skill category — items 1, 2, 3, 5, 6, 7 of the original Decision section — still holds. **Only the Codex consequence stanza is superseded.** Claude Code variant of `ad-review` continues to spawn two parallel `Task` sub-agents (one Standards-axis, one Spec-axis); that path is unaffected by this addendum.
 
 Follow-up captured: review the structural-axis-separation degradation flagged during the §10 self-review of commit `3fabb92`. A single reviewer with both axes' material loaded simultaneously can still rationalize; the schema enforces output ordering, not reasoning independence. If field evidence shows axis bleed in practice, a future ADR may reintroduce a stricter Codex path (e.g., always recommending the optional subagent escalation rather than burying it).
+
+## Addendum — 2026-09-21: decision item 7's universal set superseded by whole-set installation
+
+Decision item 7 places `agentic-review` in an always-installed universal set,
+which presupposes that the kit sorts skills into universal and optional. That
+split no longer exists. [ADR-0064](0064-install-all-skills-with-contextual-guidance.md)
+decided that every bundled skill installs for each selected host, and
+`bundledSkills()` in `src/lib/install.js` realizes it by enumerating the host's
+source directory — there is no membership list to join and nothing for a skill
+to be excluded from.
+
+What is superseded is the membership claim, not the outcome: the skill is still
+installed for every host, which is what item 7 wanted. The 2026-05-24 addendum
+above states that items 1, 2, 3, 5, 6, and 7 still hold; that sentence was true
+when written and is corrected here for item 7 only, without editing it in place.
+The workflow-operational skill category, and every other item of the Decision,
+continue to bind.

@@ -6,7 +6,7 @@ Without this file, learning which architectural decisions still bind costs one p
 
 ## Default
 
-All 57 accepted ADRs bind in full, except the fifteen below, which bind except for the named part.
+All 57 accepted ADRs bind in full, except the sixteen below, which bind except for the named part.
 
 No ADR in this directory has been deprecated or superseded as a whole document. A `proposed` ADR is not counted here and does not appear until it is accepted — it binds nothing until then, and its acceptance is the change to what binds that adds it (see *The rule that keeps it true*).
 
@@ -14,7 +14,7 @@ No ADR in this directory has been deprecated or superseded as a whole document. 
 
 | ADR | Retired | Still binding | Retired by |
 |---|---|---|---|
-| [0007](0007-workflow-operational-skills.md) | The Codex `/clear` + handoff choreography for fresh-context review, and its "feature parity is imperfect" consequence | The workflow-operational skill category itself, and every other item of the decision. The Claude Code path was never affected | Its own addendum, after Codex shipped a subagent primitive |
+| [0007](0007-workflow-operational-skills.md) | The Codex `/clear` + handoff choreography for fresh-context review, and its "feature parity is imperfect" consequence; decision item 7's always-installed universal set, which presupposed a universal-versus-optional split | The workflow-operational skill category itself, and every other item of the decision. The Claude Code path was never affected, and the skill is still installed for every host | Its own addendum, after Codex shipped a subagent primitive; its own 2026-09-21 addendum, after [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) removed the split |
 | [0035](0035-rules-location-convention.md) | The rejection of a per-repo `.agentic/rules/` layer, for project scope only | The machine store and its resolution order, unchanged | [ADR-0043](0043-per-project-rules-layer.md) |
 | [0030](0030-single-responsibility-per-document.md) | The absolute reading of directory-as-index, for a layer's *own* directory only | The single-responsibility-per-document principle, and the ban on any *other* document digesting a layer's index | [ADR-0049](0049-append-only-layers-own-a-state-projection.md) — the decision that created this page |
 | [0047](0047-absorb-team-practices-determinism-reaudit.md) | Decision 1's *realization* as inline shell copied into two skill files — not Decision 1 itself | The deterministic resolution probe as a requirement, and Decisions 2 through 4 | Its own addendum, after task-0031 shipped the probe as a skill script |
@@ -28,23 +28,26 @@ No ADR in this directory has been deprecated or superseded as a whole document. 
 | [0060](0060-ad-research-evidence-graded-studies.md) | Profile-based installation scope for `ad-research`, and the absolute artifact-free boundary for `ad-ground` | The evidence-graded study process, distinct from `ad-ground`'s implementation receipt | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md); [ADR-0070](0070-persist-grounded-decision-evidence.md) |
 | [0061](0061-ad-derisk-orchestrator.md) | Profile-based installation scope for `ad-derisk` | The uncertainty-retirement orchestrator | [ADR-0064](0064-install-all-skills-with-contextual-guidance.md) |
 | [0032](0032-ci-failure-is-local-gate-gap.md) | The Linux + macOS CI example and realized runner set | The local-gate parity rule and every other decision in the record | [ADR-0065](0065-run-ci-on-windows.md) |
+| [0065](0065-run-ci-on-windows.md) | The realized Node version pair, Node 20 and Node 22 | The two-operating-system matrix, the four-check `protect-main` requirement, and the unchanged local pre-push gate | [ADR-0078](0078-set-the-one-point-zero-quality-boundary.md) — CI now runs Node 22.13 and Node 24 |
 | [0073](0073-skill-invocation-policy-and-listing-budget.md) | `ad-rules` membership in the user-invocable-only class | The blast-radius classification rule, every other named class member, and all listing budgets | [ADR-0076](0076-compose-a-canonical-decision-maker-brief.md) |
 
-Two shapes appear above and they are checked differently. A **cross-record** amendment (0035) declares itself as a header-field pair — `Amends:` on one side, `Amended by:` on the other — which makes it verifiable without reading prose. A **self**-amendment (0007, 0047) has no second record to pair with: the record corrects itself in a dated addendum, marks the dead stanza in place, and this page is what makes it discoverable from the directory rather than only from inside the file.
+Two shapes appear above and they are checked differently. A **cross-record** amendment (0035, 0065) declares itself as a header-field pair — `Amends:` on one side, `Amended by:` on the other — which makes it verifiable without reading prose. A **self**-amendment (0007, 0047) has no second record to pair with: the record corrects itself in a dated addendum, marks the dead stanza in place, and this page is what makes it discoverable from the directory rather than only from inside the file. One record (0007) carries the self-amendment shape twice, once per retired part, which is why the corrector column and not the row is the unit to read.
 
 ## Verifying this page
 
-A keyword sweep is not the way in, and re-deriving why wastes the same hour twice. Scoped to numbered records — the unscoped form also matches this page — it reports eight:
+A keyword sweep is not the way in, and re-deriving why wastes the same hour twice. Scoped to numbered records — the unscoped form also matches this page — it over-reports, and by a margin that grows with every amendment, which is why no count is pinned here:
 
 ```sh
 grep -ilE "supersed|replaces ADR|amends|revises ADR" [0-9]*.md
 ```
 
-Six of the eight are the records named in the table above plus their correctors. The other two are false positives: **0002** supersedes a pre-ADR CLI implementation rather than an ADR, and **0008** discusses the Nygard supersession vocabulary as a concept.
+It fails in both directions at once, which is what makes it untrustworthy rather than merely noisy. It matches records that only *discuss* supersession — **0002** supersedes a pre-ADR CLI implementation rather than an ADR, and **0008** discusses the Nygard vocabulary as a concept. And it misses records whose relation is declared only as `**Amended by:**`, because the pattern spells the verb `amends`: **0032**, **0048**, and **0073** all sit in the table above and never appear in the sweep's output.
 
-The reliable check reads the header fields and compares **relations, not filenames** — the two file lists are disjoint by design, because the halves of one relation live in different records:
+The reliable check reads the header fields and compares **relations, not filenames** — a record can appear in both lists, once as a corrector and once as corrected (0063 and 0065 both do), so the unit to match is the relation:
 
 ```sh
 grep -H "^\*\*Amends:\*\*" [0-9]*.md      # each A→B here
 grep -H "^\*\*Amended by:\*\*" [0-9]*.md  # needs its B→A there
 ```
+
+This check covers cross-record amendments only. Two classes of retirement in the table above declare themselves elsewhere and will not appear: a **self**-amendment, which lives in the record's own dated addendum, and the profile-scope retirements attributed to [ADR-0064](0064-install-all-skills-with-contextual-guidance.md), which are recorded here but in no header field. Completing that second class is tracked by [task-0080](../tasks/0080-declare-the-adr-0064-amendment-relations.md).
