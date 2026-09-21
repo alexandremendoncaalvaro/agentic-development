@@ -217,6 +217,29 @@ guard. The same file cited ADR-0082 as a recorded decision while ADR-0082 is
 for a decision awaiting the owner. And `doc/adr/PROJECTION.md`'s enumeration of
 self-amendments still named two records after this branch made ADR-0080 a third.
 
+### 2026-09-21 — The Windows leg failed, and it was a production defect
+
+The pull request's matrix went red on both Windows legs while both Ubuntu legs
+passed. Two tests of `resolveCaptureDir` used POSIX path literals, which is the
+shallow reading; underneath them the function itself decided repository
+containment with a hardcoded `/` separator, so on Windows a capture written
+*inside* the repository would have been reported as outside and the
+`inRepository` flag — the thing that marks a capture as having left the private
+default — would have been silently wrong on the one platform this repository
+runs CI on precisely to catch that.
+
+Containment is now decided by `relative` plus `isAbsolute`, which carries no
+separator assumption. Verified by running both the old and the new logic under
+`node:path`'s `win32` semantics: the old one answered `false` for
+`C:\repo` plus `eval\receipts`, the new one answers `true` there and `false`
+for a sibling directory and for a `..` escape. The tests now build their paths
+with the platform's own joiner and assert equality against it rather than a
+prefix, and a third case pins the outside-the-repository answer.
+
+This is the local gate gap WORKFLOW §11 describes: the gate was closed here
+rather than iterated against red CI, and the defect was a real one the Windows
+leg existed to find.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

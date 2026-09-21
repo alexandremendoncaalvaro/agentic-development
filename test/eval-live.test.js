@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 
 import { freezeArtifact } from '../src/skills/claude-code/ad-prism/scripts/freeze-artifact.mjs';
@@ -198,19 +198,34 @@ test('regression: a failing host still produces a receipt, with the failure in i
 });
 
 test('live: a capture defaults outside the repository, so forgetting is safe', () => {
-  const dest = resolveCaptureDir({ out: null, root: '/repo', workRoot: '/tmp/work-1' });
+  // Paths are built with the platform's own joiner: a POSIX literal here passes
+  // on Linux and fails on Windows, which is the leg that measures this code.
+  const root = resolve('repo');
+  const workRoot = resolve('work-1');
+  const dest = resolveCaptureDir({ out: null, root, workRoot });
   assert.equal(dest.inRepository, false);
-  assert.ok(dest.path.startsWith('/tmp/work-1'));
+  assert.equal(dest.path, join(workRoot, 'capture'));
 });
 
 test('live: an explicit destination inside the repository is allowed but marked', () => {
+  const root = resolve('repo');
   const dest = resolveCaptureDir({
-    out: 'eval/receipts/x',
-    root: '/repo',
-    workRoot: '/tmp/work-1',
+    out: join('eval', 'receipts', 'x'),
+    root,
+    workRoot: resolve('work-1'),
   });
   assert.equal(dest.inRepository, true);
-  assert.ok(dest.path.startsWith('/repo'));
+  assert.equal(dest.path, join(root, 'eval', 'receipts', 'x'));
+});
+
+test('regression: a destination outside the repository is not marked as inside', () => {
+  const root = resolve('repo');
+  const dest = resolveCaptureDir({
+    out: resolve('elsewhere'),
+    root,
+    workRoot: resolve('work-1'),
+  });
+  assert.equal(dest.inRepository, false);
 });
 
 const CLAUDE_INIT_STREAM = [

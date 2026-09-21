@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 
 import { freezeArtifact } from '../../src/skills/claude-code/ad-prism/scripts/freeze-artifact.mjs';
 import { loadDenylist } from '../../src/leak-guard.js';
@@ -315,8 +315,11 @@ function failureTrial(trial, reason) {
 export function resolveCaptureDir({ out, root, workRoot }) {
   if (!out) return { path: join(workRoot, 'capture'), inRepository: false };
   const path = resolve(root, out);
-  const repoRoot = resolve(root);
-  return { path, inRepository: path === repoRoot || path.startsWith(`${repoRoot}/`) };
+  // Containment by `relative`, not by a separator literal: a `/` comparison
+  // reads a real in-repository path as outside on Windows, which is the one
+  // platform where getting this wrong would silently drop the flag.
+  const rel = relative(resolve(root), path);
+  return { path, inRepository: rel === '' || (!rel.startsWith('..') && !isAbsolute(rel)) };
 }
 
 /** The repository's own denylist, or an empty policy when the operator has none. */
