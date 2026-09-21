@@ -223,6 +223,14 @@ _Avoid_: "review snapshot" (snapshot implies frozen-in-time database state); "re
 
 **Related code:** [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md), [`.agentic/reviews/`](.agentic/reviews/).
 
+### Review verdicts
+
+**Definition:** the markdown file `ad-review` writes to `.agentic/reviews/<ISO>-<scope>-verdicts.md` at review time, carrying both reviewers' reports verbatim under the Standards and Spec headings. The **Review handoff** proves what a reviewer was given; the verdicts file proves what the review found. A contemporaneous artifact on the reviewing machine, not durable evidence: it shares the gitignored `.agentic/reviews/` directory, so a finding that must outlive the machine is quoted into the tracked record or labelled an open question.
+
+_Avoid_: "review report" (the reply in the session is the report; this is its persisted copy); "verdict file" without the qualifier (the audit's verdict trail is a different producer); "durable evidence" (it is not versioned).
+
+**Related code:** [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md).
+
 ### Audit handoff
 
 **Definition:** the markdown file `ad-audit` writes to `.agentic/reviews/<ISO>-audit-<scope>.md` (Claude Code: one per dispatched rule-group; Codex: one combined audit trail). Carries the target plus the resolved rule-set slice each `audit-group-reviewer` receives — one rule-group's rules, the tree/SHA, and the critical tag. Serves as the audit trail for the maximum-gate audit and the context packet for a user-spawned reviewer escalation. Ephemeral per-audit artifact; shares the `.agentic/reviews/` directory (and its `.gitignore` entry) with the Review handoff.
@@ -530,7 +538,7 @@ is the runner's job, not the adapter's).
   provider rules into their own contracts.
 - A **Kit** install materializes every bundled **Workflow-operational skill** and **Spec-driven skill** for each selected agent surface (`.claude/skills/` and `.agents/skills/`).
 - A **Fresh-context review** is implemented as a **Two-axis review** on every kit-supported host; the implementation differs per host but the noun does not.
-- A **Two-axis review** produces one or more **Review handoffs** as its audit trail.
+- A **Two-axis review** produces one or more **Review handoffs** as its audit trail and one **Review verdicts** file as its persisted output.
 - A **Session handoff** and a **Review handoff** are sibling flavours of **Handoff**; they share neither path nor lifecycle. Each is owned by exactly one skill (`ad-handoff` and `ad-review` respectively).
 - An **Audit handoff** is the maximum-gate sibling flavour, owned by `ad-audit`. It shares the `.agentic/reviews/` directory with the **Review handoff** but differs in producer and shape (per rule-group, not per axis).
 - An `ad-audit` run resolves its rule-set as the union of the three **Rule-set layers**; `ad-level-up` writes to exactly one curated layer per accepted rule (machine store or project rules — binding docs belong to their own skills).

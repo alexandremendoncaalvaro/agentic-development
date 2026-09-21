@@ -25,6 +25,8 @@
 - **C1:** <repository-local path:line and observation, or no analog plus search command> (accessed <YYYY-MM-DD> via <method>)
 - **D1:** <git command, commit/path observation, or reproducible no-prior-attempt result> (accessed <YYYY-MM-DD> via <method>)
 
+A measurement taken on a locally installed third-party artifact (a CLI binary, a package) names the artifact's public release identity and version and gives a reproduction command that runs on the CI platforms' shells; a bare local path is not a source.
+
 ## Limitations and reversal
 
 <What this record cannot establish; the concrete evidence that would reverse the decision.>

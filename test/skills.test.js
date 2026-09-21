@@ -2046,3 +2046,55 @@ for (const agent of ['claude-code', 'codex']) {
     );
   });
 }
+
+// --- Review verdict durability (task-0078): the review's outputs, not only its inputs, persist ---
+
+test('ad-review persists the reviewer verdicts beside its handoffs at review time, on both hosts', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-review', 'SKILL.md'), 'utf8');
+    assert.match(
+      body,
+      /\.agentic\/reviews\/<ISO(?:-timestamp)?>-<scope(?:-slug)?>-verdicts\.md/,
+      `${agent}/ad-review must name the verdicts file it writes`
+    );
+    assert.match(
+      body,
+      /verdicts\.md[\s\S]{0,400}verbatim|verbatim[\s\S]{0,400}verdicts\.md/,
+      `${agent}/ad-review must persist the reviewer output verbatim, not a summary`
+    );
+  }
+});
+
+test('ad-prism durable plans carry the research-layer header and dated sources, on both hosts', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
+    const brief = readFileSync(join(skillDir, 'assets', 'evaluation-brief.md'), 'utf8');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    assert.match(
+      brief,
+      /^# PRISM-NNNN: /m,
+      `${agent}/ad-prism brief must carry the numbered layer title`
+    );
+    assert.match(brief, /^\*\*Status:\*\* /m, `${agent}/ad-prism brief must carry a Status header`);
+    assert.match(
+      brief,
+      /accessed <YYYY-MM-DD> via <method>/,
+      `${agent}/ad-prism brief must date its sources`
+    );
+    assert.match(
+      body,
+      /doc\/research\/[\s\S]{0,300}dated sources|dated sources[\s\S]{0,300}doc\/research\//i
+    );
+  }
+});
+
+test('ad-ground records name the public identity of a locally installed artifact they measured, on both hosts', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const template = readFileSync(
+      join(SKILLS_ROOT, agent, 'ad-ground', 'references', 'record-template.md'),
+      'utf8'
+    );
+    assert.match(template, /public release identity and version/);
+    assert.match(template, /reproduction command/);
+  }
+});

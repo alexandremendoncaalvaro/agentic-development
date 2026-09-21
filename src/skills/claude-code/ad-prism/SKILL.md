@@ -29,6 +29,10 @@ Read [methodology.md](references/methodology.md) when designing, explaining,
 refining, interpreting, or auditing an evaluation. Use
 [evaluation-brief.md](assets/evaluation-brief.md) when a durable plan is needed,
 then run `node <skill-dir>/scripts/validate-plan.mjs <evaluation-plan.md>`.
+A plan or record placed under `doc/research/` is a research-layer artifact:
+keep the brief's numbered `PRISM-NNNN` title, its `Status` and `Decision ref`
+header, and dated sources, the same header and provenance discipline the
+`ad-ground` and `ad-research` records carry.
 Read [skill-comparison.md](references/skill-comparison.md) when you compare
 evaluation skills or decide whether one can replace another.
 

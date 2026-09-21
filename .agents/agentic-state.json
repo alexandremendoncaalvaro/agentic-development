@@ -291,7 +291,7 @@
         },
         {
           "path": ".agents/skills/ad-ground/references/record-template.md",
-          "sourceSha": "37f0a5cf6e953ed3e43b69db0ea96831ea85c2f34571e87af45f37b9365826be"
+          "sourceSha": "374df3e6636ea7aa88db3bd0aa6e4af913a2ae5749e13ef59c1005666e66c2d0"
         },
         {
           "path": ".agents/skills/ad-ground/scripts/validate-record.mjs",
@@ -481,7 +481,7 @@
         },
         {
           "path": ".agents/skills/ad-prism/assets/evaluation-brief.md",
-          "sourceSha": "441c99711d1c50e53afe69a2bc5a607c6ce1cc860d62454fcee2f78b092742e7"
+          "sourceSha": "c67b2b2454df01b0c49eed3296ba6af9a9520e7908949a6035e59aa2a92bb054"
         },
         {
           "path": ".agents/skills/ad-prism/evals/evals.json",
@@ -525,7 +525,7 @@
         },
         {
           "path": ".agents/skills/ad-prism/SKILL.md",
-          "sourceSha": "be9b9a2e8ef29021a391449265e69baffb536cbd474b165be0842bfed37a2a6b"
+          "sourceSha": "a8ff8e8a6355a4f8f61b20a782770642fc3e8ac2e4c89a941b10f08fa8cdc0f0"
         }
       ]
     },
@@ -700,7 +700,7 @@
         },
         {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "b3e029ad28eb7c666f113b00dc8b7ede2c803f04e64868af07409b5676853154"
+          "sourceSha": "207a7247d07198caa06546d12f5c0001aeee3be4d9ac84b34f0a14a25ffca6f8"
         },
         {
           "path": ".codex/agents/fresh-context-reviewer.toml",
