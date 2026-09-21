@@ -235,7 +235,7 @@
         },
         {
           "path": ".claude/skills/ad-ground/scripts/validate-record.mjs",
-          "sourceSha": "ecb8fad46cbb66888600ec47818f58570d39037d9edd9750ef46173768027f9d"
+          "sourceSha": "97ea806e6703de1f205f1983d8da2b34b33a9ea1da24aaba5aab1051132a935f"
         },
         {
           "path": ".claude/skills/ad-ground/SKILL.md",

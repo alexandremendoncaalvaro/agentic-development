@@ -1808,7 +1808,9 @@ test('validate-record: rejects a claim whose cited source is not registered', ()
     const report = runGroundRecord(dir, record);
 
     assert.equal(report.valid, false);
-    assert.deepEqual(report.errors, ['E1 references unknown source Z1']);
+    assert.deepEqual(report.errors, [
+      'E1 references unknown source Z1: register it as "- **Z1:** <citation> (accessed <YYYY-MM-DD> via <method>)" under "## Source register" or cite a registered id',
+    ]);
     assert.deepEqual(report.unreadable, []);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -1828,7 +1830,9 @@ test('validate-record: rejects a source without access provenance', () => {
     const report = runGroundRecord(dir, record);
 
     assert.equal(report.valid, false);
-    assert.deepEqual(report.errors, ['A1 has no access date and method']);
+    assert.deepEqual(report.errors, [
+      'A1 has no access date and method: end its line with "(accessed <YYYY-MM-DD> via <method>)"',
+    ]);
     assert.deepEqual(report.unreadable, []);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -1845,8 +1849,146 @@ test('validate-record: rejects a title whose number differs from its filename', 
     const report = runGroundRecord(dir, record);
 
     assert.equal(report.valid, false);
-    assert.deepEqual(report.errors, ['record title number must match filename']);
+    assert.deepEqual(report.errors, [
+      'record title number must match filename: the first line is "# GROUND-0002: <short implementation decision>"',
+    ]);
     assert.deepEqual(report.unreadable, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: a missing source group names the line shape that registers one', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-no-group-'));
+  try {
+    const record = writeGroundRecord(
+      dir,
+      VALID_GROUND_RECORD.replace(
+        '- **D1:** git log --all --oneline -- src/skills/claude-code/ad-ground — evidence-grade implementation history (accessed 2026-08-12 via Bash)\n',
+        ''
+      ).replace('A1, B1, C1, D1', 'A1, B1, C1')
+    );
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.errors, [
+      'source register has no D source: add a line shaped "- **D1:** <citation> (accessed <YYYY-MM-DD> via <method>)" under "## Source register"',
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: an evidence section without a claim names the claim heading and its two lines', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-no-claim-'));
+  try {
+    const record = writeGroundRecord(
+      dir,
+      VALID_GROUND_RECORD.replace(
+        '### E1 — A source map makes the implementation decision auditable.\n\n**Strength:** High\n**Provenance:** A1, B1, C1, D1\n',
+        'The map is auditable.\n'
+      )
+    );
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.errors, [
+      'evidence has no claim: add a heading shaped "### E1 — <claim>" under "## Evidence" followed by "**Strength:** <High | Medium | Low | Very-low>" and "**Provenance:** <A1, B1, C1, D1>" lines',
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: a claim without a valid strength names the line and the allowed values', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-no-strength-'));
+  try {
+    const record = writeGroundRecord(
+      dir,
+      VALID_GROUND_RECORD.replace('**Strength:** High', '**Strength:** Strong')
+    );
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.errors, [
+      'E1 has no valid strength: add a line "**Strength:** <High | Medium | Low | Very-low>" under its heading',
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: a claim without provenance names the provenance line shape', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-no-provenance-'));
+  try {
+    const record = writeGroundRecord(
+      dir,
+      VALID_GROUND_RECORD.replace('**Provenance:** A1, B1, C1, D1\n', '')
+    );
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.errors, [
+      'E1 has no provenance: add a line "**Provenance:** <A1, B1, C1, D1>" naming registered source ids under its heading',
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: missing metadata and sections name the exact line or heading expected', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-missing-lines-'));
+  try {
+    const record = writeGroundRecord(
+      dir,
+      VALID_GROUND_RECORD.replace('**Confidence:** Strong\n', '').replace(
+        '## Audit path\n\nRun validate-record.mjs, then inspect every cited source.\n',
+        ''
+      )
+    );
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.errors, [
+      'missing Confidence metadata: add a line "**Confidence:** <value>" under the title',
+      'missing Audit path section: add a "## Audit path" heading',
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: a wrong title or status names the line that satisfies each rule', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-title-status-'));
+  try {
+    const record = writeGroundRecord(
+      dir,
+      VALID_GROUND_RECORD.replace(
+        '# GROUND-0002: Durable evidence for a grounded decision',
+        '# Durable evidence for a grounded decision'
+      ).replace('**Status:** recorded', '**Status:** draft')
+    );
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.deepEqual(report.errors, [
+      'record title must be GROUND-NNNN: the first line is "# GROUND-0002: <short implementation decision>"',
+      'Status must be recorded: write "**Status:** recorded"',
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: every message stays on one line', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-one-line-'));
+  try {
+    const record = writeGroundRecord(dir, '# GROUND-0002: bare\n');
+    const report = runGroundRecord(dir, record);
+
+    assert.equal(report.valid, false);
+    assert.ok(report.errors.length >= 9);
+    for (const message of report.errors) assert.ok(!message.includes('\n'), message);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
