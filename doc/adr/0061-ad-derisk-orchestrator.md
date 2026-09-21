@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-08-10
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0064 — its profile-based installation scope for `ad-derisk`; the uncertainty-retirement orchestrator is unchanged.
 
 ## Context
 

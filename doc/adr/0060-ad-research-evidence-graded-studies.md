@@ -4,6 +4,7 @@
 **Date:** 2026-08-10
 **Deciders:** Alexandre Alvaro
 **Amended by:** ADR-0070
+**Amended by:** ADR-0064 — its profile-based installation scope for `ad-research`; the evidence-graded study process is unchanged.
 
 ## Context
 

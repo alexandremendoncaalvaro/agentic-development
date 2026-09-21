@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-05-10
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0064 — the vocabulary of decision item 3 and nothing it does: registration was already universal across all four profiles and the skill still installs for every host. Read this field as a pointer for the dangling term, not as a behavioral change.
 
 ## Context
 
