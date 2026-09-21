@@ -45,7 +45,7 @@ a second gate's proposal cites.
 ## Plan
 
 - [ ] `/ad-derisk`: register the unknowns (does the model act on the surfaced message; does the route grader's implicit-activation false negative, Task 0082, distort the comparison; how the fixture's hook path resolves on CI machines; the cost per trial) and retire each.
-- [ ] Run the exploratory scratch pilot and record its results in Notes with the exploratory label.
+- [x] Run the exploratory scratch pilot and record its results in Notes with the exploratory label.
 - [ ] `/ad-ground`: the fixture path convention for a hook that must resolve on any machine, and the corpus rules for a new representative; write the ground record and set `Evidence ref`.
 - [ ] Build the tracked fixture and case family test-first; extend the adapter's event vocabulary or add a sidecar join, whichever the ground record settles.
 - [ ] Run the on-versus-off comparison; record the numbers; propose or decline a second gate in a new record that checks ADR-0083 decision 7's stop criteria.
