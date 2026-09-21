@@ -110,6 +110,15 @@ corrector, so the amendment relation is paired on both sides at acceptance
 the way ADR-0063 and ADR-0078 were. The remaining owner action for this
 branch is the pull request, whose matrix is the only check not yet observed.
 
+### 2026-09-21 — Pull request 142 and its green matrix
+
+Pull request 142 opened against `main` carrying the five commits of this
+branch. Run 35606524475 passed all four required checks — ubuntu-latest and
+windows-latest, each on Node 22.13.0 and 24.x — which is the last check of
+the task's test plan and the only one the local gate cannot produce, because
+CI runs on `pull_request`. Nothing in the task remains unobserved; the merge
+is the owner's action.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
