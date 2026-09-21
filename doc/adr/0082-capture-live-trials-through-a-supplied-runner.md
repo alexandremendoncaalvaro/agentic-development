@@ -1,6 +1,6 @@
 # ADR-0082: Capture live trials through a supplied runner
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-09-21
 **Deciders:** Alexandre Alvaro
 
