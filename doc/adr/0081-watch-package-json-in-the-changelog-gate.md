@@ -1,6 +1,6 @@
 # ADR-0081: Watch package.json in the changelog gate
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-09-18
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0048 — the watched set of the `changelog-gate` pre-commit check

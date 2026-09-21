@@ -99,6 +99,17 @@ Local gate green at 1017 tests before this entry's commit; the changelog gate
 now reminds on `package.json`. The pull request and the acceptance of ADR-0081
 (with its `PROJECTION.md` row on ADR-0048) are owner actions.
 
+### 2026-09-21 — ADR-0081 accepted
+
+The owner accepted ADR-0081, which closes the last open finding of the Task
+0078 audit: the gate implemented an amendment whose record was still
+`proposed`. `Status` is now `accepted`, `doc/adr/PROJECTION.md` counts 57
+fully binding records, and its ADR-0048 row names the retired part — the
+watched set derived only from `package.json#files` — with ADR-0081 as the
+corrector, so the amendment relation is paired on both sides at acceptance
+the way ADR-0063 and ADR-0078 were. The remaining owner action for this
+branch is the pull request, whose matrix is the only check not yet observed.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
