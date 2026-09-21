@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-07-27
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0064 — its profile-based installation scope for `ad-audit`; the maximum-gate process and its evidence requirements are unchanged.
 
 ## Context
 

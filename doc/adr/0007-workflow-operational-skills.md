@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-05-09
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0064 — decision item 7's always-installed universal set; the reasoning is in this record's 2026-09-21 addendum.
 
 ## Context
 

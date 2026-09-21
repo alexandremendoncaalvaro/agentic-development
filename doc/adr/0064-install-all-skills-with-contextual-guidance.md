@@ -3,6 +3,14 @@
 **Status:** accepted
 **Date:** 2026-08-11
 **Deciders:** Alexandre Alvaro
+**Amends:** ADR-0007 — decision item 7's always-installed universal set, which presupposed a universal-versus-optional split; the workflow-operational skill category and every other item are unchanged.
+**Amends:** ADR-0020 — its profile-based installation scope for `ad-deepen`; the architectural vocabulary, regime, and process are unchanged.
+**Amends:** ADR-0021 — the vocabulary of its registration decision and nothing it does: `ad-diagnose` was already universal across all four profiles and still installs for every host, so this record is the only one ADR-0064 touches without changing an installation outcome; the phrase survives only as a name for a construct that no longer exists.
+**Amends:** ADR-0036 — its profile-based installation scope for `ad-audit`; the maximum-gate process and its evidence requirements are unchanged.
+**Amends:** ADR-0053 — its profile-based installation scope for `ad-roadmap`; the roadmap rollup, its calculation and classification rules, and its scopes are unchanged.
+**Amends:** ADR-0054 — its profile-based installation scope for `ad-question-me`; the value-first questioner behavior is unchanged.
+**Amends:** ADR-0060 — its profile-based installation scope for `ad-research`; the evidence-graded study process is unchanged.
+**Amends:** ADR-0061 — its profile-based installation scope for `ad-derisk`; the uncertainty-retirement orchestrator is unchanged.
 
 ## Context
 

@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-08-07
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0064 — its profile-based installation scope for `ad-question-me`; the value-first questioner behavior is unchanged.
 
 ## Context
 
