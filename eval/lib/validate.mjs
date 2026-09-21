@@ -168,6 +168,59 @@ function validateOrigin(receipt, path) {
     if (!SKILL_NAME.test(skill.name)) {
       fail(`live receipt ${path} names an invalid skill name "${skill.name}"`);
     }
+    validateLiveEnvironment(receipt.frozen, path);
+  }
+}
+
+const ENVIRONMENT_FIELDS = {
+  model: (value) => typeof value === 'string' && value.length > 0,
+  tools: (value) => isStringArray(value),
+  permissions: (value) => typeof value === 'string' && value.length > 0,
+  context_policy: (value) => typeof value === 'string' && value.length > 0,
+};
+const DIGEST = /^[0-9a-f]{64}$/;
+
+/**
+ * The live lane's environment claims (Spec 0007 R5). A field is either measured
+ * from the host and well formed, or `null` and named in `unmeasured` — never
+ * both and never neither. The two halves have to agree, because a receipt that
+ * claims `bare` while declaring the same field unmeasured says two things at
+ * once and a reader cannot tell which one the run actually saw.
+ */
+function validateLiveEnvironment(frozen, path) {
+  const unmeasured = frozen.unmeasured;
+  if (!isStringArray(unmeasured)) {
+    fail(`live receipt ${path} must declare frozen "unmeasured" as an array of field names`);
+  }
+  for (const [field, wellFormed] of Object.entries(ENVIRONMENT_FIELDS)) {
+    const value = frozen[field];
+    const declared = unmeasured.includes(field);
+    if (value === null || value === undefined) {
+      if (!declared) {
+        fail(`live receipt ${path} leaves frozen "${field}" unset without declaring it unmeasured`);
+      }
+      continue;
+    }
+    if (declared) {
+      fail(
+        `live receipt ${path} declares frozen "${field}" unmeasured while also reporting a value`
+      );
+    }
+    if (!wellFormed(value)) fail(`live receipt ${path} has a malformed frozen "${field}"`);
+  }
+  for (const field of unmeasured) {
+    if (!(field in ENVIRONMENT_FIELDS)) {
+      fail(`live receipt ${path} declares unknown field "${field}" unmeasured`);
+    }
+  }
+  const captures = frozen.captures;
+  if (!isRecord(captures)) {
+    fail(`live receipt ${path} must declare frozen "captures", one digest per trial`);
+  }
+  for (const [trialId, digest] of Object.entries(captures)) {
+    if (typeof digest !== 'string' || !DIGEST.test(digest)) {
+      fail(`live receipt ${path} has a malformed capture digest for trial "${trialId}"`);
+    }
   }
 }
 

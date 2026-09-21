@@ -1,6 +1,6 @@
 # Task `0081`: Build the live lane and run the authorized pilot
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-21
 **Scope ref:** doc/specs/0007-evaluate-skill-trajectories.md
 **Evidence ref:** doc/research/0025-ground-host-stream-adapters.md; doc/adr/0082-capture-live-trials-through-a-supplied-runner.md
@@ -180,6 +180,43 @@ the reviewed commit, so its findings hold, but the lesson is the review's and
 not the reviewer's: apply one axis's findings only after both axes have
 reported, or re-diff and re-review.
 
+### 2026-09-21 — Re-review after remediation: five concerns, no blockers, all applied
+
+The re-review ran against a quiescent tree, which is what the previous round
+could not have. It confirmed by direct execution that the three substantive
+remediations hold — the two skill digests agree, the placeholder substitution is
+total, the environment observation is honest — and then found that two of the
+things meant to *keep* them holding did not.
+
+The regression test for the digest was tautological. It re-derived
+`freezeArtifact` on the same path `skillIdentity` hashes internally, so it
+asserted a thing true by construction and would not have noticed the replay lane
+drifting. It now builds a receipt through the real `skillIdentity` and
+`buildLiveReceipt` and runs it through `evaluateReplay`, asserting the claim the
+staleness rule actually computes. Proved non-vacuous the only way that counts:
+the old defect was reintroduced, the test failed, and it passed again once the
+defect was removed.
+
+The boundary validator never looked at any of the live environment fields this
+branch added. A receipt could declare `context_policy: 'bare'` while also naming
+`context_policy` unmeasured, or carry a capture digest that was not a digest, and
+`validateReceipt` accepted it — in the one module ADR-0080 item 6 names as the
+boundary. The validator now requires each of the four fields to be either
+measured and well formed or `null` and named in `unmeasured`, never both and
+never neither, and requires one well-formed digest per capture. The shared live
+receipt fixture in `test/eval-harness.test.js` was updated to satisfy the
+contract it claims, which is the honest consequence of the contract changing.
+
+Three document concerns, all applied. `ARCHITECTURE.md`'s boundary sentence
+claimed a dual-host byte-parity test pins the cross-tree import; that is true of
+`freezeArtifact` and false of `src/leak-guard.js`, which has no per-host copy and
+which no parity test scans, so the sentence now describes each import's actual
+guard. The same file cited ADR-0082 as a recorded decision while ADR-0082 is
+`proposed`, which no other ADR citation in that document does; it now reads
+"proposed ... binding once accepted", the phrasing this repository already uses
+for a decision awaiting the owner. And `doc/adr/PROJECTION.md`'s enumeration of
+self-amendments still named two records after this branch made ADR-0080 a third.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -187,4 +224,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

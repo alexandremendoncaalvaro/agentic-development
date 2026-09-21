@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { freezeArtifact } from '../src/skills/claude-code/ad-prism/scripts/freeze-artifact.mjs';
 import { GRADERS } from '../eval/lib/graders.mjs';
+import { evaluateReplay } from '../eval/lib/replay.mjs';
 import { validateReceipt } from '../eval/lib/validate.mjs';
 
 import {
@@ -330,14 +332,42 @@ const CLAUDE_ROUTED_STREAM = [
   JSON.stringify({ type: 'result', subtype: 'success', result: 'opened', is_error: false }),
 ].join('\n');
 
-test('regression: the frozen skill digest matches what the staleness rule recomputes', () => {
-  const identity = skillIdentity({
-    root: process.cwd(),
+test('regression: a receipt built by the real path replays as current, not stale', () => {
+  // The earlier version of this test re-derived freezeArtifact on the same path
+  // skillIdentity hashes, which is true by construction and would not notice the
+  // replay lane drifting. This one goes through evaluateReplay, so the claim it
+  // makes is the one the staleness rule actually computes (Spec 0007 R8).
+  const caseFile = 'eval/cases/track-work-item-as-task.json';
+  const caseRecord = JSON.parse(readFileSync(caseFile, 'utf8'));
+  const receipt = buildLiveReceipt({
+    caseRecord,
     host: 'claude-code',
-    representative: 'ad-task',
+    hostVersion: '2.1.227',
+    environment: observeEnvironment({ host: 'claude-code', stream: CLAUDE_ROUTED_STREAM }),
+    scaffold: 'claude -p {request} --output-format stream-json',
+    runParameters: { trials: 1 },
+    skill: skillIdentity({
+      root: process.cwd(),
+      host: 'claude-code',
+      representative: caseRecord.representative,
+    }),
+    caseSha256: freezeArtifact(join(process.cwd(), caseFile)).sha256,
+    fixtureSha256: freezeArtifact(join(process.cwd(), caseRecord.fixture)).sha256,
+    fixtureRoot: caseRecord.fixture,
+    policy: { grants: [] },
+    captures: [{ trialId: 't1', stream: CLAUDE_ROUTED_STREAM }],
   });
-  const canonical = freezeArtifact(join(process.cwd(), 'src', 'skills', 'claude-code', 'ad-task'));
-  assert.equal(identity.sha256, canonical.sha256);
+
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-live-path-'));
+  try {
+    const receiptFile = join(dir, 'live.json');
+    writeFileSync(receiptFile, JSON.stringify(receipt));
+    const result = evaluateReplay({ caseFile, receiptFile, root: process.cwd() });
+    assert.equal(result.claim.behavioral, 'current');
+    assert.deepEqual(result.claim.mismatches, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('live: the runner must say where the request goes, so a variadic flag cannot swallow it', () => {
@@ -377,3 +407,78 @@ test('live: the request replaces the placeholder wherever the operator put it', 
     'Write',
   ]);
 });
+
+test('live: the boundary rejects an environment claim that contradicts itself', () => {
+  const caseRecord = JSON.parse(readFileSync('eval/cases/track-work-item-as-task.json', 'utf8'));
+  const receipt = liveReceiptWith(caseRecord, {
+    model: 'claude-opus-5',
+    tools: ['Read'],
+    permissions: 'default',
+    context_policy: 'bare',
+    unmeasured: ['model'],
+  });
+  assert.throws(() => validateReceipt(receipt, caseRecord, 'r'), /unmeasured/);
+});
+
+test('live: the boundary rejects a frozen field that is neither measured nor declared unmeasured', () => {
+  const caseRecord = JSON.parse(readFileSync('eval/cases/track-work-item-as-task.json', 'utf8'));
+  const receipt = liveReceiptWith(caseRecord, {
+    model: null,
+    tools: ['Read'],
+    permissions: 'default',
+    context_policy: 'bare',
+    unmeasured: [],
+  });
+  assert.throws(() => validateReceipt(receipt, caseRecord, 'r'), /unmeasured/);
+});
+
+test('live: the boundary rejects a malformed frozen environment field', () => {
+  const caseRecord = JSON.parse(readFileSync('eval/cases/track-work-item-as-task.json', 'utf8'));
+  const receipt = liveReceiptWith(caseRecord, {
+    model: 'claude-opus-5',
+    tools: 'Read',
+    permissions: 'default',
+    context_policy: 'bare',
+    unmeasured: [],
+  });
+  assert.throws(() => validateReceipt(receipt, caseRecord, 'r'), /tools/);
+});
+
+test('live: the boundary rejects a capture digest that is not a digest', () => {
+  const caseRecord = JSON.parse(readFileSync('eval/cases/track-work-item-as-task.json', 'utf8'));
+  const receipt = liveReceiptWith(
+    caseRecord,
+    observeEnvironment({ host: 'claude-code', stream: CLAUDE_ROUTED_STREAM })
+  );
+  receipt.frozen.captures.t1 = 'not-a-digest';
+  assert.throws(() => validateReceipt(receipt, caseRecord, 'r'), /capture/);
+});
+
+test('live: an honestly unmeasured environment passes the boundary', () => {
+  const caseRecord = JSON.parse(readFileSync('eval/cases/track-work-item-as-task.json', 'utf8'));
+  const receipt = liveReceiptWith(caseRecord, {
+    model: null,
+    tools: null,
+    permissions: null,
+    context_policy: null,
+    unmeasured: ['context_policy', 'model', 'permissions', 'tools'],
+  });
+  validateReceipt(receipt, caseRecord, 'r');
+});
+
+function liveReceiptWith(caseRecord, environment) {
+  return buildLiveReceipt({
+    caseRecord,
+    host: 'claude-code',
+    hostVersion: '2.1.227',
+    environment,
+    scaffold: 'claude -p {request}',
+    runParameters: { trials: 1 },
+    skill: { name: caseRecord.representative, host: 'claude-code', sha256: 'a'.repeat(64) },
+    caseSha256: 'b'.repeat(64),
+    fixtureSha256: 'c'.repeat(64),
+    fixtureRoot: caseRecord.fixture,
+    policy: { grants: [] },
+    captures: [{ trialId: 't1', stream: CLAUDE_ROUTED_STREAM }],
+  });
+}

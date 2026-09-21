@@ -187,6 +187,13 @@ function liveReceipt(dir, mutate = () => {}) {
     host: 'claude-code',
     sha256: freezeArtifact(join(ROOT, 'src', 'skills', 'claude-code', 'ad-task')).sha256,
   };
+  // A live receipt also declares which environment fields were measured and one
+  // digest per capture (task-0081). This fixture measures all four, so nothing
+  // is unmeasured and the digest stands in for the stream the trial came from.
+  receipt.frozen.unmeasured = [];
+  receipt.frozen.captures = Object.fromEntries(
+    receipt.trials.map((trial) => [trial.id, 'a'.repeat(64)])
+  );
   mutate(receipt);
   const receiptFile = join(dir, 'live.json');
   writeFileSync(receiptFile, JSON.stringify(receipt));
