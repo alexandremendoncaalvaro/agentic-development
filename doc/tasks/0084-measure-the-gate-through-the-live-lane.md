@@ -272,6 +272,57 @@ the record fails at first write; that costs further paid trials and is the
 owner's call. Total spend this entry: USD 4.19 (plus USD 0.04 for the
 `--setting-sources` probe).
 
+### 2026-09-21 — Audit dispositions and the durable record of the comparison
+
+Maximum-gate audit over the three commits (trail at
+`.agentic/reviews/2026-09-21T22-17-14Z-audit-*.md`, machine-local): seven
+groups dispatched, the critical claims group run three times under two
+models. Two findings change this record.
+
+First, provenance order (CV.7, three of three passes): GROUND-0028 was
+written in the working tree before the lane code and validated then, but
+its commit lands after the commit that implements it. The record is
+therefore recorded alongside the code, not before it; the feat commit's
+message now says so, and the earlier "built test-first under GROUND-0028"
+in these Notes is to be read the same way.
+
+Second, durability of the comparison (CV.5, unresolved by swap-and-agree):
+the streams, receipts, and evidence file live only under the gitignored
+`.agentic/reviews/evidence/`, as ADR-0082 decision 4 requires for captures
+that carry operator configuration. The load-bearing observations are
+therefore quoted here verbatim as the tracked record, and the comparison
+is read as informing, not closing, ADR-0083 decision 7: a decision-grade
+record needs its per-observation artifacts in a durable, governed channel,
+which this repository does not yet have for live captures.
+
+Gate evidence line, on arm (the whole file):
+
+```json
+{"seq":1,"at":"2026-09-21T21:46:58.831Z","gate":"artifact-gate","state":"validator-passed","host_tool":"Write","path":"doc/research/0001-ground-download-retry.md","owner":"ground-record","validator":"ad-ground/scripts/validate-record.mjs","output":"","surfaced":"","reproduction":"node .claude/skills/ad-ground/scripts/validate-record.mjs doc/research/0001-ground-download-retry.md"}
+```
+
+Result records (fields quoted from the last line of each captured stream):
+
+```json
+{"subtype": "success", "is_error": false, "duration_ms": 375131, "num_turns": 52, "total_cost_usd": 1.94936225, "session_id": "2525be66-052b-46d7-a65d-c091ffcc47c0"}
+{"subtype": "success", "is_error": false, "duration_ms": 386976, "num_turns": 55, "total_cost_usd": 2.2420782499999996, "session_id": "ec49c167-4be1-4857-b936-48830ba2c045"}
+```
+
+Capture digests (SHA-256 of `t1.jsonl`, frozen in each receipt): on
+`b62c4cdef8fc1f5aabed3bf95b4c71676a0289bb0d950e22ae714cfe6b0e8a00`, off
+`b7ef2f944367778bc9beb2910a691d85198354fb1f27cc0098030c6737f99ec7`.
+
+Also applied from the audit: `runLive` strips `GIT_DIR`, `GIT_WORK_TREE`,
+and `GIT_INDEX_FILE` from the host's environment (HK.2, the kit's own
+idiom); `installFixtureSkills` moved to `eval/lib/fixture-skills.mjs` and
+`readGateEvidence` to `eval/lib/gate-evidence.mjs` so `live.mjs` returns
+under the size ceiling; the two relativization tests carry the
+`regression:` prefix; ARCHITECTURE.md's boundary rule names the third
+`eval/`-to-`src/` import and its guard; CONTEXT.md gains "Trial copy" and
+the `fixture_skills` field; GROUND-0028's C1 line references were corrected
+to the audited tree. Refuted: a note on the DCO address, which is the
+repository's committer identity on every commit.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

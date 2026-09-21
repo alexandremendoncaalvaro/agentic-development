@@ -309,7 +309,9 @@ and its Claude Code twin; governed by
 **Definition:** one frozen, versioned unit of skill evaluation: a stable
 identifier, a natural request that never names the target skill or its
 vocabulary, a sanitized fixture, the expected route and outcome, allowed and
-forbidden effects, required approval stops, declared graders, and exclusions.
+forbidden effects, required approval stops, declared graders, exclusions, and,
+for a case the live lane runs, the `fixture_skills` the lane installs into each
+trial copy.
 
 _Avoid_: "eval" or "test case" (the unit is the frozen case, not one run of it);
 "prompt" as a name for the case (the request is one field of the case; calling
@@ -347,6 +349,21 @@ _Avoid_: "sample repo" (fixtures are digest-frozen inputs, not illustrations);
 evaluation cases).
 
 **Related code:** [`eval/fixtures/`](eval/fixtures/).
+
+### Trial copy
+
+**Definition:** the per-trial working copy of an evaluation fixture that the
+live lane spawns the host in: a fresh copy under the lane's temporary work
+root, with the skills the case declares in `fixture_skills` installed at the
+host's project skills directory, discarded with the run. A trial's recorded
+paths are relative to its trial copy.
+
+_Avoid_: "trial" for the directory (a trial is the recorded run, the copy is
+where it ran); "fixture" for the copy (the fixture is the tracked, digest-frozen
+input; the copy is disposable). The code names the copy's path `trialRoot`.
+
+**Related code:** [`eval/lib/live.mjs`](eval/lib/live.mjs),
+[`eval/lib/fixture-skills.mjs`](eval/lib/fixture-skills.mjs).
 
 ### Evaluation receipt
 
