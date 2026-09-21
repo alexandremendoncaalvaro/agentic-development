@@ -58,8 +58,10 @@ test/*.test.js                       unit + integration suite (node:test)
 eval/                                repo-only skill trajectory evaluation harness
                                      (Spec 0007): cases, sanitized fixtures, frozen
                                      receipts, host stream adapters and their sample
-                                     streams, `run.mjs replay|corpus` (the corpus gate
-                                     runs inside `npm test`); never shipped to npm
+                                     streams, `run.mjs replay|corpus|live` (the corpus
+                                     gate runs inside `npm test`; `live` spawns an
+                                     operator-supplied host and never gates anything);
+                                     never shipped to npm
 CHANGELOG.md                         release record (Keep a Changelog), rotated
                                      only by scripts/release.sh
 WORKFLOW.md                          Layer 1 Constitution — philosophy doc, shipped to npm

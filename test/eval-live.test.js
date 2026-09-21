@@ -1,14 +1,23 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { test } from 'node:test';
+
+import { freezeArtifact } from '../src/skills/claude-code/ad-prism/scripts/freeze-artifact.mjs';
+import { GRADERS } from '../eval/lib/graders.mjs';
+import { validateReceipt } from '../eval/lib/validate.mjs';
 
 import {
   assertNoLeak,
   buildLiveReceipt,
+  buildRunnerArgv,
   captureTrial,
   parseLiveArgs,
   planTrialRoots,
+  observeEnvironment,
   probeHostVersion,
   resolveCaptureDir,
+  skillIdentity,
 } from '../eval/lib/live.mjs';
 
 const CODEX_STREAM = [
@@ -67,11 +76,14 @@ test('live: a captured codex stream becomes a live receipt the contract accepts'
     },
     host: 'codex',
     hostVersion: 'codex-cli 0.139.0',
-    model: 'gpt-5-codex',
+    environment: {
+      model: 'gpt-5-codex',
+      tools: ['command_execution'],
+      permissions: 'read-only',
+      context_policy: 'bare',
+      unmeasured: [],
+    },
     scaffold: 'codex exec --json',
-    tools: ['command_execution'],
-    permissions: 'read-only',
-    contextPolicy: 'bare',
     runParameters: { max_turns: 12 },
     skill: { name: 'ad-pr', host: 'codex', sha256: 'a'.repeat(64) },
     caseSha256: 'b'.repeat(64),
@@ -134,15 +146,21 @@ test('live: a stream that ends without a terminal is a failure trial naming that
 });
 
 test('live: each trial gets its own fixture copy, so one trial cannot read the next', () => {
-  const seen = [];
+  // Injected copy and makeDir: this asserts the plan, not the filesystem, so it
+  // leaves nothing behind and holds on Windows where an absolute path differs.
+  const copied = [];
+  const workRoot = join('work', 'root');
   const roots = planTrialRoots({
     fixtureRoot: 'eval/fixtures/planning-docs-repo',
     trials: 3,
-    workRoot: '/tmp/x',
+    workRoot,
+    copy: (from, to) => copied.push([from, to]),
+    makeDir: () => {},
   });
-  for (const root of roots) seen.push(root);
-  assert.equal(new Set(seen).size, 3);
-  assert.ok(seen.every((root) => root.startsWith('/tmp/x')));
+  assert.equal(new Set(roots).size, 3);
+  assert.equal(copied.length, 3);
+  assert.ok(roots.every((root) => root.startsWith(workRoot)));
+  assert.ok(copied.every(([from]) => from === 'eval/fixtures/planning-docs-repo'));
 });
 
 test('regression: a failing host still produces a receipt, with the failure in its trial', () => {
@@ -155,11 +173,14 @@ test('regression: a failing host still produces a receipt, with the failure in i
     },
     host: 'codex',
     hostVersion: 'codex-cli 0.139.0',
-    model: 'gpt-5-codex',
+    environment: {
+      model: 'gpt-5-codex',
+      tools: [],
+      permissions: 'read-only',
+      context_policy: 'bare',
+      unmeasured: [],
+    },
     scaffold: 'codex exec --json',
-    tools: [],
-    permissions: 'read-only',
-    contextPolicy: 'bare',
     runParameters: { trials: 1 },
     skill: { name: 'ad-pr', host: 'codex', sha256: 'a'.repeat(64) },
     caseSha256: 'b'.repeat(64),
@@ -188,4 +209,171 @@ test('live: an explicit destination inside the repository is allowed but marked'
   });
   assert.equal(dest.inRepository, true);
   assert.ok(dest.path.startsWith('/repo'));
+});
+
+const CLAUDE_INIT_STREAM = [
+  JSON.stringify({
+    type: 'system',
+    subtype: 'init',
+    tools: ['Read', 'Bash', 'Skill'],
+    permissionMode: 'default',
+    slash_commands: ['ad-task'],
+  }),
+  JSON.stringify({
+    type: 'assistant',
+    message: { model: 'claude-opus-5[1m]', content: [{ type: 'text', text: 'done' }] },
+  }),
+  JSON.stringify({ type: 'result', subtype: 'success', result: 'done', is_error: false }),
+].join('\n');
+
+test('live: the environment is observed from the stream, never asserted', () => {
+  const observed = observeEnvironment({ host: 'claude-code', stream: CLAUDE_INIT_STREAM });
+  assert.deepEqual(observed.tools, ['Read', 'Bash', 'Skill']);
+  assert.equal(observed.model, 'claude-opus-5[1m]');
+  assert.equal(observed.permissions, 'default');
+  assert.equal(observed.context_policy, 'host-configured');
+  assert.deepEqual(observed.unmeasured, []);
+});
+
+test('live: a host that reports no environment says unmeasured instead of a plausible literal', () => {
+  const observed = observeEnvironment({
+    host: 'codex',
+    stream: JSON.stringify({ type: 'turn.completed' }),
+  });
+  assert.equal(observed.tools, null);
+  assert.equal(observed.model, null);
+  assert.deepEqual(observed.unmeasured.sort(), ['context_policy', 'model', 'permissions', 'tools']);
+});
+
+test('live: a context policy is only claimed bare when the host reports nothing extra', () => {
+  const bare = observeEnvironment({
+    host: 'claude-code',
+    stream: JSON.stringify({
+      type: 'system',
+      subtype: 'init',
+      tools: ['Read'],
+      permissionMode: 'default',
+    }),
+  });
+  assert.equal(bare.context_policy, 'bare');
+});
+
+test('live: each trial freezes the digest of the stream it came from', () => {
+  const receipt = buildLiveReceipt({
+    caseRecord: { id: 'c', request: '/ad-pr', request_kind: 'explicit', graders: [] },
+    host: 'codex',
+    hostVersion: 'codex-cli 0.139.0',
+    environment: {
+      model: null,
+      tools: null,
+      permissions: null,
+      context_policy: null,
+      unmeasured: [],
+    },
+    scaffold: 'codex exec --json',
+    runParameters: { trials: 1 },
+    skill: { name: 'ad-pr', host: 'codex', sha256: 'a'.repeat(64) },
+    caseSha256: 'b'.repeat(64),
+    fixtureSha256: 'c'.repeat(64),
+    fixtureRoot: 'eval/fixtures/planning-docs-repo',
+    policy: { grants: [] },
+    captures: [{ trialId: 't1', stream: CODEX_STREAM }],
+  });
+  assert.match(receipt.frozen.captures.t1, /^[0-9a-f]{64}$/);
+});
+
+test('live: a produced receipt validates against the contract and grades through the real graders', () => {
+  const caseRecord = JSON.parse(readFileSync('eval/cases/open-pull-request-explicit.json', 'utf8'));
+  const receipt = buildLiveReceipt({
+    caseRecord,
+    host: 'claude-code',
+    hostVersion: '2.1.227',
+    environment: observeEnvironment({ host: 'claude-code', stream: CLAUDE_ROUTED_STREAM }),
+    scaffold: 'claude -p --output-format stream-json',
+    runParameters: { trials: 1 },
+    skill: { name: 'ad-pr', host: 'claude-code', sha256: 'a'.repeat(64) },
+    caseSha256: 'b'.repeat(64),
+    fixtureSha256: 'c'.repeat(64),
+    fixtureRoot: 'eval/fixtures/planning-docs-repo',
+    policy: { grants: ['git push', 'gh pr create'] },
+    captures: [{ trialId: 't1', stream: CLAUDE_ROUTED_STREAM }],
+  });
+
+  // The boundary accepts it, which is what "validates against the contract" means.
+  validateReceipt(receipt, caseRecord, 'live-receipt');
+
+  // And the real graders run over it, so the lane is not a parallel pipeline.
+  // A grader returns its failures; an empty list is the pass.
+  const trial = receipt.trials[0];
+  assert.deepEqual(GRADERS.route({ trial, caseRecord, trialIndex: 0 }), []);
+  assert.deepEqual(GRADERS.approval({ trial, caseRecord, trialIndex: 0 }), []);
+});
+
+const CLAUDE_ROUTED_STREAM = [
+  JSON.stringify({
+    type: 'system',
+    subtype: 'init',
+    tools: ['Read', 'Bash', 'Skill'],
+    permissionMode: 'default',
+  }),
+  JSON.stringify({
+    type: 'assistant',
+    message: {
+      model: 'claude-opus-5',
+      content: [{ type: 'tool_use', id: 'u1', name: 'Bash', input: { command: 'git push' } }],
+    },
+  }),
+  JSON.stringify({
+    type: 'user',
+    message: { content: [{ type: 'tool_result', tool_use_id: 'u1', content: 'ok' }] },
+  }),
+  JSON.stringify({ type: 'result', subtype: 'success', result: 'opened', is_error: false }),
+].join('\n');
+
+test('regression: the frozen skill digest matches what the staleness rule recomputes', () => {
+  const identity = skillIdentity({
+    root: process.cwd(),
+    host: 'claude-code',
+    representative: 'ad-task',
+  });
+  const canonical = freezeArtifact(join(process.cwd(), 'src', 'skills', 'claude-code', 'ad-task'));
+  assert.equal(identity.sha256, canonical.sha256);
+});
+
+test('live: the runner must say where the request goes, so a variadic flag cannot swallow it', () => {
+  assert.throws(
+    () =>
+      parseLiveArgs([
+        'eval/cases/open-pull-request-explicit.json',
+        '--host',
+        'claude-code',
+        '--runner',
+        'claude',
+        '-p',
+        '--disallowedTools',
+        'Write',
+      ]),
+    /\{request\}/
+  );
+});
+
+test('live: the request replaces the placeholder wherever the operator put it', () => {
+  const { runner } = parseLiveArgs([
+    'eval/cases/open-pull-request-explicit.json',
+    '--host',
+    'claude-code',
+    '--runner',
+    'claude',
+    '-p',
+    '{request}',
+    '--disallowedTools',
+    'Write',
+  ]);
+  assert.deepEqual(buildRunnerArgv(runner, 'do the thing'), [
+    'claude',
+    '-p',
+    'do the thing',
+    '--disallowedTools',
+    'Write',
+  ]);
 });

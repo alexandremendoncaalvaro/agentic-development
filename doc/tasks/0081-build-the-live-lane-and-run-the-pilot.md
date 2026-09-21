@@ -29,7 +29,7 @@ shipped code.
 - [x] Each trial runs in its own process over its own copy of the fixture, so one trial's writes are invisible to the next.
 - [x] A captured stream and its receipt are written only after both pass the repository's existing leak-guard denylist; a match aborts the run and writes nothing.
 - [x] A host that exits non-zero, refuses an action, or ends without a terminal yields a trial with a failure exit state and its reason, and the receipt is still written; the harness aborts only on its own defects.
-- [ ] A produced live receipt validates against the existing contract, grades through the existing graders, and goes stale by the existing rule when a frozen input changes.
+- [x] A produced live receipt validates against the existing contract, grades through the existing graders, and goes stale by the existing rule when a frozen input changes.
 - [~] The pilot runs on both hosts and answers GROUND-0025's two Conditional mappings with observed evidence: whether an implicit Codex activation is recognizable from a `SKILL.md` read, and whether the hosts' declined and denied records appear where the grant-from-policy rule expects.
 - [x] GROUND-0025 and ADR-0080 record the pilot's answer for each mapping, upgrading, qualifying, or reversing it with the observation that settled it.
 
@@ -38,7 +38,7 @@ shipped code.
 - [x] Land this task and ADR-0082 in their own commit, ahead of any implementation, per CV.7.
 - [x] Implement the live lane test-first: the argument contract and its refusals, the version probe, trial isolation, the leak gate, the failure terminals, then the receipt write.
 - [x] Run the pilot at the smallest scale that answers both questions, expanding only if an answer is ambiguous.
-- [ ] Record the pilot's findings, then fresh-context review both axes before the pull request.
+- [x] Record the pilot's findings, then fresh-context review both axes before the pull request.
 
 ## Notes
 
@@ -88,11 +88,103 @@ ChatGPT account. That is the operator's toolchain, not this repository, and
 upgrading it is the owner's call, so the criterion is marked partial rather than
 done and Codex's two mappings stay Conditional and unmeasured.
 
+### 2026-09-21 — Fresh-context review, Spec axis: one blocker, three concerns, all accepted
+
+The blocker was the same defect this branch had just criticized elsewhere, now
+in its own code. `buildLiveReceipt` filled four of Spec 0007 R5's frozen inputs
+with literals: `model` from an environment variable or the string `unrecorded`,
+`tools` as an empty array, `permissions` as `operator-supplied`, and
+`context_policy` as `bare`. The pilot's own addendum proves the last one false —
+the host had twenty-nine tools and the operator's global configuration loaded —
+so the harness would have written a receipt asserting a bare context it had
+measured to be anything but. A frozen input the harness types is a claim, which
+is the standard ADR-0082 decision 2 sets and this code broke.
+
+The fix is `observeEnvironment`: every one of the four is read from the stream,
+and a field the host never reported is `null` and named in `unmeasured` rather
+than given a plausible value. Claude Code reports tools and permission mode in
+its `system/init` record and the model in its assistant messages; when that
+record also lists the operator's own commands, subagents, or servers, the
+context policy is recorded as `host-configured`, not `bare`. Codex reports none
+of it, so a Codex receipt now says so in the open.
+
+The second concern was an auditability claim ADR-0082 made that the code did not
+keep: the record said the receipt names each capture's digest, and no digest
+existed. The receipt now freezes one per trial under `frozen.captures`.
+
+The third was an acceptance criterion left unchecked with no reason. It is now
+satisfied rather than explained: a produced receipt is run through the real
+`validateReceipt` and the real `route` and `approval` graders in a test, so the
+live lane is provably not a parallel pipeline.
+
+The fourth was that the criterion naming ADR-0080 was checked while ADR-0080 was
+never touched, and its item 10 still promised the pilot's captures would replace
+the synthetic samples as tracked artifacts — which ADR-0082 reverses. ADR-0080
+now carries a dated addendum retiring that sentence and recording both mappings'
+outcomes, and `doc/adr/PROJECTION.md` gains its row in the same commit.
+
+One limitation the reviewer named is not fixable here and is stated instead: the
+pilot's counts come from a capture that is deliberately untracked, so a second
+party cannot re-derive them without re-running the pilot. The receipt's capture
+digest makes the claim checkable by whoever holds the capture, which is the most
+that the privacy decision and auditability can both have.
+
+### 2026-09-21 — Fresh-context review, Standards axis: two blockers, two concerns, all accepted
+
+The first blocker is the kind a fresh reader finds and an author cannot. The
+frozen skill digest was taken over `SKILL.md` alone, while `claimFor` in the
+replay lane recomputes it over the skill's whole directory using a different
+digest scheme entirely. The two can never agree, so **every live receipt this
+code produced would have been reported stale on its first replay**, and Spec
+0007 R8's staleness rule would have fired on receipts nothing had invalidated.
+`skillIdentity` now digests the directory, and a regression test asserts the two
+computations return the same hash rather than trusting that they do.
+
+The second blocker is a document made false by this change. `ARCHITECTURE.md`
+enumerates every `eval/` module and every test file by name, and its boundary
+rule stated that exactly **one** cross-tree import exists from `src/` into
+repo-only tooling. This branch added a second — `loadDenylist` from
+`src/leak-guard.js` — and named neither it, nor `lib/live.mjs`, nor the `live`
+subcommand, nor `test/eval-live.test.js`. All four are now named, the boundary
+sentence describes both imports and why each exists, and `AGENTS.md`'s map
+carries the subcommand with the note that it gates nothing.
+
+The first concern is a defect the pilot never exercised, because the pilot
+invoked the CLI directly rather than through `runLive`. The runner appended the
+request as the last argument, after every operator flag; the pilot's own
+documented invocation ends in `--disallowedTools Write Edit`, and appending a
+prompt after a variadic flag feeds it to that flag instead of to the model. The
+runner now requires a `{request}` placeholder and refuses an invocation without
+one, so the operator says where the prompt goes and a silent swallow is not
+reachable.
+
+The second concern: the trial-isolation test used the real filesystem, a
+hardcoded POSIX path, and no cleanup — the reviewer ran it and found the
+directories it left behind on this machine, and the assertion would fail on
+Windows, which ADR-0080 names as the measurement of exactly this family of
+code. It now injects the copy and the directory creation and asserts the plan
+rather than the filesystem.
+
+One note is recorded rather than acted on: `GUIDELINES.md` §12.5 bans spawning
+with user-controlled arguments, and the live lane does precisely that by design
+under Spec 0007 R7. The section reads as governing the shipped `src/` CLI, and
+`eval/` is repo-only, so the rule is very likely out of scope — but the text does
+not say so, and a one-line scope clarification belongs to whoever next edits
+that section rather than to this branch.
+
+A process failure of my own, which the reviewer caught and reported as a
+possible concurrent session: the working tree changed under it mid-review,
+because I applied the Spec axis's fixes while the Standards axis was still
+reading. The reviewer anchored to the static diff and an isolated worktree at
+the reviewed commit, so its findings hold, but the lesson is the review's and
+not the reviewer's: apply one axis's findings only after both axes have
+reported, or re-diff and re-review.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
 - [ ] Status updated to `done` and Notes log closes the task

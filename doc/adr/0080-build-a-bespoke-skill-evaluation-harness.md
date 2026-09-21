@@ -50,3 +50,27 @@ Negative / trade-offs:
 * Public Python skill harnesses — the right shape, but outside the Node-only stack and the no-dev-framework rule.
 * Shipping the harness as a kit skill — the harness evaluates the kit's own skills and is quality tooling for this repository; shipping it would spend the listing budget and bind downstream users to fixtures that describe this repository.
 * Duplicating the digest code inside `eval/` — avoids the cross-tree import but forks the freeze semantics that receipts and Prism artifacts must share.
+
+## Addendum — 2026-09-21: what the first authorized live pilot changed in item 10
+
+Item 10 ends by saying the pilot's captured streams "replace them as the first
+live receipts", which assumes a capture becomes a tracked artifact beside the
+synthetic samples. [ADR-0082](0082-capture-live-trials-through-a-supplied-runner.md)
+decides otherwise on the pilot's own evidence: a live capture carries the
+operator's configuration rather than only the trial, so it defaults outside the
+repository and reaching the tree is a deliberate act. The receipt freezes each
+capture's digest, so a live claim stays checkable by whoever holds the capture,
+and the synthetic samples under `eval/streams/` stay where they are instead of
+being replaced. That sentence of item 10 no longer binds; everything else in the
+item does.
+
+The pilot also settled item 10's two conditional mappings, one each way, and
+`doc/research/0025-ground-host-stream-adapters.md` carries the measurement. The
+grant-from-policy rule and the denial mapping are confirmed for Claude Code on
+observation. The implicit-activation mapping is reversed and is wider than item
+10 states: it is written here as a Codex-only allowance, and the pilot shows
+Claude Code needs it too, because with the `Skill` tool available the host read
+the `SKILL.md` and followed the skill without emitting a `Skill` call. Item 10's
+`skill_invoked` rule for Claude Code is therefore incomplete, and the correction
+is tracked as task-0082. The Codex side of both mappings remains unmeasured.
+
