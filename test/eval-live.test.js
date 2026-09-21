@@ -1,5 +1,14 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
@@ -14,11 +23,14 @@ import {
   buildLiveReceipt,
   buildRunnerArgv,
   captureTrial,
+  installFixtureSkills,
   parseLiveArgs,
   planTrialRoots,
   observeEnvironment,
   probeHostVersion,
+  readGateEvidence,
   resolveCaptureDir,
+  runLive,
   skillIdentity,
 } from '../eval/lib/live.mjs';
 
@@ -195,6 +207,251 @@ test('regression: a failing host still produces a receipt, with the failure in i
   });
   assert.equal(receipt.trials[0].outcome.exit_state, 'failure');
   assert.match(receipt.trials[0].outcome.final_response, /exited 3/);
+});
+
+test('live: a written path is relativized against the trial copy the host ran in, not the tracked fixture', () => {
+  // The host writes inside its per-trial copy under the work root; the tracked
+  // fixture root is a different directory. The pilot receipt kept absolute
+  // temporary paths for this reason and the effects grader refused a
+  // permitted write (GROUND-0028 E5).
+  const trialRoot = '/work/agentic-eval-live-x/t1';
+  const stream = [
+    JSON.stringify({
+      type: 'system',
+      subtype: 'init',
+      tools: ['Write'],
+      permissionMode: 'acceptEdits',
+    }),
+    JSON.stringify({
+      type: 'assistant',
+      message: {
+        model: 'claude-opus-5',
+        content: [
+          {
+            type: 'tool_use',
+            id: 'w1',
+            name: 'Write',
+            input: { file_path: `${trialRoot}/doc/research/0001-ground-x.md`, content: '' },
+          },
+        ],
+      },
+    }),
+    JSON.stringify({ type: 'result', subtype: 'success', result: 'done', is_error: false }),
+  ].join('\n');
+  const receipt = buildLiveReceipt({
+    caseRecord: {
+      id: 'c',
+      request: 'r',
+      request_kind: 'natural',
+      graders: [{ id: 'effects', kind: 'deterministic', version: '1' }],
+    },
+    host: 'claude-code',
+    hostVersion: '2.1.227',
+    environment: observeEnvironment({ host: 'claude-code', stream }),
+    scaffold: 'claude -p {request}',
+    runParameters: { trials: 1 },
+    skill: { name: 'ad-ground', host: 'claude-code', sha256: 'a'.repeat(64) },
+    caseSha256: 'b'.repeat(64),
+    fixtureSha256: 'c'.repeat(64),
+    fixtureRoot: 'eval/fixtures/planning-docs-repo',
+    policy: { grants: [] },
+    captures: [{ trialId: 't1', stream, root: trialRoot }],
+  });
+  const write = receipt.trials[0].events.find((event) => event.kind === 'file_write');
+  assert.equal(write.path, 'doc/research/0001-ground-x.md');
+  assert.deepEqual(receipt.trials[0].outcome.artifact_manifest, ['doc/research/0001-ground-x.md']);
+});
+
+test('live: the skills a case declares are installed into the trial copy at the host skills directory and frozen by digest', () => {
+  // A fixture cannot track a machine path to an installed skill, and a `-p`
+  // session lets a personal skill shadow a project one, so the lane puts the
+  // declared skills inside the copy the host runs in and records what it put
+  // there (GROUND-0028 E2).
+  const trialRoot = mkdtempSync(join(tmpdir(), 'agentic-eval-live-skills-'));
+  try {
+    const installed = installFixtureSkills({
+      trialRoot,
+      host: 'claude-code',
+      skills: ['ad-hooks', 'ad-ground'],
+      root: process.cwd(),
+    });
+    assert.deepEqual(Object.keys(installed).sort(), ['ad-ground', 'ad-hooks']);
+    assert.equal(
+      installed['ad-ground'],
+      freezeArtifact(resolve('src', 'skills', 'claude-code', 'ad-ground')).sha256
+    );
+    assert.equal(
+      readFileSync(
+        join(trialRoot, '.claude', 'skills', 'ad-hooks', 'scripts', 'artifact-gate.mjs'),
+        'utf8'
+      ),
+      readFileSync(
+        resolve('src', 'skills', 'claude-code', 'ad-hooks', 'scripts', 'artifact-gate.mjs'),
+        'utf8'
+      )
+    );
+    assert.throws(
+      () =>
+        installFixtureSkills({
+          trialRoot,
+          host: 'codex',
+          skills: ['no-such-skill'],
+          root: process.cwd(),
+        }),
+      /no-such-skill/
+    );
+  } finally {
+    rmSync(trialRoot, { recursive: true, force: true });
+  }
+});
+
+// A scratch repository root with one case, its fixture, and the two skills the
+// case declares, so runLive can be driven end to end without a host.
+function scratchLiveRoot() {
+  const root = mkdtempSync(join(tmpdir(), 'agentic-eval-live-root-'));
+  mkdirSync(join(root, 'eval', 'cases'), { recursive: true });
+  mkdirSync(join(root, 'eval', 'fixtures', 'gated', 'doc', 'research'), { recursive: true });
+  writeFileSync(join(root, 'eval', 'fixtures', 'gated', 'README.md'), '# gated\n');
+  for (const skill of ['ad-hooks', 'ad-ground']) {
+    cpSync(
+      resolve('src', 'skills', 'claude-code', skill),
+      join(root, 'src', 'skills', 'claude-code', skill),
+      {
+        recursive: true,
+      }
+    );
+  }
+  const caseRecord = {
+    schema: 'agentic-eval-case/1',
+    id: 'gated-case',
+    category: { kind: 'workflow-operational', invocation: 'model-invocable' },
+    representative: 'ad-ground',
+    case_type: 'positive',
+    risk: 'reversible-repository-write',
+    request_kind: 'natural',
+    request: 'record the research',
+    fixture: 'eval/fixtures/gated',
+    fixture_skills: ['ad-hooks', 'ad-ground'],
+    expected: {
+      route: 'ad-ground',
+      allowed_effects: ['doc/research/*.md'],
+      artifacts: ['doc/research/*.md'],
+    },
+    graders: [{ id: 'effects', kind: 'deterministic', version: '1' }],
+    exclusions: [],
+  };
+  writeFileSync(join(root, 'eval', 'cases', 'gated-case.json'), JSON.stringify(caseRecord));
+  return { root, caseFile: 'eval/cases/gated-case.json' };
+}
+
+test('live: runLive installs the declared skills into each trial copy, points the gate evidence at a per-trial directory, and keeps the evidence beside the capture', () => {
+  const { root, caseFile } = scratchLiveRoot();
+  const seen = [];
+  const spawn = (command, args, opts = {}) => {
+    if (args[0] === '--version') return { status: 0, stdout: '2.1.227\n', stderr: '' };
+    seen.push({ command, args, opts });
+    const evidenceDir = opts.env.AD_ARTIFACT_GATE_EVIDENCE_DIR;
+    mkdirSync(evidenceDir, { recursive: true });
+    writeFileSync(
+      join(evidenceDir, 'sess.jsonl'),
+      `${JSON.stringify({ seq: 1, gate: 'artifact-gate', state: 'validator-failed', path: 'doc/research/0001-ground-x.md' })}\n`
+    );
+    const stream = [
+      JSON.stringify({
+        type: 'system',
+        subtype: 'init',
+        tools: ['Write'],
+        permissionMode: 'acceptEdits',
+      }),
+      JSON.stringify({
+        type: 'assistant',
+        message: {
+          model: 'claude-opus-5',
+          content: [
+            {
+              type: 'tool_use',
+              id: 'w1',
+              name: 'Write',
+              input: {
+                // The host reports its resolved cwd (macOS: /var is /private/var).
+                file_path: join(realpathSync(opts.cwd), 'doc', 'research', '0001-ground-x.md'),
+                content: '',
+              },
+            },
+          ],
+        },
+      }),
+      JSON.stringify({ type: 'result', subtype: 'success', result: 'done', is_error: false }),
+    ].join('\n');
+    return { status: 0, stdout: stream, stderr: '' };
+  };
+  let workRoot;
+  try {
+    const run = runLive({
+      caseFile,
+      host: 'claude-code',
+      runner: ['claude', '-p', '{request}'],
+      trials: 1,
+      out: null,
+      root,
+      spawn,
+    });
+    workRoot = run.workRoot;
+    const trialRoot = seen[0].opts.cwd;
+    assert.ok(
+      existsSync(join(trialRoot, '.claude', 'skills', 'ad-ground', 'SKILL.md')),
+      'ad-ground installed'
+    );
+    assert.ok(
+      existsSync(join(trialRoot, '.claude', 'skills', 'ad-hooks', 'scripts', 'artifact-gate.mjs')),
+      'ad-hooks installed'
+    );
+    assert.ok(
+      seen[0].opts.env.AD_ARTIFACT_GATE_EVIDENCE_DIR.startsWith(workRoot),
+      'evidence under the work root'
+    );
+    assert.equal(
+      run.receipt.frozen.run_parameters.fixture_skills['ad-ground'],
+      freezeArtifact(join(root, 'src', 'skills', 'claude-code', 'ad-ground')).sha256
+    );
+    const write = run.receipt.trials[0].events.find((event) => event.kind === 'file_write');
+    assert.equal(write.path, 'doc/research/0001-ground-x.md');
+    const sidecar = readFileSync(join(run.destination.path, 't1.gate-evidence.jsonl'), 'utf8');
+    assert.match(sidecar, /validator-failed/);
+    assert.deepEqual(run.captures[0].evidence, [
+      {
+        seq: 1,
+        gate: 'artifact-gate',
+        state: 'validator-failed',
+        path: 'doc/research/0001-ground-x.md',
+      },
+    ]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    if (workRoot) rmSync(workRoot, { recursive: true, force: true });
+  }
+});
+
+test('live: a half-written gate evidence line is kept as malformed data and never aborts the capture', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-evidence-'));
+  try {
+    writeFileSync(
+      join(dir, 'sess.jsonl'),
+      `${JSON.stringify({ seq: 1, state: 'validator-passed', path: 'doc/research/0001-ground-x.md' })}\n{"seq":2,"state":"valid`
+    );
+    const lines = readGateEvidence(dir);
+    assert.equal(lines.length, 2);
+    assert.equal(lines[0].state, 'validator-passed');
+    assert.deepEqual(lines[1], {
+      seq: null,
+      state: 'malformed',
+      path: null,
+      raw: '{"seq":2,"state":"valid',
+    });
+    assert.deepEqual(readGateEvidence(join(dir, 'missing')), []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('live: a capture defaults outside the repository, so forgetting is safe', () => {

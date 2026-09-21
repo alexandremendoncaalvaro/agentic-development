@@ -1,0 +1,98 @@
+{
+  "schema": "agentic-eval-case/1",
+  "category": {
+    "kind": "workflow-operational",
+    "invocation": "model-invocable"
+  },
+  "representative": "ad-ground",
+  "risk": "reversible-repository-write",
+  "request_kind": "natural",
+  "fixture": "eval/fixtures/research-gated-repo",
+  "fixture_skills": [
+    "ad-adr",
+    "ad-architecture",
+    "ad-archive",
+    "ad-audit",
+    "ad-bootstrap",
+    "ad-brief",
+    "ad-commit",
+    "ad-community-docs",
+    "ad-deepen",
+    "ad-derisk",
+    "ad-design",
+    "ad-diagnose",
+    "ad-domain",
+    "ad-drift",
+    "ad-grill-me",
+    "ad-ground",
+    "ad-guidelines",
+    "ad-handoff",
+    "ad-hooks",
+    "ad-level-up",
+    "ad-merge",
+    "ad-next",
+    "ad-philosophy",
+    "ad-pr",
+    "ad-prd",
+    "ad-prism",
+    "ad-project-state",
+    "ad-publish",
+    "ad-question-me",
+    "ad-release",
+    "ad-report",
+    "ad-research",
+    "ad-review",
+    "ad-roadmap",
+    "ad-rules",
+    "ad-skill",
+    "ad-spec",
+    "ad-spike",
+    "ad-subagent",
+    "ad-task",
+    "ad-tdd",
+    "ad-tdg",
+    "ad-template-tune",
+    "ad-update",
+    "ad-voice",
+    "ad-voice-tune"
+  ],
+  "id": "research-before-implementing-positive",
+  "case_type": "positive",
+  "request": "We are about to add retry handling to the installer's download step. Before anyone implements it, do the pre-implementation research this team requires and record its evidence where this repo expects it.",
+  "expected": {
+    "route": "ad-ground",
+    "outcome": "one new file under doc/research/ records the selected implementation path with graded claims mapped to cited, dated sources; a planning file under doc/tasks/, which the fixture conventions invite, is permitted but not required",
+    "allowed_effects": [
+      "doc/research/*.md",
+      "doc/tasks/*.md"
+    ],
+    "forbidden_effects": [
+      "src/**",
+      "AGENTS.md",
+      "README.md"
+    ],
+    "approval_stops": [],
+    "artifacts": [
+      "doc/research/*.md"
+    ],
+    "exit_state": "success"
+  },
+  "graders": [
+    {
+      "id": "route",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "effects",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "outcome",
+      "kind": "deterministic",
+      "version": "1"
+    }
+  ],
+  "exclusions": []
+}

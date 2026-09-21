@@ -1,10 +1,20 @@
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 
 import { freezeArtifact } from '../../src/skills/claude-code/ad-prism/scripts/freeze-artifact.mjs';
 import { loadDenylist } from '../../src/leak-guard.js';
+import { agentLayout } from '../../src/lib/install.js';
 
 import { normalize as normalizeClaudeCode } from './adapters/claude-code.mjs';
 import { createTrial, pushDerivedEvents, UnterminatedStreamError } from './adapters/common.mjs';
@@ -168,13 +178,17 @@ export function buildLiveReceipt({
   );
   // Every trial goes through the same capture path, so a host that failed
   // produces a failure trial here instead of throwing past the receipt.
+  // Paths are relativized against the copy the host actually wrote in: each
+  // trial runs in its own copy under the work root, and a path relativized
+  // against the tracked fixture instead stays absolute, which the effects
+  // grader then refuses as an unauthorized write (GROUND-0028 E5).
   const trials = captures.map((capture) =>
     captureTrial({
       host,
       caseRecord,
       trialId: capture.trialId,
       policy,
-      fixtureRoot,
+      fixtureRoot: capture.root ?? fixtureRoot,
       result: capture.result ?? { status: 0, stdout: capture.stream, stderr: '' },
     })
   );
@@ -248,6 +262,28 @@ export function planTrialRoots({
     roots.push(root);
   }
   return roots;
+}
+
+/**
+ * Install the skills a case declares into one trial copy, at the directory the
+ * host reads project skills from, and return each skill's digest. A fixture
+ * cannot track a machine path to an installed skill, and a `-p` session lets a
+ * personal skill of the same name shadow a project one, so the skills the
+ * case needs travel inside the copy the host runs in and the receipt records
+ * exactly which bytes were there (GROUND-0028 E2). The source is the
+ * canonical `src/skills/<host>/` tree, the same one `skillIdentity` digests,
+ * so a receipt's representative digest and its installed copy agree.
+ */
+export function installFixtureSkills({ trialRoot, host, skills, root, copy = cpSync }) {
+  const { skillsDir } = agentLayout(host);
+  const installed = {};
+  for (const name of skills) {
+    const source = join(root, 'src', 'skills', host, name);
+    if (!existsSync(source)) fail(`live: fixture skill "${name}" is not bundled for ${host}`);
+    copy(source, join(trialRoot, skillsDir, name), { recursive: true });
+    installed[name] = freezeArtifact(source).sha256;
+  }
+  return installed;
 }
 
 /**
@@ -349,18 +385,41 @@ export function runLive({
   const fixtureRoot = resolve(root, caseRecord.fixture);
   const workRoot = mkdtempSync(join(tmpdir(), 'agentic-eval-live-'));
   const roots = planTrialRoots({ fixtureRoot, trials, workRoot });
+  const fixtureSkills = caseRecord.fixture_skills ?? [];
+  // Every trial copy receives the same bytes from the canonical tree, so the
+  // digests are a property of the run, not of a trial; the first install's
+  // digests are the run's record and the other copies only repeat the copy.
+  const installs = roots.map((trialRoot) =>
+    installFixtureSkills({ trialRoot, host, skills: fixtureSkills, root })
+  );
+  const installedSkills = installs[0] ?? {};
 
   const captures = roots.map((trialRoot, index) => {
     const trialId = `t${index + 1}`;
+    // The gate's evidence goes to a directory the lane owns, per trial and
+    // outside the copy, so the model never sees it and the lane can join it
+    // with the stream afterwards; a hook inherits this environment from the
+    // host (GROUND-0028 E6). A case without a wired gate leaves it empty.
+    const evidenceDir = join(workRoot, 'gate-evidence', trialId);
     const [command, ...args] = buildRunnerArgv(runner, caseRecord.request);
     const result = spawn(command, args, {
       cwd: trialRoot,
       encoding: 'utf8',
       maxBuffer: 64 * 1024 * 1024,
+      env: { ...process.env, AD_ARTIFACT_GATE_EVIDENCE_DIR: evidenceDir },
     });
     const stream = String(result.stdout ?? '');
     assertNoLeak({ label: `trial ${trialId} stream`, text: stream, denylistPatterns });
-    return { trialId, stream, result, trialRoot };
+    const evidence = readGateEvidence(evidenceDir);
+    assertNoLeak({
+      label: `trial ${trialId} gate evidence`,
+      text: JSON.stringify(evidence),
+      denylistPatterns,
+    });
+    // The host reports paths under the resolved copy (on macOS the temporary
+    // directory is a symlink into /private), so relativization uses the
+    // resolved root or every write would stay absolute (Task 0084 trial 1).
+    return { trialId, stream, result, trialRoot: realpathSync(trialRoot), evidence };
   });
 
   const receipt = buildLiveReceipt({
@@ -369,23 +428,60 @@ export function runLive({
     hostVersion,
     environment: observeEnvironment({ host, stream: captures.map((c) => c.stream).join('\n') }),
     scaffold: runner.join(' '),
-    runParameters: { trials },
+    runParameters: { trials, ...(fixtureSkills.length ? { fixture_skills: installedSkills } : {}) },
     skill: skillIdentity({ root, host, representative: caseRecord.representative }),
     caseSha256: freezeArtifact(resolve(root, caseFile)).sha256,
     fixtureSha256: freezeArtifact(fixtureRoot).sha256,
     fixtureRoot,
     policy: { grants: [] },
-    captures: captures.map(({ trialId, stream, result }) => ({ trialId, stream, result })),
+    captures: captures.map(({ trialId, stream, result, trialRoot }) => ({
+      trialId,
+      stream,
+      result,
+      root: trialRoot,
+    })),
   });
   assertNoLeak({ label: 'receipt', text: JSON.stringify(receipt), denylistPatterns });
 
   const destination = resolveCaptureDir({ out, root, workRoot });
   mkdirSync(destination.path, { recursive: true });
-  for (const { trialId, stream } of captures) {
+  for (const { trialId, stream, evidence } of captures) {
     writeFileSync(join(destination.path, `${trialId}.jsonl`), stream);
+    if (evidence.length === 0) continue;
+    writeFileSync(
+      join(destination.path, `${trialId}.gate-evidence.jsonl`),
+      evidence.map((line) => JSON.stringify(line)).join('\n') + '\n'
+    );
   }
   writeFileSync(join(destination.path, 'receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`);
   return { receipt, captures, workRoot, destination };
+}
+
+/**
+ * The gate evidence lines one trial left behind, in file then sequence order.
+ * The gate writes one file per host session; a trial normally has one, and a
+ * missing directory means no governed write happened or the gate was off.
+ */
+export function readGateEvidence(evidenceDir) {
+  if (!existsSync(evidenceDir)) return [];
+  const lines = [];
+  const files = readdirSync(evidenceDir)
+    .filter((name) => name.endsWith('.jsonl'))
+    .sort();
+  for (const file of files) {
+    for (const text of readFileSync(join(evidenceDir, file), 'utf8').split(/\r?\n/)) {
+      if (text.trim() === '') continue;
+      // A line the gate left half-written is data about the run, like a host
+      // that exits non-zero (ADR-0082 decision 6): it stays in the sidecar as
+      // malformed, joins nothing, and never aborts the capture.
+      try {
+        lines.push(JSON.parse(text));
+      } catch {
+        lines.push({ seq: null, state: 'malformed', path: null, raw: text });
+      }
+    }
+  }
+  return lines;
 }
 
 /**

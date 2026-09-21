@@ -1,0 +1,17 @@
+{
+  "description": "Evaluation fixture: the ad-hooks artifact-validator gate, resolved from the session working directory because the trial copy is not a git repository.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \".agents/skills/ad-hooks/scripts/artifact-gate.mjs\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

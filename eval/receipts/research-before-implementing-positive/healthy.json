@@ -1,0 +1,62 @@
+{
+  "schema": "agentic-eval-receipt/1",
+  "case_id": "research-before-implementing-positive",
+  "lane": "replay",
+  "origin": "synthetic",
+  "intent": "known-good",
+  "declared_failure": null,
+  "frozen": {
+    "case_sha256": "86b86da6dd92cb3653a22c1502da0446757753c822d4abd3e26cfcdb8d007ec5",
+    "fixture_sha256": "9c2905675b3b0db955b5e4067e4387f1ff22a9e81b531192b70acaf7c67dbba2",
+    "host": "claude-code",
+    "host_version": "2.1.227",
+    "model": "synthetic-replay",
+    "scaffold": "synthetic-replay",
+    "tools": [
+      "Read",
+      "Write",
+      "Skill"
+    ],
+    "permissions": "acceptEdits",
+    "context_policy": "bare",
+    "run_parameters": {
+      "max_turns": 8
+    },
+    "grader_versions": {
+      "route": "1",
+      "effects": "1",
+      "outcome": "1"
+    },
+    "trial_count": 1
+  },
+  "trials": [
+    {
+      "id": "t1",
+      "events": [
+        {
+          "seq": 1,
+          "kind": "skill_invoked",
+          "skill": "ad-ground"
+        },
+        {
+          "seq": 2,
+          "kind": "file_write",
+          "path": "doc/research/0001-ground-download-retry.md"
+        },
+        {
+          "seq": 3,
+          "kind": "final",
+          "exit_state": "success"
+        }
+      ],
+      "outcome": {
+        "final_response": "Recorded the implementation path and its graded evidence under doc/research/.",
+        "artifact_manifest": [
+          "doc/research/0001-ground-download-retry.md"
+        ],
+        "exit_state": "success"
+      },
+      "judgments": []
+    }
+  ]
+}
