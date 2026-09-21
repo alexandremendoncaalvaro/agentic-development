@@ -4154,7 +4154,11 @@ test('artifact-gate: a ground record that fails its validator is reported to the
     assert.equal(lines[0].gate, 'artifact-gate');
     assert.equal(lines[0].state, 'validator-failed');
     assert.equal(lines[0].seq, 1);
-    assert.equal(lines[0].path, rel);
+    assert.equal(
+      lines[0].path,
+      'doc/research/0001-ground-broken.md',
+      'forward slashes on every platform'
+    );
     assert.match(lines[0].reproduction, /validate-record\.mjs/);
   } finally {
     rmSync(root, { recursive: true, force: true });
