@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-08-07
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0083, the Codex-out-of-scope stanza only: Codex now documents lifecycle hooks with context-injection parity, so the session-lifecycle tier extends to Codex. The `Stop` nudge mechanism and its non-looping contract stand.
 
 ## Context
 
