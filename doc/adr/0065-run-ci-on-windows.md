@@ -4,6 +4,7 @@
 **Date:** 2026-08-11
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0032 — its CI OS matrix example and realized runner set.
+**Amended by:** ADR-0078 — its realized Node version pair; the two-operating-system matrix and the four-check requirement are unchanged.
 
 ## Context
 

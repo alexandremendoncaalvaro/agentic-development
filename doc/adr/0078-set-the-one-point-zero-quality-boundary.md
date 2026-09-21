@@ -4,6 +4,7 @@
 **Date:** 2026-09-15
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0048 — stable release semantics and the composed verification gate
+**Amends:** ADR-0065 — its realized Node version pair, which Decision item 3 moves to Node 22.13 and Node 24
 
 ## Context
 
