@@ -232,8 +232,10 @@ Applied:
 Refuted with evidence:
 
 - Branch name outside the allowed prefixes (GUIDELINES 10.1): the name is the
-  Conductor workspace placeholder and the owner instructed not to rename it;
-  the same disposition as Task 0066's audit.
+  Conductor workspace placeholder; the Conductor workspace instruction the
+  session runs under states that the tool renames the branch itself and the
+  agent must not rename it unless the owner explicitly says so, which the
+  owner did not. The same disposition as Task 0066's audit.
 - Accepted ADRs carrying `Amended by: ADR-0083` while ADR-0083 is proposed,
   and dependents advancing under a proposed ADR (ADRs and AGENTS groups): the
   ADR-0081 precedent did exactly this within the month; `b1612cd` proposed
@@ -256,6 +258,32 @@ Refuted with evidence:
 After the fixes: 13 gate tests and 4 wiring tests, full suite green, lint,
 format, and drift scan clean, byte-parity and dogfood copies in sync.
 
+### 2026-09-21 — Re-audit over the final tree and rebase
+
+`feat/live-evaluation-lane` merged into `main` as pull request 145 while
+this work ran; the branch was rebased onto `origin/main` (`f879658e`), with
+one conflict in `ARCHITECTURE.md`'s test-layout sentence resolved by keeping
+both sides (the live-lane test entry and the wiring-test entry). Full suite
+on the rebased tree: 1060 passing.
+
+Re-audit handoffs at `.agentic/reviews/2026-09-21T18-33-16Z-reaudit-{guidelines,cv}.md`
+over HEAD `07aef5c`, each carrying every prior finding for disposition. Both
+reviewers confirmed every resolution and every refutation with their own
+runs (13 gate tests, 4 wiring tests, the concurrency test, the full suite,
+byte-parity, the recomputed evidence digest, and the ADR-0081 precedent
+commits). One minor CV.5 item survived: the branch-name refutation cited the
+owner's instruction without a source; the source is the Conductor workspace
+instruction the session runs under, now named above. No blocker remains.
+
+Open for follow-up, not claimed: the live-lane join (an evaluation case
+whose fixture carries the gate wiring), the Codex live leg (operator's Codex
+CLI), and the acceptance of ADR-0083 with its PROJECTION.md row, which is the
+owner's gate; the two earlier tier members' Codex wiring is a separate
+follow-up under ADR-0083. Rule-gap candidates for `/ad-level-up`: `ad-audit`
+should tell the orchestrator to freeze edits to the target while a fan-out
+runs, or to snapshot per group; `ad-review` on a machine whose installed
+skill copy predates the verdict-persistence step silently skips it, which
+argues for the checkpoint hook naming the installed kit version.
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
