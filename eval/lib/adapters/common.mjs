@@ -10,6 +10,20 @@ import { normalizePath } from '../shared.mjs';
 
 const SKILL_MENTION = /^[/$]([a-z0-9][a-z0-9-]*)(?:\s|$)/;
 
+/**
+ * A stream that stopped before the host said how the turn ended. It is a
+ * distinct condition from a malformed record: the bytes parsed, the host just
+ * never finished. The replay lane treats both as defects, but the live lane has
+ * to tell them apart — an unterminated stream is data about the run, a
+ * malformed one is a defect in this code (ADR-0082 decision 6).
+ */
+export class UnterminatedStreamError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'UnterminatedStreamError';
+  }
+}
+
 /** Parse JSON Lines into `{ line, record }` pairs; a non-JSON line is a defect, not a skip. */
 export function parseJsonLines(lines) {
   const list = Array.isArray(lines) ? lines : String(lines).split(/\r?\n/);

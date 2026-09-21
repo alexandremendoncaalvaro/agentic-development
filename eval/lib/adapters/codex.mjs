@@ -9,6 +9,7 @@ import {
   requireArray,
   requireString,
   trialPath,
+  UnterminatedStreamError,
 } from './common.mjs';
 
 /**
@@ -58,7 +59,9 @@ export function normalize({ lines, request, requestKind, policy, fixtureRoot, tr
     }
   }
   if (!terminal) {
-    throw new Error('stream ended without a turn.completed, turn.failed, or error record');
+    throw new UnterminatedStreamError(
+      'stream ended without a turn.completed, turn.failed, or error record'
+    );
   }
   const { exitState, ...native } = terminal;
   return finishTrial(trial, { exitState, finalResponse: lastMessage, native });

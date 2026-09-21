@@ -6,6 +6,7 @@
  *
  *   node eval/run.mjs replay <case.json> <receipt.json>
  *   node eval/run.mjs corpus
+ *   node eval/run.mjs live <case.json> --host <h> [--trials N] [--out dir] --runner <cmd...>
  *
  * `replay` prints one result record. `corpus` is the replay-lane gate: it
  * evaluates every tracked receipt of every tracked case, prints the coverage
@@ -16,11 +17,13 @@
  * is malformed.
  */
 import { coverageReport, evaluateCorpus } from './lib/corpus.mjs';
+import { parseLiveArgs, runLive } from './lib/live.mjs';
 import { evaluateReplay } from './lib/replay.mjs';
 
 function usage() {
   console.error(
-    'usage: node eval/run.mjs replay <case.json> <receipt.json> | node eval/run.mjs corpus'
+    'usage: node eval/run.mjs replay <case.json> <receipt.json> | node eval/run.mjs corpus | ' +
+      'node eval/run.mjs live <case.json> --host <host> [--trials N] [--out dir] --runner <command...>'
   );
   process.exit(1);
 }
@@ -70,9 +73,18 @@ function runCorpus() {
   process.exit(failing.length === 0 && coverage.gaps.length === 0 ? 0 : 1);
 }
 
+// The live lane is never part of a gate: it spawns a real host with the
+// operator's environment, so it runs only when a person asks for it by name.
+function runLiveLane(argv) {
+  const { receipt, workRoot } = runLive(parseLiveArgs(argv));
+  print({ receipt, work_root: workRoot });
+  process.exit(receipt.trials.every((trial) => trial.outcome.exit_state === 'success') ? 0 : 1);
+}
+
 const [command, caseFile, receiptFile] = process.argv.slice(2);
 try {
-  if (command === 'replay' && caseFile && receiptFile) runReplay(caseFile, receiptFile);
+  if (command === 'live') runLiveLane(process.argv.slice(3));
+  else if (command === 'replay' && caseFile && receiptFile) runReplay(caseFile, receiptFile);
   else if (command === 'corpus' && !caseFile) runCorpus();
   else usage();
 } catch (error) {

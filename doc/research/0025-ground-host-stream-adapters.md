@@ -241,3 +241,57 @@ grant-from-policy rule in favor of the observed event.
 ## Audit path
 
 Run `node .claude/skills/ad-ground/scripts/validate-record.mjs doc/research/0025-ground-host-stream-adapters.md`, then reopen every source in the register. Structural validity proves the map, not the source content.
+
+## Addendum — 2026-09-21: the first authorized live pilot
+
+The pilot ran on Claude Code 2.1.227, model `claude-opus-5[1m]`, one trial of the
+`track-work-item-as-task` case (model-invocable, natural request, representative
+`ad-task`) in a copy of `eval/fixtures/planning-docs-repo` with the skill
+installed under `.claude/skills/`, invoked as
+`claude -p <request> --output-format stream-json --verbose --permission-mode default --disallowedTools Write Edit`.
+The Codex leg did not run; see the limitation below. The capture is not tracked
+here, for the reason ADR-0082 decision 4 now states.
+
+**The grant-and-denial mapping is confirmed.** The stream carried ten
+`system` records with subtype `permission_denied`, each naming `tool_name`,
+`tool_use_id`, and a `decision_reason` or `decision_reason_type`. Fed to the
+adapter, the trial produced ten `approval_denied` events and three `command`
+events — the denied attempts became denials rather than commands, which is
+exactly what the rule predicted. This mitigation moves from Conditional to
+High for Claude Code, on observation. It remains Conditional for Codex.
+
+**The implicit-activation mapping is reversed, and more widely than this record
+assumed.** The hypothesis above was that only Codex needs a `SKILL.md`-read
+mapping, because Claude Code has a skill record of its own. The pilot shows
+otherwise. The `system/init` record lists `Skill` among the twenty-nine tools
+available, and the model did not use it: it read
+`.claude/skills/ad-task/SKILL.md` with the ordinary `Read` tool, then ran the
+skill's `scope-anchors.mjs` script and read its task template — the skill
+demonstrably drove the work. The adapter scored that trial `skill_invoked: 0`,
+so the route grader would have failed a trial the skill actually routed. The
+`Read` of the `SKILL.md` landed in `unmapped` under
+`assistant.tool_use.Read`. The correction belongs to the Claude Code adapter and
+is tracked as task-0082; until it lands, an implicit Claude Code case is a false
+negative.
+
+**`unmapped` had its first live population**, which is what it was built for:
+nine distinct host shapes over ninety-seven records — `system.thinking_tokens`
+(70), `user.tool_result` (10), `assistant.tool_use.Read` (7),
+`assistant.tool_use.ToolSearch` (3), `system.session_state_changed` (2),
+`rate_limit_event` (2), and one each of `system.init`, `system.hook_started`,
+and `system.hook_response`. None is an error; all are records the event
+vocabulary has no kind for.
+
+**Limitations, and they are load-bearing.** One trial, one host, one model, one
+request, so this is an existence proof about record shapes and not a measurement
+of rates. The run inherited the operator's global Claude Code configuration:
+twenty-nine tools including deferred-tool machinery, and the operator's own
+global skills and subagents. That is not the `bare` context policy the receipts
+declare, and the activation finding should be re-measured under a bare
+configuration before it is generalized — a host that already has the skill's
+slash command registered globally may reach for the file rather than the tool
+for reasons the fixture did not create. The Codex leg is blocked by the
+operator's toolchain rather than by anything here: `codex-cli 0.139.0` refuses
+the account's default model `gpt-6-astra` as requiring a newer CLI, and refuses
+`gpt-5-codex` as unsupported for a ChatGPT account. The Codex adapter's two
+mappings stay Conditional and unmeasured.

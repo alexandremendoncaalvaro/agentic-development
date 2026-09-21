@@ -7,6 +7,7 @@ import {
   pushEvent,
   requireString,
   trialPath,
+  UnterminatedStreamError,
 } from './common.mjs';
 
 /**
@@ -116,7 +117,7 @@ export function normalize({ lines, request, requestKind, policy, fixtureRoot, tr
       countUnmapped(trial, record.subtype ? `${record.type}.${record.subtype}` : record.type, line);
     }
   }
-  if (!result) throw new Error('stream ended without a result message');
+  if (!result) throw new UnterminatedStreamError('stream ended without a result message');
   const success = result.record.subtype === 'success' && result.record.is_error === false;
   return finishTrial(trial, {
     exitState: success ? 'success' : 'failure',
