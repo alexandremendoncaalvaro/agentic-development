@@ -1,6 +1,6 @@
 # ADR-0083: Bound the runtime layer to feedback gates on native host hooks
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-09-21
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0055 — its Codex-out-of-scope stanza only: the record deferred Codex because context-injection parity was undocumented and named its documentation as the revisit trigger; Codex now documents lifecycle hooks with that parity, so the tier is no longer Claude-Code-scoped as a category. The `Stop` nudge itself stays wired on Claude Code only until its own Codex follow-up; its mechanism and non-looping contract are unchanged.
