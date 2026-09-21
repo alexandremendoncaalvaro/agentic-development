@@ -11,8 +11,9 @@ import {
   mkdirSync,
   existsSync,
   symlinkSync,
+  readdirSync,
 } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -4072,3 +4073,413 @@ test('workflow-checkpoint: malformed or non-object stdin → silent exit 0, neve
 test('workflow-checkpoint: AD_WORKFLOW_CHECKPOINT=0 kill switch → silent exit 0', () => {
   assert.equal(runCheckpoint(PROMPT_EVENT, { AD_WORKFLOW_CHECKPOINT: '0' }), '');
 });
+
+// --- ad-hooks session-lifecycle artifact-validator gate (ADR-0083, Spec 0008) ---
+// PostToolUse: exit 2 shows stderr to the model after the tool already ran;
+// exit 0 is silent. The claude-code copy is executed; byte-parity covers the
+// codex twin. Each test builds a throwaway repository so the gate's evidence
+// file and the validator's cwd-relative path rules are exercised for real.
+const ARTIFACT_GATE = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-hooks',
+  'scripts',
+  'artifact-gate.mjs'
+);
+
+function gateRepo() {
+  const root = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-gate-repo-')));
+  const evidence = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-gate-evidence-')));
+  mkdirSync(join(root, 'doc', 'research'), { recursive: true });
+  return { root, evidence };
+}
+
+function runGate(input, { root, evidence, env = {} }) {
+  const result = spawnSync('node', [ARTIFACT_GATE], {
+    input,
+    encoding: 'utf8',
+    cwd: root,
+    env: {
+      ...process.env,
+      AD_ARTIFACT_GATE: '',
+      AD_ARTIFACT_GATE_EVIDENCE_DIR: evidence,
+      AD_ARTIFACT_GATE_SKILLS_ROOT: '',
+      ...env,
+    },
+  });
+  return { status: result.status, stdout: result.stdout, stderr: result.stderr };
+}
+
+function claudeWriteEvent(root, relPath, sessionId = 'sess-gate') {
+  return JSON.stringify({
+    hook_event_name: 'PostToolUse',
+    session_id: sessionId,
+    cwd: root,
+    tool_name: 'Write',
+    tool_input: { file_path: join(root, relPath), content: '' },
+    tool_response: { filePath: join(root, relPath), type: 'create' },
+  });
+}
+
+function evidenceLines(evidence) {
+  const lines = [];
+  for (const file of readdirSync(evidence)) {
+    for (const line of readFileSync(join(evidence, file), 'utf8').split('\n')) {
+      if (line.trim()) lines.push(JSON.parse(line));
+    }
+  }
+  return lines;
+}
+
+test('artifact-gate: a ground record that fails its validator is reported to the model with the validator message and a reproduction command', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    const rel = join('doc', 'research', '0001-ground-broken.md');
+    writeFileSync(join(root, rel), '# GROUND-0001: broken\n\n**Status:** recorded\n');
+    const { status, stdout, stderr } = runGate(claudeWriteEvent(root, rel), { root, evidence });
+    assert.equal(status, 2, 'exit 2 is the documented way to show stderr to the model');
+    assert.equal(stdout, '', 'nothing on stdout: no decision object, no context text');
+    assert.match(stderr, /artifact-gate/, 'names the gate');
+    assert.match(stderr, /missing Decision metadata/, 'carries the validator message verbatim');
+    assert.match(
+      stderr,
+      /validate-record\.mjs doc\/research\/0001-ground-broken\.md/,
+      'reproduction command from the repository root'
+    );
+    const lines = evidenceLines(evidence);
+    assert.equal(lines.length, 1);
+    assert.equal(lines[0].gate, 'artifact-gate');
+    assert.equal(lines[0].state, 'validator-failed');
+    assert.equal(lines[0].seq, 1);
+    assert.equal(lines[0].path, rel);
+    assert.match(lines[0].reproduction, /validate-record\.mjs/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+// VALID_GROUND_RECORD is the ad-ground fixture declared above (task-0056 tests).
+
+test('artifact-gate: a ground record that passes its validator costs the model nothing and leaves a pass in the evidence', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    const rel = join('doc', 'research', '0002-ground-durable-evidence.md');
+    writeFileSync(join(root, rel), VALID_GROUND_RECORD);
+    const { status, stdout, stderr } = runGate(claudeWriteEvent(root, rel), { root, evidence });
+    assert.equal(status, 0);
+    assert.equal(stdout, '');
+    assert.equal(stderr, '');
+    const lines = evidenceLines(evidence);
+    assert.equal(lines.length, 1);
+    assert.equal(lines[0].state, 'validator-passed');
+    assert.equal(lines[0].surfaced, '');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: an ungoverned write, an event without a path, and malformed stdin are silent and leave no evidence', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    writeFileSync(join(root, 'README.md'), '# not governed\n');
+    const cases = [
+      claudeWriteEvent(root, 'README.md'),
+      JSON.stringify({
+        hook_event_name: 'PostToolUse',
+        session_id: 's',
+        cwd: root,
+        tool_name: 'Write',
+        tool_input: {},
+      }),
+      '',
+      '{not json',
+      'null',
+      '[1,2]',
+    ];
+    for (const input of cases) {
+      const { status, stdout, stderr } = runGate(input, { root, evidence });
+      assert.equal(status, 0, `silent exit 0 for ${JSON.stringify(input).slice(0, 40)}`);
+      assert.equal(stdout, '');
+      assert.equal(stderr, '');
+    }
+    assert.equal(evidenceLines(evidence).length, 0, 'no governed firing, no evidence line');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: a validator that cannot run is reported as a gate failure, never as a verdict or a silent pass', () => {
+  const { root, evidence } = gateRepo();
+  const emptySkills = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-gate-noskills-')));
+  try {
+    const rel = join('doc', 'research', '0001-ground-broken.md');
+    writeFileSync(join(root, rel), '# GROUND-0001: broken\n');
+    const { status, stdout, stderr } = runGate(claudeWriteEvent(root, rel), {
+      root,
+      evidence,
+      env: { AD_ARTIFACT_GATE_SKILLS_ROOT: emptySkills },
+    });
+    assert.equal(status, 2, 'a broken gate is visible to the model');
+    assert.equal(stdout, '');
+    assert.match(stderr, /runtime-unavailable/);
+    assert.match(stderr, /not a verdict/);
+    const lines = evidenceLines(evidence);
+    assert.equal(lines.length, 1);
+    assert.equal(lines[0].state, 'runtime-unavailable');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+    rmSync(emptySkills, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: AD_ARTIFACT_GATE=0 silences every case and writes no evidence', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    const rel = join('doc', 'research', '0001-ground-broken.md');
+    writeFileSync(join(root, rel), '# GROUND-0001: broken\n');
+    const { status, stdout, stderr } = runGate(claudeWriteEvent(root, rel), {
+      root,
+      evidence,
+      env: { AD_ARTIFACT_GATE: '0' },
+    });
+    assert.equal(status, 0);
+    assert.equal(stdout, '');
+    assert.equal(stderr, '');
+    assert.equal(evidenceLines(evidence).length, 0);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+function codexPatchEvent(root, patch, sessionId = 'sess-codex') {
+  return JSON.stringify({
+    hook_event_name: 'PostToolUse',
+    session_id: sessionId,
+    cwd: root,
+    turn_id: 'turn-1',
+    tool_name: 'apply_patch',
+    tool_input: { command: patch },
+    tool_response: { output: 'Done' },
+  });
+}
+
+test('artifact-gate: a Codex apply_patch that adds or updates governed records is recovered from the patch headers, following a move', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    writeFileSync(
+      join(root, 'doc', 'research', '0001-ground-broken.md'),
+      '# GROUND-0001: broken\n'
+    );
+    writeFileSync(
+      join(root, 'doc', 'research', '0002-ground-durable-evidence.md'),
+      VALID_GROUND_RECORD
+    );
+    const patch = [
+      '*** Begin Patch',
+      '*** Add File: doc/research/0001-ground-broken.md',
+      '+# GROUND-0001: broken',
+      '*** Update File: doc/research/0009-ground-old-name.md',
+      '*** Move to: doc/research/0002-ground-durable-evidence.md',
+      '@@',
+      '-old',
+      '+new',
+      '*** Update File: README.md',
+      '@@',
+      '+ungoverned',
+      '*** End Patch',
+    ].join('\n');
+    const { status, stderr } = runGate(codexPatchEvent(root, patch), { root, evidence });
+    assert.equal(status, 2, 'the broken record makes the whole firing exit 2');
+    assert.match(stderr, /0001-ground-broken\.md/);
+    const lines = evidenceLines(evidence);
+    assert.deepEqual(
+      lines.map((l) => [l.seq, l.path, l.state, l.host_tool]),
+      [
+        [1, 'doc/research/0001-ground-broken.md', 'validator-failed', 'apply_patch'],
+        [2, 'doc/research/0002-ground-durable-evidence.md', 'validator-passed', 'apply_patch'],
+      ],
+      'two governed paths, ordered, the moved path resolved to its destination, README ignored'
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: a PRISM plan is routed to the plan validator and a RESEARCH study is unowned', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    const plan = join('doc', 'research', '0003-some-evaluation-plan.md');
+    const study = join('doc', 'research', '0004-some-study.md');
+    writeFileSync(join(root, plan), '# PRISM-0003: An evaluation plan with nothing in it\n');
+    writeFileSync(join(root, study), '# RESEARCH-0004: A study no validator owns\n');
+    const planRun = runGate(claudeWriteEvent(root, plan), { root, evidence });
+    assert.equal(planRun.status, 2);
+    assert.match(planRun.stderr, /prism-plan failed/);
+    assert.match(planRun.stderr, /validate-plan\.mjs doc\/research\/0003-some-evaluation-plan\.md/);
+    const studyRun = runGate(claudeWriteEvent(root, study), { root, evidence });
+    assert.equal(studyRun.status, 0);
+    assert.equal(studyRun.stderr, '');
+    const lines = evidenceLines(evidence);
+    assert.equal(lines.length, 1, 'only the governed plan left evidence');
+    assert.equal(lines[0].owner, 'prism-plan');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: without an evidence override the evidence lands under the OS temporary directory, never inside the working tree', () => {
+  const { root, evidence } = gateRepo();
+  const tmp = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-gate-tmp-')));
+  try {
+    const rel = join('doc', 'research', '0002-ground-durable-evidence.md');
+    writeFileSync(join(root, rel), VALID_GROUND_RECORD);
+    const { status } = runGate(claudeWriteEvent(root, rel, 'sess/odd id'), {
+      root,
+      evidence,
+      env: { AD_ARTIFACT_GATE_EVIDENCE_DIR: '', TMPDIR: tmp, TMP: tmp, TEMP: tmp },
+    });
+    assert.equal(status, 0);
+    assert.equal(
+      readdirSync(evidence).length,
+      0,
+      'the override was empty, so the override dir stays untouched'
+    );
+    const written = readdirSync(join(tmp, 'agentic-artifact-gate'));
+    assert.deepEqual(written, ['sess_odd_id.jsonl'], 'keyed by a sanitized session id');
+    const inTree = readdirSync(root).filter((name) => name.endsWith('.jsonl'));
+    assert.deepEqual(inTree, [], 'nothing written inside the repository');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+    rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: consecutive firings in one session keep an ordered sequence', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    const rel = join('doc', 'research', '0002-ground-durable-evidence.md');
+    writeFileSync(join(root, rel), VALID_GROUND_RECORD);
+    runGate(claudeWriteEvent(root, rel), { root, evidence });
+    runGate(claudeWriteEvent(root, rel), { root, evidence });
+    runGate(claudeWriteEvent(root, rel), { root, evidence });
+    assert.deepEqual(
+      evidenceLines(evidence).map((l) => l.seq),
+      [1, 2, 3]
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+// A governed file the gate cannot read is a gate failure, not "no owner":
+// only a file that is gone (ENOENT) is legitimately silent.
+if (process.platform === 'win32' || process.getuid?.() === 0) {
+  test.skip('artifact-gate: an unreadable governed file is a runtime failure, never a silent pass (POSIX permissions, non-root only)', () => {});
+} else {
+  test('artifact-gate: an unreadable governed file is a runtime failure, never a silent pass', () => {
+    const { root, evidence } = gateRepo();
+    try {
+      const rel = join('doc', 'research', '0001-ground-locked.md');
+      writeFileSync(join(root, rel), '# GROUND-0001: locked\n');
+      chmodSync(join(root, rel), 0o000);
+      const { status, stdout, stderr } = runGate(claudeWriteEvent(root, rel), { root, evidence });
+      assert.equal(status, 2);
+      assert.equal(stdout, '');
+      assert.match(stderr, /runtime-unavailable/);
+      assert.match(stderr, /0001-ground-locked\.md/);
+      const lines = evidenceLines(evidence);
+      assert.equal(lines.length, 1);
+      assert.equal(lines[0].state, 'runtime-unavailable');
+      assert.match(lines[0].output, /EACCES/);
+    } finally {
+      chmodSync(join(root, 'doc', 'research', '0001-ground-locked.md'), 0o644);
+      rmSync(root, { recursive: true, force: true });
+      rmSync(evidence, { recursive: true, force: true });
+    }
+  });
+}
+
+test('artifact-gate: a governed file removed before the hook ran stays silent', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    const rel = join('doc', 'research', '0001-ground-gone.md');
+    const { status, stderr } = runGate(claudeWriteEvent(root, rel), { root, evidence });
+    assert.equal(status, 0);
+    assert.equal(stderr, '');
+    assert.equal(evidenceLines(evidence).length, 0);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: concurrent firings in one session never share or skip a sequence number', async () => {
+  const { root, evidence } = gateRepo();
+  try {
+    const rel = join('doc', 'research', '0002-ground-durable-evidence.md');
+    writeFileSync(join(root, rel), VALID_GROUND_RECORD);
+    const input = claudeWriteEvent(root, rel, 'sess-parallel');
+    const env = {
+      ...process.env,
+      AD_ARTIFACT_GATE: '',
+      AD_ARTIFACT_GATE_EVIDENCE_DIR: evidence,
+      AD_ARTIFACT_GATE_SKILLS_ROOT: '',
+    };
+    const runs = Array.from(
+      { length: 10 },
+      () =>
+        new Promise((resolveRun, reject) => {
+          const child = spawn('node', [ARTIFACT_GATE], { cwd: root, env });
+          child.on('error', reject);
+          child.on('close', (code) => resolveRun(code));
+          child.stdin.end(input);
+        })
+    );
+    const codes = await Promise.all(runs);
+    assert.deepEqual(codes, Array(10).fill(0));
+    const seqs = evidenceLines(evidence)
+      .map((l) => l.seq)
+      .sort((a, b) => a - b);
+    assert.deepEqual(seqs, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+// The evidence line is part of the gate's contract; a firing whose line cannot
+// be written must say so rather than pass silently (ADR-0083 decision 5).
+if (process.platform === 'win32' || process.getuid?.() === 0) {
+  test.skip('artifact-gate: an unwritable evidence directory is surfaced as a gate failure (POSIX permissions, non-root only)', () => {});
+} else {
+  test('artifact-gate: an unwritable evidence directory is surfaced as a gate failure, not a silent pass', () => {
+    const { root, evidence } = gateRepo();
+    try {
+      const rel = join('doc', 'research', '0002-ground-durable-evidence.md');
+      writeFileSync(join(root, rel), VALID_GROUND_RECORD);
+      chmodSync(evidence, 0o500);
+      const { status, stdout, stderr } = runGate(claudeWriteEvent(root, rel), { root, evidence });
+      assert.equal(status, 2, 'the validator passed but the gate could not keep its evidence');
+      assert.equal(stdout, '');
+      assert.match(stderr, /runtime-unavailable/);
+      assert.match(stderr, /evidence/);
+      assert.match(stderr, /EACCES/);
+    } finally {
+      chmodSync(evidence, 0o700);
+      rmSync(root, { recursive: true, force: true });
+      rmSync(evidence, { recursive: true, force: true });
+    }
+  });
+}

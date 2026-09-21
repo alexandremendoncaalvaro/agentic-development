@@ -1,7 +1,7 @@
 ---
 name: ad-hooks
-description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, or close the WORKFLOW §11 advisory-vs-deterministic gap. Session-lifecycle hooks (a Stop hook nudging /ad-handoff when context runs low, and a UserPromptSubmit workflow checkpoint) are Claude-Code-scoped — see ADR-0055 and ADR-0074. Opt-in skill; not auto-installed.
-summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals. Session-lifecycle hooks (Stop handoff-nudge, UserPromptSubmit workflow checkpoint) are Claude-Code-scoped.
+description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, or close the WORKFLOW §11 advisory-vs-deterministic gap. Also scaffolds session-lifecycle hooks, a Stop hook nudging /ad-handoff when context runs low and a UserPromptSubmit workflow checkpoint (Claude Code today, ADR-0055 and ADR-0074), and a PostToolUse artifact-validator gate on both hosts that shows a failing record validator to the model inside the turn (ADR-0083). Opt-in skill; not auto-installed.
+summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals — plus a session-lifecycle tier (Stop handoff-nudge and UserPromptSubmit workflow checkpoint on Claude Code today, and a dual-host PostToolUse artifact-validator gate).
 ---
 
 <background_information>
@@ -62,7 +62,29 @@ Filesystem changes:
 
 The skill does not execute the runner's install command. The skill does not write CI config.
 
-Session-lifecycle hooks — agent-side session events wired in the host's settings: a Stop hook that nudges `/ad-handoff` when context runs low (ADR-0055) and a UserPromptSubmit hook that injects the kit's workflow checkpoint on every prompt (ADR-0074) — are Claude-Code-scoped. Codex exposes compact-related hooks, but prompt-time context injection is undocumented, so this tier is not wired on Codex. The shared `scripts/handoff-nudge.mjs` and `scripts/workflow-checkpoint.mjs` ship in both host trees for byte-parity discipline only; the Codex flow does not install a settings hook for them. If Codex documents context-injection parity, revisit ADR-0055 and ADR-0074.
+Session-lifecycle hooks are agent-side session events wired in the host's hook configuration. Codex documents lifecycle hooks with the same event vocabulary as Claude Code (`PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `Stop`, and others), enabled by default, configured in `<repo>/.codex/hooks.json` or an inline `[hooks]` table in `.codex/config.toml`, and run only after the operator reviews and trusts the exact hook definition through `/hooks`. The tier has three members:
+
+- The Stop handoff nudge (ADR-0055) and the UserPromptSubmit workflow checkpoint (ADR-0074) are wired on Claude Code today; their Codex wiring is a follow-up under ADR-0083. Their scripts ship in both host trees for byte-parity discipline.
+- The **artifact-validator `PostToolUse` gate** (ADR-0083, Spec 0008, GROUND-0027) is wired on both hosts. After a skill writes a record under `doc/research/`, the gate routes the file by its first heading (`GROUND-NNNN` to `ad-ground/scripts/validate-record.mjs`, `PRISM-NNNN` to `ad-prism/scripts/validate-plan.mjs`) and, on a validator failure, exits 2 with the validator's message and a reproduction command on stderr, which Codex records as feedback in place of the tool result. A pass, an unowned file, a missing path, or malformed stdin is silent. On Codex the written paths are recovered from the `apply_patch` headers (`*** Add File:`, `*** Update File:`, `*** Move to:`) in `tool_input.command`; the matcher `Edit|Write` is a documented alias for `apply_patch`. Every governed firing appends one JSON line to `<tmpdir>/agentic-artifact-gate/<session_id>.jsonl`, outside the working tree (`AD_ARTIFACT_GATE_EVIDENCE_DIR` redirects it); `AD_ARTIFACT_GATE=0` silences the gate; `AD_ARTIFACT_GATE_SKILLS_ROOT` names the skills root when the sibling skills are installed elsewhere. It is feedback, not enforcement: no decision object, no deny, no `Stop` continuation.
+
+Wiring, merged into `<repo>/.codex/hooks.json`, with `<ad-hooks-dir>` resolved to the directory this skill was loaded from:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "node \"<ad-hooks-dir>/scripts/artifact-gate.mjs\"", "timeout": 30 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+State the resolved path before writing; tell the operator to run `/hooks` to review and trust the new definition. A `PreToolUse` guard and any `Stop`-based repair loop remain future scope behind their own decisions (ADR-0083).
 
 Documentation discipline rules apply at write time:
 - No emoji anywhere in scaffolded config or AGENTS.md update.

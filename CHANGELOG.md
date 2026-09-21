@@ -6,6 +6,17 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `/ad-hooks` session-lifecycle tier gains a third member, the
+  `PostToolUse` artifact-validator gate, wired on Claude Code and Codex:
+  after a skill writes a `GROUND-` or `PRISM-` record under `doc/research/`,
+  the gate runs the record's own validator and, on failure, shows the
+  validator's message and a reproduction command to the model inside the
+  turn (exit 2, stderr); a pass is silent, every governed firing leaves one
+  evidence line outside the working tree, and `AD_ARTIFACT_GATE=0` turns it
+  off (ADR-0083, Spec 0008, task-0083).
+
 ### Changed
 
 - `/ad-review` now persists both reviewers' reports verbatim to

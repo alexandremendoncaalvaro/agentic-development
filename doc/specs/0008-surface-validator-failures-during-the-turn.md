@@ -1,6 +1,6 @@
 # Spec `0008`: Surface artifact validator failures during the turn
 
-**Status:** draft
+**Status:** accepted
 **Created:** 2026-09-21
 **Owner:** Alexandre Alvaro
 
@@ -190,9 +190,21 @@ Agent SDK, and any hosted or daemon component are not part of this feature.
 - **Codex path extraction.** Codex's write tool delivers a patch payload; the
   gate needs a deterministic way to recover the written paths from it. Settled
   by the four-source pass before code.
+  - **Resolution (GROUND-0027 E3):** Codex reports `tool_name: "apply_patch"`
+    with the patch text in `tool_input.command`; the written paths are the
+    `*** Add File:` and `*** Update File:` headers, a `*** Move to:` header
+    replaces the preceding path, and every path is relative to the event's
+    `cwd`. The matcher `Edit|Write` is a documented alias for `apply_patch`.
 - **Which validator governs a research study.** `validate-record.mjs` was
   written for ground receipts; whether it also owns the `RESEARCH-` study shape
   or a study needs its own check is settled before the owner map is declared.
+  - **Resolution (GROUND-0027 E4):** the file's first heading decides.
+    `GROUND-NNNN` routes to `validate-record.mjs`, `PRISM-NNNN` to
+    `validate-plan.mjs`; a `RESEARCH-` study has no validator and is unowned,
+    so the gate stays silent for it. The report validator named in Context is
+    outside this feature's owner map: a report has no path or heading
+    convention under `doc/research/`, so nothing deterministic identifies one.
+    It joins the owner map only when such a convention exists.
 - **Evidence line to receipt trial event.** The evidence line is designed to be
   joinable with a captured stream; whether it becomes a receipt event kind or
   stays a sidecar is a follow-up decision in the evaluation harness, not here.

@@ -3,8 +3,8 @@
 **Status:** proposed
 **Date:** 2026-09-21
 **Deciders:** Alexandre Alvaro
-**Amends:** ADR-0055 — its Codex-out-of-scope stanza only: the record deferred Codex because context-injection parity was undocumented and named its documentation as the revisit trigger; Codex now documents lifecycle hooks with that parity, so the session-lifecycle tier extends to Codex. The `Stop` nudge mechanism and its non-looping contract are unchanged.
-**Amends:** ADR-0074 — its Codex-out-of-scope stanza only, on the same trigger. The static, exit-0, kill-switch decisions and the rejection of blocking as coercion are unchanged.
+**Amends:** ADR-0055 — its Codex-out-of-scope stanza only: the record deferred Codex because context-injection parity was undocumented and named its documentation as the revisit trigger; Codex now documents lifecycle hooks with that parity, so the tier is no longer Claude-Code-scoped as a category. The `Stop` nudge itself stays wired on Claude Code only until its own Codex follow-up; its mechanism and non-looping contract are unchanged.
+**Amends:** ADR-0074 — its Codex-out-of-scope stanza only, on the same trigger and with the same scope: the checkpoint stays wired on Claude Code only until its own follow-up. The static, exit-0, kill-switch decisions and the rejection of blocking as coercion are unchanged.
 
 ## Context
 
@@ -40,10 +40,10 @@ no field for a gate verdict, and that a live capture carries the operator's
 configuration and therefore stays outside the tree by default. A gate's
 evidence has to be designed with the same facts in view.
 
-Numbering: this record takes 0083 rather than the directory's next slot
-because the unmerged `feat/live-evaluation-lane` branch already holds
-ADR-0082; a collision at merge is a worse defect than a gap that the branch's
-landing closes.
+Numbering: this record took 0083 rather than the directory's next slot at
+proposal time because the then-unmerged `feat/live-evaluation-lane` branch
+held ADR-0082; that branch merged into `main` later the same day (pull
+request 145), so the sequence is contiguous and no gap remains.
 
 ## Decision
 
@@ -99,7 +99,9 @@ Positive:
   changing who owns the agent loop, which is the split ADR-0074 already named
   as correct.
 - One script per gate serves both hosts, so the kit's byte-parity discipline
-  holds and the Codex tree stops carrying hook scripts as dead weight.
+  holds and, for the first time, a hook script in the Codex tree is wired
+  rather than carried as dead weight; the two earlier hook scripts stay
+  unwired on Codex until their own follow-up.
 - The evidence line gives the evaluation harness a measurable signal for the
   layer's value before any second gate is argued for.
 - The App Server and the Agent SDK leave the plan, which removes an
