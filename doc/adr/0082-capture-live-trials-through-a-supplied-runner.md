@@ -54,12 +54,21 @@ written.
    re-run against the original bytes rather than re-measured against a moved
    target.
 
-4. **The capture fails closed on a leak.** Before any captured stream or receipt
-   is written, its bytes are checked against the repository's existing
-   `leak-guard` denylist, reusing `findViolations` rather than growing a second
-   policy. A match aborts the run and writes nothing. A live stream is the one
-   artifact in this repository produced by a model with the operator's
-   environment in reach, so the write is the last safe place to stop a leak.
+4. **A capture is private until a person clears it.** The harness writes streams
+   and receipts outside the repository, under the OS temporary directory, and
+   never into the working tree unless the operator passes an explicit
+   destination. The denylist check still runs and still aborts on a match, but
+   it is a second line, not the first: this repository ships no
+   `.agentic/leak-denylist.txt` — the file is gitignored and machine-local — so
+   a gate that depended on it would pass everything by default.
+
+   The first pilot is what settled this. A live host in a non-bare context
+   reports the operator's whole configuration, and the captured stream carried
+   twenty-four references to an unrelated employer's internal agent names and
+   five absolute paths inside the operator's home directory. None of it was
+   secret in the denylist sense, and all of it belongs to the operator rather
+   than to this repository. Defaulting a capture to private is the only
+   arrangement where forgetting is safe.
 
 5. **One process per trial, over a fresh copy of the fixture.** Each trial
    spawns its own process against its own copy, so a write made by trial N
@@ -90,9 +99,10 @@ Negative / trade-offs:
   refusing discovery, and it is deliberate: a harness that can find a binary can
   find the wrong one, and a harness that reads configuration to find it is one
   edit away from reading the credential beside it.
-- Captured streams add tracked bytes that grow with every pilot. They are the
-  evidence, so the growth is the point, but a future decision may need to bound
-  how many captures a case keeps.
+- A capture that stays outside the repository is evidence a reviewer cannot
+  open from the diff. The receipt names the capture and its digest, so the claim
+  stays checkable by whoever holds the machine, and promoting a capture into the
+  tree remains a deliberate act with a person's eyes on it first.
 - Copying the fixture per trial costs time linear in trial count.
 
 ## Alternatives Considered
@@ -107,3 +117,7 @@ Negative / trade-offs:
   accumulated state rather than variance.
 * **Write a second secret-scanning policy for streams.** Rejected: the
   repository already has one denylist with one owner; a second would drift.
+* **Write captures into the tree and rely on the denylist.** Rejected by the
+  first pilot's evidence: the denylist file does not exist in a fresh clone, and
+  what a live capture actually carries is the operator's configuration rather
+  than the credential shapes a denylist enumerates.

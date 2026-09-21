@@ -8,6 +8,7 @@ import {
   parseLiveArgs,
   planTrialRoots,
   probeHostVersion,
+  resolveCaptureDir,
 } from '../eval/lib/live.mjs';
 
 const CODEX_STREAM = [
@@ -171,4 +172,20 @@ test('regression: a failing host still produces a receipt, with the failure in i
   });
   assert.equal(receipt.trials[0].outcome.exit_state, 'failure');
   assert.match(receipt.trials[0].outcome.final_response, /exited 3/);
+});
+
+test('live: a capture defaults outside the repository, so forgetting is safe', () => {
+  const dest = resolveCaptureDir({ out: null, root: '/repo', workRoot: '/tmp/work-1' });
+  assert.equal(dest.inRepository, false);
+  assert.ok(dest.path.startsWith('/tmp/work-1'));
+});
+
+test('live: an explicit destination inside the repository is allowed but marked', () => {
+  const dest = resolveCaptureDir({
+    out: 'eval/receipts/x',
+    root: '/repo',
+    workRoot: '/tmp/work-1',
+  });
+  assert.equal(dest.inRepository, true);
+  assert.ok(dest.path.startsWith('/repo'));
 });

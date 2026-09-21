@@ -242,6 +242,20 @@ function failureTrial(trial, reason) {
   };
 }
 
+/**
+ * Where a capture is written. Private by default: without an explicit
+ * destination it stays under the run's temporary directory, outside the
+ * repository. A live capture carries the operator's configuration, not only the
+ * trial, and this repository ships no denylist file, so the gate cannot be what
+ * keeps a forgotten capture out of a commit (ADR-0082 decision 4).
+ */
+export function resolveCaptureDir({ out, root, workRoot }) {
+  if (!out) return { path: join(workRoot, 'capture'), inRepository: false };
+  const path = resolve(root, out);
+  const repoRoot = resolve(root);
+  return { path, inRepository: path === repoRoot || path.startsWith(`${repoRoot}/`) };
+}
+
 /** The repository's own denylist, or an empty policy when the operator has none. */
 export function denylistFor(root) {
   const path = join(root, '.agentic', 'leak-denylist.txt');
@@ -302,17 +316,13 @@ export function runLive({
   });
   assertNoLeak({ label: 'receipt', text: JSON.stringify(receipt), denylistPatterns });
 
-  if (out) {
-    mkdirSync(resolve(root, out), { recursive: true });
-    for (const { trialId, stream } of captures) {
-      writeFileSync(join(resolve(root, out), `${trialId}.jsonl`), stream);
-    }
-    writeFileSync(
-      join(resolve(root, out), 'receipt.json'),
-      `${JSON.stringify(receipt, null, 2)}\n`
-    );
+  const destination = resolveCaptureDir({ out, root, workRoot });
+  mkdirSync(destination.path, { recursive: true });
+  for (const { trialId, stream } of captures) {
+    writeFileSync(join(destination.path, `${trialId}.jsonl`), stream);
   }
-  return { receipt, captures, workRoot };
+  writeFileSync(join(destination.path, 'receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`);
+  return { receipt, captures, workRoot, destination };
 }
 
 function skillIdentity({ root, host, caseRecord }) {
