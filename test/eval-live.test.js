@@ -23,16 +23,16 @@ import {
   buildLiveReceipt,
   buildRunnerArgv,
   captureTrial,
-  installFixtureSkills,
   parseLiveArgs,
   planTrialRoots,
   observeEnvironment,
   probeHostVersion,
-  readGateEvidence,
   resolveCaptureDir,
   runLive,
   skillIdentity,
 } from '../eval/lib/live.mjs';
+import { installFixtureSkills } from '../eval/lib/fixture-skills.mjs';
+import { readGateEvidence } from '../eval/lib/gate-evidence.mjs';
 
 const CODEX_STREAM = [
   JSON.stringify({ type: 'thread.started', thread_id: 'th_1' }),
@@ -209,7 +209,7 @@ test('regression: a failing host still produces a receipt, with the failure in i
   assert.match(receipt.trials[0].outcome.final_response, /exited 3/);
 });
 
-test('live: a written path is relativized against the trial copy the host ran in, not the tracked fixture', () => {
+test('regression: task-0084 a written path is relativized against the trial copy the host ran in, not the tracked fixture', () => {
   // The host writes inside its per-trial copy under the work root; the tracked
   // fixture root is a different directory. The pilot receipt kept absolute
   // temporary paths for this reason and the effects grader refused a
@@ -344,7 +344,7 @@ function scratchLiveRoot() {
   return { root, caseFile: 'eval/cases/gated-case.json' };
 }
 
-test('live: runLive installs the declared skills into each trial copy, points the gate evidence at a per-trial directory, and keeps the evidence beside the capture', () => {
+test('regression: task-0084 runLive relativizes against the resolved trial copy, installs the declared skills, points the gate evidence at a per-trial directory, and keeps it beside the capture', () => {
   const { root, caseFile } = scratchLiveRoot();
   const seen = [];
   const spawn = (command, args, opts = {}) => {
@@ -385,6 +385,16 @@ test('live: runLive installs the declared skills into each trial copy, points th
     ].join('\n');
     return { status: 0, stdout: stream, stderr: '' };
   };
+  // A leaked git environment would redirect any `git` the spawned model runs
+  // into the leaked location (HK.2, task-0033); the lane strips it like every
+  // kit script that spawns a child does.
+  const leaked = {
+    GIT_DIR: '/nowhere/.git',
+    GIT_WORK_TREE: '/nowhere',
+    GIT_INDEX_FILE: '/nowhere/index',
+  };
+  const previous = Object.fromEntries(Object.keys(leaked).map((key) => [key, process.env[key]]));
+  Object.assign(process.env, leaked);
   let workRoot;
   try {
     const run = runLive({
@@ -410,6 +420,13 @@ test('live: runLive installs the declared skills into each trial copy, points th
       seen[0].opts.env.AD_ARTIFACT_GATE_EVIDENCE_DIR.startsWith(workRoot),
       'evidence under the work root'
     );
+    for (const key of Object.keys(leaked)) {
+      assert.equal(
+        seen[0].opts.env[key],
+        undefined,
+        `${key} is stripped from the host environment`
+      );
+    }
     assert.equal(
       run.receipt.frozen.run_parameters.fixture_skills['ad-ground'],
       freezeArtifact(join(root, 'src', 'skills', 'claude-code', 'ad-ground')).sha256
@@ -427,6 +444,10 @@ test('live: runLive installs the declared skills into each trial copy, points th
       },
     ]);
   } finally {
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
     rmSync(root, { recursive: true, force: true });
     if (workRoot) rmSync(workRoot, { recursive: true, force: true });
   }

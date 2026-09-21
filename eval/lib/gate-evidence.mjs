@@ -1,3 +1,6 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { normalizePath } from './shared.mjs';
 
 const TOOL_ACTION_KINDS = new Set(['command', 'file_write']);
@@ -94,4 +97,31 @@ export function trialMetrics({ trial, stream }) {
     events,
     exit_state: trial.outcome?.exit_state ?? null,
   };
+}
+
+/**
+ * The gate evidence lines one trial left behind, in file then sequence order.
+ * The gate writes one file per host session; a trial normally has one, and a
+ * missing directory means no governed write happened or the gate was off.
+ */
+export function readGateEvidence(evidenceDir) {
+  if (!existsSync(evidenceDir)) return [];
+  const lines = [];
+  const files = readdirSync(evidenceDir)
+    .filter((name) => name.endsWith('.jsonl'))
+    .sort();
+  for (const file of files) {
+    for (const text of readFileSync(join(evidenceDir, file), 'utf8').split(/\r?\n/)) {
+      if (text.trim() === '') continue;
+      // A line the gate left half-written is data about the run, like a host
+      // that exits non-zero (ADR-0082 decision 6): it stays in the sidecar as
+      // malformed, joins nothing, and never aborts the capture.
+      try {
+        lines.push(JSON.parse(text));
+      } catch {
+        lines.push({ seq: null, state: 'malformed', path: null, raw: text });
+      }
+    }
+  }
+  return lines;
 }

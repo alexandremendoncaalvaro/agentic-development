@@ -162,7 +162,7 @@ if (process.platform === 'win32') {
 const LIVE_FIXTURE = join(KIT_ROOT, 'eval', 'fixtures', 'research-gated-repo');
 
 async function fixtureTrialCopy(host) {
-  const { installFixtureSkills } = await import('../eval/lib/live.mjs');
+  const { installFixtureSkills } = await import('../eval/lib/fixture-skills.mjs');
   const root = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-wiring-fixture-')));
   const evidence = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-wiring-fixture-evidence-')));
   cpSync(LIVE_FIXTURE, root, { recursive: true });
