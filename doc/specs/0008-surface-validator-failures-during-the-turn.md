@@ -208,6 +208,13 @@ Agent SDK, and any hosted or daemon component are not part of this feature.
 - **Evidence line to receipt trial event.** The evidence line is designed to be
   joinable with a captured stream; whether it becomes a receipt event kind or
   stays a sidecar is a follow-up decision in the evaluation harness, not here.
+  - **Observation (Task 0084 pilot, exploratory):** Claude Code 2.1.227's
+    `stream-json` output carries no `PostToolUse` hook record and none of the
+    gate's surfaced text, while it does carry `SessionStart` hook records and
+    `Stop` hook feedback. Scenario 7's "hook record in the stream" is not
+    available on that host version; the join that works anchors the evidence
+    line on the stream's `file_write` event by session, order, and path. The
+    scenario is read that way until a host emits the record.
 
 ## Related
 
@@ -218,6 +225,7 @@ Agent SDK, and any hosted or daemon component are not part of this feature.
   `doc/adr/0057-skills-deterministic-steps-as-scripts.md`,
   `doc/adr/0074-user-prompt-submit-workflow-checkpoint-hook.md`,
   `doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md`
-- Tasks: `doc/tasks/0083-ship-the-artifact-validator-feedback-gate.md`
+- Tasks: `doc/tasks/0083-ship-the-artifact-validator-feedback-gate.md`,
+  `doc/tasks/0084-measure-the-gate-through-the-live-lane.md`
 - Depends on: `doc/specs/0007-evaluate-skill-trajectories.md` for the live
   lane that measures the gate
