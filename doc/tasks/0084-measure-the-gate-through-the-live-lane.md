@@ -323,6 +323,20 @@ the `fixture_skills` field; GROUND-0028's C1 line references were corrected
 to the audited tree. Refuted: a note on the DCO address, which is the
 repository's committer identity on every commit.
 
+### 2026-09-21 — Re-audit over the final tree and rule-gap candidates
+
+Two fresh reviewers re-audited the final tree (274e81b) carrying every prior
+finding: all ten resolved or refuted with observed evidence, the critical
+claims group clean on a fresh walk, two minor judgement-calls left as
+repository idiom (a silent skip of a non-JSON stream line in the host
+environment and metrics readers, which predates this work; test files above
+the file-size ceiling, which the repository has never applied to `test/`).
+Rule-gap candidates for `/ad-level-up`: GUIDELINES §3.3 needs either a
+`test/` carve-out or split suites; `/ad-commit` could check that a cited
+`GROUND-NNNN` record is already committed or require the "recorded
+alongside" wording, since this task broke CV.7 by commit order alone while
+the record existed first in the working tree.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
