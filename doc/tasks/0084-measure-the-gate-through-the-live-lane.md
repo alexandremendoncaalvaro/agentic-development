@@ -49,7 +49,7 @@ a second gate's proposal cites.
 - [x] `/ad-ground`: the fixture path convention for a hook that must resolve on any machine, and the corpus rules for a new representative; write the ground record and set `Evidence ref`.
 - [x] Build the tracked fixture and case family test-first; extend the adapter's event vocabulary or add a sidecar join, whichever the ground record settles.
 - [x] Run the on-versus-off comparison; record the numbers.
-- [ ] Propose or decline a second gate in a new record that checks ADR-0083 decision 7's stop criteria (waits on the owner's call on further paid trials; see the 2026-09-21 comparison entry).
+- [x] Propose or decline a second gate: declined for now, with ADR-0083 decision 7's stop criteria checked in the 2026-09-21 second-comparison entry; the new record is owed when a second gate is actually proposed.
 - [ ] `/ad-review`; `/ad-audit`; `/ad-commit`.
 
 ## Notes
@@ -336,6 +336,116 @@ Rule-gap candidates for `/ad-level-up`: GUIDELINES §3.3 needs either a
 `GROUND-NNNN` record is already committed or require the "recorded
 alongside" wording, since this task broke CV.7 by commit order alone while
 the record existed first in the working tree.
+
+### 2026-09-21 — Second comparison: the record fails at first write
+
+The owner funded trials on a configuration where the record fails at first
+write. The lane gained `--fixture-skills <a,b>` (a runner-level override of
+the case's `fixture_skills`, recorded in the receipt with its source, so the
+frozen case is untouched; GROUND-0028 addendum). Two configurations were
+tried; both are recorded.
+
+Configuration A, unskilled (one trial, gate on, USD 1.57, 245 s, 39
+turns): only `ad-hooks` in the trial copy, `--setting-sources project`. The
+model wrote one `GROUND-` record from the fixture's `AGENTS.md` convention
+alone; the gate fired once with `runtime-unavailable` because its owner map
+resolves `validate-record.mjs` beside `ad-hooks` and `ad-ground` was not
+installed. The final record fails nine validator rules (four metadata
+lines, four sections, no claim). This is Spec 0008 Scenario 5
+observed live, a visible runtime failure and never a silent pass, and it
+shows the gate cannot substitute for the skill it validates against. The
+gate-off trial of this configuration was started and stopped after about a
+minute before its result record, because a comparison of "gate cannot run"
+against "gate off" measures nothing; its partial cost is not in the stream
+and is unrecorded. Evidence line, verbatim:
+
+```json
+{"seq":1,"at":"2026-09-21T23:36:57.599Z","gate":"artifact-gate","state":"runtime-unavailable","host_tool":"Write","path":"doc/research/0001-ground-download-retry.md","owner":"ground-record","validator":"ad-ground/scripts/validate-record.mjs","output":"validator not found at /private/var/folders/3y/sx72dngd6tj_slxtklkmgyyc0000gp/T/agentic-eval-live-blptid/t1/.claude/skills/ad-ground/scripts/validate-record.mjs","surfaced":"[ad-hooks artifact-gate] runtime-unavailable: could not run the ground-record validator for doc/research/0001-ground-download-retry.md: validator not found at /private/var/folders/3y/sx72dngd6tj_slxtklkmgyyc0000gp/T/agentic-eval-live-blptid/t1/.claude/skills/ad-ground/scripts/validate-record.mjs\nThis is a gate failure, not a verdict on the artifact. Reproduce: node .claude/skills/ad-ground/scripts/validate-record.mjs doc/research/0001-ground-download-retry.md","reproduction":"node .claude/skills/ad-ground/scripts/validate-record.mjs doc/research/0001-ground-download-retry.md"}
+```
+
+Configuration B, shadowed template (one trial per arm): `ad-hooks` alone in
+the trial copy, validators resolved through
+`AD_ARTIFACT_GATE_SKILLS_ROOT=<repo>/src/skills/claude-code` exported in the
+lane's shell, and no `--setting-sources project`, so the operator's
+user-level skills load (77 skills, 2 plugins, 22 MCP servers in the init
+record) and the `ad-ground` template lives outside the working directory,
+which is the pilot's failure mode and the kit's default install scope.
+Runner otherwise identical to the first comparison; the off arm exported
+`AD_ARTIFACT_GATE=0`.
+
+| Arm | Wall-clock | Turns | Cost (USD) | Tool actions | Denials | Record writes | Gate firings | Record valid at turn end | Routed through `ad-ground` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Gate on | 459.6 s | 35 | 2.64 | 1 command, 4 writes | 13 | 3 | failed (9 messages), failed (6), passed | yes, 14 claims | no (`Skill` never called; one `Read` denied) |
+| Gate off | 282.8 s | 37 | 2.10 | 11 commands, 3 writes | 2 | 3 | none (off) | yes, 8 claims | yes (`Skill` at event 5; template read allowed) |
+
+What the on arm shows: the gate's feedback converged. The first write
+failed nine rules; the surfaced message named each missing line; the second
+write failed six, among them the register and claim shapes that Task 0086's
+messages now spell out; the third write passed. The pilot's twelve firings
+without convergence and this trial's three with convergence are the before
+and after of Task 0086, with the caveat that the pilot ran under the old
+messages and a different request. What the off arm shows: the model
+invoked `ad-ground` through the `Skill` tool and its `allowed-tools`
+frontmatter granted the `Read` of the user-level template for that turn, so
+it wrote a valid record without any gate; in the on arm the model never
+invoked the skill and its unprivileged `Read` outside the working directory
+was denied. The arms therefore differ by a routing choice the gate does not
+control, and no wall-clock, turn, or cost difference here is attributable
+to the gate. Both receipts verify; the off arm grades `pass`, the on arm
+grades `wrong_routing` (route grader: no `skill_invoked`), which is the
+recorded fact, not a defect of the lane.
+
+Verbatim evidence, on arm (validator output elided to its first message):
+
+```json
+{"seq": 1, "at": "2026-09-21T23:42:37.262Z", "gate": "artifact-gate", "state": "validator-failed", "host_tool": "Write", "path": "doc/research/0001-ground-installer-download-retry.md", "owner": "ground-record", "validator": "ad-ground/scripts/validate-record.mjs", "output": "missing Status metadata: add a line \"**Status:** <value>\" under the title [...]", "surfaced": "[see output]", "reproduction": "node /Users/ale/conductor/workspaces/agentic-development/lagos/src/skills/claude-code/ad-ground/scripts/validate-record.mjs doc/research/0001-ground-installer-download-retry.md"}
+{"seq": 2, "at": "2026-09-21T23:44:12.045Z", "gate": "artifact-gate", "state": "validator-failed", "host_tool": "Write", "path": "doc/research/0001-ground-installer-download-retry.md", "owner": "ground-record", "validator": "ad-ground/scripts/validate-record.mjs", "output": "Status must be recorded: write \"**Status:** recorded\" [...]", "surfaced": "[see output]", "reproduction": "node /Users/ale/conductor/workspaces/agentic-development/lagos/src/skills/claude-code/ad-ground/scripts/validate-record.mjs doc/research/0001-ground-installer-download-retry.md"}
+{"seq": 3, "at": "2026-09-21T23:45:40.821Z", "gate": "artifact-gate", "state": "validator-passed", "host_tool": "Write", "path": "doc/research/0001-ground-installer-download-retry.md", "owner": "ground-record", "validator": "ad-ground/scripts/validate-record.mjs", "output": "", "surfaced": "[see output]", "reproduction": "node /Users/ale/conductor/workspaces/agentic-development/lagos/src/skills/claude-code/ad-ground/scripts/validate-record.mjs doc/research/0001-ground-installer-download-retry.md"}
+```
+
+Result records:
+
+```json
+{"subtype": "success", "is_error": false, "duration_ms": 459646, "num_turns": 35, "total_cost_usd": 2.64119675, "session_id": "532bfdc4-646b-4902-b4ca-b5c46f95ab26"}
+{"subtype": "success", "is_error": false, "duration_ms": 282777, "num_turns": 37, "total_cost_usd": 2.0988472499999995, "session_id": "75e4a146-45ce-4a43-9b21-1f43b7057fef"}
+{"subtype": "success", "is_error": false, "duration_ms": 244905, "num_turns": 39, "total_cost_usd": 1.569559, "session_id": "c4f07e40-cb07-4197-8a0c-68540809c210"}
+```
+
+Capture digests: shadowed on `1ca693b8b8e43626e16686bfcb971d4ef50d70787a6d0123c9ec4ccead792c5b`,
+shadowed off `e304659a68535b153cb6be4961d9afd29cff0951abe7ad28700c59aaf51570b9`,
+unskilled on `7eb6c6cf33261cff2e0a5b801c1671acee91fc84428bbc01a4a784782df9c2e6`. Artifacts under
+`.agentic/reviews/evidence/task-0084-{shadowed-on,shadowed-off,unskilled-on}/`
+(machine-local). Spend this entry: USD 6.31 recorded plus the unrecorded
+minute of the stopped trial; session total USD 10.54 recorded.
+
+Disposition for ADR-0083 decision 7, checked against its stop criteria:
+hooks already sufficient, no: without the gate an invalid record survives
+until commit time, and the on arm's first two writes would have; native
+experience degraded, not shown: the on arm was slower and costlier, but the
+confound above prevents attributing it; no measurable gain, true at this
+sample: one trial per arm with a routing confound cannot show a gain;
+complexity over gain, open: the tracked measurement cost a lane extension,
+a fixture, three modules, and about USD 10.5 of trials to observe one
+convergence; cross-host duplication, unmeasured: Codex blocked. Decision: no
+second gate is proposed now. The feedback mechanism is proven live (one
+convergence in three firings with actionable messages, one visible runtime
+failure, zero false blocks), its gain is not, and a proposal would need at
+least a few more paired trials on configuration B, ideally with the model's
+routing held fixed (an explicit `/ad-ground` request, `request_kind:
+explicit`). Since a decline is not a proposal, ADR-0083 decision 7's
+stop-criteria check lives in this entry rather than in a new record; the
+record is owed when a second gate is proposed.
+
+### 2026-09-21 — Review of the fixture-skills slice
+
+Fresh two-axis review (`.agentic/reviews/2026-09-21T23-55-20Z-task-0084-fixture-skills-*.md`,
+machine-local): no Blocker. Applied: the argument parser's host list is
+pinned by test to the lane's adapters; an override to an empty skill list is
+recorded in the receipt like any other; CONTEXT.md's "Trial copy" and
+"Evaluation case" name the runner override; the second work root is cleaned
+on a failing assertion; and the unskilled record's failure count in the
+entry above was corrected from six to nine after the reviewer re-ran the
+validator on the captured write, the author having read a truncated output.
 
 ## Definition of Done
 

@@ -311,7 +311,7 @@ identifier, a natural request that never names the target skill or its
 vocabulary, a sanitized fixture, the expected route and outcome, allowed and
 forbidden effects, required approval stops, declared graders, exclusions, and,
 for a case the live lane runs, the `fixture_skills` the lane installs into each
-trial copy.
+trial copy unless the runner overrides the list for an arm.
 
 _Avoid_: "eval" or "test case" (the unit is the frozen case, not one run of it);
 "prompt" as a name for the case (the request is one field of the case; calling
@@ -354,8 +354,11 @@ evaluation cases).
 
 **Definition:** the per-trial working copy of an evaluation fixture that the
 live lane spawns the host in: a fresh copy under the lane's temporary work
-root, with the skills the case declares in `fixture_skills` installed at the
-host's project skills directory, discarded with the run. A trial's recorded
+root, with the skills the case declares in `fixture_skills`, or the set the
+operator names with the lane's `--fixture-skills` override, installed at the
+host's project skills directory, discarded with the run. The receipt records
+which skills were installed and whether the list came from the case or the
+runner. A trial's recorded
 paths are relative to its trial copy.
 
 _Avoid_: "trial" for the directory (a trial is the recorded run, the copy is
