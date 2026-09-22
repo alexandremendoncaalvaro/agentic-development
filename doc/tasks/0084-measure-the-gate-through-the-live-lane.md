@@ -1,6 +1,6 @@
 # Task `0084`: Measure the artifact-validator gate through the live lane
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-21
 **Scope ref:** doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md (decision 7)
 **Evidence ref:** doc/research/0028-ground-tracked-gate-measurement.md
@@ -50,7 +50,7 @@ a second gate's proposal cites.
 - [x] Build the tracked fixture and case family test-first; extend the adapter's event vocabulary or add a sidecar join, whichever the ground record settles.
 - [x] Run the on-versus-off comparison; record the numbers.
 - [x] Propose or decline a second gate: declined for now, with ADR-0083 decision 7's stop criteria checked in the 2026-09-21 second-comparison entry; the new record is owed when a second gate is actually proposed.
-- [ ] `/ad-review`; `/ad-audit`; `/ad-commit`.
+- [x] `/ad-review`; `/ad-audit`; `/ad-commit`.
 
 ## Notes
 
@@ -466,11 +466,19 @@ One swap-pass blocker on the audit handoff's own header was a wording
 ambiguity in a machine-local file (84449fe is pull request 146's head; this
 branch has no pull request yet), not a claim in any tracked record.
 
+### 2026-09-22 — Closed
+
+Pull request 146 merged (`4fb115b`); this branch rebased onto `origin/main`,
+pushed with the pre-push gate green (1088 tests), and opened as pull request
+147 through `/ad-pr`, now reachable by the agent after the owner's approval
+under ADR-0084. The task closes here; the merge of 147 is recorded on the
+pull request itself.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task

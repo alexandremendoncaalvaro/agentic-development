@@ -1,6 +1,6 @@
 # Task `0087`: Reclassify ad-pr and ad-merge behind an in-skill approval gate
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-22
 **Scope ref:** doc/adr/0073-skill-invocation-policy-and-listing-budget.md (the user-invocable-only class and its Claude Code mechanism)
 **Evidence ref:**
@@ -45,7 +45,7 @@ class membership by amendment when it moved `ad-rules` to model-invocable.
 - [x] Green: frontmatter on both hosts, descriptions within budget, the approval sentence in each Phase 0, the always-confirm rule in `ad-merge` Phase 3.
 - [x] ADR-0084, `PROJECTION.md`, ADR-0073 header, `AGENTS.md`, `ARCHITECTURE.md`, `CHANGELOG.md`.
 - [x] Refresh dogfood and user-level installs.
-- [ ] `/ad-review`; `/ad-commit`.
+- [x] `/ad-review`; `/ad-commit`.
 
 ## Notes
 
@@ -96,11 +96,19 @@ description was shortened while the Codex `ad-audit` and `ad-review`
 descriptions were tightened for the budget; the decision, its trade-off,
 the changelog entry, and this task's criteria now say so.
 
+### 2026-09-22 — Closed
+
+Pull request 146 merged (`4fb115b`); this branch rebased onto `origin/main`,
+pushed with the pre-push gate green (1088 tests), and opened as pull request
+147 through `/ad-pr`, now reachable by the agent after the owner's approval
+under ADR-0084. The task closes here; the merge of 147 is recorded on the
+pull request itself.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
