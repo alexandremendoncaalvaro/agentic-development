@@ -1,0 +1,17 @@
+{
+  "description": "Agentic Development dogfood: the ad-hooks artifact-validator gate (ADR-0083, Spec 0008).",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/artifact-gate.mjs\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

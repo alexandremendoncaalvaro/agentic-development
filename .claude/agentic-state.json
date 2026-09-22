@@ -281,6 +281,10 @@
           "sourceSha": "f73a7b28b6b6767926395eab8f9959e463afcc4da9e346301cd47211d1a6c8bc"
         },
         {
+          "path": ".claude/skills/ad-hooks/scripts/artifact-gate.mjs",
+          "sourceSha": "a9afa20dcc73fc8172675305e03397664c19d88187942884f6dd9378081f13f2"
+        },
+        {
           "path": ".claude/skills/ad-hooks/scripts/detect-hooks.mjs",
           "sourceSha": "2c56ea41a2babf40a7b05d8aecdf87740f4ded9fc9437241ba9f5234d69508ae"
         },
@@ -294,7 +298,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/SKILL.md",
-          "sourceSha": "e4c289bdb7ec6fca153460d5388aa646bb41ba573416c5b44cd4659626dc9684"
+          "sourceSha": "9c69534677bd1408938aea8536012d8993c1d6b2650f46d7f4c1fb59d1eae053"
         }
       ]
     },

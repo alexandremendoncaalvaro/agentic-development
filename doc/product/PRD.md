@@ -2,7 +2,7 @@
 
 Status: accepted
 Created: 2026-05-11
-Updated: 2026-09-15
+Updated: 2026-09-21
 Owner: Alexandre Alvaro
 
 ## Product
@@ -64,6 +64,7 @@ Multi-feature scope tiers. Delivered capability is listed once; pending work rem
 - **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill-me`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-audit`, `ad-level-up`, `ad-next`, `ad-drift`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-release`, `ad-hooks`, `ad-handoff`, `ad-subagent`, `ad-research`, `ad-derisk`, `ad-prism`, `ad-roadmap`, `ad-question-me`, `ad-voice`, and `ad-voice-tune`.
 - **Next tier — AGENTS ↔ GUIDELINES reciprocity automation.** `ad-bootstrap` writes pointer stubs (instead of inline rules) when `GUIDELINES.md` exists; `ad-drift` flags duplication.
 - **Next tier — Community-facing docs (`CONTRIBUTING.md` / `SECURITY.md`) scaffolds.** GitHub-conventional companion to `AGENTS.md`.
+- **Next tier — Optional runtime layer of deterministic host hooks.** Run the kit's existing artifact validators from the native lifecycle hooks of Claude Code and Codex, feed a failure back to the agent within the turn, and record the gate's evidence in a shape the skill eval harness can grade. Feedback-first, opt-in, skills-only mode stays valid; a blocking guard or a repair loop is a later slice behind its own decision. Grounded in `doc/research/0026-runtime-layer-deterministic-host-hooks.md`.
 - **Later tier — Per-language guideline presets.** `ad-guidelines` ships canned templates for Rust / Python / Go / TypeScript / C++ beyond the current per-language detection.
 - **Later tier — Skill eval harness.** Trajectory eval per `WORKFLOW.md` §13, applied to each shipped skill against a fixture corpus.
 - **Later tier — Example-grounded publication and reporting.** Investigate separate `ad-publish` and `ad-report` skills that use a shared, human-curated exemplar library to produce audience-aware collaboration posts and standalone reports while preserving the owner's voice through `ad-voice`.

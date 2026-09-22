@@ -525,6 +525,84 @@ is the runner's job, not the adapter's).
 [`doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md`](doc/adr/0080-build-a-bespoke-skill-evaluation-harness.md)
 (items 5 and 10).
 
+### Runtime gate
+
+**Definition:** a deterministic check the kit runs from a host's native
+lifecycle hook during the turn, over an artifact a skill just wrote or an action
+the agent is about to take; the first member is the **artifact-validator gate**,
+a feedback gate on `PostToolUse` that runs the owning validator and shows its
+message to the model inside the turn (ADR-0083, Spec 0008).
+
+_Avoid_: bare "gate" where the layer is ambiguous — qualify as **runtime gate**
+(a host hook during the turn), **corpus gate** (the replay lane's `npm test`
+step), or **quality gate** (a git hook or CI check); "enforcement" for the
+feedback form (it cannot block: the tool already ran); "hook" as a synonym (the
+hook is the host mechanism, the gate is what the kit runs on it).
+
+**Related code:** [`src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs);
+decision recorded in [`doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md`](doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md).
+
+### Gate terminal state
+
+**Definition:** the one outcome a runtime gate firing ends in, from a closed
+set of four: `validator-failed` and `runtime-unavailable` (the gate could not
+run its check) reach the model; `validator-passed` and an unowned or malformed
+event do not, and the last leaves no evidence.
+
+_Avoid_: "verdict" for `runtime-unavailable` (a gate failure is not a verdict
+on the artifact); "pass" for an unowned event (nothing was checked).
+
+**Related code:** `runValidator` and `resolveOwner` in
+[`src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs).
+
+### Gate evidence line
+
+**Definition:** the one JSON line a runtime gate appends per governed firing to
+its **evidence file**, `<tmpdir>/agentic-artifact-gate/<session_id>.jsonl`,
+carrying the gate identifier, terminal state, path, validator output, the text
+surfaced to the model, a reproduction command, and a per-session sequence
+number; machine-local by default and never written inside the working tree
+unless the operator redirects it.
+
+_Avoid_: "receipt" (an **Evaluation receipt** is the harness's frozen record; a
+gate line is a candidate input to one, not one); "log" (the line is a
+structured record a grader can join with a **Host stream**, not diagnostic
+prose); "trace".
+
+**Related code:** `appendEvidence` in
+[`src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs);
+the receipt extension is deferred in
+[`doc/specs/0008-surface-validator-failures-during-the-turn.md`](doc/specs/0008-surface-validator-failures-during-the-turn.md) (Out of Scope).
+
+### Governed artifact
+
+**Definition:** a file an installed validator owns, identified by its location
+and its first heading: under `doc/research/`, a `GROUND-NNNN` record belongs to
+`validate-record.mjs` and a `PRISM-NNNN` plan to `validate-plan.mjs`; a
+`RESEARCH-NNNN` study and every other path are unowned.
+
+_Avoid_: "tracked file" (git tracking is unrelated); "validated file" (governed
+names the ownership, not the outcome).
+
+**Related code:** the owner map in
+[`src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs);
+grounded in [`doc/research/0027-ground-artifact-validator-gate.md`](doc/research/0027-ground-artifact-validator-gate.md) (E4).
+
+### Runtime layer
+
+**Definition:** the optional set of **Runtime gates** the kit wires through the
+hosts' native lifecycle hooks, bounded by ADR-0083 to feedback first, both
+hosts through one byte-identical script per gate, no judgment in a gate, and
+evidence outside the tree; skills-only remains a valid configuration.
+
+_Avoid_: "harness" (the harness is `eval/`, which grades; the runtime layer
+runs during the turn); "runtime" alone (the host owns the agent loop); "IDE" or
+"orchestrator" (both are PRD non-goals).
+
+**Related code:** decision recorded in
+[`doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md`](doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md);
+roadmap line in [`doc/product/PRD.md`](doc/product/PRD.md).
+
 ## Relationships
 
 - An **Audience adaptation** changes the expression of a **Personal voice** for a reader or relationship; it never changes whose voice it is.
@@ -557,6 +635,8 @@ is the runner's job, not the adapter's).
   **Request kind** and the run policy supply the `skill_invoked` and
   `approval_granted` events a non-interactive stream cannot carry.
 
+- A **Runtime gate** runs on a host lifecycle hook and ends in one **Gate terminal state**; a firing on a **Governed artifact** appends one **Gate evidence line**; the **Runtime layer** is the set of such gates. A gate line is joinable with a **Host stream** through the session id, and may later become an **Evaluation receipt** event, a decision the harness owns.
+
 ## Flagged ambiguities
 
 - "**handoff**" was used in commit messages and skill bodies during the v0.17 cycle to mean both **Session handoff** (output of `ad-handoff`) and **Review handoff** (output of `ad-review`) — resolved by this glossary. Both flavours retain the unqualified noun in informal prose, but commits / SKILL.md / specs / ADRs must qualify going forward.
@@ -564,3 +644,5 @@ is the runner's job, not the adapter's).
 - "**fresh-context review**" vs "**two-axis review**" — not synonyms. Fresh-context is the WORKFLOW §10 practice (the *what*); two-axis is the kit's implementation (the *how*). Other implementations of fresh-context review are conceivable (one-axis with rotating reviewers, n-axis split, etc.) — the kit ships the two-axis flavour today. Specs and ADRs that discuss the practice use "fresh-context"; those that discuss the implementation use "two-axis".
 
 - "**subagent**" — the Claude Code primitive (`.claude/agents/<name>.md`) is distinct from a Codex sub-agent role (`[agents]` block in `~/.codex/config.toml`). Both are *user-side* role declarations consumed by their host. The kit ships three bundled reviewers on each host — `fresh-context-reviewer` (`ad-review`), `audit-group-reviewer` (`ad-audit`), and `rule-candidate-reviewer` (`ad-level-up`) — as `.claude/agents/<name>.md` for Claude Code and `.codex/agents/<name>.toml` for Codex. On Codex the `.toml` files are role declarations only; dispatch stays user-initiated per ADR-0007 Addendum 2026-05-24. When the host is ambiguous in prose, write "Claude Code subagent" or "Codex sub-agent" explicitly.
+
+- "**gate**" is overloaded across three layers — the **Runtime gate** (a host hook during the turn, ADR-0083), the **corpus gate** (the replay lane's step inside `npm test`, ADR-0080), and the **quality gates** of `WORKFLOW.md` §11 (git hooks and CI). The unqualified noun stays acceptable where one layer is obvious from the surrounding sentence; specs, ADRs, and skill bodies qualify it.

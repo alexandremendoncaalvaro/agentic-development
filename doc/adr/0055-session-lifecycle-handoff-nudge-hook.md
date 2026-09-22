@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-08-07
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0083, the Codex-out-of-scope stanza only: Codex now documents lifecycle hooks with context-injection parity, so the tier is no longer Claude-Code-scoped as a category; its first dual-host member is the artifact-validator gate, and this `Stop` nudge stays wired on Claude Code only until its own Codex follow-up. The nudge mechanism and its non-looping contract stand.
 
 ## Context
 

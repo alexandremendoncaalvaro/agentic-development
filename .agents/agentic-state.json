@@ -353,6 +353,10 @@
           "sourceSha": "74b5eccda991f28c5be138cb841683ef7cf706fb76ff8dec02f9dbad50be15b3"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/artifact-gate.mjs",
+          "sourceSha": "a9afa20dcc73fc8172675305e03397664c19d88187942884f6dd9378081f13f2"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/detect-hooks.mjs",
           "sourceSha": "2c56ea41a2babf40a7b05d8aecdf87740f4ded9fc9437241ba9f5234d69508ae"
         },
@@ -366,7 +370,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "1b61337a0e82e3541dab1cce8d6b4db97f826ddbaa103c8c845695893ca37f36"
+          "sourceSha": "6dabc3c5bae8c1c10ce5f3d601eee87b41e6b8e16786567bd0af51c6da98a41f"
         }
       ]
     },
