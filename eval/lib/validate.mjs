@@ -1,3 +1,4 @@
+import { mentionedSkill } from './adapters/common.mjs';
 import { GRADERS } from './graders.mjs';
 import { isRecord, isStringArray } from './shared.mjs';
 
@@ -51,6 +52,14 @@ function validateCaseIdentity(caseRecord, path) {
   }
   if (!REQUEST_KINDS.has(caseRecord.request_kind) || typeof caseRecord.request !== 'string') {
     fail(`case ${path} must declare a string "request" and request_kind "natural" or "explicit"`);
+  }
+  // Both hosts expand the mention before the model runs, so an explicit request
+  // without one cannot be normalized after the host ran; refusing it here
+  // costs nothing, where the live lane found it only after a paid trial.
+  if (caseRecord.request_kind === 'explicit' && mentionedSkill(caseRecord.request) === null) {
+    fail(
+      `case ${path} declares request_kind "explicit" but its request does not start with a /skill or $skill mention`
+    );
   }
 }
 
