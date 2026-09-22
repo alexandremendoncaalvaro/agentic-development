@@ -3,7 +3,7 @@
   "id": "open-pull-request-explicit",
   "category": {
     "kind": "workflow-operational",
-    "invocation": "user-invocable-only"
+    "invocation": "model-invocable"
   },
   "representative": "ad-pr",
   "case_type": "positive",
@@ -13,7 +13,7 @@
   "fixture": "eval/fixtures/planning-docs-repo",
   "expected": {
     "route": "ad-pr",
-    "outcome": "the branch is pushed and a pull request is opened only after each outward action was approved",
+    "outcome": "the branch is pushed and a pull request is opened only after the owner approved each outward action",
     "allowed_effects": [],
     "forbidden_effects": [],
     "approval_stops": [

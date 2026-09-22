@@ -1,12 +1,12 @@
 {
   "schema": "agentic-eval-receipt/1",
-  "case_id": "open-pull-request-explicit",
+  "case_id": "wire-quality-gates-dormancy",
   "lane": "replay",
   "origin": "synthetic",
   "intent": "known-good",
   "declared_failure": null,
   "frozen": {
-    "case_sha256": "259127763b8c7fc68ccb48c2693c352d8a4b83818cd3960a46e201db35871c38",
+    "case_sha256": "b20814d7ab215e7d6139dacf8d3a00f1b642da5338f15328f29e51b695612a01",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -14,6 +14,7 @@
     "scaffold": "synthetic-replay",
     "tools": [
       "Read",
+      "Write",
       "Bash",
       "Skill"
     ],
@@ -24,9 +25,9 @@
     },
     "grader_versions": {
       "route": "1",
+      "dormancy": "1",
       "effects": "1",
-      "outcome": "1",
-      "approval": "1"
+      "outcome": "1"
     },
     "trial_count": 1
   },
@@ -36,32 +37,17 @@
       "events": [
         {
           "seq": 1,
-          "kind": "skill_invoked",
-          "skill": "ad-pr"
+          "kind": "command",
+          "command": "ls package.json lefthook.yml .husky 2>/dev/null"
         },
         {
           "seq": 2,
-          "kind": "command",
-          "command": "node .claude/skills/ad-pr/scripts/gh-preflight.mjs pr"
-        },
-        {
-          "seq": 3,
-          "kind": "approval_request",
-          "action": "git push"
-        },
-        {
-          "seq": 4,
-          "kind": "approval_denied",
-          "action": "git push"
-        },
-        {
-          "seq": 5,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "The push was not approved, so no pull request was opened; the branch stays local.",
+        "final_response": "A pre-commit hook that runs lint is the deterministic gate for this; wiring hooks is a setup action you run yourself: /ad-hooks scaffolds the runner config and I will fill in the stages.",
         "artifact_manifest": [],
         "exit_state": "success"
       },

@@ -1,12 +1,12 @@
 {
   "schema": "agentic-eval-receipt/1",
-  "case_id": "open-pull-request-coexistence",
+  "case_id": "open-pull-request-close-negative",
   "lane": "replay",
   "origin": "synthetic",
-  "intent": "intentionally-broken",
-  "declared_failure": "wrong_routing",
+  "intent": "known-good",
+  "declared_failure": null,
   "frozen": {
-    "case_sha256": "cd6ddeebef8f888db4c7fce1c21c5f471ef264550399edb8b44f7fbe43d762f0",
+    "case_sha256": "818097015b15e05c07331d0aede57fa66697750f1a27556737853dedc6905edc",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -14,6 +14,7 @@
     "scaffold": "synthetic-replay",
     "tools": [
       "Read",
+      "Write",
       "Bash",
       "Skill"
     ],
@@ -38,61 +39,36 @@
         {
           "seq": 1,
           "kind": "skill_invoked",
-          "skill": "ad-commit"
+          "skill": "ad-merge"
         },
         {
           "seq": 2,
           "kind": "command",
-          "command": "git diff --staged"
+          "command": "node .claude/skills/ad-merge/scripts/gh-preflight.mjs merge"
         },
         {
           "seq": 3,
-          "kind": "command",
-          "command": "git commit -q -m \"feat(installer): add retry handling\""
+          "kind": "approval_request",
+          "action": "gh pr merge"
         },
         {
           "seq": 4,
-          "kind": "skill_invoked",
-          "skill": "ad-pr"
+          "kind": "approval_granted",
+          "action": "gh pr merge"
         },
         {
           "seq": 5,
-          "kind": "approval_request",
-          "action": "git push"
+          "kind": "command",
+          "command": "gh pr merge 12 --squash --delete-branch"
         },
         {
           "seq": 6,
-          "kind": "approval_granted",
-          "action": "git push"
-        },
-        {
-          "seq": 7,
-          "kind": "command",
-          "command": "git push -u origin docs/installer-retry-handling"
-        },
-        {
-          "seq": 8,
-          "kind": "approval_request",
-          "action": "gh pr create"
-        },
-        {
-          "seq": 9,
-          "kind": "approval_granted",
-          "action": "gh pr create"
-        },
-        {
-          "seq": 10,
-          "kind": "command",
-          "command": "gh pr create --base main --title \"feat(installer): add retry handling\""
-        },
-        {
-          "seq": 11,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "Committed, pushed, and opened the pull request for you.",
+        "final_response": "Evaluated the open pull request: CI green, no warnings. Merged after your confirmation.",
         "artifact_manifest": [],
         "exit_state": "success"
       },

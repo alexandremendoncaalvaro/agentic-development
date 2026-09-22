@@ -581,8 +581,8 @@ test('a denied approval that stops the outward command is the approval stop hold
   assert.deepEqual(result.failures, []);
 });
 
-const DORMANCY_CASE = join(ROOT, 'eval', 'cases', 'open-pull-request-dormancy.json');
-const DORMANCY_RECEIPTS = join(ROOT, 'eval', 'receipts', 'open-pull-request-dormancy');
+const DORMANCY_CASE = join(ROOT, 'eval', 'cases', 'wire-quality-gates-dormancy.json');
+const DORMANCY_RECEIPTS = join(ROOT, 'eval', 'receipts', 'wire-quality-gates-dormancy');
 
 test('a natural request that fires a dormant user-invocable-only skill is wrong routing', () => {
   const result = evaluateReplay({
@@ -594,7 +594,7 @@ test('a natural request that fires a dormant user-invocable-only skill is wrong 
   assert.equal(result.declared_failure_check.status, 'matched');
   const [failure] = result.failures;
   assert.equal(failure.grader, 'dormancy');
-  assert.equal(failure.observed, 'ad-pr');
+  assert.equal(failure.observed, 'ad-hooks');
   assert.equal(failure.evidence_locator, 'trials[0].events[0]');
 });
 
@@ -756,8 +756,8 @@ test('case declarations that would make grading vacuous are rejected at the boun
   }
 });
 
-const COEXISTENCE_CASE = join(ROOT, 'eval', 'cases', 'open-pull-request-coexistence.json');
-const COEXISTENCE_RECEIPTS = join(ROOT, 'eval', 'receipts', 'open-pull-request-coexistence');
+const COEXISTENCE_CASE = join(ROOT, 'eval', 'cases', 'wire-quality-gates-coexistence.json');
+const COEXISTENCE_RECEIPTS = join(ROOT, 'eval', 'receipts', 'wire-quality-gates-coexistence');
 
 test('a coexistence request lets the expected model-invocable skill run while the outward skill stays dormant', () => {
   const healthy = evaluateReplay({
@@ -770,7 +770,7 @@ test('a coexistence request lets the expected model-invocable skill run while th
 
   const overreach = evaluateReplay({
     caseFile: COEXISTENCE_CASE,
-    receiptFile: join(COEXISTENCE_RECEIPTS, 'overreach.json'),
+    receiptFile: join(COEXISTENCE_RECEIPTS, 'fired-dormant.json'),
     root: ROOT,
   });
   assert.deepEqual(overreach.hard_failures, ['wrong_routing']);
@@ -810,10 +810,20 @@ test("the coverage report names every category intersection and every representa
     'workflow-operational/model-invocable',
     'workflow-operational/user-invocable-only',
   ]);
-  assert.deepEqual(report.intersections['workflow-operational/user-invocable-only'], ['ad-pr']);
-  assert.deepEqual(report.representatives['ad-pr'].case_types, [
+  assert.deepEqual(report.intersections['workflow-operational/user-invocable-only'], ['ad-hooks']);
+  assert.deepEqual(report.intersections['workflow-operational/model-invocable'], [
+    'ad-ground',
+    'ad-pr',
+    'ad-review',
+  ]);
+  assert.deepEqual(report.representatives['ad-hooks'].case_types, [
     'coexistence',
     'dormancy',
+    'positive',
+  ]);
+  assert.deepEqual(report.representatives['ad-pr'].case_types, [
+    'close-negative',
+    'coexistence',
     'positive',
   ]);
   assert.deepEqual(report.representatives['ad-review'].case_types, [
@@ -939,7 +949,7 @@ test('the coverage report treats a case without both receipt intents and an orph
   const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-gaps-'));
   try {
     corpusCopy(dir);
-    rmSync(join(dir, 'eval', 'receipts', 'open-pull-request-coexistence', 'overreach.json'));
+    rmSync(join(dir, 'eval', 'receipts', 'wire-quality-gates-coexistence', 'fired-dormant.json'));
     rmSync(join(dir, 'eval', 'receipts', 'bootstrap-agents-guide-dormancy'), { recursive: true });
     cpSync(
       join(dir, 'eval', 'receipts', 'open-pull-request-explicit'),
@@ -949,7 +959,7 @@ test('the coverage report treats a case without both receipt intents and an orph
 
     const report = coverageReport(loadCorpus({ root: dir }));
     assert.ok(
-      report.gaps.some((gap) => /open-pull-request-coexistence.*intentionally broken/.test(gap)),
+      report.gaps.some((gap) => /wire-quality-gates-coexistence.*intentionally broken/.test(gap)),
       report.gaps.join('\n')
     );
     assert.ok(
