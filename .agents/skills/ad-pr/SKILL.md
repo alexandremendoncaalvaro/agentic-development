@@ -1,10 +1,12 @@
 ---
 name: ad-pr
-description: Open a GitHub pull request with a uniform body shape. Four phases — preflight (`gh` auth + branch pushed), scope assembly (commits + diff vs base), draft body (Summary / Test plan / Links), open + report URL. Title format = Conventional Commits, type inferred from the dominant commit type in the range. `gh` CLI soft-fail with install hint. Triggers on "open a PR", "create a pull request", "submit a PR", "gh pr create", "/ad-pr".
+description: Open a pull request in the repo body shape once the owner approves the draft. Use on "open a PR".
 summary: Open a GitHub pull request with a uniform body shape (Summary / Test plan / Links). Four phases — preflight (`gh` auth + branch pushed), scope assembly, draft body, open + report URL. Title format = Conventional Commits.
 ---
 
 <background_information>
+This skill is model-invocable (ADR-0084): the agent may run it when the work is ready, and the outward steps stay behind the owner's approval given in this session: the push in Phase 1 and the draft in Phase 3 are each confirmed once, recommended answer first, before the pull request is opened.
+
 Implements ADR-0024 and ADR-0032 (`doc/adr/0032-ci-failure-is-local-gate-gap.md`). Opens a PR via `gh pr create` with a uniform body shape (Summary / Test plan / Links). Helper posture on scope, links, and body drafting — warnings surface without refusing. Hard gate on local quality: the skill refuses to open a PR when pre-push / CI-mirror gates exit non-zero (WORKFLOW §11 — CI failure is a local gate gap). No `--no-verify` symmetric bypass; users who need to open a red draft invoke `<github-command> pr create --draft` directly.
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions opening a PR or submitting changes for review, invoke this skill manually.

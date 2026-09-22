@@ -75,7 +75,7 @@
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "331c56fa678192bee1cb7b1bbe7e0ea8db0b0a01a3d639e1c329c5f8b7a28404"
+          "sourceSha": "9fe167f24f4a6af6d4b0ce4b105b870f7f427440f3c2c89a546449c43437a897"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
@@ -396,7 +396,7 @@
       "files": [
         {
           "path": ".agents/skills/ad-merge/agents/openai.yaml",
-          "sourceSha": "289c42e691f628f05406c415d03beea7450c7c5c5012dae0a1de365ddec28eac"
+          "sourceSha": "4f73b82a284851baa00f120c2672f226b4215acbe0b3498112aeb32b7ab053dd"
         },
         {
           "path": ".agents/skills/ad-merge/scripts/gh-preflight.mjs",
@@ -404,7 +404,7 @@
         },
         {
           "path": ".agents/skills/ad-merge/SKILL.md",
-          "sourceSha": "1db00710a7793c0b27ad273efd4a0f4277fae9af1ecf2e3f5d909093ac5e6d29"
+          "sourceSha": "cdc85714fafb01dcba23160d96b3416ec88a8365412464a84d50688a8845183f"
         }
       ]
     },
@@ -443,7 +443,7 @@
       "files": [
         {
           "path": ".agents/skills/ad-pr/agents/openai.yaml",
-          "sourceSha": "2062555928cbdf4eac21ad1ca3e4d9ca6dfdc8a8cecae5a9b79c2c9dd14c177f"
+          "sourceSha": "2d03d3f97c19feef2f938436fe3bc5dd364a46950a3733fd4619de44bc7e1754"
         },
         {
           "path": ".agents/skills/ad-pr/scripts/gh-preflight.mjs",
@@ -451,7 +451,7 @@
         },
         {
           "path": ".agents/skills/ad-pr/SKILL.md",
-          "sourceSha": "dcbf8e88e60061a8c823996d202ae87cfa1ab7e66c96564db1b12f2a50c12aba"
+          "sourceSha": "76c782aeb5801496633826e3c5a69962f0ca32c4058a5ee5d505ce7415270623"
         }
       ]
     },
@@ -704,7 +704,7 @@
         },
         {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "207a7247d07198caa06546d12f5c0001aeee3be4d9ac84b34f0a14a25ffca6f8"
+          "sourceSha": "2b5c841ddf46ed5dda7dde9a2f0245605a154c99ce7dfb145dd9104b8ea964ad"
         },
         {
           "path": ".codex/agents/fresh-context-reviewer.toml",

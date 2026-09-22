@@ -19,6 +19,12 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Changed
 
+- `/ad-pr` and `/ad-merge` are model-invocable again: the agent may run them
+  when the work is ready, and each skill asks for the owner's approval before
+  the outward step (push and draft for `/ad-pr`, the merge on every path for
+  `/ad-merge`), instead of the host refusing the call outright; on Codex the
+  `/ad-audit` and `/ad-review` descriptions lose a few redundant words so
+  the listing budget still holds (ADR-0084, amending ADR-0073, task-0087).
 - `/ad-ground` record validator messages now name the line that satisfies
   each rule (`- **A1:** <citation> (accessed <YYYY-MM-DD> via <method>)`,
   `### E1 — <claim>`, `**Strength:**`, `**Provenance:**`, the metadata

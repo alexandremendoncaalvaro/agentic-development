@@ -1,10 +1,12 @@
 ---
 name: ad-merge
-description: Evaluate and merge a GitHub pull request. Four phases — preflight (`gh` auth + PR resolution), evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings yielding to user), merge via `gh pr merge` with auto-detected mode (squash / rebase / merge) and `--delete-branch`. Helper posture — surfaces warnings, does not block on the senior engineer's judgment. Triggers on "merge this PR", "evaluate the PR", "is it mergeable", "gh pr merge", "/ad-merge".
+description: Check a pull request (CI, review, mergeability), merge once the owner confirms. Use on "merge this PR".
 summary: Evaluate and merge a GitHub pull request. Four phases — preflight, evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`.
 ---
 
 <background_information>
+This skill is model-invocable (ADR-0084): the agent may run it when a pull request is ready, and the merge stays behind the owner's approval given in this session: Phase 3 asks once, recommended answer first, on every path a valid release-plan receipt does not already cover.
+
 Implements ADR-0025. Evaluates a PR's mergeability and performs the merge via `gh pr merge`. CI green is the only hard gate; everything else surfaces as a warning the senior engineer decides on.
 
 Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions merging a PR or evaluating mergeability, invoke this skill manually.
@@ -64,7 +66,7 @@ Phase 3 — decision. Apply the bar:
 - CI failing → hard stop. Refuse to merge until CI is green, unless the user explicitly overrides ("merge anyway"). On override, log a loud warning that this is a deliberate CI-failing merge and the responsibility is the user's. Per ADR-0025 §3, even the hard gate yields to explicit user authorization, but the override is surfaced visibly.
 - CI pending → wait by default. Ask whether to proceed only when no valid release-plan receipt exists and the user requests a decision before CI finishes.
 - CI green + warnings (no fresh-context review / no linked task / unresolved comments) → surface each warning. Ask the user to confirm under the normal flow; under a valid release-plan receipt, continue without another question unless a warning changes the approved release target or effect.
-- All green → proceed.
+- All green → ask the owner to confirm the merge once, recommended answer first; under a valid release-plan receipt, proceed without another question.
 
 State the decision back to the user before Phase 4 so they can interject.
 
