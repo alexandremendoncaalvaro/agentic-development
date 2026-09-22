@@ -17,6 +17,7 @@ import { loadDenylist } from '../../src/leak-guard.js';
 
 import { normalize as normalizeClaudeCode } from './adapters/claude-code.mjs';
 import { installFixtureSkills } from './fixture-skills.mjs';
+import { parseLiveArgs } from './live-args.mjs';
 import { observeEnvironment, probeHostVersion } from './host-environment.mjs';
 import { readGateEvidence } from './gate-evidence.mjs';
 import { normalize as normalizeCodex } from './adapters/codex.mjs';
@@ -34,58 +35,12 @@ import { createTrial, pushDerivedEvents, UnterminatedStreamError } from './adapt
  */
 
 const RECEIPT_SCHEMA = 'agentic-eval-receipt/1';
-const ADAPTERS = { 'claude-code': normalizeClaudeCode, codex: normalizeCodex };
+// Exported so the argument parser's host list can be pinned to it by test.
+export const ADAPTERS = { 'claude-code': normalizeClaudeCode, codex: normalizeCodex };
 const REQUEST_PLACEHOLDER = '{request}';
 
 function fail(message) {
   throw new Error(message);
-}
-
-/**
- * Parse the `live` subcommand's arguments. The runner is required and taken
- * verbatim: `--runner` consumes every remaining argument, so a host invocation
- * keeps its own flags without this parser having to know them.
- */
-export function parseLiveArgs(argv) {
-  const args = [...argv];
-  const caseFile = args.shift();
-  if (!caseFile || caseFile.startsWith('--')) fail('live: the first argument is the case file');
-
-  let host = null;
-  let trials = 1;
-  let out = null;
-  let runner = null;
-
-  while (args.length > 0) {
-    const flag = args.shift();
-    if (flag === '--runner') {
-      if (args.length === 0) fail('live: --runner needs the host invocation');
-      runner = args.splice(0, args.length);
-      break;
-    }
-    const value = args.shift();
-    if (value === undefined) fail(`live: ${flag} needs a value`);
-    if (flag === '--host') host = value;
-    else if (flag === '--trials') trials = Number(value);
-    else if (flag === '--out') out = value;
-    else fail(`live: unknown option ${flag}`);
-  }
-
-  if (!runner || runner.length === 0) {
-    fail('live: --runner is required; this harness never discovers a host binary (ADR-0082)');
-  }
-  if (!runner.includes(REQUEST_PLACEHOLDER)) {
-    fail(
-      `live: the --runner invocation must contain ${REQUEST_PLACEHOLDER} where the request goes; ` +
-        'appending it would let a variadic flag swallow the prompt'
-    );
-  }
-  if (!host || !(host in ADAPTERS)) {
-    fail(`live: --host must be one of ${Object.keys(ADAPTERS).join(', ')}`);
-  }
-  if (!Number.isInteger(trials) || trials < 1) fail('live: --trials must be a positive integer');
-
-  return { caseFile, host, runner, trials, out };
 }
 
 /** The host invocation with the request substituted where the operator placed it. */
@@ -298,7 +253,7 @@ function cleanGitEnvironment() {
  * streams beside the receipt. Nothing is written until every capture has passed
  * the gate, so an abort leaves no partial evidence (ADR-0082 decision 4).
  */
-export { observeEnvironment, probeHostVersion };
+export { observeEnvironment, parseLiveArgs, probeHostVersion };
 
 export function runLive({
   caseFile,
@@ -306,6 +261,7 @@ export function runLive({
   runner,
   trials,
   out,
+  fixtureSkills: fixtureSkillsOverride = null,
   root = process.cwd(),
   spawn = spawnSync,
 }) {
@@ -315,7 +271,11 @@ export function runLive({
   const fixtureRoot = resolve(root, caseRecord.fixture);
   const workRoot = mkdtempSync(join(tmpdir(), 'agentic-eval-live-'));
   const roots = planTrialRoots({ fixtureRoot, trials, workRoot });
-  const fixtureSkills = caseRecord.fixture_skills ?? [];
+  const fixtureSkills = fixtureSkillsOverride ?? caseRecord.fixture_skills ?? [];
+  const fixtureSkillsSource = fixtureSkillsOverride ? 'runner' : 'case';
+  // Recorded whenever anyone said which skills to install, even an empty
+  // list: an override to nothing is the arm whose provenance matters most.
+  const recordSkills = fixtureSkillsOverride !== null || caseRecord.fixture_skills !== undefined;
   // Every trial copy receives the same bytes from the canonical tree, so the
   // digests are a property of the run, not of a trial; the first install's
   // digests are the run's record and the other copies only repeat the copy.
@@ -358,7 +318,12 @@ export function runLive({
     hostVersion,
     environment: observeEnvironment({ host, stream: captures.map((c) => c.stream).join('\n') }),
     scaffold: runner.join(' '),
-    runParameters: { trials, ...(fixtureSkills.length ? { fixture_skills: installedSkills } : {}) },
+    runParameters: {
+      trials,
+      ...(recordSkills
+        ? { fixture_skills: installedSkills, fixture_skills_source: fixtureSkillsSource }
+        : {}),
+    },
     skill: skillIdentity({ root, host, representative: caseRecord.representative }),
     caseSha256: freezeArtifact(resolve(root, caseFile)).sha256,
     fixtureSha256: freezeArtifact(fixtureRoot).sha256,

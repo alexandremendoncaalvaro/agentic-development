@@ -27,10 +27,12 @@ import {
   planTrialRoots,
   observeEnvironment,
   probeHostVersion,
+  ADAPTERS,
   resolveCaptureDir,
   runLive,
   skillIdentity,
 } from '../eval/lib/live.mjs';
+import { LIVE_HOSTS } from '../eval/lib/live-args.mjs';
 import { installFixtureSkills } from '../eval/lib/fixture-skills.mjs';
 import { readGateEvidence } from '../eval/lib/gate-evidence.mjs';
 
@@ -396,6 +398,7 @@ test('regression: task-0084 runLive relativizes against the resolved trial copy,
   const previous = Object.fromEntries(Object.keys(leaked).map((key) => [key, process.env[key]]));
   Object.assign(process.env, leaked);
   let workRoot;
+  let unskilledWorkRoot;
   try {
     const run = runLive({
       caseFile,
@@ -443,6 +446,45 @@ test('regression: task-0084 runLive relativizes against the resolved trial copy,
         path: 'doc/research/0001-ground-x.md',
       },
     ]);
+    assert.equal(run.receipt.frozen.run_parameters.fixture_skills_source, 'case');
+
+    const unskilled = runLive({
+      caseFile,
+      host: 'claude-code',
+      runner: ['claude', '-p', '{request}'],
+      trials: 1,
+      out: null,
+      root,
+      fixtureSkills: ['ad-hooks'],
+      spawn,
+    });
+    assert.ok(
+      !existsSync(join(seen[1].opts.cwd, '.claude', 'skills', 'ad-ground')),
+      'ad-ground not installed'
+    );
+    assert.ok(
+      existsSync(join(seen[1].opts.cwd, '.claude', 'skills', 'ad-hooks')),
+      'ad-hooks installed'
+    );
+    assert.deepEqual(Object.keys(unskilled.receipt.frozen.run_parameters.fixture_skills), [
+      'ad-hooks',
+    ]);
+    assert.equal(unskilled.receipt.frozen.run_parameters.fixture_skills_source, 'runner');
+    unskilledWorkRoot = unskilled.workRoot;
+
+    const none = runLive({
+      caseFile,
+      host: 'claude-code',
+      runner: ['claude', '-p', '{request}'],
+      trials: 1,
+      out: null,
+      root,
+      fixtureSkills: [],
+      spawn,
+    });
+    rmSync(none.workRoot, { recursive: true, force: true });
+    assert.deepEqual(none.receipt.frozen.run_parameters.fixture_skills, {});
+    assert.equal(none.receipt.frozen.run_parameters.fixture_skills_source, 'runner');
   } finally {
     for (const [key, value] of Object.entries(previous)) {
       if (value === undefined) delete process.env[key];
@@ -450,6 +492,7 @@ test('regression: task-0084 runLive relativizes against the resolved trial copy,
     }
     rmSync(root, { recursive: true, force: true });
     if (workRoot) rmSync(workRoot, { recursive: true, force: true });
+    if (unskilledWorkRoot) rmSync(unskilledWorkRoot, { recursive: true, force: true });
   }
 });
 
@@ -677,6 +720,41 @@ test('live: the runner must say where the request goes, so a variadic flag canno
         'Write',
       ]),
     /\{request\}/
+  );
+});
+
+test('live: the argument parser accepts exactly the hosts the lane has an adapter for', () => {
+  assert.deepEqual([...LIVE_HOSTS].sort(), Object.keys(ADAPTERS).sort());
+});
+
+test('live: --fixture-skills overrides the skills installed into the trial copy, so an unskilled arm runs against the same frozen case', () => {
+  // Spec 0007 R9 arms: the case stays byte-identical, the receipt records
+  // what was installed and where the list came from (GROUND-0028 addendum).
+  const { fixtureSkills } = parseLiveArgs([
+    'eval/cases/research-before-implementing-positive.json',
+    '--host',
+    'claude-code',
+    '--fixture-skills',
+    'ad-hooks',
+    '--runner',
+    'claude',
+    '-p',
+    '{request}',
+  ]);
+  assert.deepEqual(fixtureSkills, ['ad-hooks']);
+  assert.throws(
+    () =>
+      parseLiveArgs([
+        'eval/cases/x.json',
+        '--host',
+        'claude-code',
+        '--fixture-skills',
+        'Not A Skill',
+        '--runner',
+        'claude',
+        '{request}',
+      ]),
+    /fixture-skills/
   );
 });
 

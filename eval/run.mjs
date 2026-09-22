@@ -6,7 +6,7 @@
  *
  *   node eval/run.mjs replay <case.json> <receipt.json>
  *   node eval/run.mjs corpus
- *   node eval/run.mjs live <case.json> --host <h> [--trials N] [--out dir] --runner <cmd...>
+ *   node eval/run.mjs live <case.json> --host <h> [--trials N] [--out dir] [--fixture-skills a,b] --runner <cmd...>
  *   node eval/run.mjs join <capture-dir>
  *
  * `replay` prints one result record. `join` reads a live capture directory
@@ -33,7 +33,7 @@ import { evaluateReplay } from './lib/replay.mjs';
 function usage() {
   console.error(
     'usage: node eval/run.mjs replay <case.json> <receipt.json> | node eval/run.mjs corpus | ' +
-      'node eval/run.mjs live <case.json> --host <host> [--trials N] [--out dir] --runner <command...> | ' +
+      'node eval/run.mjs live <case.json> --host <host> [--trials N] [--out dir] [--fixture-skills a,b] --runner <command...> | ' +
       'node eval/run.mjs join <capture-dir>'
   );
   process.exit(1);
