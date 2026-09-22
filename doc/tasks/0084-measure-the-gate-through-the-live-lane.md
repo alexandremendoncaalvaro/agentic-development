@@ -447,6 +447,25 @@ on a failing assertion; and the unskilled record's failure count in the
 entry above was corrected from six to nine after the reviewer re-ran the
 validator on the captured write, the author having read a truncated output.
 
+### 2026-09-22 — Focused audit of the second comparison
+
+Two claims-verification passes under two models
+(`.agentic/reviews/2026-09-22T00-06-32Z-audit-cv-second-comparison*.md`, machine-local)
+recomputed every number of the second comparison from the retained
+captures and found them exact, and found one violation the author had
+made again: the commit that added `--fixture-skills` cited GROUND-0028's
+addendum as grounding while the addendum landed in the following commit.
+The commit message was reworded on the unpushed branch to say the addendum
+is recorded alongside, not before (c286728); the rule-gap candidate for
+`/ad-commit` stands twice confirmed. One judgement-call restated here so it
+is not read as closed: the second comparison, like the first, rests on
+per-observation artifacts that live only on this machine, so it informs
+ADR-0083 decision 7 and does not close it; the decline of a second gate is
+the conclusion this evidence supports, not a decision the evidence proves.
+One swap-pass blocker on the audit handoff's own header was a wording
+ambiguity in a machine-local file (84449fe is pull request 146's head; this
+branch has no pull request yet), not a claim in any tracked record.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
