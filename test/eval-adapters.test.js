@@ -283,13 +283,13 @@ test('an explicit request supplies the skill and the run policy supplies the gra
 });
 
 test('a denied tool call of any kind is an approval denial, so a blocked skill never counts as fired', () => {
-  const caseFile = join(ROOT, 'eval', 'cases', 'open-pull-request-dormancy.json');
+  const caseFile = join(ROOT, 'eval', 'cases', 'wire-quality-gates-dormancy.json');
   const caseRecord = readJson(caseFile);
-  const lines = readStream('claude-code', 'open-pull-request-dormancy-fired')
+  const lines = readStream('claude-code', 'wire-quality-gates-dormancy-fired')
     .split('\n')
     .map((line) => {
       if (!line.includes('"uuid":"u4"')) return line;
-      return '{"type":"system","subtype":"permission_denied","tool_name":"Skill","tool_use_id":"toolu_02","agent_id":"agent_01","decision_reason_type":"rule","decision_reason":"Skill(ad-pr) is denied by a permission rule","message":"Denied.","session_id":"synthetic-session","uuid":"u4"}';
+      return '{"type":"system","subtype":"permission_denied","tool_name":"Skill","tool_use_id":"toolu_02","agent_id":"agent_01","decision_reason_type":"rule","decision_reason":"Skill(ad-hooks) is denied by a permission rule","message":"Denied.","session_id":"synthetic-session","uuid":"u4"}';
     });
   const trial = normalizeClaudeCode({
     lines,
@@ -301,7 +301,7 @@ test('a denied tool call of any kind is an approval denial, so a blocked skill n
   assert.deepEqual(
     trial.events.map((event) => [event.kind, event.action ?? event.exit_state]),
     [
-      ['approval_denied', 'Skill ad-pr'],
+      ['approval_denied', 'Skill ad-hooks'],
       ['final', 'success'],
     ]
   );
@@ -318,7 +318,7 @@ test('a denied tool call of any kind is an approval denial, so a blocked skill n
 
   const result = replayTrial({
     caseFile,
-    templateReceipt: join(ROOT, 'eval', 'receipts', 'open-pull-request-dormancy', 'healthy.json'),
+    templateReceipt: join(ROOT, 'eval', 'receipts', 'wire-quality-gates-dormancy', 'healthy.json'),
     trial,
     prefix: 'denied-skill',
   });
@@ -363,10 +363,10 @@ test('a SKILL.md read under any documented Codex skills root is the skill activa
 });
 
 test('a skill fired inside a subagent is flattened into the trial, so dormancy cannot hide behind a delegation', () => {
-  const caseFile = join(ROOT, 'eval', 'cases', 'open-pull-request-dormancy.json');
+  const caseFile = join(ROOT, 'eval', 'cases', 'wire-quality-gates-dormancy.json');
   const caseRecord = readJson(caseFile);
   const trial = normalizeClaudeCode({
-    lines: readStream('claude-code', 'open-pull-request-dormancy-fired'),
+    lines: readStream('claude-code', 'wire-quality-gates-dormancy-fired'),
     request: caseRecord.request,
     requestKind: caseRecord.request_kind,
     fixtureRoot: '/work/planning-docs-repo',
@@ -376,7 +376,7 @@ test('a skill fired inside a subagent is flattened into the trial, so dormancy c
     trial.events.map((event) => event.kind),
     ['skill_invoked', 'final']
   );
-  assert.equal(trial.events[0].skill, 'ad-pr');
+  assert.equal(trial.events[0].skill, 'ad-hooks');
   assert.equal(trial.native[0].parent_tool_use_id, 'toolu_01');
 
   const result = replayTrial({
@@ -385,7 +385,7 @@ test('a skill fired inside a subagent is flattened into the trial, so dormancy c
       ROOT,
       'eval',
       'receipts',
-      'open-pull-request-dormancy',
+      'wire-quality-gates-dormancy',
       'fired-dormant.json'
     ),
     trial,

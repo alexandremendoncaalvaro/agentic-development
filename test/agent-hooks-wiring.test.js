@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -144,6 +145,97 @@ if (process.platform === 'win32') {
         },
       });
       assert.equal(run.status, 2, `exit 2 through the wired command; stderr: ${run.stderr}`);
+      assert.match(run.stderr, /missing Decision metadata/);
+      assert.equal(run.stdout, '');
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+      rmSync(evidence, { recursive: true, force: true });
+    }
+  });
+}
+
+// The tracked live fixture ships its own gate wiring (Task 0084, GROUND-0028
+// E1, E2). It cannot name a machine path: the lane installs the declared
+// skills into each trial copy and the command resolves through the host's
+// project variable (Claude Code) or the session cwd (Codex). This exercises
+// both strings against a trial copy built the way the lane builds it.
+const LIVE_FIXTURE = join(KIT_ROOT, 'eval', 'fixtures', 'research-gated-repo');
+
+async function fixtureTrialCopy(host) {
+  const { installFixtureSkills } = await import('../eval/lib/fixture-skills.mjs');
+  const root = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-wiring-fixture-')));
+  const evidence = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-wiring-fixture-evidence-')));
+  cpSync(LIVE_FIXTURE, root, { recursive: true });
+  installFixtureSkills({
+    trialRoot: root,
+    host,
+    skills: ['ad-hooks', 'ad-ground'],
+    root: KIT_ROOT,
+  });
+  const rel = 'doc/research/0001-ground-broken.md';
+  writeFileSync(join(root, rel), '# GROUND-0001: broken\n\n**Status:** recorded\n');
+  return { root, evidence, rel };
+}
+
+test('live fixture wiring: the Claude Code settings command resolves through ${CLAUDE_PROJECT_DIR} into the installed skills and surfaces a validator failure', async () => {
+  const { root, evidence, rel } = await fixtureTrialCopy('claude-code');
+  try {
+    const config = JSON.parse(readFileSync(join(root, '.claude', 'settings.json'), 'utf8'));
+    const hook = findPostToolUseHook(config);
+    assert.match(hook.command, /\$\{CLAUDE_PROJECT_DIR\}\/\.claude\/skills\/ad-hooks/);
+    const command = hook.command.replaceAll('${CLAUDE_PROJECT_DIR}', root);
+    const run = spawnSync(command, {
+      shell: true,
+      cwd: root,
+      input: postToolUseEvent(root, rel, 'Write', { file_path: join(root, rel), content: '' }),
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        AD_ARTIFACT_GATE: '',
+        AD_ARTIFACT_GATE_EVIDENCE_DIR: evidence,
+        AD_ARTIFACT_GATE_SKILLS_ROOT: '',
+      },
+    });
+    assert.equal(run.status, 2, `exit 2 through the fixture's command; stderr: ${run.stderr}`);
+    assert.match(run.stderr, /missing Decision metadata/);
+    assert.match(run.stderr, /\.claude\/skills\/ad-ground\/scripts\/validate-record\.mjs/);
+    assert.equal(run.stdout, '');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+if (process.platform === 'win32') {
+  test.skip('live fixture wiring: the Codex hooks.json command runs from the session cwd (POSIX only)', () => {});
+} else {
+  test('live fixture wiring: the Codex hooks.json command resolves from the session cwd into the installed skills and surfaces a validator failure', async () => {
+    const { root, evidence, rel } = await fixtureTrialCopy('codex');
+    try {
+      const config = JSON.parse(readFileSync(join(root, '.codex', 'hooks.json'), 'utf8'));
+      const hook = findPostToolUseHook(config);
+      assert.match(hook.command, /"\.agents\/skills\/ad-hooks\/scripts\/artifact-gate\.mjs"/);
+      assert.equal(typeof hook.timeout, 'number');
+      const patch = [
+        '*** Begin Patch',
+        `*** Update File: ${rel}`,
+        '@@',
+        '+x',
+        '*** End Patch',
+      ].join('\n');
+      const run = spawnSync(hook.command, {
+        shell: '/bin/sh',
+        cwd: root,
+        input: postToolUseEvent(root, rel, 'apply_patch', { command: patch }),
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          AD_ARTIFACT_GATE: '',
+          AD_ARTIFACT_GATE_EVIDENCE_DIR: evidence,
+          AD_ARTIFACT_GATE_SKILLS_ROOT: '',
+        },
+      });
+      assert.equal(run.status, 2, `exit 2 through the fixture's command; stderr: ${run.stderr}`);
       assert.match(run.stderr, /missing Decision metadata/);
       assert.equal(run.stdout, '');
     } finally {

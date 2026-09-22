@@ -54,6 +54,24 @@ function validateCaseIdentity(caseRecord, path) {
   }
 }
 
+// The skills the live lane installs into each trial copy (GROUND-0028 E2).
+// Structural here; whether each name is bundled for the host is checked when
+// the lane installs it, because only the lane knows which host it runs.
+function validateFixtureSkills(caseRecord, path) {
+  const skills = caseRecord.fixture_skills;
+  if (skills === undefined) return;
+  if (!Array.isArray(skills) || !skills.every((name) => typeof name === 'string')) {
+    fail(`case ${path} "fixture_skills" must be an array of skill names`);
+  }
+  for (const name of skills) {
+    if (!SKILL_NAME.test(name))
+      fail(`case ${path} "fixture_skills" names an invalid skill "${name}"`);
+  }
+  if (new Set(skills).size !== skills.length) {
+    fail(`case ${path} "fixture_skills" repeats a skill name`);
+  }
+}
+
 function validateCaseExpectations(caseRecord, path) {
   const expected = caseRecord.expected;
   const route = expected?.route;
@@ -101,6 +119,7 @@ function validateCaseGraders(caseRecord, path) {
 /** Boundary validation of a case record (ADR-0080 item 6). Throws on the first defect. */
 export function validateCase(caseRecord, path) {
   validateCaseIdentity(caseRecord, path);
+  validateFixtureSkills(caseRecord, path);
   validateCaseExpectations(caseRecord, path);
   validateCaseGraders(caseRecord, path);
 }

@@ -1,0 +1,64 @@
+{
+  "schema": "agentic-eval-receipt/1",
+  "case_id": "wire-quality-gates-coexistence",
+  "lane": "replay",
+  "origin": "synthetic",
+  "intent": "known-good",
+  "declared_failure": null,
+  "frozen": {
+    "case_sha256": "bc4135c8de1fe06b6e062bfa69ca78c2f8fc47cc61135deae81e63194a4a492a",
+    "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
+    "host": "claude-code",
+    "host_version": "2.1.227",
+    "model": "synthetic-replay",
+    "scaffold": "synthetic-replay",
+    "tools": [
+      "Read",
+      "Write",
+      "Bash",
+      "Skill"
+    ],
+    "permissions": "default",
+    "context_policy": "bare",
+    "run_parameters": {
+      "max_turns": 12
+    },
+    "grader_versions": {
+      "route": "1",
+      "dormancy": "1",
+      "effects": "1",
+      "outcome": "1"
+    },
+    "trial_count": 1
+  },
+  "trials": [
+    {
+      "id": "t1",
+      "events": [
+        {
+          "seq": 1,
+          "kind": "skill_invoked",
+          "skill": "ad-task"
+        },
+        {
+          "seq": 2,
+          "kind": "file_write",
+          "path": "doc/tasks/0002-pre-commit-checks.md"
+        },
+        {
+          "seq": 3,
+          "kind": "final",
+          "exit_state": "success"
+        }
+      ],
+      "outcome": {
+        "final_response": "Recorded the pre-commit checks plan under doc/tasks/ with its completion checklist; wiring the hooks is yours to run with /ad-hooks.",
+        "artifact_manifest": [
+          "doc/tasks/0002-pre-commit-checks.md"
+        ],
+        "exit_state": "success"
+      },
+      "judgments": []
+    }
+  ]
+}

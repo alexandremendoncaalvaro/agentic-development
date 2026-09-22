@@ -1,6 +1,6 @@
 ---
 name: ad-review
-description: Two-axis fresh-context code review (Standards against AGENTS.md and ADRs; Spec against the originating task) run on Codex as one inline pass with an audit trail, findings side by side, never an approve verdict. Use before merging a diff, branch, or PR; "review this", "review main..HEAD", "senior review".
+description: Two-axis fresh-context code review (Standards against AGENTS.md and ADRs; Spec against the originating task) run on Codex as one inline pass and audit trail, findings side by side, no approve verdict. Use before merging a diff, branch, or PR; "review this", "review main..HEAD", "senior review".
 summary: Two-axis code review per WORKFLOW §10. Claude Code uses fresh-context subagents; Codex writes an audit trail, reviews inline by default, and ships a reviewer subagent for explicit escalation.
 ---
 

@@ -30,6 +30,30 @@ const REQUIRED_HEADINGS = [
   'Audit path',
 ];
 
+// A message names the line that satisfies the rule, not only the rule: the
+// artifact gate (Spec 0008 R3) returns these strings to a model that may not
+// be able to read the template, and the pilot showed it never converges on
+// the register and claim shapes without them (task-0086).
+const ACCESS_SHAPE = '(accessed <YYYY-MM-DD> via <method>)';
+const STRENGTH_SHAPE = '"**Strength:** <High | Medium | Low | Very-low>"';
+const PROVENANCE_SHAPE = '"**Provenance:** <A1, B1, C1, D1>"';
+
+function sourceShape(group) {
+  return `add a line shaped "- **${group}1:** <citation> ${ACCESS_SHAPE}" under "## Source register"`;
+}
+
+function sourceLine(id) {
+  return `"- **${id}:** <citation> ${ACCESS_SHAPE}" under "## Source register"`;
+}
+
+function noProvenance(id) {
+  return `${id} has no provenance: add a line ${PROVENANCE_SHAPE} naming registered source ids under its heading`;
+}
+
+function titleShape(number) {
+  return `the first line is "# GROUND-${number}: <short implementation decision>"`;
+}
+
 function normalizedPath(value) {
   return value.replaceAll('\\', '/');
 }
@@ -63,18 +87,19 @@ function parseSources(body, errors) {
       continue;
     }
     if (!detail.trim()) {
-      errors.push(`${id} has no source detail`);
+      errors.push(`${id} has no source detail: write it as ${sourceLine(id)}`);
       continue;
     }
     if (!ACCESS_PROVENANCE.test(detail)) {
-      errors.push(`${id} has no access date and method`);
+      errors.push(`${id} has no access date and method: end its line with "${ACCESS_SHAPE}"`);
     }
     ids.add(id);
     counts[id[0]] += 1;
   }
 
   for (const group of Object.keys(counts)) {
-    if (counts[group] === 0) errors.push(`source register has no ${group} source`);
+    if (counts[group] === 0)
+      errors.push(`source register has no ${group} source: ${sourceShape(group)}`);
   }
   return { ids, counts };
 }
@@ -85,7 +110,10 @@ function parseClaims(body, sourceIds, errors) {
 
   const starts = [...evidence.matchAll(/^### (E\d+) — .+$/gm)];
   if (starts.length === 0) {
-    errors.push('evidence has no claim');
+    errors.push(
+      'evidence has no claim: add a heading shaped "### E1 — <claim>" under "## Evidence" ' +
+        `followed by ${STRENGTH_SHAPE} and ${PROVENANCE_SHAPE} lines`
+    );
     return [];
   }
 
@@ -103,18 +131,25 @@ function parseClaims(body, sourceIds, errors) {
     seen.add(id);
 
     if (!/^\*\*Strength:\*\*\s*(High|Medium|Low|Very-low)$/m.test(claim)) {
-      errors.push(`${id} has no valid strength`);
+      errors.push(`${id} has no valid strength: add a line ${STRENGTH_SHAPE} under its heading`);
     }
     const provenance = metadata(claim, 'Provenance');
     if (!provenance) {
-      errors.push(`${id} has no provenance`);
+      errors.push(noProvenance(id));
       claims.push({ id, provenance: [] });
       continue;
     }
-    const references = provenance.split(',').map((value) => value.trim()).filter(Boolean);
-    if (references.length === 0) errors.push(`${id} has no provenance`);
+    const references = provenance
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean);
+    if (references.length === 0) errors.push(noProvenance(id));
     for (const source of references) {
-      if (!sourceIds.has(source)) errors.push(`${id} references unknown source ${source}`);
+      if (!sourceIds.has(source)) {
+        errors.push(
+          `${id} references unknown source ${source}: register it as ${sourceLine(source)} or cite a registered id`
+        );
+      }
     }
     claims.push({ id, provenance: references });
   }
@@ -151,32 +186,43 @@ if (record && RECORD_PATH.test(record)) {
 let sources = { A: 0, B: 0, C: 0, D: 0 };
 let claims = [];
 if (body !== null) {
+  const number = record.match(RECORD_PATH)[1];
   const title = /^# GROUND-(\d{4}): .+$/m.exec(body);
   if (!title) {
-    errors.push('record title must be GROUND-NNNN');
-  } else if (title[1] !== record.match(RECORD_PATH)[1]) {
-    errors.push('record title number must match filename');
+    errors.push(`record title must be GROUND-NNNN: ${titleShape(number)}`);
+  } else if (title[1] !== number) {
+    errors.push(`record title number must match filename: ${titleShape(number)}`);
   }
   for (const label of REQUIRED_METADATA) {
-    if (!metadata(body, label)) errors.push(`missing ${label} metadata`);
+    if (!metadata(body, label)) {
+      errors.push(`missing ${label} metadata: add a line "**${label}:** <value>" under the title`);
+    }
   }
   if (metadata(body, 'Status') && metadata(body, 'Status') !== 'recorded') {
-    errors.push('Status must be recorded');
+    errors.push('Status must be recorded: write "**Status:** recorded"');
   }
   for (const heading of REQUIRED_HEADINGS) {
-    if (section(body, heading) === null) errors.push(`missing ${heading} section`);
+    if (section(body, heading) === null) {
+      errors.push(`missing ${heading} section: add a "## ${heading}" heading`);
+    }
   }
   const parsedSources = parseSources(body, errors);
   sources = parsedSources.counts;
   claims = parseClaims(body, parsedSources.ids, errors);
 }
 
-console.log(JSON.stringify({
-  cwd,
-  record,
-  valid: errors.length === 0 && unreadable.length === 0,
-  sources,
-  claims,
-  errors,
-  unreadable,
-}, null, 2));
+console.log(
+  JSON.stringify(
+    {
+      cwd,
+      record,
+      valid: errors.length === 0 && unreadable.length === 0,
+      sources,
+      claims,
+      errors,
+      unreadable,
+    },
+    null,
+    2
+  )
+);

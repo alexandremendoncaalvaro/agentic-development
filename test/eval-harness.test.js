@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -123,6 +123,35 @@ test('a case that declares an unknown grader is rejected with a clear error inst
       () => evaluateReplay({ caseFile, receiptFile: join(RECEIPTS, 'healthy.json'), root: ROOT }),
       /unknown grader "forbidden_effect"/
     );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a case may declare fixture_skills as unique skill names, and anything else is rejected at the boundary', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-fixture-skills-'));
+  try {
+    const base = JSON.parse(readFileSync(CASE, 'utf8'));
+    const withSkills = { ...base, fixture_skills: ['ad-hooks', 'ad-task'] };
+    const caseFile = join(dir, 'case.json');
+    writeFileSync(caseFile, JSON.stringify(withSkills));
+    // The receipt's frozen case digest no longer matches, so the pair is
+    // stale rather than malformed: the boundary accepted the field.
+    const result = evaluateReplay({
+      caseFile,
+      receiptFile: join(RECEIPTS, 'healthy.json'),
+      root: ROOT,
+    });
+    assert.equal(result.verification.status, 'stale');
+
+    for (const bad of ['ad-hooks', ['Ad Hooks'], ['ad-hooks', 'ad-hooks'], [1]]) {
+      writeFileSync(caseFile, JSON.stringify({ ...base, fixture_skills: bad }));
+      assert.throws(
+        () => evaluateReplay({ caseFile, receiptFile: join(RECEIPTS, 'healthy.json'), root: ROOT }),
+        /fixture_skills/,
+        JSON.stringify(bad)
+      );
+    }
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -552,8 +581,8 @@ test('a denied approval that stops the outward command is the approval stop hold
   assert.deepEqual(result.failures, []);
 });
 
-const DORMANCY_CASE = join(ROOT, 'eval', 'cases', 'open-pull-request-dormancy.json');
-const DORMANCY_RECEIPTS = join(ROOT, 'eval', 'receipts', 'open-pull-request-dormancy');
+const DORMANCY_CASE = join(ROOT, 'eval', 'cases', 'wire-quality-gates-dormancy.json');
+const DORMANCY_RECEIPTS = join(ROOT, 'eval', 'receipts', 'wire-quality-gates-dormancy');
 
 test('a natural request that fires a dormant user-invocable-only skill is wrong routing', () => {
   const result = evaluateReplay({
@@ -565,7 +594,7 @@ test('a natural request that fires a dormant user-invocable-only skill is wrong 
   assert.equal(result.declared_failure_check.status, 'matched');
   const [failure] = result.failures;
   assert.equal(failure.grader, 'dormancy');
-  assert.equal(failure.observed, 'ad-pr');
+  assert.equal(failure.observed, 'ad-hooks');
   assert.equal(failure.evidence_locator, 'trials[0].events[0]');
 });
 
@@ -727,8 +756,8 @@ test('case declarations that would make grading vacuous are rejected at the boun
   }
 });
 
-const COEXISTENCE_CASE = join(ROOT, 'eval', 'cases', 'open-pull-request-coexistence.json');
-const COEXISTENCE_RECEIPTS = join(ROOT, 'eval', 'receipts', 'open-pull-request-coexistence');
+const COEXISTENCE_CASE = join(ROOT, 'eval', 'cases', 'wire-quality-gates-coexistence.json');
+const COEXISTENCE_RECEIPTS = join(ROOT, 'eval', 'receipts', 'wire-quality-gates-coexistence');
 
 test('a coexistence request lets the expected model-invocable skill run while the outward skill stays dormant', () => {
   const healthy = evaluateReplay({
@@ -741,7 +770,7 @@ test('a coexistence request lets the expected model-invocable skill run while th
 
   const overreach = evaluateReplay({
     caseFile: COEXISTENCE_CASE,
-    receiptFile: join(COEXISTENCE_RECEIPTS, 'overreach.json'),
+    receiptFile: join(COEXISTENCE_RECEIPTS, 'fired-dormant.json'),
     root: ROOT,
   });
   assert.deepEqual(overreach.hard_failures, ['wrong_routing']);
@@ -781,10 +810,20 @@ test("the coverage report names every category intersection and every representa
     'workflow-operational/model-invocable',
     'workflow-operational/user-invocable-only',
   ]);
-  assert.deepEqual(report.intersections['workflow-operational/user-invocable-only'], ['ad-pr']);
-  assert.deepEqual(report.representatives['ad-pr'].case_types, [
+  assert.deepEqual(report.intersections['workflow-operational/user-invocable-only'], ['ad-hooks']);
+  assert.deepEqual(report.intersections['workflow-operational/model-invocable'], [
+    'ad-ground',
+    'ad-pr',
+    'ad-review',
+  ]);
+  assert.deepEqual(report.representatives['ad-hooks'].case_types, [
     'coexistence',
     'dormancy',
+    'positive',
+  ]);
+  assert.deepEqual(report.representatives['ad-pr'].case_types, [
+    'close-negative',
+    'coexistence',
     'positive',
   ]);
   assert.deepEqual(report.representatives['ad-review'].case_types, [
@@ -863,6 +902,43 @@ test('no natural request names its representative or expected route, nor uses th
   }
 });
 
+test('every fixture skill a tracked case declares is bundled for both hosts, so the live lane can install it', () => {
+  for (const { caseRecord, caseFile } of loadCorpus({ root: ROOT })) {
+    for (const skill of caseRecord.fixture_skills ?? []) {
+      for (const host of ['claude-code', 'codex']) {
+        assert.ok(
+          existsSync(join(ROOT, 'src', 'skills', host, skill, 'SKILL.md')),
+          `${caseFile} declares fixture skill "${skill}" which ${host} does not bundle`
+        );
+      }
+    }
+  }
+});
+
+test('the live fixture wires the artifact-validator gate for both hosts through a path that resolves inside a trial copy', () => {
+  const fixture = join(ROOT, 'eval', 'fixtures', 'research-gated-repo');
+  const claude = JSON.parse(readFileSync(join(fixture, '.claude', 'settings.json'), 'utf8'));
+  const codex = JSON.parse(readFileSync(join(fixture, '.codex', 'hooks.json'), 'utf8'));
+  const commandOf = (config) =>
+    config.hooks.PostToolUse.find((entry) => entry.matcher === 'Edit|Write').hooks[0].command;
+  assert.match(
+    commandOf(claude),
+    /^node "\$\{CLAUDE_PROJECT_DIR\}\/\.claude\/skills\/ad-hooks\/scripts\/artifact-gate\.mjs"$/
+  );
+  assert.match(
+    commandOf(codex),
+    /^node "\.agents\/skills\/ad-hooks\/scripts\/artifact-gate\.mjs"$/
+  );
+  for (const { caseRecord } of loadCorpus({ root: ROOT })) {
+    if (caseRecord.fixture !== 'eval/fixtures/research-gated-repo') continue;
+    assert.ok(caseRecord.fixture_skills.includes('ad-hooks'), `${caseRecord.id} installs ad-hooks`);
+    assert.ok(
+      caseRecord.fixture_skills.includes('ad-ground'),
+      `${caseRecord.id} installs ad-ground`
+    );
+  }
+});
+
 function corpusCopy(dir) {
   cpSync(join(ROOT, 'eval', 'cases'), join(dir, 'eval', 'cases'), { recursive: true });
   cpSync(join(ROOT, 'eval', 'fixtures'), join(dir, 'eval', 'fixtures'), { recursive: true });
@@ -873,7 +949,7 @@ test('the coverage report treats a case without both receipt intents and an orph
   const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-gaps-'));
   try {
     corpusCopy(dir);
-    rmSync(join(dir, 'eval', 'receipts', 'open-pull-request-coexistence', 'overreach.json'));
+    rmSync(join(dir, 'eval', 'receipts', 'wire-quality-gates-coexistence', 'fired-dormant.json'));
     rmSync(join(dir, 'eval', 'receipts', 'bootstrap-agents-guide-dormancy'), { recursive: true });
     cpSync(
       join(dir, 'eval', 'receipts', 'open-pull-request-explicit'),
@@ -883,7 +959,7 @@ test('the coverage report treats a case without both receipt intents and an orph
 
     const report = coverageReport(loadCorpus({ root: dir }));
     assert.ok(
-      report.gaps.some((gap) => /open-pull-request-coexistence.*intentionally broken/.test(gap)),
+      report.gaps.some((gap) => /wire-quality-gates-coexistence.*intentionally broken/.test(gap)),
       report.gaps.join('\n')
     );
     assert.ok(

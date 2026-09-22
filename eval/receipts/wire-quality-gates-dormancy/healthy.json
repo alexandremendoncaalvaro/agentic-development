@@ -1,0 +1,57 @@
+{
+  "schema": "agentic-eval-receipt/1",
+  "case_id": "wire-quality-gates-dormancy",
+  "lane": "replay",
+  "origin": "synthetic",
+  "intent": "known-good",
+  "declared_failure": null,
+  "frozen": {
+    "case_sha256": "b20814d7ab215e7d6139dacf8d3a00f1b642da5338f15328f29e51b695612a01",
+    "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
+    "host": "claude-code",
+    "host_version": "2.1.227",
+    "model": "synthetic-replay",
+    "scaffold": "synthetic-replay",
+    "tools": [
+      "Read",
+      "Write",
+      "Bash",
+      "Skill"
+    ],
+    "permissions": "default",
+    "context_policy": "bare",
+    "run_parameters": {
+      "max_turns": 12
+    },
+    "grader_versions": {
+      "route": "1",
+      "dormancy": "1",
+      "effects": "1",
+      "outcome": "1"
+    },
+    "trial_count": 1
+  },
+  "trials": [
+    {
+      "id": "t1",
+      "events": [
+        {
+          "seq": 1,
+          "kind": "command",
+          "command": "ls package.json lefthook.yml .husky 2>/dev/null"
+        },
+        {
+          "seq": 2,
+          "kind": "final",
+          "exit_state": "success"
+        }
+      ],
+      "outcome": {
+        "final_response": "A pre-commit hook that runs lint is the deterministic gate for this; wiring hooks is a setup action you run yourself: /ad-hooks scaffolds the runner config and I will fill in the stages.",
+        "artifact_manifest": [],
+        "exit_state": "success"
+      },
+      "judgments": []
+    }
+  ]
+}

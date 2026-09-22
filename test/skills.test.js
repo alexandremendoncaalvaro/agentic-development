@@ -23,8 +23,6 @@ const USER_INVOCABLE_SKILLS = new Set([
   'ad-guidelines',
   'ad-hooks',
   'ad-level-up',
-  'ad-merge',
-  'ad-pr',
   'ad-publish',
   'ad-release',
   'ad-report',

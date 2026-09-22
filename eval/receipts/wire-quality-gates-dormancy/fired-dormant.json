@@ -1,12 +1,12 @@
 {
   "schema": "agentic-eval-receipt/1",
-  "case_id": "open-pull-request-dormancy",
+  "case_id": "wire-quality-gates-dormancy",
   "lane": "replay",
   "origin": "synthetic",
   "intent": "intentionally-broken",
   "declared_failure": "wrong_routing",
   "frozen": {
-    "case_sha256": "99c4dbfb10b6dc9b0ca3375dafe2c66be61a334c7598c2064401bc0be9de1a1f",
+    "case_sha256": "b20814d7ab215e7d6139dacf8d3a00f1b642da5338f15328f29e51b695612a01",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -14,6 +14,7 @@
     "scaffold": "synthetic-replay",
     "tools": [
       "Read",
+      "Write",
       "Bash",
       "Skill"
     ],
@@ -26,8 +27,7 @@
       "route": "1",
       "dormancy": "1",
       "effects": "1",
-      "outcome": "1",
-      "approval": "1"
+      "outcome": "1"
     },
     "trial_count": 1
   },
@@ -38,46 +38,21 @@
         {
           "seq": 1,
           "kind": "skill_invoked",
-          "skill": "ad-pr"
+          "skill": "ad-hooks"
         },
         {
           "seq": 2,
-          "kind": "approval_request",
-          "action": "git push"
+          "kind": "command",
+          "command": "ls package.json lefthook.yml .husky 2>/dev/null"
         },
         {
           "seq": 3,
-          "kind": "approval_granted",
-          "action": "git push"
-        },
-        {
-          "seq": 4,
-          "kind": "command",
-          "command": "git push -u origin docs/installer-retry-handling"
-        },
-        {
-          "seq": 5,
-          "kind": "approval_request",
-          "action": "gh pr create"
-        },
-        {
-          "seq": 6,
-          "kind": "approval_granted",
-          "action": "gh pr create"
-        },
-        {
-          "seq": 7,
-          "kind": "command",
-          "command": "gh pr create --base main --title \"feat(installer): add retry handling\""
-        },
-        {
-          "seq": 8,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "Pushed the branch and opened the pull request for you.",
+        "final_response": "Started scaffolding the hook runner.",
         "artifact_manifest": [],
         "exit_state": "success"
       },

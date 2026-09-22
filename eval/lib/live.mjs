@@ -1,5 +1,14 @@
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 
@@ -7,140 +16,31 @@ import { freezeArtifact } from '../../src/skills/claude-code/ad-prism/scripts/fr
 import { loadDenylist } from '../../src/leak-guard.js';
 
 import { normalize as normalizeClaudeCode } from './adapters/claude-code.mjs';
-import { createTrial, pushDerivedEvents, UnterminatedStreamError } from './adapters/common.mjs';
-import { createHash } from 'node:crypto';
+import { installFixtureSkills } from './fixture-skills.mjs';
+import { parseLiveArgs } from './live-args.mjs';
+import { observeEnvironment, probeHostVersion } from './host-environment.mjs';
+import { readGateEvidence } from './gate-evidence.mjs';
 import { normalize as normalizeCodex } from './adapters/codex.mjs';
+import { createTrial, pushDerivedEvents, UnterminatedStreamError } from './adapters/common.mjs';
 
 /**
  * Live lane producer (Spec 0007 R7, ADR-0082). Turns an operator-supplied host
  * invocation into captured streams and one live receipt.
  *
  * Everything that reaches a process is injected: the caller passes `spawn`, so
- * the unit boundary is testable without a host and, more importantly, there is
- * no discovery path in this module. The harness never searches `PATH`, never
- * reads a host configuration file, and never touches a credential — the
- * operator's shell already holds one, and this module only inherits it
- * (ADR-0082 decision 1).
+ * the unit boundary is testable without a host and there is no discovery path
+ * here. The harness never searches `PATH`, never reads a host configuration
+ * file, and never touches a credential; the operator's shell already holds
+ * one, and this module only inherits it (ADR-0082 decision 1).
  */
 
 const RECEIPT_SCHEMA = 'agentic-eval-receipt/1';
-const ADAPTERS = { 'claude-code': normalizeClaudeCode, codex: normalizeCodex };
+// Exported so the argument parser's host list can be pinned to it by test.
+export const ADAPTERS = { 'claude-code': normalizeClaudeCode, codex: normalizeCodex };
 const REQUEST_PLACEHOLDER = '{request}';
 
 function fail(message) {
   throw new Error(message);
-}
-
-/**
- * Parse the `live` subcommand's arguments. The runner is required and taken
- * verbatim: `--runner` consumes every remaining argument, so a host invocation
- * keeps its own flags without this parser having to know them.
- */
-export function parseLiveArgs(argv) {
-  const args = [...argv];
-  const caseFile = args.shift();
-  if (!caseFile || caseFile.startsWith('--')) fail('live: the first argument is the case file');
-
-  let host = null;
-  let trials = 1;
-  let out = null;
-  let runner = null;
-
-  while (args.length > 0) {
-    const flag = args.shift();
-    if (flag === '--runner') {
-      if (args.length === 0) fail('live: --runner needs the host invocation');
-      runner = args.splice(0, args.length);
-      break;
-    }
-    const value = args.shift();
-    if (value === undefined) fail(`live: ${flag} needs a value`);
-    if (flag === '--host') host = value;
-    else if (flag === '--trials') trials = Number(value);
-    else if (flag === '--out') out = value;
-    else fail(`live: unknown option ${flag}`);
-  }
-
-  if (!runner || runner.length === 0) {
-    fail('live: --runner is required; this harness never discovers a host binary (ADR-0082)');
-  }
-  if (!runner.includes(REQUEST_PLACEHOLDER)) {
-    fail(
-      `live: the --runner invocation must contain ${REQUEST_PLACEHOLDER} where the request goes; ` +
-        'appending it would let a variadic flag swallow the prompt'
-    );
-  }
-  if (!host || !(host in ADAPTERS)) {
-    fail(`live: --host must be one of ${Object.keys(ADAPTERS).join(', ')}`);
-  }
-  if (!Number.isInteger(trials) || trials < 1) fail('live: --trials must be a positive integer');
-
-  return { caseFile, host, runner, trials, out };
-}
-
-/**
- * The version the running binary prints. A frozen input the operator types is a
- * claim; one read from the binary that produced the trials is a measurement, so
- * a probe that cannot answer aborts rather than defaulting (ADR-0082 decision 2).
- */
-export function probeHostVersion({ runner, spawn }) {
-  const [command] = runner;
-  const result = spawn(command, ['--version'], { encoding: 'utf8' });
-  if (!result || result.status !== 0) {
-    fail(`live: ${command} --version exited ${result?.status ?? 'without a status'}`);
-  }
-  const version = String(result.stdout ?? '')
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .find((line) => line.length > 0);
-  if (!version) fail(`live: ${command} --version printed no version`);
-  return version;
-}
-
-/**
- * What the host itself reported about the run. Spec 0007 R5 freezes the
- * available tools, the permissions, the model, and the context policy, and a
- * frozen input the harness types is a claim rather than a measurement
- * (ADR-0082 decision 2). So each field is read from the stream, and a field the
- * host never reported is `null` and named in `unmeasured` — a plausible literal
- * in its place is the failure this function exists to prevent. The first pilot
- * is why: a receipt would have claimed `bare` and no tools while the host had
- * twenty-nine tools and the operator's whole configuration loaded.
- */
-export function observeEnvironment({ host, stream }) {
-  const observed = { model: null, tools: null, permissions: null, context_policy: null };
-  for (const line of String(stream).split(/\r?\n/)) {
-    if (line.trim() === '') continue;
-    let record;
-    try {
-      record = JSON.parse(line);
-    } catch {
-      continue;
-    }
-    if (host === 'claude-code') readClaudeCodeEnvironment(record, observed);
-  }
-  const unmeasured = Object.entries(observed)
-    .filter(([, value]) => value === null)
-    .map(([key]) => key)
-    .sort();
-  return { ...observed, unmeasured };
-}
-
-function readClaudeCodeEnvironment(record, observed) {
-  if (record.type === 'system' && record.subtype === 'init') {
-    if (Array.isArray(record.tools)) observed.tools = record.tools;
-    if (typeof record.permissionMode === 'string') observed.permissions = record.permissionMode;
-    // A host that also loaded the operator's own skills, subagents, or commands
-    // is not running the bare context the case assumes, and saying so is the
-    // difference between a receipt that can be trusted and one that cannot.
-    const extras = ['slash_commands', 'agents', 'mcp_servers'].filter(
-      (key) => Array.isArray(record[key]) && record[key].length > 0
-    );
-    observed.context_policy = extras.length > 0 ? 'host-configured' : 'bare';
-  }
-  if (record.type === 'assistant' && typeof record.message?.model === 'string') {
-    observed.model ??= record.message.model;
-  }
 }
 
 /** The host invocation with the request substituted where the operator placed it. */
@@ -168,13 +68,17 @@ export function buildLiveReceipt({
   );
   // Every trial goes through the same capture path, so a host that failed
   // produces a failure trial here instead of throwing past the receipt.
+  // Paths are relativized against the copy the host actually wrote in: each
+  // trial runs in its own copy under the work root, and a path relativized
+  // against the tracked fixture instead stays absolute, which the effects
+  // grader then refuses as an unauthorized write (GROUND-0028 E5).
   const trials = captures.map((capture) =>
     captureTrial({
       host,
       caseRecord,
       trialId: capture.trialId,
       policy,
-      fixtureRoot,
+      fixtureRoot: capture.root ?? fixtureRoot,
       result: capture.result ?? { status: 0, stdout: capture.stream, stderr: '' },
     })
   );
@@ -329,17 +233,35 @@ export function denylistFor(root) {
 }
 
 /**
+ * The host inherits the operator's shell (ADR-0082 decision 1) minus the three
+ * git discovery variables: a value leaked from a hook or a linked worktree
+ * would redirect every `git` the spawned model runs into the leaked location
+ * instead of the trial copy (HK.2, task-0033), the same strip every kit
+ * script that spawns a child applies.
+ */
+function cleanGitEnvironment() {
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  return env;
+}
+
+/**
  * Run one authorized pilot: probe the binary, copy the fixture per trial, spawn
  * the supplied invocation once per copy, gate every captured byte, and write the
  * streams beside the receipt. Nothing is written until every capture has passed
  * the gate, so an abort leaves no partial evidence (ADR-0082 decision 4).
  */
+export { observeEnvironment, parseLiveArgs, probeHostVersion };
+
 export function runLive({
   caseFile,
   host,
   runner,
   trials,
   out,
+  fixtureSkills: fixtureSkillsOverride = null,
   root = process.cwd(),
   spawn = spawnSync,
 }) {
@@ -349,18 +271,45 @@ export function runLive({
   const fixtureRoot = resolve(root, caseRecord.fixture);
   const workRoot = mkdtempSync(join(tmpdir(), 'agentic-eval-live-'));
   const roots = planTrialRoots({ fixtureRoot, trials, workRoot });
+  const fixtureSkills = fixtureSkillsOverride ?? caseRecord.fixture_skills ?? [];
+  const fixtureSkillsSource = fixtureSkillsOverride ? 'runner' : 'case';
+  // Recorded whenever anyone said which skills to install, even an empty
+  // list: an override to nothing is the arm whose provenance matters most.
+  const recordSkills = fixtureSkillsOverride !== null || caseRecord.fixture_skills !== undefined;
+  // Every trial copy receives the same bytes from the canonical tree, so the
+  // digests are a property of the run, not of a trial; the first install's
+  // digests are the run's record and the other copies only repeat the copy.
+  const installs = roots.map((trialRoot) =>
+    installFixtureSkills({ trialRoot, host, skills: fixtureSkills, root })
+  );
+  const installedSkills = installs[0] ?? {};
 
   const captures = roots.map((trialRoot, index) => {
     const trialId = `t${index + 1}`;
+    // The gate's evidence goes to a directory the lane owns, per trial and
+    // outside the copy, so the model never sees it and the lane can join it
+    // with the stream afterwards; a hook inherits this environment from the
+    // host (GROUND-0028 E6). A case without a wired gate leaves it empty.
+    const evidenceDir = join(workRoot, 'gate-evidence', trialId);
     const [command, ...args] = buildRunnerArgv(runner, caseRecord.request);
     const result = spawn(command, args, {
       cwd: trialRoot,
       encoding: 'utf8',
       maxBuffer: 64 * 1024 * 1024,
+      env: { ...cleanGitEnvironment(), AD_ARTIFACT_GATE_EVIDENCE_DIR: evidenceDir },
     });
     const stream = String(result.stdout ?? '');
     assertNoLeak({ label: `trial ${trialId} stream`, text: stream, denylistPatterns });
-    return { trialId, stream, result, trialRoot };
+    const evidence = readGateEvidence(evidenceDir);
+    assertNoLeak({
+      label: `trial ${trialId} gate evidence`,
+      text: JSON.stringify(evidence),
+      denylistPatterns,
+    });
+    // The host reports paths under the resolved copy (on macOS the temporary
+    // directory is a symlink into /private), so relativization uses the
+    // resolved root or every write would stay absolute (Task 0084 trial 1).
+    return { trialId, stream, result, trialRoot: realpathSync(trialRoot), evidence };
   });
 
   const receipt = buildLiveReceipt({
@@ -369,20 +318,35 @@ export function runLive({
     hostVersion,
     environment: observeEnvironment({ host, stream: captures.map((c) => c.stream).join('\n') }),
     scaffold: runner.join(' '),
-    runParameters: { trials },
+    runParameters: {
+      trials,
+      ...(recordSkills
+        ? { fixture_skills: installedSkills, fixture_skills_source: fixtureSkillsSource }
+        : {}),
+    },
     skill: skillIdentity({ root, host, representative: caseRecord.representative }),
     caseSha256: freezeArtifact(resolve(root, caseFile)).sha256,
     fixtureSha256: freezeArtifact(fixtureRoot).sha256,
     fixtureRoot,
     policy: { grants: [] },
-    captures: captures.map(({ trialId, stream, result }) => ({ trialId, stream, result })),
+    captures: captures.map(({ trialId, stream, result, trialRoot }) => ({
+      trialId,
+      stream,
+      result,
+      root: trialRoot,
+    })),
   });
   assertNoLeak({ label: 'receipt', text: JSON.stringify(receipt), denylistPatterns });
 
   const destination = resolveCaptureDir({ out, root, workRoot });
   mkdirSync(destination.path, { recursive: true });
-  for (const { trialId, stream } of captures) {
+  for (const { trialId, stream, evidence } of captures) {
     writeFileSync(join(destination.path, `${trialId}.jsonl`), stream);
+    if (evidence.length === 0) continue;
+    writeFileSync(
+      join(destination.path, `${trialId}.gate-evidence.jsonl`),
+      evidence.map((line) => JSON.stringify(line)).join('\n') + '\n'
+    );
   }
   writeFileSync(join(destination.path, 'receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`);
   return { receipt, captures, workRoot, destination };

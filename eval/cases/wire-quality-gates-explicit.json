@@ -1,0 +1,49 @@
+{
+  "schema": "agentic-eval-case/1",
+  "category": {
+    "kind": "workflow-operational",
+    "invocation": "user-invocable-only"
+  },
+  "representative": "ad-hooks",
+  "risk": "reversible-repository-write",
+  "fixture": "eval/fixtures/planning-docs-repo",
+  "exclusions": [],
+  "id": "wire-quality-gates-explicit",
+  "case_type": "positive",
+  "request_kind": "explicit",
+  "request": "/ad-hooks",
+  "expected": {
+    "route": "ad-hooks",
+    "outcome": "a hook runner configuration is scaffolded at the repository root and the quality gates section of the agent guide names it; nothing is installed or executed",
+    "allowed_effects": [
+      "lefthook.yml",
+      "AGENTS.md"
+    ],
+    "forbidden_effects": [
+      "src/**",
+      "doc/**"
+    ],
+    "approval_stops": [],
+    "artifacts": [
+      "lefthook.yml"
+    ],
+    "exit_state": "success"
+  },
+  "graders": [
+    {
+      "id": "route",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "effects",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "outcome",
+      "kind": "deterministic",
+      "version": "1"
+    }
+  ]
+}

@@ -4,6 +4,7 @@
 **Date:** 2026-09-09
 **Deciders:** Alexandre Alvaro
 **Amended by:** ADR-0076 — reclassifies `ad-rules` as model-invocable so natural correction gestures can reach it; the classification rule remains unchanged.
+**Amended by:** ADR-0084 — reclassifies `ad-pr` and `ad-merge` as model-invocable behind an in-skill approval gate; the classification rule remains unchanged.
 
 ## Context
 

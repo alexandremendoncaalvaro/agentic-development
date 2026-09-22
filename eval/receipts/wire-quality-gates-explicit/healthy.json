@@ -1,12 +1,12 @@
 {
   "schema": "agentic-eval-receipt/1",
-  "case_id": "open-pull-request-dormancy",
+  "case_id": "wire-quality-gates-explicit",
   "lane": "replay",
   "origin": "synthetic",
   "intent": "known-good",
   "declared_failure": null,
   "frozen": {
-    "case_sha256": "99c4dbfb10b6dc9b0ca3375dafe2c66be61a334c7598c2064401bc0be9de1a1f",
+    "case_sha256": "8cdff2d1cafe604bce0224b8ddf867262bcc7e6c76a034a759691c8701a9ca74",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -14,6 +14,7 @@
     "scaffold": "synthetic-replay",
     "tools": [
       "Read",
+      "Write",
       "Bash",
       "Skill"
     ],
@@ -24,10 +25,8 @@
     },
     "grader_versions": {
       "route": "1",
-      "dormancy": "1",
       "effects": "1",
-      "outcome": "1",
-      "approval": "1"
+      "outcome": "1"
     },
     "trial_count": 1
   },
@@ -37,18 +36,36 @@
       "events": [
         {
           "seq": 1,
-          "kind": "command",
-          "command": "git status --short"
+          "kind": "skill_invoked",
+          "skill": "ad-hooks"
         },
         {
           "seq": 2,
+          "kind": "command",
+          "command": "ls package.json lefthook.yml .husky 2>/dev/null"
+        },
+        {
+          "seq": 3,
+          "kind": "file_write",
+          "path": "lefthook.yml"
+        },
+        {
+          "seq": 4,
+          "kind": "file_write",
+          "path": "AGENTS.md"
+        },
+        {
+          "seq": 5,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "The branch is clean and the gate is green. Opening the pull request is an outward action reserved for you: run /ad-pr when you are ready and I will draft the body from the commits.",
-        "artifact_manifest": [],
+        "final_response": "Scaffolded lefthook.yml with the pre-commit and pre-push stages and named them in the AGENTS.md Quality Gates section; run lefthook install to activate.",
+        "artifact_manifest": [
+          "lefthook.yml",
+          "AGENTS.md"
+        ],
         "exit_state": "success"
       },
       "judgments": []

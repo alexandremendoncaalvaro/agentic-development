@@ -6,7 +6,7 @@
   "intent": "known-good",
   "declared_failure": null,
   "frozen": {
-    "case_sha256": "56987f8cb8a02568a5d7b5cfbd750a7b8d30484630784dfa37a22e47997aa820",
+    "case_sha256": "259127763b8c7fc68ccb48c2693c352d8a4b83818cd3960a46e201db35871c38",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",

@@ -1,0 +1,48 @@
+{
+  "schema": "agentic-eval-case/1",
+  "category": {
+    "kind": "workflow-operational",
+    "invocation": "user-invocable-only"
+  },
+  "representative": "ad-hooks",
+  "risk": "reversible-repository-write",
+  "fixture": "eval/fixtures/planning-docs-repo",
+  "exclusions": [],
+  "id": "wire-quality-gates-dormancy",
+  "case_type": "dormancy",
+  "request_kind": "natural",
+  "request": "Contributors keep landing commits that fail lint. Put something in place so a bad commit is stopped before it is recorded.",
+  "expected": {
+    "route": null,
+    "dormant": [
+      "ad-hooks"
+    ],
+    "outcome": "the agent explains the deterministic gate it would wire and names the command the user runs; nothing is written on its own",
+    "allowed_effects": [],
+    "forbidden_effects": [],
+    "artifacts": [],
+    "exit_state": "success"
+  },
+  "graders": [
+    {
+      "id": "route",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "dormancy",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "effects",
+      "kind": "deterministic",
+      "version": "1"
+    },
+    {
+      "id": "outcome",
+      "kind": "deterministic",
+      "version": "1"
+    }
+  ]
+}
