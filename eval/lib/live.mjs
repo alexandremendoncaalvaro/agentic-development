@@ -7,6 +7,7 @@ import {
   mkdtempSync,
   readFileSync,
   realpathSync,
+  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -15,13 +16,13 @@ import { isAbsolute, join, relative, resolve } from 'node:path';
 import { freezeArtifact } from '../../src/skills/claude-code/ad-prism/scripts/freeze-artifact.mjs';
 import { loadDenylist } from '../../src/leak-guard.js';
 
-import { normalize as normalizeClaudeCode } from './adapters/claude-code.mjs';
+import { ADAPTERS, captureTrial } from './capture-trial.mjs';
 import { installFixtureSkills } from './fixture-skills.mjs';
 import { parseLiveArgs } from './live-args.mjs';
 import { observeEnvironment, probeHostVersion } from './host-environment.mjs';
 import { readGateEvidence } from './gate-evidence.mjs';
-import { normalize as normalizeCodex } from './adapters/codex.mjs';
-import { createTrial, pushDerivedEvents, UnterminatedStreamError } from './adapters/common.mjs';
+import { repoPath } from './shared.mjs';
+import { validateCase } from './validate.mjs';
 
 /**
  * Live lane producer (Spec 0007 R7, ADR-0082). Turns an operator-supplied host
@@ -35,8 +36,6 @@ import { createTrial, pushDerivedEvents, UnterminatedStreamError } from './adapt
  */
 
 const RECEIPT_SCHEMA = 'agentic-eval-receipt/1';
-// Exported so the argument parser's host list can be pinned to it by test.
-export const ADAPTERS = { 'claude-code': normalizeClaudeCode, codex: normalizeCodex };
 const REQUEST_PLACEHOLDER = '{request}';
 
 function fail(message) {
@@ -155,61 +154,6 @@ export function planTrialRoots({
 }
 
 /**
- * Normalize one host result into a trial. A host that exits non-zero, or whose
- * stream ends without a terminal, is data about the run rather than a defect of
- * this harness, so it becomes a failure trial instead of an exception
- * (ADR-0082 decision 6). Only the harness's own defects still throw.
- */
-export function captureTrial({ host, caseRecord, trialId, policy, fixtureRoot, result }) {
-  const normalizeStream = ADAPTERS[host] ?? fail(`live: no adapter for host "${host}"`);
-  const shared = {
-    request: caseRecord.request,
-    requestKind: caseRecord.request_kind,
-    policy,
-    fixtureRoot,
-    trialId,
-  };
-  // A stream the host never terminated says something about the run, not about
-  // this harness, so the trial keeps whatever the request and policy already
-  // derived and reports the reason. Any other parse defect still throws.
-  let trial;
-  let unterminated = null;
-  try {
-    trial = normalizeStream({ lines: String(result.stdout ?? ''), ...shared });
-  } catch (error) {
-    if (!(error instanceof UnterminatedStreamError)) throw error;
-    trial = derivedOnlyTrial(shared);
-    unterminated = error.message;
-  }
-
-  // A non-zero exit outranks a missing terminal as the reason, because it is
-  // the more specific thing that happened: the host said why it stopped.
-  if (result.status !== 0) {
-    const stderr = String(result.stderr ?? '').trim();
-    return failureTrial(trial, `host exited ${result.status}: ${stderr}`);
-  }
-  if (unterminated !== null) return failureTrial(trial, `no terminal record: ${unterminated}`);
-  return trial;
-}
-
-function derivedOnlyTrial({ request, requestKind, policy, trialId }) {
-  const trial = createTrial(trialId);
-  pushDerivedEvents(trial, { request, requestKind, policy });
-  return trial;
-}
-
-function failureTrial(trial, reason) {
-  return {
-    ...trial,
-    outcome: {
-      final_response: reason,
-      artifact_manifest: trial.outcome?.artifact_manifest ?? [],
-      exit_state: 'failure',
-    },
-  };
-}
-
-/**
  * Where a capture is written. Private by default: without an explicit
  * destination it stays under the run's temporary directory, outside the
  * repository. A live capture carries the operator's configuration, not only the
@@ -248,12 +192,82 @@ function cleanGitEnvironment() {
 }
 
 /**
+ * Spawn one trial over its copy and gate what it produced. The gate's evidence
+ * goes to a directory the lane owns, per trial and outside the copy, so the
+ * model never sees it and the lane can join it with the stream afterwards; a
+ * hook inherits this environment from the host (GROUND-0028 E6). A case
+ * without a wired gate leaves it empty.
+ */
+function spawnTrial({ trialRoot, trialId, runner, request, workRoot, spawn, denylistPatterns }) {
+  const evidenceDir = join(workRoot, 'gate-evidence', trialId);
+  const [command, ...args] = buildRunnerArgv(runner, request);
+  const result = spawn(command, args, {
+    cwd: trialRoot,
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+    env: { ...cleanGitEnvironment(), AD_ARTIFACT_GATE_EVIDENCE_DIR: evidenceDir },
+  });
+  const stream = String(result.stdout ?? '');
+  assertNoLeak({ label: `trial ${trialId} stream`, text: stream, denylistPatterns });
+  const evidence = readGateEvidence(evidenceDir);
+  assertNoLeak({
+    label: `trial ${trialId} gate evidence`,
+    text: JSON.stringify(evidence),
+    denylistPatterns,
+  });
+  // The host reports paths under the resolved copy (on macOS the temporary
+  // directory is a symlink into /private), so relativization uses the
+  // resolved root or every write would stay absolute (Task 0084 trial 1).
+  return { trialId, stream, result, trialRoot: realpathSync(trialRoot), evidence };
+}
+
+/** Every captured stream, and the gate evidence beside it when there is any. */
+function writeCaptures(path, captures) {
+  mkdirSync(path, { recursive: true });
+  for (const { trialId, stream, evidence } of captures) {
+    writeFileSync(join(path, `${trialId}.jsonl`), stream);
+    if (evidence.length === 0) continue;
+    writeFileSync(
+      join(path, `${trialId}.gate-evidence.jsonl`),
+      evidence.map((line) => JSON.stringify(line)).join('\n') + '\n'
+    );
+  }
+}
+
+/**
+ * The error a receipt-assembly defect surfaces as, after the streams it had
+ * already gated are written. Keeping them can fail too; the defect stays the
+ * cause either way, so the operator never loses the reason the run stopped.
+ */
+function keepCapturesAfterDefect(path, captures, error) {
+  try {
+    writeCaptures(path, captures);
+    // A reused destination may still hold an earlier run's receipt, which
+    // would read as this run's; the lane owns that file name either way.
+    rmSync(join(path, 'receipt.json'), { force: true });
+  } catch (writeError) {
+    return new Error(
+      `${error.message}; the captured streams could not be kept in ${path}: ${writeError.message}`,
+      { cause: error }
+    );
+  }
+  return new Error(
+    `${error.message}; the captured streams were kept in ${path} and no receipt was written`,
+    { cause: error }
+  );
+}
+
+/**
  * Run one authorized pilot: probe the binary, copy the fixture per trial, spawn
  * the supplied invocation once per copy, gate every captured byte, and write the
  * streams beside the receipt. Nothing is written until every capture has passed
- * the gate, so an abort leaves no partial evidence (ADR-0082 decision 4).
+ * the gate, so a leak leaves no partial evidence (ADR-0082 decision 4). A
+ * receipt that cannot be assembled is this harness's defect, not the host's, so
+ * it gets no receipt; the streams it had already gated are still written, since
+ * they cost a real model invocation and are what a corrected adapter re-runs
+ * against (ADR-0082 decisions 3 and 6, GROUND-0029).
  */
-export { observeEnvironment, parseLiveArgs, probeHostVersion };
+export { ADAPTERS, captureTrial, observeEnvironment, parseLiveArgs, probeHostVersion };
 
 export function runLive({
   caseFile,
@@ -266,6 +280,8 @@ export function runLive({
   spawn = spawnSync,
 }) {
   const caseRecord = JSON.parse(readFileSync(resolve(root, caseFile), 'utf8'));
+  // Before the version probe: an authoring error in the case costs nothing here.
+  validateCase(caseRecord, repoPath(root, caseFile));
   const hostVersion = probeHostVersion({ runner, spawn });
   const denylistPatterns = denylistFor(root);
   const fixtureRoot = resolve(root, caseRecord.fixture);
@@ -284,70 +300,51 @@ export function runLive({
   );
   const installedSkills = installs[0] ?? {};
 
-  const captures = roots.map((trialRoot, index) => {
-    const trialId = `t${index + 1}`;
-    // The gate's evidence goes to a directory the lane owns, per trial and
-    // outside the copy, so the model never sees it and the lane can join it
-    // with the stream afterwards; a hook inherits this environment from the
-    // host (GROUND-0028 E6). A case without a wired gate leaves it empty.
-    const evidenceDir = join(workRoot, 'gate-evidence', trialId);
-    const [command, ...args] = buildRunnerArgv(runner, caseRecord.request);
-    const result = spawn(command, args, {
-      cwd: trialRoot,
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-      env: { ...cleanGitEnvironment(), AD_ARTIFACT_GATE_EVIDENCE_DIR: evidenceDir },
-    });
-    const stream = String(result.stdout ?? '');
-    assertNoLeak({ label: `trial ${trialId} stream`, text: stream, denylistPatterns });
-    const evidence = readGateEvidence(evidenceDir);
-    assertNoLeak({
-      label: `trial ${trialId} gate evidence`,
-      text: JSON.stringify(evidence),
+  const captures = roots.map((trialRoot, index) =>
+    spawnTrial({
+      trialRoot,
+      trialId: `t${index + 1}`,
+      runner,
+      request: caseRecord.request,
+      workRoot,
+      spawn,
       denylistPatterns,
-    });
-    // The host reports paths under the resolved copy (on macOS the temporary
-    // directory is a symlink into /private), so relativization uses the
-    // resolved root or every write would stay absolute (Task 0084 trial 1).
-    return { trialId, stream, result, trialRoot: realpathSync(trialRoot), evidence };
-  });
+    })
+  );
+  const destination = resolveCaptureDir({ out, root, workRoot });
 
-  const receipt = buildLiveReceipt({
-    caseRecord,
-    host,
-    hostVersion,
-    environment: observeEnvironment({ host, stream: captures.map((c) => c.stream).join('\n') }),
-    scaffold: runner.join(' '),
-    runParameters: {
-      trials,
-      ...(recordSkills
-        ? { fixture_skills: installedSkills, fixture_skills_source: fixtureSkillsSource }
-        : {}),
-    },
-    skill: skillIdentity({ root, host, representative: caseRecord.representative }),
-    caseSha256: freezeArtifact(resolve(root, caseFile)).sha256,
-    fixtureSha256: freezeArtifact(fixtureRoot).sha256,
-    fixtureRoot,
-    policy: { grants: [] },
-    captures: captures.map(({ trialId, stream, result, trialRoot }) => ({
-      trialId,
-      stream,
-      result,
-      root: trialRoot,
-    })),
-  });
+  let receipt;
+  try {
+    receipt = buildLiveReceipt({
+      caseRecord,
+      host,
+      hostVersion,
+      environment: observeEnvironment({ host, stream: captures.map((c) => c.stream).join('\n') }),
+      scaffold: runner.join(' '),
+      runParameters: {
+        trials,
+        ...(recordSkills
+          ? { fixture_skills: installedSkills, fixture_skills_source: fixtureSkillsSource }
+          : {}),
+      },
+      skill: skillIdentity({ root, host, representative: caseRecord.representative }),
+      caseSha256: freezeArtifact(resolve(root, caseFile)).sha256,
+      fixtureSha256: freezeArtifact(fixtureRoot).sha256,
+      fixtureRoot,
+      policy: { grants: [] },
+      captures: captures.map(({ trialId, stream, result, trialRoot }) => ({
+        trialId,
+        stream,
+        result,
+        root: trialRoot,
+      })),
+    });
+  } catch (error) {
+    throw keepCapturesAfterDefect(destination.path, captures, error);
+  }
   assertNoLeak({ label: 'receipt', text: JSON.stringify(receipt), denylistPatterns });
 
-  const destination = resolveCaptureDir({ out, root, workRoot });
-  mkdirSync(destination.path, { recursive: true });
-  for (const { trialId, stream, evidence } of captures) {
-    writeFileSync(join(destination.path, `${trialId}.jsonl`), stream);
-    if (evidence.length === 0) continue;
-    writeFileSync(
-      join(destination.path, `${trialId}.gate-evidence.jsonl`),
-      evidence.map((line) => JSON.stringify(line)).join('\n') + '\n'
-    );
-  }
+  writeCaptures(destination.path, captures);
   writeFileSync(join(destination.path, 'receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`);
   return { receipt, captures, workRoot, destination };
 }

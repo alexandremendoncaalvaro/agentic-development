@@ -853,3 +853,138 @@ function liveReceiptWith(caseRecord, environment) {
     captures: [{ trialId: 't1', stream: CLAUDE_ROUTED_STREAM }],
   });
 }
+
+// A stub host for runLive: answers the version probe, then returns one stream
+// per trial in order, writing each trial's gate evidence where the lane points.
+function stubHost(streams) {
+  const queue = [...streams];
+  return (command, args, opts = {}) => {
+    if (args[0] === '--version') return { status: 0, stdout: '2.1.227\n', stderr: '' };
+    const evidenceDir = opts.env.AD_ARTIFACT_GATE_EVIDENCE_DIR;
+    mkdirSync(evidenceDir, { recursive: true });
+    writeFileSync(join(evidenceDir, 'sess.jsonl'), `${JSON.stringify({ seq: 1 })}\n`);
+    return { status: 0, stdout: queue.shift(), stderr: '' };
+  };
+}
+
+const CLAUDE_OK_STREAM = [
+  JSON.stringify({ type: 'system', subtype: 'init', tools: [], permissionMode: 'default' }),
+  JSON.stringify({ type: 'result', subtype: 'success', result: 'done', is_error: false }),
+].join('\n');
+
+test('regression: task-0085 an adapter that rejects a captured stream leaves every stream on disk and names the trial', () => {
+  const { root, caseFile } = scratchLiveRoot();
+  const out = mkdtempSync(join(tmpdir(), 'agentic-eval-live-out-'));
+  const rejected = `${CLAUDE_OK_STREAM}\nnot json at all`;
+  try {
+    assert.throws(
+      () =>
+        runLive({
+          caseFile,
+          host: 'claude-code',
+          runner: ['claude', '-p', '{request}'],
+          trials: 2,
+          out,
+          root,
+          spawn: stubHost([rejected, CLAUDE_OK_STREAM]),
+        }),
+      (error) => {
+        assert.match(error.message, /trial t1/);
+        assert.ok(error.message.includes(out), 'the error names where the streams were kept');
+        assert.match(error.cause.message, /not JSON/);
+        return true;
+      }
+    );
+    assert.equal(readFileSync(join(out, 't1.jsonl'), 'utf8'), rejected);
+    assert.equal(readFileSync(join(out, 't2.jsonl'), 'utf8'), CLAUDE_OK_STREAM);
+    assert.ok(existsSync(join(out, 't1.gate-evidence.jsonl')), 'gate evidence kept beside it');
+    assert.equal(existsSync(join(out, 'receipt.json')), false, 'no receipt for a harness defect');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(out, { recursive: true, force: true });
+  }
+});
+
+test('regression: task-0085 a failed run into a reused destination does not leave the previous receipt beside its streams', () => {
+  const { root, caseFile } = scratchLiveRoot();
+  const out = mkdtempSync(join(tmpdir(), 'agentic-eval-live-out-'));
+  writeFileSync(join(out, 'receipt.json'), '{"case_id":"a previous run"}\n');
+  try {
+    assert.throws(() =>
+      runLive({
+        caseFile,
+        host: 'claude-code',
+        runner: ['claude', '-p', '{request}'],
+        trials: 1,
+        out,
+        root,
+        spawn: stubHost(['not json at all']),
+      })
+    );
+    assert.ok(existsSync(join(out, 't1.jsonl')), 'the new stream is kept');
+    assert.equal(existsSync(join(out, 'receipt.json')), false, 'the old receipt is gone');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(out, { recursive: true, force: true });
+  }
+});
+
+test('regression: task-0085 an explicit case whose request names no skill is refused before any host is spawned', () => {
+  const { root, caseFile } = scratchLiveRoot();
+  const casePath = join(root, caseFile);
+  const caseRecord = JSON.parse(readFileSync(casePath, 'utf8'));
+  writeFileSync(casePath, JSON.stringify({ ...caseRecord, request_kind: 'explicit' }));
+  const spawned = [];
+  try {
+    assert.throws(
+      () =>
+        runLive({
+          caseFile,
+          host: 'claude-code',
+          runner: ['claude', '-p', '{request}'],
+          trials: 1,
+          out: null,
+          root,
+          spawn: (command, args) => {
+            spawned.push([command, ...args]);
+            return { status: 0, stdout: '', stderr: '' };
+          },
+        }),
+      /request_kind "explicit".*\/skill or \$skill/
+    );
+    assert.deepEqual(spawned, [], 'not even the version probe ran');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('regression: task-0085 when the streams cannot be kept either, the adapter error still reaches the operator', () => {
+  const { root, caseFile } = scratchLiveRoot();
+  const scratch = mkdtempSync(join(tmpdir(), 'agentic-eval-live-out-'));
+  // A destination that is a file: the recovery write itself fails.
+  const out = join(scratch, 'not-a-directory');
+  writeFileSync(out, '');
+  try {
+    assert.throws(
+      () =>
+        runLive({
+          caseFile,
+          host: 'claude-code',
+          runner: ['claude', '-p', '{request}'],
+          trials: 1,
+          out,
+          root,
+          spawn: stubHost(['not json at all']),
+        }),
+      (error) => {
+        assert.match(error.message, /trial t1/);
+        assert.match(error.message, /could not be kept/);
+        assert.match(error.cause.message, /not JSON/);
+        return true;
+      }
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(scratch, { recursive: true, force: true });
+  }
+});

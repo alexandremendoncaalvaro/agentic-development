@@ -48,9 +48,14 @@ export function parseJsonLines(lines) {
  */
 export function explicitSkill(request, requestKind) {
   if (requestKind !== 'explicit') return null;
-  const match = SKILL_MENTION.exec(String(request ?? '').trim());
-  if (!match) throw new Error('an explicit request must start with a /skill or $skill mention');
-  return match[1];
+  const skill = mentionedSkill(request);
+  if (!skill) throw new Error('an explicit request must start with a /skill or $skill mention');
+  return skill;
+}
+
+/** The skill a request mentions at its start, or null; the case validator shares this rule. */
+export function mentionedSkill(request) {
+  return SKILL_MENTION.exec(String(request ?? '').trim())?.[1] ?? null;
 }
 
 export function createTrial(id) {
