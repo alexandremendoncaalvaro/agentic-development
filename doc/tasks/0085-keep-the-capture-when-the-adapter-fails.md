@@ -1,6 +1,6 @@
 # Task `0085`: Keep the live capture when the adapter fails
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-21
 **Scope ref:** doc/adr/0082-capture-live-trials-through-a-supplied-runner.md (decision 6)
 **Evidence ref:** doc/research/0029-ground-keep-capture-on-adapter-failure.md
@@ -70,6 +70,30 @@ could itself throw and replace the adapter error unchained (GUIDELINES 2); the
 lane now reports "could not be kept" with the adapter error still as cause,
 driven by a fourth regression test whose destination is a file.
 
+### 2026-09-23
+
+Correction from the maximum-gate audit (CV.1, both CV passes and the
+GUIDELINES reviewer): the sizes in the entry above are not the shipped file.
+`eval/lib/live.mjs` is 365 lines on `origin/main` and 362 at the commit;
+409 was the working tree with the change applied before the extraction, and
+346 predates the double-fault fix, which added 16 lines back. The extraction
+was still needed, since the change alone took the file past the 400-line
+ceiling. GROUND-0029 D1 also omitted `6f15b62` from the file's history
+(seven commits, not six); corrected in place before merge.
+
+Audit disposition: nine groups, seven dispatched (AGENTS, ARCHITECTURE,
+GUIDELINES, CONTEXT, ADR-0080 and ADR-0082, HK, CV critical under two models)
+and two N/A (NET, GH). No blocker. Refuted: "leak gate" as new vocabulary (on
+`origin/main` in ARCHITECTURE.md, Task 0081, and the live suite before this
+change); `test/eval-live.test.js` over the 3.3 ceiling (855 lines before this
+change; the standing `/ad-level-up` candidate for a `test/` carve-out).
+Reviewers who could not finish `npm run verify` hit contention from parallel
+suite runs in this worktree; the CV reviewer's clean `npm test` and
+`scripts/hook-npm-test.js` runs exited 0.
+
+Closed: every criterion and Definition of Done item checked; the change
+lands through the pull request opened from this branch.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -77,4 +101,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

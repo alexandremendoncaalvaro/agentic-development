@@ -1,7 +1,7 @@
 # GROUND-0029: Keep the live capture when the adapter fails
 
 **Status:** recorded
-**Decision:** In `runLive`, validate the case with `validateCase` before the version probe spawns anything, and make `validateCase` reject `request_kind: explicit` whose request does not start with a `/skill` or `$skill` mention, reusing the adapters' one mention pattern. When `buildLiveReceipt` throws while normalizing a trial, write every captured stream and its gate evidence to the capture directory (each already passed the leak gate), write no receipt and remove one a reused destination still holds, and rethrow an error that names the trial and the capture directory, with the adapter's error as `cause`.
+**Decision:** In `runLive`, validate the case with `validateCase` before the version probe spawns anything, and make `validateCase` reject `request_kind: explicit` whose request does not start with a `/skill` or `$skill` mention, reusing the adapters' one mention pattern. When receipt assembly throws (an adapter normalizing a trial, or any other step of `buildLiveReceipt` and the digests and identity it is given, all of them harness defects), write every captured stream and its gate evidence to the capture directory (each already passed the leak gate), write no receipt and remove one a reused destination still holds, and rethrow an error that names the trial and the capture directory, with the adapter's error as `cause`.
 **Decision ref:** doc/tasks/0085-keep-the-capture-when-the-adapter-fails.md (implements doc/adr/0082-capture-live-trials-through-a-supplied-runner.md decisions 3 and 6 under doc/specs/0007-evaluate-skill-trajectories.md R13)
 **Confidence:** Strong
 
@@ -54,7 +54,7 @@ A1: "If the `cause` option is provided, it is assigned to the `error.cause` prop
 - **C6:** `eval/lib/validate.mjs` `validateCaseIdentity`, `eval/lib/replay.mjs` `evaluateReplay` calling `validateCase`, and the explicit requests enumerated with `node -e` over `eval/cases/*.json` (accessed 2026-09-22 via repository read and `node` from the repository root)
 - **C7:** `eval/lib/live.mjs` `runLive` first lines: `JSON.parse(readFileSync(...))` then `probeHostVersion` (accessed 2026-09-22 via repository read)
 - **C8:** `eval/run.mjs` `runLiveLane` and its top-level error handling (accessed 2026-09-22 via repository read)
-- **D1:** `git log --oneline main -- eval/lib/live.mjs` lists `0ea2d0d`, `d5baf81`, `9873a0d`, `a3c9467`, `66dfbf5`, `e634762`; `git log --all --oneline -S"adapter failed" -S"keep the capture" -- eval test` finds no prior attempt (accessed 2026-09-22 via git in the `lagos` worktree)
+- **D1:** `git log --oneline main -- eval/lib/live.mjs` lists `e634762`, `66dfbf5`, `a3c9467`, `9873a0d`, `d5baf81`, `6f15b62`, `0ea2d0d`; `git log --all --oneline -S"adapter failed" -S"keep the capture" -- eval test` finds no prior attempt (accessed 2026-09-22 via git in the `lagos` worktree)
 
 ## Limitations and reversal
 
