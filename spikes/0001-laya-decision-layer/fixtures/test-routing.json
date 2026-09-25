@@ -1,0 +1,642 @@
+{
+ "labels": [
+  "none",
+  "ad-adr",
+  "ad-architecture",
+  "ad-archive",
+  "ad-audit",
+  "ad-bootstrap",
+  "ad-brief",
+  "ad-commit",
+  "ad-community-docs",
+  "ad-deepen",
+  "ad-derisk",
+  "ad-design",
+  "ad-diagnose",
+  "ad-domain",
+  "ad-drift",
+  "ad-grill-me",
+  "ad-ground",
+  "ad-guidelines",
+  "ad-handoff",
+  "ad-hooks",
+  "ad-level-up",
+  "ad-merge",
+  "ad-next",
+  "ad-philosophy",
+  "ad-pr",
+  "ad-prd",
+  "ad-prism",
+  "ad-project-state",
+  "ad-publish",
+  "ad-question-me",
+  "ad-release",
+  "ad-report",
+  "ad-research",
+  "ad-review",
+  "ad-roadmap",
+  "ad-rules",
+  "ad-skill",
+  "ad-spec",
+  "ad-spike",
+  "ad-subagent",
+  "ad-task",
+  "ad-tdd",
+  "ad-tdg",
+  "ad-template-tune",
+  "ad-update",
+  "ad-voice",
+  "ad-voice-tune"
+ ],
+ "items": [
+  {
+   "id": "eval:bootstrap-agents-guide-close-negative",
+   "request": "A new teammate joins next week. Before they arrive, write down for people how to set the project up locally and how to report a vulnerability privately.",
+   "label": "ad-community-docs",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "close-negative",
+   "lang": "en"
+  },
+  {
+   "id": "eval:bootstrap-agents-guide-coexistence",
+   "request": "I am back on this project after a month away. Where does the work stand, and is anything about how we brief agents out of date?",
+   "label": "ad-next",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "coexistence",
+   "lang": "en"
+  },
+  {
+   "id": "eval:bootstrap-agents-guide-explicit",
+   "request": "/ad-bootstrap",
+   "label": "ad-bootstrap",
+   "source": "eval-corpus",
+   "kind": "explicit",
+   "case_type": "positive",
+   "lang": "en"
+  },
+  {
+   "id": "eval:independent-look-before-merge-close-negative",
+   "request": "The installer exits with code 2 on a clean checkout and I cannot see why. Get me to the cause with something I can rerun.",
+   "label": "ad-diagnose",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "close-negative",
+   "lang": "en"
+  },
+  {
+   "id": "eval:independent-look-before-merge-coexistence",
+   "request": "Walk this branch through every rule we have on file and give me a checkable outcome for each one, so I can hand it to the team with proof.",
+   "label": "ad-audit",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "coexistence",
+   "lang": "en"
+  },
+  {
+   "id": "eval:independent-look-before-merge-positive",
+   "request": "Before this branch goes in, I want a strict second pair of eyes on the diff: against our written standards, and against what the work was supposed to deliver, with findings I can act on.",
+   "label": "ad-review",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "positive",
+   "lang": "en"
+  },
+  {
+   "id": "eval:open-pull-request-close-negative",
+   "request": "The pull request for the installer retry change is already open and its checks are green. Check whether it is ready to go in and, if it is, get it in.",
+   "label": "ad-merge",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "close-negative",
+   "lang": "en"
+  },
+  {
+   "id": "eval:open-pull-request-coexistence",
+   "request": "Land what is staged with a proper message, then get this branch in front of the team for review.",
+   "label": "ad-commit",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "coexistence",
+   "lang": "en"
+  },
+  {
+   "id": "eval:open-pull-request-explicit",
+   "request": "/ad-pr",
+   "label": "ad-pr",
+   "source": "eval-corpus",
+   "kind": "explicit",
+   "case_type": "positive",
+   "lang": "en"
+  },
+  {
+   "id": "eval:research-before-implementing-close-negative",
+   "request": "We keep going back and forth on whether the installer should retry failed downloads at all or fail fast. Settle that question with graded evidence and write the conclusion up where this repo keeps such studies; nobody is implementing anything yet.",
+   "label": "ad-research",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "close-negative",
+   "lang": "en"
+  },
+  {
+   "id": "eval:research-before-implementing-coexistence",
+   "request": "Before we implement retry handling for the installer's download step, do the pre-implementation research this team requires and record its evidence where this repo expects it, then record the planned change itself with how we will judge it finished.",
+   "label": "ad-ground",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "coexistence",
+   "lang": "en"
+  },
+  {
+   "id": "eval:research-before-implementing-positive",
+   "request": "We are about to add retry handling to the installer's download step. Before anyone implements it, do the pre-implementation research this team requires and record its evidence where this repo expects it.",
+   "label": "ad-ground",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "positive",
+   "lang": "en"
+  },
+  {
+   "id": "eval:track-work-item-as-task",
+   "request": "We agreed to add retry handling to the installer next sprint. Make sure that commitment is recorded in this repo's planning docs so whoever picks it up knows what was agreed and how we will judge it finished.",
+   "label": "ad-task",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "positive",
+   "lang": "en"
+  },
+  {
+   "id": "eval:track-work-item-close-negative",
+   "request": "We went with Node built-ins instead of an evaluation framework for the harness. Capture the reasoning so nobody relitigates it next quarter.",
+   "label": "ad-adr",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "close-negative",
+   "lang": "en"
+  },
+  {
+   "id": "eval:track-work-item-coexistence",
+   "request": "Get the retry handling onto our planning docs with what done looks like, then start it properly with a failing check that pins the timeout.",
+   "label": "ad-task",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "coexistence",
+   "lang": "en"
+  },
+  {
+   "id": "eval:wire-quality-gates-coexistence",
+   "request": "Write up the plan for pre-commit checks in our planning docs with how we will judge it finished, then wire them in.",
+   "label": "ad-task",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "coexistence",
+   "lang": "en"
+  },
+  {
+   "id": "eval:wire-quality-gates-dormancy",
+   "request": "Add a GitHub Actions workflow that checks every pull request for broken Markdown links, so reviewers see the failures on the pull request page.",
+   "label": "none",
+   "source": "eval-corpus",
+   "kind": "natural",
+   "case_type": "dormancy",
+   "lang": "en"
+  },
+  {
+   "id": "eval:wire-quality-gates-explicit",
+   "request": "/ad-hooks",
+   "label": "ad-hooks",
+   "source": "eval-corpus",
+   "kind": "explicit",
+   "case_type": "positive",
+   "lang": "en"
+  },
+  {
+   "id": "hand:r001",
+   "request": "We decided to keep the CLI offline and never phone home. Write that down as a binding decision with the options we turned down.",
+   "label": "ad-adr",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r002",
+   "request": "Decidimos usar merge commit em vez de squash. Registra essa decisão com as alternativas que descartamos.",
+   "label": "ad-adr",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r003",
+   "request": "Nobody has ever written down the layers and boundaries of this codebase. Scan it and produce the system overview document.",
+   "label": "ad-architecture",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r004",
+   "request": "There are a dozen finished tasks and two superseded decision records cluttering the docs folder. Clear the finished ones out.",
+   "label": "ad-archive",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r005",
+   "request": "This goes to the whole team tomorrow. Check it against every rule we have, one by one, and do not wave anything through.",
+   "label": "ad-audit",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r006",
+   "request": "Antes de eu postar isso pro time, passa o pente-fino em todas as nossas regras, uma por uma.",
+   "label": "ad-audit",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r007",
+   "request": "This repo has no operating guide for coding agents yet. Scan the code and write one for them.",
+   "label": "ad-bootstrap",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r008",
+   "request": "I just got back from lunch. Catch me up on where we are and what needs my decision.",
+   "label": "ad-brief",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r009",
+   "request": "Me dá um resumo rápido de onde a gente está e do que depende de mim.",
+   "label": "ad-brief",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r010",
+   "request": "The change is verified. Land it as a proper commit with the sign-off.",
+   "label": "ad-commit",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r011",
+   "request": "Tá tudo verde, commita isso direitinho com a assinatura.",
+   "label": "ad-commit",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r012",
+   "request": "We need a policy telling outside researchers how to report a security hole to us privately.",
+   "label": "ad-community-docs",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r013",
+   "request": "This module is just a pass-through that forwards every call. Find where the design is shallow and propose how to make it deeper.",
+   "label": "ad-deepen",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r014",
+   "request": "Before I commit two weeks to this migration, list what we do not know yet and retire the biggest unknowns first.",
+   "label": "ad-derisk",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r015",
+   "request": "Our frontend has colors and spacing scattered across the tailwind config. Capture the visual contract in one document.",
+   "label": "ad-design",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r016",
+   "request": "The test passes locally but fails about one run in five on CI. Find out why.",
+   "label": "ad-diagnose",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r017",
+   "request": "O instalador trava sem mensagem nenhuma em máquinas Windows. Descobre a causa.",
+   "label": "ad-diagnose",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r018",
+   "request": "People keep calling the same thing a receipt, a record, and a log. Settle the term and write it in our glossary.",
+   "label": "ad-domain",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r019",
+   "request": "Check whether the architecture doc and the decision records still match what the code actually does. Just report the gaps.",
+   "label": "ad-drift",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r020",
+   "request": "I want to build something for team onboarding but I am not sure what exactly. Interview me until the idea is sharp.",
+   "label": "ad-grill-me",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r021",
+   "request": "Before writing the retry logic, research how this is usually done, cite the docs and real examples, and tell me the happy path.",
+   "label": "ad-ground",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r022",
+   "request": "Write the full engineering reference for this project: code standards, testing strategy, security policy.",
+   "label": "ad-guidelines",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r023",
+   "request": "My context is almost full. Save everything the next session needs to pick this up.",
+   "label": "ad-handoff",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r024",
+   "request": "Tô sem contexto, prepara a passagem de bastão pra próxima sessão.",
+   "label": "ad-handoff",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r025",
+   "request": "Set up checks that run lint before every commit and the full test suite before every push.",
+   "label": "ad-hooks",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r026",
+   "request": "We keep making the same mistake with stale receipts. Turn it into a rule so it stops happening.",
+   "label": "ad-level-up",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r027",
+   "request": "Esse erro se repetiu três vezes. Vira uma regra do nosso conjunto.",
+   "label": "ad-level-up",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r028",
+   "request": "The pull request has green checks and a review. Get it in.",
+   "label": "ad-merge",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r029",
+   "request": "I am not sure what to work on now. Survey the project and tell me the next best action.",
+   "label": "ad-next",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r030",
+   "request": "Before you touch anything on this refactor, think it through, state your assumptions, and keep the change surgical.",
+   "label": "ad-philosophy",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r031",
+   "request": "The branch is pushed. Open the pull request with the usual summary and test plan.",
+   "label": "ad-pr",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r032",
+   "request": "Abre o PR desse branch com o resumo e o plano de testes.",
+   "label": "ad-pr",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r033",
+   "request": "We have an idea for a new product. Write down the target user, the problem, success metrics, and the roadmap.",
+   "label": "ad-prd",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r034",
+   "request": "How should we evaluate whether this change actually improves routing? Design the measures and the decision rule.",
+   "label": "ad-prism",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r035",
+   "request": "Gather the open issues and pull requests from GitHub together with the local task files into one state packet.",
+   "label": "ad-project-state",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r036",
+   "request": "Draft a reply on the GitHub issue explaining why we closed it, and post it once I approve.",
+   "label": "ad-publish",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r037",
+   "request": "I think this plan is right, but challenge me: what am I missing before I commit to it?",
+   "label": "ad-question-me",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r038",
+   "request": "Everything is merged. Cut the next version and publish it to npm.",
+   "label": "ad-release",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r039",
+   "request": "Tudo mergeado. Solta a próxima versão no npm.",
+   "label": "ad-release",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r040",
+   "request": "Turn these benchmark findings into a standalone report for leadership, as a PDF.",
+   "label": "ad-report",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r041",
+   "request": "Should we adopt a vector database or keep plain files? Compare the options and give me an evidence-graded conclusion.",
+   "label": "ad-research",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r042",
+   "request": "Review this diff with fresh eyes against our standards and the task it implements.",
+   "label": "ad-review",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r043",
+   "request": "Faz uma revisão desse diff com olhos novos antes de eu subir.",
+   "label": "ad-review",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r044",
+   "request": "How much of the roadmap is done, and what is left before the next milestone?",
+   "label": "ad-roadmap",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r045",
+   "request": "Which rules apply to this repository right now? List them.",
+   "label": "ad-rules",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r046",
+   "request": "Create a new skill that formats our changelog entries.",
+   "label": "ad-skill",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r047",
+   "request": "Write the feature specification for offline mode with measurable acceptance criteria and non-goals.",
+   "label": "ad-spec",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r048",
+   "request": "We do not know which image library can detect these circles reliably. Try a few against a golden set and see which works.",
+   "label": "ad-spike",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r049",
+   "request": "Make a custom subagent that only researches documentation and never edits files.",
+   "label": "ad-subagent",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r050",
+   "request": "Track this as a work item with a checklist of what done means.",
+   "label": "ad-task",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r051",
+   "request": "Implement the new flag test-first: a failing test, then the code, one behavior at a time.",
+   "label": "ad-tdd",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r052",
+   "request": "I know the input and the exact expected output, but not the best way to get there. Give me three approaches and pick one by readability.",
+   "label": "ad-tdg",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r053",
+   "request": "Learn a reusable structure for our incident reports from these three approved examples.",
+   "label": "ad-template-tune",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r054",
+   "request": "A new version of the agentic kit is out. Update my installed skills without losing my local edits.",
+   "label": "ad-update",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r055",
+   "request": "Rewrite this Slack message so it sounds like me.",
+   "label": "ad-voice",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r056",
+   "request": "Here are ten messages I wrote. Calibrate my voice profile from them.",
+   "label": "ad-voice-tune",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r057",
+   "request": "What does the `--yes` flag do in this CLI?",
+   "label": "none",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r058",
+   "request": "Qual a diferença entre merge commit e squash?",
+   "label": "none",
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r059",
+   "request": "Rename the variable `cfg` to `config` in src/lib/install.js.",
+   "label": "none",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r060",
+   "request": "Thanks, that is all for today.",
+   "label": "none",
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "hand:r061",
+   "request": "Quantos testes tem a suíte hoje?",
+   "label": "none",
+   "lang": "pt",
+   "source": "hand"
+  }
+ ]
+}

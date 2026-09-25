@@ -1,0 +1,285 @@
+{
+ "definition": "trivial: a question, a one-line mechanical edit, or an acknowledgement, which the workflow checkpoint tells the agent to skip; non-trivial: any change that needs grounding, tests, review, or an outward step",
+ "items": [
+  {
+   "id": "t001",
+   "request": "What does the --yes flag do?",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t002",
+   "request": "Qual a diferença entre merge commit e squash?",
+   "trivial": true,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t003",
+   "request": "Fix the typo \"recieve\" in README.md.",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t004",
+   "request": "Thanks!",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t005",
+   "request": "Valeu, é isso por hoje.",
+   "trivial": true,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t006",
+   "request": "How many tests does the suite have?",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t007",
+   "request": "Rename the variable cfg to config in src/lib/install.js.",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t008",
+   "request": "Which Node version does CI use?",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t009",
+   "request": "Onde fica o arquivo de configuração do lefthook?",
+   "trivial": true,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t010",
+   "request": "Show me the last three commits.",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t011",
+   "request": "What is ADR-0085 about, in one sentence?",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t012",
+   "request": "Me mostra o git status.",
+   "trivial": true,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t013",
+   "request": "Is the working tree clean?",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t014",
+   "request": "Remove the trailing whitespace on line 12 of AGENTS.md.",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t015",
+   "request": "What time zone are the commit dates in?",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t016",
+   "request": "Sim",
+   "trivial": true,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t017",
+   "request": "ok, go ahead",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t018",
+   "request": "Print the package version.",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t019",
+   "request": "Traduz essa frase pra inglês: \"o gate passou\".",
+   "trivial": true,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t020",
+   "request": "Which file defines the CLI commands?",
+   "trivial": true,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t021",
+   "request": "Add retry handling to the installer's download step.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t022",
+   "request": "Implementa o modo offline no CLI.",
+   "trivial": false,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t023",
+   "request": "Refactor the install module so update and init share the diff logic.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t024",
+   "request": "The installer crashes on Windows; find the cause and fix it.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t025",
+   "request": "Write the feature spec for offline mode.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t026",
+   "request": "Revisa esse branch inteiro antes do PR.",
+   "trivial": false,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t027",
+   "request": "Open a pull request for this branch.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t028",
+   "request": "Publish the next version to npm.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t029",
+   "request": "Design the evaluation for the new router.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t030",
+   "request": "Cria uma skill nova que formata o changelog.",
+   "trivial": false,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t031",
+   "request": "Migrate the test suite from node:test to vitest.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t032",
+   "request": "Research whether we should adopt a vector database.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t033",
+   "request": "Set up pre-commit and pre-push hooks for this repo.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t034",
+   "request": "Audita esse PR contra todas as regras.",
+   "trivial": false,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t035",
+   "request": "Split src/lib/install.js into smaller modules without changing behavior.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t036",
+   "request": "Add a new CLI command that uninstalls one skill.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t037",
+   "request": "Registra a decisão de usar merge commit como ADR.",
+   "trivial": false,
+   "lang": "pt",
+   "source": "hand"
+  },
+  {
+   "id": "t038",
+   "request": "Change the default install scope from user to project.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t039",
+   "request": "Write the handoff for the next session.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  },
+  {
+   "id": "t040",
+   "request": "Delete the old spike directory and record the outcome.",
+   "trivial": false,
+   "lang": "en",
+   "source": "hand"
+  }
+ ]
+}
