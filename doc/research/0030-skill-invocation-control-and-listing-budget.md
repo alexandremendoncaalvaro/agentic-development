@@ -1,6 +1,6 @@
 # RESEARCH-0030: Skill invocation control and the listing budget without a hard block
 
-**Status:** draft
+**Status:** concluded
 **Created:** 2026-09-24
 **Question:** For a kit of 46 skills installed into Claude Code and Codex, what should decide whether the model may invoke a skill on its own, and how should the host's skill-listing budget be handled once that decision no longer removes descriptions from the listing?
 **Stakes:** medium times reversible

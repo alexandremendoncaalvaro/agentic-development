@@ -5,6 +5,7 @@
 **Deciders:** Alexandre Alvaro
 **Amended by:** ADR-0076 — reclassifies `ad-rules` as model-invocable so natural correction gestures can reach it; the classification rule remains unchanged.
 **Amended by:** ADR-0084 — reclassifies `ad-pr` and `ad-merge` as model-invocable behind an in-skill approval gate; the classification rule remains unchanged.
+**Amended by:** ADR-0085 — replaces the invoker-class rule with an effect-gate rule and retires the 8,000-character model-invocable total; the per-description caps remain.
 
 ## Context
 
