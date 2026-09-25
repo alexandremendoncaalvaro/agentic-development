@@ -1,6 +1,6 @@
 ---
 name: ad-bootstrap
-description: Generate AGENTS.md at the repo root by scanning the codebase first, pre-filling placeholders from observed signals, and asking only the genuine gaps. Use whenever the user wants to bootstrap, scaffold, generate, create, set up, or audit AGENTS.md / CLAUDE.md / agents.md (the operational guide for agents working on this project).
+description: "Generate or audit AGENTS.md at the repo root: scans the codebase, pre-fills from observed signals, and asks only the real gaps. Use to bootstrap, scaffold, create, set up, or audit AGENTS.md or CLAUDE.md, the operational guide for agents on the project. Covers empty repos, existing code without AGENTS.md, and drift audits."
 summary: Generate or audit `AGENTS.md` at the repo root.
 ---
 

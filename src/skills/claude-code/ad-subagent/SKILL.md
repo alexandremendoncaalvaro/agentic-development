@@ -1,8 +1,7 @@
 ---
 name: ad-subagent
-description: Draft a new Claude Code subagent at .claude/agents/<name>.md, using the official subagents format. Use when the user wants to create, write, draft, or scaffold a custom Claude Code subagent for delegated work (fresh-context reviewer, codebase researcher, docs researcher, test designer, bug reproducer, bounded implementation worker). Asks one question per missing field; never invents roles or tool sets.
+description: "Draft a Claude Code subagent at .claude/agents/<name>.md in the official format, for delegated work such as a fresh-context reviewer, codebase or docs researcher, test designer, bug reproducer, or bounded worker. Use to create, write, or scaffold a custom subagent. Asks one question per missing field; never invents roles or tool sets."
 summary: Draft a Claude Code custom subagent for bounded delegated work at `.claude/agents/<name>.md`.
-disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Bash
 ---
 
@@ -51,6 +50,8 @@ Ask one question per missing field, in this order:
 **Do not invent values.** When the user does not know something, ask. Do not invent frontmatter fields not in the spec.
 
 ## Step 4 — Write the file
+
+If the target file already exists, show it and overwrite it only after the user approves; a personal-scope file lives outside the repository, so git cannot restore it.
 
 Path: `.claude/agents/<name>.md` (project, committed) or `~/.claude/agents/<name>.md` (personal). Frontmatter uses the Claude Code subagents shape (see code.claude.com/docs/en/sub-agents) — declare only the fields the subagent actually uses.
 

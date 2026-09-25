@@ -2,7 +2,7 @@
   "schema": "agentic-eval-case/1",
   "category": {
     "kind": "workflow-operational",
-    "invocation": "user-invocable-only"
+    "invocation": "model-invocable"
   },
   "representative": "ad-hooks",
   "risk": "reversible-repository-write",

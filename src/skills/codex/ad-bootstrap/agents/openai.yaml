@@ -2,4 +2,4 @@ interface:
   display_name: ad-bootstrap
   short_description: Bootstrap AGENTS.md at the repo root via scan-first, pre-fill, ask-only-gaps flow.
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

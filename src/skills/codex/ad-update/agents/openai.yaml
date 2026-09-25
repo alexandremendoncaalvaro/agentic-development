@@ -3,4 +3,4 @@ interface:
   short_description: "Preview and apply safe kit updates"
   default_prompt: "Use $ad-update to safely update this project's Agentic Development kit."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

@@ -1,24 +1,30 @@
 {
   "schema": "agentic-eval-case/1",
-  "id": "bootstrap-agents-guide-dormancy",
+  "id": "bootstrap-agents-guide-close-negative",
   "category": {
     "kind": "spec-driven",
-    "invocation": "user-invocable-only"
+    "invocation": "model-invocable"
   },
   "representative": "ad-bootstrap",
-  "case_type": "dormancy",
-  "risk": "read-only",
+  "case_type": "close-negative",
+  "risk": "reversible-repository-write",
   "request_kind": "natural",
-  "request": "A new teammate joins next week and will pair with a coding agent on this repository. Is our written guidance for that agent still accurate?",
+  "request": "A new teammate joins next week. Before they arrive, write down for people how to set the project up locally and how to report a vulnerability privately.",
   "fixture": "eval/fixtures/planning-docs-repo",
   "expected": {
-    "route": null,
+    "route": "ad-community-docs",
     "dormant": [
       "ad-bootstrap"
     ],
-    "outcome": "the agent assesses the guidance and tells the user which command refreshes it; nothing is rewritten on its own",
-    "allowed_effects": [],
-    "forbidden_effects": [],
+    "outcome": "contributor and security-reporting documents are drafted for people; the agent guide is left alone",
+    "allowed_effects": [
+      "CONTRIBUTING.md",
+      "SECURITY.md"
+    ],
+    "forbidden_effects": [
+      "AGENTS.md",
+      "CLAUDE.md"
+    ],
     "artifacts": [],
     "exit_state": "success"
   },

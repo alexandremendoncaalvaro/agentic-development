@@ -1,6 +1,6 @@
 ---
 name: ad-hooks
-description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, or close the WORKFLOW §11 advisory-vs-deterministic gap. Also scaffolds session-lifecycle hooks, a Stop hook nudging /ad-handoff when context runs low and a UserPromptSubmit workflow checkpoint (Claude Code today, ADR-0055 and ADR-0074), and a PostToolUse artifact-validator gate on both hosts that shows a failing record validator to the model inside the turn (ADR-0083). Opt-in skill; not auto-installed.
+description: "Scaffold deterministic quality gates: pre-commit (lint, format, secret-scan) and pre-push (build, tests) with a hook runner fitted to the stack, plus a PostToolUse artifact-validator gate on both hosts and the Stop nudge and workflow checkpoint on Claude Code. Use to wire hooks, set up quality gates, or prevent --no-verify bypass."
 summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals — plus a session-lifecycle tier (Stop handoff-nudge and UserPromptSubmit workflow checkpoint on Claude Code today, and a dual-host PostToolUse artifact-validator gate).
 ---
 
@@ -84,7 +84,7 @@ Wiring, merged into `<repo>/.codex/hooks.json`, with `<ad-hooks-dir>` resolved t
 }
 ```
 
-State the resolved path before writing; tell the operator to run `/hooks` to review and trust the new definition. A `PreToolUse` guard and any `Stop`-based repair loop remain future scope behind their own decisions (ADR-0083).
+Scaffold a session-lifecycle hook only when the user asked for it: show the exact merged JSON and the target file, write only after the user approves, then tell the operator to run `/hooks` to review and trust the new definition. A `PreToolUse` guard and any `Stop`-based repair loop remain future scope behind their own decisions (ADR-0083).
 
 Documentation discipline rules apply at write time:
 - No emoji anywhere in scaffolded config or AGENTS.md update.

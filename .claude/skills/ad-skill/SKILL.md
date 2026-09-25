@@ -1,8 +1,7 @@
 ---
 name: ad-skill
-description: Draft a new Claude Code or Codex skill at .claude/skills/<name>/SKILL.md (or .agents/skills/<name>/SKILL.md for Codex), using the Anthropic Skills format. Use when the user wants to create, write, draft, or scaffold a custom skill for an agentic coding tool. Asks one question per missing field; never invents skill names or triggers.
+description: "Draft a new Claude Code or Codex skill at .claude/skills/<name>/SKILL.md or .agents/skills/<name>/SKILL.md in the Anthropic Skills format. Use when the user wants to create, write, draft, or scaffold a custom skill for an agentic coding tool. Asks one question per missing field; never invents skill names or triggers."
 summary: Draft a new Claude Code or Codex skill at the appropriate path.
-disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Bash
 ---
 
@@ -28,16 +27,19 @@ Ask one question per missing field, in this order:
   1,024 characters. Claude Code alone also supports `when_to_use`, and cuts the
   combined discovery text at 1,536 characters in its Claude Code listing; this
   is not the cross-host specification limit.
-* **Invocation class** — user-invocable for outward-facing, irreversible, or
-  setup verbs; model-invocable for posture and reversible pipeline stages. Apply
-  the host flags below from that classification instead of asking the user when
-  the blast radius makes the answer clear.
+* **Effect gates** — every outward effect (push, pull request, publish, post,
+  message) and every irreversible one (files outside the repository, machine
+  stores, deletions git cannot restore) runs only after an approval step stated
+  in the body. With those gates written the skill stays model-invocable; the host
+  block below is only for a skill that cannot gate its effect.
 * **Tools needed** — `Read, Write, Glob, Grep, Bash, Task, ...` Restrict to what the skill actually uses; an audit skill with `Write` access stops being read-only.
 * **Body shape** — instructions, optional template, output contract. Keep ≤500 lines; move long material to sibling files (`reference.md`, `examples.md`, `scripts/`).
 
 **Do not invent values.** When the user does not know something, ask. Do not invent fields not in the spec — only declare frontmatter fields that actually apply.
 
 ## Step 3 — Write the file(s)
+
+If the target file already exists, show it and overwrite it only after the user approves; a personal-scope file lives outside the repository, so git cannot restore it.
 
 Path:
 
@@ -48,14 +50,15 @@ Path:
 Frontmatter shape per agent:
 
 * **Claude Code:** `name`, `description`, `allowed-tools` (and any other field
-  from the spec the user asked for). Add `disable-model-invocation: true` only
-  for the user-invocable class; omit it for model-invocable skills.
+  from the spec the user asked for). Omit `disable-model-invocation`; add
+  `disable-model-invocation: true` only for a skill whose effect has no approval
+  step in its body.
 * **Codex:** minimal frontmatter — `name`, `description`. Body uses XML tags
   (`<background_information>`, `<instructions>`, `<template>`,
   `<output_contract>`). The `agents/openai.yaml` carries
   `interface.display_name`, `interface.short_description`, and
-  `policy.allow_implicit_invocation`: `false` for user-invocable skills and
-  `true` for model-invocable skills.
+  `policy.allow_implicit_invocation: true`, or `false` only for a skill whose
+  effect has no approval step in its body.
 
 Body: imperative instructions ("do X", not "this skill does X"). Every line is recurring token cost once the skill loads — be terse. Don't restate AGENTS.md.
 

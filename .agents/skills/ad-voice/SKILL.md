@@ -1,7 +1,6 @@
 ---
 name: ad-voice
-description: |
-  Apply a confirmed machine-local personal voice profile when drafting, rewriting, or translating text. Use when the user asks "write like me", "make this sound like me", "use my voice", "adjust this for Slack/Discord/docs/email", "translate this but keep my personality", or invokes /ad-voice. Preserves facts first, carries owner communicative identity through functional language equivalents, applies separately attributed team/community accommodation, and returns one usable draft. Read-only: never learns from the request or changes the profile. Routes profile creation and corrections to ad-voice-tune.
+description: "Draft, rewrite, or translate text through the owner's confirmed machine-local voice profile, preserving facts and applying attributed team or community accommodation. Read-only: never changes the profile. Use on \"write like me\", \"use my voice\", \"make this sound like me\", \"adjust this for Slack\", \"translate but keep my personality\"."
 summary: Draft, rewrite, or translate through a confirmed local personal-voice profile. Preserves facts; layers owner identity, community accommodation, and context; never changes the profile. Falls back honestly when evidence is missing.
 ---
 

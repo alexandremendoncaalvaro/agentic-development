@@ -34,7 +34,7 @@ export const CHECKPOINT = [
   '3. Before code: /ad-ground and its evidence record.',
   '4. Implement with /ad-tdd (/ad-tdg when the strategy is the unknown).',
   '5. After each slice: /ad-review. After each large block or before a PR: /ad-audit.',
-  '6. Land with /ad-commit. /ad-pr stays with the user.',
+  '6. Land with /ad-commit; /ad-pr and /ad-merge ask the owner once before the outward step.',
   '7. Ending, or context running low: /ad-handoff for a resume chip, or a fresh-session prompt where chips are unavailable.',
 ].join('\n');
 
