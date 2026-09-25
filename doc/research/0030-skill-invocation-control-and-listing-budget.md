@@ -72,7 +72,7 @@ Codex: "Front-load the key use case and trigger words so a host can still match 
 
 **Strength:** High
 
-Two one-turn Claude Code 2.1.227 sessions on `claude-haiku-4-5-20251001` (200k window), each in a fresh temporary directory whose `.claude/skills/` holds the kit, run with `--setting-sources project` so no user or plugin skill loads, and `--debug-file` to capture the host's listing warning (M1, M2). Control arm, the kit as it ships (17 skills blocked): the host logged "Sending 41 skills via attachment (initial)" and "Skill listing over budget: 41 skills, 13647 chars > 8000 budget — descriptions will be truncated". Treatment arm, every skill model-invocable with each description cut mechanically to its first 350 characters (46 kit descriptions, 13,807 characters): "Sending 58 skills via attachment (initial)" and "Skill listing over budget: 58 skills, 19757 chars > 8000 budget". Both arms answered and cost USD 0.0171 and USD 0.0173. The difference between the listed counts and the kit's model-invocable counts (41 against 29, 58 against 46) is twelve host built-in skills in both arms. Measurement on the real host; one observation per arm, and the log names the budget, not the dropped descriptions.
+Two one-turn Claude Code 2.1.227 sessions on `claude-haiku-4-5-20251001` (200k window), each in a fresh temporary directory whose `.claude/skills/` holds the kit, run with `--setting-sources project` so no user or plugin skill loads, and `--debug-file` to capture the host's listing warning (M1, M2). Control arm, the kit as it ships (17 skills blocked): the host logged "Sending 41 skills via attachment (initial)" and "Skill listing over budget: 41 skills, 13647 chars > 8000 budget — descriptions will be truncated". Treatment arm, every skill model-invocable with each description cut mechanically to its first 350 characters (46 kit descriptions, 13,807 characters): "Sending 58 skills via attachment (initial)" and "Skill listing over budget: 58 skills, 19757 chars > 8000 budget". Both arms answered and cost USD 0.0171 and USD 0.0173. The difference between the listed counts and the kit's model-invocable counts (41 against 29, 58 against 46) is twelve host built-in skills in both arms. Measurement on the real host; one observation per arm, and the log names the budget, not the dropped descriptions. The listing size is a deterministic function of the installed skill files and the host release, not a sampled model behavior, so the run is reproducible from the tree at `e674e9a`, the script in M2, and Claude Code 2.1.227.
 
 ## Limitations and what would reverse the conclusion
 
@@ -105,6 +105,33 @@ The budget half rests on one measured session per arm on one host version (E8), 
 - **C6:** description totals per host and class, recomputed by parsing `src/skills/{claude-code,codex}/*/SKILL.md` frontmatter and `agents/openai.yaml` at `e674e9a`: Claude Code 7,971 model-invocable and 9,368 blocked; Codex 7,994 and 8,818 (accessed 2026-09-24 via a local Node script)
 - **M1:** control arm: `src/skills/claude-code/*` at `e674e9a` copied into `/tmp/listing-probe-current/.claude/skills/`, then `claude -p "Reply with exactly: ok" --model claude-haiku-4-5-20251001 --max-turns 1 --setting-sources project --output-format stream-json --verbose --debug-file debug.log` from that directory; `grep -E "Sending [0-9]+ skills|over budget" debug.log` (accessed 2026-09-24 via Claude Code 2.1.227, npm `@anthropic-ai/claude-code`; the same command reproduces on any platform with that release)
 - **M2:** treatment arm: the same copy with `disable-model-invocation: true` removed from every `SKILL.md` and each `description` truncated to its first 350 characters by a local script, same command from `/tmp/listing-probe/` (accessed 2026-09-24 via Claude Code 2.1.227)
+The treatment arm's copy was produced from the tree at `e674e9a` by this script (the one run, less its counting and print lines), from the repository root with Python 3, before the session command above; the control arm is the same `cp -R` of `src/skills/claude-code/` without the script. The two debug logs are machine-local; the lines E8 quotes are their load-bearing excerpt.
+
+```python
+import re, os, shutil, json
+src='src/skills/claude-code'; dst='/tmp/listing-probe/.claude/skills'
+for s in sorted(d for d in os.listdir(src) if not d.startswith('.')):
+    shutil.copytree(f'{src}/{s}', f'{dst}/{s}')
+    p=f'{dst}/{s}/SKILL.md'; md=open(p).read()
+    end=md.index('\n---',3); fm, body = md[:end], md[end:]
+    fm=re.sub(r'^disable-model-invocation: true\n?', '', fm, flags=re.M)
+    lines=fm.split('\n'); out=[]; i=0
+    while i < len(lines):
+        l=lines[i]
+        if l.startswith('description:'):
+            v=l[len('description:'):].strip()
+            if v in ('|','>','|-','>-'):
+                parts=[]; i+=1
+                while i < len(lines) and (lines[i].startswith('  ') or lines[i]==''):
+                    parts.append(lines[i].strip()); i+=1
+                text=' '.join(x for x in parts if x)
+            else:
+                text=json.loads(v) if v.startswith('"') else v; i+=1
+            if len(text)>350: text=text[:350].rstrip()
+            out.append('description: '+json.dumps(text)); continue
+        out.append(l); i+=1
+    open(p,'w').write('\n'.join(out)+body)
+```
 - **D1:** `git log --reverse -S"disable-model-invocation: true" -- src/skills/claude-code`: the flag entered in `1efd695` (2026-09-09, ADR-0073), was extended in `9ef119d` and `0ab4ca8`, and removed from `ad-pr` and `ad-merge` in `9147f7e` (2026-09-22, ADR-0084) (accessed 2026-09-24 via git in the `lagos` worktree)
 
 ## Derived decision

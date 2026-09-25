@@ -178,6 +178,14 @@ _Avoid_: "generator skill" (implies one-shot; spec-driven skills are lazy and re
 
 **Related code:** [`doc/adr/0007-workflow-operational-skills.md`](doc/adr/0007-workflow-operational-skills.md), [`src/skills/claude-code/ad-spec/`](src/skills/claude-code/ad-spec/), [`src/skills/claude-code/ad-task/`](src/skills/claude-code/ad-task/).
 
+### Effect gate
+
+**Definition:** the approval step a skill states in its body before an **outward effect** (one that reaches other people or systems: push, pull request, merge, tag, release, registry publish, a message or post) or an **irreversible effect** (a change git cannot restore: files outside the repository, machine-level stores, global installs, untracked deletions, history rewrites). The agent asks the owner and receives a yes, or the owner requested that exact action, before the effect runs. A skill whose effects all sit behind an effect gate is model-invocable; the host block is reserved for a skill that has none.
+
+_Avoid_: "user-invocable skill" (the retired class of ADR-0073; invocation no longer carries the safety); "permission" (the host's tool-level mechanism, not the skill's own step); "confirmation" alone (a local write to a tracked file needs none).
+
+**Related code:** [`doc/adr/0085-gate-skill-effects-inside-the-skill.md`](doc/adr/0085-gate-skill-effects-inside-the-skill.md), [`test/skills.test.js`](test/skills.test.js) (the empty host-block exception set).
+
 ### Fresh-context review
 
 **Definition:** WORKFLOW §10 practice — a code review performed without inherited bias from the session that wrote the code. The reviewer reads only the assembled handoff (diff plus spec slice); no conversation history; no prior context. Implementation differs per host (see **Two-axis review**).
@@ -327,8 +335,10 @@ the model-facing request text a prompt, as Spec 0007 R3 does, is fine).
 `eval/`, where every case names its **representative** (the skill under
 evaluation) and its **case type** (`positive`, `close-negative`, `dormancy`, or
 `coexistence`); the corpus gate evaluates every tracked pair and fails on any
-uncovered category intersection or representative missing one of its three case
-types.
+populated category intersection without a representative, or a representative
+missing one of its three case types. An intersection is populated when the kit
+ships a skill of its class; while no skill carries the host block (ADR-0085), the
+user-invocable-only intersections are reported but empty.
 
 _Avoid_: "test suite" (the unit suite under `test/` runs the harness; the corpus
 is what the harness evaluates); "benchmark" (no universal score exists).

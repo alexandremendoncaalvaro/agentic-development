@@ -33,7 +33,7 @@ Negative / trade-offs:
 - An in-skill approval is an instruction the model follows, not a barrier the host enforces; for `ad-release` and `ad-publish`, whose effects reach a registry or an audience, the deterministic barrier is gone and the approval step is the whole protection. Accepted: ADR-0084 made the same trade for `ad-pr` and `ad-merge`, and the owner's approval remains the gate on every outward step.
 - On a 200k window more descriptions compete for the same budget, so more of them are dropped, least-invoked first and in listing order in a fresh session; the names stay invocable. Mitigated by the per-description cap and by the overflow response in decision 4.
 - On Codex a large listing may omit whole skills, and that threshold is unmeasured while the local CLI refuses the account's models. Accepted as a named limitation of RESEARCH-0030; a Codex measurement that shows kit skills omitted reverses the budget half of this decision for that host.
-- The evaluation corpus loses its user-invocable-only category, so the cases authored for it are re-authored for the model-invocable class.
+- The evaluation corpus loses its user-invocable-only category, so the cases authored for it are re-authored for the model-invocable class. ADR-0080 item 8 frames the dormancy grader and a null route for a user-invocable-only case; the case validator already applies that rule to any representative, and a dormancy case now names a model-invocable skill that a nearby request must not fire.
 
 Revisit trigger: a routing trial showing a pipeline skill missed for lack of its description, a Codex listing that omits kit skills, or a skill whose effect cannot be gated in its body.
 
