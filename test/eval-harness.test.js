@@ -1,7 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -560,7 +568,7 @@ test('an outward command that runs without a granted approval for its declared s
   assert.equal(failure.evidence_locator, 'trials[0].events[5]');
 });
 
-test('an explicit user-invocable-only invocation whose outward actions were each approved passes', () => {
+test('an explicit invocation whose outward actions were each approved passes', () => {
   const result = evaluateReplay({
     caseFile: PR_CASE,
     receiptFile: join(PR_RECEIPTS, 'healthy.json'),
@@ -584,7 +592,7 @@ test('a denied approval that stops the outward command is the approval stop hold
 const DORMANCY_CASE = join(ROOT, 'eval', 'cases', 'wire-quality-gates-dormancy.json');
 const DORMANCY_RECEIPTS = join(ROOT, 'eval', 'receipts', 'wire-quality-gates-dormancy');
 
-test('a natural request that fires a dormant user-invocable-only skill is wrong routing', () => {
+test('a nearby natural request that fires the dormant skill is wrong routing', () => {
   const result = evaluateReplay({
     caseFile: DORMANCY_CASE,
     receiptFile: join(DORMANCY_RECEIPTS, 'fired-dormant.json'),
@@ -759,7 +767,7 @@ test('case declarations that would make grading vacuous are rejected at the boun
 const COEXISTENCE_CASE = join(ROOT, 'eval', 'cases', 'wire-quality-gates-coexistence.json');
 const COEXISTENCE_RECEIPTS = join(ROOT, 'eval', 'receipts', 'wire-quality-gates-coexistence');
 
-test('a coexistence request lets the expected model-invocable skill run while the outward skill stays dormant', () => {
+test('a coexistence request lets the planning skill lead and the hook skill install only behind the owner approval', () => {
   const healthy = evaluateReplay({
     caseFile: COEXISTENCE_CASE,
     receiptFile: join(COEXISTENCE_RECEIPTS, 'healthy.json'),
@@ -768,15 +776,16 @@ test('a coexistence request lets the expected model-invocable skill run while th
   assert.equal(healthy.disposition, 'pass');
   assert.deepEqual(healthy.failures, []);
 
-  const overreach = evaluateReplay({
+  const bypassed = evaluateReplay({
     caseFile: COEXISTENCE_CASE,
-    receiptFile: join(COEXISTENCE_RECEIPTS, 'fired-dormant.json'),
+    receiptFile: join(COEXISTENCE_RECEIPTS, 'bypassed-approval.json'),
     root: ROOT,
   });
-  assert.deepEqual(overreach.hard_failures, ['wrong_routing']);
-  assert.equal(overreach.failures.length, 1);
-  assert.equal(overreach.failures[0].grader, 'dormancy');
-  assert.equal(overreach.declared_failure_check.status, 'matched');
+  assert.deepEqual(bypassed.hard_failures, ['bypassed_approval']);
+  assert.equal(bypassed.failures.length, 1);
+  assert.equal(bypassed.failures[0].grader, 'approval');
+  assert.equal(bypassed.failures[0].expected, 'lefthook install');
+  assert.equal(bypassed.declared_failure_check.status, 'matched');
 });
 
 test('every tracked synthetic receipt fails for exactly its declared reason and known-good receipts pass', () => {
@@ -810,11 +819,21 @@ test("the coverage report names every category intersection and every representa
     'workflow-operational/model-invocable',
     'workflow-operational/user-invocable-only',
   ]);
-  assert.deepEqual(report.intersections['workflow-operational/user-invocable-only'], ['ad-hooks']);
+  // ADR-0085: no kit skill carries the host block, so both user-invocable-only
+  // intersections are unpopulated and need no representative.
+  assert.deepEqual(report.intersections['spec-driven/user-invocable-only'], []);
+  assert.deepEqual(report.intersections['workflow-operational/user-invocable-only'], []);
   assert.deepEqual(report.intersections['workflow-operational/model-invocable'], [
     'ad-ground',
+    'ad-hooks',
     'ad-pr',
     'ad-review',
+  ]);
+  assert.ok(report.intersections['spec-driven/model-invocable'].includes('ad-bootstrap'));
+  assert.deepEqual(report.representatives['ad-bootstrap'].case_types, [
+    'close-negative',
+    'coexistence',
+    'positive',
   ]);
   assert.deepEqual(report.representatives['ad-hooks'].case_types, [
     'coexistence',
@@ -949,8 +968,12 @@ test('the coverage report treats a case without both receipt intents and an orph
   const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-gaps-'));
   try {
     corpusCopy(dir);
-    rmSync(join(dir, 'eval', 'receipts', 'wire-quality-gates-coexistence', 'fired-dormant.json'));
-    rmSync(join(dir, 'eval', 'receipts', 'bootstrap-agents-guide-dormancy'), { recursive: true });
+    rmSync(
+      join(dir, 'eval', 'receipts', 'wire-quality-gates-coexistence', 'bypassed-approval.json')
+    );
+    rmSync(join(dir, 'eval', 'receipts', 'bootstrap-agents-guide-close-negative'), {
+      recursive: true,
+    });
     cpSync(
       join(dir, 'eval', 'receipts', 'open-pull-request-explicit'),
       join(dir, 'eval', 'receipts', 'renamed-away-case'),
@@ -963,7 +986,7 @@ test('the coverage report treats a case without both receipt intents and an orph
       report.gaps.join('\n')
     );
     assert.ok(
-      report.gaps.some((gap) => /bootstrap-agents-guide-dormancy.*no receipts/.test(gap)),
+      report.gaps.some((gap) => /bootstrap-agents-guide-close-negative.*no receipts/.test(gap)),
       report.gaps.join('\n')
     );
     assert.ok(
@@ -1021,4 +1044,29 @@ test('the coverage report lists the hosts recorded per intersection, and the hos
   const report = coverageReport(loadCorpus({ root: ROOT }));
   assert.deepEqual(report.hosts['workflow-operational/model-invocable'], ['claude-code', 'codex']);
   assert.deepEqual(report.hosts['spec-driven/model-invocable'], ['claude-code']);
+});
+
+test('regression: task-0088 a populated intersection without a representative is a gap, an unpopulated one is not', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-eval-populated-'));
+  try {
+    corpusCopy(dir);
+    const casesDir = join(dir, 'eval', 'cases');
+    for (const name of readdirSync(casesDir)) {
+      const record = JSON.parse(readFileSync(join(casesDir, name), 'utf8'));
+      if (record.category.kind !== 'spec-driven') continue;
+      rmSync(join(casesDir, name));
+      rmSync(join(dir, 'eval', 'receipts', record.id), { recursive: true, force: true });
+    }
+    const report = coverageReport(loadCorpus({ root: dir }));
+    assert.ok(
+      report.gaps.includes('intersection spec-driven/model-invocable has no representative'),
+      report.gaps.join('\n')
+    );
+    assert.ok(
+      !report.gaps.some((gap) => /user-invocable-only has no representative/.test(gap)),
+      report.gaps.join('\n')
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

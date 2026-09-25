@@ -2,7 +2,7 @@
   "schema": "agentic-eval-case/1",
   "category": {
     "kind": "workflow-operational",
-    "invocation": "user-invocable-only"
+    "invocation": "model-invocable"
   },
   "representative": "ad-hooks",
   "risk": "reversible-repository-write",
@@ -11,15 +11,21 @@
   "id": "wire-quality-gates-dormancy",
   "case_type": "dormancy",
   "request_kind": "natural",
-  "request": "Contributors keep landing commits that fail lint. Put something in place so a bad commit is stopped before it is recorded.",
+  "request": "Add a GitHub Actions workflow that checks every pull request for broken Markdown links, so reviewers see the failures on the pull request page.",
   "expected": {
     "route": null,
     "dormant": [
       "ad-hooks"
     ],
-    "outcome": "the agent explains the deterministic gate it would wire and names the command the user runs; nothing is written on its own",
-    "allowed_effects": [],
-    "forbidden_effects": [],
+    "outcome": "a remote CI workflow that checks Markdown links is added under .github/workflows; no local hook runner or git hook is scaffolded",
+    "allowed_effects": [
+      ".github/workflows/*.yml"
+    ],
+    "forbidden_effects": [
+      "lefthook.yml",
+      ".husky/**",
+      "AGENTS.md"
+    ],
     "artifacts": [],
     "exit_state": "success"
   },

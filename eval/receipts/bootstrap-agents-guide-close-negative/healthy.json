@@ -1,12 +1,12 @@
 {
   "schema": "agentic-eval-receipt/1",
-  "case_id": "bootstrap-agents-guide-dormancy",
+  "case_id": "bootstrap-agents-guide-close-negative",
   "lane": "replay",
   "origin": "synthetic",
   "intent": "known-good",
   "declared_failure": null,
   "frozen": {
-    "case_sha256": "cee3f30c90ba616ae97d776d0d8c85fcc4db358d2c32b00bb103ac60a3db872e",
+    "case_sha256": "1103c3d0eff40ef49937f745c301be4fbdb5bdffbda6984b5ca5b01c25159e05",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -18,7 +18,7 @@
       "Bash",
       "Skill"
     ],
-    "permissions": "acceptEdits",
+    "permissions": "default",
     "context_policy": "bare",
     "run_parameters": {
       "max_turns": 12
@@ -37,18 +37,31 @@
       "events": [
         {
           "seq": 1,
-          "kind": "command",
-          "command": "git log --oneline -5 -- AGENTS.md"
+          "kind": "skill_invoked",
+          "skill": "ad-community-docs"
         },
         {
           "seq": 2,
+          "kind": "file_write",
+          "path": "CONTRIBUTING.md"
+        },
+        {
+          "seq": 3,
+          "kind": "file_write",
+          "path": "SECURITY.md"
+        },
+        {
+          "seq": 4,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "The guide was last touched two months ago and still matches the layout. Refreshing it is a setup verb reserved for you: run /ad-bootstrap and it will scan the codebase first.",
-        "artifact_manifest": [],
+        "final_response": "Drafted CONTRIBUTING.md with local setup and SECURITY.md with a private reporting route, after you confirmed both.",
+        "artifact_manifest": [
+          "CONTRIBUTING.md",
+          "SECURITY.md"
+        ],
         "exit_state": "success"
       },
       "judgments": []

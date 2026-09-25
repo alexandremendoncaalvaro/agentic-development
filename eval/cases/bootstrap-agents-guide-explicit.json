@@ -3,7 +3,7 @@
   "id": "bootstrap-agents-guide-explicit",
   "category": {
     "kind": "spec-driven",
-    "invocation": "user-invocable-only"
+    "invocation": "model-invocable"
   },
   "representative": "ad-bootstrap",
   "case_type": "positive",

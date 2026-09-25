@@ -6,7 +6,7 @@
   "intent": "intentionally-broken",
   "declared_failure": "wrong_routing",
   "frozen": {
-    "case_sha256": "b20814d7ab215e7d6139dacf8d3a00f1b642da5338f15328f29e51b695612a01",
+    "case_sha256": "34b19ba1e84bef31c52afe8b61ee920c6f6ee9c84babad9f3a5dd8cb80292d70",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -52,7 +52,7 @@
         }
       ],
       "outcome": {
-        "final_response": "Started scaffolding the hook runner.",
+        "final_response": "Started scaffolding a local hook runner.",
         "artifact_manifest": [],
         "exit_state": "success"
       },

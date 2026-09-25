@@ -3,7 +3,7 @@
   "id": "bootstrap-agents-guide-coexistence",
   "category": {
     "kind": "spec-driven",
-    "invocation": "user-invocable-only"
+    "invocation": "model-invocable"
   },
   "representative": "ad-bootstrap",
   "case_type": "coexistence",
@@ -13,23 +13,17 @@
   "fixture": "eval/fixtures/planning-docs-repo",
   "expected": {
     "route": "ad-next",
-    "dormant": [
-      "ad-bootstrap"
-    ],
-    "outcome": "the agent surveys the project state and recommends next actions, leaving any guide rewrite to the user",
+    "outcome": "the agent surveys the project state, reports what in the agent guide is out of date, and rewrites nothing without the owner asking",
     "allowed_effects": [],
-    "forbidden_effects": [],
+    "forbidden_effects": [
+      "AGENTS.md"
+    ],
     "artifacts": [],
     "exit_state": "success"
   },
   "graders": [
     {
       "id": "route",
-      "kind": "deterministic",
-      "version": "1"
-    },
-    {
-      "id": "dormancy",
       "kind": "deterministic",
       "version": "1"
     },

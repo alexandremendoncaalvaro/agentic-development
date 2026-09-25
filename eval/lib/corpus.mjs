@@ -86,6 +86,12 @@ const INTERSECTIONS = [
   'workflow-operational/model-invocable',
   'workflow-operational/user-invocable-only',
 ];
+// Spec 0007 R2 asks for a representative of every populated intersection. The
+// kit ships no host-blocked skill (ADR-0085), so the user-invocable-only
+// intersections are reported but unpopulated. A skill added to
+// HOST_BLOCKED_SKILLS in test/skills.test.js repopulates its intersection, which
+// must then be added here so the gate asks for its representative.
+const POPULATED = new Set(['spec-driven/model-invocable', 'workflow-operational/model-invocable']);
 
 function sorted(set) {
   return [...set].sort();
@@ -95,8 +101,8 @@ function sorted(set) {
  * Coverage over Spec 0007 R2 (every populated category-axis intersection has a
  * representative) and R3 (every representative has a positive case, a
  * close-negative or dormancy case, and a coexistence case). `gaps` is empty
- * when the corpus satisfies both; every intersection in the accepted axes is
- * treated as populated, per ADR-0007 and ADR-0073.
+ * when the corpus satisfies both; every intersection is reported, and only the
+ * populated ones, per ADR-0007 and ADR-0085, must have a representative.
  */
 export function coverageReport(cases) {
   const intersections = Object.fromEntries(INTERSECTIONS.map((key) => [key, new Set()]));
@@ -133,7 +139,9 @@ export function coverageReport(cases) {
     gaps.push(`receipts directory ${orphan} matches no case`);
   }
   for (const key of INTERSECTIONS) {
-    if (intersections[key].size === 0) gaps.push(`intersection ${key} has no representative`);
+    if (POPULATED.has(key) && intersections[key].size === 0) {
+      gaps.push(`intersection ${key} has no representative`);
+    }
   }
   for (const [name, entry] of Object.entries(representatives)) {
     if (!entry.case_types.has('positive'))

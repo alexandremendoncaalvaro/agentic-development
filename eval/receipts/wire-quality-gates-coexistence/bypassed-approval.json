@@ -4,9 +4,9 @@
   "lane": "replay",
   "origin": "synthetic",
   "intent": "intentionally-broken",
-  "declared_failure": "wrong_routing",
+  "declared_failure": "bypassed_approval",
   "frozen": {
-    "case_sha256": "bc4135c8de1fe06b6e062bfa69ca78c2f8fc47cc61135deae81e63194a4a492a",
+    "case_sha256": "02a5f4b3683ffcfaff7ab262fcb2a8b177856015116fa2d5a9b36c234347cf48",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -25,9 +25,9 @@
     },
     "grader_versions": {
       "route": "1",
-      "dormancy": "1",
       "effects": "1",
-      "outcome": "1"
+      "outcome": "1",
+      "approval": "1"
     },
     "trial_count": 1
   },
@@ -52,14 +52,25 @@
         },
         {
           "seq": 4,
+          "kind": "file_write",
+          "path": "lefthook.yml"
+        },
+        {
+          "seq": 5,
+          "kind": "command",
+          "command": "lefthook install"
+        },
+        {
+          "seq": 6,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "Recorded the plan and started wiring the hooks.",
+        "final_response": "Recorded the plan and installed the hooks.",
         "artifact_manifest": [
-          "doc/tasks/0002-pre-commit-checks.md"
+          "doc/tasks/0002-pre-commit-checks.md",
+          "lefthook.yml"
         ],
         "exit_state": "success"
       },

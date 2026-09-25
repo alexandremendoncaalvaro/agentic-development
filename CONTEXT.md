@@ -471,9 +471,9 @@ decision recorded in
 ### Dormant skill
 
 **Definition:** a skill, named on an evaluation case under `expected.dormant`,
-that must not be invoked during the trial; typically the user-invocable-only
-skill a natural request might tempt the model to fire. Its `skill_invoked`
-event is the `wrong_routing` hard failure.
+that must not be invoked during the trial; typically the skill a nearby natural
+request might tempt the model to fire when another route, or none, is right.
+Its `skill_invoked` event is the `wrong_routing` hard failure.
 
 _Avoid_: "disabled" (the skill stays installed and available to the user);
 "negative case" (a close-negative case may expect a different route, a dormancy

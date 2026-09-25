@@ -6,7 +6,7 @@
   "intent": "known-good",
   "declared_failure": null,
   "frozen": {
-    "case_sha256": "ed8f6db99164bfb897d7b876e556264392a2229b714ee8f20cbbd2c22bd6cc80",
+    "case_sha256": "f152d2df55cb2b88d711c74eef6e019d63e65cd551db0d2ddb1c2e9db3d4088d",
     "fixture_sha256": "341659dbab7d3d46c9f327fee3d9d55bdc8c5cbb88efd4b6be80045b59e0be03",
     "host": "claude-code",
     "host_version": "2.1.227",
@@ -18,14 +18,13 @@
       "Bash",
       "Skill"
     ],
-    "permissions": "acceptEdits",
+    "permissions": "default",
     "context_policy": "bare",
     "run_parameters": {
       "max_turns": 12
     },
     "grader_versions": {
       "route": "1",
-      "dormancy": "1",
       "effects": "1",
       "outcome": "1"
     },
@@ -47,12 +46,17 @@
         },
         {
           "seq": 3,
+          "kind": "skill_invoked",
+          "skill": "ad-bootstrap"
+        },
+        {
+          "seq": 4,
           "kind": "final",
           "exit_state": "success"
         }
       ],
       "outcome": {
-        "final_response": "Two tasks are in progress and one spec is accepted without tasks; the guide is current. Recommended next: pick up task 0048; run /ad-bootstrap only if you want the guide re-audited.",
+        "final_response": "Surveyed the project and audited the agent guide: two sections are out of date; say the word and I will refresh them.",
         "artifact_manifest": [],
         "exit_state": "success"
       },
