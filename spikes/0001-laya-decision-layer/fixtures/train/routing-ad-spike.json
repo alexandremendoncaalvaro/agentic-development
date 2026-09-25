@@ -1,0 +1,182 @@
+[
+ {
+  "request": "We need to pick between three different OCR libraries for extracting text from scanned invoices, and none of them clearly wins on the docs alone — want to test against real samples before committing.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Not sure whether to use a rule-based parser or an LLM-based extraction pipeline for our resume parsing feature. Both seem plausible but I have no idea which will actually perform better on our data.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "I want to try three different approaches to background removal for product photos — traditional CV thresholding, a pretrained segmentation model, and a commercial API — and compare them against known-good outputs.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "There are like four different ways to do fuzzy deduplication of customer records and I genuinely don't know which will hold up. Can we set up something with sample data to compare them?",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "The spec for the barcode scanner is locked but I have no clue if pyzbar, zxing, or a custom OpenCV pipeline will actually detect our warped labels reliably.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Before we commit to a face-blurring approach for the video pipeline, I want to run a couple of models against a fixed set of test clips and see which actually blurs correctly at each stage.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso decidir entre duas bibliotecas de reconhecimento de voz para o app, mas nenhuma documentação deixa claro qual lida melhor com sotaque brasileiro. Quero testar as duas com áudios reais antes de escolher.",
+  "label": "ad-spike",
+  "lang": "pt"
+ },
+ {
+  "request": "Temos um pipeline de várias etapas para converter PDFs escaneados em texto estruturado e não sei qual técnica de OCR mais camada de pós-processamento vai funcionar melhor. Queria testar isso com alguns documentos fixos como referência.",
+  "label": "ad-spike",
+  "lang": "pt"
+ },
+ {
+  "request": "Trying to figure out whether a diffusion-based upscaler or a classic super-resolution model works better for our thumbnail pipeline — want fixed test images and per-stage debug output so I can eyeball where each approach breaks.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "We're stuck between two clustering algorithms for grouping similar support tickets and there's no clear winner from the papers or docs. I want a throwaway setup to compare them stage by stage on a fixed set.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "A técnica para extrair tabelas de PDFs financeiros não está clara — testei camelot e tabula rapidamente mas nenhum ganhou de forma óbvia. Quero montar algo comparando as duas em cima de um conjunto fixo de PDFs de exemplo.",
+  "label": "ad-spike",
+  "lang": "pt"
+ },
+ {
+  "request": "For the license plate recognition feature, I want to compare a classical edge-detection approach against a YOLO-based detector using the same set of test photos, checking outputs at each processing stage.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Could you set up an experiment comparing sentence-transformers vs a custom TF-IDF approach for our search relevance, using a fixed query/document set so we can eyeball which ranks better at each step?",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "None of us can agree if we should hand-roll a state machine or use a workflow engine library for the order fulfillment logic. Multiple plausible options, no clear winner from research — let's actually try both against sample orders.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Ainda não sabemos se vale mais usar um modelo de detecção de objetos pronto ou treinar um customizado para identificar defeitos nas peças. Queria montar um teste com fotos reais e comparar as duas abordagens etapa por etapa.",
+  "label": "ad-spike",
+  "lang": "pt"
+ },
+ {
+  "request": "I want to prototype two different approaches for real-time audio noise suppression — spectral gating vs a small neural net — and validate each stage's output against a handful of recorded reference clips before we pick one.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "The data pipeline needs to dedupe images by perceptual similarity but I don't know if pHash, dHash, or a CNN embedding approach will actually work on our messy product photos. Want to compare with fixture images.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "We have three candidate strategies for parsing malformed CSVs from vendors and no amount of reading the docs tells us which handles our edge cases best. I'd like to test them side by side on real problem files.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Estamos em dúvida entre duas abordagens para anonimizar dados de CPF em documentos escaneados — regex simples versus um modelo NER treinado. Nenhuma fonte resolve isso, queria comparar as duas com documentos de teste fixos.",
+  "label": "ad-spike",
+  "lang": "pt"
+ },
+ {
+  "request": "For compressing our video uploads, should we go with a two-pass ffmpeg preset or a custom bitrate ladder? I can't tell from benchmarks alone — want to run both against sample uploads and inspect intermediate outputs.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "There's genuine uncertainty about whether template matching or feature-based matching will correctly align our satellite imagery tiles. Set up a comparison with known-good aligned tiles as the reference.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso decidir a técnica certa para detectar duplicidade de documentos escaneados — hashing perceptual, embeddings de imagem, ou comparação de texto extraído. Nenhuma abordagem é claramente superior, quero testar as três com um conjunto fixo de documentos.",
+  "label": "ad-spike",
+  "lang": "pt"
+ },
+ {
+  "request": "Our recommendation engine could use collaborative filtering or a content-based embedding approach and honestly either could work — I want a quick staged comparison with a fixed dataset before we lock in the architecture.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "I keep going back and forth between two different libraries for parsing EDI files and can't tell which handles our partner's weird formatting quirks. Let's set up a comparison against actual sample files with debug output at each parsing stage.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Need to figure out the right technique for extracting speaker turns from call recordings — diarization library A vs B vs a custom VAD+clustering pipeline. Want to validate each against a small set of labeled reference calls.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "A gente não sabe ainda qual abordagem de compressão de imagem médica preserva mais detalhe sem estourar o tamanho do arquivo — testei rapidamente dois codecs e não ficou claro. Quero montar uma comparação com imagens de referência fixas.",
+  "label": "ad-spike",
+  "lang": "pt"
+ },
+ {
+  "request": "I need to add rate limiting to our public API. I'm pretty sure there's a standard approach using token buckets that's well documented — can you find the right pattern and implement it?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "The technique is already settled — we're using JWT with refresh tokens like every other service in this repo. Just need you to wire up the new auth endpoint.",
+  "label": "ad-task",
+  "lang": "en"
+ },
+ {
+  "request": "Implement the invoice reconciliation feature per the spec we finalized last week, and validate the whole pipeline against the sample invoice set end to end.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Before we start building the new multi-tenant billing system, I want to surface the biggest technical risks and open questions so we know what could go wrong.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Our checkout service has been throwing intermittent 500s since yesterday's deploy and I need help tracing through logs to find the root cause.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Can you help sketch the high-level architecture for our new notification service, showing how it'll integrate with the existing event bus?",
+  "label": "ad-architecture",
+  "lang": "en"
+ },
+ {
+  "request": "We already tested Kafka against RabbitMQ last sprint and picked Kafka — can you write up the record documenting that decision and the reasoning?",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "Can you put together a broad landscape survey of how teams typically structure feature flags at scale? Just want context before we even think about picking anything.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Write unit tests for this date-parsing function — the logic is already implemented and correct, I just want good test coverage.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Can you clean up the formatting in this component and remove the unused imports?",
+  "label": "none",
+  "lang": "en"
+ }
+]

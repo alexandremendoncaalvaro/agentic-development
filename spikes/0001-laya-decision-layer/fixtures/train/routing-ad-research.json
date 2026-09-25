@@ -1,0 +1,182 @@
+[
+ {
+  "request": "Should we migrate our monolith to microservices, or is that overkill for a team our size? Want real backing before I bring this to the staff meeting.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Need a proper comparison of Kafka vs RabbitMQ for our event pipeline before we commit budget to either one.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "What's actually the most advanced approach in vector databases for RAG applications right now?",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Is Rust actually faster than Go for our use case, or is that just hype? Want real evidence, not forum opinions.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Compare GraphQL and REST for our new mobile API and give me a defensible recommendation with sources.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "I keep hearing serverless is cheaper but I don't trust it — can you dig into whether that actually holds for workloads like ours before we plan the migration budget?",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Dig through what's out there on the tradeoffs of event sourcing before we bake it into the design doc.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "We need to decide between self-hosting our LLM or using a hosted API — what does the evidence actually say about cost and latency at our scale?",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Is switching our CI from Jenkins to GitHub Actions actually going to save us time, or is that wishful thinking on the team's part?",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "What's the best approach for handling multi-tenancy at our scale — row-level security, schema-per-tenant, or separate databases entirely? Need a grounded answer with tradeoffs laid out.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Look into whether WebAssembly is mature enough for us to run untrusted plugin code in production safely.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Compare Terraform and Pulumi properly — I want an actual conclusion at the end, not just a pros and cons list.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "How strong is the evidence that pair programming improves code quality? Our team lead wants a solid answer before we mandate it org-wide.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Is trunk-based development worth mandating company-wide? Need something I can bring to leadership with actual backing, not just my gut feeling.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "What does the data actually say about monorepos versus polyrepos for orgs our size?",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Kafka vs RabbitMQ — need a real comparison, please, before Friday's architecture review.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Look into whether feature flags meaningfully reduce deployment risk, backed by actual sources instead of blog posts and vendor marketing.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Redis or Memcached for session storage — which one actually has stronger evidence behind it for our traffic patterns?",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "I need a defensible answer on whether GraphQL federation is the right call before the architecture team votes on it next week.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Our infra team keeps arguing about whether Nomad or Kubernetes is the better fit for us long-term, and it's all opinion so far — can you settle it with real evidence and grade the sources?",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Before we lock in the vendor contract, I want a properly sourced writeup on whether managed Elasticsearch is worth the premium over self-hosting OpenSearch for a workload our size.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Precisamos decidir entre usar Kubernetes ou nos manter em containers simples no ECS — dá pra levantar as evidências antes da reunião de quinta?",
+  "label": "ad-research",
+  "lang": "pt"
+ },
+ {
+  "request": "Qual é a abordagem mais avançada hoje em bancos de dados vetoriais pra busca semântica?",
+  "label": "ad-research",
+  "lang": "pt"
+ },
+ {
+  "request": "Vale a pena migrar de REST para gRPC nos nossos microsserviços internos? Quero uma conclusão bem fundamentada, com fontes.",
+  "label": "ad-research",
+  "lang": "pt"
+ },
+ {
+  "request": "Estamos avaliando se compensa trocar nosso pipeline de CI/CD, mas ninguém trouxe dados reais ainda — pode investigar isso a fundo pra eu levar pro time?",
+  "label": "ad-research",
+  "lang": "pt"
+ },
+ {
+  "request": "É verdade que NoSQL escala melhor que SQL relacional pro nosso caso de uso, ou isso é só marketing de fornecedor?",
+  "label": "ad-research",
+  "lang": "pt"
+ },
+ {
+  "request": "Investiga se vale a pena adotarmos Rust pra parte crítica de performance do sistema, com evidências de peso e não só achismo.",
+  "label": "ad-research",
+  "lang": "pt"
+ },
+ {
+  "request": "Precisamos de uma comparação séria entre monorepo e multirepo antes de decidirmos a estrutura do novo projeto, com prós e contras bem embasados.",
+  "label": "ad-research",
+  "lang": "pt"
+ },
+ {
+  "request": "We've already decided to move off MySQL to Postgres, can you find the best concrete path to get us there with minimal downtime?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Can you validate whether this new caching library actually works with our setup before we commit to rolling it out further?",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "I want to document why we chose Kubernetes over ECS last quarter so it's on record for the next person who asks.",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "My question about scaling is way too vague right now, can you help me sharpen it before I go dig into anything?",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Can you draft the product requirements for the new onboarding flow we discussed last week?",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Diagnose why our checkout service keeps timing out under load — it started happening after last night's deploy.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Write up an architecture proposal for splitting our monolith into services along the lines we sketched on the whiteboard.",
+  "label": "ad-architecture",
+  "lang": "en"
+ },
+ {
+  "request": "Audit our current auth implementation for security gaps before the compliance review next month.",
+  "label": "ad-audit",
+  "lang": "en"
+ }
+]

@@ -1,0 +1,182 @@
+[
+ {
+  "request": "We're finally open-sourcing our internal tool next week and have nothing telling outside contributors how to submit patches.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "GitHub keeps nagging that this repo lacks a security policy — can you check what's missing and fill only the gaps?",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "New volunteers keep asking me how to set up the dev environment before submitting a fix; I don't have anything written down for them.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Can you check if our CONTRIBUTING.md already covers the test command and PR checklist, or if it's just a stale stub?",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "We need a place for people to report vulnerabilities responsibly instead of opening a public issue.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Scaffold the standard GitHub community files for this repo, but don't touch the security doc since legal already reviewed it.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Someone opened an issue asking where to send a CVE report and we don't have an answer for them.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Audit our contribution guide against what our test suite and lint config actually require.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "I want a doc contributors can read before their first PR that explains branch naming and commit conventions we actually use.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Before we go public, make sure we have both a contribution guide and a disclosure policy in place.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Check whether SECURITY.md exists anywhere in this repo — root, .github, or docs — before you write a new one.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "We got a security report over email and had no formal channel for it, need to fix that gap going forward.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Pull together contributor documentation from our README and existing PR template rather than guessing at conventions.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "This repo has an old CONTRIBUTING.md from two years ago, tell me concretely what's out of date rather than rewriting it wholesale.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "I need a security policy but I genuinely don't know our supported version window yet — can you just ask me instead of assuming?",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Set up the two standard community health files for open source projects, respecting whatever's already there.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Our maintainers want a clear escalation path for vulnerability reports before we announce this project publicly.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Look at our test commands and issue templates, then draft contributor onboarding docs from what you find.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Double check our security policy doc isn't missing a disclosure timeline before we link it from the README.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Vamos abrir esse projeto pro público e ainda não temos nenhum guia explicando como alguém pode contribuir com código.",
+  "label": "ad-community-docs",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso de uma política de segurança que diga como relatar vulnerabilidades, mas não sei qual prazo de resposta prometer ainda.",
+  "label": "ad-community-docs",
+  "lang": "pt"
+ },
+ {
+  "request": "Confere se já existe algum arquivo de segurança nesse repositório antes de criar um novo, pode estar em outra pasta.",
+  "label": "ad-community-docs",
+  "lang": "pt"
+ },
+ {
+  "request": "Nosso guia de contribuição está desatualizado, quero saber exatamente o que falta em vez de reescrever tudo do zero.",
+  "label": "ad-community-docs",
+  "lang": "pt"
+ },
+ {
+  "request": "Alguém relatou uma falha de segurança por e-mail semana passada e a gente não tinha nenhum canal formal pra isso.",
+  "label": "ad-community-docs",
+  "lang": "pt"
+ },
+ {
+  "request": "Monta os documentos padrão de comunidade open source pra esse repositório, sem sobrescrever nada que já exista.",
+  "label": "ad-community-docs",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso de um documento explicando pra novos colaboradores como rodar os testes e abrir PR antes do lançamento público.",
+  "label": "ad-community-docs",
+  "lang": "pt"
+ },
+ {
+  "request": "Our team needs a shared style guide document laying out naming conventions and formatting rules we all agree to follow.",
+  "label": "ad-guidelines",
+  "lang": "en"
+ },
+ {
+  "request": "Set up pre-commit hooks that run lint and the test suite automatically before every commit.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Our GitHub issue and pull request templates are outdated, can you refresh the fields they ask contributors to fill in?",
+  "label": "ad-template-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Write release notes summarizing everything that changed for the 3.2.0 tag we're about to publish.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Summarize the changes on my current branch into a clear pull request description for review.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Draft a roadmap document laying out the features we plan to ship next quarter.",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "Run a security audit on our authentication module and flag any vulnerabilities you find in the code itself.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a status report on where the database migration project currently stands and what's blocking it.",
+  "label": "ad-project-state",
+  "lang": "en"
+ },
+ {
+  "request": "We need to define house rules for how the agent should behave when it touches this repo's config files.",
+  "label": "ad-rules",
+  "lang": "en"
+ },
+ {
+  "request": "Write a code of conduct for our open source community outlining expected behavior and moderation steps.",
+  "label": "none",
+  "lang": "en"
+ }
+]

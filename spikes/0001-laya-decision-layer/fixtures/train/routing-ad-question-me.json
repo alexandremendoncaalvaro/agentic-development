@@ -1,0 +1,202 @@
+[
+ {
+  "request": "I've been heads down on this migration plan for two days — can you poke holes in it before I present it tomorrow?",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Before I commit this refactor, look it over and tell me what I might be missing.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "I'm fairly confident in this API design but want a second pair of eyes to see what I haven't considered.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Can you look at my draft PRD and flag anything that only I can decide, without just telling me it's fine?",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "I want to sanity check this caching strategy before rolling it out to prod.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Take a look at this half-finished spec and tell me the gaps that actually matter, not busywork nitpicks.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "I think this schema change is solid but I'd like someone to push back on it before I merge.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Here's my plan for the auth rewrite — probe it for blind spots I can't see from the inside.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Before I lock in this architecture doc, surface the tradeoffs I need to weigh myself.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "I'm about to ship this feature flag rollout, can you stress test my reasoning first?",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Look at this incident postmortem draft and tell me what's still shaky, but don't just give me a thumbs up or down.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "I drafted this data retention policy — what decisions in here are actually mine to make that I haven't made yet?",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Give this branching strategy proposal a hard look and tell me what only the team lead could answer.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "I want to pressure-test my assumptions on this rate limiter before I finalize it.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Can you look over my onboarding doc draft and point out anything unresolved that isn't answerable from the codebase?",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "This is my plan for splitting the monolith — poke at it so I catch problems before the standup.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "I've written up my reasoning for picking Kafka over SQS, tell me what's missing before I present it to the team.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "quick gut check on this deploy plan before I run it — what am I not seeing",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "I'm not asking for a go/no-go, just want you to surface the open questions in this design doc that I need to resolve myself.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Wrote up a proposal for consolidating our microservices into fewer deployables, can you find the soft spots in my thinking before I send it to leadership?",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "here's my draft rollback runbook, tell me what's genuinely unclear rather than nitpicking formatting",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "I've mapped out the event schema for the new billing pipeline — before I freeze it, what needs my judgment call that you can't just derive from the code?",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Sketched out a plan for handling multi-region failover, want you to challenge it constructively before our architecture review Thursday.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Terminei o rascunho da migração de banco de dados, pode apontar o que ainda não considerei antes de eu seguir em frente?",
+  "label": "ad-question-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Antes de eu confirmar essa decisão de arquitetura, quero que você levante os pontos que só eu posso decidir.",
+  "label": "ad-question-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Escrevi esse plano de rollback, será que você consegue achar furos que eu não percebi?",
+  "label": "ad-question-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero uma segunda opinião sobre essa proposta de cache antes de aplicar em produção, sem me dar um veredito, só as perguntas certas.",
+  "label": "ad-question-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Estou quase fechando esse desenho de API, pode revisar e me dizer o que ainda está em aberto?",
+  "label": "ad-question-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Dá uma olhada nesse plano de deploy e me diz se estou esquecendo de algo importante antes de eu apertar o botão.",
+  "label": "ad-question-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso de alguém para questionar minhas premissas nesse documento de design antes da reunião de amanhã.",
+  "label": "ad-question-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Really put this proposal through the wringer and tell me straight up whether it's ready to ship or not.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Can you do a full code review on this PR before I merge it?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "What are the biggest risks in this rollout plan and how likely are they to actually bite us?",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Production is throwing intermittent 500s on checkout, can you help me figure out the root cause?",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "I made some performance claims in this design doc — can you verify them against the actual benchmark numbers?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Can you audit this codebase for security vulnerabilities before we go live next week?",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Can you look at this decision from the angle of the ops team, the security team, and end users, and tell me where those views clash?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Given where the project stands right now, what should I actually pick up next?",
+  "label": "ad-next",
+  "lang": "en"
+ },
+ {
+  "request": "I want to do a quick throwaway prototype to see if this library even handles our use case before investing real time.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Can you compare the current implementation against the original design doc and tell me where it's drifted?",
+  "label": "ad-drift",
+  "lang": "en"
+ }
+]

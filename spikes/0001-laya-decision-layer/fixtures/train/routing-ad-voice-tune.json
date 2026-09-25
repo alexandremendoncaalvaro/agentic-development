@@ -1,0 +1,182 @@
+[
+ {
+  "request": "I want you to look at my last few PR descriptions and start writing my commit messages in that same tone going forward.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Can we go through some of my old Slack messages in #eng-general from last month so you pick up how I actually phrase things?",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "My teammate keeps correcting how I write standup updates, I'd like to feed those corrections into how you write for me from now on.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Before you touch anything, I want to make sure only my own emails from the support inbox get used, not the whole team's.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "There's a difference between how I write for the open source repo audience versus how I text my cofounder, can you keep those separate?",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Pull my sent folder from the last 90 days, but only messages I authored, and build something that captures how I write.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "The 'no worries, happy to help!' style isn't really me, it's just something I picked up talking to one client, don't bake that in permanently.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Update whatever captures my writing style with just this one change: I never start sentences with 'So,'",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Can you check if there's already something tracking my style saved locally, and tell me what's in it before we change anything?",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "I want to authorize you to read one Discord thread, just the messages from me, between June 1 and June 15.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Review these three code review comments I wrote and figure out the pattern in how blunt I tend to be, then keep that somewhere.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "I don't want you inferring my tone from the whole team channel, just from my own posts please.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Something feels off, the way you're writing sounds too formal for me, can we adjust it based on actual examples of my writing?",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Here's a doc with edits my manager made to my email drafts, I want you to learn only what's mine, not incorporate their changes as my style.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Set it up so going forward you keep the way I sound stored somewhere on this machine, not shared anywhere else.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Quick one, can you check what write-style profile is currently saved before we add anything new to it?",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "I want to make sure that whenever you draft things for me you sound like how I actually write to customers, not like a generic assistant.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Propose one adjustment at a time please, don't just overwrite the whole thing at once with everything you inferred.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "There's a folder of my old newsletter drafts, I want to authorize reading just those, nothing else in that directory.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Quero que você analise minhas últimas mensagens no Slack e aprenda o jeito que eu realmente escrevo, só as minhas, não as do time todo.",
+  "label": "ad-voice-tune",
+  "lang": "pt"
+ },
+ {
+  "request": "Antes de ler qualquer coisa privada, me diga exatamente quais mensagens e de que período você vai usar para isso.",
+  "label": "ad-voice-tune",
+  "lang": "pt"
+ },
+ {
+  "request": "Separei uns e-mails antigos meus, quero autorizar a leitura só desses, para você entender melhor meu tom de escrita.",
+  "label": "ad-voice-tune",
+  "lang": "pt"
+ },
+ {
+  "request": "Ei, dá pra ajustar uma coisa só no jeito que você escreve por mim? Não gosto de começar frase com 'Então,'",
+  "label": "ad-voice-tune",
+  "lang": "pt"
+ },
+ {
+  "request": "Será que já existe algo salvo localmente sobre como eu escrevo? Queria ver antes de mudarmos qualquer coisa.",
+  "label": "ad-voice-tune",
+  "lang": "pt"
+ },
+ {
+  "request": "Puxa as correções que meu editor fez nos meus rascunhos, mas só aprenda o que é realmente meu estilo, não o dele.",
+  "label": "ad-voice-tune",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero manter separado o jeito que escrevo pra comunidade open source do jeito que escrevo pros meus amigos, dá pra fazer isso?",
+  "label": "ad-voice-tune",
+  "lang": "pt"
+ },
+ {
+  "request": "Can you make sure our commit messages follow the team's contribution guidelines before I push this branch?",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "I want to update the community contribution doc with our new PR etiquette rules for external contributors.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Let's write up a style guide for how everyone on the team should format and write our documentation.",
+  "label": "ad-guidelines",
+  "lang": "en"
+ },
+ {
+  "request": "Can you use my usual tone to draft this release announcement for the customers mailing list?",
+  "label": "ad-voice",
+  "lang": "en"
+ },
+ {
+  "request": "I want to tune the project's PR template so it asks contributors for testing steps and screenshots.",
+  "label": "ad-template-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Review this PR and tell me if the code quality and test coverage meet our standards.",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Can you grill me with hard questions about this architecture decision before I present it to the team?",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Help me write a philosophy doc explaining why we prioritize simplicity over flexibility in this codebase.",
+  "label": "ad-philosophy",
+  "lang": "en"
+ },
+ {
+  "request": "I need a report summarizing what happened during last night's production outage for stakeholders.",
+  "label": "ad-report",
+  "lang": "en"
+ },
+ {
+  "request": "Draft the release notes for version 2.3 using our usual product-facing voice.",
+  "label": "ad-release",
+  "lang": "en"
+ }
+]

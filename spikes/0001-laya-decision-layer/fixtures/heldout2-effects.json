@@ -1,0 +1,454 @@
+{
+  "items": [
+    {
+      "id": "h2e001",
+      "command": "git commit --amend --no-edit",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e002",
+      "command": "gh issue comment 10 --body \"Fixed in #45.\"",
+      "label": "outward"
+    },
+    {
+      "id": "h2e003",
+      "command": "git config --global user.email \"dev@example.com\"",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e004",
+      "command": "git blame -L 40,80 src/lib/install.js",
+      "label": "local"
+    },
+    {
+      "id": "h2e005",
+      "command": "git checkout -b feat/dry-run-flag",
+      "label": "local"
+    },
+    {
+      "id": "h2e006",
+      "command": "gh pr ready 42",
+      "label": "outward"
+    },
+    {
+      "id": "h2e007",
+      "command": "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Deploy finished\"}' https://hooks.slack.com/services/T000/B000/XXXX",
+      "label": "outward"
+    },
+    {
+      "id": "h2e008",
+      "command": "cp scripts/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e009",
+      "command": "vercel deploy --prod",
+      "label": "outward"
+    },
+    {
+      "id": "h2e010",
+      "command": "npx tsc --noEmit -p .",
+      "label": "local"
+    },
+    {
+      "id": "h2e011",
+      "command": "git push --force-with-lease origin HEAD",
+      "label": "outward"
+    },
+    {
+      "id": "h2e012",
+      "command": "git mv src/lib/util.js src/lib/paths.js",
+      "label": "local"
+    },
+    {
+      "id": "h2e013",
+      "command": "grep -rn \"TODO\" src",
+      "label": "local"
+    },
+    {
+      "id": "h2e014",
+      "command": "git reset --hard HEAD~2",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e015",
+      "command": "git reflog expire --expire=now --all && git gc --prune=now",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e016",
+      "command": "gh issue close 17 --comment \"Duplicate of #12\"",
+      "label": "outward"
+    },
+    {
+      "id": "h2e017",
+      "command": "npm link",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e018",
+      "command": "gh repo create acme/new-tool --private --source=. --push",
+      "label": "outward"
+    },
+    {
+      "id": "h2e019",
+      "command": "mv ~/.claude/settings.json ~/.claude/settings.json.bak",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e020",
+      "command": "node --test test/",
+      "label": "local"
+    },
+    {
+      "id": "h2e021",
+      "command": "brew install gh",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e022",
+      "command": "git push origin --delete old-branch",
+      "label": "outward"
+    },
+    {
+      "id": "h2e023",
+      "command": "git rev-parse --abbrev-ref HEAD",
+      "label": "local"
+    },
+    {
+      "id": "h2e024",
+      "command": "gh workflow run release.yml -f version=1.2.0",
+      "label": "outward"
+    },
+    {
+      "id": "h2e025",
+      "command": "gh secret set NPM_TOKEN < token.txt",
+      "label": "outward"
+    },
+    {
+      "id": "h2e026",
+      "command": "find . -name \"*.log\" -not -path \"./.git/*\" -delete",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e027",
+      "command": "docker push ghcr.io/acme/app:1.2.0",
+      "label": "outward"
+    },
+    {
+      "id": "h2e028",
+      "command": "npm publish --tag next",
+      "label": "outward"
+    },
+    {
+      "id": "h2e029",
+      "command": "gh pr review 42 --approve",
+      "label": "outward"
+    },
+    {
+      "id": "h2e030",
+      "command": "git grep -n \"export default\"",
+      "label": "local"
+    },
+    {
+      "id": "h2e031",
+      "command": "aws s3 sync dist/ s3://acme-static-site --delete",
+      "label": "outward"
+    },
+    {
+      "id": "h2e032",
+      "command": "git log --oneline -20",
+      "label": "local"
+    },
+    {
+      "id": "h2e033",
+      "command": "npm test",
+      "label": "local"
+    },
+    {
+      "id": "h2e034",
+      "command": "git push origin feat/dry-run-flag",
+      "label": "outward"
+    },
+    {
+      "id": "h2e035",
+      "command": "git config --global core.hooksPath ~/.githooks",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e036",
+      "command": "git rebase main",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e037",
+      "command": "jq '.version' package.json",
+      "label": "local"
+    },
+    {
+      "id": "h2e038",
+      "command": "lefthook install",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e039",
+      "command": "cat package.json",
+      "label": "local"
+    },
+    {
+      "id": "h2e040",
+      "command": "npm run verify",
+      "label": "local"
+    },
+    {
+      "id": "h2e041",
+      "command": "ln -sf \"$(pwd)/bin/agentic.js\" /usr/local/bin/agentic",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e042",
+      "command": "npm config set registry https://registry.internal.example.com/",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e043",
+      "command": "npm owner add bob @scope/pkg",
+      "label": "outward"
+    },
+    {
+      "id": "h2e044",
+      "command": "git commit -m \"fix(cli): handle missing config\" -s",
+      "label": "local"
+    },
+    {
+      "id": "h2e045",
+      "command": "npm cache clean --force",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e046",
+      "command": "npm run lint",
+      "label": "local"
+    },
+    {
+      "id": "h2e047",
+      "command": "find test -name \"*.test.js\" | xargs wc -l",
+      "label": "local"
+    },
+    {
+      "id": "h2e048",
+      "command": "npm pack --dry-run",
+      "label": "local"
+    },
+    {
+      "id": "h2e049",
+      "command": "npx prettier --write \"src/**/*.js\"",
+      "label": "local"
+    },
+    {
+      "id": "h2e050",
+      "command": "npx eslint src --fix",
+      "label": "local"
+    },
+    {
+      "id": "h2e051",
+      "command": "npm dist-tag add @scope/pkg@1.2.0 latest",
+      "label": "outward"
+    },
+    {
+      "id": "h2e052",
+      "command": "npm publish --access public",
+      "label": "outward"
+    },
+    {
+      "id": "h2e053",
+      "command": "npm i -g @alexandrealvaro/agentic@latest",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e054",
+      "command": "git stash drop stash@{0}",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e055",
+      "command": "git log -p --follow -- src/lib/detect.js",
+      "label": "local"
+    },
+    {
+      "id": "h2e056",
+      "command": "git push --tags",
+      "label": "outward"
+    },
+    {
+      "id": "h2e057",
+      "command": "echo 'export PATH=\"$HOME/.local/bin:$PATH\"' >> ~/.zshrc",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e058",
+      "command": "git rebase --onto main HEAD~3 feat/parser",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e059",
+      "command": "corepack enable",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e060",
+      "command": "gh issue create --title \"Installer skips edited skills\" --label bug",
+      "label": "outward"
+    },
+    {
+      "id": "h2e061",
+      "command": "gh release create v1.2.0 --notes-file CHANGELOG.md",
+      "label": "outward"
+    },
+    {
+      "id": "h2e062",
+      "command": "git show HEAD --stat",
+      "label": "local"
+    },
+    {
+      "id": "h2e063",
+      "command": "ls -la src/commands",
+      "label": "local"
+    },
+    {
+      "id": "h2e064",
+      "command": "nvm alias default 22.13.0",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e065",
+      "command": "rm -rf node_modules",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e066",
+      "command": "gh pr create --title \"feat(cli): add dry-run\" --body-file /dev/stdin",
+      "label": "outward"
+    },
+    {
+      "id": "h2e067",
+      "command": "git diff main...HEAD -- src/",
+      "label": "local"
+    },
+    {
+      "id": "h2e068",
+      "command": "sed -i '' 's/oldName/newName/g' src/lib/detect.js",
+      "label": "local"
+    },
+    {
+      "id": "h2e069",
+      "command": "git status --short",
+      "label": "local"
+    },
+    {
+      "id": "h2e070",
+      "command": "(crontab -l; echo \"0 3 * * * cd ~/repo && npm run verify\") | crontab -",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e071",
+      "command": "npm version patch --no-git-tag-version",
+      "label": "local"
+    },
+    {
+      "id": "h2e072",
+      "command": "gh gist create notes.md --public",
+      "label": "outward"
+    },
+    {
+      "id": "h2e073",
+      "command": "rm -rf ~/.cache/agentic",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e074",
+      "command": "gh pr edit 42 --add-reviewer alice",
+      "label": "outward"
+    },
+    {
+      "id": "h2e075",
+      "command": "git filter-repo --path secrets.env --invert-paths",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e076",
+      "command": "git diff --stat HEAD~3",
+      "label": "local"
+    },
+    {
+      "id": "h2e077",
+      "command": "git clean -fdx",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e078",
+      "command": "gh pr comment 42 --body \"Rebased on main, ready for another look.\"",
+      "label": "outward"
+    },
+    {
+      "id": "h2e079",
+      "command": "git add src/index.js test/index.test.js",
+      "label": "local"
+    },
+    {
+      "id": "h2e080",
+      "command": "git checkout -- .",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e081",
+      "command": "git push origin v1.2.0",
+      "label": "outward"
+    },
+    {
+      "id": "h2e082",
+      "command": "npx wrangler deploy",
+      "label": "outward"
+    },
+    {
+      "id": "h2e083",
+      "command": "npm install -g pnpm",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e084",
+      "command": "gh api repos/acme/tool/labels -f name=needs-triage -f color=ededed",
+      "label": "outward"
+    },
+    {
+      "id": "h2e085",
+      "command": "npm deprecate @scope/pkg@1.0.0 \"Use 2.x\"",
+      "label": "outward"
+    },
+    {
+      "id": "h2e086",
+      "command": "git worktree remove --force ../feature-wt",
+      "label": "irreversible"
+    },
+    {
+      "id": "h2e087",
+      "command": "npm ls commander",
+      "label": "local"
+    },
+    {
+      "id": "h2e088",
+      "command": "gh pr merge 42 --squash --delete-branch",
+      "label": "outward"
+    },
+    {
+      "id": "h2e089",
+      "command": "node bin/agentic.js --help",
+      "label": "local"
+    },
+    {
+      "id": "h2e090",
+      "command": "rm -f .env.local",
+      "label": "irreversible"
+    }
+  ]
+}

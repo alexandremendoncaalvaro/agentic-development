@@ -1,0 +1,187 @@
+[
+ {
+  "request": "App search feels bad. Just fix it?",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Can you just make the dashboard better? Not sure exactly what's wrong with it but users complain about it a lot.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "I want to add 'workspaces' to the app, but honestly I'm not sure if that means a new tenant model, a UI grouping, or both — figure out what makes sense and start building.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "We need better notifications. Push, email, in-app, whatever works, just get it done by end of sprint.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "The 'account' object means different things in three different services and I keep getting confused reading the code — can we sort out what it should actually mean before I touch anything?",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Let's revamp the onboarding flow. I don't have a strong opinion on the steps, just make it feel modern and reduce drop-off somehow.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Add support for 'teams' — might overlap with orgs already, not sure how much.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Make search faster. I don't know if that means indexing, caching, or a UI change, just improve it however makes sense.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "We should support multiple 'projects' per user, and also maybe rename 'boards' to 'projects' while we're at it — not sure which one to tackle first or if they're even related.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "I want the API to be more consistent but I honestly couldn't tell you exactly what's inconsistent about it right now.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Improve performance on the checkout page. Could be the payment call, could be the cart rendering, not sure where to start or what 'improved' even looks like here.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Can we clean up how permissions work? Admins, owners, members — I'm not sure those map cleanly to what's actually in the database anymore.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "There's a request to add 'billing groups' but I genuinely don't know if that's a new entity or just a filter on existing accounts — help me figure out which before we scope any work.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Users keep saying the app feels slow but nobody has said what page or action, and I don't have a target number in mind either.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "We need to support 'guest' access somehow, sometime this quarter, in whatever form makes sense given how auth currently works.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "I want to merge 'customer' and 'client' into one concept but I haven't decided whether that means a schema migration or just renaming labels in the UI.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Just make onboarding self-serve. I don't really know what blocks that today or what 'done' looks like here.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "The word 'session' shows up meaning three different things across the frontend and backend and it's starting to bite us — can we settle on what it should mean before the next feature touches it?",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Add a 'draft' state to posts — not sure if that's a new status field, a separate table, or a flag, and I haven't thought about who should be able to see drafts.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "We keep saying we want 'better observability' without agreeing on what that actually buys us or how we'd even know it worked.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Quero melhorar a experiência de 'onboarding', mas não sei se isso significa menos passos, um tutorial novo, ou as duas coisas — me ajuda a decidir por onde começar.",
+  "label": "ad-grill-me",
+  "lang": "pt"
+ },
+ {
+  "request": "O time pediu para adicionarmos 'grupos' no sistema, só que não ficou claro se isso é a mesma coisa que 'times' que já existem ou algo totalmente novo.",
+  "label": "ad-grill-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Precisamos deixar o checkout mais rápido, só não sei se o problema é no backend, no frontend ou nos dois, e não tenho um número alvo em mente.",
+  "label": "ad-grill-me",
+  "lang": "pt"
+ },
+ {
+  "request": "A palavra 'cliente' é usada de um jeito no banco de dados e de outro na API, e isso está causando confusão — antes de mexer em qualquer coisa, queria entender o que isso deveria significar.",
+  "label": "ad-grill-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Adiciona suporte a acesso de 'convidado' de algum jeito, ainda não decidimos exatamente como isso deveria funcionar com o sistema de permissões atual.",
+  "label": "ad-grill-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero unificar os conceitos de 'conta' e 'perfil' mas não sei se isso é migração de banco ou só uma questão de nomenclatura na tela.",
+  "label": "ad-grill-me",
+  "lang": "pt"
+ },
+ {
+  "request": "O pessoal reclama que o app está 'lento' só que ninguém especificou em qual tela ou ação, nem o que seria uma melhora aceitável.",
+  "label": "ad-grill-me",
+  "lang": "pt"
+ },
+ {
+  "request": "The auth token refresh logic broke after the last deploy — access tokens aren't refreshing before they expire and users get logged out mid-session.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Rename the UserService class to AccountService across the whole backend and update all the references and imports.",
+  "label": "none",
+  "lang": "en"
+ },
+ {
+  "request": "We already agreed on using WebSockets for real-time updates — can you look into how our current connection pool handles reconnects so we can implement it?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "We know we need caching on the search endpoint, but I'm torn between Redis and an in-memory LRU — help me think through which fits better here.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Record that we've decided to move away from cookie-based sessions in favor of JWT, along with the reasoning, so we don't relitigate this later.",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "I keep seeing 'workspace' and 'tenant' used interchangeably in the codebase — can you write down the definitive definition for both terms in our shared glossary?",
+  "label": "ad-domain",
+  "lang": "en"
+ },
+ {
+  "request": "Before we scope anything, list all the ways this payment integration could fail in production so we know what to guard against.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a one page summary of the current state of the migration project so I can share it with stakeholders tomorrow.",
+  "label": "ad-project-state",
+  "lang": "en"
+ },
+ {
+  "request": "Draft a product requirements doc for the new notifications center feature based on the discussion notes I'm about to paste in.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Write me a short brief summarizing the goals and constraints of the rate-limiting feature before the team kickoff tomorrow morning.",
+  "label": "ad-brief",
+  "lang": "en"
+ }
+]

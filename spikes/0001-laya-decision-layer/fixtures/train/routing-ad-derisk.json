@@ -1,0 +1,182 @@
+[
+ {
+  "request": "We have a spec for the new billing migration but I'm nervous about three assumptions around the payment gateway's rate limits — how do I make sure those are solid before we start coding?",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Before the team commits two sprints to this real-time sync feature, I want to map out what could go wrong and knock out the scariest unknowns first.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Got a PRD for the offline-first mode. Need to figure out which parts are risky enough to validate before writing any code.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Is it safe to start building the multi-tenant migration now, or are there unknowns we should nail down first?",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "I want a list of every assumption in this integration plan that could blow up the build, ranked by how bad it'd be if wrong.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "The design doc assumes Kafka can handle our peak throughput but nobody's verified that — what's the right way to shake out that kind of unknown before we start?",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Before greenlighting the new search indexing pipeline, I need to surface the unknowns and drive them down one by one.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "We keep getting burned by surprises mid-sprint. I want a pass over this task that flags every risky assumption and resolves the worst ones before coding starts.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Task is defined and scoped, but I'm not confident about how the vendor API behaves under load — help me figure out what's still uncertain before we commit engineering time.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Can you go through this feature spec and tell me which parts are still guesses versus verified, then help close the gaps that matter most?",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "This migration touches three systems I've never worked with. I want to reduce the unknowns to an acceptable level before writing a line of code.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "We drafted a design for the notification fan-out service — I want confidence it'll actually work before the team starts building, especially the throughput assumptions.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "How much uncertainty is left in this plan, and which pieces should I nail down first given how costly they'd be if wrong?",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Task file's approved but I keep worrying about edge cases in the auth handoff — want to systematically knock those unknowns down before implementation kicks off.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "There's a lot riding on whether this caching strategy actually works at our scale — I'd like to validate the risky bits before the team starts building.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "We're about to start a big refactor and I want to make sure we've stress-tested every shaky assumption in the plan first.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Given the deadline, I only want to spend time validating the unknowns that could actually sink the build — not everything.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Spec's locked, but two of the integrations we're relying on have never been tested together. Help me get that risk down before we commit to the sprint.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "I don't want to start coding until we know which parts of this plan are solid and which are still guesses that could blow up the timeline.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Temos a especificação pronta para a nova função de pagamentos, mas ainda não sei se as suposições sobre o limite de taxa da API são seguras. Como reduzo essa incerteza antes de começarmos a construir?",
+  "label": "ad-derisk",
+  "lang": "pt"
+ },
+ {
+  "request": "Antes de começar a construir esse pipeline de dados, quero mapear tudo que pode dar errado e resolver os riscos mais graves primeiro.",
+  "label": "ad-derisk",
+  "lang": "pt"
+ },
+ {
+  "request": "O plano de arquitetura pressupõe que o banco aguenta o pico de carga, mas ninguém validou isso. Preciso saber o que fazer com essa incerteza antes de codificar.",
+  "label": "ad-derisk",
+  "lang": "pt"
+ },
+ {
+  "request": "É seguro começar a implementação dessa migração multi-tenant agora, ou ainda tem incerteza demais no plano?",
+  "label": "ad-derisk",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero uma lista de tudo que pode quebrar nessa integração, ordenada pelo impacto, e resolver os itens mais arriscados antes do time começar a codar.",
+  "label": "ad-derisk",
+  "lang": "pt"
+ },
+ {
+  "request": "Essa tarefa já está definida, mas tenho dúvidas sérias sobre como o serviço do fornecedor se comporta sob carga alta. Preciso reduzir essa incerteza antes de comprometer o time.",
+  "label": "ad-derisk",
+  "lang": "pt"
+ },
+ {
+  "request": "Antes de aprovar esse recurso de sincronização em tempo real, preciso identificar as suposições arriscadas e derrubar as piores antes de começarmos.",
+  "label": "ad-derisk",
+  "lang": "pt"
+ },
+ {
+  "request": "I need to find out whether our current logging library supports structured JSON output — can you research that for me?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "I want to try two different caching approaches side by side on a small prototype to see which one actually performs better.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Can you poke holes in this feature scope and challenge me on whether we actually need all of it?",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Grade the quality of this research doc against our sourcing standards before I share it with the team.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Write up a proper requirements doc for this new reporting feature based on the notes from yesterday's meeting.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Help me design the overall system architecture for the new microservices split.",
+  "label": "ad-architecture",
+  "lang": "en"
+ },
+ {
+  "request": "Production is throwing intermittent 500s on the checkout endpoint — help me figure out what's causing it.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Can you review this PR and check for bugs, style issues, and missing tests?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Ask me a series of questions to help me clarify what I actually want from this feature before I write the ticket.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Help me lay out the roadmap for the next two quarters of this product.",
+  "label": "ad-roadmap",
+  "lang": "en"
+ }
+]

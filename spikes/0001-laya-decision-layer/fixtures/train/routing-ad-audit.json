@@ -1,0 +1,182 @@
+[
+ {
+  "request": "Before I open this PR, can you go through every rule in our rule-set and give me a verdict for each one against this diff?",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "I need a full checklist-style review of this branch against all our coding standards before I hand it off to the team.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Can you run a rigorous pass checking each rule in our style guide against these changes, with evidence for every finding?",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "About to post this analysis to the team channel — verify every claim in it is backed by real evidence first.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "We need a maximum-scrutiny check of this feature branch before merge, going rule by rule with nothing waved through.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Can you spin up a fresh reviewer for each rule-group in our ADRs and get me a coverage matrix for this PR?",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "I don't want a quick skim — I want every single rule in the project checked and a pass/fail recorded for this diff.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Double-check this handoff doc's claims against the repo's rules before I send it, cross-model on anything critical.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "This is going out to stakeholders tomorrow — I need it audited against our full rule-set, not just spot-checked.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Give me an exhaustive verdict list for every rule in the project against the changes in feature/payments-v2.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Before merging, walk the whole rule-set as a checklist against this diff and flag anything unresolved with proof.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "I want a second, adversarial pass on this PR that checks literally every rule we have documented, not just the obvious ones.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Can you verify this draft report's claims line by line against our ADRs before I post it to the board?",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Need a hard gate review here — every rule group gets its own fresh reviewer and nothing gets approved without evidence.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "This branch touched a lot of files — I want proof every changed file was actually checked against our rules, not just summarized.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Run the toughest review we have on this diff — I'd rather find problems now than have someone else find them after merge.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "I'm about to hand this off to another team — can you make sure every rule in our project checklist has been verified against it first?",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "There's a prior review trail on this branch — redo the audit and carry forward each old finding with a resolved/refuted status.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a rule-by-rule verdict table for this pull request, cross-checked with a second model on the critical parts, before I ship it.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Antes de abrir o PR, quero uma verificação rigorosa de cada regra do nosso conjunto de regras contra esse diff.",
+  "label": "ad-audit",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso de uma auditoria completa dessa branch, regra por regra, com evidência para cada veredito, antes de repassar para o time.",
+  "label": "ad-audit",
+  "lang": "pt"
+ },
+ {
+  "request": "Vou postar essa análise no canal da equipe amanhã — confere se cada afirmação tem evidência real antes disso?",
+  "label": "ad-audit",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero o gate máximo de qualidade nesse PR, cada grupo de regras revisado por um revisor novo, nada aprovado sem prova.",
+  "label": "ad-audit",
+  "lang": "pt"
+ },
+ {
+  "request": "Essa mudança mexeu em muitos arquivos, preciso confirmar que todos foram checados contra as regras do projeto, não só resumidos.",
+  "label": "ad-audit",
+  "lang": "pt"
+ },
+ {
+  "request": "Antes do merge, passa pelo checklist inteiro de regras do repositório contra essa branch e aponta o que ficou sem resolver.",
+  "label": "ad-audit",
+  "lang": "pt"
+ },
+ {
+  "request": "Esse documento vai para os stakeholders amanhã, preciso de uma auditoria completa contra nossas regras, não só uma olhada rápida.",
+  "label": "ad-audit",
+  "lang": "pt"
+ },
+ {
+  "request": "Can you do a quick two-axis pass over this diff before I merge — just the light review, not the whole rule-set thing.",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Take these gaps we just found in the audit and turn them into actual rule updates in our ADR docs.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Can you draft the PR description and open it on GitHub for this branch?",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Write me a report summarizing what shipped this sprint for the stakeholders.",
+  "label": "ad-report",
+  "lang": "en"
+ },
+ {
+  "request": "I want to grill myself with hard questions about this design before committing to it.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Can you write the commit message for these staged changes?",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Help me draft an ADR proposing we switch from REST to gRPC for internal services.",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "Diagnose why this service keeps crashing under load — walk me through root cause analysis.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Check our current architecture against the philosophy doc and see if we've drifted from our original principles.",
+  "label": "ad-drift",
+  "lang": "en"
+ },
+ {
+  "request": "Can you research what other teams do for feature flag rollouts and summarize the tradeoffs?",
+  "label": "ad-research",
+  "lang": "en"
+ }
+]

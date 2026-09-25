@@ -1,0 +1,182 @@
+[
+ {
+  "request": "Before we roll out the new caching layer, I need to figure out what evidence would actually justify keeping it versus reverting.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "We ran an A/B test on the checkout flow but I'm not sure the sample size is big enough to trust the conversion lift.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Our current benchmark only tracks latency — help me refine it so it also captures whether users actually complete the task faster.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Someone claimed in last week's report that the new ranking model improved retention by 8%. Can you check if the evidence actually supports that?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "What decision rule should we use for automatically rolling back a deploy based on error rate spikes?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Should we evaluate the new recommendation model offline against historical logs or run it as a live shadow test first?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "I want to know what kind of evidence would actually be enough to justify migrating our primary datastore to Postgres.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "We're launching a chatbot next month — help me define what to measure and what threshold means it's ready.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "The model passed all unit tests, but I'm not convinced that means it's actually fit for the business decision we're making with it.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Two internal usability studies came back with opposite conclusions about the new nav — how do I reconcile them before deciding?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Can you look over the evaluation plan a colleague drafted for the fraud model and tell me if anything's missing?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Is a customer survey enough evidence for deciding to deprecate the old export API, or do we need something stronger?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "I need to set the acceptance thresholds for when we'd approve versus reject an update to the credit scoring model.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "We ran a study last quarter, but I want to check whether it still holds up now that user behavior has shifted.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "How do I separate 'does this feature technically work' from 'is this actually the right thing to ship' in our test plan?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Draft a durable evaluation brief for the pricing experiment so we have a record of the decision rationale.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Our churn study only sampled active users — could that selection bias be skewing the conclusion we're about to act on?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "What's the difference between how confident we are in these results and how strong the evidence actually is?",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "Help me pick the right evaluation question and evidence source before we decide whether to switch vendors.",
+  "label": "ad-prism",
+  "lang": "en"
+ },
+ {
+  "request": "A equipe executiva quer aprovar essa funcionalidade com base em uma única demonstração interna — isso é evidência suficiente para sustentar essa alegação?",
+  "label": "ad-prism",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso desenhar um teste que mostre se o novo limite de fraude está realmente pegando mais fraudes de verdade, não só sinalizando mais transações.",
+  "label": "ad-prism",
+  "lang": "pt"
+ },
+ {
+  "request": "Ficamos discutindo se a métrica atual de 'qualidade do modelo' é mesmo a certa para essa decisão de lançamento.",
+  "label": "ad-prism",
+  "lang": "pt"
+ },
+ {
+  "request": "Pode revisar esse desenho de avaliação antes de eu apresentar para a diretoria — a evidência realmente sustenta a alegação que estamos fazendo?",
+  "label": "ad-prism",
+  "lang": "pt"
+ },
+ {
+  "request": "Qual fonte de dados devemos confiar para a decisão de conformidade — os logs de auditoria ou os incidentes relatados por usuários?",
+  "label": "ad-prism",
+  "lang": "pt"
+ },
+ {
+  "request": "Tenho sinais conflitantes de três testes diferentes desse experimento e preciso de ajuda para decidir qual será a recomendação final.",
+  "label": "ad-prism",
+  "lang": "pt"
+ },
+ {
+  "request": "Me explica por que a métrica atual de onboarding não mostra de verdade se os usuários vão continuar usando o produto.",
+  "label": "ad-prism",
+  "lang": "pt"
+ },
+ {
+  "request": "I want to survey the latest academic approaches to federated learning before we commit to any implementation direction.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Can you spin up a quick prototype to see if WebSockets are even feasible for our real-time notifications feature?",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Check our repo against the team's linting and branch-naming rules and flag any violations.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Take these evaluation results and format them into a polished report for the stakeholder meeting.",
+  "label": "ad-report",
+  "lang": "en"
+ },
+ {
+  "request": "This whitepaper on our benchmark results is ready — can you handle getting it approved for external publication?",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "This new distributed consensus approach feels risky and unproven — help me figure out how exposed we are before committing.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso confirmar se essa alegação sobre o desempenho do concorrente realmente tem uma fonte confiável por trás.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "Our payments service is throwing intermittent 500 errors and I can't tell what's causing it.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Can you review this pull request for code quality and style issues before I merge it?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Write unit tests for this parsing function before I implement the rest of the logic.",
+  "label": "ad-tdd",
+  "lang": "en"
+ }
+]

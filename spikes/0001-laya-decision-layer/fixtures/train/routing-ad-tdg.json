@@ -1,0 +1,182 @@
+[
+ {
+  "request": "I already know the exact output this pricing function needs to produce for this sample order, I just haven't decided how to structure the discount calculation — want to compare a couple of approaches and pick whichever is easiest to reason about, but first tell me which tests actually cover this file.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "For this date-normalization helper, given this messy input and the clean output we need, could you outline two or three ways to build it and choose one purely on performance, after checking what currently depends on it test-wise?",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Not sure whether to solve this deduplication with a hash set, sorting, or a bloom filter — the expected result for the sample is fixed, so just pick whichever keeps the code simplest and check what tests would need to pass first.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "The API contract is locked — same input, same JSON shape out — but I'm torn on whether to refactor with a builder pattern or plain functions. Find the tests touching this handler before we start.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "I have a fixed before/after pair for this string sanitizer. Lay out a few candidate implementations and settle on the one that's easiest to unit test, but map the current test coverage first so we don't break anything blind.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "This report generator needs to hit an exact known output for the sample dataset. Give me a short list of implementation options weighed on readability and pick one, and check which suite exercises this module beforehand.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "We know the target output for this rate limiter given a burst of requests. Not sure if to use a token bucket or sliding window — sketch both, pick by simplicity, and see what tests are wired to this code first.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "For the tax calc module I have the golden input/output pair from finance. Can you propose two or three implementation paths and choose one based on how easy it'll be to extend later? Check test coverage on this file before editing.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Given this raw log line and the parsed struct we expect, there's more than one way to write the parser — pick the option that's fastest to run, but first find every test hitting this parsing logic.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "The expected diff output for this merge tool is already defined by our fixture. I want a couple of implementation candidates weighed only on memory footprint, and a check of what tests cover this before we touch it.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "I know what this normalization function must output for the sample input, just unsure if recursion or iteration is the better path here — compare both, pick the more testable one, and map dependent tests first.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Given the exact HTML we need this template renderer to produce, sketch two or three ways to implement it and choose based on code size, but confirm what's covered by tests before changing the renderer.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "For this retry wrapper, the expected behavior on the sample input/output is fixed. Propose a few implementation options and settle on one using only readability as the tiebreaker, after mapping which tests would be affected.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "This encryption helper needs to match a known ciphertext for a given plaintext. There's a few ways to wire the library calls — pick whichever is least error-prone, but check which tests touch this file first.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "We already agreed what output the batching function should give for this input. Sketch two or three internal designs and pick the one cheapest to maintain, and find which tests currently cover it before editing.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Given this sample request and the exact response body we must return, propose different ways to assemble it and choose by which is easiest to mock in tests, checking test coverage on this handler beforehand.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "I know the target output for the config merger given these two sample configs. Just unsure whether to do deep merge manually or via a library — compare options, pick by dependency footprint, and map affected tests first.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "This slug generator has a locked input/output example. Give me two or three ways to build it and pick the one with fewer edge cases, but first identify which tests would break if I touch this.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "For the pagination cursor logic, I have the exact before/after example. Sketch a couple of implementation strategies and choose based on which is simplest to debug later, after checking what tests currently exercise this code path.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Já sei exatamente qual deve ser a saída desse conversor de moeda para essa entrada de exemplo, só não decidi como implementar. Pode montar duas ou três opções e escolher a mais fácil de testar? Antes, mapeia quais testes cobrem esse arquivo.",
+  "label": "ad-tdg",
+  "lang": "pt"
+ },
+ {
+  "request": "Tenho o par de entrada e saída esperado para essa função de validação de CPF, mas não sei se uso regex ou parsing manual. Compara as opções e escolhe pela que for mais simples de manter, mas primeiro veja quais testes tocam esse trecho.",
+  "label": "ad-tdg",
+  "lang": "pt"
+ },
+ {
+  "request": "O formato de saída desse relatório já está definido pelo time financeiro. Preciso de algumas alternativas de implementação avaliadas só pela performance, e checar quais testes existentes cobrem esse módulo antes de mexer.",
+  "label": "ad-tdg",
+  "lang": "pt"
+ },
+ {
+  "request": "Sei o que essa função de ordenação precisa retornar para essa lista de exemplo, só não decidi entre quicksort adaptado ou usar a lib nativa com comparador customizado. Escolhe pela legibilidade e mapeia os testes que dependem disso primeiro.",
+  "label": "ad-tdg",
+  "lang": "pt"
+ },
+ {
+  "request": "Para esse parser de log, tenho a entrada bruta e a estrutura esperada de saída. Lista algumas formas de implementar e escolhe uma só pelo critério de facilidade de extensão, depois de ver quais testes cobrem esse arquivo.",
+  "label": "ad-tdg",
+  "lang": "pt"
+ },
+ {
+  "request": "A resposta esperada desse endpoint de checkout já está fechada com o time de produto. Preciso de um par de estratégias diferentes de implementação, escolhidas pelo menor acoplamento, e um mapeamento dos testes afetados antes de editar.",
+  "label": "ad-tdg",
+  "lang": "pt"
+ },
+ {
+  "request": "Já temos o exemplo fixo de entrada e saída para essa função de cálculo de frete. Monta duas alternativas de implementação e escolhe pela que for mais fácil de debugar, mas antes descobre quais testes cobrem essa parte do código.",
+  "label": "ad-tdg",
+  "lang": "pt"
+ },
+ {
+  "request": "I'm honestly not sure whether websockets, long polling, or SSE is even the right technique for this live-update feature — need to prototype and validate before committing to anything.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Nobody wrote down what this legacy pricing function is actually supposed to return for edge cases, can you help pin down the correct expected behavior first?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Let's write a failing test for this new validation rule first, then write just enough code to make it pass, then refactor.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "This repo has no test runner or CI gate configured at all — can you set up pre-commit checks and a basic pipeline?",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "This function returns the wrong value only sometimes in production and I can't figure out why — can you help me understand what's actually happening?",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Can you go over this pull request diff and flag any code quality or style issues before I merge it?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "This database migration touches our core billing tables in production — I need to understand everything that could go wrong before we run it.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "We need to figure out the service boundaries and how components should talk to each other for the new notifications system.",
+  "label": "ad-architecture",
+  "lang": "en"
+ },
+ {
+  "request": "Can you look into how a few other open-source projects handle webhook rate limiting before we design ours?",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Can you fix the typo in the README where it says 'recieve' instead of 'receive'?",
+  "label": "none",
+  "lang": "en"
+ }
+]

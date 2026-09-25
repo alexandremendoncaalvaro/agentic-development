@@ -1,0 +1,182 @@
+[
+ {
+  "request": "The CI checks on PR #482 just went green, can you check if we're good to merge it?",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Can you take a look at pull request 219 and tell me if it's ready to land, then merge it once I say go?",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "I think #77 is done, walk me through whether review comments are resolved before merging.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Merge the hotfix branch's PR into main, delete the branch afterward.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Is this PR mergeable? Check CI, review status, and any linked ticket, then merge if all clear.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Please evaluate PR #310 - I want to know about unresolved comments and whether tests pass before we ship it.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Go ahead and land the pull request for the payments refactor, squash and delete the branch.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Before merging PR 88, confirm the linked Jira ticket is actually addressed.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Can you check mergeability of the current PR and merge it if CI is passing?",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "I approved the PR, now merge it using whatever mode makes sense for this repo.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "This PR has been open forever, can you verify it still passes CI and merge it today?",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Check whether pull request #56 has any blocking review comments left before we merge.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "The reviewers signed off, go ahead and merge #145 with branch cleanup.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Can you tell me if PR 12 is safe to merge given the current test results?",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Merge the release candidate PR once you confirm the merge-commit strategy is compatible.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "I want a final check on the API-gateway PR: CI, comments, and mergeability, then merge if it's clean.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Land this PR for me — just make sure nothing's still failing in CI first.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Double check the fresh-context review on PR #900 hasn't flagged anything before merging.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Once you confirm CI is green on the auth-fix PR, go ahead and merge it and remove the branch.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "O PR #34 já passou pela revisão, pode conferir o CI e mesclar se estiver tudo certo?",
+  "label": "ad-merge",
+  "lang": "pt"
+ },
+ {
+  "request": "Confere se esse pull request está pronto pra ser mesclado e já faz o merge, apagando o branch depois.",
+  "label": "ad-merge",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso saber se a PR do bugfix ainda tem comentários pendentes antes de eu aprovar o merge.",
+  "label": "ad-merge",
+  "lang": "pt"
+ },
+ {
+  "request": "Pode verificar se a task vinculada à PR 210 foi realmente concluída antes de mesclarmos?",
+  "label": "ad-merge",
+  "lang": "pt"
+ },
+ {
+  "request": "Assim que o CI ficar verde na PR de refatoração, pode seguir com o merge e deletar a branch.",
+  "label": "ad-merge",
+  "lang": "pt"
+ },
+ {
+  "request": "Dá uma olhada na PR 77 pra ver se tá tudo certo pra mesclar, incluindo status dos testes.",
+  "label": "ad-merge",
+  "lang": "pt"
+ },
+ {
+  "request": "Fecha essa pull request pra mim, mas só depois de confirmar que não tem nada quebrando no CI.",
+  "label": "ad-merge",
+  "lang": "pt"
+ },
+ {
+  "request": "Can you open a pull request for the feature/login-fix branch so the team can start looking at it?",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "I need to commit these staged changes with a good descriptive message before I do anything else.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Can you do a thorough code review of the auth module before I even open a PR?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Kick off the release process for v2.3.0 once the changelog is finalized.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "What should I work on next given the current sprint board and priorities?",
+  "label": "ad-next",
+  "lang": "en"
+ },
+ {
+  "request": "Diagnose why the CI pipeline keeps failing on the integration tests, I can't figure out the root cause.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a snapshot of where the project stands right now across all the open workstreams.",
+  "label": "ad-project-state",
+  "lang": "en"
+ },
+ {
+  "request": "Set up a git hook that lints and formats code before every commit.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Write up the architecture decision record for switching our messaging layer to event sourcing.",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "Spin up a quick spike to test whether websockets would actually solve our latency issue.",
+  "label": "ad-spike",
+  "lang": "en"
+ }
+]

@@ -1,0 +1,182 @@
+[
+ {
+  "request": "Our checkout API started timing out intermittently after last week's deploy and I have no idea which change caused it.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "This test passes locally but fails in CI every third run, and I can't tell why.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Users are reporting the dashboard freezes after about 10 minutes of use, but I can't reproduce it on my machine yet.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Something is causing our memory usage to climb slowly over 24 hours in production — no idea what's leaking.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "The payment webhook handler throws a null pointer sometimes but not always, and the stack trace doesn't point anywhere useful.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Query latency doubled after we upgraded the ORM, but nothing in the diff looks obviously wrong.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Can you help me figure out why this background job silently stops processing after a few hours?",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "This is broken and I can't tell why.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "We migrated to a new cache layer and now search results are occasionally stale — need to find the root cause.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "The login flow works fine in staging but breaks in prod, and the logs aren't giving me a clear signal.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Something in our recent refactor made the build 3x slower and nobody can pinpoint which module is responsible.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "I need to find out why this race condition only shows up under high concurrency.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "The app crashes on startup for some users but not others, and I have zero leads on why.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "This function used to return consistent results, now it flakes about 1 in 20 runs — let's track down what's happening.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Response times for this endpoint spiked overnight with no deploy in between — help me get to the bottom of it.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "We have a memory leak somewhere in the image processing pipeline and I don't know where to start looking.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "This bug only reproduces on iOS Safari and I can't figure out what's different about that environment.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Our nightly ETL job has started failing sporadically and the error messages it throws are cryptic and unhelpful.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "The search feature was working fine last sprint and now it's returning wrong results for some queries — need to trace what changed.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Esse endpoint está retornando erro 500 aleatoriamente em produção e não consigo entender o motivo.",
+  "label": "ad-diagnose",
+  "lang": "pt"
+ },
+ {
+  "request": "A aplicação está consumindo cada vez mais memória com o tempo e não sei de onde vem o vazamento.",
+  "label": "ad-diagnose",
+  "lang": "pt"
+ },
+ {
+  "request": "Esse teste passa na minha máquina mas falha no pipeline de CI, e não tenho a menor pista do porquê.",
+  "label": "ad-diagnose",
+  "lang": "pt"
+ },
+ {
+  "request": "O tempo de resposta da API dobrou depois do último deploy, mas o diff não mostra nada óbvio.",
+  "label": "ad-diagnose",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso descobrir por que esse job em background trava depois de rodar por algumas horas.",
+  "label": "ad-diagnose",
+  "lang": "pt"
+ },
+ {
+  "request": "Os usuários estão relatando que o app trava depois de uns minutos de uso e ainda não consegui reproduzir isso.",
+  "label": "ad-diagnose",
+  "lang": "pt"
+ },
+ {
+  "request": "Essa condição de corrida só aparece com alta concorrência e não sei por onde começar a investigar.",
+  "label": "ad-diagnose",
+  "lang": "pt"
+ },
+ {
+  "request": "This test was passing yesterday and is failing today with the exact same expected output — nothing else changed, just get it green again.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "I'm torn between websockets or polling for this real-time feature and want to try both quickly before we commit to one.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "I don't fully understand what the product team wants from this notification feature, help me pin down the actual requirements.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Let's write the tests first for this new validation function before I write any implementation code.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Can you review this PR diff for code quality and potential issues before I merge it?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "I've finished the fix, please stage and commit these changes with a good commit message.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Open a pull request for this branch with a summary of what changed and why.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Help me plan out next quarter's engineering priorities for this project.",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "I want to sketch out the high-level architecture for a new microservice before we start coding it.",
+  "label": "ad-architecture",
+  "lang": "en"
+ },
+ {
+  "request": "Can you explain what this regex does?",
+  "label": "none",
+  "lang": "en"
+ }
+]

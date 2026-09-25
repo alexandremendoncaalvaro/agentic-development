@@ -1,0 +1,182 @@
+[
+ {
+  "request": "I've got three clean commits on this branch ahead of main, ready to send this up for review.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Can you get this branch turned into something reviewers can look at on GitHub?",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "The owner just gave the go-ahead on the draft, let's get this out for review now.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Push my feature branch and open it up for review with a summary and test plan.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Everything's committed and tests pass locally, time to submit this for team review.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Let's wrap up this fix and put it in front of the reviewers.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "I need this branch shared with the team on GitHub so they can review the changes.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Time to submit this work for review, make sure the description covers what changed and how it was tested.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "The lead just approved the plan we walked through, go ahead and get this posted for review.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Finish this off by getting it in front of the team with proper context and links to the ticket.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "My commits look good locally, can you push and get this ready for eyes on GitHub?",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "We're done iterating, submit this for review with the usual summary and test plan format.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Send this branch up so QA can start reviewing the changes.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Draft is approved, let's make it official and get it in front of reviewers.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Can you package this work up with a title following our commit conventions and get it reviewed?",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "This bugfix is ready, get it out there for the team to review before we merge.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "I want this feature branch reviewed by the team, include links to the Jira ticket in the description.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Everything's tested and passing CI locally, let's get this into review.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Push the branch and open it for review, note the summary and how I tested it.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Já commitei tudo e os testes passam, pode abrir isso para revisão da equipe?",
+  "label": "ad-pr",
+  "lang": "pt"
+ },
+ {
+  "request": "O dono aprovou o rascunho, bora colocar essa branch pra revisão no GitHub.",
+  "label": "ad-pr",
+  "lang": "pt"
+ },
+ {
+  "request": "Terminei essa correção, preciso que isso vá pra revisão com resumo e plano de testes.",
+  "label": "ad-pr",
+  "lang": "pt"
+ },
+ {
+  "request": "Pode enviar essa branch pro repositório e deixar pronta pra revisão do time?",
+  "label": "ad-pr",
+  "lang": "pt"
+ },
+ {
+  "request": "Já validei localmente, agora quero colocar essa feature na fila de revisão dos colegas.",
+  "label": "ad-pr",
+  "lang": "pt"
+ },
+ {
+  "request": "Finalizei os commits atômicos, hora de mandar isso pra revisão com os links do ticket.",
+  "label": "ad-pr",
+  "lang": "pt"
+ },
+ {
+  "request": "Meu código está pronto e os testes passam, pode formalizar isso pra revisão da galera?",
+  "label": "ad-pr",
+  "lang": "pt"
+ },
+ {
+  "request": "I've made a bunch of changes but haven't committed anything yet, can you help split this into clean commits?",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "This PR has been approved by everyone, can you go ahead and merge it into main now?",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "We need to plan out the release for this sprint, what version bump and changelog should we do?",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Can you look over this diff and flag any issues before I touch anything else with it?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Production is throwing weird intermittent errors, can you help me figure out what's actually going wrong?",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "I want to set up a pre-commit hook that automatically runs the linter before every commit.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "I want to quickly prototype this idea in a throwaway branch just to see if the approach is feasible.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Can you order me a pizza while this build runs in the background?",
+  "label": "none",
+  "lang": "en"
+ },
+ {
+  "request": "Add this bug report to my task list so I can pick it up next week.",
+  "label": "ad-task",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a summary of where this project currently stands overall, including open work streams.",
+  "label": "ad-project-state",
+  "lang": "en"
+ }
+]

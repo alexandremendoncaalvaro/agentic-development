@@ -1,0 +1,182 @@
+[
+ {
+  "request": "Before I start building the rate limiter, I want to make sure we're not reinventing something badly — can you dig into how others handle this and what our repo already does?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "I need to pick between using a queue library or rolling our own for this background job system, but I don't want to guess based on vibes.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Antes de implementar o cache distribuído, preciso entender como a documentação oficial do Redis recomenda isso e como já fizemos coisas parecidas aqui.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "We're about to add OAuth to the mobile app — pull together the official spec guidance, some real-world examples, and check what our git history says about past auth attempts.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Can you look into how to properly implement pagination for this GraphQL endpoint before I write any code? I want citations, not guesses.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Quero entender a forma correta de fazer retries com backoff exponencial antes de codar isso, com base na doc oficial e em exemplos reais.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "There's a decision point on whether to use WebSockets or SSE for live notifications — research it properly before we commit to an approach.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "I'm about to touch the payment webhook handler for the first time. Can you check prior art, our own history with it, and the provider's docs first?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Before adding a new ORM to the project, get the full picture — docs, community examples, what similar code already exists here.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso que você pesquise como implementar upload multipart em S3 corretamente, olhando doc oficial e exemplos validados antes de eu escrever qualquer linha.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "how should I approach building this event sourcing layer? don't just start coding, look into what's already proven to work",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Before wiring up a circuit breaker to our HTTP client, walk through what the standard approach looks like and what's already in the codebase.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "I want a documented research pass before touching the encryption-at-rest implementation — official crypto library docs, known-good examples, and our own git history with it.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Antes de decidir a biblioteca de validação de schema, faça uma pesquisa completa: documentação, exemplos da comunidade e o que já usamos no projeto.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "Never touched this legacy queue consumer before — can you research the happy path and how similar consumers were built elsewhere before I dive in?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "We need to migrate from REST to gRPC for this service. Before writing a single line, pull the official gRPC docs, some reference implementations, and check our history for prior migration attempts.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Do proper homework before implementing the idempotency key logic — I want sources, not assumptions.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Pesquise a forma recomendada de implementar rate limiting distribuído com Redis antes de eu começar a escrever o código.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "I'm not sure if we should hand-roll JWT validation or use a library — investigate the tradeoffs with real sources before we pick.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Look into how the community solves multi-tenant database isolation, check the official Postgres docs on row-level security, and see if we've done anything like this before I write the migration.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Antes de implementar o fluxo de reconciliação financeira, quero uma pesquisa completa com base em documentação, exemplos reais e histórico do repositório.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "Can you research the standard way to implement soft deletes in an event-sourced system before I start the schema design?",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "This is my first time adding a Kafka consumer group — research the official docs and validated examples before we write the consumer logic.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso de uma investigação completa antes de escolher entre gRPC-Web e REST para o novo serviço, com fontes confiáveis.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "Before implementing exponential backoff for our retry logic, I'd like to see what the official library docs say and how it's done in similar projects.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "We're picking a state management approach for the new frontend module — do the research first: docs, community patterns, and what we've done before in this repo.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Can you do a deep architectural review of our microservices boundaries and suggest improvements?",
+  "label": "ad-architecture",
+  "lang": "en"
+ },
+ {
+  "request": "I want to spike a quick prototype of this idea over the next hour, doesn't need to be production quality.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Write up an ADR documenting why we chose Postgres over MongoDB for this service.",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "Can you audit our authentication flow for security vulnerabilities?",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Diagnose why the checkout flow is throwing intermittent 500 errors in production.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "I want you to grill me on my understanding of this consensus algorithm before I present it to the team.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Can you write the commit message for these staged changes?",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Explore the risk landscape around switching our entire auth provider — what could go wrong and how likely is it?",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Review this pull request for code quality and correctness before I merge it.",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Explain the domain model behind our billing subsystem so I understand the business rules.",
+  "label": "ad-domain",
+  "lang": "en"
+ }
+]

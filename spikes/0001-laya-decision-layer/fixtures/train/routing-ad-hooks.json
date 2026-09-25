@@ -1,0 +1,182 @@
+[
+ {
+  "request": "We keep pushing broken builds to CI, can you set up something that stops that before we even get to origin?",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Precisamos de um hook que rode lint e formatação automaticamente antes de cada commit.",
+  "label": "ad-hooks",
+  "lang": "pt"
+ },
+ {
+  "request": "Devs on the team keep using --no-verify to skip checks, I want gates that actually make sense so they stop doing that.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Can you scaffold pre-commit and pre-push checks for this repo — lint, format, secret scanning on commit, tests and build on push?",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Quero configurar um runner de hooks pra rodar os testes antes de cada push.",
+  "label": "ad-hooks",
+  "lang": "pt"
+ },
+ {
+  "request": "Set up a warn-only secret scanner in our commit hook for now, I don't want it blocking commits yet until we trust it.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "I want the AGENTS.md quality gates section updated to reflect whatever hook setup we land on.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Alguém commitou uma API key ontem, preciso de um scanner de segredos rodando antes de cada commit.",
+  "label": "ad-hooks",
+  "lang": "pt"
+ },
+ {
+  "request": "What's the one-time install command I need to run after you wire up the pre-commit config?",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Add a nudge when a session ends that reminds the agent to write a handoff note before wrapping up.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Can we get a checkpoint that fires on every prompt to make sure the agent is following our workflow doc?",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "I need a gate that validates artifacts an agent produces right after it writes a file, catching bad output before it lands.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Nosso pre-commit está lento demais e o time começou a pular ele, dá pra deixar mais rápido e ainda pegar os problemas principais?",
+  "label": "ad-hooks",
+  "lang": "pt"
+ },
+ {
+  "request": "Only scaffold the push-side gates for now — build and test — we're not ready for commit-time checks yet.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Detect what test runner and linter this project uses and wire up matching hooks for us.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Podemos adicionar um hook pre-push que roda o build e os testes de integração antes de permitir o push?",
+  "label": "ad-hooks",
+  "lang": "pt"
+ },
+ {
+  "request": "I want a lightweight pre-commit gate, nothing that takes more than a few seconds, just format and lint.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Set up husky and lint-staged for this repo so formatting is enforced automatically on commit.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Our secret scanner should just warn for the first couple weeks so we can tune it without blocking anyone's work.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "É possível configurar um checkpoint que roda a cada prompt do usuário pra garantir que o agente segue o workflow do time?",
+  "label": "ad-hooks",
+  "lang": "pt"
+ },
+ {
+  "request": "Configure both tiers of gates for this repo — fast checks on commit, slower build and test on push — using whatever tool fits our current stack.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Can you wire lefthook for pre-commit and pre-push in this monorepo based on what's already installed?",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "We just had an incident because someone bypassed our checks with --no-verify, I need actual gates in place that stop that.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Configura os hooks de commit pra rodar eslint, prettier e um scanner de segredo antes de cada commit.",
+  "label": "ad-hooks",
+  "lang": "pt"
+ },
+ {
+  "request": "I want a PostToolUse gate that double-checks any file an agent writes matches expected structure before moving on.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Make sure pushing to main runs the full test suite first, and committing runs a quick lint and format pass.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Write a good commit message for these staged changes summarizing what changed and why.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Can you review my current changes for bugs and edge cases before I commit them?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Help me write the failing tests first before I implement this feature.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "I'm wrapping up for the day, write up a handoff doc summarizing where I left off and what's next.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Prepare a release for this version — changelog, version bump, and tag.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Open a pull request for this branch with a clear description of the changes.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Create a CONTRIBUTING.md documenting our coding style and conventions.",
+  "label": "ad-guidelines",
+  "lang": "en"
+ },
+ {
+  "request": "Set up this brand new repo from scratch with the initial project structure.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Do a full security audit of our authentication module and report the findings.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a status report on where this project currently stands.",
+  "label": "ad-project-state",
+  "lang": "en"
+ }
+]

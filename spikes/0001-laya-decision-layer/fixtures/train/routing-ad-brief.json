@@ -1,0 +1,217 @@
+[
+ {
+  "request": "I just got back from two weeks off and have no idea what happened on this project while I was gone.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "My manager wants a status update in ten minutes and I haven't looked at this repo in days.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Can you pull together what's actually going on here — what changed, why, and what's blocking us — before I jump back in?",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "I need a plain-language rundown of the current state of this project for our exec sync this afternoon.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Someone just handed me this codebase mid-sprint and I need to understand the current direction and open decisions fast.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "What's the story here — what are we building, why, and what's still unresolved?",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "I'm about to walk into a client call and need to know exactly where this project stands right now.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Reconstruct what's happened in this session so far and tell me what decisions are actually mine to make.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "I need to understand the current blockers and completion criteria on the active task before I touch anything.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Pull the recent commits, branch state, and task context together into something a non-technical stakeholder could read.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "I've lost track of why we made certain changes last week — can you reconstruct the reasoning without changing anything?",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Give me the short version: what's the objective, what's done, what's blocked, and what needs my sign-off?",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Before I merge anything I want to understand the full picture of what's currently in flight.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "I need a read-only overview of project state for a board update, nothing should be modified.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "What decisions are actually waiting on me right now versus already settled by the team?",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "I stepped away from this for a few days, help me get oriented on the active task and its acceptance criteria.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Give me the full picture — current branch, latest commit, active task, and why any of it matters — before I start coding.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "What's blocking progress on this right now, and what's just noise?",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "I need to explain to my director in five minutes why this task isn't done yet, help me get the facts straight.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "It's been a week since I checked in on this repo, can you orient me on what's changed and why it matters before I dive in?",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Translate all the technical noise from this sprint into something my product lead can actually understand at a glance.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "I need to walk into a leadership review having actually understood what's happened here, not just skimmed the commit log.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Help me understand what's really going on before I make a call I might regret — what's confirmed versus still assumed?",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Someone on my team asked how things are progressing and honestly I don't remember — can you reconstruct it for me?",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "I only have five minutes before this meeting, tell me what matters about where this project currently stands.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a no-BS rundown of the current situation, what's actually resolved, and what still needs a real decision from me.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Acabei de voltar de férias e preciso entender rapidamente o que mudou no projeto nas últimas duas semanas.",
+  "label": "ad-brief",
+  "lang": "pt"
+ },
+ {
+  "request": "Meu chefe quer um resumo em linguagem simples sobre o andamento do projeto para a reunião de hoje.",
+  "label": "ad-brief",
+  "lang": "pt"
+ },
+ {
+  "request": "Pode me contextualizar sobre o que está acontecendo agora e por quê, sem alterar nada no código?",
+  "label": "ad-brief",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso saber quais decisões realmente dependem de mim antes de continuar trabalhando nessa tarefa.",
+  "label": "ad-brief",
+  "lang": "pt"
+ },
+ {
+  "request": "Estou entrando nesse projeto no meio da sprint, me ajuda a entender a direção atual e os bloqueios.",
+  "label": "ad-brief",
+  "lang": "pt"
+ },
+ {
+  "request": "Antes da call com o cliente, quero entender exatamente em que pé está o projeto agora.",
+  "label": "ad-brief",
+  "lang": "pt"
+ },
+ {
+  "request": "Reconstrua o que aconteceu na sessão até agora e me diga o que ainda está em aberto.",
+  "label": "ad-brief",
+  "lang": "pt"
+ },
+ {
+  "request": "Just show me raw git status, branch, and recent commits — no narrative, I'll interpret it myself.",
+  "label": "ad-project-state",
+  "lang": "en"
+ },
+ {
+  "request": "I need something I can paste into the client's weekly progress email, polished and ready to send.",
+  "label": "ad-report",
+  "lang": "en"
+ },
+ {
+  "request": "I'm going on leave next week and need everything documented so the next engineer can pick this up cold.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Given everything that's already shipped, what should I tackle next on this project?",
+  "label": "ad-next",
+  "lang": "en"
+ },
+ {
+  "request": "Check whether our current implementation has drifted away from what the spec originally described.",
+  "label": "ad-drift",
+  "lang": "en"
+ },
+ {
+  "request": "We're cutting a new version tomorrow, write up the release notes summarizing everything included.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Push back hard on this decision I made and stress-test whether it actually holds up.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Take the conclusion from our last discussion and get it ready to publish in the public changelog.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "The CI pipeline keeps failing on the same tests, figure out the root cause.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Draft the product requirements document for the new feature we're about to build.",
+  "label": "ad-prd",
+  "lang": "en"
+ }
+]

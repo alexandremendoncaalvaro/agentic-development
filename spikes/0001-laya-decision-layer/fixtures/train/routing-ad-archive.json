@@ -1,0 +1,182 @@
+[
+ {
+  "request": "The auth refactor task has been done for a week, can you clean it out of the tree?",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "We shipped the checkout spec last sprint, get rid of the file so it stops cluttering doc/specs.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Sweep doc/tasks for anything marked done and remove those files for good.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "This PRD is superseded by the new one we approved yesterday — please prune it out.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Clear out finished task docs.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Our doc/adr folder has three ADRs marked deprecated since the migration to the new auth provider, can you hard-delete them and rely on git log for history?",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "I want a lean working tree — go through doc/product and remove any PRD whose status says superseded.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Purge all completed specs from the repo, we don't need them sitting around anymore.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Can you clean up the plan files that are no longer active? Anything done or shipped should go.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "There's an ADR about the old caching strategy that got superseded and its reasoning is now in the architecture doc — remove the ADR file.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Time to tidy up — remove every task marked done so future scans don't waste tokens on them.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "The onboarding spec shipped months ago, delete it from the tree, git history is fine as the record.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Please prune the doc/tasks directory of anything that's finished.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "We've accumulated a lot of stale done tasks and shipped specs across the docs folders, and I'd like someone to go through and hard-delete the ones that are truly finished, keeping only what's still active or binding.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Get rid of the deprecated rate-limiting ADR, we already moved its content into the API guidelines doc.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Clean sweep of doc/product for any PRD that's marked superseded please.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Can you archive the finished plan docs? I don't want them showing up when the agent globs the directory.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "There's a task file for the payments migration that's been done for two weeks, remove it.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "Trim the repo of any completed spec files, keep the tree lean.",
+  "label": "ad-archive",
+  "lang": "en"
+ },
+ {
+  "request": "As tarefas de refatoração do login já estão concluídas há dias, pode remover esses arquivos do repositório?",
+  "label": "ad-archive",
+  "lang": "pt"
+ },
+ {
+  "request": "Esse PRD foi substituído pelo novo documento aprovado ontem, pode apagar o arquivo antigo definitivamente?",
+  "label": "ad-archive",
+  "lang": "pt"
+ },
+ {
+  "request": "Faça uma limpeza na pasta doc/tasks e remova tudo que já estiver marcado como concluído.",
+  "label": "ad-archive",
+  "lang": "pt"
+ },
+ {
+  "request": "Temos uma ADR sobre a estratégia antiga de cache que já foi superada e o conteúdo já está no documento de arquitetura, pode excluir o arquivo da ADR?",
+  "label": "ad-archive",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero manter a árvore de arquivos enxuta, pode apagar as specs que já foram entregues?",
+  "label": "ad-archive",
+  "lang": "pt"
+ },
+ {
+  "request": "Essa ADR está depreciada desde a migração do provedor de autenticação, remova com o histórico do git servindo como registro.",
+  "label": "ad-archive",
+  "lang": "pt"
+ },
+ {
+  "request": "Pode varrer o diretório doc/product e remover qualquer PRD marcado como substituído?",
+  "label": "ad-archive",
+  "lang": "pt"
+ },
+ {
+  "request": "Can you write an ADR documenting why we chose Postgres over Mongo?",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "Create a new task file for the login refactor work.",
+  "label": "ad-task",
+  "lang": "en"
+ },
+ {
+  "request": "Commit these changes with a good conventional commit message.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Check if our documentation still matches what's actually in the codebase.",
+  "label": "ad-drift",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a summary of where the project stands right now.",
+  "label": "ad-project-state",
+  "lang": "en"
+ },
+ {
+  "request": "Write a PRD for the new notifications feature we're planning.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Review this pull request for code quality and style issues.",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Cut a new release and bump the version number.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Update the README with the new installation steps.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Merge the feature branch into main once tests pass.",
+  "label": "ad-merge",
+  "lang": "en"
+ }
+]

@@ -98,3 +98,19 @@ def accuracy(rows, key="correct"):
 def p50(values):
     ordered = sorted(values)
     return round(ordered[len(ordered) // 2], 1) if ordered else None
+
+
+def questions():
+    """The three questions, shared by training, calibration, and evaluation."""
+    criteria = load("skill-criteria.json")
+    gloss = {k: " ".join(v.replace("`", "").split()[:6]) for k, v in criteria.items()}
+    return {
+        "route": {"t": "choice", "ins": "Which workflow skill should handle this request? Pick none when no skill applies.",
+                  "crit": gloss},
+        "effect": {"t": "choice", "ins": "What kind of effect does running this shell command have?",
+                   "crit": load("test-effects.json")["definitions"]},
+        "size": {"t": "choice",
+                 "ins": "Is this a quick request, or does it need a real engineering workflow?",
+                 "crit": {"quick": "a question, an acknowledgement, or a one-line mechanical edit",
+                          "workflow": "a change that needs research, tests, review, or an outward step"}},
+    }

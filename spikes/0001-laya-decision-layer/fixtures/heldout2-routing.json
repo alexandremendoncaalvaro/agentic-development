@@ -1,0 +1,568 @@
+{
+  "items": [
+    {
+      "id": "h2r001",
+      "request": "We just agreed to move from REST polling to server-sent events for notifications. Capture that choice, the alternatives we threw out, and what it costs us in the decisions folder, so it is binding from now on.",
+      "label": "ad-adr",
+      "lang": "en"
+    },
+    {
+      "id": "h2r002",
+      "request": "Decidimos trocar o Jest pelo node:test de vez. Deixa essa escolha registrada formalmente, com contexto e consequências, pra ninguém reabrir a discussão daqui a seis meses.",
+      "label": "ad-adr",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r003",
+      "request": "There is no single document explaining how this service is layered, where the module boundaries sit, or how it gets deployed. Scan the code and produce that top-level system overview file.",
+      "label": "ad-architecture",
+      "lang": "en"
+    },
+    {
+      "id": "h2r004",
+      "request": "Rewrite ARCHITECTURE.md for the new layout, covering the queue workers, the API gateway and the tracing stack we added, and keep only what is still true about the old parts.",
+      "label": "ad-architecture",
+      "lang": "en"
+    },
+    {
+      "id": "h2r005",
+      "request": "doc/tasks has forty finished task files cluttering it. Take the ones marked done out of the tree; git history is enough of a record.",
+      "label": "ad-archive",
+      "lang": "en"
+    },
+    {
+      "id": "h2r006",
+      "request": "Tem um monte de spec já entregue e PRD substituído em doc/. Pode tirar esses arquivos concluídos do repositório, o histórico do git guarda o que precisar.",
+      "label": "ad-archive",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r007",
+      "request": "Before this branch goes to the team I want the heaviest check we have: walk every convention in our rules files and give me pass or fail for each one, with evidence, no skipping.",
+      "label": "ad-audit",
+      "lang": "en"
+    },
+    {
+      "id": "h2r008",
+      "request": "I wrote a status note claiming the migration is backward compatible and fully tested. Check each of those claims against the repository's rules and the actual code before I send it anywhere.",
+      "label": "ad-audit",
+      "lang": "en"
+    },
+    {
+      "id": "h2r009",
+      "request": "This repo has code but no agent instructions file at the root. Look at the build scripts, the test setup and the layout, and create the file coding agents read at the start of every session.",
+      "label": "ad-bootstrap",
+      "lang": "en"
+    },
+    {
+      "id": "h2r010",
+      "request": "Começando um repositório novo, ainda vazio. Quero montar o arquivo de instruções que os agentes de código leem na raiz, com comandos de build, testes e convenções do projeto.",
+      "label": "ad-bootstrap",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r011",
+      "request": "I was out for three days. In plain words, what is going on with this work right now, why, and is anything waiting on me?",
+      "label": "ad-brief",
+      "lang": "en"
+    },
+    {
+      "id": "h2r012",
+      "request": "Me explica como se eu fosse o chefe: o que está acontecendo nessa sessão, por quê, e o que falta pra fechar. Sem jargão.",
+      "label": "ad-brief",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r013",
+      "request": "Tests are green. Land these changes in git, but the lint fixes and the new feature should go in as separate entries, each with the sign-off trailer.",
+      "label": "ad-commit",
+      "lang": "en"
+    },
+    {
+      "id": "h2r014",
+      "request": "Save this parser change to history with a proper conventional-format message and my sign-off line.",
+      "label": "ad-commit",
+      "lang": "en"
+    },
+    {
+      "id": "h2r015",
+      "request": "We are open-sourcing this library next month. Add the file that tells outside contributors how to send patches and the one that explains how to report a vulnerability privately.",
+      "label": "ad-community-docs",
+      "lang": "en"
+    },
+    {
+      "id": "h2r016",
+      "request": "Precisa de um guia pra quem quer contribuir com o projeto e de uma política de como reportar falha de segurança. Não existe nenhum dos dois no repositório ainda.",
+      "label": "ad-community-docs",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r017",
+      "request": "src/lib has a dozen tiny wrapper modules that just forward calls to each other. Figure out which ones earn their keep and propose how to pull that complexity behind fewer, narrower interfaces.",
+      "label": "ad-deepen",
+      "lang": "en"
+    },
+    {
+      "id": "h2r018",
+      "request": "Every caller of our config loader has to know about three env files and their precedence order. Propose a refactor so that knowledge lives in one place instead of leaking into every caller.",
+      "label": "ad-deepen",
+      "lang": "en"
+    },
+    {
+      "id": "h2r019",
+      "request": "The task for offline sync is written up, but I have no idea whether conflict resolution, storage quotas or token refresh will bite us. Before anyone writes code, list what we don't know and knock each item down.",
+      "label": "ad-derisk",
+      "lang": "en"
+    },
+    {
+      "id": "h2r020",
+      "request": "Antes de começar a construir a integração com o gateway de pagamento, quero mapear o que pode dar errado tecnicamente e eliminar essas incertezas uma por uma, até sobrar só risco de negócio.",
+      "label": "ad-derisk",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r021",
+      "request": "Our Tailwind config and tokens.json define colors, spacing and typography, but there is no written visual contract. Produce the design contract file from those tokens with the rationale for each.",
+      "label": "ad-design",
+      "lang": "en"
+    },
+    {
+      "id": "h2r022",
+      "request": "The frontend team exported our palette and type scale from Figma. Turn that into the repository's visual design document so agents stop inventing hex values.",
+      "label": "ad-design",
+      "lang": "en"
+    },
+    {
+      "id": "h2r023",
+      "request": "Since yesterday's deploy the /search endpoint went from 80ms to 2s at p95 and I can't tell why. Help me find the cause.",
+      "label": "ad-diagnose",
+      "lang": "en"
+    },
+    {
+      "id": "h2r024",
+      "request": "O teste de integração falha uma vez a cada dez rodadas no CI e nunca localmente. Quero descobrir a causa de verdade, não chutar.",
+      "label": "ad-diagnose",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r025",
+      "request": "Half the code says 'account', half says 'workspace', and the tickets say 'tenant' for the same thing. We agreed 'workspace' is the word; record it in the project's vocabulary file with the other names flagged as ones to avoid.",
+      "label": "ad-domain",
+      "lang": "en"
+    },
+    {
+      "id": "h2r026",
+      "request": "We finally agreed what a 'session' means versus a 'run' in this codebase. Write both definitions and how they relate into the repository's shared language document.",
+      "label": "ad-domain",
+      "lang": "en"
+    },
+    {
+      "id": "h2r027",
+      "request": "Several ADRs still say proposed, though I think we implemented them months ago, and the agent instructions mention a deploy script that is gone. Compare the docs with reality and list the mismatches without changing anything.",
+      "label": "ad-drift",
+      "lang": "en"
+    },
+    {
+      "id": "h2r028",
+      "request": "Faz uma checagem só de leitura: a documentação do projeto (instruções dos agentes, arquitetura, decisões) ainda bate com o código? Quero uma lista do que está desalinhado.",
+      "label": "ad-drift",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r029",
+      "request": "I want 'better notifications' but honestly I don't know what that means yet. Interrogate me about it one question at a time, suggesting an answer for each, until we have something concrete.",
+      "label": "ad-grill-me",
+      "lang": "en"
+    },
+    {
+      "id": "h2r030",
+      "request": "My request is 'make onboarding faster', and it probably hides three different decisions. Pull them apart by quizzing me before anyone starts researching.",
+      "label": "ad-grill-me",
+      "lang": "en"
+    },
+    {
+      "id": "h2r031",
+      "request": "Before we write the retry logic for the webhook consumer, check what the official docs recommend, find real projects doing it, see how this repo handles retries elsewhere and what the git log says about past attempts. Then tell me the canonical approach.",
+      "label": "ad-ground",
+      "lang": "en"
+    },
+    {
+      "id": "h2r032",
+      "request": "Vou implementar paginação por cursor na API. Antes de codar, pesquisa o jeito idiomático nessa stack, com fontes, e como o próprio repositório já resolve coisas parecidas.",
+      "label": "ad-ground",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r033",
+      "request": "We need the full engineering reference for this repo: coding standards, complexity limits, testing strategy, git conventions and security rules. Start from our eslint and prettier setup and only ask what you cannot infer.",
+      "label": "ad-guidelines",
+      "lang": "en"
+    },
+    {
+      "id": "h2r034",
+      "request": "Our engineering standards document still says we test with Mocha, but we moved to Vitest and added a type-check gate. Update that reference document accordingly.",
+      "label": "ad-guidelines",
+      "lang": "en"
+    },
+    {
+      "id": "h2r035",
+      "request": "I am about to close this session and a new agent picks the work up tomorrow. Package where we are, what is decided, what is open and what to run next, so it can continue cold.",
+      "label": "ad-handoff",
+      "lang": "en"
+    },
+    {
+      "id": "h2r036",
+      "request": "O contexto tá quase acabando. Gera um resumo pra outra sessão continuar exatamente daqui.",
+      "label": "ad-handoff",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r037",
+      "request": "People keep pushing code that fails lint and tests. Wire up git hooks so formatting and secret scanning run before each commit and the test suite runs before each push.",
+      "label": "ad-hooks",
+      "lang": "en"
+    },
+    {
+      "id": "h2r038",
+      "request": "I want the agent host to remind me to save state when a session stops and to validate task files after every edit. Set up those session lifecycle automations.",
+      "label": "ad-hooks",
+      "lang": "en"
+    },
+    {
+      "id": "h2r039",
+      "request": "Agents have added default exports three times now. Turn 'named exports only' into a durable convention in our rules, but vet it first so we are not overfitting to one incident.",
+      "label": "ad-level-up",
+      "lang": "en"
+    },
+    {
+      "id": "h2r040",
+      "request": "The convention that docs-only changes always need a changelog entry has become useless. Evaluate whether we should drop it from our rule set and remove it once I approve.",
+      "label": "ad-level-up",
+      "lang": "en"
+    },
+    {
+      "id": "h2r041",
+      "request": "PR #212 has two approvals. Check CI and whether any comments are unresolved, then land it into main once I confirm.",
+      "label": "ad-merge",
+      "lang": "en"
+    },
+    {
+      "id": "h2r042",
+      "request": "Verifica se o pull request 87 está verde e sem conflito e, se estiver tudo certo, integra na main depois do meu ok.",
+      "label": "ad-merge",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r043",
+      "request": "I don't know what to pick up now. Look over the specs, tasks and ADRs and recommend the top next actions in priority order.",
+      "label": "ad-next",
+      "lang": "en"
+    },
+    {
+      "id": "h2r044",
+      "request": "Run a doctor-style checkup across the project's documents and tell me what is missing or half-done and what I should tackle first.",
+      "label": "ad-next",
+      "lang": "en"
+    },
+    {
+      "id": "h2r045",
+      "request": "Before we touch this refactor, commit out loud to the working principles for it: think first, keep the changes surgical, verify before calling anything done, and report to me as a decision-maker.",
+      "label": "ad-philosophy",
+      "lang": "en"
+    },
+    {
+      "id": "h2r046",
+      "request": "Antes de começar essa mudança grande, declara explicitamente as posturas de trabalho que vai seguir nela: simplicidade, mudança cirúrgica e verificar antes de dizer que terminou.",
+      "label": "ad-philosophy",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r047",
+      "request": "The branch is pushed. Put it up for review on GitHub with a summary, a test plan and links to the task, and show me the body first.",
+      "label": "ad-pr",
+      "lang": "en"
+    },
+    {
+      "id": "h2r048",
+      "request": "Cria a solicitação de revisão no GitHub pra essa branch, com resumo e plano de teste; me mostra o texto antes de enviar.",
+      "label": "ad-pr",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r049",
+      "request": "We are scoping a new product: an internal tool for support agents to replay customer calls. Write up who it is for, the problem, what success looks like, what is out of scope, and the rough multi-feature plan.",
+      "label": "ad-prd",
+      "lang": "en"
+    },
+    {
+      "id": "h2r050",
+      "request": "Our target user shifted from solo developers to small teams. Update the product-level requirements document to reflect that and adjust the success metrics.",
+      "label": "ad-prd",
+      "lang": "en"
+    },
+    {
+      "id": "h2r051",
+      "request": "We changed the ranking model. How should we evaluate whether it is actually better: which measures, and what threshold would make us ship or roll back?",
+      "label": "ad-prism",
+      "lang": "en"
+    },
+    {
+      "id": "h2r052",
+      "request": "Rodei a avaliação do classificador e deu 91% de acerto. Me ajuda a interpretar se esse número sustenta colocar em produção ou se o desenho da avaliação tem furo.",
+      "label": "ad-prism",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r053",
+      "request": "Gather the current project state from both the local doc/tasks files and the open GitHub issues and PRs into one packet, noting where each fact came from and how fresh it is.",
+      "label": "ad-project-state",
+      "lang": "en"
+    },
+    {
+      "id": "h2r054",
+      "request": "The status tooling only reads local files. Combine the configured GitHub issues and pull requests with the repository artifacts, and flag any source that failed to load.",
+      "label": "ad-project-state",
+      "lang": "en"
+    },
+    {
+      "id": "h2r055",
+      "request": "Draft the GitHub proposal issue for the caching idea from our template, keep internal notes out of it, and do not post until I approve the exact repository.",
+      "label": "ad-publish",
+      "lang": "en"
+    },
+    {
+      "id": "h2r056",
+      "request": "Me ajuda a responder o comentário do mantenedor no pull request deles usando os fatos que já levantamos, e só posta depois que eu aprovar.",
+      "label": "ad-publish",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r057",
+      "request": "Here is my half-built migration plan. Don't grade it; just tell me the questions only I can answer that could sink it, most dangerous first.",
+      "label": "ad-question-me",
+      "lang": "en"
+    },
+    {
+      "id": "h2r058",
+      "request": "I am about to commit to this approach for the importer. What am I overlooking that you cannot work out from the code yourself?",
+      "label": "ad-question-me",
+      "lang": "en"
+    },
+    {
+      "id": "h2r059",
+      "request": "Cut version 2.4.0 of the package: run our release script, open the release PR, tag it, push it to the npm registry and create the GitHub release, with one approval from me for the whole thing.",
+      "label": "ad-release",
+      "lang": "en"
+    },
+    {
+      "id": "h2r060",
+      "request": "A publicação de versão de ontem parou no meio, depois da tag mas antes de subir pro npm. Retoma de onde parou.",
+      "label": "ad-release",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r061",
+      "request": "Take the benchmark findings we collected and turn them into a standalone PDF report for the leadership meeting, with charts, using our report template.",
+      "label": "ad-report",
+      "lang": "en"
+    },
+    {
+      "id": "h2r062",
+      "request": "This analysis was written for engineers. Restructure it for the product managers, render it to HTML and check that the charts are accessible.",
+      "label": "ad-report",
+      "lang": "en"
+    },
+    {
+      "id": "h2r063",
+      "request": "Should we adopt OpenTelemetry or keep our homegrown tracing? I don't want code yet; I want a study with graded evidence and a conclusion we can defend.",
+      "label": "ad-research",
+      "lang": "en"
+    },
+    {
+      "id": "h2r064",
+      "request": "Qual o estado da arte em detecção de fala sobreposta? Quero um estudo com fontes avaliadas e uma conclusão, não implementação.",
+      "label": "ad-research",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r065",
+      "request": "Give main..HEAD a strict senior-engineer look: one pass for conformance to our conventions and ADRs, one pass for whether it does what the task asked.",
+      "label": "ad-review",
+      "lang": "en"
+    },
+    {
+      "id": "h2r066",
+      "request": "Antes de integrar, revisa esse diff com olhos novos, contra as convenções do repositório e contra a tarefa que originou a mudança.",
+      "label": "ad-review",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r067",
+      "request": "How far along are we on the roadmap? Give me a checklist of what has shipped and what is left in each tier, with a percentage.",
+      "label": "ad-roadmap",
+      "lang": "en"
+    },
+    {
+      "id": "h2r068",
+      "request": "The VP wants to know whether the Q3 delivery front is on track. Cross-check the roadmap against the actual specs and tasks and tell me what is delivered, in flight and blocked.",
+      "label": "ad-roadmap",
+      "lang": "en"
+    },
+    {
+      "id": "h2r069",
+      "request": "Which rules are actually in force for you in this repo right now, global ones, repo ones and kit ones? Just list the topics.",
+      "label": "ad-rules",
+      "lang": "en"
+    },
+    {
+      "id": "h2r070",
+      "request": "Você esqueceu de novo de rodar o gate local antes de propor o push. Recarrega as regras que valem aqui e corrige o plano atual.",
+      "label": "ad-rules",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r071",
+      "request": "I keep explaining the same deploy checklist to the agent. Package it as an on-demand capability for Claude Code under .claude/skills so it loads when someone asks to deploy.",
+      "label": "ad-skill",
+      "lang": "en"
+    },
+    {
+      "id": "h2r072",
+      "request": "Create a Codex capability under .agents/skills that walks through our database migration checklist whenever someone asks to run a migration.",
+      "label": "ad-skill",
+      "lang": "en"
+    },
+    {
+      "id": "h2r073",
+      "request": "Before we break CSV export into tasks, write the feature contract: who uses it, what it must do, measurable success criteria and what is explicitly out.",
+      "label": "ad-spec",
+      "lang": "en"
+    },
+    {
+      "id": "h2r074",
+      "request": "Preciso do documento da funcionalidade de convites por e-mail, com critérios de sucesso mensuráveis e não-objetivos, herdando o escopo do documento de produto.",
+      "label": "ad-spec",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r075",
+      "request": "We need to find table regions in scanned invoices and I am not sure whether OpenCV contours, a layout model or pdfplumber heuristics will work. Set up a staged experiment against a hand-labelled set of sample invoices with debug output per stage.",
+      "label": "ad-spike",
+      "lang": "en"
+    },
+    {
+      "id": "h2r076",
+      "request": "I have no idea whether mammoth, docx4js or raw XML parsing can semantically diff two Word files. Build throwaway experiments against hand-labelled expected outputs and compare them stage by stage.",
+      "label": "ad-spike",
+      "lang": "en"
+    },
+    {
+      "id": "h2r077",
+      "request": "Make me a delegated helper agent definition under .claude/agents that reproduces bug reports in isolation, with only Read and Bash tools.",
+      "label": "ad-subagent",
+      "lang": "en"
+    },
+    {
+      "id": "h2r078",
+      "request": "Quero um agente auxiliar pro Claude Code que só pesquisa documentação oficial e devolve citações. Cria a definição dele no diretório de agentes.",
+      "label": "ad-subagent",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r079",
+      "request": "Track 'migrate the cron jobs to the queue' as a unit of work in doc/tasks, with checkbox acceptance criteria and a notes log.",
+      "label": "ad-task",
+      "lang": "en"
+    },
+    {
+      "id": "h2r080",
+      "request": "Log the rate-limiting work for the public API as a tracked item in the repo so we don't lose it; we will get to it next sprint.",
+      "label": "ad-task",
+      "lang": "en"
+    },
+    {
+      "id": "h2r081",
+      "request": "Implement the discount calculation for tiered pricing. Start with one failing test for the simplest tier through the public function, make it pass, then add the next case.",
+      "label": "ad-tdd",
+      "lang": "en"
+    },
+    {
+      "id": "h2r082",
+      "request": "Implementa a validação de CPF começando por um teste que falha, código mínimo pra passar, e vai crescendo caso a caso.",
+      "label": "ad-tdd",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r083",
+      "request": "Here is the raw log line and the exact JSON I want out of it. Give me three ways to write the parser and pick the most readable one.",
+      "label": "ad-tdg",
+      "lang": "en"
+    },
+    {
+      "id": "h2r084",
+      "request": "I need to change the slug generator. First tell me which tests exercise that file and run them, then propose alternative implementations for this input and expected output.",
+      "label": "ad-tdg",
+      "lang": "en"
+    },
+    {
+      "id": "h2r085",
+      "request": "Here are five status-update posts the team liked. Derive the reusable structure from them and improve our publication template, one change at a time for my approval.",
+      "label": "ad-template-tune",
+      "lang": "en"
+    },
+    {
+      "id": "h2r086",
+      "request": "Our incident report template keeps producing walls of text. Use these approved examples to refine it, keeping the examples I wrote separate from the ones that came from the community.",
+      "label": "ad-template-tune",
+      "lang": "en"
+    },
+    {
+      "id": "h2r087",
+      "request": "A newer version of the agentic kit is out. Show me what would change in my installed skills, then apply it without clobbering the ones I edited.",
+      "label": "ad-update",
+      "lang": "en"
+    },
+    {
+      "id": "h2r088",
+      "request": "Atualiza o kit de skills de engenharia instalado na minha máquina pra última versão, mas me mostra antes o que muda.",
+      "label": "ad-update",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r089",
+      "request": "Here are ten of my Slack messages. Learn how I actually write from them and update my personal writing profile, proposing each change before saving it.",
+      "label": "ad-voice-tune",
+      "lang": "en"
+    },
+    {
+      "id": "h2r090",
+      "request": "You made my reply sound too formal and I rewrote it myself. Learn from my rewrite so future drafts match how I write.",
+      "label": "ad-voice-tune",
+      "lang": "en"
+    },
+    {
+      "id": "h2r091",
+      "request": "Rewrite this PR comment so it sounds like me, not like a bot.",
+      "label": "ad-voice",
+      "lang": "en"
+    },
+    {
+      "id": "h2r092",
+      "request": "Traduz essa mensagem pro inglês mantendo meu jeito de escrever; é pra um canal do Slack da comunidade.",
+      "label": "ad-voice",
+      "lang": "pt"
+    },
+    {
+      "id": "h2r093",
+      "request": "What is the difference between let and const in JavaScript?",
+      "label": "none",
+      "lang": "en"
+    },
+    {
+      "id": "h2r094",
+      "request": "Qual é o fuso horário padrão do Node quando a variável TZ não está definida?",
+      "label": "none",
+      "lang": "pt"
+    }
+  ]
+}

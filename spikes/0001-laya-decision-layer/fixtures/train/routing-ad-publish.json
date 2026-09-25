@@ -1,0 +1,182 @@
+[
+ {
+  "request": "We got a proposal from an external contributor on GitHub—can you help me write a reply that acknowledges their idea but flags the two technical blockers before I post it?",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Draft a reply to that Discord message asking about our deployment cadence.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso responder no Slack sobre o atraso na entrega, mas sem mencionar os detalhes internos do incidente.",
+  "label": "ad-publish",
+  "lang": "pt"
+ },
+ {
+  "request": "Turn this internal design discussion into a GitHub issue proposing the change to the wider team, only including the facts we've already confirmed.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Can you put together the text for a pull request comment replying to the reviewer's concerns about backward compatibility, referencing the migration guide and specific version numbers we tested, but leave out anything about our internal roadmap discussions?",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Escreve uma resposta para o issue do GitHub explicando por que decidimos não seguir com essa abordagem, citando os números do benchmark.",
+  "label": "ad-publish",
+  "lang": "pt"
+ },
+ {
+  "request": "Before I hit send on this Slack message to the partner team, can you check it only says things we've actually verified?",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Write the proposal issue for switching our logging library, ready for me to approve before posting.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Ajuda a redigir uma mensagem no Discord respondendo a um usuário que reportou um bug, mas só depois que eu aprovar o texto final.",
+  "label": "ad-publish",
+  "lang": "pt"
+ },
+ {
+  "request": "I want to reply to this GitHub PR thread thanking the contributor and summarizing the changes we're requesting, without leaking our internal timeline.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "There's a thread in our open-source repo's issue tracker where someone's asking for a roadmap commitment—draft a response that states only what we're confident about and flags the rest as uncertain, ready for my review.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso publicar um comentário no pull request explicando por que fechamos a issue, mas quero revisar antes de enviar.",
+  "label": "ad-publish",
+  "lang": "pt"
+ },
+ {
+  "request": "Compose a Slack reply summarizing the outage timeline for the customer channel, sticking strictly to confirmed facts.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Draft the GitHub proposal issue for migrating to the new build system.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Help me respond to this Discord thread about our plugin API—keep it consistent with what we've publicly committed to before, and hold it for my sign-off.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Escreve a resposta pro comentário no GitHub sobre a proposta de refatoração, mas não menciona as discussões internas que tivemos sobre isso.",
+  "label": "ad-publish",
+  "lang": "pt"
+ },
+ {
+  "request": "We're proposing a new contribution guideline to the community—draft the GitHub issue with the rationale, the specific rule changes, and links to the prior discussion, and hold off posting until I say it's good.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Reply to the maintainer's question on our PR about test coverage, referencing the actual coverage numbers from CI.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso de um rascunho de resposta pro Slack do time de parceiros sobre o cronograma da integração, sem citar nada que ainda não foi confirmado.",
+  "label": "ad-publish",
+  "lang": "pt"
+ },
+ {
+  "request": "Write a Discord announcement about the new release, but don't post it yet—I want to check it first.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Draft a reply on the GitHub issue clarifying our stance on the deprecation timeline, grounded in the dates we already published.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Redige um comentário pro pull request explicando o motivo da mudança de abordagem, citando a discussão técnica que tivemos, mas sem expor detalhes sensíveis.",
+  "label": "ad-publish",
+  "lang": "pt"
+ },
+ {
+  "request": "Someone opened an issue suggesting we support a new export format—write a response acknowledging the request, explaining our current constraints, and proposing a timeline, but only using information we've already confirmed internally.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "I need to post a short update in the community Slack about the delayed feature, keep it honest but don't reveal the internal blocker details.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Prep the reply text for this GitHub PR comment thread, I'll approve before it goes out.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Turn our internal decision notes into a public-facing GitHub proposal issue, keeping only what's appropriate to share externally.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Write the release notes for v2.4.0 based on the merged PRs this sprint.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Can you review this pull request and leave inline comments on the diff?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Merge the feature branch into main once CI passes.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Draft a product requirements doc for the new onboarding flow.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Write a commit message summarizing these staged changes.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Put together a handoff doc for the on-call engineer taking over tomorrow.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Update the CONTRIBUTING.md with our new PR guidelines.",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Verify these three claims about the library's performance before I quote them anywhere.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Adjust the tone of our docs to sound more formal and less casual.",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Summarize where the project stands right now so I can update my manager.",
+  "label": "ad-project-state",
+  "lang": "en"
+ }
+]

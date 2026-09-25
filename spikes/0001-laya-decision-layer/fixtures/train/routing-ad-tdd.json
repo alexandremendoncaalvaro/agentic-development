@@ -1,0 +1,182 @@
+[
+ {
+  "request": "I need to add a discount-code feature to checkout. Let's start with a test for applying a valid code before writing any implementation.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Before implementing the password reset flow, can you set up a test that expects the reset email to be sent, then make it pass?",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "We have a bug where refunds double-charge customers. I know exactly what correct behavior looks like — capture it as an assertion, watch it fail, then fix the code.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Let's build the new tax calculator one behavior at a time: write an assertion, see it fail, implement just enough to pass, repeat.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "I want to implement rate limiting for the API. Start with the simplest end-to-end check that exercises the whole request path, then flesh out the middle.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Can you drive out the CSV export feature test by test? I don't want any code that isn't backed by a failing assertion first.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "For the new invite-user endpoint, set up a minimal check through the public API that fails, then write just enough code to make it green.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "I'd like to implement cart merging behavior incrementally — small assertion, small implementation, small assertion, small implementation.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Add validation to the signup form: for each rule, write an assertion that fails first, then implement just enough code to satisfy it.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "We need retry logic for the payment gateway client. Let's express the retry behavior as checks against the public client interface before coding it.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Implement the new search ranking tweak by encoding the expected ranking order as an assertion first, then adjusting the algorithm until it matches.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "I want a lightweight check that goes all the way from HTTP request to database write for the new comments feature, before we build out the details.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Let's tackle the pagination fix behavior-by-behavior — each edge case gets its own assertion before any code changes.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "For the subscription cancellation feature, don't write the service and repository layers separately — start with one thin path through all the layers and grow it.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Can you implement email verification tokens by first writing a check that expects a token to expire after 24 hours, then making it pass?",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "I'd like to build out the new leaderboard feature incrementally, one assertion at a time, refactoring only once each piece is green.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "We need to fix the race condition in the queue consumer. I know the exact correct behavior — capture it as a failing check, then correct the implementation.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Let's implement the new webhook delivery guarantees by writing the smallest possible check that fails, then building up from there.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Let's implement optimistic locking for the inventory update endpoint — capture the conflict-detection behavior in a failing check before writing any code, then implement just enough to satisfy it.",
+  "label": "ad-tdd",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso implementar o cálculo de frete grátis. Vamos começar escrevendo uma verificação que falha para o caso mais simples antes de mexer no código.",
+  "label": "ad-tdd",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero corrigir o bug de duplicação de pedidos criando primeiro uma verificação que reproduz o comportamento esperado, depois ajustando a implementação até passar.",
+  "label": "ad-tdd",
+  "lang": "pt"
+ },
+ {
+  "request": "Para a nova funcionalidade de cupons, vamos construir aos poucos: uma verificação pequena, implementação mínima, verificação, implementação, sempre um comportamento por vez.",
+  "label": "ad-tdd",
+  "lang": "pt"
+ },
+ {
+  "request": "Antes de implementar a autenticação por dois fatores, monta uma verificação mínima que passe pelo fluxo inteiro, do pedido até a resposta, mesmo que simplificado.",
+  "label": "ad-tdd",
+  "lang": "pt"
+ },
+ {
+  "request": "Vamos implementar a regra de cancelamento de assinatura descrevendo cada caso como uma verificação que falha antes de escrever qualquer lógica?",
+  "label": "ad-tdd",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso adicionar validação de CPF no cadastro. Pode escrever a verificação esperando a rejeição de CPF inválido antes de implementar a validação?",
+  "label": "ad-tdd",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero refatorar o módulo de precificação, mas só depois que todas as verificações de comportamento estiverem passando — nada de mexer no código ainda sem cobertura.",
+  "label": "ad-tdd",
+  "lang": "pt"
+ },
+ {
+  "request": "We have three different possible approaches to speeding up this image processing pipeline and we're not sure which one will actually work — can you help us prototype and compare them?",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "The checkout total is randomly off by a few cents in production but I have no idea why yet — can you help me investigate?",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "I have the exact input/output pairs for this data transformation, but there are like three different algorithmic strategies that could work — help me pick the best one.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Can you review my last PR before I open it, look for missed edge cases and style issues?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Write me a good commit message for the changes I just made to the auth middleware.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "I want to break down the 'add multi-tenant support' epic into smaller actionable tickets.",
+  "label": "ad-task",
+  "lang": "en"
+ },
+ {
+  "request": "Can you help me draft an ADR for why we're switching from REST to gRPC for internal services?",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "I'm not sure if my understanding of the payment reconciliation domain is correct, can you interview me about it and challenge my assumptions?",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Can you write a report summarizing what we learned from testing these three caching strategies?",
+  "label": "ad-report",
+  "lang": "en"
+ },
+ {
+  "request": "We need to update our architecture diagram now that we've added the new event bus service.",
+  "label": "ad-architecture",
+  "lang": "en"
+ }
+]

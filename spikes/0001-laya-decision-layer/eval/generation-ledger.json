@@ -1,0 +1,265 @@
+{
+ "model": "claude-sonnet-5",
+ "calls": [
+  {
+   "job": "routing-ad-adr",
+   "items": 36,
+   "usd": 0.1314
+  },
+  {
+   "job": "routing-ad-architecture",
+   "items": 36,
+   "usd": 0.1107
+  },
+  {
+   "job": "routing-ad-archive",
+   "items": 36,
+   "usd": 0.1197
+  },
+  {
+   "job": "routing-ad-audit",
+   "items": 36,
+   "usd": 0.1043
+  },
+  {
+   "job": "routing-ad-bootstrap",
+   "items": 36,
+   "usd": 0.1181
+  },
+  {
+   "job": "routing-ad-brief",
+   "items": 43,
+   "usd": 0.099
+  },
+  {
+   "job": "routing-ad-commit",
+   "items": 37,
+   "usd": 0.0871
+  },
+  {
+   "job": "routing-ad-community-docs",
+   "items": 36,
+   "usd": 0.1169
+  },
+  {
+   "job": "routing-ad-deepen",
+   "items": 36,
+   "usd": 0.1203
+  },
+  {
+   "job": "routing-ad-derisk",
+   "items": 36,
+   "usd": 0.1122
+  },
+  {
+   "job": "routing-ad-design",
+   "items": 36,
+   "usd": 0.126
+  },
+  {
+   "job": "routing-ad-diagnose",
+   "items": 36,
+   "usd": 0.1034
+  },
+  {
+   "job": "routing-ad-domain",
+   "items": 36,
+   "usd": 0.1228
+  },
+  {
+   "job": "routing-ad-drift",
+   "items": 36,
+   "usd": 0.102
+  },
+  {
+   "job": "routing-ad-grill-me",
+   "items": 37,
+   "usd": 0.1594
+  },
+  {
+   "job": "routing-ad-ground",
+   "items": 36,
+   "usd": 0.1102
+  },
+  {
+   "job": "routing-ad-guidelines",
+   "items": 36,
+   "usd": 0.1123
+  },
+  {
+   "job": "routing-ad-handoff",
+   "items": 36,
+   "usd": 0.1197
+  },
+  {
+   "job": "routing-ad-hooks",
+   "items": 36,
+   "usd": 0.1338
+  },
+  {
+   "job": "routing-ad-level-up",
+   "items": 36,
+   "usd": 0.1083
+  },
+  {
+   "job": "routing-ad-merge",
+   "items": 36,
+   "usd": 0.0985
+  },
+  {
+   "job": "routing-ad-next",
+   "items": 36,
+   "usd": 0.1275
+  },
+  {
+   "job": "routing-ad-philosophy",
+   "items": 36,
+   "usd": 0.1294
+  },
+  {
+   "job": "routing-ad-pr",
+   "items": 36,
+   "usd": 0.0947
+  },
+  {
+   "job": "routing-ad-prd",
+   "items": 43,
+   "usd": 0.1105
+  },
+  {
+   "job": "routing-ad-prism",
+   "items": 36,
+   "usd": 0.1412
+  },
+  {
+   "job": "routing-ad-project-state",
+   "items": 36,
+   "usd": 0.1081
+  },
+  {
+   "job": "routing-ad-publish",
+   "items": 36,
+   "usd": 0.1238
+  },
+  {
+   "job": "routing-ad-question-me",
+   "items": 40,
+   "usd": 0.1115
+  },
+  {
+   "job": "routing-ad-release",
+   "items": 36,
+   "usd": 0.103
+  },
+  {
+   "job": "routing-ad-report",
+   "items": 36,
+   "usd": 0.1057
+  },
+  {
+   "job": "routing-ad-research",
+   "items": 36,
+   "usd": 0.1319
+  },
+  {
+   "job": "routing-ad-review",
+   "items": 43,
+   "usd": 0.1051
+  },
+  {
+   "job": "routing-ad-roadmap",
+   "items": 40,
+   "usd": 0.1012
+  },
+  {
+   "job": "routing-ad-rules",
+   "items": 36,
+   "usd": 0.1198
+  },
+  {
+   "job": "routing-ad-skill",
+   "items": 36,
+   "usd": 0.1118
+  },
+  {
+   "job": "routing-ad-spec",
+   "items": 36,
+   "usd": 0.1213
+  },
+  {
+   "job": "routing-ad-spike",
+   "items": 36,
+   "usd": 0.1462
+  },
+  {
+   "job": "routing-ad-subagent",
+   "items": 36,
+   "usd": 0.1163
+  },
+  {
+   "job": "routing-ad-task",
+   "items": 36,
+   "usd": 0.1062
+  },
+  {
+   "job": "routing-ad-tdd",
+   "items": 36,
+   "usd": 0.129
+  },
+  {
+   "job": "routing-ad-tdg",
+   "items": 36,
+   "usd": 0.1504
+  },
+  {
+   "job": "routing-ad-template-tune",
+   "items": 36,
+   "usd": 0.1245
+  },
+  {
+   "job": "routing-ad-update",
+   "items": 36,
+   "usd": 0.1031
+  },
+  {
+   "job": "routing-ad-voice",
+   "items": 36,
+   "usd": 0.127
+  },
+  {
+   "job": "routing-ad-voice-tune",
+   "items": 36,
+   "usd": 0.1192
+  },
+  {
+   "job": "routing-none",
+   "items": 71,
+   "usd": 0.0764
+  },
+  {
+   "job": "effects-local",
+   "items": 90,
+   "usd": 0.267
+  },
+  {
+   "job": "effects-irreversible",
+   "items": 90,
+   "usd": 0.2248
+  },
+  {
+   "job": "effects-outward",
+   "items": 90,
+   "usd": 0.1564
+  },
+  {
+   "job": "trivial-true",
+   "items": 110,
+   "usd": 0.1671
+  },
+  {
+   "job": "trivial-false",
+   "items": 110,
+   "usd": 0.2152
+  }
+ ]
+}

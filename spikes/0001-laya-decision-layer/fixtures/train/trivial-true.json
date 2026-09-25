@@ -1,0 +1,552 @@
+[
+ {
+  "request": "thanks",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "ok",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "sounds good",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "yep, go ahead",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What language is this project written in?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Which package manager does this repo use?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Rename the variable `usr` to `user` on line 12.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Add a semicolon at the end of that line.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Cool, thanks for the fix!",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What does this function return?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "How do I run the test suite?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Change the indentation to 2 spaces here.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "got it",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Perfect, that works.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What's the current Node version required by this project?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Capitalize the first letter of that string.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Nice one!",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Where is the config file located?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Change `let` to `const` on that line.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Great, appreciate it.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What does the `--force` flag do in git push?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Add a trailing comma there.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "thx",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Is Python 3.11 installed here?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Remove that unused import at the top.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Awesome, that's exactly what I needed.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What's the difference between `let` and `var`?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Change the port number to 8080.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "yup",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "How many files are in the src folder?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Sure, go ahead.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Fix the typo: 'recieve' should be 'receive'.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What does this regex match?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Cool",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Bump the version number to 2.1.0 in package.json.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Understood.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What shell are we using right now?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Add a blank line between these two functions.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Nice, thank you!",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What's the exit code convention for this CLI?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Change the color hex value to #FF0000.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Alright, sounds fine.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What is a closure in JavaScript?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Delete that console.log statement.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Great job.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "How do I check the git status?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Swap the order of those two arguments.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "k",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What does HTTP 404 mean?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Change the function name from `calc` to `calculate`.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Appreciate the quick turnaround.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What's the default timeout for this API client?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Add a period at the end of that comment.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Yes, that's correct.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What does `npm ci` do differently from `npm install`?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Uncomment that line.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Fantastic, thanks!",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Which branch am I currently on?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Change the tab size to 4.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "makes sense",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What's a race condition?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Increase the timeout value to 5000ms.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Please change every instance of the word 'colour' to 'color' in that one line, since we're standardizing on American English spelling for this file.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "How do I list all installed npm packages?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Wrap that string in quotes.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Thanks a lot, that helps.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What does `chmod 755` mean?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Change the array to use `const` instead of `let`.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Alright.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What's the purpose of a .gitignore file?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Add a newline at the end of the file.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Right on.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "How do I check which Python version is active?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Change the string quotes from double to single.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Cool, understood.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "What does this error code mean?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Remove the extra whitespace at the end of that line.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Thanks so much for walking me through that, I really appreciate how clearly you explained the difference between synchronous and asynchronous functions, it makes a lot more sense now.",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "yeah that's fine",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "Could you tell me what version of TypeScript this repository is currently configured to use, and whether it's specified in the package.json file or somewhere else entirely?",
+  "trivial": true,
+  "lang": "en"
+ },
+ {
+  "request": "valeu",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "beleza",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "ok, pode seguir",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Qual linguagem esse projeto usa?",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Muito obrigado pela ajuda!",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Renomeia a variável `usr` para `user` na linha 12.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Qual é a versão do Node necessária aqui?",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Entendido.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Troca `let` por `const` nessa linha.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Perfeito, era isso mesmo que eu precisava.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Onde fica o arquivo de configuração?",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Remove esse console.log ali.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Show de bola!",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Qual a diferença entre `let` e `var`?",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Adiciona um ponto e vírgula no final dessa linha.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Certo, obrigado.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Como faço para rodar os testes?",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Muda a porta para 8080.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Legal, valeu!",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "O que significa o código de erro 404?",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Apaga essa linha em branco extra.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Ótimo trabalho, muito obrigado!",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Qual branch eu estou agora?",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Aumenta o timeout para 5000ms.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Faz sentido, obrigado.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Como eu listo os pacotes instalados do npm?",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Coloca essa string entre aspas.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Perfeito, muito obrigado por explicar isso com tanta clareza, realmente ajudou a entender melhor o funcionamento das promises em JavaScript.",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Qual é a diferença entre uma função síncrona e uma assíncrona?",
+  "trivial": true,
+  "lang": "pt"
+ },
+ {
+  "request": "Beleza, pode adicionar uma vírgula extra no final desse array, só isso mesmo, nada mais precisa mudar por enquanto.",
+  "trivial": true,
+  "lang": "pt"
+ }
+]

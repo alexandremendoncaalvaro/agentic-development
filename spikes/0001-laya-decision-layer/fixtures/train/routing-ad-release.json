@@ -1,0 +1,182 @@
+[
+ {
+  "request": "Can you cut a patch release for this package? Bump the version, update the changelog, and get it published to npm.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "We need to publish version 2.3.0 tonight, kick off the release process.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Resume the release for tag v1.4.2, I think it stalled right after the tag got pushed.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "prepare a minor release, we need the new feature out on npm asap",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "the CI failed halfway through publishing v3.0.0, can you pick up where it left off without redoing what's already done?",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "create the GitHub Release for the latest tag please, changelog notes should already be in the repo",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "let's ship a prerelease build so QA can test the RC before we cut the real version",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "I approved the release PR in the thread, go ahead and finish publishing it to npm now",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "our root package needs a major version bump released, changelog and DCO commit and all",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "check whether we even have what we need to release this repo before I ask you to do it",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "publish the tagged version 4.1.0 to npm, the tag already exists from earlier today",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "kick off the patch release workflow, don't skip the dry run step first",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "something broke last time we tried to release this thing, can you resume from tag v0.9.1",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "run the release script for a minor bump and open the release PR for review",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "we're ready to go live, please handle the npm publish for this package now",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Time to release - please handle the version bump, PR, tag, and npm publish end to end.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Our maintainer approved the diff, go ahead and finalize the release for this package.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "We tagged v5.0.0 manually last week but never finished publishing it, can you pick that back up?",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Need a dry-run of the patch release before I actually give the go-ahead to publish anything.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Precisamos publicar uma nova versão patch desse pacote no npm, pode preparar o release?",
+  "label": "ad-release",
+  "lang": "pt"
+ },
+ {
+  "request": "Retoma o processo de release da tag v2.5.0, acho que travou logo depois da tag ser criada",
+  "label": "ad-release",
+  "lang": "pt"
+ },
+ {
+  "request": "Cria o GitHub Release pra última tag que já foi publicada no npm ontem",
+  "label": "ad-release",
+  "lang": "pt"
+ },
+ {
+  "request": "Bora fazer um release minor, já testei tudo e só falta subir pro npm",
+  "label": "ad-release",
+  "lang": "pt"
+ },
+ {
+  "request": "O publish falhou na metade ontem à noite, consegue continuar o release da v1.8.3 sem refazer tudo?",
+  "label": "ad-release",
+  "lang": "pt"
+ },
+ {
+  "request": "Prepara um release prerelease pra galera de QA validar antes da gente cortar a versão final",
+  "label": "ad-release",
+  "lang": "pt"
+ },
+ {
+  "request": "Aprovei o PR de release agora, pode seguir com a publicação no npm e criar a tag anotada",
+  "label": "ad-release",
+  "lang": "pt"
+ },
+ {
+  "request": "Open a pull request for the changes on my feature branch with a clear summary of the fix.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Write me a good commit message for these staged changes about the bugfix in the parser.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Go ahead and merge the approved PR into main once CI comes back green.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Publish the updated docs site to our GitHub Pages now that the content change is in.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Set up a pre-push git hook that blocks pushes if the test suite fails locally.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Run a security audit on our npm dependencies before we ship anything else this sprint.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Help me sketch out the roadmap for the next three releases we're planning this quarter.",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "Our npm publish step in CI keeps failing with a weird 403, can you figure out why?",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Write an ADR documenting why we're moving from manual to scripted release approvals.",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "What's a good npm package name for a small CLI tool I'm about to build?",
+  "label": "none",
+  "lang": "en"
+ }
+]

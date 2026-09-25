@@ -1,0 +1,182 @@
+[
+ {
+  "request": "My context window is about to run out and I need everything captured somewhere so I can pick this up tomorrow without re-explaining it all.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "I'm switching from Claude Code to Codex for the rest of this feature — can you get everything ready so the other agent knows exactly where I left off?",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Context's getting tight, compact this into something a fresh session can pick up from.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso encerrar por hoje, mas ainda tem bastante coisa em aberto. Consegue deixar tudo registrado para eu continuar amanhã sem perder o fio?",
+  "label": "ad-handoff",
+  "lang": "pt"
+ },
+ {
+  "request": "This session has gotten really long and I'm worried about losing track of the open decisions before I clear it.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Estou trocando de agente no meio dessa tarefa, preciso que o próximo consiga entender exatamente onde parei.",
+  "label": "ad-handoff",
+  "lang": "pt"
+ },
+ {
+  "request": "Save the current state of this working session somewhere I can pick it back up from later.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "We've been at this for hours, I need to compact everything into a doc before I lose the thread entirely.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Antes de eu fechar o terminal, salva o progresso e as decisões pendentes num lugar que eu consiga recuperar depois.",
+  "label": "ad-handoff",
+  "lang": "pt"
+ },
+ {
+  "request": "I need to pause mid-implementation and want a snapshot of what's done, what's not, and what the next agent should tackle first.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Getting close to the token limit here — can you condense the session into something the next instance can read cold?",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso passar isso para outro dev continuar, mas ele não estava acompanhando a conversa. Dá pra deixar um resumo completo do estado atual?",
+  "label": "ad-handoff",
+  "lang": "pt"
+ },
+ {
+  "request": "This chat is about to get cleared, please make sure nothing we discussed gets lost.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "I want to switch machines and continue this session elsewhere without re-explaining everything from scratch.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Vou limpar essa sessão daqui a pouco, mas antes preciso que tudo isso fique registrado em algum lugar recuperável.",
+  "label": "ad-handoff",
+  "lang": "pt"
+ },
+ {
+  "request": "Can you put together something that captures the working tree, open questions, and next steps so I don't have to re-derive them next time?",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "I'm giving this to a teammate who'll pick it up tomorrow morning — they weren't in this conversation at all.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Things are getting messy in here and the context is filling up fast, help me consolidate before we lose anything important.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Depois dessa reunião vou ter que parar o trabalho aqui, mas quero retomar exatamente do mesmo ponto depois.",
+  "label": "ad-handoff",
+  "lang": "pt"
+ },
+ {
+  "request": "Before I close this out for the weekend, capture where things stand — the diff, the open questions, everything.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "I keep bumping into the context limit, so let's condense this session into a resumable artifact.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "The next person picking this up has zero context on our conversation, I need everything well documented so they can continue.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "This is a long-running debugging session and I want a clean snapshot before I switch to a different tool.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Let's freeze the current state of this work — I need to step away and someone else, or future me, will continue it.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Compact this session before I clear it.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso fazer uma pausa longa nesse projeto e quero ter certeza de que, quando eu voltar, vou lembrar exatamente das decisões que tomamos.",
+  "label": "ad-handoff",
+  "lang": "pt"
+ },
+ {
+  "request": "Write up a PRD for this new onboarding flow feature before we start building anything.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Commit these changes with a proper message, we're not pushing yet.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Can you create an ADR documenting why we chose Postgres over Mongo for this service?",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "Open a pull request for this branch against main with a good description of the changes.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "What should I work on next given everything sitting in the backlog right now?",
+  "label": "ad-next",
+  "lang": "en"
+ },
+ {
+  "request": "Run a quick spike to see if this caching approach is even feasible before we commit to it.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Review this pull request and tell me if the logic is sound before I merge it.",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Diagnose why the staging server keeps crashing every few hours, something's clearly wrong.",
+  "label": "ad-diagnose",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a status report on where the project stands overall for the stakeholders meeting.",
+  "label": "ad-project-state",
+  "lang": "en"
+ },
+ {
+  "request": "Grill me on this design decision, I want to make sure I've actually thought it through.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ }
+]

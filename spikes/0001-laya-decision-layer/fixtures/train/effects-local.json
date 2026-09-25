@@ -1,0 +1,362 @@
+[
+ {
+  "command": "git status",
+  "label": "local"
+ },
+ {
+  "command": "git status --short --branch",
+  "label": "local"
+ },
+ {
+  "command": "git diff",
+  "label": "local"
+ },
+ {
+  "command": "git diff --stat HEAD~3 HEAD",
+  "label": "local"
+ },
+ {
+  "command": "git diff --cached",
+  "label": "local"
+ },
+ {
+  "command": "git log --oneline -n 20",
+  "label": "local"
+ },
+ {
+  "command": "git log --graph --all --decorate",
+  "label": "local"
+ },
+ {
+  "command": "git show HEAD~2:src/index.js",
+  "label": "local"
+ },
+ {
+  "command": "git blame src/utils/parser.js",
+  "label": "local"
+ },
+ {
+  "command": "git ls-files --others --exclude-standard",
+  "label": "local"
+ },
+ {
+  "command": "git ls-tree -r HEAD --name-only",
+  "label": "local"
+ },
+ {
+  "command": "git remote -v",
+  "label": "local"
+ },
+ {
+  "command": "git branch -vv",
+  "label": "local"
+ },
+ {
+  "command": "git tag --list",
+  "label": "local"
+ },
+ {
+  "command": "git stash list",
+  "label": "local"
+ },
+ {
+  "command": "git config --local core.editor vim",
+  "label": "local"
+ },
+ {
+  "command": "git config --local user.email \"dev@example.com\"",
+  "label": "local"
+ },
+ {
+  "command": "git remote add upstream https://github.com/example/upstream.git",
+  "label": "local"
+ },
+ {
+  "command": "git fetch origin",
+  "label": "local"
+ },
+ {
+  "command": "git pull origin main",
+  "label": "local"
+ },
+ {
+  "command": "git add -A",
+  "label": "local"
+ },
+ {
+  "command": "git add src/components/Header.jsx",
+  "label": "local"
+ },
+ {
+  "command": "git commit -m \"Fix off-by-one error in pagination\"",
+  "label": "local"
+ },
+ {
+  "command": "git commit -am \"Update lockfile after dependency bump\"",
+  "label": "local"
+ },
+ {
+  "command": "git commit --amend --no-edit",
+  "label": "local"
+ },
+ {
+  "command": "git checkout -b feature/user-auth",
+  "label": "local"
+ },
+ {
+  "command": "git checkout -- src/index.js",
+  "label": "local"
+ },
+ {
+  "command": "git restore src/index.js",
+  "label": "local"
+ },
+ {
+  "command": "git restore --staged src/index.js",
+  "label": "local"
+ },
+ {
+  "command": "git reset HEAD src/index.js",
+  "label": "local"
+ },
+ {
+  "command": "git reset --soft HEAD~1",
+  "label": "local"
+ },
+ {
+  "command": "git stash",
+  "label": "local"
+ },
+ {
+  "command": "git stash pop",
+  "label": "local"
+ },
+ {
+  "command": "git rm --cached debug.log",
+  "label": "local"
+ },
+ {
+  "command": "git branch -d old-feature-branch",
+  "label": "local"
+ },
+ {
+  "command": "git branch -D stale/experiment",
+  "label": "local"
+ },
+ {
+  "command": "git merge feature/user-auth",
+  "label": "local"
+ },
+ {
+  "command": "git cherry-pick 4a1b2c3",
+  "label": "local"
+ },
+ {
+  "command": "git rebase main",
+  "label": "local"
+ },
+ {
+  "command": "git tag v0.9.1-local-test",
+  "label": "local"
+ },
+ {
+  "command": "git worktree list",
+  "label": "local"
+ },
+ {
+  "command": "gh repo view",
+  "label": "local"
+ },
+ {
+  "command": "gh pr list --state open",
+  "label": "local"
+ },
+ {
+  "command": "gh pr view 452",
+  "label": "local"
+ },
+ {
+  "command": "gh pr diff 452",
+  "label": "local"
+ },
+ {
+  "command": "gh issue list --label bug",
+  "label": "local"
+ },
+ {
+  "command": "gh issue view 88",
+  "label": "local"
+ },
+ {
+  "command": "gh api repos/example/repo/commits --paginate",
+  "label": "local"
+ },
+ {
+  "command": "npm list --depth=0",
+  "label": "local"
+ },
+ {
+  "command": "npm outdated",
+  "label": "local"
+ },
+ {
+  "command": "npm audit",
+  "label": "local"
+ },
+ {
+  "command": "npm audit fix",
+  "label": "local"
+ },
+ {
+  "command": "npm view react version",
+  "label": "local"
+ },
+ {
+  "command": "npm ci",
+  "label": "local"
+ },
+ {
+  "command": "npm install",
+  "label": "local"
+ },
+ {
+  "command": "npm run build",
+  "label": "local"
+ },
+ {
+  "command": "npm run lint -- --fix",
+  "label": "local"
+ },
+ {
+  "command": "npm run format",
+  "label": "local"
+ },
+ {
+  "command": "npm test",
+  "label": "local"
+ },
+ {
+  "command": "npm version patch --no-git-tag-version",
+  "label": "local"
+ },
+ {
+  "command": "npm pack",
+  "label": "local"
+ },
+ {
+  "command": "npx prettier --write .",
+  "label": "local"
+ },
+ {
+  "command": "npx eslint . --fix",
+  "label": "local"
+ },
+ {
+  "command": "npx tsc --noEmit",
+  "label": "local"
+ },
+ {
+  "command": "node -e \"console.log(process.version)\"",
+  "label": "local"
+ },
+ {
+  "command": "node scripts/generate-changelog.js",
+  "label": "local"
+ },
+ {
+  "command": "node --version",
+  "label": "local"
+ },
+ {
+  "command": "python --version",
+  "label": "local"
+ },
+ {
+  "command": "python -m pytest -q",
+  "label": "local"
+ },
+ {
+  "command": "python -m unittest discover -s tests",
+  "label": "local"
+ },
+ {
+  "command": "python manage.py migrate",
+  "label": "local"
+ },
+ {
+  "command": "python -m venv .venv",
+  "label": "local"
+ },
+ {
+  "command": "pip freeze > requirements.txt",
+  "label": "local"
+ },
+ {
+  "command": "curl -s https://api.github.com/repos/example/repo",
+  "label": "local"
+ },
+ {
+  "command": "curl -I https://example.com",
+  "label": "local"
+ },
+ {
+  "command": "curl -o release-notes.md https://raw.githubusercontent.com/example/repo/main/CHANGELOG.md",
+  "label": "local"
+ },
+ {
+  "command": "wget -q -O - https://raw.githubusercontent.com/example/repo/main/README.md",
+  "label": "local"
+ },
+ {
+  "command": "brew list",
+  "label": "local"
+ },
+ {
+  "command": "brew info node",
+  "label": "local"
+ },
+ {
+  "command": "rm src/legacy/deprecated-util.js",
+  "label": "local"
+ },
+ {
+  "command": "cp -r src/components src/components-backup",
+  "label": "local"
+ },
+ {
+  "command": "cp .env.example .env",
+  "label": "local"
+ },
+ {
+  "command": "mv src/OldComponent.jsx src/NewComponent.jsx",
+  "label": "local"
+ },
+ {
+  "command": "touch src/components/Footer.jsx",
+  "label": "local"
+ },
+ {
+  "command": "mkdir -p src/features/checkout",
+  "label": "local"
+ },
+ {
+  "command": "chmod +x scripts/deploy.sh",
+  "label": "local"
+ },
+ {
+  "command": "echo \"LOG_LEVEL=debug\" >> .env.local",
+  "label": "local"
+ },
+ {
+  "command": "cat package.json | jq .version",
+  "label": "local"
+ },
+ {
+  "command": "grep -r \"TODO\" src/",
+  "label": "local"
+ },
+ {
+  "command": "find . -name \"*.test.js\" -not -path \"*/node_modules/*\"",
+  "label": "local"
+ }
+]

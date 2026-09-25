@@ -1,0 +1,182 @@
+[
+ {
+  "request": "Hey, I think our engineering skills kit is a few versions behind — can you check what's changed upstream before we touch anything?",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Our team installed the agentic dev toolkit months ago, can you see if there's a newer version and show me what would change without applying it yet?",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Can you sync my local skills with whatever's published now, but don't overwrite anything I've customized?",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Just curious if there's drift between the installed skills and the latest publish — pull it and tell me the diff.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Go ahead and pull down the newest skill definitions and apply them, I'm fine with it as long as my edits are preserved.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Is the machine-wide dev kit stale? Preview what an update would look like.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "We need to get everyone on the latest published skill set — refresh it globally please.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Before you do anything else, tell me if the shared agent toolkit has newer skills available.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Please refresh the installed skills for Claude Code specifically, not Codex.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "I heard there was a new release of the skill package — check and show me the plan first.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Update everything but don't force overwrite any skill I've hand-edited.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Can we get this repo's skill materialization synced to the newest project-scoped version?",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Just check for updates to the global kit, I don't want to apply anything yet.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "The onboarding doc mentions v2 skills but we're clearly still on v1 — bring us current.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Apply the latest kit update now, we already reviewed the dry run yesterday.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Something feels off with our skill versions across the team — can you verify against upstream?",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "We migrated off the legacy per-repo docs a while back, now just want the global tool synced to latest.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Pull the newest agent skill definitions down and let me see the diff before deciding whether to apply it.",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Can you check whether there's a newer version of the shared engineering skill kit and just report differences for now?",
+  "label": "ad-update",
+  "lang": "en"
+ },
+ {
+  "request": "Acho que nosso kit de skills está desatualizado, pode verificar se tem uma versão mais nova antes de aplicar qualquer coisa?",
+  "label": "ad-update",
+  "lang": "pt"
+ },
+ {
+  "request": "Atualiza o kit de desenvolvimento global pra mim, só não sobrescreve os arquivos que eu editei manualmente.",
+  "label": "ad-update",
+  "lang": "pt"
+ },
+ {
+  "request": "Será que dá pra ver se as skills instaladas na máquina estão com drift em relação à última versão publicada?",
+  "label": "ad-update",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso sincronizar as skills do time com a versão mais recente publicada no pacote.",
+  "label": "ad-update",
+  "lang": "pt"
+ },
+ {
+  "request": "Faz um preview da atualização do kit antes de aplicar, quero ver o que vai mudar primeiro.",
+  "label": "ad-update",
+  "lang": "pt"
+ },
+ {
+  "request": "Já revisamos o plano ontem, pode aplicar a atualização do kit agora.",
+  "label": "ad-update",
+  "lang": "pt"
+ },
+ {
+  "request": "Nosso kit de skills parece estar bem atrasado em relação ao que foi publicado, dá uma olhada?",
+  "label": "ad-update",
+  "lang": "pt"
+ },
+ {
+  "request": "Can you update our npm dependencies to the latest versions and run the test suite afterward?",
+  "label": "none",
+  "lang": "en"
+ },
+ {
+  "request": "I want to bootstrap a brand new project with the agentic skills installed for the first time.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Check if our codebase has drifted away from the architecture we documented a few sprints ago.",
+  "label": "ad-drift",
+  "lang": "en"
+ },
+ {
+  "request": "Create a brand new custom skill for our internal linting workflow that other repos can reuse.",
+  "label": "ad-skill",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a report on the current state of this project's tasks and open work items.",
+  "label": "ad-project-state",
+  "lang": "en"
+ },
+ {
+  "request": "Publish our package to npm with the version bump we agreed on this morning.",
+  "label": "ad-publish",
+  "lang": "en"
+ },
+ {
+  "request": "Set up git hooks so commits automatically run our linter and formatter before they land.",
+  "label": "ad-hooks",
+  "lang": "en"
+ },
+ {
+  "request": "Cut a new release for our library, tag it, and write up the changelog.",
+  "label": "ad-release",
+  "lang": "en"
+ },
+ {
+  "request": "Run a security audit across our dependencies and flag anything with known vulnerabilities.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Merge the feature branch into main now that the review is approved.",
+  "label": "ad-merge",
+  "lang": "en"
+ }
+]

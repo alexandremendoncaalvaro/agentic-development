@@ -1,0 +1,182 @@
+[
+ {
+  "request": "We just cloned this legacy repo and there's zero documentation for AI agents — can you scan it and create the operational guide agents should follow?",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "New engineers keep confusing our AI assistant with wrong build commands. Set up a root-level guide summarizing how to actually work in this codebase.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "This project has an AGENTS.md but I suspect it's stale after all our recent refactors — can you check what's out of sync?",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "We're starting a brand new repo, nothing in it yet besides a README. Walk me through setting up the baseline instructions file for coding agents.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Can you look through our package.json, docs folder, and directory structure and generate a concise agent instructions file at the root?",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Our CLAUDE.md hasn't been touched in months while the test framework changed twice. Audit it against the current codebase and tell me what's wrong.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "I want a single file at the repo root that tells any AI coding tool our build, test, and lint commands without me repeating myself every session.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "This monorepo has three different stacks and no unified guide for automated agents. Can you scan everything and produce one?",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Please inspect the ADRs in doc/adr and fold the binding decisions into a fresh top-level agent guide.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "We inherited this Go service with almost no docs. Generate the operational file agents need, pulling from go.mod and whatever comments exist.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Quick one — does this repo already have an agent instructions file, and if not can you scaffold one from what's actually here?",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "I keep having to explain the same repo conventions to Claude every session. Can we bake that into a persistent file it reads automatically?",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Audit our existing top-level agent guide against the current package.json and directory layout — I think it references dependencies we removed.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Set up the baseline agent configuration doc for this greenfield project before we write any real code.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Scan the whole repo — manifests, README, docs — and pre-fill an agent operating guide, only asking me things you genuinely can't infer.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "There's drift between what our AGENTS.md claims and how the build actually works now. Can you flag every mismatch?",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "For this fresh empty project I want to answer a few quick questions and get a starter agent guide out of it.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Our Rust workspace has no root guide for coding agents — derive one from Cargo.toml and the existing module layout.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Take a pass through this repo's structure and README and draft the top-level instructions file that keeps agent output aligned with our conventions.",
+  "label": "ad-bootstrap",
+  "lang": "en"
+ },
+ {
+  "request": "Acabamos de clonar esse repositório antigo e não existe nenhum guia para agentes de IA — pode escanear o código e criar esse arquivo na raiz?",
+  "label": "ad-bootstrap",
+  "lang": "pt"
+ },
+ {
+  "request": "Nosso arquivo de instruções para agentes está desatualizado depois da migração pro monorepo, pode auditar e me dizer o que mudou?",
+  "label": "ad-bootstrap",
+  "lang": "pt"
+ },
+ {
+  "request": "Esse projeto é novo, só tem o README por enquanto. Quero montar do zero o guia operacional pros agentes de IA seguirem.",
+  "label": "ad-bootstrap",
+  "lang": "pt"
+ },
+ {
+  "request": "Cansei de explicar as mesmas convenções do projeto pro assistente toda sessão, dá pra gerar um arquivo na raiz com tudo isso?",
+  "label": "ad-bootstrap",
+  "lang": "pt"
+ },
+ {
+  "request": "Verifica se o guia de agentes que já existe aqui ainda bate com o package.json e a estrutura de pastas atual, acho que tem coisa desatualizada.",
+  "label": "ad-bootstrap",
+  "lang": "pt"
+ },
+ {
+  "request": "Dá uma olhada no manifesto e no README desse serviço em Python e cria o arquivo de orientação pros agentes, preenchendo o que já dá pra inferir.",
+  "label": "ad-bootstrap",
+  "lang": "pt"
+ },
+ {
+  "request": "Esse monorepo tem três stacks diferentes e nenhum guia unificado pra IA. Escaneia tudo e monta um só pra gente.",
+  "label": "ad-bootstrap",
+  "lang": "pt"
+ },
+ {
+  "request": "I want a doc that reminds every agent to think before coding, verify before claiming done, and generally behave carefully — not tied to any specific tech stack.",
+  "label": "ad-philosophy",
+  "lang": "en"
+ },
+ {
+  "request": "Can you write a GUIDELINES.md documenting our team's coding standards, naming conventions, and review expectations?",
+  "label": "ad-guidelines",
+  "lang": "en"
+ },
+ {
+  "request": "Check whether the descriptions in our docs folder still match what the actual service code does, we've had a lot of silent changes lately.",
+  "label": "ad-drift",
+  "lang": "en"
+ },
+ {
+  "request": "Set up ESLint and a shared rules config so everyone's editor enforces the same style automatically.",
+  "label": "ad-rules",
+  "lang": "en"
+ },
+ {
+  "request": "Write up a summary of where the project currently stands — what's shipped, what's in flight, what's blocked — for the new hire starting Monday.",
+  "label": "ad-project-state",
+  "lang": "en"
+ },
+ {
+  "request": "I'm rotating off this project next week, put together a handoff doc covering everything the next owner needs to know.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Our PR template is missing a rollback checklist, can you add a section for that?",
+  "label": "ad-template-tune",
+  "lang": "en"
+ },
+ {
+  "request": "We're open-sourcing this repo, can you draft a CONTRIBUTING.md explaining how outside contributors should submit changes?",
+  "label": "ad-community-docs",
+  "lang": "en"
+ },
+ {
+  "request": "Generate a report summarizing what shipped this sprint across the three feature branches.",
+  "label": "ad-report",
+  "lang": "en"
+ },
+ {
+  "request": "Refactor the auth module so it issues JWT tokens instead of session cookies.",
+  "label": "none",
+  "lang": "en"
+ }
+]

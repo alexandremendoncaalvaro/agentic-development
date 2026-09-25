@@ -1,0 +1,44 @@
+{
+ "checkpoint": "convaiinnovations/laya-multilingual",
+ "set": "heldout1",
+ "routing": {
+  "laya": {
+   "n": 76,
+   "accuracy": 0.184,
+   "accuracy_pt": 0.083,
+   "p50_ms": 44.9
+  }
+ },
+ "effects": {
+  "patterns": {
+   "n": 68,
+   "accuracy_3class": 1.0,
+   "accuracy_gate": 1.0,
+   "missed_gates": 0
+  },
+  "laya": {
+   "n": 68,
+   "accuracy_3class": 0.294,
+   "accuracy_gate": 0.382,
+   "missed_gates": 27,
+   "p50_ms": 19.1
+  },
+  "hybrid": {
+   "n": 68,
+   "accuracy_3class": 0.779,
+   "accuracy_gate": 0.779,
+   "missed_gates": 0
+  }
+ },
+ "trivial": {
+  "heuristic": {
+   "n": 40,
+   "accuracy": 0.975
+  },
+  "laya": {
+   "n": 40,
+   "accuracy": 0.625,
+   "p50_ms": 12.7
+  }
+ }
+}

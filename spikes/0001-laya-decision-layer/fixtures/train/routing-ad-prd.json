@@ -1,0 +1,217 @@
+[
+ {
+  "request": "We're pivoting the app from consumer to enterprise customers — need to rewrite the target user and problem statement before anything else changes.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Can you help me pin down the success metrics for this product for the quarter?",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Adding a new initiative to the roadmap and want to note why we're deprioritizing the old one at the same time.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Legal flagged a data-retention rule that touches every feature we ship — where's the right durable place to put that?",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Kicking off a brand new product line, need to nail down who we're building for and why before we design anything.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "The non-goals section is stale — we swore off supporting SSO last year but now leadership wants to revisit that call.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Need the initial product vision written up before we start carving it into individual feature specs next sprint.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "We just decided to expand into a second market segment, the product doc needs to reflect that shift.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "What's our problem statement again, formally? I need something clean to paste into the exec deck.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "We now have three products living in this one repo, so we need an index plus a scoped page for the newest one.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Restructuring the roadmap since two planned features just got merged into a single bigger initiative.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Want to capture our target user segments clearly before the team starts writing specs for individual pieces.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Our onboarding success metric just changed from raw signups to activation rate — that needs updating at the top level.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "There's a compliance constraint on how long we retain data that applies across every feature, not just one — need a durable home for it.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Let's write the product brief: problem, goals, and everything we're explicitly not doing this year.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Stakeholders want a one-pager covering our target user and roadmap ahead of Monday's planning meeting.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "We killed a feature that was slated for next quarter, so the roadmap document needs to reflect the change.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Can you scope out the product vision for this new internal tool we're building for the ops team?",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Need to formally document why we're choosing not to support offline mode — it's a business call, not just a feature footnote.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "honestly not sure who we're even building this for anymore, can we write that down properly before the next sprint planning",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "We're merging two products under one team and need a combined vision doc that covers both target users.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "The board asked for our north star metric and I realize we never wrote it down anywhere durable.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "New hire keeps asking what problem this product actually solves — time we had a real doc to point to instead of a Slack thread.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "We've quietly changed our non-goals three times this year in conversation, none of it written down anywhere.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Sales wants to know the full feature roadmap for the next two quarters at the product level, not just engineering's sprint board.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "We're adding a regulatory constraint that every future feature has to respect, and it needs a home above individual specs.",
+  "label": "ad-prd",
+  "lang": "en"
+ },
+ {
+  "request": "Precisamos atualizar o documento de produto porque mudamos completamente o público-alvo do aplicativo.",
+  "label": "ad-prd",
+  "lang": "pt"
+ },
+ {
+  "request": "Vamos começar um produto novo, preciso definir o problema e os objetivos principais antes de detalhar qualquer funcionalidade.",
+  "label": "ad-prd",
+  "lang": "pt"
+ },
+ {
+  "request": "O jurídico impôs uma restrição que afeta todas as funcionalidades do sistema, onde devemos registrar isso de forma duradoura?",
+  "label": "ad-prd",
+  "lang": "pt"
+ },
+ {
+  "request": "As métricas de sucesso do produto mudaram, precisamos revisar o roadmap geral antes da reunião de planejamento.",
+  "label": "ad-prd",
+  "lang": "pt"
+ },
+ {
+  "request": "Adicionamos um segundo produto no mesmo repositório, então precisamos de um índice e de uma página própria pra ele.",
+  "label": "ad-prd",
+  "lang": "pt"
+ },
+ {
+  "request": "Preciso documentar os não-objetivos do produto pra deixar bem claro o que não vamos fazer esse ano.",
+  "label": "ad-prd",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero registrar a visão geral do produto antes de começarmos a quebrar isso em especificações de funcionalidades individuais.",
+  "label": "ad-prd",
+  "lang": "pt"
+ },
+ {
+  "request": "Write up a technical spec for the checkout flow we're building next sprint, including edge cases and acceptance criteria.",
+  "label": "ad-spec",
+  "lang": "en"
+ },
+ {
+  "request": "Document why we picked event sourcing over plain CRUD for the order service so future engineers understand the tradeoff.",
+  "label": "ad-adr",
+  "lang": "en"
+ },
+ {
+  "request": "The team keeps using 'tenant' and 'workspace' interchangeably, can we pin down exactly what each term means in our system?",
+  "label": "ad-domain",
+  "lang": "en"
+ },
+ {
+  "request": "I have a fuzzy idea for something new but haven't even figured out what problem it solves yet — can you interview me about it?",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Reorder our feature timeline for the next two quarters and flag dependencies between the items.",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "Sketch out the high-level system architecture and how the services actually talk to each other.",
+  "label": "ad-architecture",
+  "lang": "en"
+ },
+ {
+  "request": "Look into what our competitors are shipping in this space before we commit to a direction.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Put together a quick one-pager summarizing this initiative for tomorrow's leadership sync.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "What could realistically go wrong with this plan? List the biggest risks and how likely each one is.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a rundown of where things currently stand across the codebase and open work.",
+  "label": "ad-project-state",
+  "lang": "en"
+ }
+]

@@ -1,0 +1,182 @@
+[
+ {
+  "request": "We keep hitting the same code review comment about naming test fixtures — can we turn that into an actual rule so it stops recurring?",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Retire the old rule about avoiding default exports, we don't follow it anymore and it's just noise.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Add a convention that all API handlers must validate input with zod before touching the database.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Our audit run flagged a gap: no rule exists for how we handle feature flags. Let's fix that.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "I want this project's linting exception documented as a proper rule instead of a comment in the config.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Can you help me formalize the pattern we've been using for error boundaries into something the whole team follows?",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "This convention only applies to me, not the team — should it live in my personal rule set instead of the repo?",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "We've settled on trunk-based development, let's make sure that's captured as a rule going forward.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "There's a rule that says never use moment.js, but we removed that dependency ages ago. Time to retire it.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Every new dev breaks the migration naming pattern. Let's write a rule for it, with an example.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "I noticed several PRs violating our commit message style but there's no documented rule anywhere — can we add one?",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "This deviates from my normal global convention on file structure, but it's intentional for this repo. How do we record that as an override?",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Short: turn this into a rule.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "The team agreed today that we should always use feature branches off main, never off other feature branches — let's lock that in as policy.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Should the 'no console.log in production code' guideline become an enforced rule now that we have three violations this month?",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "We keep debating tabs vs spaces in code review. Let's just settle it and write the decision down as a rule.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "I'd like to merge two overlapping rules about error handling into one cleaner statement.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Can we add a rule requiring all new endpoints to have OpenAPI docs before merge?",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "The audit surfaced a recurring pattern that isn't in our rule-set yet — worth promoting it, but I want to see the proposal first before anything gets written.",
+  "label": "ad-level-up",
+  "lang": "en"
+ },
+ {
+  "request": "Toda vez que revisamos PR, alguém esquece de adicionar testes de integração. Podemos transformar isso numa regra oficial do projeto?",
+  "label": "ad-level-up",
+  "lang": "pt"
+ },
+ {
+  "request": "Essa regra sobre não usar bibliotecas externas para datas já não faz mais sentido, dá pra aposentar ela?",
+  "label": "ad-level-up",
+  "lang": "pt"
+ },
+ {
+  "request": "Quero formalizar o padrão que usamos para nomear branches como uma convenção do time.",
+  "label": "ad-level-up",
+  "lang": "pt"
+ },
+ {
+  "request": "Encontramos uma lacuna nas regras durante a auditoria — falta uma diretriz sobre como tratar segredos em variáveis de ambiente.",
+  "label": "ad-level-up",
+  "lang": "pt"
+ },
+ {
+  "request": "Essa convenção é só minha, não do projeto. Dá pra guardar no meu conjunto de regras pessoal em vez do repositório?",
+  "label": "ad-level-up",
+  "lang": "pt"
+ },
+ {
+  "request": "Vamos unir essas duas regras conflitantes sobre estrutura de pastas em uma só, mais enxuta?",
+  "label": "ad-level-up",
+  "lang": "pt"
+ },
+ {
+  "request": "Antes de aplicar qualquer mudança, me mostra a proposta da nova regra e o motivo — só confirmo depois de aprovar manualmente.",
+  "label": "ad-level-up",
+  "lang": "pt"
+ },
+ {
+  "request": "Run a check comparing our last sprint's PRs against the project's rule-set and flag any violations.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "I think our documentation style guide has drifted from what we actually write in code comments — can you compare and report the differences?",
+  "label": "ad-drift",
+  "lang": "en"
+ },
+ {
+  "request": "Merge these two feature branches together and resolve the conflicts in the auth module.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Tune the PR template so it stops asking for a screenshot on backend-only changes.",
+  "label": "ad-template-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Our README's tone feels inconsistent across sections, can you make the voice more uniform?",
+  "label": "ad-voice-tune",
+  "lang": "en"
+ },
+ {
+  "request": "Write the commit message for the changes I just staged, following conventional commits.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Can you review this pull request for logic bugs and style issues before I merge it?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "What should I work on next given the open issues in the backlog?",
+  "label": "ad-next",
+  "lang": "en"
+ },
+ {
+  "request": "Draft a general onboarding guidelines document for new hires covering our dev environment setup.",
+  "label": "ad-guidelines",
+  "lang": "en"
+ },
+ {
+  "request": "List out all the rules currently in effect for this repository so I can read them.",
+  "label": "ad-rules",
+  "lang": "en"
+ }
+]
