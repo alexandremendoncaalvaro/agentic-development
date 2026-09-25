@@ -1,0 +1,364 @@
+{
+ "items": [
+  {
+   "id": "h3t001",
+   "request": "Design the database schema for recurring appointments with timezone support.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t002",
+   "request": "Release version 3.0 of the SDK to npm and announce it in the team channel.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t003",
+   "request": "Migra o banco de MySQL para Postgres sem downtime e valida os dados depois.",
+   "trivial": false,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t004",
+   "request": "Our Docker image is 2 GB; cut it down and verify the app still boots in staging.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t005",
+   "request": "Draft and post a reply on the upstream GitHub issue proposing our patch.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t006",
+   "request": "Remove the unused `import os` at the top of utils.py.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t007",
+   "request": "Change the button label from 'Submit' to 'Save' in SettingsForm.tsx.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t008",
+   "request": "Refatora o módulo de estoque pra separar a regra de negócio do acesso ao banco, mantendo o comportamento.",
+   "trivial": false,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t009",
+   "request": "Beleza, pode seguir.",
+   "trivial": true,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t010",
+   "request": "The nightly job occasionally deadlocks on the orders table. Find out why and fix it.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t011",
+   "request": "Ok, go ahead.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t012",
+   "request": "Memory keeps growing in the websocket gateway until it gets OOM-killed; track it down.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t013",
+   "request": "Sounds good, let's leave it like that.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t014",
+   "request": "Migrate the whole test suite from Jest to Vitest and make sure CI still passes.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t015",
+   "request": "Set up pre-commit and pre-push hooks with linting, secret scanning, and the test suite.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t016",
+   "request": "Compara Redis e Memcached pro nosso cache de sessão e recomenda um com base em evidência.",
+   "trivial": false,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t017",
+   "request": "Write a spec for multi-tenant billing and break it into tasks.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t018",
+   "request": "What does `set -euo pipefail` mean in a bash script?",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t019",
+   "request": "Faz o release da versão 2.1 da biblioteca e abre o PR com as notas.",
+   "trivial": false,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t020",
+   "request": "Delete the commented-out console.log on line 17 of app.js.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t021",
+   "request": "Make the log message on line 88 say 'connected' instead of 'conected'.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t022",
+   "request": "Correct the broken link to CONTRIBUTING.md in the docs index.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t023",
+   "request": "Is Node 22 an LTS release?",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t024",
+   "request": "Rename the variable `tmp` to `retryCount` on line 42 of src/client.ts.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t025",
+   "request": "Em qual pasta ficam os testes de integração?",
+   "trivial": true,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t026",
+   "request": "Add end-to-end tests for the checkout flow covering failed payments and retries.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t027",
+   "request": "Add `.DS_Store` to .gitignore.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t028",
+   "request": "Cria a pipeline de CI que roda lint, testes e build em Linux e Windows.",
+   "trivial": false,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t029",
+   "request": "Corrige o erro de digitação 'configuraçao' no título do README.",
+   "trivial": true,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t030",
+   "request": "Figure out why the iOS build fails only on CI and not locally, then fix it.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t031",
+   "request": "Got it, makes sense.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t032",
+   "request": "Update the copyright year in the LICENSE file to 2026.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t033",
+   "request": "Qual a diferença entre `let` e `const`?",
+   "trivial": true,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t034",
+   "request": "What port does the dev server use by default here?",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t035",
+   "request": "What does the -u flag on git push do?",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t036",
+   "request": "Add rate limiting to the public API and make it configurable per customer.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t037",
+   "request": "Implement pagination on the /orders endpoint with cursor-based paging and update the API docs.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t038",
+   "request": "Bump the timeout constant in config.py from 30 to 45.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t039",
+   "request": "Should we move our background jobs from Sidekiq to a managed queue? Compare the options.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t040",
+   "request": "Troca o nome da constante MAX para MAX_RETRIES na linha 12 do retry.go.",
+   "trivial": true,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t041",
+   "request": "Implementa exportação de relatórios em PDF com filtros por data e testes automatizados.",
+   "trivial": false,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t042",
+   "request": "Add OAuth login with Google to the web app, including the callback route, session handling, and tests.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t043",
+   "request": "O que significa o status HTTP 409?",
+   "trivial": true,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t044",
+   "request": "What's the keyboard shortcut to open the command palette in VS Code?",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t045",
+   "request": "How do I list the files in the last commit?",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t046",
+   "request": "Fix the typo 'recieve' in the README heading.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t047",
+   "request": "Evaluate whether the new ranking model actually improves click-through and decide if we ship it.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t048",
+   "request": "Which file defines the `parseDate` function?",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t049",
+   "request": "Entendi, faz sentido.",
+   "trivial": true,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t050",
+   "request": "Thanks, that fixed it.",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t051",
+   "request": "Refactor the payment module so providers are pluggable, without changing any public behavior.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t052",
+   "request": "Review this 900-line PR for security issues before we merge it.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t053",
+   "request": "Adiciona suporte a múltiplos idiomas no app, com as traduções carregadas sob demanda.",
+   "trivial": false,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t054",
+   "request": "O login às vezes falha em produção com erro 500 sem padrão claro; investiga e corrige.",
+   "trivial": false,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t055",
+   "request": "Replace our hand-rolled config loader with a validated schema and migrate every service to it.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t056",
+   "request": "Introduce feature flags for the new search experience and roll it out to 10% of users.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t057",
+   "request": "Obrigado, funcionou.",
+   "trivial": true,
+   "lang": "pt"
+  },
+  {
+   "id": "h3t058",
+   "request": "Split the monolith's notification code into its own service with a message queue between them.",
+   "trivial": false,
+   "lang": "en"
+  },
+  {
+   "id": "h3t059",
+   "request": "Perfect, thank you!",
+   "trivial": true,
+   "lang": "en"
+  },
+  {
+   "id": "h3t060",
+   "request": "Upgrade React from 17 to 19 across the monorepo and fix whatever breaks.",
+   "trivial": false,
+   "lang": "en"
+  }
+ ]
+}

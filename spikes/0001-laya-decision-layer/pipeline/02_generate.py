@@ -7,6 +7,7 @@ the host-reported cost of every call is written to eval/generation-ledger.json.
 
   python 02_generate.py probe            # one routing call, to measure cost
   python 02_generate.py all [--max-usd N] # every call, stopping before the budget
+  python 02_generate.py v2 [--max-usd N]  # boundary commands and neighbouring-skill requests
 """
 
 import json
@@ -37,7 +38,7 @@ def call(prompt):
         proc = subprocess.run(
             ["claude", "-p", prompt, "--model", MODEL, "--max-turns", "1", "--setting-sources", "project",
              "--output-format", "json", "--tools", ""],
-            cwd=empty, capture_output=True, text=True, timeout=600)
+            cwd=empty, capture_output=True, text=True, timeout=600, stdin=subprocess.DEVNULL)
     if proc.returncode != 0:
         raise RuntimeError(f"teacher call failed ({proc.returncode}): {proc.stderr[-500:]}")
     record = json.loads(proc.stdout)
@@ -98,6 +99,53 @@ distinct {side}. Vary length (1 to 40 words) and tone; write 30 in Brazilian Por
 Output only a JSON array of objects {{"request": str, "trivial": {str(trivial).lower()}, "lang": "en"|"pt"}}."""
 
 
+NEIGHBOURS = [
+    ("ad-review", "ad-audit"), ("ad-pr", "ad-merge"), ("ad-commit", "ad-pr"), ("ad-grill-me", "ad-question-me"),
+    ("ad-ground", "ad-research"), ("ad-ground", "ad-tdg"), ("ad-spike", "ad-tdg"), ("ad-derisk", "ad-task"),
+    ("ad-brief", "ad-handoff"), ("ad-brief", "ad-roadmap"), ("ad-next", "ad-roadmap"), ("ad-drift", "ad-architecture"),
+    ("ad-guidelines", "ad-bootstrap"), ("ad-community-docs", "ad-guidelines"), ("ad-domain", "ad-design"),
+    ("ad-deepen", "ad-philosophy"), ("ad-voice", "ad-voice-tune"), ("ad-publish", "ad-report"),
+    ("ad-template-tune", "ad-publish"), ("ad-skill", "ad-subagent"), ("ad-spec", "ad-prd"), ("ad-adr", "ad-research"),
+]
+
+
+def neighbours_prompt(pairs):
+    lines = "\n".join(f"- {a} versus {b}" for a, b in pairs)
+    cards = "\n\n".join(f"<skill name=\"{n}\">\n{skill_card(n)[:900]}\n</skill>" for n in sorted({x for p in pairs for x in p}))
+    return f"""You are generating training data for a request router in an engineering-workflow kit.
+Some skills are easy to confuse. For each pair below, write 4 requests that clearly belong to the
+first skill and 4 that clearly belong to the second, each one close enough to the other skill that a
+careless router could mix them up; the difference must be in what the request actually asks for.
+{lines}
+
+Skill definitions:
+{cards}
+
+Never use a skill's name, slash command, or phrases copied from its definition. Write a quarter in
+Brazilian Portuguese. Output only a JSON array of objects {{"request": str, "label": str, "lang": "en"|"pt"}}."""
+
+
+def effects_wide_prompt(kind, definitions):
+    return f"""Generate training data for a classifier of shell commands an AI coding agent may run on a
+developer's machine while working in a git repository. Classes:
+- local: {definitions['local']}
+- irreversible: {definitions['irreversible']}
+- outward: {definitions['outward']}
+Write 90 distinct, realistic commands whose correct class is "{kind}", deliberately spread across the
+whole range of tools a developer's machine runs beyond git and npm: other package and version managers,
+cloud and container CLIs, deployment and infrastructure tools, system configuration and schedulers,
+remote copy and sync, databases, messaging and publishing CLIs. Include hard cases near the boundary
+with the other classes. Output only a JSON array of objects {{"command": str, "label": "{kind}"}}."""
+
+
+def jobs_v2():
+    definitions = load("test-effects.json")["definitions"]
+    for kind in ("local", "irreversible", "outward"):
+        yield f"effects-wide-{kind}", effects_wide_prompt(kind, definitions)
+    yield "routing-neighbours-a", neighbours_prompt(NEIGHBOURS[:11])
+    yield "routing-neighbours-b", neighbours_prompt(NEIGHBOURS[11:])
+
+
 def jobs():
     labels = list(load("skill-criteria.json"))
     definitions = load("test-effects.json")["definitions"]
@@ -117,7 +165,7 @@ def main():
     ledger = json.loads(LEDGER.read_text()) if LEDGER.exists() else {"model": MODEL, "calls": []}
     done = {c["job"] for c in ledger["calls"]}
     spent = sum(c["usd"] for c in ledger["calls"])
-    for job, prompt in jobs():
+    for job, prompt in (jobs_v2() if mode == "v2" else jobs()):
         if job in done:
             continue
         if spent >= max_usd:

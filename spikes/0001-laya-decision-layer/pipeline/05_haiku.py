@@ -5,7 +5,7 @@ answer one label per request. Batching changes the task slightly from one reques
 and is recorded as a limitation. Runs like 02_generate.py: an empty directory, project-only
 settings, one turn, no tools. Cost per call goes to eval/haiku-ledger.json.
 
-  python 05_haiku.py <set>   # heldout1 | heldout2
+  python 05_haiku.py <set> [batch]   # heldout1 | heldout2 | heldout3
 """
 
 import json
@@ -18,9 +18,10 @@ import time
 from common import SPIKE, accuracy, load
 
 SET = sys.argv[1]
-FILE = {"heldout1": "test-routing.json", "heldout2": "heldout2-routing.json"}[SET]
+FILE = {"heldout1": "test-routing.json", "heldout2": "heldout2-routing.json", "heldout3": "heldout3-routing.json"}[SET]
 MODEL = "claude-haiku-4-5-20251001"
-BATCH = 17
+# 17 per call on heldout1 and heldout2; 47 on heldout3, to stay inside the spike's USD 8 ceiling.
+BATCH = int(sys.argv[2]) if len(sys.argv) > 2 else 17
 
 
 def main():
@@ -43,7 +44,7 @@ Answer with only a JSON array of {len(chunk)} skill names in request order."""
             t0 = time.perf_counter()
             proc = subprocess.run(["claude", "-p", prompt, "--model", MODEL, "--max-turns", "1",
                                    "--setting-sources", "project", "--output-format", "json", "--tools", ""],
-                                  cwd=empty, capture_output=True, text=True, timeout=600)
+                                  cwd=empty, capture_output=True, text=True, timeout=600, stdin=subprocess.DEVNULL)
             ms = (time.perf_counter() - t0) * 1000
         record = json.loads(proc.stdout)
         labels = json.loads(re.search(r"\[[\s\S]*\]", record["result"]).group(0))

@@ -1,10 +1,11 @@
 """Stage 3: evaluate a Laya checkpoint and the deterministic baselines on a held-out set.
 
-  python 04_eval.py <checkpoint-or-hub-id> <set>   # set: heldout1 | heldout2
+  python 04_eval.py <checkpoint-or-hub-id> <set>   # set: heldout1 | heldout2 | heldout3
 
 heldout1 is fixtures/test-*.json (written with the baselines in view); heldout2 is
 fixtures/heldout2-*.json, written by an independent author who never saw the baselines,
-so only heldout2 compares baselines fairly. Explicit /skill requests are left to the
+so only heldout2 compares baselines fairly. heldout3 comes from the same independent author after
+v1's errors on heldout2 were seen, so it is the unbiased test of anything tuned after v1. Explicit /skill requests are left to the
 deterministic parser and excluded from routing accuracy. Debug rows go to
 debug/03-eval/<set>-<checkpoint>/, the summary to eval/<set>-<checkpoint>.json.
 """
@@ -20,7 +21,8 @@ from common import (SPIKE, accuracy, heuristic_trivial, load, p50, pattern_effec
 CHECKPOINT, SET = sys.argv[1], sys.argv[2]
 NAME = Path(CHECKPOINT).name if Path(CHECKPOINT).exists() else CHECKPOINT.split("/")[-1]
 FILES = {"heldout1": ("test-routing.json", "test-effects.json", "test-trivial.json"),
-         "heldout2": ("heldout2-routing.json", "heldout2-effects.json", "heldout2-trivial.json")}[SET]
+         "heldout2": ("heldout2-routing.json", "heldout2-effects.json", "heldout2-trivial.json"),
+         "heldout3": ("heldout3-routing.json", "heldout3-effects.json", "heldout3-trivial.json")}[SET]
 DEBUG = SPIKE / "debug" / "03-eval" / f"{SET}-{NAME}"
 DEBUG.mkdir(parents=True, exist_ok=True)
 

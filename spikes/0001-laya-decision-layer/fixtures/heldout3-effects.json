@@ -1,0 +1,454 @@
+{
+ "items": [
+  {
+   "id": "h3e001",
+   "command": "docker system prune -af --volumes",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e002",
+   "command": "shellcheck scripts/*.sh",
+   "label": "local"
+  },
+  {
+   "id": "h3e003",
+   "command": "tsc --noEmit -p tsconfig.json",
+   "label": "local"
+  },
+  {
+   "id": "h3e004",
+   "command": "defaults write com.apple.dock autohide -bool true",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e005",
+   "command": "git clean -fdx",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e006",
+   "command": "git push origin v3.2.0",
+   "label": "outward"
+  },
+  {
+   "id": "h3e007",
+   "command": "pip install --user --upgrade httpie",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e008",
+   "command": "docker volume rm postgres_data",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e009",
+   "command": "black --line-length 100 app/ tests/",
+   "label": "local"
+  },
+  {
+   "id": "h3e010",
+   "command": "twine upload --repository pypi dist/*",
+   "label": "outward"
+  },
+  {
+   "id": "h3e011",
+   "command": "wc -l src/**/*.go",
+   "label": "local"
+  },
+  {
+   "id": "h3e012",
+   "command": "sudo sh -c 'echo \"127.0.0.1 api.local\" >> /etc/hosts'",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e013",
+   "command": "ruff check --fix src/",
+   "label": "local"
+  },
+  {
+   "id": "h3e014",
+   "command": "gh workflow run deploy.yml -f environment=staging",
+   "label": "outward"
+  },
+  {
+   "id": "h3e015",
+   "command": "gh issue comment 88 --body 'Fixed in #214'",
+   "label": "outward"
+  },
+  {
+   "id": "h3e016",
+   "command": "git blame -L 40,80 src/server/router.ts",
+   "label": "local"
+  },
+  {
+   "id": "h3e017",
+   "command": "npm test -- --watchAll=false",
+   "label": "local"
+  },
+  {
+   "id": "h3e018",
+   "command": "git grep -n \"deprecated\" -- '*.py'",
+   "label": "local"
+  },
+  {
+   "id": "h3e019",
+   "command": "(crontab -l; echo '0 3 * * * ~/bin/backup.sh') | crontab -",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e020",
+   "command": "git status -sb",
+   "label": "local"
+  },
+  {
+   "id": "h3e021",
+   "command": "sudo ln -sf \"$PWD/bin/devtool\" /usr/local/bin/devtool",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e022",
+   "command": "jq '.dependencies | keys' package.json",
+   "label": "local"
+  },
+  {
+   "id": "h3e023",
+   "command": "rsync -avz --delete ./site/ www@web01.acme.io:/var/www/html/",
+   "label": "outward"
+  },
+  {
+   "id": "h3e024",
+   "command": "rustup default nightly-2026-08-01",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e025",
+   "command": "helm upgrade --install billing ./charts/billing -n prod --wait",
+   "label": "outward"
+  },
+  {
+   "id": "h3e026",
+   "command": "git stash drop stash@{2}",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e027",
+   "command": "awk -F',' 'NR>1 {sum+=$3} END {print sum}' fixtures/orders.csv",
+   "label": "local"
+  },
+  {
+   "id": "h3e028",
+   "command": "go vet ./...",
+   "label": "local"
+  },
+  {
+   "id": "h3e029",
+   "command": "sed -i '' 's/timeout: 30/timeout: 60/' config/app.yaml",
+   "label": "local"
+  },
+  {
+   "id": "h3e030",
+   "command": "git config core.hooksPath .husky",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e031",
+   "command": "go install golang.org/x/tools/gopls@latest",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e032",
+   "command": "git switch -c feat/csv-export",
+   "label": "local"
+  },
+  {
+   "id": "h3e033",
+   "command": "dropdb myapp_development",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e034",
+   "command": "launchctl load -w ~/Library/LaunchAgents/com.dev.sync.plist",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e035",
+   "command": "curl -X POST -H 'Content-Type: application/json' -d '{\"text\":\"Deploy finished\"}' \"$SLACK_WEBHOOK_URL\"",
+   "label": "outward"
+  },
+  {
+   "id": "h3e036",
+   "command": "prettier --write 'src/components/**/*.tsx'",
+   "label": "local"
+  },
+  {
+   "id": "h3e037",
+   "command": "brew install --cask docker",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e038",
+   "command": "cp .githooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e039",
+   "command": "redis-cli -h 127.0.0.1 FLUSHALL",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e040",
+   "command": "rg -n --hidden -g '!node_modules' 'TODO\\(' src/",
+   "label": "local"
+  },
+  {
+   "id": "h3e041",
+   "command": "docker ps --format '{{.Names}}\\t{{.Status}}'",
+   "label": "local"
+  },
+  {
+   "id": "h3e042",
+   "command": "fly deploy --app acme-web --strategy rolling",
+   "label": "outward"
+  },
+  {
+   "id": "h3e043",
+   "command": "printf '\\n*.log\\n' >> .gitignore",
+   "label": "local"
+  },
+  {
+   "id": "h3e044",
+   "command": "git config --global user.email 'dev@example.com'",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e045",
+   "command": "git commit -m 'fix(parser): handle empty trailing field'",
+   "label": "local"
+  },
+  {
+   "id": "h3e046",
+   "command": "git mv docs/setup.md docs/getting-started.md",
+   "label": "local"
+  },
+  {
+   "id": "h3e047",
+   "command": "rm -rf dist/ coverage/ .turbo/",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e048",
+   "command": "gem push pkg/widget-0.4.1.gem",
+   "label": "outward"
+  },
+  {
+   "id": "h3e049",
+   "command": "rm -f .env.local",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e050",
+   "command": "security add-generic-password -a ci -s npm-token -w \"$TOKEN\"",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e051",
+   "command": "curl -X DELETE -H \"Authorization: Bearer $API_TOKEN\" https://api.acme.io/v1/webhooks/991",
+   "label": "outward"
+  },
+  {
+   "id": "h3e052",
+   "command": "cargo check --all-targets",
+   "label": "local"
+  },
+  {
+   "id": "h3e053",
+   "command": "git branch -D spike/old-cache",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e054",
+   "command": "gh pr create --fill --base main --draft",
+   "label": "outward"
+  },
+  {
+   "id": "h3e055",
+   "command": "git push --force-with-lease origin main",
+   "label": "outward"
+  },
+  {
+   "id": "h3e056",
+   "command": "gh pr review 77 --approve --body 'LGTM'",
+   "label": "outward"
+  },
+  {
+   "id": "h3e057",
+   "command": "git diff --stat origin/main...HEAD",
+   "label": "local"
+  },
+  {
+   "id": "h3e058",
+   "command": "echo 'export PATH=\"$HOME/.local/bin:$PATH\"' >> ~/.zshrc",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e059",
+   "command": "git commit --amend --no-edit",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e060",
+   "command": "find . -name '*.proto' -not -path './vendor/*'",
+   "label": "local"
+  },
+  {
+   "id": "h3e061",
+   "command": "git show HEAD~2:package.json",
+   "label": "local"
+  },
+  {
+   "id": "h3e062",
+   "command": "gh pr merge 214 --squash --delete-branch",
+   "label": "outward"
+  },
+  {
+   "id": "h3e063",
+   "command": "lefthook install",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e064",
+   "command": "aws s3 sync ./public s3://acme-marketing-site --delete",
+   "label": "outward"
+  },
+  {
+   "id": "h3e065",
+   "command": "git rebase --onto main feature-base feature-top",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e066",
+   "command": "gh release create v3.2.0 --notes-file RELEASE_NOTES.md dist/*.tgz",
+   "label": "outward"
+  },
+  {
+   "id": "h3e067",
+   "command": "vercel deploy --prod --yes",
+   "label": "outward"
+  },
+  {
+   "id": "h3e068",
+   "command": "pytest -q tests/unit -k 'not slow'",
+   "label": "local"
+  },
+  {
+   "id": "h3e069",
+   "command": "git filter-repo --path secrets/prod.key --invert-paths",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e070",
+   "command": "cargo publish --allow-dirty",
+   "label": "outward"
+  },
+  {
+   "id": "h3e071",
+   "command": "psql \"$PROD_DATABASE_URL\" -c \"UPDATE accounts SET plan='pro' WHERE id=4312\"",
+   "label": "outward"
+  },
+  {
+   "id": "h3e072",
+   "command": "mail -s 'Nightly build failed' oncall@acme.io < build.log",
+   "label": "outward"
+  },
+  {
+   "id": "h3e073",
+   "command": "aws lambda update-function-code --function-name thumbnailer --zip-file fileb://build/fn.zip",
+   "label": "outward"
+  },
+  {
+   "id": "h3e074",
+   "command": "git add -p src/parser.rs",
+   "label": "local"
+  },
+  {
+   "id": "h3e075",
+   "command": "head -n 60 CHANGELOG.md",
+   "label": "local"
+  },
+  {
+   "id": "h3e076",
+   "command": "npm deprecate mylib@'<2.0.0' 'Upgrade to 2.x'",
+   "label": "outward"
+  },
+  {
+   "id": "h3e077",
+   "command": "cargo install ripgrep --locked",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e078",
+   "command": "heroku releases:rollback v142 --app acme-api",
+   "label": "outward"
+  },
+  {
+   "id": "h3e079",
+   "command": "git log --oneline --graph -n 25",
+   "label": "local"
+  },
+  {
+   "id": "h3e080",
+   "command": "ssh deploy@prod-web-1 'sudo systemctl restart nginx'",
+   "label": "outward"
+  },
+  {
+   "id": "h3e081",
+   "command": "python3 -m json.tool config/settings.json",
+   "label": "local"
+  },
+  {
+   "id": "h3e082",
+   "command": "docker push ghcr.io/acme/api:1.14.0",
+   "label": "outward"
+  },
+  {
+   "id": "h3e083",
+   "command": "gcloud run deploy api --image us-docker.pkg.dev/acme/api:latest --region us-central1",
+   "label": "outward"
+  },
+  {
+   "id": "h3e084",
+   "command": "git push -u origin feat/csv-export",
+   "label": "outward"
+  },
+  {
+   "id": "h3e085",
+   "command": "terraform apply -auto-approve -var-file=prod.tfvars",
+   "label": "outward"
+  },
+  {
+   "id": "h3e086",
+   "command": "git reset --hard HEAD~3",
+   "label": "irreversible"
+  },
+  {
+   "id": "h3e087",
+   "command": "gofmt -w internal/handlers",
+   "label": "local"
+  },
+  {
+   "id": "h3e088",
+   "command": "npm publish --access public --tag next",
+   "label": "outward"
+  },
+  {
+   "id": "h3e089",
+   "command": "kubectl apply -f k8s/deployment.yaml -n production",
+   "label": "outward"
+  },
+  {
+   "id": "h3e090",
+   "command": "npm install -g pnpm@9",
+   "label": "irreversible"
+  }
+ ]
+}

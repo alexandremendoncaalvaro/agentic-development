@@ -1,0 +1,47 @@
+{
+ "items": 2346,
+ "validation": 260,
+ "device": "mps",
+ "epochs": [
+  {
+   "epoch": 1,
+   "loss": 1.9109,
+   "val": {
+    "route": 0.503,
+    "size": 0.95,
+    "effect": 0.77
+   },
+   "seconds": 1698
+  },
+  {
+   "epoch": 2,
+   "loss": 0.8871,
+   "val": {
+    "route": 0.564,
+    "size": 1.0,
+    "effect": 0.787
+   },
+   "seconds": 5133
+  },
+  {
+   "epoch": 3,
+   "loss": 0.4284,
+   "val": {
+    "route": 0.57,
+    "size": 1.0,
+    "effect": 0.787
+   },
+   "seconds": 8952
+  },
+  {
+   "epoch": 4,
+   "loss": 0.2317,
+   "val": {
+    "route": 0.626,
+    "size": 1.0,
+    "effect": 0.82
+   },
+   "seconds": 11920
+  }
+ ]
+}

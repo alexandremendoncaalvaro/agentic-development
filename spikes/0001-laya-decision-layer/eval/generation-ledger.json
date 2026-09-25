@@ -260,6 +260,26 @@
    "job": "trivial-false",
    "items": 110,
    "usd": 0.2152
+  },
+  {
+   "job": "effects-wide-local",
+   "items": 90,
+   "usd": 0.1713
+  },
+  {
+   "job": "effects-wide-irreversible",
+   "items": 90,
+   "usd": 0.2917
+  },
+  {
+   "job": "effects-wide-outward",
+   "items": 90,
+   "usd": 0.17
+  },
+  {
+   "job": "routing-neighbours-a",
+   "items": 88,
+   "usd": 0.2823
   }
  ]
 }

@@ -136,6 +136,10 @@ def main():
         log.append({"epoch": epoch + 1, "loss": round(sum(losses) / len(losses), 4), "val": acc, "seconds": round(time.time() - t0)})
         print(json.dumps(log[-1]), flush=True)
 
+    temperature = fit_temperature(model, val, tok)
+    cfg["temperature"] = [temperature, 1.0, 1.0]  # (choice, score, noul): every spike question is a choice
+    cfg.pop("temperature_by_options", None)
+    print(f"fitted choice temperature {temperature:.3f} on {len(val)} held-back items", flush=True)
     OUT.mkdir(parents=True, exist_ok=True)
     save_file({k: v.float().contiguous().cpu() for k, v in model.state_dict().items()}, OUT / "model.safetensors")
     shutil.copytree(BASE / "encoder", OUT / "encoder", dirs_exist_ok=True)
@@ -144,6 +148,37 @@ def main():
     (OUT / "rl_agent_config.json").write_text(json.dumps(cfg, indent=1))
     (OUT / "train-log.json").write_text(json.dumps({"items": len(train), "validation": len(val), "device": str(DEVICE),
                                                      "epochs": log}, indent=1))
+
+
+def fit_temperature(model, val, tok):
+    """One choice temperature on the held-back split, as Laya's notebook fits one per type."""
+    model.eval()
+    pairs = []
+    with torch.no_grad():
+        for start in range(0, len(val), 16):
+            chunk = val[start:start + 16]
+            ids, att, mpos, mmask, target, qtype = (t.to(DEVICE) for t in collate(chunk, tok.pad_token_id))
+            logits, _ = model(ids, att, mpos, mmask, qtype)
+            for row, it in zip(logits.float().cpu(), chunk):
+                pairs.append((row[: len(it["target"])].tolist(), it["target"]))
+    model.train()
+    kmax = max(len(z) for z, _ in pairs)
+    logits = torch.full((len(pairs), kmax), -1e4)
+    target = torch.zeros((len(pairs), kmax))
+    for i, (z, tgt) in enumerate(pairs):
+        logits[i, : len(z)] = torch.tensor(z)
+        target[i, : len(tgt)] = torch.tensor(tgt)
+    log_t = torch.zeros(1, requires_grad=True)
+    opt = torch.optim.LBFGS([log_t], lr=0.1, max_iter=100)
+
+    def closure():
+        opt.zero_grad()
+        loss = -(target * torch.log_softmax(logits / log_t.exp(), -1)).sum(-1).mean()
+        loss.backward()
+        return loss
+
+    opt.step(closure)
+    return float(torch.clamp(log_t.exp(), 0.1, 10.0).item())
 
 
 @torch.no_grad()

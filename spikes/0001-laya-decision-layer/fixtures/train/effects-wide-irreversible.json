@@ -1,0 +1,362 @@
+[
+ {
+  "command": "brew install postgresql",
+  "label": "irreversible"
+ },
+ {
+  "command": "brew uninstall --force imagemagick",
+  "label": "irreversible"
+ },
+ {
+  "command": "brew services stop postgresql",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo apt-get remove --purge nginx",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo apt-get install -y redis-server",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo yum remove httpd",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo dnf install nginx",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo pacman -Rns vim",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo snap install code --classic",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo snap remove docker",
+  "label": "irreversible"
+ },
+ {
+  "command": "pip install --user requests",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo pip3 install --upgrade setuptools",
+  "label": "irreversible"
+ },
+ {
+  "command": "pipx install poetry",
+  "label": "irreversible"
+ },
+ {
+  "command": "gem install rails",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo gem uninstall bundler",
+  "label": "irreversible"
+ },
+ {
+  "command": "cargo install ripgrep",
+  "label": "irreversible"
+ },
+ {
+  "command": "go install github.com/golang/mock/mockgen@latest",
+  "label": "irreversible"
+ },
+ {
+  "command": "nvm uninstall 14",
+  "label": "irreversible"
+ },
+ {
+  "command": "rustup toolchain uninstall stable",
+  "label": "irreversible"
+ },
+ {
+  "command": "asdf uninstall python 3.9.0",
+  "label": "irreversible"
+ },
+ {
+  "command": "conda install -n base numpy",
+  "label": "irreversible"
+ },
+ {
+  "command": "npm install -g pm2",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo npm uninstall -g eslint",
+  "label": "irreversible"
+ },
+ {
+  "command": "docker rm -f web-server",
+  "label": "irreversible"
+ },
+ {
+  "command": "docker volume rm postgres-data",
+  "label": "irreversible"
+ },
+ {
+  "command": "docker network rm backend-net",
+  "label": "irreversible"
+ },
+ {
+  "command": "docker system prune -a --volumes -f",
+  "label": "irreversible"
+ },
+ {
+  "command": "docker image prune -a -f",
+  "label": "irreversible"
+ },
+ {
+  "command": "kubectl delete deployment payments -n production",
+  "label": "irreversible"
+ },
+ {
+  "command": "kubectl delete pvc data-claim -n production",
+  "label": "irreversible"
+ },
+ {
+  "command": "kubectl drain node-3 --delete-emptydir-data --force",
+  "label": "irreversible"
+ },
+ {
+  "command": "helm uninstall billing-service -n prod",
+  "label": "irreversible"
+ },
+ {
+  "command": "gcloud compute instances delete build-agent --zone=us-central1-a",
+  "label": "irreversible"
+ },
+ {
+  "command": "gcloud projects delete old-sandbox-project",
+  "label": "irreversible"
+ },
+ {
+  "command": "gcloud sql instances delete legacy-mysql",
+  "label": "irreversible"
+ },
+ {
+  "command": "gcloud pubsub topics delete order-events",
+  "label": "irreversible"
+ },
+ {
+  "command": "gcloud pubsub subscriptions delete order-events-sub",
+  "label": "irreversible"
+ },
+ {
+  "command": "az vm delete --name legacy-vm --resource-group rg-prod --yes",
+  "label": "irreversible"
+ },
+ {
+  "command": "az group delete --name rg-old-project --yes",
+  "label": "irreversible"
+ },
+ {
+  "command": "aws ec2 terminate-instances --instance-ids i-0abcd1234ef567890",
+  "label": "irreversible"
+ },
+ {
+  "command": "aws s3 rb s3://acme-uploads-bucket --force",
+  "label": "irreversible"
+ },
+ {
+  "command": "aws s3 rm s3://acme-static-site/index.html",
+  "label": "irreversible"
+ },
+ {
+  "command": "aws iam delete-user --user-name jsmith",
+  "label": "irreversible"
+ },
+ {
+  "command": "aws rds delete-db-instance --db-instance-identifier prod-orders-db --skip-final-snapshot",
+  "label": "irreversible"
+ },
+ {
+  "command": "aws dynamodb delete-table --table-name Sessions",
+  "label": "irreversible"
+ },
+ {
+  "command": "aws sqs purge-queue --queue-url https://sqs.us-east-1.amazonaws.com/123456789012/jobs",
+  "label": "irreversible"
+ },
+ {
+  "command": "terraform destroy -auto-approve",
+  "label": "irreversible"
+ },
+ {
+  "command": "terraform apply -auto-approve",
+  "label": "irreversible"
+ },
+ {
+  "command": "pulumi destroy --yes",
+  "label": "irreversible"
+ },
+ {
+  "command": "cdk destroy ProdStack",
+  "label": "irreversible"
+ },
+ {
+  "command": "ansible-playbook decommission-hosts.yml -i prod-inventory",
+  "label": "irreversible"
+ },
+ {
+  "command": "serverless remove --stage production",
+  "label": "irreversible"
+ },
+ {
+  "command": "heroku apps:destroy --app legacy-billing-api --confirm legacy-billing-api",
+  "label": "irreversible"
+ },
+ {
+  "command": "fly apps destroy old-staging-app",
+  "label": "irreversible"
+ },
+ {
+  "command": "vercel remove old-marketing-site --yes",
+  "label": "irreversible"
+ },
+ {
+  "command": "rabbitmqadmin delete queue name=email-notifications",
+  "label": "irreversible"
+ },
+ {
+  "command": "kafka-topics.sh --bootstrap-server broker:9092 --delete --topic user-events",
+  "label": "irreversible"
+ },
+ {
+  "command": "mosquitto_pub -h broker.local -r -t devices/thermostat/config -m \"\"",
+  "label": "irreversible"
+ },
+ {
+  "command": "psql -h prod-db.internal -U admin -c \"TRUNCATE TABLE orders;\"",
+  "label": "irreversible"
+ },
+ {
+  "command": "mysql -h prod.internal -u root -e \"DROP DATABASE staging;\"",
+  "label": "irreversible"
+ },
+ {
+  "command": "mongosh \"mongodb://prod-cluster.internal\" --eval \"db.dropDatabase()\"",
+  "label": "irreversible"
+ },
+ {
+  "command": "redis-cli -h cache-prod.internal FLUSHALL",
+  "label": "irreversible"
+ },
+ {
+  "command": "sqlite3 /var/data/app/production.db \"DELETE FROM users WHERE id=42;\"",
+  "label": "irreversible"
+ },
+ {
+  "command": "influx delete --bucket metrics --start 1970-01-01T00:00:00Z --stop 2026-01-01T00:00:00Z",
+  "label": "irreversible"
+ },
+ {
+  "command": "flyway -url=jdbc:postgresql://prod-db.internal/app migrate",
+  "label": "irreversible"
+ },
+ {
+  "command": "crontab -r",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo systemctl disable --now nginx",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo systemctl mask ssh",
+  "label": "irreversible"
+ },
+ {
+  "command": "launchctl unload ~/Library/LaunchAgents/com.company.backup.plist",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo launchctl bootout system/com.apple.mDNSResponder",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo useradd -m deploy",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo userdel -r olduser",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo passwd -l root",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo timedatectl set-timezone America/New_York",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo hostnamectl set-hostname build-agent-02",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo ufw deny 22/tcp",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo iptables -F",
+  "label": "irreversible"
+ },
+ {
+  "command": "sudo pmset -a sleep 0",
+  "label": "irreversible"
+ },
+ {
+  "command": "git config --global user.email \"new-address@example.com\"",
+  "label": "irreversible"
+ },
+ {
+  "command": "git clean -fdx",
+  "label": "irreversible"
+ },
+ {
+  "command": "rm -rf .git",
+  "label": "irreversible"
+ },
+ {
+  "command": "git filter-branch --force --index-filter \"git rm --cached --ignore-unmatch secrets.env\" --prune-empty -- --all",
+  "label": "irreversible"
+ },
+ {
+  "command": "git reflog expire --expire=now --all && git gc --prune=now",
+  "label": "irreversible"
+ },
+ {
+  "command": "printf '#!/bin/sh\\nexit 1\\n' > .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit",
+  "label": "irreversible"
+ },
+ {
+  "command": "rm -rf node_modules",
+  "label": "irreversible"
+ },
+ {
+  "command": "rm -f .env",
+  "label": "irreversible"
+ },
+ {
+  "command": "scp -r ./dist root@prod-web01:/var/www/html",
+  "label": "irreversible"
+ },
+ {
+  "command": "rsync -avz --delete ./site/ deploy@web01.example.com:/var/www/html/",
+  "label": "irreversible"
+ },
+ {
+  "command": "rclone sync ./photos gdrive:Photos --delete-empty-src-dirs",
+  "label": "irreversible"
+ },
+ {
+  "command": "aws s3 sync ./dist s3://acme-static-site --delete",
+  "label": "irreversible"
+ }
+]

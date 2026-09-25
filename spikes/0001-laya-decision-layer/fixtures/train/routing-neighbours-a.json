@@ -1,0 +1,442 @@
+[
+ {
+  "request": "Can you look over this branch against our coding standards and check it matches what the ticket asked for before I open a PR?",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "I want a fresh pair of eyes comparing this diff to our conventions and to the original task description.",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Take a look at this branch and tell me if the implementation matches spec and follows our conventions.",
+  "label": "ad-review",
+  "lang": "en"
+ },
+ {
+  "request": "Pode dar uma olhada nesse diff comparando com os padrões do projeto e com o que a tarefa pedia, antes de eu abrir o PR?",
+  "label": "ad-review",
+  "lang": "pt"
+ },
+ {
+  "request": "Before I post this to the team, I need every single rule we have checked against this branch, one by one, with a verdict for each.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Run the most exhaustive check possible on this PR — I want full coverage against every rule we have, not just a quick pass.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "I need a full rule-by-rule verification of these drafted claims before handoff, nothing skipped.",
+  "label": "ad-audit",
+  "lang": "en"
+ },
+ {
+  "request": "Quero uma verificação exaustiva, regra por regra, de todo o nosso conjunto de regras contra essa branch antes de eu postar para o time.",
+  "label": "ad-audit",
+  "lang": "pt"
+ },
+ {
+  "request": "The branch is pushed and I approved the draft summary — go ahead and open the pull request now.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Draft the summary and test plan section and open this as a pull request against main.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "I'm ready to submit this branch, can you write up the body and open it as a new PR?",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "A branch já está no ar, pode abrir o pull request com o resumo e o plano de testes que combinamos?",
+  "label": "ad-pr",
+  "lang": "pt"
+ },
+ {
+  "request": "Check if PR #142 is ready — CI status, review state, any unresolved comments — and merge it if it's clean.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Is this pull request ready to land right now? If CI is green go ahead and merge it.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Pull up the status of that PR, confirm nothing's blocking it, and land it into main.",
+  "label": "ad-merge",
+  "lang": "en"
+ },
+ {
+  "request": "Verifica se o PR está com o CI passando e sem comentários pendentes, e se estiver tudo certo pode fazer o merge.",
+  "label": "ad-merge",
+  "lang": "pt"
+ },
+ {
+  "request": "This change is verified and ready — stage it and write a proper commit message with sign-off.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "I've got a few unrelated fixes mixed in the working tree, split them into separate commits please.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Go ahead and commit this with a conventional message, make sure it's signed off.",
+  "label": "ad-commit",
+  "lang": "en"
+ },
+ {
+  "request": "Essa alteração já foi validada, pode preparar o stage e registrar o commit com a assinatura de praxe?",
+  "label": "ad-commit",
+  "lang": "pt"
+ },
+ {
+  "request": "The commits are already in place on the branch — now open the pull request for it.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Write up a summary and test plan and open this branch against the release branch as a pull request.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Push this up and open a pull request so the team can see it.",
+  "label": "ad-pr",
+  "lang": "en"
+ },
+ {
+  "request": "Os commits já estão prontos na branch, agora só falta abrir o pull request com o resumo do que foi feito.",
+  "label": "ad-pr",
+  "lang": "pt"
+ },
+ {
+  "request": "I have a vague idea for a feature but haven't nailed down what it actually needs to do — walk me through the questions I need to answer first.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Before I even start researching this, push back on my assumptions one at a time until we've got something concrete.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "This request bundles like three different decisions together, help me untangle it before we do anything else.",
+  "label": "ad-grill-me",
+  "lang": "en"
+ },
+ {
+  "request": "Essa ideia ainda está bem vaga, sem condição clara de sucesso — pode me questionar uma pergunta de cada vez até ficar definido?",
+  "label": "ad-grill-me",
+  "lang": "pt"
+ },
+ {
+  "request": "I'm mostly done with this feature — can you poke at it and tell me what I might be missing before I wrap up?",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Look at the work in progress and raise anything that's genuinely my call to decide, not things you can just look up yourself.",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Am I still on track with this implementation, or is there something I'm not seeing?",
+  "label": "ad-question-me",
+  "lang": "en"
+ },
+ {
+  "request": "Já estou quase terminando essa parte, pode revisar e apontar só as questões que realmente dependem da minha decisão?",
+  "label": "ad-question-me",
+  "lang": "pt"
+ },
+ {
+  "request": "Before I start writing this integration, check the official docs, our existing patterns, and git history for how we've done this before.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "I need the standard approach nailed down with sources before touching any code for this feature.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Look into how this library is meant to be used and how we've used similar things in this repo before I implement it.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Antes de começar a implementar essa parte, pesquisa a documentação oficial e como já fizemos algo parecido no repositório.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "Would switching to this new queueing library actually be worth it over what we have now? I want a written comparison with a conclusion.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a review of caching strategies for this kind of workload, weigh the evidence and recommend one.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "I need a documented study of option A versus option B so we can decide, not code yet.",
+  "label": "ad-research",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso de um estudo comparando essas duas abordagens, com as evidências ponderadas e uma conclusão registrada, sem escrever código ainda.",
+  "label": "ad-research",
+  "lang": "pt"
+ },
+ {
+  "request": "I don't know the standard way to handle retries in this stack — find out how it's typically done and how our codebase already handles it.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Research the recommended pattern for this before I write a line of code.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "What's the established approach here — check docs and prior art in the repo before we commit to anything.",
+  "label": "ad-ground",
+  "lang": "en"
+ },
+ {
+  "request": "Não sei qual é a forma recomendada de lidar com isso — pesquisa a documentação e o que já existe no repositório antes de eu implementar.",
+  "label": "ad-ground",
+  "lang": "pt"
+ },
+ {
+  "request": "I know exactly what output this function needs to produce for this input — generate a few implementation strategies and pick the best one by performance.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "The technique is settled, I just need three candidate implementations compared against a single criterion before we pick one and build it.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Map out which tests depend on this code, then give me three ways to implement it and choose by simplicity.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Já sei qual é o resultado esperado para essa entrada — gera três estratégias de implementação e escolhe uma por um único critério.",
+  "label": "ad-tdg",
+  "lang": "pt"
+ },
+ {
+  "request": "We're not sure which library to use for this image processing step — set up a staged comparison with a reference dataset to evaluate a few candidates.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "I want to evaluate two or three completely different approaches to this problem with debug artifacts at each stage before committing to one.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Which computer vision approach actually works here? Build a staged pipeline with sample data to test the candidates.",
+  "label": "ad-spike",
+  "lang": "en"
+ },
+ {
+  "request": "Não sabemos qual biblioteca usar para esse processamento — monta uma comparação em estágios com dados de referência para avaliar as opções.",
+  "label": "ad-spike",
+  "lang": "pt"
+ },
+ {
+  "request": "The technique for this is already decided, I just need to see three implementation variants scored against one criterion before picking one.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "Given this exact input and the output I expect, generate a few strategies to get there and pick the simplest.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "I know how to solve this, I just want the list of dependent tests and a handful of implementation options to choose from.",
+  "label": "ad-tdg",
+  "lang": "en"
+ },
+ {
+  "request": "A técnica já está definida, só preciso de três variantes de implementação avaliadas por um critério único antes de escolher.",
+  "label": "ad-tdg",
+  "lang": "pt"
+ },
+ {
+  "request": "Before we start building this, list out everything that's uncertain and figure out how to knock each one down.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Is it actually safe to start coding this yet, or are there unknowns we haven't dealt with?",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "I want a register of the risks in this plan and a way to retire each before we commit engineering time.",
+  "label": "ad-derisk",
+  "lang": "en"
+ },
+ {
+  "request": "Antes de começar a construir isso, lista todas as incertezas e como vamos reduzir cada uma antes de investir tempo.",
+  "label": "ad-derisk",
+  "lang": "pt"
+ },
+ {
+  "request": "Write up a tracked work item for this with acceptance criteria I can check off one by one.",
+  "label": "ad-task",
+  "lang": "en"
+ },
+ {
+  "request": "Create a backlog entry for this feature with clear completion checkboxes.",
+  "label": "ad-task",
+  "lang": "en"
+ },
+ {
+  "request": "I need this turned into a proper task file with acceptance criteria, marked as not yet started.",
+  "label": "ad-task",
+  "lang": "en"
+ },
+ {
+  "request": "Cria um item de trabalho rastreável para isso, com critérios de aceite marcáveis, ainda não iniciado.",
+  "label": "ad-task",
+  "lang": "pt"
+ },
+ {
+  "request": "Catch me up on where things stand — what's happening, why, and what decisions are waiting on me.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Give me a simple report I can bring to my manager about the current state of this project.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Where are we right now? I just walked in and need the full picture in a few paragraphs.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Me atualiza sobre onde estamos agora — o que está acontecendo, por quê, e quais decisões dependem de mim.",
+  "label": "ad-brief",
+  "lang": "pt"
+ },
+ {
+  "request": "We're running low on context in this session, save everything a fresh agent would need to pick this up later.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Wrap up this session into something I can hand to another agent tomorrow to continue exactly where we left off.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Compact the state of this conversation into a resumable file before we run out of room.",
+  "label": "ad-handoff",
+  "lang": "en"
+ },
+ {
+  "request": "Estamos ficando sem espaço de contexto nessa sessão, salva tudo que um agente novo precisaria para continuar depois.",
+  "label": "ad-handoff",
+  "lang": "pt"
+ },
+ {
+  "request": "I need a quick summary for my boss on what's going on right now and what needs a decision.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Summarize the current state of the session for someone who just arrived and has no context.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "What's happening at this moment and why does it matter — give me the short version.",
+  "label": "ad-brief",
+  "lang": "en"
+ },
+ {
+  "request": "Preciso de um resumo simples pro meu chefe sobre o que está acontecendo agora e o que precisa de decisão.",
+  "label": "ad-brief",
+  "lang": "pt"
+ },
+ {
+  "request": "How much of this project is actually done? Give me a checklist against the delivery plan.",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "Are we on track against the delivery plan — what's shipped, what's next, what's blocked?",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "I need a percent-complete progress report reconciled against our specs and tracked tasks.",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "Quanto desse projeto já está pronto? Quero um checklist comparando com o que foi planejado e o que falta.",
+  "label": "ad-roadmap",
+  "lang": "pt"
+ },
+ {
+  "request": "I'm not sure what to work on next, can you scan the project and tell me the top priority actions?",
+  "label": "ad-next",
+  "lang": "en"
+ },
+ {
+  "request": "Run a check across the project artifacts and tell me what needs attention first.",
+  "label": "ad-next",
+  "lang": "en"
+ },
+ {
+  "request": "What should I do next given everything currently sitting in this repo?",
+  "label": "ad-next",
+  "lang": "en"
+ },
+ {
+  "request": "Não sei bem o que fazer agora, pode dar uma varredura no projeto e me dizer quais são as próximas ações prioritárias?",
+  "label": "ad-next",
+  "lang": "pt"
+ },
+ {
+  "request": "What percentage of the roadmap have we actually delivered so far?",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "Reconcile our specs and tasks against the roadmap and tell me what's shipped versus remaining.",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "I want a progress checklist showing how far along we are on the main delivery front.",
+  "label": "ad-roadmap",
+  "lang": "en"
+ },
+ {
+  "request": "Qual porcentagem do que estava planejado já foi realmente entregue até agora?",
+  "label": "ad-roadmap",
+  "lang": "pt"
+ }
+]

@@ -1,0 +1,362 @@
+[
+ {
+  "command": "pip list --outdated",
+  "label": "local"
+ },
+ {
+  "command": "pip show requests",
+  "label": "local"
+ },
+ {
+  "command": "pip freeze",
+  "label": "local"
+ },
+ {
+  "command": "pip install --dry-run -r requirements.txt",
+  "label": "local"
+ },
+ {
+  "command": "brew list --versions",
+  "label": "local"
+ },
+ {
+  "command": "brew outdated",
+  "label": "local"
+ },
+ {
+  "command": "brew info wget",
+  "label": "local"
+ },
+ {
+  "command": "cargo tree",
+  "label": "local"
+ },
+ {
+  "command": "cargo check",
+  "label": "local"
+ },
+ {
+  "command": "cargo build --release",
+  "label": "local"
+ },
+ {
+  "command": "gem list --local",
+  "label": "local"
+ },
+ {
+  "command": "conda list --name base",
+  "label": "local"
+ },
+ {
+  "command": "conda env list",
+  "label": "local"
+ },
+ {
+  "command": "apt list --installed",
+  "label": "local"
+ },
+ {
+  "command": "dnf list installed",
+  "label": "local"
+ },
+ {
+  "command": "yum check-update",
+  "label": "local"
+ },
+ {
+  "command": "pacman -Qi git",
+  "label": "local"
+ },
+ {
+  "command": "go list -m all",
+  "label": "local"
+ },
+ {
+  "command": "go build ./...",
+  "label": "local"
+ },
+ {
+  "command": "rustup show",
+  "label": "local"
+ },
+ {
+  "command": "aws sts get-caller-identity",
+  "label": "local"
+ },
+ {
+  "command": "aws s3 ls s3://my-data-bucket",
+  "label": "local"
+ },
+ {
+  "command": "aws ec2 describe-instances --region us-east-1",
+  "label": "local"
+ },
+ {
+  "command": "aws s3 sync ./dist s3://my-bucket --dryrun",
+  "label": "local"
+ },
+ {
+  "command": "gcloud config list",
+  "label": "local"
+ },
+ {
+  "command": "gcloud compute instances list",
+  "label": "local"
+ },
+ {
+  "command": "az account show",
+  "label": "local"
+ },
+ {
+  "command": "az vm list --output table",
+  "label": "local"
+ },
+ {
+  "command": "doctl account get",
+  "label": "local"
+ },
+ {
+  "command": "heroku apps:info -a my-app",
+  "label": "local"
+ },
+ {
+  "command": "docker ps -a",
+  "label": "local"
+ },
+ {
+  "command": "docker images",
+  "label": "local"
+ },
+ {
+  "command": "docker logs my-container --tail 100",
+  "label": "local"
+ },
+ {
+  "command": "docker inspect my-container",
+  "label": "local"
+ },
+ {
+  "command": "docker-compose config",
+  "label": "local"
+ },
+ {
+  "command": "docker build -t myapp:local .",
+  "label": "local"
+ },
+ {
+  "command": "kubectl get pods -n staging",
+  "label": "local"
+ },
+ {
+  "command": "kubectl describe deployment web -n staging",
+  "label": "local"
+ },
+ {
+  "command": "kubectl apply -f deployment.yaml --dry-run=client",
+  "label": "local"
+ },
+ {
+  "command": "helm list -A",
+  "label": "local"
+ },
+ {
+  "command": "helm template ./chart",
+  "label": "local"
+ },
+ {
+  "command": "minikube status",
+  "label": "local"
+ },
+ {
+  "command": "kind get clusters",
+  "label": "local"
+ },
+ {
+  "command": "terraform plan -out=tfplan",
+  "label": "local"
+ },
+ {
+  "command": "terraform show tfplan",
+  "label": "local"
+ },
+ {
+  "command": "terraform validate",
+  "label": "local"
+ },
+ {
+  "command": "terraform state list",
+  "label": "local"
+ },
+ {
+  "command": "pulumi preview",
+  "label": "local"
+ },
+ {
+  "command": "ansible-inventory --list",
+  "label": "local"
+ },
+ {
+  "command": "ansible-playbook site.yml --check",
+  "label": "local"
+ },
+ {
+  "command": "packer validate template.json",
+  "label": "local"
+ },
+ {
+  "command": "cdk diff",
+  "label": "local"
+ },
+ {
+  "command": "sam local invoke MyFunction",
+  "label": "local"
+ },
+ {
+  "command": "crontab -l",
+  "label": "local"
+ },
+ {
+  "command": "systemctl status nginx",
+  "label": "local"
+ },
+ {
+  "command": "systemctl list-units --type=service",
+  "label": "local"
+ },
+ {
+  "command": "launchctl list",
+  "label": "local"
+ },
+ {
+  "command": "launchctl print system/com.apple.mDNSResponder",
+  "label": "local"
+ },
+ {
+  "command": "journalctl -u ssh -n 50",
+  "label": "local"
+ },
+ {
+  "command": "at -l",
+  "label": "local"
+ },
+ {
+  "command": "sysctl -a",
+  "label": "local"
+ },
+ {
+  "command": "df -h",
+  "label": "local"
+ },
+ {
+  "command": "top -l 1",
+  "label": "local"
+ },
+ {
+  "command": "rsync -avn ./build/ user@host:/var/www/app",
+  "label": "local"
+ },
+ {
+  "command": "rsync -av ./local/ ./local-backup/",
+  "label": "local"
+ },
+ {
+  "command": "scp user@host:/etc/hosts ./hosts.bak",
+  "label": "local"
+ },
+ {
+  "command": "rclone lsd remote:bucket",
+  "label": "local"
+ },
+ {
+  "command": "rclone sync ./data remote:bucket --dry-run",
+  "label": "local"
+ },
+ {
+  "command": "rclone check ./data remote:bucket",
+  "label": "local"
+ },
+ {
+  "command": "psql -h localhost -U admin -c \"SELECT count(*) FROM users;\"",
+  "label": "local"
+ },
+ {
+  "command": "mysql -u root -p -e \"SHOW DATABASES;\"",
+  "label": "local"
+ },
+ {
+  "command": "redis-cli GET session:1234",
+  "label": "local"
+ },
+ {
+  "command": "redis-cli KEYS \"cache:*\"",
+  "label": "local"
+ },
+ {
+  "command": "mongo mydb --eval \"db.users.find().limit(5)\"",
+  "label": "local"
+ },
+ {
+  "command": "sqlite3 app.db \".tables\"",
+  "label": "local"
+ },
+ {
+  "command": "mysqldump --no-data mydb > schema.sql",
+  "label": "local"
+ },
+ {
+  "command": "pg_dump --schema-only mydb > schema.sql",
+  "label": "local"
+ },
+ {
+  "command": "aws sns list-topics",
+  "label": "local"
+ },
+ {
+  "command": "twilio api:core:messages:list --limit 5",
+  "label": "local"
+ },
+ {
+  "command": "gh pr view 42",
+  "label": "local"
+ },
+ {
+  "command": "gh pr diff 42",
+  "label": "local"
+ },
+ {
+  "command": "gh issue list --state open",
+  "label": "local"
+ },
+ {
+  "command": "npm publish --dry-run",
+  "label": "local"
+ },
+ {
+  "command": "npm pack",
+  "label": "local"
+ },
+ {
+  "command": "git push --dry-run origin main",
+  "label": "local"
+ },
+ {
+  "command": "git fetch --dry-run",
+  "label": "local"
+ },
+ {
+  "command": "make build",
+  "label": "local"
+ },
+ {
+  "command": "mvn compile",
+  "label": "local"
+ },
+ {
+  "command": "gradle build",
+  "label": "local"
+ },
+ {
+  "command": "pytest -q",
+  "label": "local"
+ }
+]
