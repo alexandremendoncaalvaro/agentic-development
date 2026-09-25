@@ -6,7 +6,7 @@ Without this file, learning which architectural decisions still bind costs one p
 
 ## Default
 
-All 60 accepted ADRs bind in full, except the nineteen below, which bind except for the named part.
+All 61 accepted ADRs bind in full, except the nineteen below, which bind except for the named part.
 
 No ADR in this directory has been deprecated or superseded as a whole document. A `proposed` ADR is not counted here and does not appear until it is accepted — it binds nothing until then, and its acceptance is the change to what binds that adds it (see *The rule that keeps it true*).
 
@@ -32,7 +32,7 @@ No ADR in this directory has been deprecated or superseded as a whole document. 
 | [0080](0080-build-a-bespoke-skill-evaluation-harness.md) | Item 10's promise that the pilot's captured streams replace the synthetic samples as tracked artifacts, and its `skill_invoked` rule for Claude Code, which the first pilot showed is incomplete | Every other part of item 10 and every other item of the decision; the synthetic samples stay, and the receipt freezes each capture's digest instead | Its own 2026-09-21 addendum, after the first live pilot; the capture decision is [ADR-0082](0082-capture-live-trials-through-a-supplied-runner.md) and the adapter correction is task-0082 |
 | [0055](0055-session-lifecycle-handoff-nudge-hook.md) | The Codex-out-of-scope stanza: the session-lifecycle tier is no longer Claude-Code-scoped as a category | The `Stop` handoff nudge, its non-looping `systemMessage` contract, its size gate and once-per-session flag, and its Claude Code wiring until a Codex follow-up | [ADR-0083](0083-bound-the-runtime-layer-to-feedback-gates.md) |
 | [0074](0074-user-prompt-submit-workflow-checkpoint-hook.md) | The Codex-out-of-scope stanza, on the same trigger | The static, exit-0, kill-switch `UserPromptSubmit` checkpoint, its rejection of blocking as coercion, and its Claude Code wiring until a Codex follow-up | [ADR-0083](0083-bound-the-runtime-layer-to-feedback-gates.md) |
-| [0073](0073-skill-invocation-policy-and-listing-budget.md) | `ad-rules`, `ad-pr`, and `ad-merge` membership in the user-invocable-only class | The blast-radius classification rule, every other named class member, and all listing budgets | [ADR-0076](0076-compose-a-canonical-decision-maker-brief.md); [ADR-0084](0084-reclassify-pr-and-merge-behind-an-approval-gate.md) |
+| [0073](0073-skill-invocation-policy-and-listing-budget.md) | The invoker-class rule and its user-invocable-only class, with every member; the 8,000-character total for model-invocable descriptions | The per-description caps, now for every skill: 350 characters with the use case and triggers first, and the 1,024-character specification maximum | [ADR-0076](0076-compose-a-canonical-decision-maker-brief.md); [ADR-0084](0084-reclassify-pr-and-merge-behind-an-approval-gate.md); [ADR-0085](0085-gate-skill-effects-inside-the-skill.md) |
 
 Two shapes appear above and they are checked differently. A **cross-record** amendment (0035, 0065) declares itself as a header-field pair — `Amends:` on one side, `Amended by:` on the other — which makes it verifiable without reading prose. A **self**-amendment (0007, 0047, 0080) has no second record to pair with: the record corrects itself in a dated addendum, marks the dead stanza in place, and this page is what makes it discoverable from the directory rather than only from inside the file. One record (0007) carries one of each, one per retired part, which is why the corrector column and not the row is the unit to read.
 

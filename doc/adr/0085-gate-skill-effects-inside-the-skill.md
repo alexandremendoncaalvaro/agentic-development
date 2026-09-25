@@ -1,6 +1,6 @@
 # ADR-0085: Gate skill effects inside the skill, not by blocking model invocation
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-09-24
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0073 — replaces the invoker-class rule and its user-invocable-only class with an effect-gate rule, and retires the 8,000-character total for model-invocable descriptions; the 350-character per-description cap and the 1,024-character specification maximum remain, now for every skill.

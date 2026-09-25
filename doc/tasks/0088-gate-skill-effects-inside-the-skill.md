@@ -1,6 +1,6 @@
 # Task `0088`: Make every skill model-invocable behind its in-skill gate
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-24
 **Scope ref:** doc/adr/0085-gate-skill-effects-inside-the-skill.md
 **Evidence ref:** doc/research/0030-skill-invocation-control-and-listing-budget.md
@@ -19,8 +19,8 @@ Seventeen kit skills cannot be started by the agent even when the owner asks for
 - [x] No kit skill carries `disable-model-invocation: true` on Claude Code or `policy.allow_implicit_invocation: false` on Codex, and `test/skills.test.js` fails when either appears outside an explicit exception set that is empty.
 - [x] Every description on both hosts is at most 350 characters, opens with the use case and trigger phrases, and stays within 1,024; the 8,000-character total is no longer enforced.
 - [x] The evaluation corpus carries no `user-invocable-only` case, every representative keeps its positive, boundary or dormancy, and coexistence coverage, and the corpus gate is green.
-- [ ] `AGENTS.md`, `ARCHITECTURE.md`, `doc/adr/PROJECTION.md`, and the `ad-skill` authoring guidance state the effect-gate rule instead of the invoker classes.
-- [ ] The dogfood install is refreshed and byte-identical to `src/skills/`; `npm run verify` is green.
+- [x] `AGENTS.md`, `ARCHITECTURE.md`, `doc/adr/PROJECTION.md`, and the `ad-skill` authoring guidance state the effect-gate rule instead of the invoker classes.
+- [x] The dogfood install is refreshed and byte-identical to `src/skills/`; `npm run verify` is green.
 
 ## Plan
 
@@ -29,8 +29,8 @@ Seventeen kit skills cannot be started by the agent even when the owner asks for
 - [x] Gate verification of the 17 skills; add any missing approval step.
 - [x] Red, then green: the flag and cap tests in `test/skills.test.js`, then the frontmatter, YAML, and description changes on both hosts.
 - [x] Re-author the `bootstrap-agents-guide` and `wire-quality-gates` case families for the model-invocable class.
-- [ ] Update the binding docs and refresh the dogfood install.
-- [ ] `/ad-review` per slice, `/ad-audit` before the pull request, `/ad-commit`.
+- [x] Update the binding docs and refresh the dogfood install.
+- [x] `/ad-review` per slice, `/ad-audit` before the pull request, `/ad-commit`.
 
 ## Notes
 
@@ -52,11 +52,15 @@ Fresh two-axis review of the corpus slice (`.agentic/reviews/2026-09-25T02-40-29
 
 Branch-wide maximum-gate audit at `fe84ba1` (`.agentic/reviews/2026-09-25T03-06-18Z-audit-*`, machine-local): nine groups, seven dispatched, NET and GH not applicable. The orchestrator's gate on that head: `node scripts/hook-npm-test.js` exit 0, 1125/1125, corpus failing none, no high vulnerability. Findings applied: RESEARCH-0030 now carries the exact script that built the treatment arm, so its measurement is reproducible from the tree and the named host release (CV.5, found by two independent passes); `CONTEXT.md` "Evaluation corpus" says the gate fails only on a populated intersection, and a new "Effect gate" entry names the rule's noun; ADR-0085 records that ADR-0080 item 8's dormancy rule now applies to any representative. Open, owner's call: ADR-0085 is `proposed` while `AGENTS.md` and `ARCHITECTURE.md` state it as binding, found by four groups; acceptance flips its status and updates `doc/adr/PROJECTION.md` in one commit before the pull request.
 
+### 2026-09-25
+
+The owner accepted ADR-0085 in session. Its status flips to `accepted` and `doc/adr/PROJECTION.md` records what of ADR-0073 still binds (the per-description caps) in the same commit, as the projection rule requires. Every criterion is checked; the change lands through the pull request opened from this branch.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
