@@ -49,9 +49,10 @@ def main():
     rows = []
     for item in routing:
         result, ms = timed(agent.predict, item["request"], {"route": qs["route"]})
-        got = result["answers"]["route"]["choice"]
+        answer = result["answers"]["route"]
+        got = answer["choice"]
         rows.append({"id": item["id"], "lang": item.get("lang"), "expected": item["label"], "got": got,
-                     "correct": got == item["label"], "ms": round(ms, 1)})
+                     "p": round(answer["probabilities"][got], 4), "correct": got == item["label"], "ms": round(ms, 1)})
     dump("routing-laya", rows)
     summary["routing"] = {"laya": {"n": len(rows), "accuracy": accuracy(rows),
                                    "accuracy_pt": accuracy([r for r in rows if r["lang"] == "pt"]),
@@ -64,11 +65,12 @@ def main():
         pattern, matched = pattern_effect(item["command"])
         result, ms = timed(agent.predict, item["command"], {"effect": qs["effect"]})
         model = result["answers"]["effect"]["choice"]
+        model_p = round(result["answers"]["effect"]["probabilities"][model], 4)
         for name, got in (("patterns", pattern), ("laya", model), ("hybrid", pattern if matched else model)):
             table[name].append({"id": item["id"], "command": item["command"], "expected": expected, "got": got,
                                 "correct": got == expected, "gate_correct": (got != "local") == (expected != "local"),
                                 "missed_gate": expected != "local" and got == "local",
-                                **({"ms": round(ms, 1)} if name == "laya" else {})})
+                                **({"ms": round(ms, 1), "p": model_p} if name == "laya" else {})})
     for name, data in table.items():
         dump(f"effects-{name}", data)
     summary["effects"] = {name: {"n": len(data), "accuracy_3class": accuracy(data),
