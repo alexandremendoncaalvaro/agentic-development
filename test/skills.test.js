@@ -9,33 +9,15 @@ import { bundledSkills } from '../src/lib/install.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SKILLS_ROOT = join(__dirname, '..', 'src', 'skills');
 
-// ADR-0073: every kit skill belongs to one invocation class. User-invocable
-// skills are outward-facing or setup human verbs; their descriptions leave the host
-// listing (`disable-model-invocation` / `allow_implicit_invocation: false`).
-// The remaining skills are model-invocable and must fit the smallest
-// documented listing budget (8,000 chars) at ≤350 chars each.
-const USER_INVOCABLE_SKILLS = new Set([
-  'ad-archive',
-  'ad-architecture',
-  'ad-bootstrap',
-  'ad-community-docs',
-  'ad-design',
-  'ad-guidelines',
-  'ad-hooks',
-  'ad-level-up',
-  'ad-publish',
-  'ad-release',
-  'ad-report',
-  'ad-skill',
-  'ad-subagent',
-  'ad-template-tune',
-  'ad-update',
-  'ad-voice',
-  'ad-voice-tune',
-]);
+// ADR-0085 (amends ADR-0073): every kit skill is model-invocable, and the
+// safety of an outward or irreversible effect lives in the approval step the
+// skill states before it. The host block (`disable-model-invocation` /
+// `allow_implicit_invocation: false`) is reserved for a skill whose effect has
+// no such step, and the kit ships none. Every description stays short and
+// trigger-first; no whole-collection total is enforced (RESEARCH-0030).
+const HOST_BLOCKED_SKILLS = new Set();
 const SPEC_DESCRIPTION_CAP = 1024;
-const MODEL_DESCRIPTION_CAP = 350;
-const MODEL_LISTING_BUDGET = 8000;
+const DESCRIPTION_CAP = 350;
 
 // The tests enumerate skills through the installer's own enumerator, so the
 // dot-directory exclusion (task-0065) has one implementation and one test.
@@ -1989,60 +1971,47 @@ test('the ADR projection states the number of ACCEPTED records the directory hol
   );
 });
 
-// ADR-0073 — invocation class and listing budget, per host.
+// ADR-0085 — invocation flag and description cap, per host.
 for (const agent of ['claude-code', 'codex']) {
   const skills = listSkills(agent);
   const names = new Set(skills.map((s) => s.name));
 
-  test(`${agent}: every ADR-0073 user-invocable skill exists`, () => {
-    for (const name of USER_INVOCABLE_SKILLS) {
-      assert.ok(names.has(name), `ADR-0073 names ${name}, but no such ${agent} skill exists`);
+  test(`${agent}: every ADR-0085 host-blocked exception exists`, () => {
+    for (const name of HOST_BLOCKED_SKILLS) {
+      assert.ok(names.has(name), `ADR-0085 names ${name}, but no such ${agent} skill exists`);
     }
   });
 
-  let modelListingChars = 0;
   for (const { name, dir } of skills) {
     const fm = parseFrontmatter(join(dir, 'SKILL.md'));
-    const userOnly = USER_INVOCABLE_SKILLS.has(name);
+    const blocked = HOST_BLOCKED_SKILLS.has(name);
 
-    test(`skill ${agent}/${name}: invocation class matches ADR-0073`, () => {
+    test(`skill ${agent}/${name}: invocation flag matches ADR-0085`, () => {
       if (agent === 'claude-code') {
         assert.equal(
           fm['disable-model-invocation'],
-          userOnly ? true : undefined,
-          userOnly
-            ? 'user-invocable skill must set disable-model-invocation: true'
-            : 'model-invocable skill must not set disable-model-invocation'
+          blocked ? true : undefined,
+          blocked
+            ? 'a host-blocked exception must set disable-model-invocation: true'
+            : 'a skill that gates its effects in its body must not set disable-model-invocation (ADR-0085)'
         );
       } else {
         const doc = yaml.load(readFileSync(join(dir, 'agents', 'openai.yaml'), 'utf8'));
         assert.equal(
           doc?.policy?.allow_implicit_invocation,
-          !userOnly,
-          `allow_implicit_invocation must be ${!userOnly} for a ${
-            userOnly ? 'user-invocable' : 'model-invocable'
-          } skill`
+          !blocked,
+          `allow_implicit_invocation must be ${!blocked} (ADR-0085)`
         );
       }
     });
 
-    if (!userOnly) {
-      modelListingChars += fm.description.length;
-      test(`skill ${agent}/${name}: model-invocable description fits ${MODEL_DESCRIPTION_CAP} chars`, () => {
-        assert.ok(
-          fm.description.length <= MODEL_DESCRIPTION_CAP,
-          `model-invocable description must be ≤${MODEL_DESCRIPTION_CAP} chars (ADR-0073); got ${fm.description.length}`
-        );
-      });
-    }
+    test(`skill ${agent}/${name}: description fits ${DESCRIPTION_CAP} chars`, () => {
+      assert.ok(
+        fm.description.length <= DESCRIPTION_CAP,
+        `description must be ≤${DESCRIPTION_CAP} chars, use case and triggers first (ADR-0085); got ${fm.description.length}`
+      );
+    });
   }
-
-  test(`${agent}: model-invocable descriptions fit the ${MODEL_LISTING_BUDGET}-char listing budget`, () => {
-    assert.ok(
-      modelListingChars <= MODEL_LISTING_BUDGET,
-      `model-invocable descriptions total ${modelListingChars} chars; budget is ${MODEL_LISTING_BUDGET} (ADR-0073)`
-    );
-  });
 }
 
 // --- Review verdict durability (task-0078): the review's outputs, not only its inputs, persist ---

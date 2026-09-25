@@ -1,8 +1,7 @@
 ---
 name: ad-voice-tune
-description: Create or evolve the user's machine-local personal voice profile behind an explicit human gate. Use only when the user invokes /ad-voice-tune, asks to calibrate or refine their voice, supplies owner samples or authorized team conversations, or asks the system to learn from a correction. Separates owner communicative identity from target-community accommodation, negotiates source and retention before private reads, stores derived patterns by default, proposes one profile delta at a time, and writes only after explicit approval. Distinct from ad-voice, which applies a profile read-only.
+description: "Create or refine the owner's machine-local voice profile from owner samples or authorized conversations, separating identity from community accommodation and storing derived patterns. Negotiates sources before private reads, proposes one delta at a time, writes only after explicit approval. Use on \"calibrate my voice\", \"learn from this correction\"."
 summary: Calibrate the local personal-voice profile from authorized owner and community evidence. Separates identity from accommodation, retains derived patterns by default, and writes one explicitly approved delta at a time.
-disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: ad-archive
-description: Sweep completed plan files (tasks Status:done, specs Status:shipped, PRDs Status:superseded, ADRs Status:superseded or deprecated) out of the working tree and into git history via `git rm`. Use when the user wants to archive, clean, prune, or sweep done tasks / shipped specs / superseded PRDs / superseded or deprecated ADRs / completed legacy plan documents. Hard-delete-only — git history is the ledger, no in-tree archive subdirectory, no `CHANGELOG.md` (Rule #2 forbids changelogs in narrative documents). ADRs with `Status: accepted` are removable only when the user names them and the substance is verifiably absorbed into a binding doc (ARCHITECTURE.md / GUIDELINES.md / AGENTS.md / code).
+description: "Hard-delete completed plan files (done tasks, shipped specs, superseded PRDs, superseded or deprecated ADRs) with `git rm`, leaving git history as the ledger. Use to archive, clean, prune, or sweep finished records out of the tree. An accepted ADR goes only when the user names it and its substance is found in a binding doc."
 summary: Hard-delete completed plan files (tasks / specs / PRDs / superseded ADRs) into git history. ADR-accepted requires absorption proof.
 ---
 

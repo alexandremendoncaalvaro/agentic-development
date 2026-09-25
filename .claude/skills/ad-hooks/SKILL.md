@@ -1,8 +1,7 @@
 ---
 name: ad-hooks
-description: Scaffold deterministic quality gates per WORKFLOW.md §11 — pre-commit (lint, format, secret-scan), pre-push (build, unit, integration). Detects the project's stack and recommends a hook runner (Husky / lefthook / pre-commit / native), scaffolds the runner config, and updates AGENTS.md Quality Gates. Also scaffolds session-lifecycle hooks — a Stop hook that nudges /ad-handoff when context runs low (ADR-0055), a UserPromptSubmit hook that injects the kit's workflow checkpoint on every prompt (ADR-0074), and a PostToolUse artifact-validator gate on Claude Code and Codex that shows a failing record validator to the model inside the turn (ADR-0083). Use when the user wants to wire hooks, configure pre-commit / pre-push, set up quality gates, prevent --no-verify bypass, wire a session-lifecycle / Stop hook, nudge ad-handoff before context is lost, or close the WORKFLOW §11 advisory-vs-deterministic gap. Opt-in skill; not auto-installed in the universal set.
+description: "Scaffold deterministic quality gates: pre-commit (lint, format, secret-scan) and pre-push (build, tests) with a hook runner fitted to the stack, plus session hooks: a Stop handoff nudge, a UserPromptSubmit workflow checkpoint, and a PostToolUse artifact-validator gate. Use to wire hooks, set up quality gates, or prevent --no-verify bypass."
 summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals — plus a session-lifecycle tier (a Stop handoff nudge, a UserPromptSubmit workflow checkpoint, and a dual-host PostToolUse artifact-validator gate).
-disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Bash
 ---
 
@@ -202,7 +201,7 @@ Claude Code Desktop shares this wiring with the CLI but inherits only `PATH` and
 
 ### Resolving the script path
 
-Both hooks run from `.claude/settings.json`, which is read at session start; the command needs a path that exists wherever the kit was installed. Do not hard-code `${CLAUDE_PROJECT_DIR}/.claude/skills/...`: the installer defaults to the user scope (`~/.claude/skills/ad-hooks`), where that path does not exist. Resolve `<ad-hooks-dir>` from the base directory stated at the top of this skill load and write it as an absolute path (or `${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks` only when the skill actually loaded from the project install). State the resolved path to the user before writing; hook edits take effect in the next session.
+Both hooks run from `.claude/settings.json`, which is read at session start; the command needs a path that exists wherever the kit was installed. Do not hard-code `${CLAUDE_PROJECT_DIR}/.claude/skills/...`: the installer defaults to the user scope (`~/.claude/skills/ad-hooks`), where that path does not exist. Resolve `<ad-hooks-dir>` from the base directory stated at the top of this skill load and write it as an absolute path (or `${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks` only when the skill actually loaded from the project install). Scaffold a session-lifecycle hook only when the user asked for that hook: show the exact merged JSON and the target file, and write only after the user approves. Hook edits take effect in the next session.
 
 ## Output contract
 

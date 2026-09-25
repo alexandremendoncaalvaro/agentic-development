@@ -2,7 +2,6 @@
 name: ad-update
 description: Preview and safely update the machine-global Agentic Development kit. Use when the user asks to update agentic, refresh installed skills, get the latest kit, sync the engineering skills, inspect kit drift, or invokes `/ad-update`. Project scope is explicit; preserves local edits unless the user explicitly requests force.
 summary: Preview and safely apply the current machine-global Agentic Development kit update, preserving local skill edits by default.
-disable-model-invocation: true
 allowed-tools: Read, Bash
 ---
 
@@ -12,7 +11,7 @@ Update the machine-global Agentic Development materialization. This is the sessi
 
 ## Step 1 — Preview
 
-From any directory, run:
+Run the preview only when the user asked to check, inspect, or update the kit: it downloads and executes the latest published package. From any directory, run:
 
 ```bash
 npx --yes @alexandrealvaro/agentic@latest update --dry-run --yes
@@ -38,7 +37,7 @@ First preview from that repository root:
 npx --yes @alexandrealvaro/agentic@latest update --scope project --migrate-legacy --dry-run --yes
 ```
 
-Then apply the reviewed plan without `--dry-run`. The migration removes state-recorded pristine skills, exact historical copies of `WORKFLOW.md` / `WORKFLOW-FLOWS.md`, and the bounded generated skills section in `AGENTS.md` or `CLAUDE.md`. It preserves changed skills and unknown workflow files; use `--force` only after the user explicitly chooses to remove a changed skill.
+Then, after the user approves the previewed removal list, apply it without `--dry-run`. The migration removes state-recorded pristine skills, exact historical copies of `WORKFLOW.md` / `WORKFLOW-FLOWS.md`, and the bounded generated skills section in `AGENTS.md` or `CLAUDE.md`. It preserves changed skills and unknown workflow files; use `--force` only after the user explicitly chooses to remove a changed skill.
 
 ## Step 4 — Verify and report
 

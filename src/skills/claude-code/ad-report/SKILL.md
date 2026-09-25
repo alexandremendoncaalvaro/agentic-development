@@ -1,8 +1,7 @@
 ---
 name: ad-report
-description: Draft, review, render, or verify a standalone analytical report through approved artifact templates. Use when the user invokes /ad-report, asks for a report from findings and evidence, wants an existing analysis restructured for an audience, or requests a DOCX, PDF, presentation, visualization, site, HTML, or Markdown analytical deliverable. Owns editorial hierarchy, composes available artifact capabilities through their public contracts, preserves facts, and gates export beyond the agreed local target. Ordinary use never tunes templates.
+description: "Draft, review, render, or verify a standalone analytical report from approved templates (Markdown, HTML, DOCX, PDF, slides, visualizations), preserving facts and asking before any export beyond the agreed local target. Use when the user wants a report from findings and evidence, or an existing analysis restructured for an audience."
 summary: Draft or review standalone analytical reports from approved templates, then compose the available renderer and its visual and accessibility verification workflow.
-disable-model-invocation: true
 allowed-tools: Read, Write, Bash
 ---
 
@@ -141,7 +140,10 @@ Return one usable report or the requested verified local artifact. Hide source
 selection, composition trace, and internal ledgers unless requested or needed for
 a material limitation.
 
-Writing to the agreed local target is part of the framed request. Before publishing
+Writing to the agreed local target is part of the framed request. When that
+target is outside the repository or already exists, confirm the exact path with
+the owner before writing, and never overwrite an existing file without explicit
+approval. Before publishing
 or exporting beyond that agreed local target, show a receipt with the final
 artifact, exact destination, selected template ID and layer, format, completed and
 missing verification, material limitations, and exact action. Wait for explicit

@@ -3,4 +3,4 @@ interface:
   short_description: "Orchestrate a confirmed npm release"
   default_prompt: "Use $ad-release to prepare and publish a safe npm release."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

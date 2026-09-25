@@ -3,4 +3,4 @@ interface:
   short_description: "Calibrate your private personal voice profile"
   default_prompt: "Use $ad-voice-tune to propose one evidence-backed update to my personal voice profile."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

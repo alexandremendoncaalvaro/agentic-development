@@ -2,4 +2,4 @@ interface:
   display_name: ad-community-docs
   short_description: Scaffold or audit CONTRIBUTING.md and SECURITY.md without inventing maintainer policy.
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

@@ -9,7 +9,7 @@ Update the machine-global Agentic Development materialization. This is the sessi
 </background_information>
 
 <instructions>
-Step 1 — preview. From any directory, run:
+Step 1 — preview. Run the preview only when the user asked to check, inspect, or update the kit: it downloads and executes the latest published package. From any directory, run:
 
 ```bash
 npx --yes @alexandrealvaro/agentic@latest update --dry-run --yes
@@ -31,7 +31,7 @@ Step 3 — migrate a legacy project only when the user asks to clean prior proje
 npx --yes @alexandrealvaro/agentic@latest update --scope project --migrate-legacy --dry-run --yes
 ```
 
-Then apply the reviewed plan without `--dry-run`. The migration removes state-recorded pristine skills, exact historical copies of `WORKFLOW.md` / `WORKFLOW-FLOWS.md`, and the bounded generated skills section in `AGENTS.md` or `CLAUDE.md`. It preserves changed skills and unknown workflow files; use `--force` only after the user explicitly chooses to remove a changed skill.
+Then, after the user approves the previewed removal list, apply it without `--dry-run`. The migration removes state-recorded pristine skills, exact historical copies of `WORKFLOW.md` / `WORKFLOW-FLOWS.md`, and the bounded generated skills section in `AGENTS.md` or `CLAUDE.md`. It preserves changed skills and unknown workflow files; use `--force` only after the user explicitly chooses to remove a changed skill.
 
 Step 4 — verify and report. Report the command's concrete result: created, updated, preserved, skipped, and migrated files. State whether the global kit was changed; never call it "latest" merely because the command ran. If a local edit was preserved, name the path and offer the user's actual choices: keep it, reconcile it manually, or re-run with explicit `--force`.
 

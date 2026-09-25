@@ -2,4 +2,4 @@ interface:
   display_name: ad-hooks
   short_description: Scaffold deterministic quality gates per WORKFLOW §11 (pre-commit / pre-push). Detect-then-recommend Husky / lefthook / pre-commit / native; never silently pick.
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

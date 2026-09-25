@@ -1,6 +1,6 @@
 ---
 name: ad-subagent
-description: Draft a new Codex custom subagent at .codex/agents/<name>.toml, using the official Codex subagents format. Use when the user wants to create, write, draft, or scaffold a custom Codex subagent for delegated work (fresh-context reviewer, codebase explorer, docs researcher, test designer, bug reproducer, bounded implementation worker). Asks one question per missing field; never invents roles or tool sets.
+description: "Draft a Codex custom subagent at .codex/agents/<name>.toml in the official format, for delegated work such as a fresh-context reviewer, codebase explorer, docs researcher, test designer, bug reproducer, or bounded worker. Use to create, write, or scaffold a custom subagent. Asks one question per missing field; never invents roles or tool sets."
 summary: Draft a Codex custom subagent for bounded delegated work at `.codex/agents/<name>.toml`.
 ---
 
@@ -41,7 +41,7 @@ Step 3 — interview to fill. Ask one question per missing field, in this order:
 
 Do NOT invent values. When the user does not know something, ask. Do not invent TOML fields not supported by the Codex subagents docs.
 
-Step 4 — write the file.
+Step 4 — write the file. If the target file already exists, show it and overwrite it only after the user approves; a personal-scope file lives outside the repository, so git cannot restore it.
 
 Path: `.codex/agents/<name>.toml` or `~/.codex/agents/<name>.toml`.
 

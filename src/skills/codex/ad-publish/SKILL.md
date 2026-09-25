@@ -1,6 +1,6 @@
 ---
 name: ad-publish
-description: Draft or review collaboration publications through approved artifact templates. Use when the user invokes /ad-publish, asks to draft or improve a GitHub proposal issue, asks for a concise Slack, Discord, GitHub issue, or pull-request reply, wants a proposal publication checked against prior approved patterns, or asks to publish that final text. Resolves layered templates, separates private context from outward content, grounds claims, composes personal voice and research skills through their public contracts, and requires an exact-target approval receipt before any outward action. Ordinary use is read-only and never tunes templates.
+description: "Draft or review collaboration publications (a GitHub proposal issue, a Slack, Discord, issue, or pull-request reply) from approved templates, grounding claims and keeping private context out of outward text. Posts only after an exact-target approval from the owner. Use on \"draft the issue\", \"reply on Slack\", \"publish this\"."
 summary: Draft or review collaboration publications from approved templates and authorized evidence. Preserves facts, composes existing skills, and gates every outward action.
 ---
 
