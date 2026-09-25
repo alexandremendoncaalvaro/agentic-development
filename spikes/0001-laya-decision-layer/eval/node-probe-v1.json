@@ -1,0 +1,16 @@
+{
+ "runtime": "node v22.22.3, onnxruntime-node CPU",
+ "load_ms": 1427,
+ "effects": {
+  "n": 90,
+  "parity": 1,
+  "p50_ms": 36,
+  "p95_ms": 45
+ },
+ "size": {
+  "n": 60,
+  "parity": 1,
+  "p50_ms": 28,
+  "p95_ms": 31
+ }
+}
