@@ -348,8 +348,9 @@ Before writing a test or code:
 2. Confirm the public interface — what does the caller need to know? Types, ordering, error modes. Interface design *is* testability design.
 3. Identify deepening opportunities (Layer 2 vocabulary per §8): small interface, deep implementation.
 4. List the behaviors to test, not the implementation steps. Pick the **first** behavior — the one that proves end-to-end the path works. The rest defer until the tracer bullet lands.
-5. Establish the green baseline. For existing code, list the tests already covering the surface (TDM, §9.4) and run them. For new code, write the first test fresh.
-6. Get the user's approval on the plan in one sentence before any test or code is written.
+5. For a unit that keeps state between calls, write the state × event table: every state, every event that can reach it, and the same-instant, tie, and inclusive/exclusive boundary variant of each. Each cell becomes a behavior in the list or an explicit N/A with its reason; review passes over a new state machine otherwise find the next unlisted cell one round at a time.
+6. Establish the green baseline. For existing code, list the tests already covering the surface (TDM, §9.4) and run them. For new code, write the first test fresh.
+7. Get the user's approval on the plan in one sentence before any test or code is written.
 
 ### Phase 2 — Tracer bullet
 
@@ -367,7 +368,7 @@ For each remaining behavior: `RED → minimum code → GREEN`. Three rules:
 
 ### Phase 4 — Refactor
 
-Once all planned tests pass: extract duplication, deepen modules (move complexity behind smaller interfaces), apply SOLID where natural. Run tests after each refactor step. **Never refactor while RED** — get to green first, then refactor with the green baseline as the safety net.
+Once all planned tests pass: extract duplication, deepen modules (move complexity behind smaller interfaces), apply SOLID where natural. Run tests after each refactor step. **Never refactor while RED** — get to green first, then refactor with the green baseline as the safety net. For a unit that keeps state, sweep operator mutations before its first publication: flip one comparison or logical operator at a time and rerun its tests. Each survivor is a missing test until a distinguishing input has been searched for and none exists; close survivors one at a time through the Phase 3 loop, and record the search beside any survivor kept. A bare "equivalent" is a claim, not a result.
 
 The refactor phase is where deepening (§8) happens. Treat tests as a fixed contract; the implementation is free to change shape as long as the contract holds.
 

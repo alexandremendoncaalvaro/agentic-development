@@ -405,7 +405,7 @@
         },
         {
           "path": ".claude/skills/ad-prism/references/methodology.md",
-          "sourceSha": "aa7113fa92a474a8af0a1c0d4b1be11327961c64f2a5f3f2bbe89bea54258e9e"
+          "sourceSha": "184d5d7b60fba64d4230e614136c1772a81f52d01c64c8ef3a0cb957f57e1ffd"
         },
         {
           "path": ".claude/skills/ad-prism/references/skill-comparison.md",
@@ -696,7 +696,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-tdd/SKILL.md",
-          "sourceSha": "1e0a0b49a9c17915032ebb93f0307da2ff7a53cc962762940e878c60c3867c00"
+          "sourceSha": "c1f413d5831b21f6819cac15765a663997e5aae50ccf46f2ca07b9b28bb12f47"
         }
       ]
     },

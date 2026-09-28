@@ -37,8 +37,9 @@ Before writing a test or a line of code:
 2. **Confirm the public interface.** What is the smallest surface the caller needs to know? Types, ordering constraints, error modes. Interface design is testability design.
 3. **Identify deepening opportunities** (small interface over deep implementation per WORKFLOW §8). Surface-area-light interfaces are easier to test against and survive refactors.
 4. **List the behaviors to test, not the implementation steps.** Pick the **first** behavior — the one that proves end-to-end the path works. The rest are deferred until the tracer bullet lands.
-5. **Test Dependency Map (TDM) for existing code.** If the change modifies existing code, list the tests already covering the surface and run them to establish the green baseline. New-code changes skip the existing-tests TDM and write the first test fresh.
-6. **Get user approval on the plan.** One sentence — "I'll test behavior X first via interface Y, then iterate." User confirms or steers before any test is written.
+5. **Stateful unit: write the state × event table.** When the unit keeps state between calls (a tracker, latch, observer, coordinator), list every state, every event that can reach it, and the same-instant, tie, and inclusive/exclusive boundary variant of each before the first test. Each cell becomes a behavior in the list or an explicit N/A with its reason. Review passes over a new state machine find the next unlisted cell one round at a time; the table finds them up front.
+6. **Test Dependency Map (TDM) for existing code.** If the change modifies existing code, list the tests already covering the surface and run them to establish the green baseline. New-code changes skip the existing-tests TDM and write the first test fresh.
+7. **Get user approval on the plan.** One sentence — "I'll test behavior X first via interface Y, then iterate." User confirms or steers before any test is written.
 
 You cannot test everything. Confirm with the user which behaviors matter most; focus on critical paths and complex logic.
 
@@ -80,6 +81,7 @@ Once all planned tests pass:
 - [ ] Apply SOLID where natural; never force-fit a pattern.
 - [ ] Consider what the new code reveals about the existing code — opportunities to deepen pre-existing shallow modules surface during TDD because the new tests pin behavior the old code was implicitly relying on.
 - [ ] Run tests after **each** refactor step. Never refactor while RED — get to GREEN first, then refactor with the green baseline as the safety net.
+- [ ] **Stateful unit: sweep operator mutations before the first publication.** Flip one comparison or logical operator at a time (`<`/`<=`, `>`/`>=`, `==`/`!=`, `&&`/`||`, null checks) in the unit's file and rerun its tests. Each survivor is a missing test until a distinguishing input has been searched for and none exists; close survivors one at a time through the Step 3 loop, and record the search beside any survivor kept. A bare "equivalent" is a claim, not a result.
 
 The refactor phase is where deepening happens. Treat the tests as a fixed contract; the implementation is free to change shape as long as the contract holds.
 

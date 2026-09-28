@@ -31,6 +31,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   `audit-group-reviewer` briefs on both hosts now cite that result and run
   only the narrowest tests for the files they ground, so parallel reviewers
   no longer each start the whole suite in one worktree (task-0093).
+- `/ad-tdd` plans a stateful unit (a tracker, latch, observer or
+  coordinator) with a state × event table that includes the same-instant,
+  tie and boundary variant of each event, and sweeps operator mutations over
+  that unit before its first publication, treating every survivor as a
+  missing test until a distinguishing input has been searched for; the
+  `/ad-prism` methodology asks that a measure drawn from an already-emitted
+  instrument be computable from the fields that instrument actually carries;
+  WORKFLOW.md §16 carries the same two TDD steps (task-0089).
 - `/ad-pr` and `/ad-merge` are model-invocable again: the agent may run them
   when the work is ready, and each skill asks for the owner's approval before
   the outward step (push and draft for `/ad-pr`, the merge on every path for
