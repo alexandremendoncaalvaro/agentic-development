@@ -1,3 +1,0 @@
-{"id": "eval:bootstrap-agents-guide-explicit", "expected": "ad-bootstrap", "got": "ad-bootstrap", "correct": true}
-{"id": "eval:open-pull-request-explicit", "expected": "ad-pr", "got": "ad-pr", "correct": true}
-{"id": "eval:wire-quality-gates-explicit", "expected": "ad-hooks", "got": "ad-hooks", "correct": true}
