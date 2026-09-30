@@ -241,7 +241,7 @@ _Avoid_: "review report" (the reply in the session is the report; this is its pe
 
 ### Audit handoff
 
-**Definition:** the markdown file `ad-audit` writes to `.agentic/reviews/<ISO>-audit-<scope>.md` (Claude Code: one per dispatched rule-group; Codex: one combined audit trail). Carries the target plus the resolved rule-set slice each `audit-group-reviewer` receives — one rule-group's rules, the tree/SHA, and the critical tag. Serves as the audit trail for the maximum-gate audit and the context packet for a user-spawned reviewer escalation. Ephemeral per-audit artifact; shares the `.agentic/reviews/` directory (and its `.gitignore` entry) with the Review handoff.
+**Definition:** the markdown file `ad-audit` writes to `.agentic/reviews/<ISO>-audit-<scope>.md` (Claude Code: one per dispatched rule-group; Codex: one combined audit trail). Carries the target plus the resolved rule-set slice each `audit-group-reviewer` receives — one rule-group's rules, the tree/SHA, and the critical tag. Serves as the audit trail for the maximum-gate audit and the context packet for a user-spawned reviewer escalation. It also carries the `Gate:` line: the result of the full quality gate the orchestrator runs once before the review, whose output sits beside it as `<ISO>-audit-gate.log`. Ephemeral per-audit artifact; shares the `.agentic/reviews/` directory (and its `.gitignore` entry) with the Review handoff.
 
 _Avoid_: conflating it with the **Review handoff** — same directory, different producer (`ad-audit` vs `ad-review`) and shape (per-rule-group vs per-axis).
 
