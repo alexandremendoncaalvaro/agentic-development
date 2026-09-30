@@ -55,7 +55,7 @@
       "files": [
         {
           "path": ".claude/agents/audit-group-reviewer.md",
-          "sourceSha": "f4180423e5665fecd545517e75d83f29e4c9f96c87273a02ffd30ed2ba425b75"
+          "sourceSha": "e090477469b2727a3fba0ccd0e30f07f1e387dd626e8de3fa03953c95fde1608"
         },
         {
           "path": ".claude/skills/ad-audit/scripts/resolve-rules.mjs",
@@ -63,7 +63,7 @@
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "40e68bca87e9b2a9dce721a1302ce65d5a4b6f605a8e3e18222e17d17ddd66f9"
+          "sourceSha": "66a05e66e5a0bb04b86f87adb9dfb74b2dd208ee63cf931d61c7aa9c77908b98"
         }
       ]
     },

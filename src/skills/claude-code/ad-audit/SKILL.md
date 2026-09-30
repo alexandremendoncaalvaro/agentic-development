@@ -76,6 +76,9 @@ with the expectation is itself a finding, never proceeded past silently.
 --- TREE/SHA ---
 <the tree and SHA under audit>
 
+--- GATE ---
+Gate: <command> → <exit status>, <pass/fail summary>; log: <path>; target=<SHA>
+
 --- GROUP RULES ---
 <the full text of this group's rules — from the repo binding doc / ADR / machine store>
 
@@ -95,6 +98,8 @@ target=<the Step 0 SHA>
 Persist each handoff to `.agentic/reviews/<ISO-timestamp>-audit-<group-slug>.md` (create the dir if missing; advise `.gitignore` for `.agentic/reviews/`). If the target spans >50 files, ask the user to narrow scope before dispatching — cost compounds across groups.
 
 ## Step 4 — Fan out one reviewer per group, in parallel
+
+**Run the full quality gate once, immediately before dispatch.** After the scope check above and before any reviewer runs, run the repository's own full quality gate (the pre-push or CI command its binding docs name) on the target, serially, and persist the output to `.agentic/reviews/<ISO-timestamp>-audit-gate.log`. Then fill each persisted handoff's `--- GATE ---` section with the result as one `Gate:` line — command, exit status, pass/fail summary, log path, and the `target=<SHA>` it ran on — before dispatching it. Reviewers cite that result instead of each rerunning the full suite: parallel reviewers each starting the whole gate in one worktree starved one another until none finished, the same overload ADR-0052 Decision 4 keeps out of the falsification lane. A gate that failed, was killed, or did not complete is written as such (`Gate: <command> → killed, no summary`), never as a pass (CV.6), and Step 8 lists it — a failure as a finding, an incomplete run as an OPEN QUESTION. A target with no runnable gate is written `Gate: none — <reason>`.
 
 Send a single message with one `Task` call per dispatched group, all routing to the bundled `audit-group-reviewer` subagent, each with its group handoff. Parallel dispatch is mandatory — isolation prevents cross-contamination and sequential wastes wall time.
 

@@ -1650,6 +1650,24 @@ test('both audit-group-reviewer briefs forbid mutation and hand the lane trigger
   }
 });
 
+// task-0093: parallel reviewers each running the full suite starved one
+// another (Task 0085); the orchestrator runs the gate once, before dispatch.
+test('ad-audit runs the full gate once and reviewers run only targeted tests, on both hosts', () => {
+  for (const rel of ['claude-code/ad-audit/SKILL.md', 'codex/ad-audit/SKILL.md']) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
+    assert.match(body, /full quality gate once/i, `${rel} lost the gate-once step`);
+    assert.match(body, /before any (reviewer|group)/i, `${rel} no longer runs the gate first`);
+    assert.match(body, /`Gate:`/, `${rel} no longer puts the gate result in each handoff`);
+    assert.match(body, /never as a pass \(CV\.6\)/, `${rel} lets a failed gate read as a pass`);
+    assert.match(body, /`Gate: none — <reason>`/, `${rel} lost the no-gate form`);
+  }
+  for (const rel of ANCHOR_ECHO_BRIEFS) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
+    assert.match(body, /`Gate:`/, `${rel} no longer points the reviewer at the gate result`);
+    assert.match(body, /narrowest test command/i, `${rel} lost the targeted-tests bound`);
+  }
+});
+
 // --- Skill scripts host parity (task-0031) ---
 // A skill script (scripts/ beside SKILL.md) is host-agnostic executable code:
 // both hosts must ship it, byte-identical, so the copy-drift that motivated
