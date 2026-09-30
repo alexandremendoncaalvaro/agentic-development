@@ -69,6 +69,23 @@ Type guide: `feat:` new user-visible capability; `fix:` bug fix; `chore:` mainte
 
 Breaking changes: add `!` after the type/scope and a `BREAKING CHANGE:` footer paragraph.
 
+Cited records. When the draft cites a record (`GROUND-`, `RESEARCH-`, `PRISM-`, `ADR-`, `task-`/`Task`, `Spec`/`spec-` plus four digits), pipe the draft into the read-only probe from the repository root:
+
+```
+node .agents/skills/ad-commit/scripts/cited-records.mjs - <<'EOF'
+<draft message>
+EOF
+```
+
+If this skill was loaded from another base directory, substitute that base. Execute it; do not re-derive its git reads in prose. Its JSON lists each cited id with its `path` and one `state`; act on each before writing:
+- `in-head` — committed earlier; the draft may say the record preceded this work. When the report adds `pending`, the record also carries an uncommitted edit (an addendum, a correction) that did not precede it: `staged` means the edit lands in this commit, so say the edit is recorded alongside; `unstaged` means it is not in this commit at all, so stage it when it belongs to this concern or claim nothing about it. `staged-removal` means this commit deletes the record, so do not cite it as governing the work. A record renamed in the index reports its new path with `pending: staged`.
+- `staged` — lands in this same commit, so it was not recorded before the work: say "recorded alongside", never "before" or "grounded first".
+- `working-tree` — on disk but not staged, so it did not precede the work either: stage it when it belongs to this concern (then treat it as `staged`); otherwise drop any claim that it is part of this commit or came first.
+- `archived` — committed earlier and since removed from the tree (for example by `ad-archive`); it did precede later work, but do not claim it still governs.
+- `not-found` — the id resolves nowhere: correct the id or remove the citation.
+
+The probe reports and never blocks; the wording stays your call.
+
 Phase 4 — sign + write. Resolve identity:
 
 ```
