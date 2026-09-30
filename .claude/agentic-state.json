@@ -113,8 +113,12 @@
           "sourceSha": "a914864688f4d5503c092f5b5335ab78d31fa3e4e5f9d6d24142b9fc9d05c1c2"
         },
         {
+          "path": ".claude/skills/ad-commit/scripts/cited-records.mjs",
+          "sourceSha": "ee84f43041b25e91846bed196f83853788d91376a2b1b8f04d7d153bc863926b"
+        },
+        {
           "path": ".claude/skills/ad-commit/SKILL.md",
-          "sourceSha": "cebf6e8e206a29f1b5602f07a8508beb757b0e7ed16387f524ddac43d8ce8db8"
+          "sourceSha": "07e001d741b3471955f11d6ea2effe7b74a38f220c1a972836216993dae01d84"
         }
       ]
     },

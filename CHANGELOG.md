@@ -8,6 +8,13 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
+- `/ad-commit` on Claude Code and Codex bundles `cited-records.mjs`, a
+  read-only probe that reports, for every record a draft commit message
+  cites (`GROUND-`, `RESEARCH-`, `PRISM-`, `ADR-`, task, and spec ids),
+  whether it is already committed (and whether it carries an uncommitted
+  edit), staged in this commit, only on disk, only in history, or not found. Phase 3 uses it so a message says a
+  record was "recorded alongside" when it lands with the work, instead of
+  claiming it came first (task-0092).
 - `/ad-hooks` session-lifecycle tier gains a third member, the
   `PostToolUse` artifact-validator gate, wired on Claude Code and Codex:
   after a skill writes a `GROUND-` or `PRISM-` record under `doc/research/`,
