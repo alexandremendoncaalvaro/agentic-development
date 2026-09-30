@@ -648,16 +648,12 @@
           "sourceSha": "d353fb58812958a7cf6023cee9b8253a82ebfc497d6175ef2d136f285be4a102"
         },
         {
-          "path": ".claude/skills/ad-spike/references/spike-adr-template.md",
-          "sourceSha": "0075f1c430d490c3fe489e040db1d6c51a819cc979dae6c673f537854f33f74a"
-        },
-        {
           "path": ".claude/skills/ad-spike/scripts/next-number.mjs",
           "sourceSha": "94b9eb42c1e5a3bad32136f8646ef44dd191050f6acc6f4d29b99daeecf9c9b1"
         },
         {
           "path": ".claude/skills/ad-spike/SKILL.md",
-          "sourceSha": "2a2e362583c5f82a6139f39cb93f768b92aec63f1e00b1fc6b7b7b8c44455dac"
+          "sourceSha": "efb4c0fe10d1fa0e4a4604338c77c5a890957a3d5831413c90304d8a5dfbfffa"
         }
       ]
     },

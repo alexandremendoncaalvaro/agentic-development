@@ -111,7 +111,7 @@ The per-stage layer is what makes the spike actionable. End-to-end says *that* i
 
 When the spike concludes — either the picked technique works or it does not — record the outcome via `/ad-adr` and delete the spike directory. The ADR is the persistent artifact; the spike code is throwaway.
 
-For the spike-outcome ADR template, see [references/spike-adr-template.md](references/spike-adr-template.md).
+The ADR uses `/ad-adr`'s canonical template and captures the technique picked, the end-to-end pass rate, where failures concentrated and their root cause, and the mitigation; the techniques held in reserve and rejected go under `Alternatives Considered`, each with the spike result that rejected it.
 
 After the ADR captures the outcome, delete only the exact
 `spikes/NNNN-<slug>/` directory and route the ADR plus deletion to `/ad-commit`.

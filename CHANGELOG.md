@@ -47,6 +47,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- `/ad-spike` on Claude Code drafts the spike-outcome ADR from `/ad-adr`'s
+  canonical template instead of its own skeleton, which lacked the
+  `Status`, `Date`, and `Deciders` lines and the `Alternatives Considered`
+  section; rejected techniques now go under `Alternatives Considered`, as on
+  Codex (task-0090).
 - The pre-commit `changelog-gate` now watches `package.json`, which npm
   publishes regardless of the `files` field, so a scripts, dependencies,
   engines, or bin change without a changelog entry gets the reminder

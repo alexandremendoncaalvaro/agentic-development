@@ -132,6 +132,26 @@ test('Claude Code numbered workflow headings use one vocabulary per skill', () =
   }
 });
 
+// task-0090: a second ADR skeleton drifted from ad-adr's and shaped ADR-0086
+// wrong; ad-adr owns the only one. A skeleton is any file with an
+// `# ADR-NNNN` title line, whatever its name or directory.
+test('only ad-adr ships an ADR skeleton on either host', () => {
+  const walk = (dir) =>
+    readdirSync(dir).flatMap((entry) => {
+      const path = join(dir, entry);
+      return statSync(path).isDirectory() ? walk(path) : [path];
+    });
+  for (const agent of ['claude-code', 'codex']) {
+    for (const { name, dir } of listSkills(agent)) {
+      if (name === 'ad-adr') continue;
+      const skeletons = walk(dir).filter((file) =>
+        /^#\s+ADR-NNNN\b/m.test(readFileSync(file, 'utf8'))
+      );
+      assert.deepEqual(skeletons, [], `${agent}/${name} ships an ADR skeleton; route to /ad-adr`);
+    }
+  }
+});
+
 test('skill authoring and hand-off instructions preserve host and commit contracts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const read = (skill) => readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
