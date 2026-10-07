@@ -245,6 +245,19 @@ dispositions:
   beyond the criteria. Accepted: they record an exception the feature
   needed.
 
+### 2026-10-07 — last pass and real-path check at 6b817ae
+
+Two-axis review and CV re-audit of 51cc1f4..6b817ae (comments, a test name
+and Notes): no blocker, no concern, nothing above a note; both axes "ship
+as-is". Before this pass, the gate wired in `.claude/settings.json`, run on
+this repository with a `git push && gh pr create` event, logged gate-run
+`clear` and review and audit `would-block`: the comment commit had changed
+the tree after the last review, the reading the gate exists to give. With
+this pass's verdicts file (`Target-SHA` 6b817ae) and audit summary written,
+the same command logged `clear` for gate-run, review and audit before `git
+push && gh pr create` and before `gh pr merge`. This entry touches only a
+receipt-neutral path.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
