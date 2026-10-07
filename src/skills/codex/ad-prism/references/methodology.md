@@ -14,7 +14,11 @@ forms:
 
 Keep each link explicit enough that a reviewer can ask whether the task can
 produce the evidence, whether the measure represents the claim, and whether the
-decision rule follows from the result. Separate observed facts, inferences,
+decision rule follows from the result. When the data source is an instrument the
+team already emits (telemetry tags, log fields, stored records), read what it
+actually emits and confirm the measure is computable from those fields; a measure
+that needs a field the instrument does not carry is an open gap to record, not a
+planned measure. Separate observed facts, inferences,
 choices, and open gaps. Do not infer baseline, candidate, winner, or intended
 replacement from ordering or names.
 

@@ -505,7 +505,7 @@
         },
         {
           "path": ".agents/skills/ad-prism/references/methodology.md",
-          "sourceSha": "aa7113fa92a474a8af0a1c0d4b1be11327961c64f2a5f3f2bbe89bea54258e9e"
+          "sourceSha": "184d5d7b60fba64d4230e614136c1772a81f52d01c64c8ef3a0cb957f57e1ffd"
         },
         {
           "path": ".agents/skills/ad-prism/references/skill-comparison.md",
@@ -856,7 +856,7 @@
         },
         {
           "path": ".agents/skills/ad-tdd/SKILL.md",
-          "sourceSha": "2234bf684beef772e13400316e5c29181c76f97bc90457012fe4c78021a71ca4"
+          "sourceSha": "c6b8272aa564a9eeea9ee4796c5f2303f308e4539ac47712e3529b1085bab723"
         }
       ]
     },
