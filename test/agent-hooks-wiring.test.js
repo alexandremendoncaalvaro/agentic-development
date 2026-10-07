@@ -244,3 +244,67 @@ if (process.platform === 'win32') {
     }
   });
 }
+
+// The handoff-chip reminder (ADR-0087) rides the same Edit|Write entry on both
+// hosts. Each config's command is run as the host would run it against a
+// write to a handoff file, and the reminder must come back on stdout.
+function findChipHook(config) {
+  const entry = (config.hooks?.PostToolUse ?? []).find((e) => e.matcher === 'Edit|Write');
+  assert.ok(entry, 'a PostToolUse entry with matcher Edit|Write is wired');
+  const hook = entry.hooks.find((h) => h.type === 'command' && /handoff-chip\.mjs/.test(h.command));
+  assert.ok(hook, 'the entry runs handoff-chip.mjs as a command hook');
+  return hook;
+}
+
+function handoffWrite(toolName, toolInput) {
+  return JSON.stringify({
+    hook_event_name: 'PostToolUse',
+    session_id: 'wiring-chip',
+    cwd: tmpdir(),
+    tool_name: toolName,
+    tool_input: toolInput,
+    tool_response: {},
+  });
+}
+
+const WIRED_HANDOFF = join(tmpdir(), 'agentic-handoffs', '2026-10-06T12-00-00Z-wiring.md');
+
+test('agent hooks wiring: the Claude Code settings command runs the handoff-chip reminder on a handoff write', () => {
+  const config = JSON.parse(readFileSync(join(KIT_ROOT, '.claude', 'settings.json'), 'utf8'));
+  const hook = findChipHook(config);
+  assert.match(hook.command, /\$\{CLAUDE_PROJECT_DIR\}/);
+  const command = hook.command.replaceAll('${CLAUDE_PROJECT_DIR}', KIT_ROOT);
+  const run = spawnSync(command, {
+    shell: true,
+    cwd: KIT_ROOT,
+    input: handoffWrite('Write', { file_path: WIRED_HANDOFF, content: '' }),
+    encoding: 'utf8',
+    env: { ...process.env, AD_HANDOFF_CHIP: '' },
+  });
+  assert.equal(run.status, 0, `exit 0 through the wired command; stderr: ${run.stderr}`);
+  const parsed = JSON.parse(run.stdout);
+  assert.ok(parsed.hookSpecificOutput.additionalContext.includes(WIRED_HANDOFF));
+});
+
+if (process.platform === 'win32') {
+  test.skip('agent hooks wiring: the Codex hooks.json command runs the handoff-chip reminder (POSIX only)', () => {});
+} else {
+  test('agent hooks wiring: the Codex hooks.json command runs the handoff-chip reminder on an apply_patch handoff write', () => {
+    const config = JSON.parse(readFileSync(join(KIT_ROOT, '.codex', 'hooks.json'), 'utf8'));
+    const hook = findChipHook(config);
+    assert.match(hook.command, /src\/skills\/codex\/ad-hooks\/scripts\/handoff-chip\.mjs/);
+    assert.equal(typeof hook.timeout, 'number');
+    const patch = ['*** Begin Patch', `*** Add File: ${WIRED_HANDOFF}`, '+x', '*** End Patch'].join(
+      '\n'
+    );
+    const run = spawnSync(hook.command, {
+      shell: '/bin/sh',
+      cwd: KIT_ROOT,
+      input: handoffWrite('apply_patch', { command: patch }),
+      encoding: 'utf8',
+      env: { ...process.env, AD_HANDOFF_CHIP: '' },
+    });
+    assert.equal(run.status, 0, `exit 0 through the wired command; stderr: ${run.stderr}`);
+    assert.ok(JSON.parse(run.stdout).hookSpecificOutput.additionalContext.includes(WIRED_HANDOFF));
+  });
+}

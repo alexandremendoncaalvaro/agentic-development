@@ -273,7 +273,7 @@
         },
         {
           "path": ".claude/skills/ad-handoff/SKILL.md",
-          "sourceSha": "f77ac9b5f3bcd9717008b739bda4b0dd7d35165019b8d3cfa3180ecdc2cf6416"
+          "sourceSha": "dcba0debaf0d2253e1c34191d5d1b4f0a205e8967e7c1e3ca471e583632ecfed"
         }
       ]
     },
@@ -293,6 +293,10 @@
           "sourceSha": "2c56ea41a2babf40a7b05d8aecdf87740f4ded9fc9437241ba9f5234d69508ae"
         },
         {
+          "path": ".claude/skills/ad-hooks/scripts/handoff-chip.mjs",
+          "sourceSha": "97088fcaf9111bf332ec4c9d5fa96fc4805bc1accf53b853cec6392c4953ca0a"
+        },
+        {
           "path": ".claude/skills/ad-hooks/scripts/handoff-nudge.mjs",
           "sourceSha": "aa381a001366c562fd4e0230d9121380f677dd88cec9df5e4b6f1af554145731"
         },
@@ -302,7 +306,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/SKILL.md",
-          "sourceSha": "9e14d0da2e6a39c92f72743005a3f2e07d78499791c305385e83f80542592ee5"
+          "sourceSha": "794b1aaa981a8d827c7086b59cecaae750fa416ba58ee63901e81daeddea6002"
         }
       ]
     },
