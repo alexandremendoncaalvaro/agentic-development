@@ -262,6 +262,23 @@ tests) and 7147a9c (1324 tests); the later commits change only task Notes.
 The previous entry's "Labelled" refers to this label, which it did not yet
 carry; this entry is where it lands.
 
+### 2026-10-07 — findings of the last pass at bf40816
+
+The entry above did not quote the CV re-audit's findings at bf40816. Both,
+with severity and disposition:
+
+- CV Minor: the entry "last review and re-audit at 6a1cfd8" stated
+  reviewer-run results (a revert run's 54 of 55, a 1323-test gate) as fact.
+  Fixed: the entry above labels every reviewer-run result reviewer-reported.
+- CV Nit: "Local gate after the fix" did not name its tree. Fixed: the entry
+  above names 4163acf (1323 tests) and 7147a9c (1324 tests); the CV reviewer
+  re-ran `npm run verify` at bf40816 (reviewer-reported: 1324 of 1324).
+
+The Standards and Spec axes raised Notes only, none needing a change: the
+stricter `gatesConfig` turns non-object configs into `runtime-unavailable`
+on every check, `MAY_PUBLISH` still covers every handled form, and the
+non-Bash branch is bounded by the wired matchers.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
