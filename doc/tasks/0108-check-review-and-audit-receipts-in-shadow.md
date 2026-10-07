@@ -100,6 +100,77 @@ and disposition:
 
 Local gate at 3ba8e82: `npm run verify` exit 0, 1303 tests.
 
+### 2026-10-07 — audit at 9e958c5
+
+`/ad-audit` of origin/main..9e958c5 (groups CV with a cross-model second pass
+in two orders, GH, HK, AGENTS.md, GUIDELINES.md, ARCHITECTURE and CONTEXT,
+ADRs; NET not applicable; every changed file read by at least one reviewer,
+the installed copies checked by `cmp`; anchors matched; local gate green,
+1303 tests): no blocker. Every finding, with severity and disposition:
+
+1. CV Minor (all three CV passes): the 18.4 s figure had no reproduction
+   command, and two reviewers measured 6.2 to 6.9 s for the old code. Fixed:
+   re-measured with a recorded command. In a scratch repository with 300
+   verdicts files naming a commit that HEAD no longer matches, `gh pr merge`
+   took 8.41, 8.24 and 8.28 s with the gate at 503295b and 0.71, 0.68 and
+   0.70 s at this branch's head, at a load average near 9; the evidence file
+   held 12 lines, so every run executed. The 18.4 s single run is superseded,
+   and the code comment no longer carries a number. Reproduction: extract
+   `git archive 503295b src/skills/claude-code/ad-hooks/scripts` into a
+   non-symlinked directory (`realpath`; through a symlink the script's main
+   guard does not fire), write 300 `<n>-x-verdicts.md` files with
+   `Target-SHA: <first commit>`, commit a change, and pipe a Bash
+   `gh pr merge` event into each script under `/usr/bin/time -p`.
+2. CV Minor (passes A and B): "each new behaviour failed first" and the
+   red-first order have no retained artifact; tests and code share commits.
+   Accepted as a label: author-reported, observed in the authoring session.
+   The mutation claim was reproduced by two reviewers in disposable copies
+   (bypassing the freshness comparison turned five tests red).
+3. CV Minor (pass B): the A2 rejection above rests on the author's fetch.
+   Accepted as a label: A2 is a public page, cited with its access date and
+   method in GROUND-0040, open to the same re-check.
+4. CV Minor (pass B): the `ad-hooks` text said the read-out labels other pull
+   requests, which Task 0110 did not say. Fixed: the text now says the
+   read-out must label them, and Task 0110's Notes carry both labelling
+   inputs.
+5. CV Nit: the Notes omit the reviewers' positive notes. Accepted: they are
+   not findings.
+6. GUIDELINES Minor (12.5): the review command ran through a shell. Fixed
+   test-first: it is an argument list run without a shell, and a string is
+   `runtime-unavailable`; the remaining exception, a repository-configured
+   program, is recorded in ADR-0089's third addendum under decision 7.
+7. GUIDELINES Minor (9.5): the chained-command fix lacked the regression
+   name. Fixed: the test is named `regression: task-0108 review, ...`.
+8. GUIDELINES Minor (2.5): `checkSetting` drops the parse error. Rejected:
+   the error surfaces as the `runtime-unavailable` line's output, as its
+   comment states.
+9. AGENTS.md Minor: the same shell-execution trust question. Fixed with 6.
+10. ARCH/CONTEXT Minor: ARCHITECTURE said one line per action. Fixed.
+11. ARCH/CONTEXT Minor: **Review verdicts** did not name the `Target-SHA:`
+    line. Fixed; it now links the gate.
+12. ARCH/CONTEXT Minor: no term for the audit summary. Fixed: **Audit
+    summary** added, and **Audit handoff** warns against conflating them.
+13. ARCH/CONTEXT Nit: long lines in CONTEXT. Rejected: CONTEXT keeps one
+    line per paragraph in most terms (125 lines over 100 characters before
+    this branch).
+14. ARCH/CONTEXT Nit: `runtime-unavailable` lines lack the fields **Gate
+    evidence line** lists. Rejected for this task: pre-existing since Task
+    0107, unchanged here.
+15. ADRs Minor: tree-keyed review and audit freshness was not in ADR-0089.
+    Fixed: third addendum.
+16. ADRs Minor: `.agentic/reviews/**` always neutral was not in ADR-0089.
+    Fixed: same addendum.
+17. ADRs Nit: decision 7 says the check is off when the read is impossible;
+    the code logs `runtime-unavailable`. Fixed in the addendum: a broken read
+    is counted, `"review": false` turns it off.
+18. CV Minor (pass B): GROUND-0040 D2's command failed on an empty
+    repository. Fixed: it adds a file first.
+19. CV Note (pass B): `git log -S'review receipt'` now returns more commits
+    than D3 records. Accepted: true when recorded; later commits added the
+    phrase.
+
+GH and HK: no finding. GH.3 (rules in flight) must be re-run before the push.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

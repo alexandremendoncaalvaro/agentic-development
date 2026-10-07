@@ -59,7 +59,7 @@ Boundary rule: only `src/lib/install.js` resolves `KIT_ROOT`-rooted paths (`impo
 
 ## Observability
 
-* Logs: `process.stderr.write(...)` for per-file action lines in non-interactive flows; `@clack/prompts` panels interactively. The CLI has no structured logging. One skill script does: the `ad-hooks` artifact-validator gate appends one JSON evidence line per governed firing to `<tmpdir>/agentic-artifact-gate/<session_id>.jsonl`, machine-local by default and redirectable through `AD_ARTIFACT_GATE_EVIDENCE_DIR` ([ADR-0083](doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md)). The receipt gate appends one line per checked landing action to `<tmpdir>/agentic-sequence-gate/<session_id>.jsonl` (`AD_SEQUENCE_GATE_EVIDENCE_DIR`), and `gate-run.mjs` keeps its receipts in the gitignored `.agentic/receipts/`.
+* Logs: `process.stderr.write(...)` for per-file action lines in non-interactive flows; `@clack/prompts` panels interactively. The CLI has no structured logging. One skill script does: the `ad-hooks` artifact-validator gate appends one JSON evidence line per governed firing to `<tmpdir>/agentic-artifact-gate/<session_id>.jsonl`, machine-local by default and redirectable through `AD_ARTIFACT_GATE_EVIDENCE_DIR` ([ADR-0083](doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md)). The receipt gate appends one line per check of each landing action to `<tmpdir>/agentic-sequence-gate/<session_id>.jsonl` (`AD_SEQUENCE_GATE_EVIDENCE_DIR`), and `gate-run.mjs` keeps its receipts in the gitignored `.agentic/receipts/`.
 * Metrics: N/A — short-lived CLI, no telemetry.
 * Traces: N/A.
 

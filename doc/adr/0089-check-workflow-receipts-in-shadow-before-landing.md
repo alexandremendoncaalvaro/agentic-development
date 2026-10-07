@@ -140,3 +140,22 @@ clause that a gate invokes the validator a skill invokes does not apply, since
 a receipt gate checks existence and freshness only, so the amendment header
 now names that clause.
 
+## Addendum 2026-10-07: review and audit receipts
+
+From Task 0108 and its audit. Decision 3's commit receipts are compared by
+tree, as the first addendum does for the gate-run receipt: the review or
+audit SHA is resolved to its tree, so a commit reworded or amended without a
+code change keeps its review and audit (GROUND-0040 E2), the rule GitHub and
+Gerrit apply to approvals. `.agentic/reviews/` joins `.agentic/receipts/` as
+always receipt-neutral, for every check, so a committed review or audit file
+never makes the receipts stale. Decision 7's bot-review read is a command in
+`.agentic/gates.json`, an argument list run without a shell within at most 20
+seconds, for the review only; it runs repository-owned configuration with the
+hook's privileges, the trust the repository's hook wiring already holds, and
+is the exception to GUIDELINES 12.5's fixed argument lists that decision 7
+authorizes. When that read times out or its setting is invalid, the check
+logs `runtime-unavailable` instead of switching off, so a broken read is
+counted rather than hidden; switching it off stays `"review": false`. A chained
+command logs the checks of each landing action in it, and `gh pr ready <n>`
+and `gh pr merge <n>` are compared with the local `HEAD`; Task 0110 labels
+both when it counts events.

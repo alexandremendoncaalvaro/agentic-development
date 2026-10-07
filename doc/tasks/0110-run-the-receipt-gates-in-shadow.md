@@ -44,6 +44,15 @@ check, at least 20 labelled would-block events, at most one false block among
 them, within at most four weeks; a check short of 20 events stays in shadow.
 The owner also approved the plan of Tasks 0107 to 0110.
 
+### 2026-10-07 — labelling inputs from Task 0108
+
+Task 0108's audit found two cases the read-out must label, not count blindly.
+`gh pr ready <n>` and `gh pr merge <n>` are compared with the local `HEAD`,
+which is that pull request's head only when its branch is checked out; a line
+for another pull request does not describe it. A chained command logs the
+checks of each landing action in it, so `git push && gh pr create` writes two
+gate-run lines for one state; count it once per state.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
