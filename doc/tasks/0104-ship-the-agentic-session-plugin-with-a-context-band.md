@@ -13,7 +13,7 @@
 
 The owner wants the context band from the RESEARCH-0033 spike in the kit, as
 an opt-in Claude Code plugin, shown only above a fill threshold, with a
-one-press `/ad-handoff`. ADR-0088 (proposed) amends ADR-0041 to allow an
+one-press `/ad-handoff`. ADR-0088 amends ADR-0041 to allow an
 additive companion plugin; GROUND-0035 grounds the marketplace layout, the
 vendor's `token-weather` pattern, and the numeric user option; RESEARCH-0036
 surveyed the mods ecosystem and set the measure toward auto-compaction.
@@ -52,6 +52,10 @@ Append-only log. Date each entry. Never rewrite past entries.
 Opened after the owner chose plugin distribution and a threshold band.
 The ground record, ADR-0088 and this plan are committed before any plugin
 code; implementation waits for the owner's approval of the plan.
+
+The owner approved the plan and accepted ADR-0088 in chat; the owner also
+replaced Task 0106's display-only receipt with the shadow mode of evidence
+gates, to be planned in its own front.
 
 ## Definition of Done
 

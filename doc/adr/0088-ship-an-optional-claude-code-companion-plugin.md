@@ -1,8 +1,9 @@
 # ADR-0088: Ship an optional Claude Code companion plugin beside the installer
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-10-07
 **Deciders:** Alexandre Alvaro
+**Amends:** ADR-0041, its "do not package the kit as a Claude Code plugin" clause only, through the revisit trigger ADR-0041 names
 
 ## Context
 
@@ -11,8 +12,6 @@ ADR-0041 kept the flat `ad-` prefix and the `agentic` installer and rejected plu
 Two facts behind ADR-0041 have also changed. Codex now has plugins with the same `namespace:skill` shape (RESEARCH-0033 E8, E9). And Claude Code mods, which run inside the host and can draw, ship only as plugins (GROUND-0035 E1). The RESEARCH-0033 spike showed a mod can read the real context fill, draw a band with a button, and reach the desktop task server (E12 to E14) — work no skill or settings hook can do.
 
 ## Decision
-
-On acceptance this ADR amends ADR-0041's "do not package the kit as a Claude Code plugin" clause only, through the revisit trigger ADR-0041 names; the `Amends` and `Amended by` headers land in the accepting commit.
 
 We will publish an **optional Claude Code companion plugin**, `agentic-session`, from a marketplace in this repository.
 
