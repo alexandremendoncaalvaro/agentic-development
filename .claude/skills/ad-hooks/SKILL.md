@@ -89,7 +89,7 @@ If the user is wiring CI alongside hooks (GitHub Actions / GitLab CI / Circle), 
 
 ## Session-lifecycle hooks (Claude Code only)
 
-Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; it has four members. The first two are wired on Claude Code only (their Codex extension is a follow-up under ADR-0083); the artifact-validator gate and the handoff-chip reminder are wired on both hosts because Codex documents the same `PostToolUse` contract (GROUND-0027, GROUND-0034).
+Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; it has five members. The first two are wired on Claude Code only (their Codex extension is a follow-up under ADR-0083); the artifact-validator gate, the handoff-chip reminder and the shadow receipt gate are wired on both hosts because Codex documents the same `PostToolUse` and `PreToolUse` contracts (GROUND-0027, GROUND-0034, GROUND-0038).
 
 ### Handoff-nudge `Stop` hook (ADR-0055)
 
@@ -212,6 +212,16 @@ Scaffold it in two parts:
 1. **The script** ships with this skill at `scripts/handoff-chip.mjs` (Node, zero-dependency, byte-identical across hosts; it imports `artifact-gate.mjs` from the same directory).
 2. **The wiring** — add a command to the `Edit|Write` `PostToolUse` entry on each host (create the entry when the artifact gate is not wired): `{ "type": "command", "command": "node \"<ad-hooks-dir>/scripts/handoff-chip.mjs\"" }` in `.claude/settings.json`, and the same with `"timeout": 30` in `.codex/hooks.json`.
 
+### Shadow receipt gate on `PreToolUse` (ADR-0089)
+
+Records, before a landing action, whether the workflow step it depends on left a fresh receipt for the exact state, so the owner's "did the local gate run for this?" has a logged answer. Shadow mode is the only mode: it never denies and nobody sees it during the session (GROUND-0038).
+
+* **The receipt.** After the repository's CI-mirror command passes, `scripts/gate-run.mjs record --command "<command>" --exit 0` appends a receipt to `.agentic/receipts/gate-run.jsonl`, keyed to the git tree of the working copy (computed through an empty temporary index, so the real index is untouched and the tree equals the next commit's). Wire it where the command already runs: an npm `postverify` script, or the step after the pre-push runner. Add `.agentic/receipts/` to `.gitignore`.
+* **The check.** `scripts/sequence-gate.mjs` hangs off **`PreToolUse`** matched on **`Bash`** on both hosts. Before `git push` or `gh pr create` it looks for a passing receipt whose tree equals `HEAD^{tree}` or differs from it only in receipt-neutral paths (`receiptNeutral` globs in `.agentic/gates.json`, default `doc/tasks/**`).
+* **Evidence only.** It appends one line per checked action, state `clear`, `would-block` or `runtime-unavailable`, to `<tmpdir>/agentic-sequence-gate/<session_id>.jsonl` (`AD_SEQUENCE_GATE_EVIDENCE_DIR` redirects it). It always exits 0 and prints nothing. `AD_SEQUENCE_GATE=0` silences it. Enforcing any check is a later decision, after the shadow run meets ADR-0089's preset criterion.
+
+Scaffold it in three parts: the receipt hook beside the CI-mirror command, the `.gitignore` line, and the wiring `{ "matcher": "Bash", "hooks": [ { "type": "command", "command": "node \"<ad-hooks-dir>/scripts/sequence-gate.mjs\"" } ] }` under `PreToolUse` in `.claude/settings.json`, and the same with `"timeout": 30` in `.codex/hooks.json`.
+
 ### Resolving the script path
 
 Every hook in this tier runs from the host's hook configuration (`.claude/settings.json` on Claude Code, `.codex/hooks.json` on Codex), read at session start; the command needs a path that exists wherever the kit was installed. Do not hard-code `${CLAUDE_PROJECT_DIR}/.claude/skills/...`: the installer defaults to the user scope (`~/.claude/skills/ad-hooks`), where that path does not exist. Resolve `<ad-hooks-dir>` from the base directory stated at the top of this skill load and write it as an absolute path (or `${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks` only when the skill actually loaded from the project install). Scaffold a session-lifecycle hook only when the user asked for that hook: show the exact merged JSON and the target file, and write only after the user approves. Hook edits take effect in the next session.
@@ -224,7 +234,7 @@ Filesystem changes:
 - An updated `AGENTS.md` Quality Gates section (or appended if absent), naming the runner, the gates wired, the bootstrap command, and the no-bypass policy.
 - For the native-hooks fallback only: a `setup-hooks.sh` script the user runs after every clone.
 
-The skill does not execute the runner's install command. The skill does not write CI config. The git-hooks flow (Steps 0–6) does not configure agent-side session hooks — the separate Session-lifecycle hooks tier does that (`.claude/settings.json` `Stop` handoff nudge — ADR-0055 — `UserPromptSubmit` workflow checkpoint — ADR-0074 — the `PostToolUse` artifact-validator gate on both hosts — ADR-0083 — and the `PostToolUse` handoff-chip reminder on both hosts — ADR-0087). A `PreToolUse` guard and any `Stop`-based repair loop remain future scope behind their own decisions (ADR-0083).
+The skill does not execute the runner's install command. The skill does not write CI config. The git-hooks flow (Steps 0–6) does not configure agent-side session hooks — the separate Session-lifecycle hooks tier does that (`.claude/settings.json` `Stop` handoff nudge — ADR-0055 — `UserPromptSubmit` workflow checkpoint — ADR-0074 — the `PostToolUse` artifact-validator gate on both hosts — ADR-0083 — the `PostToolUse` handoff-chip reminder on both hosts — ADR-0087 — and the shadow `PreToolUse` receipt gate on both hosts — ADR-0089). A `PreToolUse` guard that denies and any `Stop`-based repair loop remain future scope behind their own decisions (ADR-0083, ADR-0089).
 
 A narrative document, so the documentation discipline rules apply at write time:
 

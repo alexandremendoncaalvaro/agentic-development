@@ -358,11 +358,15 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/artifact-gate.mjs",
-          "sourceSha": "a9afa20dcc73fc8172675305e03397664c19d88187942884f6dd9378081f13f2"
+          "sourceSha": "87f975c6b6973d112052a2fa3f69a93dada3ee3dd4c2e0116cadb9b341ab536c"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/detect-hooks.mjs",
           "sourceSha": "2c56ea41a2babf40a7b05d8aecdf87740f4ded9fc9437241ba9f5234d69508ae"
+        },
+        {
+          "path": ".agents/skills/ad-hooks/scripts/gate-run.mjs",
+          "sourceSha": "626e30fd66d269d0aaa49ccf9ccffc35dac442a44ebabcfe503341cda5e957a1"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/handoff-chip.mjs",
@@ -373,12 +377,16 @@
           "sourceSha": "aa381a001366c562fd4e0230d9121380f677dd88cec9df5e4b6f1af554145731"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/sequence-gate.mjs",
+          "sourceSha": "42ce0a3b7bc62cee4d715ebc9d66ad9093d56e9078797a3f4b22c81b7bfa72cd"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
           "sourceSha": "ed4fdb3a3540f3f823d54b1c049cef680c20fd2d9324b5cf3cb6fee2bdcc32b2"
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "c658b3d20685299c637d5a91bf8ff4c2dce678edee55a66a63a3de377258b604"
+          "sourceSha": "c1ca8f10f4a0e2b0877e8e4d9ebd8cbfa07612f2a05e76a45330b92736cf1d73"
         }
       ]
     },
@@ -459,7 +467,7 @@
         },
         {
           "path": ".agents/skills/ad-pr/SKILL.md",
-          "sourceSha": "5210210ed54e8f5e879ce0d2a04df41765377024f66c86a588e4dead0a2cde00"
+          "sourceSha": "f5fc997471e36c8032e5c5eb8be8b9f0d533a5ffacd1386028272c6558610666"
         }
       ]
     },

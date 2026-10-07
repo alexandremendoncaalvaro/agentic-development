@@ -35,6 +35,17 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/src/skills/claude-code/ad-hooks/scripts/sequence-gate.mjs\""
+          }
+        ]
+      }
     ]
   }
 }

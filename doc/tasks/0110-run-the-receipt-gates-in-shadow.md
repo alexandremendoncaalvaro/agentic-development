@@ -1,0 +1,54 @@
+# Task `0110`: Run the receipt gates in shadow and read out the flip criterion
+
+**Status:** proposed
+**Created:** 2026-10-07
+**Scope ref:** doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md (decision 6, shadow run)
+**Evidence ref:**
+**Owner:** Alexandre Alvaro
+**Execution:** HITL
+**Spec ref:**
+**Board ref:**
+
+## Context
+
+ADR-0089 ships shadow mode only. Enforcing any check needs a measured
+false-block rate against a criterion the owner sets before the run starts,
+plus a read of whether the owner's pre-approval checks were preceded by a
+would-block event (the RESEARCH-0037 hypothesis).
+
+## Acceptance Criteria
+
+- [ ] Before the run: the owner's per-check criterion (minimum labelled events, maximum false-block rate, window) is recorded in these Notes; the evaluation is frozen with `ad-prism` before the first session counts.
+- [ ] The gates run in this repository and the company repository for the window; each would-block event is labelled true or false by the owner or a fresh-context reviewer.
+- [ ] The read-out reports, per check: events, false-block rate against the criterion, the share of the owner's pre-approval checks that had a preceding would-block event, any session the gate stalled, and the limit that a failed evidence write loses its line (ADR-0089 second addendum), with the count of `unreadable_receipts` seen, read as a lower bound (the gate stops counting once a receipt covers the action).
+- [ ] Each check is marked "propose enforcement", "keep in shadow" or "remove", with the evidence; enforcement itself is a later ADR.
+
+## Plan
+
+- [ ] Freeze the evaluation (`/ad-prism`) with the owner's criterion.
+- [ ] Run, label, read out; record the result in these Notes and in RESEARCH-0037 or its successor.
+
+## Notes
+
+Append-only log. Date each entry. Never rewrite past entries.
+
+### 2026-10-07
+
+Planned with ADR-0089 (proposed) from RESEARCH-0037. Implementation waits for
+the owner's acceptance of ADR-0089 and approval of this plan.
+
+### 2026-10-07 — criterion set
+
+The owner accepted ADR-0089 and set the flip criterion before any run: per
+check, at least 20 labelled would-block events, at most one false block among
+them, within at most four weeks; a check short of 20 events stays in shadow.
+The owner also approved the plan of Tasks 0107 to 0110.
+
+## Definition of Done
+
+All Acceptance Criteria checked, plus:
+
+- [ ] Local tests pass (or N/A documented in Notes)
+- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [ ] No orphan `TODO`/`FIXME` introduced
+- [ ] Status updated to `done` and Notes log closes the task

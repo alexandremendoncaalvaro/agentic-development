@@ -62,11 +62,12 @@ Filesystem changes:
 
 The skill does not execute the runner's install command. The skill does not write CI config.
 
-Session-lifecycle hooks are agent-side session events wired in the host's hook configuration. Codex documents lifecycle hooks with the same event vocabulary as Claude Code (`PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `Stop`, and others), enabled by default, configured in `<repo>/.codex/hooks.json` or an inline `[hooks]` table in `.codex/config.toml`, and run only after the operator reviews and trusts the exact hook definition through `/hooks`. The tier has four members:
+Session-lifecycle hooks are agent-side session events wired in the host's hook configuration. Codex documents lifecycle hooks with the same event vocabulary as Claude Code (`PreToolUse`, `PostToolUse`, `UserPromptSubmit`, `Stop`, and others), enabled by default, configured in `<repo>/.codex/hooks.json` or an inline `[hooks]` table in `.codex/config.toml`, and run only after the operator reviews and trusts the exact hook definition through `/hooks`. The tier has five members:
 
 - The Stop handoff nudge (ADR-0055) and the UserPromptSubmit workflow checkpoint (ADR-0074) are wired on Claude Code today; their Codex wiring is a follow-up under ADR-0083. Their scripts ship in both host trees for byte-parity discipline.
 - The **artifact-validator `PostToolUse` gate** (ADR-0083, Spec 0008, GROUND-0027) is wired on both hosts. After a skill writes a record under `doc/research/`, the gate routes the file by its first heading (`GROUND-NNNN` to `ad-ground/scripts/validate-record.mjs`, `PRISM-NNNN` to `ad-prism/scripts/validate-plan.mjs`) and, on a validator failure, exits 2 with the validator's message and a reproduction command on stderr, which Codex records as feedback in place of the tool result. A pass, an unowned file, a missing path, or malformed stdin is silent. On Codex the written paths are recovered from the `apply_patch` headers (`*** Add File:`, `*** Update File:`, `*** Move to:`) in `tool_input.command`; the matcher `Edit|Write` is a documented alias for `apply_patch`. Every governed firing appends one JSON line to `<tmpdir>/agentic-artifact-gate/<session_id>.jsonl`, outside the working tree (`AD_ARTIFACT_GATE_EVIDENCE_DIR` redirects it); `AD_ARTIFACT_GATE=0` silences the gate; `AD_ARTIFACT_GATE_SKILLS_ROOT` names the skills root when the sibling skills are installed elsewhere. It is feedback, not enforcement: no decision object, no deny, no `Stop` continuation.
 - The **handoff-chip `PostToolUse` reminder** (ADR-0087, GROUND-0034) is wired on both hosts, as a second command in the same `Edit|Write` entry. When a written path is a Markdown file directly under an `agentic-handoffs` directory, it exits 0 with `hookSpecificOutput.additionalContext`, which Codex documents as added developer context (documented, not yet observed on Codex), naming the path and asking the model to offer the resume chip where the host has a chip tool, or the path and a fresh-session prompt where it does not (Codex has none). Everything else is silent; `AD_HANDOFF_CHIP=0` silences it. It is a reminder, not a gate: no validator, no evidence file, no exit 2.
+- The **shadow receipt gate on `PreToolUse`** (ADR-0089, GROUND-0038) is wired on both hosts, matched on `Bash` (Codex maps `exec_command` to `Bash` and puts the command in `tool_input.command`). After the repository's CI-mirror command passes, `scripts/gate-run.mjs record --command "<command>" --exit 0` appends a receipt to `.agentic/receipts/gate-run.jsonl` keyed to the working copy's git tree (through an empty temporary index; add `.agentic/receipts/` to `.gitignore`). Before `git push` or `gh pr create`, `scripts/sequence-gate.mjs` appends one line, `clear`, `would-block` or `runtime-unavailable`, to `<tmpdir>/agentic-sequence-gate/<session_id>.jsonl` (`AD_SEQUENCE_GATE_EVIDENCE_DIR` redirects it), comparing the receipt with `HEAD^{tree}` and allowing changes only in receipt-neutral paths (`receiptNeutral` in `.agentic/gates.json`, default `doc/tasks/**`). Shadow mode only: it always exits 0, prints nothing, and never denies; `AD_SEQUENCE_GATE=0` silences it.
 
 Wiring, merged into `<repo>/.codex/hooks.json`, with `<ad-hooks-dir>` resolved to the directory this skill was loaded from:
 
@@ -81,12 +82,20 @@ Wiring, merged into `<repo>/.codex/hooks.json`, with `<ad-hooks-dir>` resolved t
           { "type": "command", "command": "node \"<ad-hooks-dir>/scripts/handoff-chip.mjs\"", "timeout": 30 }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "node \"<ad-hooks-dir>/scripts/sequence-gate.mjs\"", "timeout": 30 }
+        ]
+      }
     ]
   }
 }
 ```
 
-Scaffold a session-lifecycle hook only when the user asked for it: show the exact merged JSON and the target file, write only after the user approves, then tell the operator to run `/hooks` to review and trust the new definition. A `PreToolUse` guard and any `Stop`-based repair loop remain future scope behind their own decisions (ADR-0083).
+Scaffold a session-lifecycle hook only when the user asked for it: show the exact merged JSON and the target file, write only after the user approves, then tell the operator to run `/hooks` to review and trust the new definition. A `PreToolUse` guard that denies and any `Stop`-based repair loop remain future scope behind their own decisions (ADR-0083, ADR-0089).
 
 Documentation discipline rules apply at write time:
 - No emoji anywhere in scaffolded config or AGENTS.md update.

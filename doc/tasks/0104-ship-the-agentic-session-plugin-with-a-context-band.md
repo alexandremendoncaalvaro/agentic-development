@@ -1,6 +1,6 @@
 # Task `0104`: Ship the agentic-session plugin with a context band
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-07
 **Scope ref:** doc/product/PRD.md (Next tier, Optional Claude Code companion plugin)
 **Evidence ref:** doc/research/0035-ground-claude-code-session-plugin.md
@@ -41,7 +41,7 @@ Slice 1 — the band (this task):
 - [x] `/ad-review` (first pass, on the uncommitted implementation over c6e3ea7).
 - [x] `/ad-audit` at 43a558f; its fixes applied.
 - [x] `/ad-review` of the final branch, verdicts recorded with severity, disposition and target SHA.
-- [ ] `/ad-commit`; PR and merge on the owner's approval; CI green on Ubuntu and Windows.
+- [x] `/ad-commit`; PR and merge on the owner's approval; CI green on Ubuntu and Windows.
 
 Slices 2 and 3 are Tasks 0105 (resume chip) and 0106 (verify-before-done
 receipt), after this one.
@@ -199,6 +199,16 @@ closed locally first: `test/windows-paths.test.js` now fails on any host when a
 test dynamically imports a joined or resolved path (it failed, naming this
 file), and the imports go through `pathToFileURL(...).href` (it passes).
 
+### 2026-10-07 — Closed
+
+The owner approved the pull request text and the merge after CI. Pull request
+160 opened with the approved body (the posted body matched the approved text
+except GitHub's trailing newline) and, after the Windows fix (5af3259), passed
+CI on Ubuntu and Windows with Node 22.13 and 24, and merged as d592cd6. Audit
+item 13 is closed by that run. The owner installs from GitHub with `claude
+plugin marketplace add alexandremendoncaalvaro/agentic-development` and
+`claude plugin install agentic-session@agentic-development`.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -206,4 +216,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

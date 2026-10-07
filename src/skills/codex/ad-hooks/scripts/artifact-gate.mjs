@@ -270,7 +270,7 @@ function withEvidenceLock(file, fn) {
  * of the gate's contract, so a write that fails is reported by the caller
  * rather than swallowed (ADR-0083 decision 5).
  */
-function appendEvidence(file, line) {
+export function appendEvidence(file, line) {
   try {
     mkdirSync(dirname(file), { recursive: true });
     withEvidenceLock(file, () => {
