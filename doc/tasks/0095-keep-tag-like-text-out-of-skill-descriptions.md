@@ -78,6 +78,13 @@ commit ancestry, because test and fix landed in one commit; the auditors
 re-derived it independently, the shipped matcher flags 12 of 92 descriptions
 at `1fedcfd` and none after the change.
 
+### 2026-10-06 — re-audit
+
+The re-audit resolved the earlier items. The 668- and 1237-test counts in
+the entries above are session outputs that were not retained; the retained
+evidence is the 12-of-92 matcher result, which a reviewer re-derived, and the
+final gate (1244 tests, 0 failures, 0 vulnerabilities).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

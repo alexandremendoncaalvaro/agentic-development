@@ -628,7 +628,7 @@ grounded in [`doc/research/0027-ground-artifact-validator-gate.md`](doc/research
 
 ### Session reminder
 
-**Definition:** a static or path-keyed instruction that an `ad-hooks` session-lifecycle hook puts in front of the user or the model, with no validator behind it: the `Stop` handoff nudge (ADR-0055), the `UserPromptSubmit` workflow checkpoint (ADR-0074), and the handoff-chip `PostToolUse` reminder (ADR-0087). It always exits 0, records no evidence, and carries a kill switch.
+**Definition:** a static or path-keyed instruction that an `ad-hooks` session-lifecycle hook puts in front of the user or the model, with no validator behind it: the `Stop` handoff nudge (ADR-0055), the `UserPromptSubmit` workflow checkpoint (ADR-0074), and the handoff-chip `PostToolUse` reminder (ADR-0087). It always exits 0 and records no gate evidence; the `Stop` nudge keeps only a once-per-session flag file, and the checkpoint and the handoff-chip reminder each carry a kill switch.
 
 _Avoid_: "gate" or **Runtime gate** (a gate runs an existing validator and records evidence, ADR-0083; a reminder does neither); "enforcement" (a reminder only informs).
 

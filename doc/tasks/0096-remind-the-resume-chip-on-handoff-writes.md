@@ -107,6 +107,15 @@ files. Not changed, with reason: the silent exit on unreadable stdin follows
 the documented reminder contract of ADR-0074 (a reminder that cannot read its
 input must not break the session).
 
+### 2026-10-06 — re-audit
+
+The re-audit resolved P1 to P3 and P5 to P9 and found one new item, fixed:
+`CONTEXT.md` and `ARCHITECTURE.md` said every session reminder records nothing
+and carries a kill switch, but the `Stop` nudge keeps a once-per-session flag
+file and has no switch; both now say so. The live-check quote above is
+elided; the full text is `reminder(path)` in the pinned blob for that path,
+which a reviewer can reproduce without the host.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
