@@ -1,6 +1,6 @@
 ---
 name: ad-skill
-description: "Draft a new Claude Code or Codex skill at .claude/skills/<name>/SKILL.md or .agents/skills/<name>/SKILL.md in the Anthropic Skills format. Use when the user wants to create, write, draft, or scaffold a custom skill for an agentic coding tool. Asks one question per missing field; never invents skill names or triggers."
+description: "Draft a new Claude Code or Codex skill at .claude/skills/NAME/SKILL.md or .agents/skills/NAME/SKILL.md in the Anthropic Skills format. Use when the user wants to create, write, draft, or scaffold a custom skill for an agentic coding tool. Asks one question per missing field; never invents skill names or triggers."
 summary: Draft a new Claude Code or Codex skill at the appropriate path.
 ---
 
@@ -20,7 +20,9 @@ Step 2 — interview to fill. Ask one question per missing field, in this order:
   does and when to use it in `description`; its specification maximum is 1,024
   characters. Claude Code alone also supports `when_to_use`, and cuts the
   combined discovery text at 1,536 characters in its Claude Code listing; this
-  is not the cross-host specification limit.
+  is not the cross-host specification limit. The description cannot contain
+  XML tags, so write a path placeholder as `NNNN-slug` or `NAME`, never in
+  angle brackets.
 - Effect gates — every outward effect (push, pull request, publish, post,
   message) and every irreversible one (files outside the repository, machine
   stores, deletions git cannot restore) runs only after an approval step stated

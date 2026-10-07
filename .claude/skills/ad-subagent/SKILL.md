@@ -1,6 +1,6 @@
 ---
 name: ad-subagent
-description: "Draft a Claude Code subagent at .claude/agents/<name>.md in the official format, for delegated work such as a fresh-context reviewer, codebase or docs researcher, test designer, bug reproducer, or bounded worker. Use to create, write, or scaffold a custom subagent. Asks one question per missing field; never invents roles or tool sets."
+description: "Draft a Claude Code subagent at .claude/agents/NAME.md in the official format, for delegated work such as a fresh-context reviewer, codebase or docs researcher, test designer, bug reproducer, or bounded worker. Use to create, write, or scaffold a custom subagent. Asks one question per missing field; never invents roles or tool sets."
 summary: Draft a Claude Code custom subagent for bounded delegated work at `.claude/agents/<name>.md`.
 allowed-tools: Read, Write, Glob, Bash
 ---

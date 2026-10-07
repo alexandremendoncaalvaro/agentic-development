@@ -20,7 +20,7 @@
         },
         {
           "path": ".agents/skills/ad-adr/SKILL.md",
-          "sourceSha": "8d18e27891202b7de839fb5bdf1feac091fd436adde31a98f9c372d6eac36e2e"
+          "sourceSha": "fe8d5d12d365eeda0e0469b5267ad587ea4e512995061191e49133adda454c45"
         }
       ]
     },
@@ -365,6 +365,10 @@
           "sourceSha": "2c56ea41a2babf40a7b05d8aecdf87740f4ded9fc9437241ba9f5234d69508ae"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/handoff-chip.mjs",
+          "sourceSha": "23ad4852e275fa3acabbd9b4e58951d7494808095f5d85859e66e733e5ae53c5"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/handoff-nudge.mjs",
           "sourceSha": "aa381a001366c562fd4e0230d9121380f677dd88cec9df5e4b6f1af554145731"
         },
@@ -374,7 +378,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "f4398f17ce6f21b69781fe32279fdffc072cc926a7094c5bfb4bd09c997ca788"
+          "sourceSha": "c658b3d20685299c637d5a91bf8ff4c2dce678edee55a66a63a3de377258b604"
         }
       ]
     },
@@ -691,7 +695,7 @@
         },
         {
           "path": ".agents/skills/ad-research/SKILL.md",
-          "sourceSha": "704eaf232245e55583587f34f3d257981ee185f4e0fb68e3f0d9dcfff6f50519"
+          "sourceSha": "5c7877d6287d87c67b26eca3923745907572ddd646b2dda7a944a225094b5ddb"
         }
       ]
     },
@@ -759,7 +763,7 @@
         },
         {
           "path": ".agents/skills/ad-skill/SKILL.md",
-          "sourceSha": "4be4d7b1057a62dd36e2ec529d195d3abe3aa080c8a03bd72b39f776b11c96e5"
+          "sourceSha": "1dafadc6f14403555b30fcc824b10595614a7bcb75192c4c6c2472ca803e1575"
         }
       ]
     },
@@ -780,7 +784,7 @@
         },
         {
           "path": ".agents/skills/ad-spec/SKILL.md",
-          "sourceSha": "6797cf0d05178725827694f0a9d1b3ed552cc1edc8aaf0ee417238976ff3bc47"
+          "sourceSha": "7d7f1ba13c656e1d1aafb2b74d952b3e702c123fa6fda4fa9db25233e92b7067"
         }
       ]
     },
@@ -818,7 +822,7 @@
         },
         {
           "path": ".agents/skills/ad-subagent/SKILL.md",
-          "sourceSha": "776fffd285f22b0df8b56da7e735ebc95322b634461a71f3562f0022fae80c2a"
+          "sourceSha": "b479603deb3219cc1ea5ac0d04c7d3c48e6ce5c99d2f24d96be58d92e04ce96c"
         }
       ]
     },
@@ -843,7 +847,7 @@
         },
         {
           "path": ".agents/skills/ad-task/SKILL.md",
-          "sourceSha": "d6716f7d356d568010beb70814ae42fda61c90a050715338841ffdef6047cb46"
+          "sourceSha": "a20e6f7751566afd749fe2b505ee271b4780f68530a9a00e94be7a603b065fb0"
         }
       ]
     },

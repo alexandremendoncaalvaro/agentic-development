@@ -18,6 +18,14 @@ const SKILLS_ROOT = join(__dirname, '..', 'src', 'skills');
 const HOST_BLOCKED_SKILLS = new Set();
 const SPEC_DESCRIPTION_CAP = 1024;
 const DESCRIPTION_CAP = 350;
+// The Agent Skills field requirements forbid XML tags in `description`
+// (task-0095, RESEARCH-0032 E1). A tag is a name followed only by bare words
+// or name=value attributes, plus comments, processing instructions and CDATA,
+// so spaced comparisons ("a < b") and ones with symbols ("i<length && count>0")
+// stay allowed; an unspaced word-only one ("a<b and c>d") reads as a tag and
+// is flagged, as in dotnet/skills SkillProfiler.
+const TAG_LIKE =
+  /<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<!\[CDATA\[|<\/?[A-Za-z_][\w.:-]*(?:\[\]|\?)*(?:[\s,]+[A-Za-z_][\w.:-]*(?:\[\]|\?)*(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'<>=,]+))?)*\s*\/?>/;
 
 // The tests enumerate skills through the installer's own enumerator, so the
 // dot-directory exclusion (task-0065) has one implementation and one test.
@@ -2049,8 +2057,34 @@ for (const agent of ['claude-code', 'codex']) {
         `description must be ≤${DESCRIPTION_CAP} chars, use case and triggers first (ADR-0085); got ${fm.description.length}`
       );
     });
+
+    test(`regression: task-0095 skill ${agent}/${name}: description carries no tag-like text`, () => {
+      const match = fm.description.match(TAG_LIKE);
+      assert.equal(
+        match,
+        null,
+        `description must not contain XML tags (task-0095); found ${match?.[0]}`
+      );
+    });
   }
 }
+
+test('tag-like matcher flags tags and allows comparisons (task-0095)', () => {
+  for (const tagged of [
+    'doc/adr/NNNN-<slug>.md',
+    '</div>',
+    '<Foo bar="x" />',
+    '<_Root />',
+    'a <!-- c --> b',
+    '<![CDATA[',
+    'a<b and c>d',
+  ]) {
+    assert.match(tagged, TAG_LIKE, tagged);
+  }
+  for (const plain of ['a < b', 'latency >5s', 'i<length && count>0', 'doc/adr/NNNN-slug.md']) {
+    assert.doesNotMatch(plain, TAG_LIKE, plain);
+  }
+});
 
 // --- Review verdict durability (task-0078): the review's outputs, not only its inputs, persist ---
 

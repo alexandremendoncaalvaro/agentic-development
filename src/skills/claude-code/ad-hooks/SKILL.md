@@ -1,7 +1,7 @@
 ---
 name: ad-hooks
-description: "Scaffold deterministic quality gates: pre-commit (lint, format, secret-scan) and pre-push (build, tests) with a hook runner fitted to the stack, plus session hooks: a Stop handoff nudge, a UserPromptSubmit workflow checkpoint, and a PostToolUse artifact-validator gate. Use to wire hooks, set up quality gates, or prevent --no-verify bypass."
-summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals — plus a session-lifecycle tier (a Stop handoff nudge, a UserPromptSubmit workflow checkpoint, and a dual-host PostToolUse artifact-validator gate).
+description: "Scaffold deterministic quality gates: pre-commit (lint, format, secret-scan) and pre-push (build, tests) fitted to the stack, plus session hooks (Stop handoff nudge, workflow checkpoint, PostToolUse artifact gate and handoff-chip reminder). Use to wire hooks, set up quality gates, or prevent --no-verify bypass."
+summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals — plus a session-lifecycle tier (a Stop handoff nudge, a UserPromptSubmit workflow checkpoint, and dual-host PostToolUse artifact gate and handoff-chip reminder).
 allowed-tools: Read, Write, Glob, Bash
 ---
 
@@ -89,7 +89,7 @@ If the user is wiring CI alongside hooks (GitHub Actions / GitLab CI / Circle), 
 
 ## Session-lifecycle hooks (Claude Code only)
 
-Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; it has three members. The first two are wired on Claude Code only (their Codex extension is a follow-up under ADR-0083); the third, the artifact-validator gate, is wired on both hosts because Codex documents the same `PostToolUse` contract (GROUND-0027).
+Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; it has four members. The first two are wired on Claude Code only (their Codex extension is a follow-up under ADR-0083); the artifact-validator gate and the handoff-chip reminder are wired on both hosts because Codex documents the same `PostToolUse` contract (GROUND-0027, GROUND-0034).
 
 ### Handoff-nudge `Stop` hook (ADR-0055)
 
@@ -199,9 +199,22 @@ Scaffold it in two parts:
 
 Claude Code Desktop shares this wiring with the CLI but inherits only `PATH` and a fixed set of variables from the shell profile, so set `AD_ARTIFACT_GATE*` variables where Desktop sessions can see them, not only in `.zshrc`.
 
+### Handoff-chip `PostToolUse` reminder (ADR-0087)
+
+Reminds the model to offer the one-click resume chip when a handoff file is written, whether or not `/ad-handoff` ran: the measured chip miss is a handoff written without the skill (RESEARCH-0033). Key facts (verified against both hosts' hooks references, GROUND-0034):
+
+* It hangs off **`PostToolUse`** matched on **`Edit|Write`**, in the same entry as the artifact gate. It fires only when a written path is a Markdown file directly under an `agentic-handoffs` directory; paths are recovered with the artifact gate's own parser, so Codex `apply_patch` headers work too.
+* It prints **`hookSpecificOutput.additionalContext` on exit 0**, the field both hosts document as placing text in the model's context for this event (plain stdout is ignored there); observed on Claude Code, not yet on Codex. The text names the path, asks for the chip where the host has a chip tool, and for the path plus a fresh-session prompt where it does not.
+* It is a **reminder, not a gate**: no validator, no evidence file, no exit 2, no decision object. Everything else is silent. `AD_HANDOFF_CHIP=0` silences it.
+
+Scaffold it in two parts:
+
+1. **The script** ships with this skill at `scripts/handoff-chip.mjs` (Node, zero-dependency, byte-identical across hosts; it imports `artifact-gate.mjs` from the same directory).
+2. **The wiring** — add a command to the `Edit|Write` `PostToolUse` entry on each host (create the entry when the artifact gate is not wired): `{ "type": "command", "command": "node \"<ad-hooks-dir>/scripts/handoff-chip.mjs\"" }` in `.claude/settings.json`, and the same with `"timeout": 30` in `.codex/hooks.json`.
+
 ### Resolving the script path
 
-Both hooks run from `.claude/settings.json`, which is read at session start; the command needs a path that exists wherever the kit was installed. Do not hard-code `${CLAUDE_PROJECT_DIR}/.claude/skills/...`: the installer defaults to the user scope (`~/.claude/skills/ad-hooks`), where that path does not exist. Resolve `<ad-hooks-dir>` from the base directory stated at the top of this skill load and write it as an absolute path (or `${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks` only when the skill actually loaded from the project install). Scaffold a session-lifecycle hook only when the user asked for that hook: show the exact merged JSON and the target file, and write only after the user approves. Hook edits take effect in the next session.
+Every hook in this tier runs from the host's hook configuration (`.claude/settings.json` on Claude Code, `.codex/hooks.json` on Codex), read at session start; the command needs a path that exists wherever the kit was installed. Do not hard-code `${CLAUDE_PROJECT_DIR}/.claude/skills/...`: the installer defaults to the user scope (`~/.claude/skills/ad-hooks`), where that path does not exist. Resolve `<ad-hooks-dir>` from the base directory stated at the top of this skill load and write it as an absolute path (or `${CLAUDE_PROJECT_DIR}/.claude/skills/ad-hooks` only when the skill actually loaded from the project install). Scaffold a session-lifecycle hook only when the user asked for that hook: show the exact merged JSON and the target file, and write only after the user approves. Hook edits take effect in the next session.
 
 ## Output contract
 
@@ -211,7 +224,7 @@ Filesystem changes:
 - An updated `AGENTS.md` Quality Gates section (or appended if absent), naming the runner, the gates wired, the bootstrap command, and the no-bypass policy.
 - For the native-hooks fallback only: a `setup-hooks.sh` script the user runs after every clone.
 
-The skill does not execute the runner's install command. The skill does not write CI config. The git-hooks flow (Steps 0–6) does not configure agent-side session hooks — the separate Session-lifecycle hooks tier does that (`.claude/settings.json` `Stop` handoff nudge — ADR-0055 — `UserPromptSubmit` workflow checkpoint — ADR-0074 — and the `PostToolUse` artifact-validator gate on both hosts — ADR-0083). A `PreToolUse` guard and any `Stop`-based repair loop remain future scope behind their own decisions (ADR-0083).
+The skill does not execute the runner's install command. The skill does not write CI config. The git-hooks flow (Steps 0–6) does not configure agent-side session hooks — the separate Session-lifecycle hooks tier does that (`.claude/settings.json` `Stop` handoff nudge — ADR-0055 — `UserPromptSubmit` workflow checkpoint — ADR-0074 — the `PostToolUse` artifact-validator gate on both hosts — ADR-0083 — and the `PostToolUse` handoff-chip reminder on both hosts — ADR-0087). A `PreToolUse` guard and any `Stop`-based repair loop remain future scope behind their own decisions (ADR-0083).
 
 A narrative document, so the documentation discipline rules apply at write time:
 

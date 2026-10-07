@@ -1,6 +1,6 @@
 ---
 name: ad-research
-description: Turn an open question into an evidence-graded study at doc/research/NNNN-<slug>.md with a defensible conclusion, not code. Use on "should we adopt X", "A vs B", "state of the art", "evaluate options", "literature review", "research this". Graduates binding conclusions to an ADR.
+description: Turn an open question into an evidence-graded study at doc/research/NNNN-slug.md with a defensible conclusion, not code. Use on "should we adopt X", "A vs B", "state of the art", "evaluate options", "literature review", "research this". Graduates binding conclusions to an ADR.
 summary: Research-to-conclusion — turn an open question into an evidence-graded study at doc/research/NNNN-<slug>.md via the Evidence-Based loop + WORKFLOW §17 grading + the scientific method when measurable. Reuses ad-ground for Acquire; graduates a binding conclusion to an ADR. WORKFLOW §17 + §4-5.
 ---
 

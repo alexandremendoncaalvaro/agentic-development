@@ -1,0 +1,132 @@
+# Task `0096`: Remind the resume chip on handoff writes
+
+**Status:** done
+**Created:** 2026-10-06
+**Scope ref:** src/skills/claude-code/ad-hooks/SKILL.md (session-lifecycle tier); src/skills/claude-code/ad-handoff/SKILL.md (report); doc/adr/0087-remind-the-resume-chip-on-handoff-writes.md
+**Evidence ref:** doc/research/0034-ground-handoff-chip-hook.md
+**Owner:** Alexandre Alvaro
+**Execution:** AFK
+**Spec ref:**
+**Board ref:**
+
+## Context
+
+The owner asked for the resume chip to be the default at handoff on Claude
+Code. `/ad-handoff` already asks for it, and RESEARCH-0033 measured that
+the skill is followed whenever it runs; the only miss was a handoff written
+without the skill. ADR-0087 adds a third reminder to the
+`ad-hooks` session tier that fires on the write itself, so the chip reaches
+the model whether or not the skill ran.
+
+## Acceptance Criteria
+
+- [x] `scripts/handoff-chip.mjs` exists byte-identical under both `ad-hooks` trees, zero dependencies, and recovers the written path with the artifact gate's `recoverPaths`.
+- [x] Given a `PostToolUse` event whose written path is a Markdown file under an `agentic-handoffs` directory, on either host's tool input, the script exits 0 and prints `hookSpecificOutput` with `hookEventName: "PostToolUse"` and an `additionalContext` that names the path, the chip, the fresh-session fallback, and `/ad-handoff`.
+- [x] Any other path, an event without a path, and empty, malformed or non-object input exit 0 with no output.
+- [x] `AD_HANDOFF_CHIP=0` silences every case.
+- [x] `ad-hooks/SKILL.md` on both hosts documents the reminder as a tier member with its wiring, and `/ad-handoff` on Claude Code makes the chip a numbered report step (the Codex body names no chip, because Codex has no chip primitive).
+- [x] This repository's `.claude/settings.json` and `.codex/hooks.json` wire it, and a wiring test locks both.
+- [x] One handoff write on Claude Code with the hook wired shows the reminder reaching the model.
+- [x] The dogfood installs are refreshed, `npm run verify` passes, and `CHANGELOG.md` records the change.
+
+## Plan
+
+- [x] Red: contract tests in `test/skill-scripts.test.js` beside the checkpoint tests; wiring test in `test/agent-hooks-wiring.test.js`.
+- [x] Green: the script; both `ad-hooks` and `ad-handoff` bodies; dogfood wiring; refresh the install.
+- [x] Live check on Claude Code; `CHANGELOG.md`; `/ad-review`; `/ad-commit`.
+
+## Notes
+
+Append-only log. Date each entry. Never rewrite past entries.
+
+### 2026-10-06
+
+Opened from RESEARCH-0033, step 1; the owner approved the backlog in chat.
+Ground record GROUND-0034; decision ADR-0087, proposed until the owner
+accepts it.
+
+Red, then green: seven new tests (five contract, two wiring) failed before
+the script and the wiring existed and pass after; `npm run verify` passed
+with 1151 tests and no audit finding.
+
+Live check on Claude Code 2.1.227: a `claude -p` session in this worktree,
+with the hook wired, wrote a file under `$TMPDIR/agentic-handoffs/`; the
+model quoted the reminder verbatim as "PostToolUse:Write hook additional
+context". Stream kept private; SHA-256 prefix `62d0be499004471b`. The
+test file was deleted afterwards.
+
+Fresh-context review on both axes (persisted under
+`.agentic/reviews/20261007T021556Z-working-tree-*`): no Blocker. Standards
+Concern 1, a handoff written through `Bash` does not fire the hook:
+checked against the measured miss, session `b4e59e4a`, which wrote its
+handoff with `Write`, so the hook covers the observed case; the gap is now
+a stated trade-off in ADR-0087. Standards Concern 2, a duplicate offer when
+`/ad-handoff` writes the file: the reminder now asks for the chip once and
+names the skill's report step as that offer. Spec Concern, two items of
+RESEARCH-0033 step 1 are outside this slice: routing the nudge and the
+checkpoint through `/ad-handoff` is already true of the checkpoint (item 7)
+and ADR-0087 records why the `Stop` nudge stays as it is; the stale
+"Codex has no AskUserQuestion primitive" lines in the Codex tree are a
+separate correction, left for its own task. ADR-0087 stays proposed until
+the owner accepts it.
+
+### 2026-10-06 — audit dispositions and live check on the final script
+
+The earlier live check is superseded: the reminder text changed after it
+(review fix, then the audit's vocabulary fix), and a digest alone is not
+inspectable evidence. Re-run on the final script, blob
+`425dec522a083d17ccdb4d9f3b42fe87185623d7` (`git hash-object
+src/skills/claude-code/ad-hooks/scripts/handoff-chip.mjs`), with Claude Code
+2.1.227 in this repository, which wires the hook in `.claude/settings.json`:
+
+    claude -p "Use the Write tool to write the single line 'live check' to the file $TMPDIR/agentic-handoffs/<ISO>-livecheck.md. After the write, quote verbatim any additional context or hook text you received about that write, or say NONE if there was none. Do nothing else." --allowedTools Write
+
+The model replied with the hook text, labelled by the host as
+"PostToolUse:Write hook additional context", beginning "A session handoff was
+written to /var/folders/.../agentic-handoffs/20261007T022346Z-livecheck.md. If
+this host has a background-task chip tool ... offer the handoff as a resume
+chip, once, in your reply" and ending "check it against the template of that
+skill first." The test file was deleted afterwards. Codex delivery remains
+documented, not observed: the operator's Codex CLI could not start a trial
+(Task 0083), and the record says so wherever it names Codex.
+
+The review files named above are local and gitignored by design; the findings
+and dispositions quoted in this log are the durable record. ADR-0087 and
+GROUND-0034 were recorded alongside the code, in one commit, not before it.
+
+`/ad-audit` dispositions, all fixed in the follow-up commit: GROUND-0034 and
+RESEARCH-0033 grade the transcript measurement as exploratory (a private
+corpus a reviewer cannot reopen), and GROUND-0034 drops to Conditional;
+RESEARCH-0032 gives the commands that reproduce its delta counts and corrects
+spec-kit's count from 50 to 191; ADR-0087 names its relation to ADR-0055,
+ADR-0074 and ADR-0083; `CONTEXT.md` gains **Resume chip** and **Session
+reminder**, and `ARCHITECTURE.md` places reminders beside the runtime gates;
+the reminder says "session handoff"; both `ad-hooks` descriptions and the
+script-path paragraph name the new member and both hosts' configuration
+files. Not changed, with reason: the silent exit on unreadable stdin follows
+the documented reminder contract of ADR-0074 (a reminder that cannot read its
+input must not break the session).
+
+### 2026-10-06 — re-audit
+
+The re-audit resolved P1 to P3 and P5 to P9 and found one new item, fixed:
+`CONTEXT.md` and `ARCHITECTURE.md` said every session reminder records nothing
+and carries a kill switch, but the `Stop` nudge keeps a once-per-session flag
+file and has no switch; both now say so. The live-check quote above is
+elided; the full text is `reminder(path)` in the pinned blob for that path,
+which a reviewer can reproduce without the host.
+
+### 2026-10-06 — ADR accepted
+
+The owner accepted ADR-0087 in chat; `doc/adr/PROJECTION.md` now counts 63
+accepted ADRs in the same commit. It retires no part of another record, so
+it adds no table row.
+
+## Definition of Done
+
+All Acceptance Criteria checked, plus:
+
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task

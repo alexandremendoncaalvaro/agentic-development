@@ -8,6 +8,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
+- `/ad-hooks` session-lifecycle tier gains a fourth member, the
+  handoff-chip `PostToolUse` reminder on both hosts: when a handoff file is
+  written under `agentic-handoffs/`, with or without `/ad-handoff`, the model
+  is told to offer the one-click resume chip where the host has one, or the
+  path and a fresh-session prompt where it does not (observed on Claude Code;
+  documented, not yet observed, on Codex); `/ad-handoff` on Claude
+  Code makes the chip a numbered report step (ADR-0087, GROUND-0034,
+  task-0096).
 - `/ad-commit` on Claude Code and Codex bundles `cited-records.mjs`, a
   read-only probe that reports, for every record a draft commit message
   cites (`GROUND-`, `RESEARCH-`, `PRISM-`, `ADR-`, task, and spec ids),
@@ -67,6 +75,12 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- Six skill descriptions (`/ad-adr`, `/ad-research`, `/ad-skill`, `/ad-spec`,
+  `/ad-subagent`, `/ad-task`) on both hosts no longer carry angle-bracket path
+  placeholders such as `<slug>`, which the Agent Skills field requirements
+  forbid and which a claude.ai upload or marketplace sync rejects; a test now
+  blocks tag-like text in every description, and `/ad-skill` tells authors the
+  rule (task-0095).
 - `/ad-spike` on Claude Code drafts the spike-outcome ADR from `/ad-adr`'s
   canonical template instead of its own skeleton, which lacked the
   `Status`, `Date`, and `Deciders` lines and the `Alternatives Considered`

@@ -4216,6 +4216,87 @@ test('workflow-checkpoint: AD_WORKFLOW_CHECKPOINT=0 kill switch → silent exit 
   assert.equal(runCheckpoint(PROMPT_EVENT, { AD_WORKFLOW_CHECKPOINT: '0' }), '');
 });
 
+// --- ad-hooks session-lifecycle handoff-chip reminder (ADR-0087) ---
+// PostToolUse: `hookSpecificOutput.additionalContext` on exit 0 reaches the
+// model on both hosts (GROUND-0034 E2). The claude-code copy is executed;
+// byte-parity covers the codex twin.
+const HANDOFF_CHIP = join(
+  __dirname,
+  '..',
+  'src',
+  'skills',
+  'claude-code',
+  'ad-hooks',
+  'scripts',
+  'handoff-chip.mjs'
+);
+
+// execFileSync throws on a non-zero exit, so every call also asserts the
+// "always exit 0, never block" contract.
+function runChip(input, env = {}) {
+  return execFileSync('node', [HANDOFF_CHIP], {
+    input,
+    encoding: 'utf8',
+    env: { ...process.env, AD_HANDOFF_CHIP: '', ...env },
+  });
+}
+
+const HANDOFF_PATH = join(tmpdir(), 'agentic-handoffs', '2026-10-06T12-00-00Z-chip.md');
+
+function writeEvent(toolName, toolInput) {
+  return JSON.stringify({
+    hook_event_name: 'PostToolUse',
+    session_id: 'sess-chip',
+    cwd: tmpdir(),
+    tool_name: toolName,
+    tool_input: toolInput,
+    tool_response: {},
+  });
+}
+
+test('handoff-chip: a Claude Code write to a handoff file → additionalContext naming the path, the chip, the fallback and /ad-handoff', () => {
+  const out = runChip(writeEvent('Write', { file_path: HANDOFF_PATH, content: '# h' }));
+  const parsed = JSON.parse(out);
+  assert.equal(parsed.hookSpecificOutput.hookEventName, 'PostToolUse');
+  const text = parsed.hookSpecificOutput.additionalContext;
+  assert.ok(text.includes(HANDOFF_PATH), 'names the written path');
+  assert.match(text, /chip/i);
+  assert.match(text, /fresh-session prompt/i);
+  assert.ok(text.includes('/ad-handoff'), 'points back to the skill');
+  assert.equal(parsed.decision, undefined, 'never a decision object');
+});
+
+test('handoff-chip: a Codex apply_patch adding a handoff file → the same reminder', () => {
+  const patch = ['*** Begin Patch', `*** Add File: ${HANDOFF_PATH}`, '+# h', '*** End Patch'].join(
+    '\n'
+  );
+  const parsed = JSON.parse(runChip(writeEvent('apply_patch', { command: patch })));
+  assert.ok(parsed.hookSpecificOutput.additionalContext.includes(HANDOFF_PATH));
+});
+
+test('handoff-chip: any other path, or a non-Markdown file in the handoff directory → silent', () => {
+  assert.equal(runChip(writeEvent('Write', { file_path: join(tmpdir(), 'notes.md') })), '');
+  assert.equal(
+    runChip(writeEvent('Write', { file_path: join(tmpdir(), 'agentic-handoffs', 'x.json') })),
+    ''
+  );
+  assert.equal(runChip(writeEvent('Bash', { command: 'ls' })), '');
+});
+
+test('handoff-chip: empty, malformed or non-object stdin → silent exit 0', () => {
+  assert.equal(runChip(''), '');
+  assert.equal(runChip('{not json'), '');
+  assert.equal(runChip('null'), '');
+  assert.equal(runChip('[1,2]'), '');
+});
+
+test('handoff-chip: AD_HANDOFF_CHIP=0 kill switch → silent exit 0', () => {
+  const event = writeEvent('Write', { file_path: HANDOFF_PATH });
+  for (const value of ['0', 'false', 'off']) {
+    assert.equal(runChip(event, { AD_HANDOFF_CHIP: value }), '');
+  }
+});
+
 // --- ad-hooks session-lifecycle artifact-validator gate (ADR-0083, Spec 0008) ---
 // PostToolUse: exit 2 shows stderr to the model after the tool already ran;
 // exit 0 is silent. The claude-code copy is executed; byte-parity covers the

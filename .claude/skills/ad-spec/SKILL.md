@@ -1,6 +1,6 @@
 ---
 name: ad-spec
-description: Draft a feature specification at doc/specs/NNNN-<slug>.md (Spec Kit-aligned — who, what, measurable success criteria, non-goals), inheriting scope from the PRD. Use when a feature needs a contract before tasks; "write a spec", "feature spec", "acceptance criteria", "define the feature".
+description: Draft a feature specification at doc/specs/NNNN-slug.md (Spec Kit-aligned — who, what, measurable success criteria, non-goals), inheriting scope from the PRD. Use when a feature needs a contract before tasks; "write a spec", "feature spec", "acceptance criteria", "define the feature".
 summary: Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 4 of the six-layer artifact stack. References parent PRD (`ad-prd`, Layer 3) for product-scope inheritance.
 allowed-tools: Read, Write, Glob, Bash
 ---

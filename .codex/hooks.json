@@ -1,5 +1,5 @@
 {
-  "description": "Agentic Development dogfood: the ad-hooks artifact-validator gate (ADR-0083, Spec 0008).",
+  "description": "Agentic Development dogfood: the ad-hooks artifact-validator gate (ADR-0083, Spec 0008) and handoff-chip reminder (ADR-0087).",
   "hooks": {
     "PostToolUse": [
       {
@@ -8,6 +8,11 @@
           {
             "type": "command",
             "command": "node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/artifact-gate.mjs\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/handoff-chip.mjs\"",
             "timeout": 30
           }
         ]
