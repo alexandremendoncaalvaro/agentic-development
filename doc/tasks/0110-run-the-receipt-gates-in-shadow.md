@@ -53,6 +53,14 @@ for another pull request does not describe it. A chained command logs the
 checks of each landing action in it, so `git push && gh pr create` writes two
 gate-run lines for one state; count it once per state.
 
+### 2026-10-07 — labelling inputs, corrected
+
+Corrects the entry above after Task 0108's re-review: a chained command now
+runs each check once, against the first landing action that needs it, so
+`git push && gh pr create` writes one gate-run line, not two. A third input:
+each check reads only the newest 20 receipt files, so a covering receipt with
+more than 20 newer ones reads as missing; label such a line false.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

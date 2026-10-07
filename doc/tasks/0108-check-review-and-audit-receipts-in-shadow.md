@@ -171,6 +171,55 @@ the installed copies checked by `cmp`; anchors matched; local gate green,
 
 GH and HK: no finding. GH.3 (rules in flight) must be re-run before the push.
 
+### 2026-10-07 — re-audit and re-review at 7be7d7d
+
+Re-audit of 9e958c5..7be7d7d (CV in two passes, the second on another model
+in reverse order; ADRs, GUIDELINES, ARCHITECTURE and CONTEXT together) and a
+two-axis re-review of 503295b..7be7d7d. Local gate at 7be7d7d: `npm run
+verify` exit 0, 1303 tests. No blocker. Every prior finding of the audit at
+9e958c5 and of the review at 503295b was carried: resolved, refuted with
+evidence (items 8, 13 and 14, each re-run by a reviewer), or accepted as a
+label. Both CV passes reproduced item 1's re-measurement: 9.3 to 10.9 s for
+the gate at 503295b and 0.76 to 0.83 s at 7be7d7d, at a load average of 11
+to 12. New findings, with dispositions:
+
+- Re-review Standards Concern and Spec Note: a chained command ran a
+  bot-review command once per action, so two runs could exceed the
+  30-second Codex hook timeout. Fixed: each check runs once per command,
+  logged against the first action that needs it; the regression test now
+  expects that, and a new test counts one command run for `gh pr ready &&
+  gh pr merge`. Both failed before the change (author-reported).
+- Re-audit CV Nit: the evidence line's reproduction lost the argument
+  quoting. Fixed: it is the JSON argument list.
+- Re-review Spec Concern: the 20-file cap can hide a covering receipt with
+  more than 20 newer ones. Accepted as a design choice and made explicit:
+  the `ad-hooks` text says so, ADR-0089's third addendum names it, and Task
+  0110's Notes add it as a labelling input.
+- Re-audit CV Minor (both passes): item 6's "fixed test-first" lacked a
+  label. Accepted as a label: author-reported, like item 2.
+- Re-audit CV Minor (both passes): item 1 did not name the head it measured.
+  It was the script at a009b08, unchanged at 7be7d7d.
+- Re-audit CV Minor: ADR-0089's addendum said decision 7 "authorizes" the
+  GUIDELINES 12.5 exception and claimed the hook wiring's trust without a
+  source. Fixed: the addendum now records the exception itself and states
+  that the repository's hook configuration already runs programs it names.
+- Re-audit docs Minor: GUIDELINES 12.5 did not point to that exception.
+  Fixed: it names ADR-0089's third addendum.
+- Re-audit docs Minor: PROJECTION had no row for ADR-0089's self-amendments.
+  Fixed: a row names the three retired phrases, ADR-0089 marks them in
+  place, and the count of partly binding ADRs is now twenty-two.
+- Re-review Standards Note: a mis-wrapped comment. Fixed.
+- Re-review Standards Note: a verdicts file starting with a BOM or a blank
+  line is skipped without a count. Accepted: `ad-review` writes the header
+  as the first line.
+- Re-review Spec Note: the string command form narrowed the configuration.
+  Accepted: never released; recorded in the addendum and the skill text.
+- Re-review Spec Note: "Code review completed" was ticked before the
+  re-review. Accepted: this entry records that re-review.
+- Re-audit docs, unverified: GROUND-0040's GitHub and Gerrit citations were
+  not re-fetched by that reviewer. Accepted as a label: public pages with
+  access dates.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

@@ -402,7 +402,7 @@ The following do not require permission prompts when invoked by an agent:
 
 ### 12.5 Shell Execution
 
-- No shell command execution from kit code with user-controlled arguments. The CLI does not exec arbitrary commands; it spawns `git`/`npm` with fixed argument lists.
+- No shell command execution from kit code with user-controlled arguments. The CLI does not exec arbitrary commands; it spawns `git`/`npm` with fixed argument lists. One recorded exception: the `ad-hooks` receipt gate runs a bot-review command a repository names in `.agentic/gates.json`, as an argument list without a shell ([ADR-0089](doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md), third addendum).
 
 ### 12.6 Dependency Audit
 

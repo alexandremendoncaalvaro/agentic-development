@@ -150,12 +150,19 @@ Gerrit apply to approvals. `.agentic/reviews/` joins `.agentic/receipts/` as
 always receipt-neutral, for every check, so a committed review or audit file
 never makes the receipts stale. Decision 7's bot-review read is a command in
 `.agentic/gates.json`, an argument list run without a shell within at most 20
-seconds, for the review only; it runs repository-owned configuration with the
-hook's privileges, the trust the repository's hook wiring already holds, and
-is the exception to GUIDELINES 12.5's fixed argument lists that decision 7
-authorizes. When that read times out or its setting is invalid, the check
-logs `runtime-unavailable` instead of switching off, so a broken read is
-counted rather than hidden; switching it off stays `"review": false`. A chained
-command logs the checks of each landing action in it, and `gh pr ready <n>`
-and `gh pr merge <n>` are compared with the local `HEAD`; Task 0110 labels
-both when it counts events.
+seconds, for the review only. It runs a program the repository names, as the
+repository's own hook configuration already does, and this addendum records
+it as the exception to GUIDELINES 12.5's fixed argument lists. When that read
+times out or its setting is invalid, the check logs `runtime-unavailable`
+instead of switching off, so a broken read is counted rather than hidden;
+switching it off stays `"review": false`. A chained command runs each check
+once, logged against the first landing action that needs it. `gh pr ready
+<n>` and `gh pr merge <n>` are compared with the local `HEAD`, and each check
+reads only the newest 20 receipt files; Task 0110 labels the events both
+limits can produce.
+
+With the addenda above, three phrases no longer bind as written: decision 3's
+"when its SHA is `HEAD`" (a receipt is fresh by tree), decision 4's "the
+ADR-0083 evidence file" (the gate writes its own), and decision 7's "the
+check is off for that repository" (an impossible read logs
+`runtime-unavailable`). Everything else in those decisions binds.
