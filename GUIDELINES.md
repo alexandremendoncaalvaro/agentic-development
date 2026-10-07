@@ -318,7 +318,7 @@ Open via `/ad-pr`. Uniform body shape:
 - task / spec / ADR / issue back-links
 ```
 
-Optional, between Summary and Test plan, each omitted when it cannot be stated from the work: `## Evidence` (before and after), `## Merge danger` (one-way or two-way door, blast radius), and one small diagram in the summary when it explains the change better than prose.
+Optional, between Summary and Test plan: `## Evidence` (before and after) and `## Merge danger` (one-way or two-way door, blast radius), each omitted when it cannot be stated from the work. One small diagram may sit in the summary when it explains the change better than prose.
 
 PR title format: Conventional Commits (type inferred from dominant commit type in the range).
 
