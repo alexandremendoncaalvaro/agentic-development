@@ -722,3 +722,69 @@ test('sequence-gate: gates.json names the GitHub CLI wrappers a repository uses'
   ]);
   assert.deepEqual(checksOf('ghp pr comment 5 --body "x"'), ['gh pr comment:publish']);
 });
+
+test('regression: task-0109 review, a malformed githubCommands never fails the hook', () => {
+  const repo = fixtureRepo();
+  writeGates(repo, { githubCommands: [5] });
+  const { stdout, lines } = runGate(repo, 'git push');
+  assert.equal(stdout, '');
+  assert.equal(lines[0].check, 'gate-run');
+});
+
+test('regression: task-0109 review, a backslash line continuation joins the command', () => {
+  const repo = fixtureRepo();
+  approve(repo, 'Approved text.\n');
+  const command = 'gh pr comment 1 \\\n  --body \\\n  "Approved text."';
+  assert.equal(linesFor(runGate(repo, command).lines, 'publish')[0].state, 'clear');
+  const inQuotes = 'gh pr comment 1 --body "Approved \\\ntext."';
+  assert.equal(linesFor(runGate(repo, inQuotes).lines, 'publish')[0].state, 'clear');
+});
+
+test('regression: task-0109 review, a body file the gate cannot read faithfully is runtime-unavailable', () => {
+  const repo = fixtureRepo();
+  const file = approve(repo, 'Approved text.\n', 'b.md');
+  mkdirSync(join(repo, 'sub'));
+  writeFileSync(join(repo, 'big.md'), 'x'.repeat(2 * 1024 * 1024));
+  for (const command of [
+    'cd sub && gh pr comment 1 --body-file b.md',
+    'gh pr comment 1 --body-file ~/b.md',
+    'gh pr comment 1 --body-file big.md',
+    'gh pr comment 1 --body-file sub',
+  ]) {
+    const [publish] = linesFor(runGate(repo, command).lines, 'publish');
+    assert.equal(publish?.state, 'runtime-unavailable', command);
+  }
+  assert.equal(
+    linesFor(runGate(repo, `cd sub && gh pr comment 1 --body-file ${file}`).lines, 'publish')[0]
+      .state,
+    'clear',
+    'an absolute path stays readable after cd'
+  );
+});
+
+test('sequence-gate: each publication in a chained command is checked; unrelated commands log nothing', () => {
+  const repo = fixtureRepo();
+  approve(repo, 'Approved text.\n');
+  const lines = runGate(
+    repo,
+    'gh pr comment 1 -b "Approved text." && gh issue comment 2 -b "Other"'
+  ).lines;
+  assert.deepEqual(
+    lines.map((l) => `${l.action}:${l.state}`),
+    ['gh pr comment:clear', 'gh issue comment:would-block']
+  );
+  for (const command of ['ls -la', 'echo comment', 'git log --grep=api']) {
+    assert.deepEqual(runGate(repo, command).lines, [], command);
+  }
+});
+
+test('publish-receipt: a body file it cannot read is reported in one line, never a stack trace', () => {
+  const repo = fixtureRepo();
+  const run = spawnSync(
+    'node',
+    [PUBLISH_RECEIPT, 'record', '--destination', 'x', '--body-file', 'missing.md'],
+    { cwd: repo, encoding: 'utf8', env: cleanEnv() }
+  );
+  assert.equal(run.status, 1);
+  assert.match(run.stderr, /^publish-receipt: no receipt recorded \(.+\)\n$/);
+});

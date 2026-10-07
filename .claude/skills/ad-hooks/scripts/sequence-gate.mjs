@@ -51,7 +51,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { appendEvidence } from './artifact-gate.mjs';
 import { git, headTree, readReceipts, repositoryRoot } from './gate-run.mjs';
-import { checkPublish, outgoingPublication } from './publish-receipt.mjs';
+import { checkPublish, outgoingPublications } from './publish-receipt.mjs';
 import { readAuditReceipts, readReviewReceipts } from './review-receipts.mjs';
 
 export const GATE_ID = 'sequence-gate';
@@ -126,7 +126,8 @@ function gatesConfig(root) {
 function githubCommands(cwd) {
   try {
     const names = gatesConfig(repositoryRoot(cwd)).githubCommands;
-    const valid = Array.isArray(names) && names.every((n) => /^[\w.-]+$/.test(n));
+    const valid =
+      Array.isArray(names) && names.every((n) => typeof n === 'string' && /^[\w.-]+$/.test(n));
     return valid && names.length > 0 ? names : DEFAULT_GITHUB_COMMANDS;
   } catch {
     return DEFAULT_GITHUB_COMMANDS;
@@ -317,25 +318,40 @@ function readStdin() {
 }
 
 function logPublication(event, cwd) {
-  if (checkSetting(cwd, 'publish') === false) return;
-  let publication;
-  let result;
+  const log = (action, result) =>
+    appendEvidence(evidencePathFor(event.session_id, process.env), {
+      at: new Date().toISOString(),
+      gate: GATE_ID,
+      action,
+      host_tool: event.tool_name,
+      ...result,
+    });
+  let publications;
   try {
-    publication = outgoingPublication(event, cwd, githubCommands(cwd));
-    if (!publication) return;
-    if (publication.unreadable) throw new Error(publication.unreadable);
-    result = checkPublish(cwd, publication.body);
+    publications = outgoingPublications(event, cwd, githubCommands(cwd));
   } catch (error) {
-    result = { check: 'publish', state: 'runtime-unavailable', output: String(error.message) };
+    log('unknown', {
+      check: 'publish',
+      state: 'runtime-unavailable',
+      output: String(error.message),
+    });
+    return;
   }
-  appendEvidence(evidencePathFor(event.session_id, process.env), {
-    at: new Date().toISOString(),
-    gate: GATE_ID,
-    action: publication?.action ?? 'unknown',
-    host_tool: event.tool_name,
-    ...result,
-  });
+  if (publications.length === 0 || checkSetting(cwd, 'publish') === false) return;
+  for (const publication of publications) {
+    let result;
+    try {
+      if (publication.unreadable) throw new Error(publication.unreadable);
+      result = checkPublish(cwd, publication.body);
+    } catch (error) {
+      result = { check: 'publish', state: 'runtime-unavailable', output: String(error.message) };
+    }
+    log(publication.action, result);
+  }
 }
+
+const MAY_ACT =
+  /\bpush\b|\bpr\b[\s\\]+(?:create|ready|merge|comment)\b|\bissue\b[\s\\]+comment\b|\/comments\b/;
 
 function main() {
   if (process.env.AD_SEQUENCE_GATE === '0') return;
@@ -348,6 +364,9 @@ function main() {
     return;
   }
   if (event === null || typeof event !== 'object' || Array.isArray(event)) return;
+  // Most shell calls name no landing or publishing verb; they leave before any
+  // git call, so the hook adds no measurable cost to them (task-0109 Notes).
+  if (event.tool_name === 'Bash' && !MAY_ACT.test(String(event.tool_input?.command))) return;
   const cwd = typeof event.cwd === 'string' && event.cwd ? event.cwd : process.cwd();
   logPublication(event, cwd);
   if (event.tool_name !== 'Bash') return;
@@ -378,5 +397,10 @@ function main() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main();
+  // Shadow mode never fails the tool call, whatever goes wrong inside.
+  try {
+    main();
+  } catch {
+    process.exitCode = 0;
+  }
 }

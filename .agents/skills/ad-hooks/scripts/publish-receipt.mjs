@@ -19,7 +19,7 @@
  */
 
 import { createHash } from 'node:crypto';
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { RECEIPTS_DIR, repositoryRoot } from './gate-run.mjs';
@@ -139,7 +139,9 @@ export function tokenize(command) {
           i += heredoc[0].length - 1;
           continue;
         }
-        if (command[i] === '\\' && '"\\$`'.includes(command[i + 1])) {
+        if (command[i] === '\\' && command[i + 1] === '\n') {
+          i += 1;
+        } else if (command[i] === '\\' && '"\\$`'.includes(command[i + 1])) {
           word.value += command[i + 1];
           i += 1;
         } else {
@@ -147,6 +149,9 @@ export function tokenize(command) {
           word.value += command[i];
         }
       }
+    } else if (char === '\\' && command[i + 1] === '\n') {
+      // A line continuation: the shell drops both characters.
+      i += 1;
     } else if (char === '\\') {
       begin();
       word.value += command[i + 1] ?? '';
@@ -170,7 +175,7 @@ function segments(items) {
   return result;
 }
 
-function commentBody(action, args, cwd) {
+function commentBody(action, args, context) {
   for (let i = 0; i < args.length; i += 1) {
     const flag = args[i].value;
     const [name, inline] = flag.includes('=') ? flag.split(/=(.*)/s) : [flag, undefined];
@@ -190,7 +195,7 @@ function commentBody(action, args, cwd) {
         return { action, unreadable: 'the body file path holds a shell expansion' };
       if (value.value === '-')
         return { action, unreadable: 'the body is read from standard input' };
-      return bodyFromFile(action, value.value, cwd);
+      return bodyFromFile(action, value.value, context);
     }
   }
   return { action, unreadable: 'no body flag; gh would prompt for it' };
@@ -200,11 +205,24 @@ function commentBody(action, args, cwd) {
 // (GROUND-0041 E2). Another connector is added here.
 const CHAT_SEND_TOOLS = [{ pattern: /^mcp__.+__slack_send_message$/, field: 'message' }];
 
-// A body file read here is the file the command will send; one that cannot be
-// read leaves the body unknown, never a missing receipt.
-function bodyFromFile(action, value, cwd) {
-  const path = isAbsolute(value) ? value : join(cwd, value);
+// A design choice: far above any comment body, small enough to keep the hook
+// fast.
+export const MAX_BODY_BYTES = 1024 * 1024;
+
+// A body file read here must be the file the command will send. A path the
+// shell resolves differently (after a `cd`, or under `~`), a non-regular or
+// oversized file, or one that cannot be read leaves the body unknown, never a
+// missing receipt.
+function bodyFromFile(action, value, context) {
+  if (value.startsWith('~')) return { action, unreadable: `${value} is expanded by the shell` };
+  if (!isAbsolute(value) && context.changedDirectory) {
+    return { action, unreadable: `${value} is relative to a directory changed earlier` };
+  }
+  const path = isAbsolute(value) ? value : join(context.cwd, value);
   try {
+    const stat = statSync(path);
+    if (!stat.isFile()) return { action, unreadable: `${value} is not a regular file` };
+    if (stat.size > MAX_BODY_BYTES) return { action, unreadable: `${value} exceeds the size cap` };
     return { action, body: readFileSync(path, 'utf8') };
   } catch (error) {
     return { action, unreadable: `cannot read ${value} (${error.code})` };
@@ -213,7 +231,7 @@ function bodyFromFile(action, value, cwd) {
 
 // `gh api <path>/comments` with a `body` field or an `--input` JSON body; a
 // call without one (a listing) publishes nothing.
-function apiBody(args, cwd) {
+function apiBody(args, context) {
   const action = 'gh api comments';
   if (!args.some((w) => /\/comments(\/|$|\?)/.test(w.value))) return null;
   for (let i = 0; i < args.length; i += 1) {
@@ -226,13 +244,13 @@ function apiBody(args, cwd) {
       const fromFile = (name === '-F' || name === '--field') && value.startsWith('@');
       if (!fromFile) return { action, body: value };
       if (value === '@-') return { action, unreadable: 'the body is read from standard input' };
-      return bodyFromFile(action, value.slice(1), cwd);
+      return bodyFromFile(action, value.slice(1), context);
     }
     if (name === '--input') {
       if (!next || next.unreadable || next.value === '-') {
         return { action, unreadable: 'the request body is not a readable file' };
       }
-      const input = bodyFromFile(action, next.value, cwd);
+      const input = bodyFromFile(action, next.value, context);
       if (input.unreadable) return input;
       let body;
       try {
@@ -247,33 +265,40 @@ function apiBody(args, cwd) {
 }
 
 /**
- * The outward publication a tool call performs: `{ action, body }`, or
- * `{ action, unreadable }` when its body cannot be known before it runs, or
- * null when it publishes nothing.
+ * The outward publications a tool call performs, in order: each `{ action,
+ * body }`, or `{ action, unreadable }` when its body cannot be known before it
+ * runs. Empty when it publishes nothing.
  */
-export function outgoingPublication(event, cwd, githubCommands = ['gh']) {
+export function outgoingPublications(event, cwd, githubCommands = ['gh']) {
   const chat = CHAT_SEND_TOOLS.find((t) => t.pattern.test(String(event.tool_name)));
   if (chat) {
     const body = event.tool_input?.[chat.field];
-    return typeof body === 'string'
-      ? { action: 'chat send', body }
-      : { action: 'chat send', unreadable: `no ${chat.field} text in the tool input` };
+    return [
+      typeof body === 'string'
+        ? { action: 'chat send', body }
+        : { action: 'chat send', unreadable: `no ${chat.field} text in the tool input` },
+    ];
   }
   const command = event.tool_name === 'Bash' ? event.tool_input?.command : null;
-  if (typeof command !== 'string') return null;
+  if (typeof command !== 'string') return [];
+  const publications = [];
+  const context = { cwd, changedDirectory: false };
   for (const words of segments(tokenize(command))) {
+    const program = words.find((w) => !/^\w+=/.test(w.value))?.value;
+    if (['cd', 'pushd', 'popd'].includes(program)) context.changedDirectory = true;
     const at = words.findIndex((w) => githubCommands.includes(w.value));
     if (at === -1) continue;
     const [kind, verb] = [words[at + 1]?.value, words[at + 2]?.value];
     if ((kind === 'pr' || kind === 'issue') && verb === 'comment') {
-      return commentBody(`gh ${kind} comment`, words.slice(at + 3), cwd);
+      const publication = commentBody(`gh ${kind} comment`, words.slice(at + 3), context);
+      if (publication) publications.push(publication);
     }
     if (kind === 'api') {
-      const publication = apiBody(words.slice(at + 2), cwd);
-      if (publication) return publication;
+      const publication = apiBody(words.slice(at + 2), context);
+      if (publication) publications.push(publication);
     }
   }
-  return null;
+  return publications;
 }
 
 function parseArgs(argv) {
@@ -293,7 +318,15 @@ function main() {
     process.exitCode = 64;
     return;
   }
-  const receipt = recordPublishReceipt(process.cwd(), args);
+  let receipt;
+  try {
+    receipt = recordPublishReceipt(process.cwd(), args);
+  } catch (error) {
+    const reason = String(error.message).split('\n')[0];
+    process.stderr.write(`publish-receipt: no receipt recorded (${reason})\n`);
+    process.exitCode = 1;
+    return;
+  }
   process.stdout.write(
     `publish-receipt: recorded ${receipt.sha256.slice(0, 12)} for ${receipt.destination}\n`
   );
