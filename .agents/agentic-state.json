@@ -366,7 +366,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/gate-run.mjs",
-          "sourceSha": "7cbf90ea9bc008ea9f4d580ea132ed3ce4605704b47fb3caebf3972aadecf709"
+          "sourceSha": "4bda5f68dbb1fa60f621d915a39ae5ec90cd95a895e5bb6fff720f9b2a1602e5"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/handoff-chip.mjs",
@@ -378,7 +378,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "5b2131805b5340e914217060bc1a9fd470471fa5ecbeca51e0340d87ec49358d"
+          "sourceSha": "cf7d2f88d71fd1cc34f7ccfb91ef893cebe85cde8b153e75fc1db6b49dfcb057"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",

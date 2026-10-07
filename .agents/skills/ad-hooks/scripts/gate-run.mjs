@@ -119,7 +119,18 @@ function main() {
     process.exitCode = 64;
     return;
   }
-  const receipt = recordReceipt(process.cwd(), args);
+  let receipt;
+  try {
+    receipt = recordReceipt(process.cwd(), args);
+  } catch (error) {
+    // The command already passed; a missing receipt only means the receipt
+    // gate will log would-block. Never fail the caller's gate over it.
+    const reason = String(error.stderr || error.message)
+      .trim()
+      .split('\n')[0];
+    process.stderr.write(`gate-run: no receipt recorded (${reason})\n`);
+    return;
+  }
   process.stdout.write(
     `gate-run: recorded tree ${receipt.tree.slice(0, 12)} for "${receipt.command}" (exit ${receipt.exit})\n`
   );

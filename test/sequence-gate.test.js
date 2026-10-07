@@ -181,3 +181,85 @@ test('gate-run: a malformed invocation exits 64 and records nothing', () => {
   assert.equal(run.status, 64);
   assert.equal(existsSync(join(repo, '.agentic', 'receipts', 'gate-run.jsonl')), false);
 });
+
+test('sequence-gate: a code file renamed into a receipt-neutral path still makes the receipt stale', () => {
+  const repo = fixtureRepo();
+  mkdirSync(join(repo, 'src'), { recursive: true });
+  writeFileSync(join(repo, 'src', 'a.js'), 'export const a = 1;\n');
+  git(repo, 'add', '-A');
+  git(repo, 'commit', '-qm', 'code');
+  recordRun(repo);
+  mkdirSync(join(repo, 'doc', 'tasks'), { recursive: true });
+  git(repo, 'mv', 'src/a.js', 'doc/tasks/a.js');
+  git(repo, 'commit', '-qm', 'move code out of src');
+  assert.equal(runGate(repo, 'git push').lines[0].state, 'would-block');
+});
+
+test('sequence-gate: a receipt-neutral path with non-ASCII characters still matches its glob', () => {
+  const repo = fixtureRepo();
+  recordRun(repo);
+  mkdirSync(join(repo, 'doc', 'tasks'), { recursive: true });
+  writeFileSync(join(repo, 'doc', 'tasks', '0001-ação.md'), 'notes\n');
+  git(repo, 'add', '-A');
+  git(repo, 'commit', '-qm', 'task notes with an accent');
+  assert.equal(runGate(repo, 'git push').lines[0].state, 'clear');
+});
+
+test('sequence-gate: git global options before push are still a push', () => {
+  const repo = fixtureRepo();
+  for (const command of [
+    'git -C . push',
+    'git --no-pager push origin x',
+    'git -c push.default=current push',
+  ]) {
+    assert.equal(runGate(repo, command).lines[0]?.action, 'git push', command);
+  }
+});
+
+test('sequence-gate: a malformed gates.json is a runtime-unavailable line, never a failed hook', () => {
+  const repo = fixtureRepo();
+  mkdirSync(join(repo, '.agentic'), { recursive: true });
+  writeFileSync(join(repo, '.agentic', 'gates.json'), '{ not json');
+  recordRun(repo);
+  assert.equal(runGate(repo, 'git push').lines[0].state, 'runtime-unavailable');
+});
+
+test('sequence-gate: a Codex-shaped PreToolUse event is read the same way', () => {
+  const repo = fixtureRepo();
+  const evidenceDir = mkdtempSync(join(tmpdir(), 'sequence-gate-evidence-'));
+  const event = {
+    hook_event_name: 'PreToolUse',
+    session_id: 'sess-codex',
+    transcript_path: null,
+    cwd: repo,
+    model: 'gpt-5-codex',
+    turn_id: 'turn-1',
+    tool_name: 'Bash',
+    tool_use_id: 'call-1',
+    tool_input: { command: 'gh pr create --fill' },
+  };
+  execFileSync('node', [SEQUENCE_GATE], {
+    input: JSON.stringify(event),
+    encoding: 'utf8',
+    env: cleanEnv({ AD_SEQUENCE_GATE_EVIDENCE_DIR: evidenceDir }),
+  });
+  const line = JSON.parse(readFileSync(join(evidenceDir, 'sess-codex.jsonl'), 'utf8'));
+  assert.equal(line.action, 'gh pr create');
+  assert.equal(line.state, 'would-block');
+});
+
+test('gate-run: outside a git repository it records nothing, explains why, and exits 0', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gate-run-no-repo-'));
+  const run = spawnSync(
+    'node',
+    [GATE_RUN, 'record', '--command', 'npm run verify', '--exit', '0'],
+    {
+      cwd: dir,
+      encoding: 'utf8',
+      env: cleanEnv({ GIT_CEILING_DIRECTORIES: tmpdir() }),
+    }
+  );
+  assert.equal(run.status, 0, run.stderr);
+  assert.match(run.stderr, /gate-run: no receipt recorded/);
+  assert.equal(existsSync(join(dir, '.agentic')), false);
+});

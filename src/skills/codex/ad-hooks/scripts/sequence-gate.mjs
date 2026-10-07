@@ -39,8 +39,12 @@ export const DEFAULT_RECEIPT_NEUTRAL = ['doc/tasks/**'];
 // A receipt never invalidates itself, even where `.agentic/` is not ignored.
 const ALWAYS_NEUTRAL = ['.agentic/receipts/**'];
 
+// Global options may sit between `git` and the verb (`git -C dir push`). Words
+// inside a quoted string can still match; the shadow run measures that.
+const GIT_OPTIONS = String.raw`(?:\s+(?:-[Cc]\s+\S+|--?[\w-]+(?:=\S+)?))*`;
+
 const ACTIONS = [
-  { id: 'git push', pattern: /(^|[\s;&|(])git\s+push\b/ },
+  { id: 'git push', pattern: new RegExp(String.raw`(^|[\s;&|(])git${GIT_OPTIONS}\s+push\b`) },
   { id: 'gh pr create', pattern: /(^|[\s;&|(])gh\s+pr\s+create\b/ },
 ];
 
@@ -70,9 +74,11 @@ export function receiptNeutral(root) {
   return Array.isArray(config.receiptNeutral) ? config.receiptNeutral : DEFAULT_RECEIPT_NEUTRAL;
 }
 
+// --no-renames: a rename reports both sides, so a file moved into a neutral
+// path still shows its source. -z: paths arrive unquoted, accents included.
 function changedPaths(root, fromTree, toTree) {
-  const out = git(root, ['diff', '--name-only', fromTree, toTree]);
-  return out ? out.split('\n') : [];
+  const out = git(root, ['diff', '--name-only', '--no-renames', '-z', fromTree, toTree]);
+  return out.split('\0').filter(Boolean);
 }
 
 /** The newest passing receipt that covers `tree`, or null. */
