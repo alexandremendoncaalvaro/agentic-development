@@ -20,7 +20,7 @@ Step 1 — determine NNNN and slug. Run `node .agents/skills/ad-task/scripts/nex
 Step 2 — interview to fill. Ask one question per missing field, in this order:
 - Context: why this task exists, what problem it solves, any assumption being tested.
 - Acceptance Criteria: measurable conditions. Each is a checkbox; pass/fail must be observable, not aspirational ("loads in under 2s", not "fast enough").
-- Plan: concrete sequential steps with file paths where applicable. Each is a checkbox.
+- Plan: concrete sequential steps with file paths where applicable. Each is a checkbox. Slice vertically; the one exception is a wide mechanical refactor (rename a column, retype a shared symbol) that breaks so many call sites at once that no slice can land green — sequence it as expand–contract instead: add the new form beside the old, migrate call sites in batches sized by blast radius, then delete the old form once no caller remains.
 - Scope ref: require the exact repository-local anchor validated in Step 0, with an optional section or roadmap-tier suffix. It is mandatory; a board reference never replaces it.
 - Evidence ref: leave blank when creating a proposed task unless a durable evidence record already grounds its implementation decision. Before non-trivial implementation begins, ad-ground fills it with the validated `doc/research/NNNN-ground-<slug>.md` receipt; it supplements Scope ref, which remains the admission anchor.
 - Owner: ask.

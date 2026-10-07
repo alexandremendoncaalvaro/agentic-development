@@ -63,7 +63,7 @@ If the user starts with a solution, validate it against the Today statement and 
 
 Do not invent values. When the user does not know, leave `<TODO>` in the field and continue.
 
-Step 4 — interview UX. Codex has no `AskUserQuestion` primitive. Use inline numbered text for multi-choice prompts. One question per turn; do not chain three text questions in one message.
+Step 4 — interview UX. For multi-choice prompts, use Codex's `request_user_input` tool when the session exposes it (one to three short questions with options; only some collaboration modes offer it), otherwise inline numbered text. One question per turn; do not chain three text questions in one message.
 
 Step 5 — write the file. Path: `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` (multi-product). Use the template at [references/prd-template.md](references/prd-template.md). Stop after writing. Do not flip status to `accepted` — that requires user review.
 

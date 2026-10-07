@@ -71,6 +71,13 @@ Phase 3 — draft body. Template:
 ## Summary
 - <1-3 bullets — the WHY, not the what>
 
+## Evidence
+- Before: <failing test run, output, or screenshot>
+- After: <passing test run, output, or screenshot>
+
+## Merge danger
+- <one-way or two-way door>; blast radius: <who or what this can break>
+
 ## Test plan
 - [ ] <test 1>
 - [ ] <test 2>
@@ -81,6 +88,9 @@ Phase 3 — draft body. Template:
 
 Rules:
 - Summary: explain motivation. The commit list and diff already show the what. 1-3 bullets max.
+- Evidence (optional): a before and after a reviewer can trust without re-running — the failing then passing test, the command output, a screenshot for a visual change. Skip it — and omit the heading — when the test plan already shows the change working. Never fabricate evidence.
+- Merge danger (optional, recommended for anything not trivially reversible): say whether the change is a two-way door (cheap to roll back) or a one-way door (a migration, a published artifact, a deleted resource), and its blast radius — who or what it can break. A reviewer judges risk from this line without reading the diff. Omit the heading when you cannot state it from the diff; never guess a door.
+- Diagram (optional): one small diagram (a sequence, a call tree, a file-tree diff) in the summary when it explains the change better than prose; never more than the question needs.
 - Test plan: concrete steps a reviewer can run. `npm test`, manual smoke, integration check. Skip the section if there is genuinely nothing to test (pure docs PR). Never fabricate test items.
 - Links: every detected back-link from Phase 2. Skip the section if there are none. Never invent links.
 

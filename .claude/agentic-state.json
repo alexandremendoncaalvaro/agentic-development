@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "kitVersion": "1.0.0",
+  "kitVersion": "1.1.0",
   "agent": "claude-code",
   "skills": {
     "ad-adr": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-adr/references/adr-template.md",
@@ -21,7 +21,7 @@
       ]
     },
     "ad-architecture": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-architecture/references/architecture-template.md",
@@ -38,7 +38,7 @@
       ]
     },
     "ad-archive": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-archive/scripts/find-terminal.mjs",
@@ -51,7 +51,7 @@
       ]
     },
     "ad-audit": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/agents/audit-group-reviewer.md",
@@ -68,7 +68,7 @@
       ]
     },
     "ad-bootstrap": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-bootstrap/references/agents-template.md",
@@ -85,7 +85,7 @@
       ]
     },
     "ad-brief": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-brief/evals/evals.json",
@@ -106,7 +106,7 @@
       ]
     },
     "ad-commit": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-commit/references/conventional-commits.md",
@@ -123,7 +123,7 @@
       ]
     },
     "ad-community-docs": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-community-docs/references/contributing-template.md",
@@ -144,7 +144,7 @@
       ]
     },
     "ad-deepen": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-deepen/references/vocabulary.md",
@@ -157,7 +157,7 @@
       ]
     },
     "ad-derisk": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-derisk/SKILL.md",
@@ -166,7 +166,7 @@
       ]
     },
     "ad-design": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-design/SKILL.md",
@@ -175,7 +175,7 @@
       ]
     },
     "ad-diagnose": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-diagnose/references/loop-recipes.md",
@@ -187,12 +187,12 @@
         },
         {
           "path": ".claude/skills/ad-diagnose/SKILL.md",
-          "sourceSha": "98e924805a85f5f46e3269b14cdca66cae69d30dbe18fcfd03e336239c529e44"
+          "sourceSha": "ee075578419dd44563e957f1b6d3fd72cfdfafc866f0a68a0691299659498c1a"
         }
       ]
     },
     "ad-domain": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-domain/references/context-templates.md",
@@ -205,7 +205,7 @@
       ]
     },
     "ad-drift": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-drift/scripts/drift-scan.mjs",
@@ -218,7 +218,7 @@
       ]
     },
     "ad-grill-me": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-grill-me/SKILL.md",
@@ -227,7 +227,7 @@
       ]
     },
     "ad-ground": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-ground/references/output-format.md",
@@ -248,7 +248,7 @@
       ]
     },
     "ad-guidelines": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-guidelines/references/guidelines-template.md",
@@ -265,7 +265,7 @@
       ]
     },
     "ad-handoff": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-handoff/references/handoff-template.md",
@@ -278,7 +278,7 @@
       ]
     },
     "ad-hooks": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-hooks/references/hook-commands.md",
@@ -311,7 +311,7 @@
       ]
     },
     "ad-level-up": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/agents/rule-candidate-reviewer.md",
@@ -319,12 +319,12 @@
         },
         {
           "path": ".claude/skills/ad-level-up/SKILL.md",
-          "sourceSha": "4892a8a2e1d40201d8f78c09e6e56e039a724cf04345594e69479d31af1379d4"
+          "sourceSha": "f13025a8e393a8225eeece10b664e5e7ccba053ba7e85e65ecb80ec026ab7033"
         }
       ]
     },
     "ad-merge": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-merge/scripts/gh-preflight.mjs",
@@ -337,7 +337,7 @@
       ]
     },
     "ad-next": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-next/scripts/survey.mjs",
@@ -350,7 +350,7 @@
       ]
     },
     "ad-philosophy": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-philosophy/SKILL.md",
@@ -359,7 +359,7 @@
       ]
     },
     "ad-pr": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-pr/scripts/gh-preflight.mjs",
@@ -367,12 +367,12 @@
         },
         {
           "path": ".claude/skills/ad-pr/SKILL.md",
-          "sourceSha": "468e50493a4887558346a511557d2603772147845837c7adae5c7ac316084048"
+          "sourceSha": "788a05ada1e7e18f77057196d8fcf15258e29efd6376832728ca834db9086593"
         }
       ]
     },
     "ad-prd": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-prd/references/prd-template.md",
@@ -385,7 +385,7 @@
       ]
     },
     "ad-prism": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-prism/assets/audit.md",
@@ -442,7 +442,7 @@
       ]
     },
     "ad-project-state": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-project-state/references/configuration.md",
@@ -459,7 +459,7 @@
       ]
     },
     "ad-publish": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-publish/references/channel-capabilities.md",
@@ -500,7 +500,7 @@
       ]
     },
     "ad-question-me": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-question-me/SKILL.md",
@@ -509,7 +509,7 @@
       ]
     },
     "ad-release": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-release/scripts/release-plan.mjs",
@@ -530,7 +530,7 @@
       ]
     },
     "ad-report": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-report/references/composition.md",
@@ -563,7 +563,7 @@
       ]
     },
     "ad-research": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-research/references/research-template.md",
@@ -576,7 +576,7 @@
       ]
     },
     "ad-review": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/agents/fresh-context-reviewer.md",
@@ -589,7 +589,7 @@
       ]
     },
     "ad-roadmap": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-roadmap/references/output-templates.md",
@@ -602,7 +602,7 @@
       ]
     },
     "ad-rules": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-rules/scripts/resolve-global-rules.mjs",
@@ -615,7 +615,7 @@
       ]
     },
     "ad-skill": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-skill/SKILL.md",
@@ -624,7 +624,7 @@
       ]
     },
     "ad-spec": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-spec/references/spec-template.md",
@@ -641,7 +641,7 @@
       ]
     },
     "ad-spike": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-spike/references/eval-format.md",
@@ -666,7 +666,7 @@
       ]
     },
     "ad-subagent": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-subagent/SKILL.md",
@@ -675,7 +675,7 @@
       ]
     },
     "ad-task": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-task/references/task-template.md",
@@ -691,21 +691,21 @@
         },
         {
           "path": ".claude/skills/ad-task/SKILL.md",
-          "sourceSha": "c3a5b55b46c4c8348b51673ad122c9f78c44333e29e71a32d4abbe544d4bcde3"
+          "sourceSha": "09018cf9575e5dde9a55b48c95c90a34df7e07e5cb83fbe5547b125dd301c88a"
         }
       ]
     },
     "ad-tdd": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-tdd/SKILL.md",
-          "sourceSha": "c1f413d5831b21f6819cac15765a663997e5aae50ccf46f2ca07b9b28bb12f47"
+          "sourceSha": "9e318646ad3f57c70fd61b0496c2898c585fcc7a72a975c7cd4a437f3960ec5d"
         }
       ]
     },
     "ad-tdg": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-tdg/SKILL.md",
@@ -714,7 +714,7 @@
       ]
     },
     "ad-template-tune": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-template-tune/references/curation.md",
@@ -735,7 +735,7 @@
       ]
     },
     "ad-update": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-update/SKILL.md",
@@ -744,7 +744,7 @@
       ]
     },
     "ad-voice": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-voice/references/application.md",
@@ -769,7 +769,7 @@
       ]
     },
     "ad-voice-tune": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": [
         {
           "path": ".claude/skills/ad-voice-tune/references/calibration.md",

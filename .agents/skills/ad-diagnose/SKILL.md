@@ -25,6 +25,8 @@ Route elsewhere when:
 - The technique itself is uncertain across multiple plausible approaches → `ad-spike` (WORKFLOW §14).
 - The spec or expected behavior is unclear → `ad-grill-me`.
 
+Redact. This skill shows commands, output and captured artifacts. Redact every secret before showing any of them: write `<REDACTED>` in its place. Build the loop against environment variables so a credential stays in the environment rather than in what you show, and quote only the lines of a captured artifact that carry the signal. If the redacted output is not enough to diagnose, say so and ask the user.
+
 Phase 1 — build a feedback loop. **This is the skill. Everything else is mechanical.** A fast, deterministic, agent-runnable pass/fail signal for the bug is what enables every later phase. Without a loop, no amount of staring at code finds the cause.
 
 Spend disproportionate effort here. Be aggressive. Refuse to give up.
@@ -42,16 +44,24 @@ A 30-second flaky loop is barely better than no loop. A 2-second deterministic l
 
 Non-deterministic bugs. Goal is not a clean repro but a higher reproduction rate. Loop the trigger 100×, parallelize, add stress, narrow timing windows, inject sleeps. A 50%-flake bug is debuggable; 1% is not — keep raising the rate.
 
-When you genuinely cannot build a loop. Stop and say so explicitly. List what you tried. Ask the user for one of: (a) access to whatever environment reproduces it, (b) a captured artifact (HAR file, log dump, core dump, screen recording with timestamps), (c) permission to add temporary production instrumentation. Do not proceed to Phase 3 without a loop.
+When you genuinely cannot build a loop. Stop and say so explicitly. List what you tried. Ask the user for one of: (a) access to whatever environment reproduces it, (b) a redacted captured artifact (HAR file, log dump, core dump, screen recording with timestamps), (c) permission to add temporary production instrumentation. Do not proceed to Phase 3 without a loop.
 
-Phase 2 — reproduce. Run the loop. Watch the bug appear.
+Phase 1 is done when you can name one command (a test invocation, a script, a curl) that you have already run at least once, with its invocation and redacted output shown, and that is:
+- Red-capable: it drives the bug's code path and asserts the user's exact symptom, so it goes red on this bug and green once fixed — not merely "runs without erroring".
+- Deterministic: the same verdict every run (for a flaky bug, a pinned and high reproduction rate).
+- Fast: seconds, not minutes.
+- Agent-runnable: it runs unattended.
+
+Phase 2 — reproduce and minimise. Run the loop. Watch the bug appear.
 
 Confirm:
 - The loop produces the failure mode the user described — not a different failure that happens to be nearby. Wrong bug = wrong fix.
 - The failure is reproducible across multiple runs (or, for non-deterministic bugs, at a high enough rate to debug).
 - You captured the exact symptom (error message, wrong output, slow timing) so later phases can verify the fix actually addresses it.
 
-Do not proceed until the bug reproduces.
+Minimise. Once the loop is red, shrink the scenario to the smallest one that still fails. Remove inputs, callers, configuration, data and steps one at a time, re-running the loop after each cut, and keep only what the failure needs. A minimal repro narrows the hypotheses in Phase 3 and becomes the regression test in Phase 5. Done when every remaining element is load-bearing: removing any one of them turns the loop green (for a flaky bug, drops the reproduction rate to its baseline). When the loop replays a captured artifact you cannot shrink, say so and move on.
+
+Do not proceed until the bug reproduces and the repro is minimised.
 
 Phase 3 — hypothesise. Generate **3–5 ranked hypotheses** before testing any of them. Single-hypothesis generation anchors on the first plausible idea — this is the most common debugging failure mode after no-loop.
 

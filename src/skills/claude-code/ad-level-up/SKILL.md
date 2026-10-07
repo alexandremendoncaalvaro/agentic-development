@@ -26,7 +26,7 @@ Recommend the layer from the rule's own content (does it generalize beyond this 
 
 One sentence plus the citation (a finding, PR, transcript, or `file:line` — or the `ad-audit` handoff that surfaced it). If it cannot be cited, stop — it is not grounded, and a lone uncited slip is a memory note, not a rule.
 
-A **PR-history harvest** is a first-class candidate source (ADR-0047): periodically — monthly-ish, or after a dense review round — scan the recent merged PRs for defects reviewers missed and review comments that repeat; each recurring gap arrives with its citations built in. Harvest is a source, not a bypass: every harvested candidate still clears Steps 2–7.
+A **PR-history harvest** is a first-class candidate source (ADR-0047): periodically — monthly-ish, or after a dense review round — scan the recent merged PRs for defects reviewers missed and review comments that repeat; each recurring gap arrives with its citations built in. Harvest is a source, not a bypass: every harvested candidate still clears Steps 2–7. Session transcripts are a candidate source too: a recurring correction, a repeated wasted step, or a gate the agent skipped, each cited by transcript path and line; a transcript candidate clears Steps 2–7 like any other, recurrence gate included.
 
 ## Step 2 — Trace to root cause
 
@@ -44,6 +44,7 @@ All four must pass; reject the rest **out loud**:
 ## Step 4 — Effectiveness pass
 
 - **Classify:** improvement · correction · increment · **merge into an existing rule** · **extend an existing rule** · **reject**. Prefer sharpening / merging / extending over adding a new line.
+- **Machine-checkable?** A mechanical violation — a forbidden pattern, a missing file, a format a script can test — belongs in a deterministic check (a hook through `/ad-hooks`, a lint rule, a test), not in rule text an agent may skip (WORKFLOW §11). Classify it **reject** as rule text and record the route ("routed to `/ad-hooks`" or the lint rule) in the report; the check itself is built through that skill or a task, behind its own owner approval, never written by this skill.
 - **Redundancy:** does an existing rule (or a repo binding doc) already watch this? If so, merge — never add an overlapping rule.
 - **Real behaviour:** does it catch a defect actually observed (cite it), or a hypothetical? A rule guarding a defect nobody has hit is dead weight — reject or shelve as a note.
 - **Dead-rule sweep:** if an existing rule no longer maps to real behaviour or is subsumed by another, flag it for retirement in the same proposal.

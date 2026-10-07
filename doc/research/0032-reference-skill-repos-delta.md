@@ -86,6 +86,17 @@ None material. The batched-grilling claim conflicts with `ad-grill-me`'s one-que
 
 All sources accessed 2026-10-06 by blob-less clone (GitHub repositories) or WebFetch (platform.claude.com, code.claude.com, agentskills.io). Full candidate table with 28 rows, commit SHAs and per-row grading: session scratchpad `research-A-references.md` (not committed; the graded claims above are the durable record).
 
+## Correction
+
+Conclusion item 3 overstated the gap. The ADR-0080 harness already proves a
+grader can fail: `coverageReport` in `eval/lib/corpus.mjs` reports a gap for
+any case without an `intentionally-broken` receipt, and the replay's
+`declared_failure_check` (`eval/lib/replay.mjs`) requires that receipt to
+fail for its declared reason. The sidecar searched for "mutation" and missed
+the mechanism under its own name. What remains open is the other half, for
+live comparisons only: baseline headroom and noise below the minimum lift,
+which belong in `/ad-prism`'s evaluation design, not in the replay lane.
+
 ## Derived decision
 
 None yet. Item 1 is a defect fix through a normal task. Items 2 to 5 and the runners-up go through `/ad-level-up` or individual tasks on the owner's approval.
