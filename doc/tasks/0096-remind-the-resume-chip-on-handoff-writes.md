@@ -14,7 +14,7 @@
 The owner asked for the resume chip to be the default at handoff on Claude
 Code. `/ad-handoff` already asks for it, and RESEARCH-0033 measured that
 the skill is followed whenever it runs; the only miss was a handoff written
-without the skill. ADR-0087 (proposed) adds a third reminder to the
+without the skill. ADR-0087 adds a third reminder to the
 `ad-hooks` session tier that fires on the write itself, so the chip reaches
 the model whether or not the skill ran.
 
@@ -115,6 +115,12 @@ and carries a kill switch, but the `Stop` nudge keeps a once-per-session flag
 file and has no switch; both now say so. The live-check quote above is
 elided; the full text is `reminder(path)` in the pinned blob for that path,
 which a reviewer can reproduce without the host.
+
+### 2026-10-06 — ADR accepted
+
+The owner accepted ADR-0087 in chat; `doc/adr/PROJECTION.md` now counts 63
+accepted ADRs in the same commit. It retires no part of another record, so
+it adds no table row.
 
 ## Definition of Done
 

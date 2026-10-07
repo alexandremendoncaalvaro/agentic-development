@@ -1,6 +1,6 @@
 # ADR-0087: `ad-hooks` reminds the model to offer the resume chip when a handoff is written
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-10-06
 **Deciders:** Alexandre Alvaro
 **Related:** ADR-0055, ADR-0074 (same reminder class); ADR-0083 (not amended: this reminder is outside its gate rules)
