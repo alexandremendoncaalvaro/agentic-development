@@ -121,6 +121,76 @@ severity and disposition:
 Local gate at b55e6b6's tree: `npm run verify` exit 0, 1320 tests,
 0 vulnerabilities.
 
+### 2026-10-07 — audit and re-review at 0894759
+
+`/ad-audit` of origin/main..0894759 (CV with two cross-model passes in two
+orders, GH, HK, AGENTS.md, GUIDELINES.md, ARCHITECTURE and CONTEXT, ADRs; NET
+not applicable; every changed file read by at least one reviewer, installed
+copies checked by `cmp`; anchors matched; gate at 0894759: `npm run verify`
+exit 0 on Node v24.16.0, 1320 tests) and a two-axis re-review of
+534102f..0894759. No blocker. Every finding, with severity and disposition:
+
+1. CV Major/Minor (all three CV passes): the implementation entry's "438
+   lines before, 378 after" matches no commit. Corrected here: measured with
+   `git cat-file -p <commit>:<path>` and Python, `sequence-gate.mjs` was 399
+   lines at the base, 382 at 714b458 and 406 at 0894759; the earlier figures
+   were uncommitted states. It is 360 after 9d4d7f8.
+2. GUIDELINES Major (3.2, 3.4): `tokenize` exceeded the complexity and
+   nesting limits. Fixed in 9d4d7f8: three readers, two levels deep,
+   behaviour unchanged.
+3. GUIDELINES Minor (3.3): `sequence-gate.mjs` passed 400 lines. Fixed: the
+   bot-review command check moved to `review-receipts.mjs`.
+4. GUIDELINES Minor (9.5): two fixed-bug tests lacked the regression name.
+   Fixed. The latency fix has no test: its effect is a time, measured in the
+   review entry and not deterministic enough to pin; accepted.
+5. GUIDELINES Minor (12.x): the hook could read `.env` or `.npmrc` named as
+   a body file. Fixed test-first: never read, `runtime-unavailable`.
+6. GUIDELINES Minor (2.2): the `githubCommands` fallback was silent. Accepted
+   with a comment: a broken `gates.json` surfaces as the runtime-unavailable
+   line of every check that reads it.
+7. GUIDELINES Minor (2.2): `checkPublish`'s comment said "or null". Fixed.
+8. GUIDELINES Minor: `bash -c "..."` and global-flag forms are invisible.
+   Accepted: listed for Task 0110.
+9. GUIDELINES Nit: short callback names. Accepted: the house lint passes;
+   the renamed `tokenize` uses full names.
+10. CV Minor (passes A, B): timings, the real-path run and the mutation
+    checks have no retained artifact. Accepted as a label: author-reported,
+    observed in the authoring session. Pass B reproduced the real-path
+    behaviour and the latency direction (about 0.03 s per unrelated call) in
+    a temporary repository.
+11. CV Minor (pass A): GROUND-0041 D2's approved file is a local copy.
+    Fixed: D2 says so; the published half is reopenable at pull request 162.
+12. CV Major (pass A): CHANGELOG and ADR-0089 stated the Slack hook as fact
+    without a live send. Fixed: both say it rests on both hosts'
+    documentation and simulated events, not yet observed live (the Slack
+    connector is not authenticated in this session).
+13. CV Minor (pass B): the review entry grouped one Spec Note (task state).
+    Accepted: it was consistent with a review in progress, as the reviewer
+    said.
+14. CV Minor (primary pass): the delta re-review was not recorded. Recorded
+    in this entry.
+15. ARCH/CONTEXT Minor: ARCHITECTURE said the gate runs on Bash only. Fixed.
+16. ARCH/CONTEXT Minor: **Gate evidence line** listed head and tree for every
+    receipt-gate line. Fixed: it names the publish line's hash and the
+    runtime-unavailable shape.
+17. ARCH/CONTEXT Nit: Observability omitted `publish.jsonl`. Fixed.
+18. ADRs Minor: the fourth addendum narrowed "chat send" without saying
+    whether it retires anything. Fixed: a coverage limit, decision 2 binds
+    unchanged; no PROJECTION change.
+19. ADRs Nit: the line counts (item 1).
+20. Re-review Standards Note: a `cd` inside `( ... )` or `{ ...; }` was
+    missed. Fixed test-first.
+21. Re-review Standards and Spec Note: an error line was written even with
+    the publish check off. Fixed: the switch is read first.
+22. Re-review Spec Note: quoted verbs (`"gh" "pr" "comment"`) skip the
+    pre-filter. Accepted: listed for Task 0110.
+23. Re-review Spec Note: "Code review completed" was ticked before this
+    re-review. Accepted: this entry records it.
+
+GH, HK and AGENTS.md: no finding; GH.3 (rules in flight) is re-run before
+the push. Local gate after the fixes (8e98828's tree): `npm run verify` exit
+0, 1322 tests, 0 vulnerabilities.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
