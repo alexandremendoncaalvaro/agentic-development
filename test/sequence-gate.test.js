@@ -828,3 +828,22 @@ test('regression: task-0109 audit, an unreadable gates.json surfaces on a commen
     assert.equal(publish.check, 'publish', command);
   }
 });
+
+test('regression: task-0109 review, a gates.json that is not an object surfaces too, on comments and chat sends', () => {
+  const repo = fixtureRepo();
+  mkdirSync(join(repo, '.agentic'), { recursive: true });
+  for (const content of ['null', '5', '[]']) {
+    writeFileSync(join(repo, '.agentic', 'gates.json'), content);
+    const [comment] = runGate(repo, 'ghp pr comment 1 --body hi').lines;
+    assert.equal(comment?.state, 'runtime-unavailable', content);
+    const [chat] = runEvent(repo, 'mcp__s__slack_send_message', { channel_id: 'C', message: 'hi' });
+    assert.equal(chat?.state, 'runtime-unavailable', content);
+  }
+  writeFileSync(join(repo, '.agentic', 'gates.json'), '{broken');
+  const lines = runGate(repo, 'git push origin fix-comment').lines;
+  assert.deepEqual(
+    lines.map((l) => l.check),
+    ['gate-run'],
+    'a branch name is not a comment'
+  );
+});

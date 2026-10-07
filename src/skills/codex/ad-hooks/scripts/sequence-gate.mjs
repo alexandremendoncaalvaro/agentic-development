@@ -113,9 +113,16 @@ export function globToRegExp(glob) {
   return new RegExp(`^${source}$`);
 }
 
+// A missing file is the default configuration; anything other than a JSON
+// object is unreadable, never a silent default.
 function gatesConfig(root) {
   const file = join(root, '.agentic', 'gates.json');
-  return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {};
+  if (!existsSync(file)) return {};
+  const config = JSON.parse(readFileSync(file, 'utf8'));
+  if (config === null || typeof config !== 'object' || Array.isArray(config)) {
+    throw new Error('.agentic/gates.json is not a JSON object');
+  }
+  return config;
 }
 
 /**
@@ -324,7 +331,7 @@ function logPublication(event, cwd) {
   }
 }
 
-const MAY_PUBLISH = /\bcomment\b|\/comments\b/;
+const MAY_PUBLISH = /\b(?:pr|issue)\b[\s\\]+comment\b|\/comments\b/;
 const MAY_ACT =
   /\bpush\b|\bpr\b[\s\\]+(?:create|ready|merge|comment)\b|\bissue\b[\s\\]+comment\b|\/comments\b/;
 
