@@ -1678,10 +1678,10 @@ test('ad-audit runs the full gate once and reviewers run only targeted tests, on
 
 // task-0097: practices absorbed from the reference repositories (RESEARCH-0032)
 // and the corrected Codex structured-question line (RESEARCH-0033 E10).
-const BOTH_HOSTS = (skill) => [`claude-code/${skill}/SKILL.md`, `codex/${skill}/SKILL.md`];
+const bothHosts = (skill) => [`claude-code/${skill}/SKILL.md`, `codex/${skill}/SKILL.md`];
 
 test('ad-diagnose redacts secrets, minimises the repro, and closes Phase 1 on a run red-capable command, on both hosts', () => {
-  for (const rel of BOTH_HOSTS('ad-diagnose')) {
+  for (const rel of bothHosts('ad-diagnose')) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
     assert.match(body, /redact/i, `${rel} does not ask to redact secrets`);
     assert.match(body, /minimise/i, `${rel} lost the Minimise step`);
@@ -1697,7 +1697,7 @@ test('ad-diagnose redacts secrets, minimises the repro, and closes Phase 1 on a 
 });
 
 test('ad-pr offers Evidence and Merge danger sections and an optional diagram, on both hosts', () => {
-  for (const rel of BOTH_HOSTS('ad-pr')) {
+  for (const rel of bothHosts('ad-pr')) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
     assert.match(body, /## Evidence/, `${rel} has no Evidence section`);
     assert.match(body, /## Merge danger/, `${rel} has no Merge danger section`);
@@ -1708,7 +1708,7 @@ test('ad-pr offers Evidence and Merge danger sections and an optional diagram, o
 });
 
 test('ad-tdd names the tautological test, on both hosts', () => {
-  for (const rel of BOTH_HOSTS('ad-tdd')) {
+  for (const rel of bothHosts('ad-tdd')) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
     assert.match(body, /tautological/i, `${rel} does not name the tautological test`);
     assert.match(
@@ -1720,7 +1720,7 @@ test('ad-tdd names the tautological test, on both hosts', () => {
 });
 
 test('expand–contract is the named exception to vertical slicing, in WORKFLOW and ad-task on both hosts', () => {
-  for (const rel of BOTH_HOSTS('ad-task')) {
+  for (const rel of bothHosts('ad-task')) {
     assert.match(
       readFileSync(join(SKILLS_ROOT, rel), 'utf8'),
       /expand–contract/,
@@ -1732,7 +1732,7 @@ test('expand–contract is the named exception to vertical slicing, in WORKFLOW 
 });
 
 test('ad-level-up reads session transcripts and routes mechanical violations to a hook or lint rule, on both hosts', () => {
-  for (const rel of BOTH_HOSTS('ad-level-up')) {
+  for (const rel of bothHosts('ad-level-up')) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
     assert.match(body, /session transcript/i, `${rel} does not accept transcripts as a source`);
     assert.match(body, /mechanical violation/i, `${rel} has no mechanical-violation routing`);

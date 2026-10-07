@@ -73,6 +73,30 @@ match `mechanical violation`, require the Phase-1 output to be shown, and
 assert that the five Codex bodies name `request_user_input` and the
 fallback.
 
+### 2026-10-07 — audit dispositions
+
+`/ad-audit` over 4754695 (seven groups: CV with a second pass on another
+model and reversed order, GH, AGENTS.md, GUIDELINES.md, ARCHITECTURE.md and
+CONTEXT.md, the touched ADRs; HK and NET not applicable, no hook or .NET
+surface): no blocker. Dispositions, fixed in the follow-up commit unless
+stated:
+
+- The red run is now reproducible: with the commit's test file over the
+  `ee0ddd4` skill bodies and `WORKFLOW.md` (`git checkout ee0ddd4 --
+  src/skills WORKFLOW.md` in a disposable worktree, then `node --test
+  test/skills.test.js`), the six new tests fail and the other 668 pass.
+- The Plan and Definition of Done were ticked before this audit ran; they
+  stand from this entry on, which records the audit.
+- Review files under `.agentic/reviews/` are gitignored by design; the
+  findings and dispositions quoted in this log are the tracked record, as
+  `/ad-review` requires. Raised by CV in two consecutive audits, so it goes
+  to `/ad-level-up` as a candidate (CV.5 against the review-file design).
+- `BOTH_HOSTS` renamed `bothHosts` (GUIDELINES §2.1).
+- GUIDELINES §10.3 now names the optional PR sections, so the binding doc
+  matches `/ad-pr`.
+- A transcript candidate clears the same gates as any other, recurrence
+  included (ADR-0037 D3).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

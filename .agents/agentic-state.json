@@ -391,7 +391,7 @@
         },
         {
           "path": ".agents/skills/ad-level-up/SKILL.md",
-          "sourceSha": "2cf01609ec7331fea13fd7d5b6099f3a1170aea636a1a7b9f4336fad3fce656c"
+          "sourceSha": "dfc2025706b147fa35f4edde9e4651a99713c70e04951e5db56bafd3c2919689"
         },
         {
           "path": ".codex/agents/rule-candidate-reviewer.toml",

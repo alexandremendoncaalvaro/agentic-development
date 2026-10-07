@@ -26,7 +26,7 @@ Recommend the layer from the rule's own content (does it generalize beyond this 
 
 One sentence plus the citation (a finding, PR, transcript, or `file:line` — or the `ad-audit` handoff that surfaced it). If it cannot be cited, stop — it is not grounded, and a lone uncited slip is a memory note, not a rule.
 
-A **PR-history harvest** is a first-class candidate source (ADR-0047): periodically — monthly-ish, or after a dense review round — scan the recent merged PRs for defects reviewers missed and review comments that repeat; each recurring gap arrives with its citations built in. Harvest is a source, not a bypass: every harvested candidate still clears Steps 2–7. Session transcripts are a candidate source too: a recurring correction, a repeated wasted step, or a gate the agent skipped, each cited by transcript path and line.
+A **PR-history harvest** is a first-class candidate source (ADR-0047): periodically — monthly-ish, or after a dense review round — scan the recent merged PRs for defects reviewers missed and review comments that repeat; each recurring gap arrives with its citations built in. Harvest is a source, not a bypass: every harvested candidate still clears Steps 2–7. Session transcripts are a candidate source too: a recurring correction, a repeated wasted step, or a gate the agent skipped, each cited by transcript path and line; a transcript candidate clears Steps 2–7 like any other, recurrence gate included.
 
 ## Step 2 — Trace to root cause
 
