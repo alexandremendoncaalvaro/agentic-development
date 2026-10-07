@@ -1,6 +1,6 @@
 # Task `0107`: Check the gate-run receipt before push, in shadow
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md (decisions 1 to 4, gate-run check)
 **Evidence ref:** doc/research/0038-ground-gate-run-receipt-shadow-check.md
@@ -29,7 +29,7 @@ and its evidence line before the other checks reuse them.
 - [x] `/ad-ground` the `PreToolUse` input shapes on both hosts and the evidence line format; record the GROUND study.
 - [x] Red, then green (`/ad-tdd`); partly test-after with mutation checks, see Notes 2026-10-07.
 - [x] `ad-hooks` text and wiring; ARCHITECTURE and CONTEXT terms; CHANGELOG.
-- [ ] `/ad-review`; `/ad-audit`; `/ad-commit`; PR on the owner's approval.
+- [x] `/ad-review`; `/ad-audit`; `/ad-commit`; PR on the owner's approval.
 
 ## Notes
 
@@ -190,6 +190,12 @@ deb910f to 6c9d498, 84db1af to 5898743, 2dfdf8c to 74b47d7, 2bceb12 to
 re-audit at 1b39846 therefore cover 74b47d7 and 92d7b7e. Commits 6c5b258 and
 earlier, including every code commit before 2bceb12, kept their SHAs.
 
+### 2026-10-07 — Closed
+
+Pull request 161 passed CI on Ubuntu and Windows with Node 22.13 and 24 and
+merged as 108f603. The shadow sequence gate is wired in this repository from
+that commit; Task 0110 reads its evidence.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -197,4 +203,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
