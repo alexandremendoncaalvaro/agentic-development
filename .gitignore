@@ -5,6 +5,7 @@ node_modules/
 .env.local
 .npmrc
 .agentic/reviews/
+.agentic/receipts/
 .agentic/leak-denylist.txt
 /rules/
 .agentic/rules/

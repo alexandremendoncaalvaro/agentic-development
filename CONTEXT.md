@@ -580,6 +580,36 @@ hook is the host mechanism, the gate is what the kit runs on it).
 **Related code:** [`src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs);
 decision recorded in [`doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md`](doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md).
 
+### Workflow receipt
+
+**Definition:** a machine-readable record that a workflow step ran for an exact
+state: the local CI-mirror run for a working-copy git tree (the gate-run
+receipt, in `.agentic/receipts/gate-run.jsonl`), and, as ADR-0089's later
+slices land, a review or audit for a commit and an outward-text approval for a
+body hash. A local working copy; the durable record stays the tracked task
+Notes or pull request body (rule CV.5).
+
+_Avoid_: bare "receipt" (an **Evaluation receipt** is the harness's frozen
+record of trials); "proof" (it records that a step ran, not that it was done
+well).
+
+**Related code:** [`src/skills/claude-code/ad-hooks/scripts/gate-run.mjs`](src/skills/claude-code/ad-hooks/scripts/gate-run.mjs);
+decision recorded in [`doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md`](doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md).
+
+### Receipt gate
+
+**Definition:** a **Runtime gate** on `PreToolUse` that, before a landing or
+outward action, checks that the **Workflow receipt** the action depends on
+exists and is fresh for the current state, and appends a `clear`,
+`would-block` or `runtime-unavailable` line to its own evidence file,
+`<tmpdir>/agentic-sequence-gate/<session_id>.jsonl`. It ships in shadow mode
+only: it always exits 0, prints nothing and never denies (ADR-0089).
+
+_Avoid_: "enforcement" or "block" for the shadow form (nothing is stopped);
+"validator gate" (it checks existence and freshness, never content).
+
+**Related code:** [`src/skills/claude-code/ad-hooks/scripts/sequence-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/sequence-gate.mjs).
+
 ### Gate terminal state
 
 **Definition:** the one outcome a runtime gate firing ends in, from a closed
@@ -690,6 +720,8 @@ roadmap line in [`doc/product/PRD.md`](doc/product/PRD.md).
   `approval_granted` events a non-interactive stream cannot carry.
 
 - The **Companion plugin** sits beside the **Kit**, never inside it: the `agentic` installer neither installs nor requires it. Its context band is the on-screen counterpart of the `Stop` handoff **Session reminder**, which stays the fallback where the plugin is absent.
+
+- A **Receipt gate** reads a **Workflow receipt** and writes **Gate evidence lines**; neither the receipt nor the line is an **Evaluation receipt**.
 
 - A **Runtime gate** runs on a host lifecycle hook and ends in one **Gate terminal state**; a firing on a **Governed artifact** appends one **Gate evidence line**; the **Runtime layer** is the set of such gates. A gate line is joinable with a **Host stream** through the session id, and may later become an **Evaluation receipt** event, a decision the harness owns.
 

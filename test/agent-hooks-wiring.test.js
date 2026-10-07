@@ -308,3 +308,64 @@ if (process.platform === 'win32') {
     assert.ok(JSON.parse(run.stdout).hookSpecificOutput.additionalContext.includes(WIRED_HANDOFF));
   });
 }
+
+// ADR-0089: the shadow receipt gate is wired on PreToolUse matched on Bash.
+// Executed through the wired Claude Code command; the Codex half is structural.
+test('agent hooks wiring: the PreToolUse Bash entry runs the shadow sequence gate, which logs and never blocks', () => {
+  for (const file of ['.claude/settings.json', '.codex/hooks.json']) {
+    const config = JSON.parse(readFileSync(join(KIT_ROOT, file), 'utf8'));
+    const entry = (config.hooks?.PreToolUse ?? []).find((e) => e.matcher === 'Bash');
+    assert.ok(entry, `${file}: a PreToolUse entry matched on Bash`);
+    const hook = entry.hooks.find((h) => /sequence-gate\.mjs/.test(h.command));
+    assert.ok(hook, `${file}: the entry runs sequence-gate.mjs`);
+    const rel = /(src\/skills\/[^"]+sequence-gate\.mjs)"/.exec(hook.command)?.[1];
+    assert.ok(rel && existsSync(join(KIT_ROOT, rel)), `${file}: the wired script exists: ${rel}`);
+  }
+
+  const root = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-wiring-repo-')));
+  const evidence = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-wiring-evidence-')));
+  try {
+    const env = { ...process.env, AD_SEQUENCE_GATE: '', AD_SEQUENCE_GATE_EVIDENCE_DIR: evidence };
+    delete env.GIT_DIR;
+    delete env.GIT_WORK_TREE;
+    delete env.GIT_INDEX_FILE;
+    spawnSync('git', ['init', '-q'], { cwd: root, env });
+    spawnSync(
+      'git',
+      [
+        '-c',
+        'user.name=w',
+        '-c',
+        'user.email=w@example.test',
+        'commit',
+        '-q',
+        '--allow-empty',
+        '-m',
+        'x',
+      ],
+      { cwd: root, env }
+    );
+    const config = JSON.parse(readFileSync(join(KIT_ROOT, '.claude', 'settings.json'), 'utf8'));
+    const hook = config.hooks.PreToolUse.find((e) => e.matcher === 'Bash').hooks[0];
+    const run = spawnSync(hook.command.replaceAll('${CLAUDE_PROJECT_DIR}', KIT_ROOT), {
+      shell: true,
+      cwd: KIT_ROOT,
+      input: JSON.stringify({
+        hook_event_name: 'PreToolUse',
+        session_id: 'wiring-session',
+        cwd: root,
+        tool_name: 'Bash',
+        tool_input: { command: 'git push' },
+      }),
+      encoding: 'utf8',
+      env,
+    });
+    assert.equal(run.status, 0, `shadow mode exits 0; stderr: ${run.stderr}`);
+    assert.equal(run.stdout, '');
+    const line = JSON.parse(readFileSync(join(evidence, 'wiring-session.jsonl'), 'utf8'));
+    assert.equal(line.state, 'would-block');
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});

@@ -8,6 +8,12 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
+- `/ad-hooks` ships a shadow receipt gate on both hosts (ADR-0089): after the
+  local CI-mirror command passes, `scripts/gate-run.mjs` records a receipt
+  keyed to the working copy's git tree, and `scripts/sequence-gate.mjs`, wired
+  on `PreToolUse` for Bash, logs before `git push` and `gh pr create` whether
+  that receipt is fresh. It never blocks and prints nothing; enforcement waits
+  on a measured shadow run (RESEARCH-0037, GROUND-0038, task-0107).
 - An optional Claude Code companion plugin, `agentic-session`, published from
   this repository's marketplace: a context band above the prompt that appears
   once the session reaches a configurable share of the auto-compact point (60%

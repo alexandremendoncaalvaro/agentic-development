@@ -60,6 +60,8 @@ Run local gates before opening the PR (WORKFLOW §11 — CI failure is a local g
 
 1. **Detect the pre-push tier.** Read `lefthook.yml`, `.husky/pre-push`, `.pre-commit-config.yaml` (pre-push stage), or `.git/hooks/pre-push` to extract the commands the pre-push hook runs.
 2. **Run them explicitly.** Do not rely on `git push` firing the hook — the hook already ran (or will run) on push. Running the same commands here catches gaps *before* the PR opens and burns CI minutes. If no hook runner is detected, fall back to reading `.github/workflows/*.yml` (or the detected CI surface) and run its test / lint / typecheck / build commands locally.
+
+   When `ad-hooks`' receipt gate is installed (`<ad-hooks-dir>/scripts/gate-run.mjs` exists), record the passing run so the gate sees it before `gh pr create`: `node <ad-hooks-dir>/scripts/gate-run.mjs record --command "<the commands run>" --exit 0`. Record only a run that passed.
 3. **Refuse on red.** If any gate command exits non-zero, refuse to open the PR. Surface: `Pre-push gate <name> failed: <exit-code output>. Fix locally before opening the PR — pushing red-CI diffs burns cloud minutes and normalizes broken main. Rerun /ad-pr after fixing.` Do not offer `--no-verify` or a bypass flag; WORKFLOW §11 is binding.
 4. **Warn on absent gates.** If neither a hook runner nor a CI surface exists, surface: `No pre-push or CI config detected — opening PR without a local gate check. Wire /ad-hooks so subsequent PRs get preflight coverage.` Continue.
 
