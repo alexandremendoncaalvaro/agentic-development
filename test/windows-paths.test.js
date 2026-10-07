@@ -124,3 +124,22 @@ test('no test dynamically imports a raw filesystem path', () => {
     'import a pathToFileURL(...).href or a relative specifier instead'
   );
 });
+
+// Task 0109: the receipt gate reads a command line as the shell does, so an
+// unquoted Windows path (C:\Users\...) loses its backslashes as escapes. Four
+// publish tests failed only on Windows CI for that reason. This guard fails on
+// any host when a gate test puts a path variable into a command unquoted.
+test('gate tests quote every path they put into a shell command', () => {
+  const source = readFileSync(new URL('./sequence-gate.test.js', import.meta.url), 'utf8');
+  const unquoted = source
+    .split('\n')
+    .map((line, index) => ({ line, number: index + 1 }))
+    .filter(({ line }) =>
+      /(--body-file|=@|--input)\s*\$\{(?!quoted\()/.test(line.replace(/quoted\(`[^`]*`\)/g, ''))
+    );
+  assert.deepEqual(
+    unquoted.map(({ number, line }) => `${number}: ${line.trim()}`),
+    [],
+    'wrap the path in quoted(...)'
+  );
+});

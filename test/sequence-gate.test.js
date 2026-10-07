@@ -825,7 +825,7 @@ test('regression: task-0109 audit, the gate never reads .env or .npmrc named as 
   for (const name of ['.env', '.env.local', '.npmrc']) {
     writeFileSync(join(repo, name), 'TOKEN=x\n');
     const [publish] = linesFor(
-      runGate(repo, `gh pr comment 1 --body-file ${name}`).lines,
+      runGate(repo, `gh pr comment 1 --body-file ${quoted(name)}`).lines,
       'publish'
     );
     assert.equal(publish.state, 'runtime-unavailable', name);
