@@ -191,6 +191,37 @@ GH, HK and AGENTS.md: no finding; GH.3 (rules in flight) is re-run before
 the push. Local gate after the fixes (8e98828's tree): `npm run verify` exit
 0, 1322 tests, 0 vulnerabilities.
 
+### 2026-10-07 — final review and re-audit at 86d9fe9
+
+Two-axis review and CV re-audit of 0894759..86d9fe9: no blocker, no concern;
+both axes "ship as-is". The Standards reviewer ran a differential fuzz of the
+old and new `tokenize` over 400,000 random commands: identical except a lone
+trailing backslash, which no longer yields an empty word (intended: it
+carried no body). The CV reviewer reproduced the line counts and caught
+mutations of the `.env` guard and the subshell `cd` fix. Findings, with
+dispositions:
+
+- CV Minor: with an unreadable `gates.json`, a comment logged `would-block`
+  under `gh` and nothing under `ghp`, contradicting item 6 above. Fixed
+  test-first: the publish path reads the config strictly and logs
+  `runtime-unavailable` for any command that may publish.
+- CV Minor: item 21's switch order has no test; reverting it leaves 54 of 54
+  green. Accepted: no input reaches the error branch it guards (every body
+  reader returns an unreadable reason instead of throwing); it is defensive.
+- CV Nit: "54 tests green throughout" in 9d4d7f8 counted the suite after the
+  commit; it held 52 during the refactor. Corrected here.
+- CV Nit: the old 438 and 378 figures cannot be checked from git. Accepted:
+  author-reported, superseded by item 1's measured counts.
+- Standards Note: the `.env` guard matches names, not symlinks. Accepted:
+  listed with the other limits.
+- Spec Note: ADR-0089's fourth addendum ran sentences together. Fixed:
+  re-wrapped.
+- Spec Notes: CHANGELOG's wording omits "simulated events", and GH.3 is
+  re-run before the push. Accepted.
+
+Local gate after the fix: `npm run verify` exit 0, 1323 tests,
+0 vulnerabilities.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
