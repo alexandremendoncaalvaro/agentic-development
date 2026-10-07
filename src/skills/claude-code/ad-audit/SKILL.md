@@ -132,6 +132,8 @@ When a surviving finding asserts that a specific test or suite **cannot fail** o
 
 Never emit "approve". Order findings by severity — **critical** (correctness, security, data loss — or an evidence-gate blocker) · **major** (logic error, broken contract, real coverage gap) · **minor** (suboptimal, low risk) · **nit** (style) — so the reader triages instead of wading. The severity value `critical` names a finding; it is unrelated to the rule-set's CRITICAL tag on a *group* (Step 5). Severity ranks confirmed findings; it never relaxes the evidence bar. List each blocker with the evidence artifact it needs; state everything still unverified as an OPEN QUESTION. The bar: nothing clears until every teammate-visible claim carries a reproducible artifact and every blocker is resolved or refuted with evidence.
 
+**Persist the audit summary.** Write one JSON file per audit to `.agentic/reviews/<ISO-timestamp>-audit-<scope-slug>-summary.json`: `{"target": "<full SHA under audit>", "at": "<ISO time>", "scope": "<scope-slug>", "findings": [{"id": "<n>", "severity": "critical|major|minor|nit", "disposition": "<disposition>"}]}`, an empty `findings` array when nothing survived. A disposition is `open` until acted on, then `fixed`, `accepted` or `rejected` with its evidence, or on a re-audit `resolved`, `refuted` or `still-open`; rewrite the file as dispositions change, keeping the audited `target`. An audit of uncommitted work writes `"target": "none (working tree)"`. It is the audit receipt `ad-hooks`' shadow receipt gate reads before `gh pr create`, `gh pr ready` and `gh pr merge` (ADR-0089); the gate checks that an audit ran for the state, never its findings. Like the trail, it is a local working copy; the tracked task Notes or pull request carry each finding's disposition.
+
 ## Step 9 — Close the loop
 
 If the audit surfaced a defect pattern no rule covers, or a rule that misled or was ambiguous, hand it to `/ad-level-up` as a candidate (it runs the anti-overfitting gates and never writes without approval). An audit that finds a real, generalising gap and raises no candidate is incomplete.
@@ -142,6 +144,7 @@ If the audit surfaced a defect pattern no rule covers, or a rule that misled or 
 - One line per rule verdict: `<verdict> · <severity, on violations/judgement-calls> · <rule id> · <file:line | claim> · <failure scenario> · <artifact needed>`.
 - A **coverage matrix**: every group accounted for — dispatched (per-rule verdicts, anchors verified) or N/A-with-reason — and, for diff targets, every changed file (in a reviewer's `Files grounded` line, or N/A-with-reason) — so coverage is auditable at a glance.
 - Blockers grouped on top; then the open-question / still-unverified list; then any proposed rule delta for Step 9.
+- One summary file per audit at `.agentic/reviews/<ISO>-audit-<scope>-summary.json` with the target SHA and every finding's severity and disposition.
 - No "approve" verdict, no defending the work, no rewrite. Empty result is reported explicitly.
 
 ## Next

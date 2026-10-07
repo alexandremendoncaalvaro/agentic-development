@@ -78,6 +78,8 @@ Step 7 — empirical falsification lane (serial, orchestrator-only, ADR-0052). W
 
 Step 8 — aggregate + verdict. Union all findings (never drop a lone one); confirm real ones against the code/output and reject wrong ones with evidence. Anchor check (task-0033): a group section — or an escalation reviewer — whose echoed `Anchors:` line mismatches the expected anchors (any file hash, or the target SHA), or is absent, has UNVERIFIED verdicts, never silently accepted: re-review the group (or re-dispatch the escalation), or mark it unaccounted in the coverage matrix; a "ran/read" assertion without a matching anchor is not trusted. Honest ceiling: a matching echo is necessary, not sufficient — it cannot prove recomputation rather than copying; the expectations persist in the trail file so the comparison outlives the run. Coverage check — two axes: (a) every group accounted for by verdicts or N/A-with-reason; (b) for diff targets, every changed file accounted for — in a group section's `Files grounded` line, or explicitly N/A-with-reason (fixture, vendored, generated). A gap on either axis makes the audit INCOMPLETE. Then the verdict — NEVER "approve", findings ordered by severity: list each blocker with the evidence artifact it needs; state everything unverified as an OPEN QUESTION.
 
+Persist the audit summary: one JSON file per audit at `.agentic/reviews/<ISO-timestamp>-audit-<scope-slug>-summary.json`, `{"target": "<full SHA under audit>", "at": "<ISO time>", "scope": "<scope-slug>", "findings": [{"id": "<n>", "severity": "critical|major|minor|nit", "disposition": "<disposition>"}]}`, an empty `findings` array when nothing survived. A disposition is `open` until acted on, then `fixed`, `accepted` or `rejected` with its evidence, or on a re-audit `resolved`, `refuted` or `still-open`; rewrite the file as dispositions change, keeping the audited `target`. An audit of uncommitted work writes `"target": "none (working tree)"`. It is the audit receipt `ad-hooks`' shadow receipt gate reads before `gh pr create`, `gh pr ready` and `gh pr merge` (ADR-0089); the gate checks that an audit ran for the state, never its findings. Like the trail, it is a local working copy; the tracked task Notes or pull request carry each finding's disposition.
+
 Step 9 — close the loop. Hand any rule gap (a defect pattern no rule covers, or a rule that misled) to `/ad-level-up` as a candidate.
 </instructions>
 
@@ -86,6 +88,7 @@ Step 9 — close the loop. Hand any rule gap (a defect pattern no rule covers, o
 - One `## Group: <id>` section per dispatched group; one line per rule: `<verdict> · <severity, on violations/judgement-calls> · <rule id> · <file:line | claim> · <failure scenario> · <artifact needed or observed>`; each section closes with its `Files grounded:` and `Anchors:` lines.
 - A coverage matrix: every group accounted for (verdicts or N/A-with-reason) — and, for diff targets, every changed file (grounded by a section, or N/A-with-reason).
 - Blockers on top; then open questions; then any proposed rule delta for `/ad-level-up`.
+- One summary file per audit at `.agentic/reviews/<ISO>-audit-<scope>-summary.json` with the target SHA and every finding's severity and disposition.
 - No "approve" verdict, no defending the work, no rewrite. Empty result reported explicitly.
 </output_contract>
 

@@ -584,9 +584,10 @@ decision recorded in [`doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md
 
 **Definition:** a machine-readable record that a workflow step ran for an exact
 state: the local CI-mirror run for a working-copy git tree (the gate-run
-receipt, in `.agentic/receipts/gate-run.jsonl`), and, as ADR-0089's later
-slices land, a review or audit for a commit and an outward-text approval for a
-body hash. A local working copy; the durable record stays the tracked task
+receipt, in `.agentic/receipts/gate-run.jsonl`), a review or audit for a
+commit (the `Target-SHA:` line of an `ad-review` verdicts file and the
+`target` of an `ad-audit` summary, both under `.agentic/reviews/`), and, as
+ADR-0089's last slice lands, an outward-text approval for a body hash. A local working copy; the durable record stays the tracked task
 Notes or pull request body, which quote what the step found.
 
 _Avoid_: bare "receipt" (an **Evaluation receipt** is the harness's frozen
@@ -629,7 +630,7 @@ on the artifact); "pass" for an unowned event (nothing was checked).
 ### Gate evidence line
 
 **Definition:** the one JSON line a runtime gate appends per governed firing
-to its own **evidence file** under the OS temporary directory, keyed by
+(for the **Receipt gate**, per check of an action) to its own **evidence file** under the OS temporary directory, keyed by
 session, with a per-session sequence number, the gate identifier, its
 **Gate terminal state** and a reproduction command; machine-local by default
 and never written inside the working tree unless the operator redirects it.
