@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * ad-hooks receipt gates — the shadow sequence gate (ADR-0089, tasks
- * 0107 and 0108).
+ * ad-hooks receipt gates — the shadow sequence gate (ADR-0089, tasks 0107
+ * to 0109).
  *
  * A `PreToolUse` command hook on Bash for Claude Code and Codex. Before a
  * landing action it checks that each step the action depends on left a fresh
@@ -11,26 +11,30 @@
  * owner sees it (GROUND-0038 E1).
  *
  * Contract:
- *   - stdin: the host's PreToolUse event JSON; the command is
- *     `tool_input.command` under `tool_name: "Bash"` on both hosts. Empty,
- *     malformed, non-Bash or unrelated input is silent and leaves no line.
+ *   - stdin: the host's PreToolUse event JSON. A shell command is
+ *     `tool_input.command` under `tool_name: "Bash"` on both hosts; a chat
+ *     send is an MCP tool (`mcp__<server>__slack_send_message`). Empty,
+ *     malformed or unrelated input is silent and leaves no line.
  *   - Checks per action: `git push` gate-run; `gh pr create` gate-run, review
- *     and audit; `gh pr ready` and `gh pr merge` review and audit.
- *   - Freshness, every check: a receipt covers HEAD when its tree is
+ *     and audit; `gh pr ready` and `gh pr merge` review and audit;
+ *     `gh pr comment`, `gh issue comment`, a `gh api` comment call and a chat
+ *     send, publish. `githubCommands` in `.agentic/gates.json` names the
+ *     wrappers a repository runs `gh` under (default `["gh"]`).
+ *   - Freshness of commit receipts: a receipt covers HEAD when its tree is
  *     `HEAD^{tree}`, or every path changed since it is receipt-neutral
  *     (`receiptNeutral` globs in `.agentic/gates.json`, default `doc/tasks/**`;
  *     `.agentic/receipts/` and `.agentic/reviews/` are always neutral).
  *   - gate-run: a gate-run.mjs receipt with exit 0, keyed by tree.
- *   - review: an `ad-review` verdicts file, `.agentic/reviews/*-verdicts.md`,
- *     whose `Target-SHA:` line names a commit; audit: an `ad-audit` summary,
- *     `.agentic/reviews/*-summary.json`, whose `target` names one. The commit
- *     is resolved to its tree (GROUND-0040). Neither result is judged.
+ *   - review and audit: `review-receipts.mjs` (GROUND-0040). Neither result
+ *     is judged.
+ *   - publish: `publish-receipt.mjs`; a receipt whose hash equals the
+ *     normalized outgoing body (GROUND-0041). A body known only when the
+ *     command runs is runtime-unavailable.
  *   - `.agentic/gates.json` `checks.<check>`: `false` turns the check off; a
  *     `{ "command": [argv], "timeoutSeconds" }` object, for the review only,
- *     replaces the receipt by a
- *     command that exits 0 when bot or harness evidence exists for the commit
- *     in `AGENTIC_HEAD_SHA` (default bound 10 seconds; a timeout is
- *     runtime-unavailable).
+ *     replaces the receipt by a command that exits 0 when bot or harness
+ *     evidence exists for the commit in `AGENTIC_HEAD_SHA` (default bound 10
+ *     seconds; a timeout is runtime-unavailable).
  *   - Evidence: one JSON line per check of an action in
  *     `<evidence dir>/<session_id>.jsonl`, state `clear`, `would-block` or
  *     `runtime-unavailable`. The directory defaults to the OS temporary
@@ -40,53 +44,55 @@
  * Zero dependencies; byte-identical in both host trees.
  */
 
-import { spawnSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { appendEvidence } from './artifact-gate.mjs';
 import { git, headTree, readReceipts, repositoryRoot } from './gate-run.mjs';
+import { checkPublish, outgoingPublications } from './publish-receipt.mjs';
+import { commandCheck, readAuditReceipts, readReviewReceipts } from './review-receipts.mjs';
 
 export const GATE_ID = 'sequence-gate';
 export const DEFAULT_RECEIPT_NEUTRAL = ['doc/tasks/**'];
+export const DEFAULT_GITHUB_COMMANDS = ['gh'];
 // A receipt never invalidates itself, even where `.agentic/` is not ignored.
 const ALWAYS_NEUTRAL = ['.agentic/receipts/**', '.agentic/reviews/**'];
-export const REVIEWS_DIR = join('.agentic', 'reviews');
 
 // Global options may sit between `git` and the verb (`git -C dir push`). Words
 // inside a quoted string can still match; the shadow run measures that.
 const OPTION_VALUE = String.raw`(?:"[^"]*"|'[^']*'|[^\s"']\S*)`;
 const GIT_OPTIONS = String.raw`(?:\s+(?:-[Cc]\s+(?:\S*=)?${OPTION_VALUE}|--?[\w-]+(?:=\S+)?))*`;
 
-const ACTIONS = [
-  {
-    id: 'git push',
-    pattern: new RegExp(String.raw`(^|[\s;&|(])git${GIT_OPTIONS}\s+push\b`),
-    checks: ['gate-run'],
-  },
-  {
-    id: 'gh pr create',
-    pattern: /(^|[\s;&|(])gh\s+pr\s+create\b/,
-    checks: ['gate-run', 'review', 'audit'],
-  },
-  {
-    id: 'gh pr ready',
-    pattern: /(^|[\s;&|(])gh\s+pr\s+ready\b/,
-    checks: ['review', 'audit'],
-  },
-  {
-    id: 'gh pr merge',
-    pattern: /(^|[\s;&|(])gh\s+pr\s+merge\b/,
-    checks: ['review', 'audit'],
-  },
+// The GitHub CLI's pull request verbs, matched after any of the names a
+// repository runs it under (`githubCommands` in `.agentic/gates.json`).
+const PR_ACTIONS = [
+  { verb: 'create', checks: ['gate-run', 'review', 'audit'] },
+  { verb: 'ready', checks: ['review', 'audit'] },
+  { verb: 'merge', checks: ['review', 'audit'] },
 ];
+
+function actionsFor(githubCommands) {
+  const names = githubCommands.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  return [
+    {
+      id: 'git push',
+      pattern: new RegExp(String.raw`(^|[\s;&|(])git${GIT_OPTIONS}\s+push\b`),
+      checks: ['gate-run'],
+    },
+    ...PR_ACTIONS.map(({ verb, checks }) => ({
+      id: `gh pr ${verb}`,
+      pattern: new RegExp(String.raw`(^|[\s;&|(])(?:${names})\s+pr\s+${verb}\b`),
+      checks,
+    })),
+  ];
+}
 
 // Every landing action in the command, so a chained `git push && gh pr
 // create` runs the checks both need.
-function findActions(command) {
+function findActions(command, githubCommands = DEFAULT_GITHUB_COMMANDS) {
   if (typeof command !== 'string') return [];
-  return ACTIONS.filter((action) => action.pattern.test(command));
+  return actionsFor(githubCommands).filter((action) => action.pattern.test(command));
 }
 
 /** The first landing action a shell command performs, or null. */
@@ -107,9 +113,37 @@ export function globToRegExp(glob) {
   return new RegExp(`^${source}$`);
 }
 
+// A missing file is the default configuration; anything other than a JSON
+// object is unreadable, never a silent default.
 function gatesConfig(root) {
   const file = join(root, '.agentic', 'gates.json');
-  return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {};
+  if (!existsSync(file)) return {};
+  const config = JSON.parse(readFileSync(file, 'utf8'));
+  if (config === null || typeof config !== 'object' || Array.isArray(config)) {
+    throw new Error('.agentic/gates.json is not a JSON object');
+  }
+  return config;
+}
+
+/**
+ * The names the repository runs the GitHub CLI under: plain words only, so a
+ * name can never widen the match. `gh` when unset; an unreadable `gates.json`
+ * surfaces as a runtime-unavailable line on the landing checks and on any
+ * command that may publish.
+ */
+function githubCommandsIn(config) {
+  const names = config.githubCommands;
+  const valid =
+    Array.isArray(names) && names.every((n) => typeof n === 'string' && /^[\w.-]+$/.test(n));
+  return valid && names.length > 0 ? names : DEFAULT_GITHUB_COMMANDS;
+}
+
+function githubCommands(cwd) {
+  try {
+    return githubCommandsIn(gatesConfig(repositoryRoot(cwd)));
+  } catch {
+    return DEFAULT_GITHUB_COMMANDS;
+  }
 }
 
 export function receiptNeutral(root) {
@@ -191,66 +225,6 @@ export function checkGateRun(cwd) {
   };
 }
 
-const SHA = /^[0-9a-f]{40}$/;
-const TARGET_SHA_LINE = /^Target-SHA:[ \t]*(.*?)\s*$/;
-const WORKING_TREE = 'none (working tree)';
-export const MAX_COMMIT_RECEIPTS = 20;
-
-/**
- * Commit receipts under `.agentic/reviews/`, oldest first by file name (an
- * ISO timestamp prefix), from the newest `MAX_COMMIT_RECEIPTS` files only:
- * the directory is never pruned, and resolving every file made the hook's
- * cost grow with it (task-0108 Notes). Each file ending in `suffix` whose
- * target, read by `targetOf`, is a full commit SHA, resolved to that
- * commit's tree. A file with no target (written before receipts existed) or
- * a working-tree target is no receipt; an unparsable file, any other target
- * or a commit that cannot be resolved is counted as unreadable.
- */
-function readCommitReceipts(root, suffix, targetOf) {
-  const dir = join(root, REVIEWS_DIR);
-  const receipts = [];
-  let unreadable = 0;
-  if (!existsSync(dir)) return { receipts, unreadable };
-  const names = readdirSync(dir)
-    .filter((file) => file.endsWith(suffix))
-    .sort()
-    .slice(-MAX_COMMIT_RECEIPTS);
-  for (const name of names) {
-    let sha;
-    try {
-      sha = targetOf(readFileSync(join(dir, name), 'utf8'));
-    } catch {
-      unreadable += 1;
-      continue;
-    }
-    if (sha === undefined || sha === WORKING_TREE) continue;
-    if (typeof sha !== 'string' || !SHA.test(sha)) {
-      unreadable += 1;
-      continue;
-    }
-    try {
-      receipts.push({ sha, tree: git(root, ['rev-parse', `${sha}^{tree}`]) });
-    } catch {
-      unreadable += 1;
-    }
-  }
-  return { receipts, unreadable };
-}
-
-/** `ad-review` verdicts files, by their `Target-SHA:` line. */
-export function readReviewReceipts(root) {
-  return readCommitReceipts(
-    root,
-    '-verdicts.md',
-    (text) => TARGET_SHA_LINE.exec(text.split('\n', 1)[0])?.[1]
-  );
-}
-
-/** `ad-audit` summary files, by their `target` field. */
-export function readAuditReceipts(root) {
-  return readCommitReceipts(root, '-summary.json', (text) => JSON.parse(text)?.target ?? null);
-}
-
 // A review or an audit names the commit it covered; the check compares that
 // commit's tree with HEAD's under the same freshness rule as a gate run.
 function commitReceiptCheck(check, readCommitReceipts, reproduction) {
@@ -283,54 +257,6 @@ export const checkAudit = commitReceiptCheck(
   'run /ad-audit on the range ending at HEAD'
 );
 
-export const DEFAULT_COMMAND_TIMEOUT_SECONDS = 10;
-// A design choice, under the 30 seconds this repository's Codex wiring gives
-// the hook, leaving room for its git calls.
-export const MAX_COMMAND_TIMEOUT_SECONDS = 20;
-
-/**
- * A repository whose review is done by a bot or harness names, in
- * `.agentic/gates.json`, a local command that exits 0 when that evidence
- * exists for the commit in `AGENTIC_HEAD_SHA`. The command is bounded well
- * under the hosts' 600-second hook timeout (GROUND-0040 E1).
- */
-function commandCheck(check, setting, cwd) {
-  // ADR-0089 decision 7 lets bot evidence stand in for a review only.
-  if (check !== 'review') throw new Error(`a command replaces the review only, not ${check}`);
-  const seconds = setting.timeoutSeconds ?? DEFAULT_COMMAND_TIMEOUT_SECONDS;
-  if (typeof seconds !== 'number' || !(seconds > 0 && seconds <= MAX_COMMAND_TIMEOUT_SECONDS)) {
-    throw new Error(`timeoutSeconds must be above 0 and at most ${MAX_COMMAND_TIMEOUT_SECONDS}`);
-  }
-  // An argument list, run without a shell (GUIDELINES 12.5); a pipeline
-  // belongs in a script the list names.
-  const argv = setting.command;
-  if (!Array.isArray(argv) || argv.length === 0 || !argv.every((a) => typeof a === 'string')) {
-    throw new Error('command must be a non-empty argument list of strings');
-  }
-  const root = repositoryRoot(cwd);
-  const head = git(root, ['rev-parse', 'HEAD']);
-  const run = spawnSync(argv[0], argv.slice(1), {
-    cwd: root,
-    stdio: 'ignore',
-    timeout: seconds * 1000,
-    env: { ...process.env, AGENTIC_HEAD_SHA: head },
-  });
-  // Not reading the evidence is not evidence that it is missing.
-  if (run.error || run.status === null) {
-    throw new Error(`${check} command timed out or did not run: ${run.error?.code ?? run.signal}`);
-  }
-  return {
-    check,
-    state: run.status === 0 ? 'clear' : 'would-block',
-    head,
-    tree: headTree(root),
-    receipt: run.status === 0 ? 'command' : null,
-    missing: run.status === 0 ? [] : [check],
-    unreadable_receipts: 0,
-    reproduction: JSON.stringify(argv),
-  };
-}
-
 const CHECKS = { 'gate-run': checkGateRun, review: checkReview, audit: checkAudit };
 
 function runCheck(check, cwd) {
@@ -355,6 +281,60 @@ function readStdin() {
   }
 }
 
+function logPublication(event, cwd) {
+  const log = (action, result) =>
+    appendEvidence(evidencePathFor(event.session_id, process.env), {
+      at: new Date().toISOString(),
+      gate: GATE_ID,
+      action,
+      host_tool: event.tool_name,
+      ...result,
+    });
+  // Read strictly here: an unreadable gates.json could hide a configured
+  // wrapper, so a command that may publish logs it instead of a guess.
+  let config;
+  try {
+    config = gatesConfig(repositoryRoot(cwd));
+  } catch (error) {
+    const command = String(event.tool_input?.command);
+    if (event.tool_name !== 'Bash' || MAY_PUBLISH.test(command)) {
+      log('unknown', {
+        check: 'publish',
+        state: 'runtime-unavailable',
+        output: String(error.message),
+      });
+    }
+    return;
+  }
+  if (config.checks?.publish === false) return;
+  let publications;
+  try {
+    publications = outgoingPublications(event, cwd, githubCommandsIn(config));
+  } catch (error) {
+    log('unknown', {
+      check: 'publish',
+      state: 'runtime-unavailable',
+      output: String(error.message),
+    });
+    return;
+  }
+  if (publications.length === 0) return;
+  for (const publication of publications) {
+    let result;
+    try {
+      if (publication.unreadable) throw new Error(publication.unreadable);
+      result = checkPublish(cwd, publication.body);
+    } catch (error) {
+      result = { check: 'publish', state: 'runtime-unavailable', output: String(error.message) };
+    }
+    log(publication.action, result);
+  }
+}
+
+const MAY_PUBLISH = /\b(?:pr|issue)\b[\s\\]+comment\b|\/comments\b/;
+const MAY_ACT =
+  /\bpush\b|\bpr\b[\s\\]+(?:create|ready|merge|comment)\b|\bissue\b[\s\\]+comment\b|\/comments\b/;
+
 function main() {
   if (process.env.AD_SEQUENCE_GATE === '0') return;
   const raw = readStdin().trim();
@@ -366,11 +346,15 @@ function main() {
     return;
   }
   if (event === null || typeof event !== 'object' || Array.isArray(event)) return;
+  // Most shell calls name no landing or publishing verb; they leave before any
+  // git call, so the hook adds no measurable cost to them (task-0109 Notes).
+  if (event.tool_name === 'Bash' && !MAY_ACT.test(String(event.tool_input?.command))) return;
+  const cwd = typeof event.cwd === 'string' && event.cwd ? event.cwd : process.cwd();
+  logPublication(event, cwd);
   if (event.tool_name !== 'Bash') return;
-  const actions = findActions(event.tool_input?.command);
+  const actions = findActions(event.tool_input?.command, githubCommands(cwd));
   if (actions.length === 0) return;
 
-  const cwd = typeof event.cwd === 'string' && event.cwd ? event.cwd : process.cwd();
   // Each check runs once per command, logged against the first action that
   // needs it, so a chained command runs a bot-review command once.
   const firstNeeding = new Map();
@@ -395,5 +379,10 @@ function main() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main();
+  // Shadow mode never fails the tool call, whatever goes wrong inside.
+  try {
+    main();
+  } catch {
+    process.exitCode = 0;
+  }
 }

@@ -594,8 +594,9 @@ decision recorded in [`doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md
 state: the local CI-mirror run for a working-copy git tree (the gate-run
 receipt, in `.agentic/receipts/gate-run.jsonl`), a review or audit for a
 commit (the `Target-SHA:` line of an `ad-review` verdicts file and the
-`target` of an `ad-audit` summary, both under `.agentic/reviews/`), and, as
-ADR-0089's last slice lands, an outward-text approval for a body hash. A local working copy; the durable record stays the tracked task
+`target` of an `ad-audit` summary, both under `.agentic/reviews/`), and an
+outward-text approval for the SHA-256 of a normalized body (the publish
+receipt, in `.agentic/receipts/publish.jsonl`, recorded by `ad-publish`). A local working copy; the durable record stays the tracked task
 Notes or pull request body, which quote what the step found.
 
 _Avoid_: bare "receipt" (an **Evaluation receipt** is the harness's frozen
@@ -644,9 +645,11 @@ session, with a per-session sequence number, the gate identifier, its
 and never written inside the working tree unless the operator redirects it.
 The artifact-validator gate writes to `agentic-artifact-gate/` and adds the
 path, the validator output and the text surfaced to the model; the **Receipt
-gate** writes to `agentic-sequence-gate/` and adds the action, the head commit
-and tree, the receipt that covered it, the missing receipts and the count of
-unreadable receipts.
+gate** writes to `agentic-sequence-gate/` and adds the action, the receipt
+that covered it, the missing receipts and the count of unreadable receipts,
+plus the head commit and tree for a commit receipt or the outgoing body's
+SHA-256 for a publish receipt; a `runtime-unavailable` line carries the check
+and its output instead.
 
 _Avoid_: "receipt" (an **Evaluation receipt** is the harness's frozen record; a
 gate line is a candidate input to one, not one); "log" (the line is a

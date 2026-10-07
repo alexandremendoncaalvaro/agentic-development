@@ -28,6 +28,16 @@
             "timeout": 30
           }
         ]
+      },
+      {
+        "matcher": "mcp__.*__slack_send_message",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/sequence-gate.mjs\"",
+            "timeout": 30
+          }
+        ]
       }
     ]
   }

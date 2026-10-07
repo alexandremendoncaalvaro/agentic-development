@@ -1,6 +1,6 @@
 # Task `0108`: Check review and audit receipts before PR actions, in shadow
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md (decisions 1 and 2, review and audit check)
 **Evidence ref:** doc/research/0040-ground-review-and-audit-receipts.md
@@ -28,7 +28,7 @@ not, and no single file summarizes an audit.
 
 - [x] Red, then green in the skill scripts and the gate (`/ad-tdd`); byte parity across both hosts.
 - [x] Skill text for `ad-review` and `ad-audit`; CHANGELOG.
-- [ ] `/ad-review`; `/ad-audit`; `/ad-commit`; PR on the owner's approval.
+- [x] `/ad-review`; `/ad-audit`; `/ad-commit`; PR on the owner's approval.
 
 ## Notes
 
@@ -258,6 +258,13 @@ the same command logged `clear` for gate-run, review and audit before `git
 push && gh pr create` and before `gh pr merge`. This entry touches only a
 receipt-neutral path.
 
+### 2026-10-07 — Closed
+
+The owner approved the pull request text (posted body matched the approved
+hash, apart from GitHub's trailing newline) and the merge. Pull request 162
+passed CI on Ubuntu and Windows with Node 22.13 and 24 and merged as 2e3b724
+with a merge commit, which keeps every SHA these Notes cite.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -265,4 +272,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task
