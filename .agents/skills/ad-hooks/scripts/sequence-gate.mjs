@@ -83,7 +83,7 @@ const ACTIONS = [
 ];
 
 // Every landing action in the command, so a chained `git push && gh pr
-// create` logs the checks of both.
+// create` runs the checks both need.
 function findActions(command) {
   if (typeof command !== 'string') return [];
   return ACTIONS.filter((action) => action.pattern.test(command));
@@ -201,11 +201,10 @@ export const MAX_COMMIT_RECEIPTS = 20;
  * ISO timestamp prefix), from the newest `MAX_COMMIT_RECEIPTS` files only:
  * the directory is never pruned, and resolving every file made the hook's
  * cost grow with it (task-0108 Notes). Each file ending in `suffix` whose
- * target, read by `targetOf`, is a full commit SHA, resolved to that commit's
- * tree. A file
- * with no target (written before receipts existed) or a working-tree target
- * is no receipt; an unparsable file, any other target or a commit that cannot
- * be resolved is counted as unreadable.
+ * target, read by `targetOf`, is a full commit SHA, resolved to that
+ * commit's tree. A file with no target (written before receipts existed) or
+ * a working-tree target is no receipt; an unparsable file, any other target
+ * or a commit that cannot be resolved is counted as unreadable.
  */
 function readCommitReceipts(root, suffix, targetOf) {
   const dir = join(root, REVIEWS_DIR);

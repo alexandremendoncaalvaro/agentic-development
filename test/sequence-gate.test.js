@@ -443,7 +443,7 @@ test('sequence-gate: committing the review and audit files does not make them st
   assert.deepEqual(states, ['clear', 'clear']);
 });
 
-test('regression: task-0108 review, a chained command logs the checks of every landing action in it', () => {
+test('regression: task-0108 review, a chained command runs the checks of every landing action in it', () => {
   const repo = fixtureRepo();
   const lines = runGate(repo, 'git push -u origin x && gh pr create --fill').lines;
   assert.deepEqual(
