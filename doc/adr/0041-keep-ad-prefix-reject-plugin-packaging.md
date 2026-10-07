@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-07-28
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0088, the "do not package the kit as a Claude Code plugin" clause only: the owner made plugin-marketplace distribution a PRD goal, this ADR's revisit trigger, so an optional Claude Code companion plugin of host-native add-ons ships beside the installer. The flat `ad-` prefix and the installer distribution of skills stand.
 
 ## Context
 
