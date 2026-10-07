@@ -1,9 +1,9 @@
 # Task `0107`: Check the gate-run receipt before push, in shadow
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md (decisions 1 to 4, gate-run check)
-**Evidence ref:**
+**Evidence ref:** doc/research/0038-ground-gate-run-receipt-shadow-check.md
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
 **Spec ref:**
@@ -26,7 +26,7 @@ and its evidence line before the other checks reuse them.
 
 ## Plan
 
-- [ ] `/ad-ground` the `PreToolUse` input shapes on both hosts and the evidence line format; record the GROUND study.
+- [x] `/ad-ground` the `PreToolUse` input shapes on both hosts and the evidence line format; record the GROUND study.
 - [ ] Red, then green, one behavior at a time (`/ad-tdd`).
 - [ ] `ad-hooks` text and wiring; ARCHITECTURE and CONTEXT terms; CHANGELOG.
 - [ ] `/ad-review`; `/ad-audit`; `/ad-commit`; PR on the owner's approval.
