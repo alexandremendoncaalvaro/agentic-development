@@ -407,7 +407,11 @@ test('sequence-gate: gates.json turns a check off for the repository', () => {
 test('sequence-gate: a review command in gates.json reads bot review evidence for HEAD', () => {
   const repo = fixtureRepo();
   const head = git(repo, 'rev-parse', 'HEAD');
-  const exitOnHead = `node -e "process.exit(process.env.AGENTIC_HEAD_SHA === '${head}' ? 0 : 1)"`;
+  const exitOnHead = [
+    'node',
+    '-e',
+    `process.exit(process.env.AGENTIC_HEAD_SHA === '${head}' ? 0 : 1)`,
+  ];
   writeGates(repo, { checks: { review: { command: exitOnHead } } });
   const [review] = linesFor(runGate(repo, 'gh pr merge').lines, 'review');
   assert.equal(review.state, 'clear');
@@ -416,10 +420,12 @@ test('sequence-gate: a review command in gates.json reads bot review evidence fo
 
 test('sequence-gate: a review command that fails is a would-block; one that times out could not read', () => {
   const repo = fixtureRepo();
-  writeGates(repo, { checks: { review: { command: 'node -e "process.exit(1)"' } } });
+  writeGates(repo, { checks: { review: { command: ['node', '-e', 'process.exit(1)'] } } });
   assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'review')[0].state, 'would-block');
   writeGates(repo, {
-    checks: { review: { command: 'node -e "setTimeout(() => {}, 5000)"', timeoutSeconds: 0.5 } },
+    checks: {
+      review: { command: ['node', '-e', 'setTimeout(() => {}, 5000)'], timeoutSeconds: 0.5 },
+    },
   });
   const [review] = linesFor(runGate(repo, 'gh pr merge').lines, 'review');
   assert.equal(review.state, 'runtime-unavailable');
@@ -437,7 +443,7 @@ test('sequence-gate: committing the review and audit files does not make them st
   assert.deepEqual(states, ['clear', 'clear']);
 });
 
-test('sequence-gate: a chained command logs the checks of every landing action in it', () => {
+test('regression: task-0108 review, a chained command logs the checks of every landing action in it', () => {
   const repo = fixtureRepo();
   const lines = runGate(repo, 'git push -u origin x && gh pr create --fill').lines;
   assert.deepEqual(
@@ -448,12 +454,15 @@ test('sequence-gate: a chained command logs the checks of every landing action i
 
 test('sequence-gate: an invalid command bound or a command outside review is runtime-unavailable', () => {
   const repo = fixtureRepo();
-  const ok = 'node -e "process.exit(0)"';
+  const ok = ['node', '-e', 'process.exit(0)'];
   for (const timeoutSeconds of [0, -1, 'x', 21]) {
     writeGates(repo, { checks: { review: { command: ok, timeoutSeconds } } });
     const [review] = linesFor(runGate(repo, 'gh pr merge').lines, 'review');
     assert.equal(review.state, 'runtime-unavailable', `timeoutSeconds ${timeoutSeconds}`);
   }
+  writeGates(repo, { checks: { review: { command: 'node -e "process.exit(0)"' } } });
+  const [shellString] = linesFor(runGate(repo, 'gh pr merge').lines, 'review');
+  assert.equal(shellString.state, 'runtime-unavailable', 'a shell string is not an argument list');
   writeGates(repo, { checks: { audit: { command: ok } } });
   const [audit] = linesFor(runGate(repo, 'gh pr merge').lines, 'audit');
   assert.equal(audit.state, 'runtime-unavailable');

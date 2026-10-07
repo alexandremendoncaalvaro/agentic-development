@@ -26,7 +26,8 @@
  *     `.agentic/reviews/*-summary.json`, whose `target` names one. The commit
  *     is resolved to its tree (GROUND-0040). Neither result is judged.
  *   - `.agentic/gates.json` `checks.<check>`: `false` turns the check off; a
- *     `{ "command", "timeoutSeconds" }` object replaces the receipt by a
+ *     `{ "command": [argv], "timeoutSeconds" }` object, for the review only,
+ *     replaces the receipt by a
  *     command that exits 0 when bot or harness evidence exists for the commit
  *     in `AGENTIC_HEAD_SHA` (default bound 10 seconds; a timeout is
  *     runtime-unavailable).
@@ -198,8 +199,8 @@ export const MAX_COMMIT_RECEIPTS = 20;
 /**
  * Commit receipts under `.agentic/reviews/`, oldest first by file name (an
  * ISO timestamp prefix), from the newest `MAX_COMMIT_RECEIPTS` files only:
- * the directory is never pruned, and resolving every file cost 18 s for 300
- * of them (task-0108 Notes). Each file ending in `suffix` whose target, read by
+ * the directory is never pruned, and resolving every file made the hook's
+ * cost grow with it (task-0108 Notes). Each file ending in `suffix` whose target, read by
  * `targetOf`, is a full commit SHA, resolved to that commit's tree. A file
  * with no target (written before receipts existed) or a working-tree target
  * is no receipt; an unparsable file, any other target or a commit that cannot
@@ -300,11 +301,16 @@ function commandCheck(check, setting, cwd) {
   if (typeof seconds !== 'number' || !(seconds > 0 && seconds <= MAX_COMMAND_TIMEOUT_SECONDS)) {
     throw new Error(`timeoutSeconds must be above 0 and at most ${MAX_COMMAND_TIMEOUT_SECONDS}`);
   }
+  // An argument list, run without a shell (GUIDELINES 12.5); a pipeline
+  // belongs in a script the list names.
+  const argv = setting.command;
+  if (!Array.isArray(argv) || argv.length === 0 || !argv.every((a) => typeof a === 'string')) {
+    throw new Error('command must be a non-empty argument list of strings');
+  }
   const root = repositoryRoot(cwd);
   const head = git(root, ['rev-parse', 'HEAD']);
-  const run = spawnSync(setting.command, {
+  const run = spawnSync(argv[0], argv.slice(1), {
     cwd: root,
-    shell: true,
     stdio: 'ignore',
     timeout: seconds * 1000,
     env: { ...process.env, AGENTIC_HEAD_SHA: head },
@@ -321,7 +327,7 @@ function commandCheck(check, setting, cwd) {
     receipt: run.status === 0 ? 'command' : null,
     missing: run.status === 0 ? [] : [check],
     unreadable_receipts: 0,
-    reproduction: setting.command,
+    reproduction: argv.join(' '),
   };
 }
 
@@ -329,7 +335,9 @@ const CHECKS = { 'gate-run': checkGateRun, review: checkReview, audit: checkAudi
 
 function runCheck(check, cwd) {
   const setting = checkSetting(cwd, check);
-  if (setting && typeof setting.command === 'string') return commandCheck(check, setting, cwd);
+  if (setting && typeof setting === 'object' && 'command' in setting) {
+    return commandCheck(check, setting, cwd);
+  }
   return CHECKS[check](cwd);
 }
 
