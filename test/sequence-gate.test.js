@@ -263,3 +263,18 @@ test('gate-run: outside a git repository it records nothing, explains why, and e
   assert.match(run.stderr, /gate-run: no receipt recorded/);
   assert.equal(existsSync(join(dir, '.agentic')), false);
 });
+
+test('sequence-gate: a quoted option argument before push is still a push; other git verbs are not', () => {
+  const repo = fixtureRepo();
+  for (const command of ['git -C "my dir" push', "git -c user.name='A B' push"]) {
+    assert.equal(runGate(repo, command).lines[0]?.action, 'git push', command);
+  }
+  for (const command of [
+    'git commit -m x',
+    'git status',
+    'git stash push',
+    'git remote add push u',
+  ]) {
+    assert.equal(runGate(repo, command).lines.length, 0, command);
+  }
+});

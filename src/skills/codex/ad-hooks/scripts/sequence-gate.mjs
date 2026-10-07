@@ -41,7 +41,8 @@ const ALWAYS_NEUTRAL = ['.agentic/receipts/**'];
 
 // Global options may sit between `git` and the verb (`git -C dir push`). Words
 // inside a quoted string can still match; the shadow run measures that.
-const GIT_OPTIONS = String.raw`(?:\s+(?:-[Cc]\s+\S+|--?[\w-]+(?:=\S+)?))*`;
+const OPTION_VALUE = String.raw`(?:"[^"]*"|'[^']*'|[^\s"']\S*)`;
+const GIT_OPTIONS = String.raw`(?:\s+(?:-[Cc]\s+(?:\S*=)?${OPTION_VALUE}|--?[\w-]+(?:=\S+)?))*`;
 
 const ACTIONS = [
   { id: 'git push', pattern: new RegExp(String.raw`(^|[\s;&|(])git${GIT_OPTIONS}\s+push\b`) },
