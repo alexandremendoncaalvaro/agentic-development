@@ -817,3 +817,14 @@ test('regression: task-0109 audit, the gate never reads .env or .npmrc named as 
     assert.match(publish.output, /not read/, name);
   }
 });
+
+test('regression: task-0109 audit, an unreadable gates.json surfaces on a comment instead of hiding it', () => {
+  const repo = fixtureRepo();
+  mkdirSync(join(repo, '.agentic'), { recursive: true });
+  writeFileSync(join(repo, '.agentic', 'gates.json'), '{broken');
+  for (const command of ['gh pr comment 1 --body hi', 'ghp pr comment 1 --body hi']) {
+    const [publish] = runGate(repo, command).lines;
+    assert.equal(publish?.state, 'runtime-unavailable', command);
+    assert.equal(publish.check, 'publish', command);
+  }
+});

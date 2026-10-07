@@ -120,16 +120,20 @@ function gatesConfig(root) {
 
 /**
  * The names the repository runs the GitHub CLI under: plain words only, so a
- * name can never widen the match. `gh` when unset or unreadable; a broken
- * `gates.json` still surfaces, as the runtime-unavailable line of every check
- * that reads it.
+ * name can never widen the match. `gh` when unset; an unreadable `gates.json`
+ * surfaces as a runtime-unavailable line on the landing checks and on any
+ * command that may publish.
  */
+function githubCommandsIn(config) {
+  const names = config.githubCommands;
+  const valid =
+    Array.isArray(names) && names.every((n) => typeof n === 'string' && /^[\w.-]+$/.test(n));
+  return valid && names.length > 0 ? names : DEFAULT_GITHUB_COMMANDS;
+}
+
 function githubCommands(cwd) {
   try {
-    const names = gatesConfig(repositoryRoot(cwd)).githubCommands;
-    const valid =
-      Array.isArray(names) && names.every((n) => typeof n === 'string' && /^[\w.-]+$/.test(n));
-    return valid && names.length > 0 ? names : DEFAULT_GITHUB_COMMANDS;
+    return githubCommandsIn(gatesConfig(repositoryRoot(cwd)));
   } catch {
     return DEFAULT_GITHUB_COMMANDS;
   }
@@ -279,10 +283,26 @@ function logPublication(event, cwd) {
       host_tool: event.tool_name,
       ...result,
     });
-  if (checkSetting(cwd, 'publish') === false) return;
+  // Read strictly here: an unreadable gates.json could hide a configured
+  // wrapper, so a command that may publish logs it instead of a guess.
+  let config;
+  try {
+    config = gatesConfig(repositoryRoot(cwd));
+  } catch (error) {
+    const command = String(event.tool_input?.command);
+    if (event.tool_name !== 'Bash' || MAY_PUBLISH.test(command)) {
+      log('unknown', {
+        check: 'publish',
+        state: 'runtime-unavailable',
+        output: String(error.message),
+      });
+    }
+    return;
+  }
+  if (config.checks?.publish === false) return;
   let publications;
   try {
-    publications = outgoingPublications(event, cwd, githubCommands(cwd));
+    publications = outgoingPublications(event, cwd, githubCommandsIn(config));
   } catch (error) {
     log('unknown', {
       check: 'publish',
@@ -304,6 +324,7 @@ function logPublication(event, cwd) {
   }
 }
 
+const MAY_PUBLISH = /\bcomment\b|\/comments\b/;
 const MAY_ACT =
   /\bpush\b|\bpr\b[\s\\]+(?:create|ready|merge|comment)\b|\bissue\b[\s\\]+comment\b|\/comments\b/;
 
