@@ -3,7 +3,7 @@
 **Status:** proposed
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md (decisions 1 and 2, review and audit check)
-**Evidence ref:**
+**Evidence ref:** doc/research/0040-ground-review-and-audit-receipts.md
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
 **Spec ref:**
