@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // ADR-0088, task-0104: the agentic-session companion plugin. The engine run is
 // verified live in the desktop app (GROUND-0035 limitations); these tests cover
@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const PLUGIN = join(ROOT, 'plugins', 'agentic-session');
 const { fillReading, normalizeThreshold, shouldShow, bandLabel, DEFAULT_THRESHOLD, HANDOFF_LABEL } =
-  await import(join(PLUGIN, 'hooks', 'band.mjs'));
+  await import(pathToFileURL(join(PLUGIN, 'hooks', 'band.mjs')).href);
 
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 
@@ -111,7 +111,7 @@ test('the plugin manifest declares the threshold option and one hooks module tha
 });
 
 function loadPlugin(threshold, usage) {
-  return import(join(PLUGIN, 'hooks', 'register.mjs')).then(({ register }) => {
+  return import(pathToFileURL(join(PLUGIN, 'hooks', 'register.mjs')).href).then(({ register }) => {
     const hooks = {};
     register((event, ...rest) => (hooks[event] = rest.at(-1)), { threshold });
     const logs = [];
@@ -174,7 +174,7 @@ test('the npm package does not ship the plugin or the marketplace', () => {
 });
 
 test('a failed reading hides the band and logs the reason to the debug log only', async () => {
-  const { register } = await import(join(PLUGIN, 'hooks', 'register.mjs'));
+  const { register } = await import(pathToFileURL(join(PLUGIN, 'hooks', 'register.mjs')).href);
   const hooks = {};
   register((event, ...rest) => (hooks[event] = rest.at(-1)), { threshold: 1 });
   const logs = [];
