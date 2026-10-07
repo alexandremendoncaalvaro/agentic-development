@@ -52,6 +52,7 @@ Step 3 — incremental loop. For each remaining behavior:
 
 Rules:
 
+- No tautological tests. A tautological test recomputes its expected value the way the code computes it, so it passes by construction and cannot catch the bug. Take expected values from an independent source — a literal, a worked example, the spec.
 - One test at a time. The horizontal-slicing anti-pattern (write all tests, then write all code) is rejected. Bulk-written tests verify *imagined* behavior, not actual behavior; the suite becomes insensitive to real changes and the agent *outruns its headlights*, committing to test structure before understanding the implementation.
 - Only enough code to pass the current test. Anticipating the next test bloats the implementation and couples it to assumptions not yet verified.
 - Tests verify behavior through public interfaces. No private-method tests, no internal-collaborator mocks, no direct database/file-system assertions when the public interface is what the caller uses. If a test would couple to implementation, surface it and prompt — either rewrite to the public surface or accept the coupling explicitly with rationale in the task notes.
@@ -76,7 +77,7 @@ Per-cycle checklist (confirm before moving to the next behavior):
 
 If any checkbox fails, fix it before writing the next test.
 
-Interview UX: Codex has no `AskUserQuestion` primitive. Use inline numbered text for plan approval and coupling-acceptance prompts. One question per turn.
+Interview UX: for plan approval and coupling-acceptance prompts, use Codex's `request_user_input` tool when the session exposes it (one to three short questions with options; only some collaboration modes offer it), otherwise inline numbered text. One question per turn.
 </instructions>
 
 <output_contract>

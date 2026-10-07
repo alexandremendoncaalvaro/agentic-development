@@ -27,7 +27,7 @@ Step 6 — write the study. Write doc/research/NNNN-<slug>.md using the template
 
 Step 7 — graduate (when the conclusion binds). After the study is reviewed, if its conclusion is a binding decision, graduate it: open an ADR (ad-adr) that references this study by path — the study holds the evidence, the ADR records the decision. If the conclusion feeds a pre-construction build, hand to ad-derisk (Front B) rather than building blind.
 
-Interview: ask one question at a time for the framing choices (scope, stakes level, the candidate options) and the concluding verdict. Codex has no AskUserQuestion primitive; use inline numbered questions.
+Interview: ask one question at a time for the framing choices (scope, stakes level, the candidate options) and the concluding verdict. Use Codex's `request_user_input` tool when the session exposes it (one to three short questions with options; only some collaboration modes offer it), otherwise inline numbered text.
 </instructions>
 
 <template path="doc/research/NNNN-<slug>.md">

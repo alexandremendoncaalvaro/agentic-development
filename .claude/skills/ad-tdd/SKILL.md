@@ -11,7 +11,7 @@ Implements WORKFLOW.md §16. Process scaffold for the implementation phase when 
 
 TDD is a deterministic LLM guardrail: a failing test is unambiguous, so "almost right" (the WORKFLOW §12 failure mode) cannot slip past. The skill keeps the agent inside red-green-refactor and blocks the named anti-pattern (horizontal slicing).
 
-**Good tests read like a specification.** *"User can checkout with a valid cart"* tells you exactly what capability exists. **Bad tests couple to implementation** — mock internal collaborators, assert on private state, test the *shape* of things (data structures, function signatures) rather than user-facing behavior. A test that breaks on a rename but not on a behavior change was testing implementation, not behavior.
+**Good tests read like a specification.** *"User can checkout with a valid cart"* tells you exactly what capability exists. **Bad tests couple to implementation** — mock internal collaborators, assert on private state, test the *shape* of things (data structures, function signatures) rather than user-facing behavior. A test that breaks on a rename but not on a behavior change was testing implementation, not behavior. A **tautological test** is the same failure in a quieter form: its expected value is recomputed the way the code computes it, so it passes by construction and cannot catch the bug. Take expected values from an independent source — a literal, a worked example, the spec.
 
 ## Step 0 — Confirm regime
 

@@ -30,7 +30,7 @@ Step 5 — stop criterion. Stop when every critical unknown is Strong, or Condit
 
 Step 6 — hand off the de-risked design. Report the resolved register (each unknown with its §17 grade), links to the spikes and ADRs the loop spawned, and the design that is now ready to build. Route to ad-spec to formalize the feature, ad-adr to record a binding decision, and ad-tdd to build.
 
-Interview: ask one question at a time for the risk-register review (which unknowns are critical) and the stop-criterion checkpoint (build now / keep de-risking / accept a named risk). Codex has no AskUserQuestion primitive; use inline numbered questions.
+Interview: ask one question at a time for the risk-register review (which unknowns are critical) and the stop-criterion checkpoint (build now / keep de-risking / accept a named risk). Use Codex's `request_user_input` tool when the session exposes it (one to three short questions with options; only some collaboration modes offer it), otherwise inline numbered text.
 </instructions>
 
 <output_contract>

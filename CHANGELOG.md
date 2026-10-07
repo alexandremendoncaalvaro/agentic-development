@@ -6,6 +6,23 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- Practices from the kit's reference skill repositories, adapted in the kit's
+  own words (RESEARCH-0032, task-0097): `/ad-diagnose` redacts secrets before
+  showing commands or artifacts, minimises the repro until every element is
+  load-bearing, and closes Phase 1 only on a red-capable command it has
+  already run; `/ad-pr` bodies may carry before-and-after `Evidence`, a
+  `Merge danger` line (one-way or two-way door, blast radius), and one small
+  diagram; `/ad-tdd` names the tautological test; `WORKFLOW.md` §6 and
+  `/ad-task` name expand–contract as the exception to vertical slicing;
+  `/ad-level-up` reads session transcripts as a candidate source and routes a
+  mechanically checkable violation to `/ad-hooks` or a lint rule instead of
+  rule text.
+- Codex skill bodies no longer say Codex has no structured-question tool; they
+  use `request_user_input` where the session exposes it, with inline numbered
+  text as the fallback (RESEARCH-0033 E10, task-0097).
+
 ## [1.1.0] - 2026-10-06
 
 ### Added

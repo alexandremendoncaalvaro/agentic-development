@@ -1676,6 +1676,86 @@ test('ad-audit runs the full gate once and reviewers run only targeted tests, on
   }
 });
 
+// task-0097: practices absorbed from the reference repositories (RESEARCH-0032)
+// and the corrected Codex structured-question line (RESEARCH-0033 E10).
+const BOTH_HOSTS = (skill) => [`claude-code/${skill}/SKILL.md`, `codex/${skill}/SKILL.md`];
+
+test('ad-diagnose redacts secrets, minimises the repro, and closes Phase 1 on a run red-capable command, on both hosts', () => {
+  for (const rel of BOTH_HOSTS('ad-diagnose')) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
+    assert.match(body, /redact/i, `${rel} does not ask to redact secrets`);
+    assert.match(body, /minimise/i, `${rel} lost the Minimise step`);
+    assert.match(
+      body,
+      /every remaining element is load-bearing/i,
+      `${rel} has no Minimise stop rule`
+    );
+    assert.match(body, /red-capable/i, `${rel} has no Phase-1 completion criterion`);
+    assert.match(body, /already run/i, `${rel} does not require the loop command to have run`);
+    assert.match(body, /output shown/i, `${rel} does not require the loop output to be shown`);
+  }
+});
+
+test('ad-pr offers Evidence and Merge danger sections and an optional diagram, on both hosts', () => {
+  for (const rel of BOTH_HOSTS('ad-pr')) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
+    assert.match(body, /## Evidence/, `${rel} has no Evidence section`);
+    assert.match(body, /## Merge danger/, `${rel} has no Merge danger section`);
+    assert.match(body, /two-way door/i, `${rel} does not name reversibility`);
+    assert.match(body, /blast radius/i, `${rel} does not name blast radius`);
+    assert.match(body, /diagram/i, `${rel} does not allow a diagram`);
+  }
+});
+
+test('ad-tdd names the tautological test, on both hosts', () => {
+  for (const rel of BOTH_HOSTS('ad-tdd')) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
+    assert.match(body, /tautological/i, `${rel} does not name the tautological test`);
+    assert.match(
+      body,
+      /independent source/i,
+      `${rel} does not ask for an independent expected value`
+    );
+  }
+});
+
+test('expand–contract is the named exception to vertical slicing, in WORKFLOW and ad-task on both hosts', () => {
+  for (const rel of BOTH_HOSTS('ad-task')) {
+    assert.match(
+      readFileSync(join(SKILLS_ROOT, rel), 'utf8'),
+      /expand–contract/,
+      `${rel} lacks the exception`
+    );
+  }
+  const workflow = readFileSync(join(SKILLS_ROOT, '..', '..', 'WORKFLOW.md'), 'utf8');
+  assert.match(workflow, /expand–contract/, 'WORKFLOW.md lacks the exception');
+});
+
+test('ad-level-up reads session transcripts and routes mechanical violations to a hook or lint rule, on both hosts', () => {
+  for (const rel of BOTH_HOSTS('ad-level-up')) {
+    const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
+    assert.match(body, /session transcript/i, `${rel} does not accept transcripts as a source`);
+    assert.match(body, /mechanical violation/i, `${rel} has no mechanical-violation routing`);
+    assert.match(body, /\/ad-hooks/, `${rel} does not route to /ad-hooks`);
+  }
+});
+
+test('no Codex skill body says Codex lacks a structured-question tool', () => {
+  for (const name of bundledSkills('codex')) {
+    const body = readFileSync(join(SKILLS_ROOT, 'codex', name, 'SKILL.md'), 'utf8');
+    assert.doesNotMatch(
+      body,
+      /Codex has no `?AskUserQuestion`? primitive/,
+      `codex/${name} carries the stale line`
+    );
+  }
+  for (const name of ['ad-derisk', 'ad-guidelines', 'ad-prd', 'ad-research', 'ad-tdd']) {
+    const body = readFileSync(join(SKILLS_ROOT, 'codex', name, 'SKILL.md'), 'utf8');
+    assert.match(body, /`request_user_input`/, `codex/${name} lost the structured-question tool`);
+    assert.match(body, /inline numbered text/, `codex/${name} lost the fallback`);
+  }
+});
+
 // --- Skill scripts host parity (task-0031) ---
 // A skill script (scripts/ beside SKILL.md) is host-agnostic executable code:
 // both hosts must ship it, byte-identical, so the copy-drift that motivated

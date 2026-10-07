@@ -88,7 +88,7 @@ Step 3 — interview to fill preference questions. One question at a time. Skip 
 
 3.7 Canonical examples confirmation. If Step 1 found candidate examples, present the paths and ask whether each should be treated as canonical. Keep at most one row per pattern unless two variants are genuinely necessary. If the user cannot endorse an example, omit the section; bad exemplars are worse than no exemplars.
 
-Codex has no `AskUserQuestion` primitive — use inline numbered text for the three-tier Object Calisthenics question and other multi-choice prompts.
+For the three-tier Object Calisthenics question and other multi-choice prompts, use Codex's `request_user_input` tool when the session exposes it (one to three short questions with options; only some collaboration modes offer it), otherwise inline numbered text.
 
 Step 4 — AGENTS.md reciprocity. After writing `GUIDELINES.md`, offer to refresh `AGENTS.md` engineering sections as pointer stubs:
 
