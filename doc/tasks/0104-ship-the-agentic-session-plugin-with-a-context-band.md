@@ -15,12 +15,14 @@ The owner wants the context band from the RESEARCH-0033 spike in the kit, as
 an opt-in Claude Code plugin, shown only above a fill threshold, with a
 one-press `/ad-handoff`. ADR-0088 (proposed) amends ADR-0041 to allow an
 additive companion plugin; GROUND-0035 grounds the marketplace layout, the
-vendor's `token-weather` pattern, and the numeric user option.
+vendor's `token-weather` pattern, and the numeric user option; RESEARCH-0036
+surveyed the mods ecosystem and set the measure toward auto-compaction.
 
 ## Acceptance Criteria
 
 - [ ] `.claude-plugin/marketplace.json` lists `agentic-session` with a relative source `./plugins/agentic-session`, and the entry name equals the manifest name.
 - [ ] `plugins/agentic-session/` holds a manifest with a `threshold` number option (default 60, min 1, max 99), a `hooks/hooks.json` naming one ESM module, and that module.
+- [ ] The fill is measured toward the auto-compact point (`autoCompactThreshold` from `$.session.usage({ breakdown: true })`) when auto-compaction is on, and toward the model's window otherwise; the band names which.
 - [ ] With the fill at or above the threshold, the band shows the percentage and a `Handoff` button that submits `/ad-handoff`; below it, or with no reading, nothing is drawn and the engine's own band stands.
 - [ ] The reading is taken on `session.start` and on each main-loop `turn.complete` (subagent turns skipped), never on every draw.
 - [ ] The plugin intercepts no tool call and rewrites no prompt.
@@ -38,8 +40,8 @@ Slice 1 — the band (this task):
 - [ ] Docs: README install section, ARCHITECTURE pattern, CONTEXT term, CHANGELOG.
 - [ ] `/ad-review`; `/ad-audit`; `/ad-commit`; PR on the owner's approval.
 
-Slice 2 — create the resume chip from the plugin: a separate decision after the
-band is in use (ADR-0088 Decision 6), not in this task.
+Slices 2 and 3 are Tasks 0105 (resume chip) and 0106 (verify-before-done
+receipt), after this one.
 
 ## Notes
 
