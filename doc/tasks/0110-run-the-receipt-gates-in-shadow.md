@@ -61,6 +61,13 @@ runs each check once, against the first landing action that needs it, so
 each check reads only the newest 20 receipt files, so a covering receipt with
 more than 20 newer ones reads as missing; label such a line false.
 
+### 2026-10-07 — chained pull request actions
+
+From Task 0108's final review: in `gh pr ready && gh pr merge` both checks
+are logged once, against `gh pr ready`; no `gh pr merge` line appears. Read a
+missing later-action line in a chained command as covered by the first, not
+as a gate that did not fire.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

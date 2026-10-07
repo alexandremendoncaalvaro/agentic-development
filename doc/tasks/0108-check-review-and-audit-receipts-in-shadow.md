@@ -220,6 +220,31 @@ to 12. New findings, with dispositions:
   not re-fetched by that reviewer. Accepted as a label: public pages with
   access dates.
 
+### 2026-10-07 — final review and re-audit at 51cc1f4
+
+Two-axis review and a CV re-audit of 7be7d7d..51cc1f4: no blocker, no
+concern; both axes "ship as-is". The CV reviewer reverted the gate to
+7be7d7d in a disposable clone and the two chained-command tests failed
+(35 of 37 passed), reproducing the red claim above. Findings, with
+dispositions:
+
+- Standards Note and CV Nit: a comment and the regression test title still
+  said a chained command logs the checks of every action. Fixed.
+- Standards Note: the receipt-reader comment was ragged. Fixed.
+- Standards Note: the entry above says ADR-0089 "marks them in place"; the
+  retired phrases are named in the third addendum's closing paragraph, not
+  at each decision, as ADR-0080 does. Corrected here.
+- Spec Note: Task 0110 did not say that a chained `gh pr ready && gh pr
+  merge` logs no merge line. Fixed in Task 0110's Notes.
+- Spec Note and CV Nit: Task 0110's first labelling entry still reads two
+  lines per chain. Accepted: its correction follows it, and Notes are
+  append-only.
+- Standards Note: the reproduction is a JSON argument list, not a shell
+  line. Accepted: the command is an argument list.
+- Spec Note: the ADR addendum, PROJECTION row and GUIDELINES pointer go
+  beyond the criteria. Accepted: they record an exception the feature
+  needed.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
