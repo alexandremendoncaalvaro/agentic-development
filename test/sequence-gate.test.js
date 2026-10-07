@@ -436,3 +436,89 @@ test('sequence-gate: committing the review and audit files does not make them st
   const states = runGate(repo, 'gh pr merge').lines.map((line) => line.state);
   assert.deepEqual(states, ['clear', 'clear']);
 });
+
+test('sequence-gate: a chained command logs the checks of every landing action in it', () => {
+  const repo = fixtureRepo();
+  const lines = runGate(repo, 'git push -u origin x && gh pr create --fill').lines;
+  assert.deepEqual(
+    lines.map((line) => `${line.action}:${line.check}`),
+    ['git push:gate-run', 'gh pr create:gate-run', 'gh pr create:review', 'gh pr create:audit']
+  );
+});
+
+test('sequence-gate: an invalid command bound or a command outside review is runtime-unavailable', () => {
+  const repo = fixtureRepo();
+  const ok = 'node -e "process.exit(0)"';
+  for (const timeoutSeconds of [0, -1, 'x', 21]) {
+    writeGates(repo, { checks: { review: { command: ok, timeoutSeconds } } });
+    const [review] = linesFor(runGate(repo, 'gh pr merge').lines, 'review');
+    assert.equal(review.state, 'runtime-unavailable', `timeoutSeconds ${timeoutSeconds}`);
+  }
+  writeGates(repo, { checks: { audit: { command: ok } } });
+  const [audit] = linesFor(runGate(repo, 'gh pr merge').lines, 'audit');
+  assert.equal(audit.state, 'runtime-unavailable');
+  assert.match(audit.output, /review only/);
+});
+
+test('sequence-gate: a review target is read from the first line, and a malformed one is counted', () => {
+  const repo = fixtureRepo();
+  const head = git(repo, 'rev-parse', 'HEAD');
+  const dir = join(repo, '.agentic', 'reviews');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, '20261007T100000Z-a-verdicts.md'),
+    `## Findings\n\nTarget-SHA: ${head}\n`
+  );
+  writeFileSync(join(dir, '20261007T100001Z-b-verdicts.md'), `Target-SHA: ${head.slice(0, 7)}\n`);
+  writeAudit(repo, head.toUpperCase());
+  const lines = runGate(repo, 'gh pr merge').lines;
+  const [review] = linesFor(lines, 'review');
+  const [audit] = linesFor(lines, 'audit');
+  assert.equal(review.state, 'would-block');
+  assert.equal(review.unreadable_receipts, 1);
+  assert.equal(audit.unreadable_receipts, 1);
+});
+
+test('sequence-gate: an audit summary without a target is counted as unreadable', () => {
+  const repo = fixtureRepo();
+  mkdirSync(join(repo, '.agentic', 'reviews'), { recursive: true });
+  writeFileSync(
+    join(repo, '.agentic', 'reviews', '20261007T1-audit-x-summary.json'),
+    '{"findings": []}\n'
+  );
+  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'audit')[0].unreadable_receipts, 1);
+});
+
+test('sequence-gate: a code change after the audit makes the audit stale', () => {
+  const repo = fixtureRepo();
+  writeAudit(repo, git(repo, 'rev-parse', 'HEAD'));
+  writeFileSync(join(repo, 'a.txt'), 'changed after audit\n');
+  git(repo, 'commit', '-qam', 'unaudited change');
+  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'audit')[0].state, 'would-block');
+});
+
+test('sequence-gate: turning one check off leaves the others running', () => {
+  const repo = fixtureRepo();
+  writeGates(repo, { checks: { audit: false } });
+  assert.deepEqual(
+    runGate(repo, 'gh pr create').lines.map((line) => line.check),
+    ['gate-run', 'review']
+  );
+});
+
+test('sequence-gate: gh pr ready reads the same review and audit receipts', () => {
+  const repo = fixtureRepo();
+  const head = git(repo, 'rev-parse', 'HEAD');
+  writeReview(repo, head);
+  const lines = runGate(repo, 'gh pr ready 12').lines;
+  assert.equal(linesFor(lines, 'review')[0].state, 'clear');
+  assert.equal(linesFor(lines, 'audit')[0].state, 'would-block');
+});
+
+test('sequence-gate: a check examines at most the newest receipts, so its cost stays bounded', () => {
+  const repo = fixtureRepo();
+  for (let i = 10; i < 40; i += 1) writeReview(repo, 'e'.repeat(40), `20261007T1200${i}Z`);
+  const [review] = linesFor(runGate(repo, 'gh pr merge').lines, 'review');
+  assert.equal(review.state, 'would-block');
+  assert.equal(review.unreadable_receipts, 20);
+});

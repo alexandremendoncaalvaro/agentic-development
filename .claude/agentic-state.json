@@ -306,7 +306,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "540d277776fe32a82dea6cace501a031bf87f363cca8e46ae21f4161934b7a15"
+          "sourceSha": "b42ff267c8535f8b7b7a2bedcd31f7ba43b2d736a31cea18d6b47564f1cbf967"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
@@ -314,7 +314,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/SKILL.md",
-          "sourceSha": "57f25064149625b66f2ed58f6557531a5d40dfa2f1709ac4e4292e7711a0bf30"
+          "sourceSha": "e827af38ecabcf6548fe7d4deb1ca621d7e701efad2fc9041b9fe1e3b41c2941"
         }
       ]
     },

@@ -81,14 +81,16 @@ const ACTIONS = [
   },
 ];
 
-function findAction(command) {
-  if (typeof command !== 'string') return null;
-  return ACTIONS.find((action) => action.pattern.test(command)) ?? null;
+// Every landing action in the command, so a chained `git push && gh pr
+// create` logs the checks of both.
+function findActions(command) {
+  if (typeof command !== 'string') return [];
+  return ACTIONS.filter((action) => action.pattern.test(command));
 }
 
-/** The landing action a shell command performs, or null. */
+/** The first landing action a shell command performs, or null. */
 export function landingAction(command) {
-  return findAction(command)?.id ?? null;
+  return findActions(command)[0]?.id ?? null;
 }
 
 export function globToRegExp(glob) {
@@ -189,23 +191,30 @@ export function checkGateRun(cwd) {
 }
 
 const SHA = /^[0-9a-f]{40}$/;
-const TARGET_SHA_LINE = /^Target-SHA:\s*(\S+)\s*$/m;
+const TARGET_SHA_LINE = /^Target-SHA:[ \t]*(.*?)\s*$/;
+const WORKING_TREE = 'none (working tree)';
+export const MAX_COMMIT_RECEIPTS = 20;
 
 /**
  * Commit receipts under `.agentic/reviews/`, oldest first by file name (an
- * ISO timestamp prefix): each file ending in `suffix` whose target, read by
- * `targetOf`, is a commit SHA, resolved to that commit's tree. A target that
- * is not a SHA (a working-tree review) is no receipt; an unparsable file or a
- * commit that cannot be resolved is counted as unreadable.
+ * ISO timestamp prefix), from the newest `MAX_COMMIT_RECEIPTS` files only:
+ * the directory is never pruned, and resolving every file cost 18 s for 300
+ * of them (task-0108 Notes). Each file ending in `suffix` whose target, read by
+ * `targetOf`, is a full commit SHA, resolved to that commit's tree. A file
+ * with no target (written before receipts existed) or a working-tree target
+ * is no receipt; an unparsable file, any other target or a commit that cannot
+ * be resolved is counted as unreadable.
  */
 function readCommitReceipts(root, suffix, targetOf) {
   const dir = join(root, REVIEWS_DIR);
   const receipts = [];
   let unreadable = 0;
   if (!existsSync(dir)) return { receipts, unreadable };
-  for (const name of readdirSync(dir)
+  const names = readdirSync(dir)
     .filter((file) => file.endsWith(suffix))
-    .sort()) {
+    .sort()
+    .slice(-MAX_COMMIT_RECEIPTS);
+  for (const name of names) {
     let sha;
     try {
       sha = targetOf(readFileSync(join(dir, name), 'utf8'));
@@ -213,7 +222,11 @@ function readCommitReceipts(root, suffix, targetOf) {
       unreadable += 1;
       continue;
     }
-    if (typeof sha !== 'string' || !SHA.test(sha)) continue;
+    if (sha === undefined || sha === WORKING_TREE) continue;
+    if (typeof sha !== 'string' || !SHA.test(sha)) {
+      unreadable += 1;
+      continue;
+    }
     try {
       receipts.push({ sha, tree: git(root, ['rev-parse', `${sha}^{tree}`]) });
     } catch {
@@ -225,12 +238,16 @@ function readCommitReceipts(root, suffix, targetOf) {
 
 /** `ad-review` verdicts files, by their `Target-SHA:` line. */
 export function readReviewReceipts(root) {
-  return readCommitReceipts(root, '-verdicts.md', (text) => TARGET_SHA_LINE.exec(text)?.[1]);
+  return readCommitReceipts(
+    root,
+    '-verdicts.md',
+    (text) => TARGET_SHA_LINE.exec(text.split('\n', 1)[0])?.[1]
+  );
 }
 
 /** `ad-audit` summary files, by their `target` field. */
 export function readAuditReceipts(root) {
-  return readCommitReceipts(root, '-summary.json', (text) => JSON.parse(text)?.target);
+  return readCommitReceipts(root, '-summary.json', (text) => JSON.parse(text)?.target ?? null);
 }
 
 // A review or an audit names the commit it covered; the check compares that
@@ -266,6 +283,9 @@ export const checkAudit = commitReceiptCheck(
 );
 
 export const DEFAULT_COMMAND_TIMEOUT_SECONDS = 10;
+// A design choice, under the 30 seconds this repository's Codex wiring gives
+// the hook, leaving room for its git calls.
+export const MAX_COMMAND_TIMEOUT_SECONDS = 20;
 
 /**
  * A repository whose review is done by a bot or harness names, in
@@ -274,13 +294,19 @@ export const DEFAULT_COMMAND_TIMEOUT_SECONDS = 10;
  * under the hosts' 600-second hook timeout (GROUND-0040 E1).
  */
 function commandCheck(check, setting, cwd) {
+  // ADR-0089 decision 7 lets bot evidence stand in for a review only.
+  if (check !== 'review') throw new Error(`a command replaces the review only, not ${check}`);
+  const seconds = setting.timeoutSeconds ?? DEFAULT_COMMAND_TIMEOUT_SECONDS;
+  if (typeof seconds !== 'number' || !(seconds > 0 && seconds <= MAX_COMMAND_TIMEOUT_SECONDS)) {
+    throw new Error(`timeoutSeconds must be above 0 and at most ${MAX_COMMAND_TIMEOUT_SECONDS}`);
+  }
   const root = repositoryRoot(cwd);
   const head = git(root, ['rev-parse', 'HEAD']);
   const run = spawnSync(setting.command, {
     cwd: root,
     shell: true,
     stdio: 'ignore',
-    timeout: (setting.timeoutSeconds ?? DEFAULT_COMMAND_TIMEOUT_SECONDS) * 1000,
+    timeout: seconds * 1000,
     env: { ...process.env, AGENTIC_HEAD_SHA: head },
   });
   // Not reading the evidence is not evidence that it is missing.
@@ -333,11 +359,11 @@ function main() {
   }
   if (event === null || typeof event !== 'object' || Array.isArray(event)) return;
   if (event.tool_name !== 'Bash') return;
-  const action = findAction(event.tool_input?.command);
-  if (!action) return;
+  const actions = findActions(event.tool_input?.command);
+  if (actions.length === 0) return;
 
   const cwd = typeof event.cwd === 'string' && event.cwd ? event.cwd : process.cwd();
-  for (const check of action.checks) {
+  for (const [action, check] of actions.flatMap((a) => a.checks.map((c) => [a, c]))) {
     if (checkSetting(cwd, check) === false) continue;
     let result;
     try {
