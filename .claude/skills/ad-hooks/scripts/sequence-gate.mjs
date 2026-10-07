@@ -82,26 +82,35 @@ function changedPaths(root, fromTree, toTree) {
   return out.split('\0').filter(Boolean);
 }
 
-/** The newest passing receipt that covers `tree`, or null. */
+/**
+ * The newest passing receipt that covers `tree`, or null, and how many
+ * receipts could not be read or compared (a torn line, a tree no longer in the
+ * object store).
+ */
 export function freshReceipt(root, tree) {
   const neutral = [...ALWAYS_NEUTRAL, ...receiptNeutral(root)].map(globToRegExp);
-  const passing = readReceipts(root).filter((receipt) => receipt.exit === 0);
+  const { receipts, unreadable } = readReceipts(root);
+  let uncomparable = 0;
+  const passing = receipts.filter((receipt) => receipt.exit === 0);
   for (const receipt of passing.reverse()) {
     let paths;
     try {
       paths = changedPaths(root, receipt.tree, tree);
     } catch {
-      continue; // a tree no longer in the object store covers nothing
+      uncomparable += 1;
+      continue;
     }
-    if (paths.every((path) => neutral.some((glob) => glob.test(path)))) return receipt;
+    if (paths.every((path) => neutral.some((glob) => glob.test(path)))) {
+      return { receipt, unreadable: unreadable + uncomparable };
+    }
   }
-  return null;
+  return { receipt: null, unreadable: unreadable + uncomparable };
 }
 
 export function checkGateRun(cwd) {
   const root = repositoryRoot(cwd);
   const tree = headTree(root);
-  const receipt = freshReceipt(root, tree);
+  const { receipt, unreadable } = freshReceipt(root, tree);
   return {
     check: 'gate-run',
     state: receipt ? 'clear' : 'would-block',
@@ -109,6 +118,7 @@ export function checkGateRun(cwd) {
     tree,
     receipt: receipt ? receipt.tree : null,
     missing: receipt ? [] : ['gate-run'],
+    unreadable_receipts: unreadable,
     reproduction:
       'run the repository CI-mirror command, then: node <ad-hooks>/scripts/gate-run.mjs record ' +
       '--command "<that command>" --exit 0',

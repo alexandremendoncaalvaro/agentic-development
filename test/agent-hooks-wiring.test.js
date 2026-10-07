@@ -369,3 +369,61 @@ test('agent hooks wiring: the PreToolUse Bash entry runs the shadow sequence gat
     rmSync(evidence, { recursive: true, force: true });
   }
 });
+
+// The Codex command resolves the script through `$(git rev-parse
+// --show-toplevel)` from the session cwd; cmd.exe has no `$(...)`, so this
+// half runs on POSIX only, as the artifact-gate Codex test does.
+if (process.platform === 'win32') {
+  test.skip('agent hooks wiring: the Codex PreToolUse command runs the shadow sequence gate (POSIX only)', () => {});
+} else {
+  test('agent hooks wiring: the Codex PreToolUse command runs the shadow sequence gate through a POSIX shell', () => {
+    const root = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-wiring-repo-')));
+    const evidence = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-wiring-evidence-')));
+    try {
+      const env = { ...process.env, AD_SEQUENCE_GATE: '', AD_SEQUENCE_GATE_EVIDENCE_DIR: evidence };
+      delete env.GIT_DIR;
+      delete env.GIT_WORK_TREE;
+      delete env.GIT_INDEX_FILE;
+      spawnSync('git', ['init', '-q'], { cwd: root, env });
+      spawnSync(
+        'git',
+        [
+          '-c',
+          'user.name=w',
+          '-c',
+          'user.email=w@example.test',
+          'commit',
+          '-q',
+          '--allow-empty',
+          '-m',
+          'x',
+        ],
+        { cwd: root, env }
+      );
+      const config = JSON.parse(readFileSync(join(KIT_ROOT, '.codex', 'hooks.json'), 'utf8'));
+      const hook = config.hooks.PreToolUse.find((e) => e.matcher === 'Bash').hooks[0];
+      const run = spawnSync(hook.command, {
+        shell: '/bin/sh',
+        cwd: KIT_ROOT,
+        input: JSON.stringify({
+          hook_event_name: 'PreToolUse',
+          session_id: 'wiring-codex',
+          cwd: root,
+          turn_id: 'turn-1',
+          tool_name: 'Bash',
+          tool_input: { command: 'gh pr create --fill' },
+        }),
+        encoding: 'utf8',
+        env,
+      });
+      assert.equal(run.status, 0, `shadow mode exits 0; stderr: ${run.stderr}`);
+      assert.equal(run.stdout, '');
+      const line = JSON.parse(readFileSync(join(evidence, 'wiring-codex.jsonl'), 'utf8'));
+      assert.equal(line.action, 'gh pr create');
+      assert.equal(line.state, 'would-block');
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+      rmSync(evidence, { recursive: true, force: true });
+    }
+  });
+}

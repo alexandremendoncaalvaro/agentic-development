@@ -278,3 +278,14 @@ test('sequence-gate: a quoted option argument before push is still a push; other
     assert.equal(runGate(repo, command).lines.length, 0, command);
   }
 });
+
+test('sequence-gate: torn receipt lines are counted on the evidence line, not dropped silently', () => {
+  const repo = fixtureRepo();
+  recordRun(repo);
+  writeFileSync(join(repo, '.agentic', 'receipts', 'gate-run.jsonl'), '{"tree": "torn\n', {
+    flag: 'a',
+  });
+  const [line] = runGate(repo, 'git push').lines;
+  assert.equal(line.state, 'clear');
+  assert.equal(line.unreadable_receipts, 1);
+});

@@ -12,7 +12,7 @@
  * index is never touched.
  *
  * The receipt is a local working copy; the durable record of a gate run stays
- * the tracked task Notes or pull request body (rule CV.5).
+ * the tracked task Notes or pull request body.
  *
  * Zero dependencies; byte-identical in both host trees.
  */
@@ -72,21 +72,27 @@ export function gateRunFile(root) {
   return join(root, RECEIPTS_DIR, GATE_RUN_FILE);
 }
 
-/** Every receipt in the file, oldest first; a malformed line is skipped. */
+/**
+ * Every receipt in the file, oldest first, and the count of lines that carry
+ * none (torn or hand-edited), so a caller can report them instead of losing
+ * them silently.
+ */
 export function readReceipts(root) {
   const file = gateRunFile(root);
-  if (!existsSync(file)) return [];
   const receipts = [];
+  let unreadable = 0;
+  if (!existsSync(file)) return { receipts, unreadable };
   for (const line of readFileSync(file, 'utf8').split('\n')) {
     if (!line.trim()) continue;
     try {
       const receipt = JSON.parse(line);
       if (receipt && typeof receipt.tree === 'string') receipts.push(receipt);
+      else unreadable += 1;
     } catch {
-      /* a torn or hand-edited line carries no receipt */
+      unreadable += 1;
     }
   }
-  return receipts;
+  return { receipts, unreadable };
 }
 
 export function recordReceipt(cwd, { command, exit }) {
