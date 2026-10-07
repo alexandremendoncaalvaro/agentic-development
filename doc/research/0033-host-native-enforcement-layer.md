@@ -65,12 +65,41 @@ None between sources. The open trade-off is internal: the mod layer's value agai
 ## Limitations and what would reverse the conclusion
 
 - Small chip corpus; Codex sessions not in the store. A larger corpus showing misses inside `/ad-handoff` runs would shift weight back to skill text.
-- Unverified: whether a mod's `$.mcp.call` can reach the desktop `spawn_task` server; whether Claude Code reads agent-plugins.org manifests; exact event keys for skill-frontmatter hooks; whether Codex's status line accepts a custom command.
+- Unverified: whether Claude Code reads agent-plugins.org manifests; exact event keys for skill-frontmatter hooks; whether Codex's status line accepts a custom command.
 - A spike showing no gain from mods over hooks closes step 3.
 
 ## Provenance and artifacts
 
 Accessed 2026-10-06: code.claude.com docs (hooks, skills, plugins-reference, plugins/mods) and learn.chatgpt.com Codex docs (plugins, hooks, config reference) by WebFetch; `openai/codex` source by GitHub API; agent-plugins.org by WebFetch; the bundled `plugin-authoring` reference and typings by local read. Measurement scripts and the full sidecar report (session scratchpad `chip.mjs`, `chip2.mjs`, `research-B-host-specialization.md`) are not committed; the graded claims above are the durable record.
+
+## Spike result
+
+Step 2 ran on 2026-10-07 as a throwaway mod loaded by hot reload in a Claude
+Code desktop session (engine 2.1.289), then deleted. It settles three of the
+open items:
+
+- **E12 — A mod reads the real context fill.** `$.session.usage()` returned
+  `context.percent = 67` mid-session, the token figure the `Stop` nudge
+  currently approximates from transcript bytes. **Strength: High** (observed).
+- **E13 — A mod renders a one-press handoff affordance.** An `AbovePrompt`
+  band showing the context percentage and a `Handoff` button (wired to
+  `$.prompt.submit({ text: '/ad-handoff', asUser: true })`) rendered for the
+  owner; the button was not pressed. **Strength: High** (observed by the
+  owner).
+- **E14 — A mod reaches the desktop task server.** `$.mcp.call('ccd_session',
+  'dismiss_task', { task_id: 'spike-nonexistent-id' })` returned the server's
+  own validation error ("task_id must be the id returned by spawn_task"),
+  which proves the call reached the server that owns `spawn_task` without
+  creating a chip. A mod can therefore create the resume chip itself,
+  deterministically, instead of asking the model to. **Strength: High**
+  (observed; `spawn_task` itself was not called).
+
+What this changes: step 3 is now feasible on Claude Code desktop, and the
+strongest form of the chip guarantee is a mod that calls `spawn_task` on the
+handoff write, not a reminder. It does not change the constraints that made
+step 3 conditional: the mod API is early access, mods are Claude-Code-only and
+ship only as a plugin (ADR-0041), and the owner's terminal CLI (2.1.227) does
+not load them. The step-1 reminder (ADR-0087) stays the portable baseline.
 
 ## Derived decision
 
