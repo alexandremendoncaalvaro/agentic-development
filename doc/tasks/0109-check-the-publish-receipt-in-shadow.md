@@ -78,11 +78,54 @@ Local gate at 714b458: `npm run verify` exit 0 on Node 24.16.0, 1315 tests,
 0 vulnerabilities; `npm pack --dry-run` lists both new modules for both
 hosts.
 
+### 2026-10-07 — review at 534102f
+
+Fresh-context two-axis review of origin/main..534102f, every finding with
+severity and disposition:
+
+- Standards Concern: `{"githubCommands": [5]}` crashed the hook with exit 1
+  (reproduced by the reviewer). Fixed test-first in 3462668: entries must be
+  strings, and `main` is wrapped so shadow mode never fails a call.
+- Standards Concern: a backslash line continuation became the body. Fixed
+  test-first, inside and outside double quotes; removing the in-quotes fix
+  turned its assertion red.
+- Standards Concern: a relative body file after a `cd` was read from the
+  event's directory. Fixed test-first: it, a path under `~`, a non-regular
+  file and a file over 1 MiB (a design cap) are `runtime-unavailable`.
+- Standards Concern: every shell call now spawned git. Measured first: an
+  unrelated `ls -la` event took a minimum of 0.070 s against 0.027 s for the
+  gate at 3479fbd (7 runs each). Fixed: a text pre-filter returns before any
+  git call; 0.031 s median against 0.028 s (9 runs each, load above 11).
+- Standards Concern: a FIFO or huge file could block the hook. Fixed with the
+  regular-file check and size cap above; the FIFO case is covered by the
+  regular-file check, not by its own test.
+- Standards Note: only the first publication in a chained command was
+  checked. Fixed test-first: each gets its own line.
+- Standards Note: flag forms such as `-fbody=x` are not parsed. Accepted:
+  stated in GROUND-0041 and Task 0110's Notes.
+- Standards Note: the recorder printed a stack trace. Fixed test-first: one
+  line, exit 1.
+- Standards Note: `publish.jsonl` is read whole. Accepted: stated in
+  GROUND-0041.
+- Spec Concern: `githubCommands` changes Task 0108's pull request checks.
+  Fixed: ADR-0089's fourth addendum records it, and Task 0110's window
+  starts after this slice merges.
+- Spec Concern: `.agentic/gates.json` is a repository-specific change.
+  Fixed with the same addendum.
+- Spec Concern: chat coverage is Slack only. Accepted for this slice and
+  recorded in the addendum and Task 0110's Notes.
+- Spec Notes: the module move, the `gh api` body sources and the
+  trailing-newline normalization are disclosed and accepted; an explicit
+  unrelated-command test was added; byte parity is checked by the suite.
+
+Local gate at b55e6b6's tree: `npm run verify` exit 0, 1320 tests,
+0 vulnerabilities.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
 - [ ] Status updated to `done` and Notes log closes the task
