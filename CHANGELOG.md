@@ -26,6 +26,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Changed
 
+- `/ad-audit` runs the repository's full verification gate once, before the
+  reviewers start, and hands every group its result as a `Gate:` line; the
+  `audit-group-reviewer` briefs on both hosts now cite that result and run
+  only the narrowest tests for the files they ground, so parallel reviewers
+  no longer each start the whole suite in one worktree (task-0093).
 - `/ad-pr` and `/ad-merge` are model-invocable again: the agent may run them
   when the work is ready, and each skill asks for the owner's approval before
   the outward step (push and draft for `/ad-pr`, the merge on every path for
