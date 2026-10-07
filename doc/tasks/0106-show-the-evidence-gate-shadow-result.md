@@ -53,6 +53,13 @@ This task is re-scoped to display the gate's shadow result, renamed from
 `0106-show-a-verify-before-done-receipt.md`, and marked HITL because it waits on
 that decision.
 
+### 2026-10-07 — paired with Task 0111
+
+The owner asked for a continuous at-a-glance briefing (focus, plan stage,
+deviations, roadmap progress, Definition of Done) on the same plugin surface.
+Task 0111 tracks it; the owner chose to build the two together, after Task
+0109.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
