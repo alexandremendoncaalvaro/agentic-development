@@ -18,15 +18,15 @@ unchanged.
 
 ## Acceptance Criteria
 
-- [ ] On the owner's approval, `ad-publish` records the destination, the SHA-256 of the normalized approved body and the approval time under `.agentic/receipts/`, on both hosts.
-- [ ] `sequence-gate.mjs` logs "would block" before `gh pr comment`, `gh issue comment`, a comments API call and a chat send tool when no receipt matches the outgoing body's hash; it reads the body from `--body`, `--body-file` and the tool input.
-- [ ] Normalization is stated and tested (line endings, trailing whitespace), so a reformatted but identical body matches and any other change does not.
-- [ ] Tests cover a matching body, an edited body, no receipt, each body source, and an unrelated command.
+- [x] On the owner's approval, `ad-publish` records the destination, the SHA-256 of the normalized approved body and the approval time under `.agentic/receipts/`, on both hosts.
+- [x] `sequence-gate.mjs` logs "would block" before `gh pr comment`, `gh issue comment`, a comments API call and a chat send tool when no receipt matches the outgoing body's hash; it reads the body from `--body`, `--body-file` and the tool input.
+- [x] Normalization is stated and tested (line endings, trailing whitespace), so a reformatted but identical body matches and any other change does not.
+- [x] Tests cover a matching body, an edited body, no receipt, each body source, and an unrelated command.
 
 ## Plan
 
-- [ ] `/ad-ground` how each outward command carries its body; red, then green (`/ad-tdd`).
-- [ ] `ad-publish` text; CHANGELOG.
+- [x] `/ad-ground` how each outward command carries its body; red, then green (`/ad-tdd`).
+- [x] `ad-publish` text; CHANGELOG.
 - [ ] `/ad-review`; `/ad-audit`; `/ad-commit`; PR on the owner's approval.
 
 ## Notes
@@ -42,11 +42,47 @@ the owner's acceptance of ADR-0089 and approval of this plan.
 
 The owner accepted ADR-0089 and approved this plan.
 
+### 2026-10-07 — implementation
+
+GROUND-0041 was committed (3479fbd) before the first implementing commit
+(4088923). Built one behaviour per cycle through the scripts' command lines;
+each new behaviour failed first for the expected reason (author-reported:
+observed in the authoring session, not retained): the recorder missing, a
+quoted `--body` unread, a heredoc read as an expansion, `gh issue comment`
+and `gh api` calls unseen, the chat tool unseen, a missing body file logged
+against an `unknown` action, `ghp` unseen, and no `PreToolUse` entry for the
+chat tool. The edited-body and normalization tests passed on first run,
+through code the tracer step had already written; replacing the hash
+comparison with "any receipt", and removing each normalization rule in turn,
+turned them red.
+
+Beyond the ask, both grounded in this task's measurement needs:
+
+- `githubCommands` in `.agentic/gates.json` (default `["gh"]`) names the
+  wrappers a repository runs `gh` under, for the pull request checks of Task
+  0108 too. This repository commits `["gh", "ghp"]`: the owner runs `gh`
+  through `ghp` here, so without it Task 0110's shadow run would see none of
+  the owner's pull request or comment commands.
+- The review and audit receipt readers moved to `review-receipts.mjs`, so
+  `sequence-gate.mjs` stays under GUIDELINES 3.3's size review threshold
+  (438 lines before, 378 after).
+
+Real path, on this repository with the command wired in `.claude/settings.json`
+and simulated events, nothing posted: after recording a receipt for a test
+text, `ghp pr comment 162 --body-file <that file>` logged publish `clear`, a
+different `--body` logged `would-block`, and a
+`mcp__<server>__slack_send_message` event with the same text logged `clear`;
+the test receipt was then deleted from the local receipts file.
+
+Local gate at 714b458: `npm run verify` exit 0 on Node 24.16.0, 1315 tests,
+0 vulnerabilities; `npm pack --dry-run` lists both new modules for both
+hosts.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
+- [x] Local tests pass (or N/A documented in Notes)
 - [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
+- [x] No orphan `TODO`/`FIXME` introduced
 - [ ] Status updated to `done` and Notes log closes the task
