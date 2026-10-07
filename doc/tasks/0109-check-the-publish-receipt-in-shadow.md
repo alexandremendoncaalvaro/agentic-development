@@ -222,6 +222,29 @@ dispositions:
 Local gate after the fix: `npm run verify` exit 0, 1323 tests,
 0 vulnerabilities.
 
+### 2026-10-07 — last review and re-audit at 6a1cfd8
+
+Combined review and CV re-audit of 86d9fe9..6a1cfd8: no blocker. The CV
+reviewer reverted the gate to 86d9fe9 in a disposable clone and the new
+regression test failed (54 of 55), then passed on restore, and ran `npm run
+verify` at 6a1cfd8: exit 0, 1323 tests. Findings, with dispositions:
+
+- Review Concern (both axes): a `gates.json` of `null`, a number or an array
+  still hid a configured wrapper. Fixed test-first: `gatesConfig` rejects
+  anything but a JSON object, for every check; a test covers comments and
+  the chat send.
+- Review Note: `MAY_PUBLISH` matched any word "comment", so `git push origin
+  fix-comment` with a broken config added a publish line. Fixed: it matches
+  only `pr`/`issue comment` and `/comments`; pinned in the same test.
+- Review Note: on a broken config any non-Bash tool logs a line. Accepted:
+  only the chat-send tool is wired to reach the gate.
+- CV Minor: the previous entry states the reviewers' fuzz (400,000 commands)
+  and mutation results as fact. Labelled: reviewer-reported, observed in
+  their sessions, not retained.
+
+Local gate after the fix: `npm run verify` exit 0, 1324 tests,
+0 vulnerabilities.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
