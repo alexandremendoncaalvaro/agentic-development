@@ -3,7 +3,7 @@
 **Status:** accepted
 **Date:** 2026-10-07
 **Deciders:** Alexandre Alvaro
-**Amends:** ADR-0083, decisions 1 and 7 and decision 3's validator clause, for receipt gates only: a receipt gate may run before a tool call, may be proposed while the artifact-validator gate stays the only feedback gate, and checks a receipt's existence and freshness instead of invoking a skill's validator. Every other ADR-0083 decision binds it unchanged.
+**Amends:** ADR-0083, decisions 1 and 7, decision 3's validator clause and decision 5's every-state-is-recorded clause, for receipt gates only: a receipt gate may run before a tool call, may be proposed while the artifact-validator gate stays the only feedback gate, checks a receipt's existence and freshness instead of invoking a skill's validator, and may lose an evidence line it cannot write (second addendum). Every other ADR-0083 decision binds it unchanged.
 **Related:** ADR-0047, ADR-0055, ADR-0074 (the decisions a blocking guard must name); ADR-0072 (digest-bound approval precedent); ADR-0088 (the band may display the result)
 
 ## Context

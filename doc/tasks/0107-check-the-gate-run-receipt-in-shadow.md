@@ -159,6 +159,25 @@ blocker. Every finding, with severity and disposition:
 14. CV Nit: no review of the final head. Addressed by this audit; its fixes
     get a delta re-audit before the pull request.
 
+### 2026-10-07 — re-audit at 1b39846
+
+Re-audit of 2dfdf8c..1b39846 (CV, and ADRs with ARCHITECTURE, CONTEXT and
+GUIDELINES): every prior finding resolved, the Paperclip rejection upheld in
+part (its figures are dated in the study). New, with dispositions:
+
+- CV Minor: items 7 and 12 above state red runs without artifacts. Accepted
+  as a label: both are author-reported; the red outputs were observed in the
+  authoring session and not retained, and 2bceb12 holds the test and the fix
+  together.
+- CV Nit: the 2dfdf8c gate run (1281 tests) is in the auditor's local trail,
+  not in a tracked record. Accepted: the tracked claim is this entry's; the
+  head's gate is re-run before the pull request.
+- ADRs Minor: the lost-line decision contradicts ADR-0083 decision 5 without
+  naming it in the amendment pair. Fixed: ADR-0089, ADR-0083 and PROJECTION
+  now name decision 5's every-state-is-recorded clause.
+- GUIDELINES Nit: `unreadable_receipts` is a lower bound. Fixed: Task 0110's
+  read-out says so.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

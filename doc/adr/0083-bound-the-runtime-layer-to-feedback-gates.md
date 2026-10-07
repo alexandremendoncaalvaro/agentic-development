@@ -5,7 +5,7 @@
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0055 — its Codex-out-of-scope stanza only: the record deferred Codex because context-injection parity was undocumented and named its documentation as the revisit trigger; Codex now documents lifecycle hooks with that parity, so the tier is no longer Claude-Code-scoped as a category. The `Stop` nudge itself stays wired on Claude Code only until its own Codex follow-up; its mechanism and non-looping contract are unchanged.
 **Amends:** ADR-0074 — its Codex-out-of-scope stanza only, on the same trigger and with the same scope: the checkpoint stays wired on Claude Code only until its own follow-up. The static, exit-0, kill-switch decisions and the rejection of blocking as coercion are unchanged.
-**Amended by:** ADR-0089, decisions 1 and 7 and decision 3's validator clause, for receipt gates only: a receipt gate checks that a workflow receipt exists and is fresh before a landing or outward action, may run before the tool call, and ships in shadow mode (it never denies) while the artifact-validator gate stays the only feedback gate. Every other decision here binds receipt gates unchanged.
+**Amended by:** ADR-0089, decisions 1 and 7, decision 3's validator clause and decision 5's every-state-is-recorded clause, for receipt gates only: a receipt gate checks that a workflow receipt exists and is fresh before a landing or outward action, may run before the tool call, and ships in shadow mode (it never denies) while the artifact-validator gate stays the only feedback gate. Every other decision here binds receipt gates unchanged.
 
 ## Context
 
