@@ -245,6 +245,23 @@ verify` at 6a1cfd8: exit 0, 1323 tests. Findings, with dispositions:
 Local gate after the fix: `npm run verify` exit 0, 1324 tests,
 0 vulnerabilities.
 
+### 2026-10-07 — last pass at bf40816, and evidence labels
+
+Combined review and CV re-audit of 6a1cfd8..bf40816: no blocker; both review
+axes "ship as-is". The CV reviewer restored the gate from 4163acf in a
+disposable clone, saw the new regression test fail (55 of 56), and ran `npm
+run verify` at bf40816: exit 0, 1324 tests, 0 vulnerabilities.
+
+Labels, since past entries are append-only: in the entries "final review and
+re-audit at 86d9fe9", "last review and re-audit at 6a1cfd8" and this one,
+every result a reviewer ran (the 400,000-command fuzz, the mutation and
+revert runs and their pass counts, their `npm run verify` runs) is
+reviewer-reported: observed in the reviewer's session, not retained. The
+author's gate runs named "after the fix" ran on the trees of 4163acf (1323
+tests) and 7147a9c (1324 tests); the later commits change only task Notes.
+The previous entry's "Labelled" refers to this label, which it did not yet
+carry; this entry is where it lands.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
