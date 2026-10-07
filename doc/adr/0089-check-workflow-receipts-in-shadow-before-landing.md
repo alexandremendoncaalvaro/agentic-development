@@ -114,3 +114,15 @@ exceeds the preset threshold.
   ADR-0088 item 3. The band may display the result; the gate stays a hook.
 - **Amend ADR-0083 in place** — rejected: its decisions bind the validator
   gate; a separate record keeps the new class and its flip criterion visible.
+
+## Addendum 2026-10-07: what the first slice keys and logs
+
+Task 0107 refined two details, within decision 1's rule that a receipt is
+keyed to what it covered. The gate-run receipt is keyed to the git tree of the
+working copy, with the commit SHA kept for display: the CI-mirror command runs
+before the commit that lands the tested change, so that commit's tree, not its
+SHA, is what the run covered (GROUND-0038). Freshness in decision 3 is
+therefore "its tree is `HEAD^{tree}`, or only receipt-neutral paths differ".
+The evidence file also records `clear` and `runtime-unavailable` lines, so
+coverage can be measured; the false-block count of decision 6 is taken over
+`would-block` lines only.

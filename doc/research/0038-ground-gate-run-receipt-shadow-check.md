@@ -1,13 +1,13 @@
 # GROUND-0038: Record gate runs by tree and check them in shadow before push and PR
 
 **Status:** recorded
-**Decision:** A zero-dependency `gate-run.mjs` in `ad-hooks` records, after a successful CI-mirror run, a receipt keyed to the git tree of the working copy (computed through a temporary index outside the repository), and a zero-dependency `sequence-gate.mjs`, wired as `PreToolUse` on Bash on both hosts, logs a would-block or clear evidence line before `git push` and `gh pr create` by comparing that receipt with `HEAD^{tree}`, always exiting 0 with no output.
+**Decision:** A zero-dependency `gate-run.mjs` in `ad-hooks` records, after a successful CI-mirror run, a receipt keyed to the git tree of the working copy (computed through an empty temporary index outside the repository), and a zero-dependency `sequence-gate.mjs`, wired as `PreToolUse` on Bash on both hosts, logs a would-block or clear evidence line before `git push` and `gh pr create` by comparing that receipt with `HEAD^{tree}`, always exiting 0 with no output.
 **Decision ref:** doc/tasks/0107-check-the-gate-run-receipt-in-shadow.md
 **Confidence:** Strong
 
 ## Decision and confidence
 
-Both hosts send the shell command to a `PreToolUse` hook as `tool_name: "Bash"` with the text in `tool_input.command`, and both let the call proceed when the hook exits 0 with empty stdout, so one byte-identical script can observe the action without influencing it, which is ADR-0089's shadow contract. The receipt is keyed to the tree, not the commit: the CI-mirror command normally runs before the commit that lands the tested change, so a commit-keyed receipt would name the parent and report a false block on every push. A temporary index seeded from the real one and refreshed with `git add -A` yields the tree the next commit will have, untracked and modified files included, without touching the real index. The evidence line and its locking reuse the artifact gate's append routine, and the script reuses the kit's precedent of importing a sibling hook script. Axis-2: Strong. The tree identity was measured, the host contract is official documentation on both hosts, and the change only logs.
+Both hosts send the shell command to a `PreToolUse` hook as `tool_name: "Bash"` with the text in `tool_input.command`, and both let the call proceed when the hook exits 0 with empty stdout, so one byte-identical script can observe the action without influencing it, which is ADR-0089's shadow contract. The receipt is keyed to the tree, not the commit: the CI-mirror command normally runs before the commit that lands the tested change, so a commit-keyed receipt would name the parent and report a false block on every push. An empty temporary index filled with `git add -A` yields the tree the next commit will have, untracked and modified files included, without touching the real index. The evidence line and its locking reuse the artifact gate's append routine, and the script reuses the kit's precedent of importing a sibling hook script. Axis-2: Strong. The tree identity was measured, the host contract is official documentation on both hosts, and the change only logs.
 
 ## Evidence
 
@@ -18,12 +18,12 @@ Both hosts send the shell command to a `PreToolUse` hook as `tool_name: "Bash"` 
 
 Claude Code's input carries `session_id`, `cwd`, `tool_name: "Bash"` and `tool_input.command`; a `PreToolUse` hook's stdout on exit 0 is parsed as JSON when present, so a silent hook prints nothing (A1). Codex sends the same fields, maps `exec_command` to `Bash`, ignores plain stdout for `PreToolUse`, treats exit 0 with no output as success, and skips a new or changed hook until it is trusted (A2). Default timeouts are 600 seconds on both.
 
-### E2 — A temporary index yields the tree the next commit will have, without touching the real index
+### E2 — An empty temporary index yields the tree the next commit will have, without touching the real index
 
 **Strength:** High
-**Provenance:** A3, D2
+**Provenance:** A3, D2, D3
 
-`git write-tree` writes the tree of the index named by `GIT_INDEX_FILE` (A3). Measured: in a scratch repository with one modified and one untracked file, a copy of the index outside the repository refreshed by `git add -A` and written with `git write-tree` gave `8407bc34`, the real index still showed both changes, and after `git add -A` and a commit `HEAD^{tree}` was the same `8407bc34` (D2). A first attempt with the copy inside the repository gave a different tree, because the copy itself was added: the index must live outside the working tree.
+`git write-tree` writes the tree of the index named by `GIT_INDEX_FILE` (A3). Measured: in a scratch repository with one modified and one untracked file, a copy of the index outside the repository refreshed by `git add -A` and written with `git write-tree` gave `8407bc34`, the real index still showed both changes, and after `git add -A` and a commit `HEAD^{tree}` was the same `8407bc34` (D2). A first attempt with the copy inside the repository gave a different tree, because the copy itself was added: the index must live outside the working tree. Seeding from the real index then proved unreliable under test-driven development: a same-size edit within the second of the base commit was recorded as unchanged in 4 of 6 runs, because the copy's fresh mtime defeats git's racy-entry check. An empty index hashes every file's content instead; on this repository it gave the same tree as the seeded copy in 0.20 seconds for 1,019 files, against 0.03 seconds seeded, and the test passed in 10 of 10 runs (D3).
 
 ### E3 — The kit has the evidence-line, kill-switch and sibling-import patterns, and no pre-tool gate yet
 
@@ -50,6 +50,8 @@ claude-mods' merge gate is a `PreToolUse` hook on `gh pr merge` and trunk pushes
 - **C3:** `scripts/hook-npm-test.js`, `sanitizedEnv` and `defaultGateCommand` (`npm run verify`), wired as the `npm-verify` pre-push command in `lefthook.yml` (accessed 2026-10-07 via Read)
 - **D1:** `git log --oneline -S'PreToolUse' -- src/skills scripts .claude .codex` returned 07aef5c, cbc9b66 and ce33ab3, none of which wires a `PreToolUse` hook (accessed 2026-10-07 via Bash)
 - **D2:** scratch-repository measurement with git 2.x: `cp .git/index $T/idx; GIT_INDEX_FILE=$T/idx git add -A; GIT_INDEX_FILE=$T/idx git write-tree` before, and `git add -A; git commit; git rev-parse HEAD^{tree}` after, both `8407bc34184a82997ead21d9b6dad34e314c2a7f` (accessed 2026-10-07 via Bash; reproducible with any git on Linux, macOS or Git Bash on Windows)
+
+- **D3:** this repository at 6ec9f9b: `GIT_INDEX_FILE=$T/idx git add -A; git write-tree` from an empty index and from a copy of the real index both gave `7d8b43836cc0c067980f679f0062987005ababb1`, in 0.20 s and 0.03 s real time for 1,019 tracked files; `test/sequence-gate.test.js` failed 4 of 6 runs with the seeded index and passed 10 of 10 with the empty one (accessed 2026-10-07 via Bash, `/usr/bin/time -p`)
 
 ## Limitations and reversal
 
