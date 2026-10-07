@@ -1,6 +1,6 @@
 ---
 name: ad-task
-description: Draft a task file at doc/tasks/NNNN-<slug>.md with checkbox acceptance criteria and an append-only Notes log. Use when work needs a tracked unit; "create a task", "open a ticket", "work item", "backlog entry", "plan this as a task". Status starts proposed.
+description: Draft a task file at doc/tasks/NNNN-slug.md with checkbox acceptance criteria and an append-only Notes log. Use when work needs a tracked unit; "create a task", "open a ticket", "work item", "backlog entry", "plan this as a task". Status starts proposed.
 summary: Draft a new task at `doc/tasks/NNNN-<slug>.md`.
 allowed-tools: Read, Write, Glob, Bash
 ---

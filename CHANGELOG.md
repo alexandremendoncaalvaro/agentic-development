@@ -74,6 +74,12 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- Six skill descriptions (`/ad-adr`, `/ad-research`, `/ad-skill`, `/ad-spec`,
+  `/ad-subagent`, `/ad-task`) on both hosts no longer carry angle-bracket path
+  placeholders such as `<slug>`, which the Agent Skills field requirements
+  forbid and which a claude.ai upload or marketplace sync rejects; a test now
+  blocks tag-like text in every description, and `/ad-skill` tells authors the
+  rule (task-0095).
 - `/ad-spike` on Claude Code drafts the spike-outcome ADR from `/ad-adr`'s
   canonical template instead of its own skeleton, which lacked the
   `Status`, `Date`, and `Deciders` lines and the `Alternatives Considered`
