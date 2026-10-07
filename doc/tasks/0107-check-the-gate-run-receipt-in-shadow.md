@@ -178,6 +178,18 @@ part (its figures are dated in the study). New, with dispositions:
 - GUIDELINES Nit: `unreadable_receipts` is a lower bound. Fixed: Task 0110's
   read-out says so.
 
+### 2026-10-07 — history rewritten before push
+
+Before the branch was first pushed, an unmeasured duration figure for the
+harness spike was removed from the history of RESEARCH-0039, not only from
+its text: an estimate without a measurement is not published, including in a
+superseded commit. The rewrite changed only that sentence; every reviewed
+file's content is unchanged. Commits cited above map as follows (old to new):
+deb910f to 6c9d498, 84db1af to 5898743, 2dfdf8c to 74b47d7, 2bceb12 to
+496c28d, 1b39846 to 92d7b7e, 42dc6e9 to 952b697. The audit at 2dfdf8c and the
+re-audit at 1b39846 therefore cover 74b47d7 and 92d7b7e. Commits 6c5b258 and
+earlier, including every code commit before 2bceb12, kept their SHAs.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

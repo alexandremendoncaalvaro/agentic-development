@@ -22,13 +22,15 @@ Paperclip is the one outside candidate worth a time-boxed comparison. Among
 the candidates surveyed, it is the only one whose documentation describes the
 runtime refusing to close a task until configured review and approval stages
 pass, with reviewers that can be agents on another harness (Codex reviewing
-Claude Code). It is seven months old, releases every one to two weeks, has
+Claude Code). It was created on 2026-03-02, published six releases between 2026-09-02 and 2026-10-06, has
 telemetry on by default, and is a separate server that holds its own task and
 run records, so it is a personal-repository trial only.
 
-Conditional, with the mitigation of a spike on a personal
-repository that runs the native arm against Paperclip on the same three tasks
-under a decision rule fixed before the run.
+Conditional, with the mitigation of a spike on a personal repository that
+runs the native arm against Paperclip on the same three tasks under a decision
+rule fixed before the run. The comparison is fair only once the review,
+audit and publish receipts exist (Tasks 0108 and 0109), so the native arm is
+complete; the spike measures its own cost.
 
 ## Question and scope
 
