@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, sep as PATH_SEP } from 'node:path';
 import { installSkills } from '../src/lib/install.js';
@@ -106,4 +106,21 @@ test('PATH_SEP sanity: forward-slash test runs no-op on POSIX, real fix on Windo
   // installSkills tests above are the actual regression coverage; this
   // assertion just confirms PATH_SEP is one of the two known values.
   assert.ok(['/', '\\'].includes(PATH_SEP), `unexpected PATH_SEP: ${PATH_SEP}`);
+});
+
+// The ESM loader rejects a bare absolute Windows path (`D:\\...`): a dynamic
+// import of a joined or resolved path passes on POSIX and fails only on the
+// Windows CI legs. Catch it on every host before push.
+test('no test dynamically imports a raw filesystem path', () => {
+  const dir = new URL('.', import.meta.url);
+  const offenders = [];
+  for (const name of readdirSync(dir).filter((file) => file.endsWith('.js'))) {
+    const source = readFileSync(new URL(name, dir), 'utf8');
+    if (/import\(\s*(join|resolve)\(/.test(source)) offenders.push(name);
+  }
+  assert.deepEqual(
+    offenders,
+    [],
+    'import a pathToFileURL(...).href or a relative specifier instead'
+  );
 });

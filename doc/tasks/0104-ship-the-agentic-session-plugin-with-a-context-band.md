@@ -189,6 +189,16 @@ CV re-audit: no Blocker.
 Plugin tests: 14 of 14 pass after the fixes; `claude plugin validate` (engine
 2.1.289) passes and lists `$.ui.log` via `logFailure`.
 
+### 2026-10-07 — Windows CI failure, closed locally
+
+Pull request 160's CI failed on both Windows legs, as audit item 13 left open:
+`test/session-plugin.test.js` imported the plugin modules with a joined
+absolute path, which the ESM loader rejects on Windows
+(`ERR_UNSUPPORTED_ESM_URL_SCHEME`, protocol `d:`); Ubuntu passed. The gap is
+closed locally first: `test/windows-paths.test.js` now fails on any host when a
+test dynamically imports a joined or resolved path (it failed, naming this
+file), and the imports go through `pathToFileURL(...).href` (it passes).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
