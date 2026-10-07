@@ -110,12 +110,60 @@ test('the plugin manifest declares the threshold option and one hooks module tha
   assert.ok(existsSync(join(PLUGIN, 'hooks', hooks.modules[0])), 'the hooks module exists');
 });
 
-test('the plugin draws and submits only: it hooks no tool call and rewrites no prompt', () => {
-  const source = readFileSync(join(PLUGIN, 'hooks', 'register.mjs'), 'utf8');
-  assert.doesNotMatch(source, /on\(\s*['"]tool\.call['"]/);
-  assert.doesNotMatch(source, /on\(\s*['"]prompt\.submit['"]/);
-  assert.match(source, /\$\.prompt\.submit\(\{ text: '\/ad-handoff', asUser: true \}\)/);
-  assert.match(source, /justifyContent: 'space-between'/, 'the button sits at the right edge');
+function loadPlugin(threshold, usage) {
+  return import(join(PLUGIN, 'hooks', 'register.mjs')).then(({ register }) => {
+    const hooks = {};
+    register((event, ...rest) => (hooks[event] = rest.at(-1)), { threshold });
+    const logs = [];
+    const submitted = [];
+    const element = (type) => (props) => ({ type, props });
+    const $ = {
+      session: { usage },
+      prompt: { submit: async (input) => submitted.push(input) },
+      ui: {
+        invalidate: () => {},
+        log: (text, options) => logs.push({ text, options }),
+        resolve: () => ({ Box: element('Box'), Text: element('Text'), Button: element('Button') }),
+      },
+    };
+    return { hooks, logs, submitted, $ };
+  });
+}
+
+const FULL = async () => ({
+  context: { tokens: 90000, window: 200000 },
+});
+
+test('the plugin draws and submits only: it hooks no tool call and rewrites no prompt', async () => {
+  const { hooks, submitted, $ } = await loadPlugin(1, FULL);
+  assert.deepEqual(Object.keys(hooks).sort(), [
+    'session.compact',
+    'session.end',
+    'session.start',
+    'turn.complete',
+    'ui.render',
+  ]);
+  await hooks['session.start']($, {}, async () => undefined);
+  const band = hooks['ui.render']($, { hasSurvey: false }, () => 'engine band');
+  assert.equal(band.props.justifyContent, 'space-between', 'the button sits at the right edge');
+  const button = band.props.children.find((child) => child.type === 'Button');
+  button.props.onPress();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(submitted, [{ text: '/ad-handoff', asUser: true }]);
+});
+
+test('a rejected handoff submit is logged to the debug log only', async () => {
+  const { hooks, logs, $ } = await loadPlugin(1, FULL);
+  $.prompt.submit = async () => {
+    throw new Error('submit refused');
+  };
+  await hooks['session.start']($, {}, async () => undefined);
+  const band = hooks['ui.render']($, { hasSurvey: false }, () => 'engine band');
+  band.props.children.find((child) => child.type === 'Button').props.onPress();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(logs.length, 1);
+  assert.match(logs[0].text, /submit refused/);
+  assert.deepEqual(logs[0].options, { to: 'debug' });
 });
 
 test('the npm package does not ship the plugin or the marketplace', () => {

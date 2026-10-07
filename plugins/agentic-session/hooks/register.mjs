@@ -60,7 +60,7 @@ async function takeReading($, state) {
     // Fail closed (ADR-0088): with no fresh reading the band is not drawn;
     // the reason goes to the debug log, never on screen.
     state.fill = null;
-    $.ui.log(`agentic-session: no context reading (${error?.message ?? error})`, { to: 'debug' });
+    logFailure($, 'no context reading', error);
   }
   $.ui.invalidate('ui.render');
 }
@@ -71,5 +71,11 @@ function clearReading($, state) {
 }
 
 function submitHandoff($) {
-  void $.prompt.submit({ text: '/ad-handoff', asUser: true });
+  $.prompt
+    .submit({ text: '/ad-handoff', asUser: true })
+    .catch((error) => logFailure($, 'handoff not submitted', error));
+}
+
+function logFailure($, what, error) {
+  $.ui.log(`agentic-session: ${what} (${error?.message ?? error})`, { to: 'debug' });
 }
