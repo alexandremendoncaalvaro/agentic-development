@@ -20,7 +20,7 @@ would-block event (the RESEARCH-0037 hypothesis).
 
 - [ ] Before the run: the owner's per-check criterion (minimum labelled events, maximum false-block rate, window) is recorded in these Notes; the evaluation is frozen with `ad-prism` before the first session counts.
 - [ ] The gates run in this repository and the company repository for the window; each would-block event is labelled true or false by the owner or a fresh-context reviewer.
-- [ ] The read-out reports, per check: events, false-block rate against the criterion, the share of the owner's pre-approval checks that had a preceding would-block event, and any session the gate stalled.
+- [ ] The read-out reports, per check: events, false-block rate against the criterion, the share of the owner's pre-approval checks that had a preceding would-block event, any session the gate stalled, and the limit that a failed evidence write loses its line (ADR-0089 second addendum), with the count of `unreadable_receipts` seen.
 - [ ] Each check is marked "propose enforcement", "keep in shadow" or "remove", with the evidence; enforcement itself is a later ADR.
 
 ## Plan

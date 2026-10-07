@@ -587,7 +587,7 @@ state: the local CI-mirror run for a working-copy git tree (the gate-run
 receipt, in `.agentic/receipts/gate-run.jsonl`), and, as ADR-0089's later
 slices land, a review or audit for a commit and an outward-text approval for a
 body hash. A local working copy; the durable record stays the tracked task
-Notes or pull request body (rule CV.5).
+Notes or pull request body, which quote what the step found.
 
 _Avoid_: bare "receipt" (an **Evaluation receipt** is the harness's frozen
 record of trials); "proof" (it records that a step ran, not that it was done
@@ -613,9 +613,12 @@ _Avoid_: "enforcement" or "block" for the shadow form (nothing is stopped);
 ### Gate terminal state
 
 **Definition:** the one outcome a runtime gate firing ends in, from a closed
-set of four: `validator-failed` and `runtime-unavailable` (the gate could not
-run its check) reach the model; `validator-passed` and an unowned or malformed
-event do not, and the last leaves no evidence.
+set fixed per gate. The artifact-validator gate has four: `validator-failed`
+and `runtime-unavailable` (the gate could not run its check) reach the model;
+`validator-passed` and an unowned or malformed event do not, and the last
+leaves no evidence. The **Receipt gate** has three, none of which reaches the
+model in shadow mode: `clear`, `would-block` and `runtime-unavailable`; an
+unrelated or malformed event leaves no evidence.
 
 _Avoid_: "verdict" for `runtime-unavailable` (a gate failure is not a verdict
 on the artifact); "pass" for an unowned event (nothing was checked).
@@ -625,12 +628,16 @@ on the artifact); "pass" for an unowned event (nothing was checked).
 
 ### Gate evidence line
 
-**Definition:** the one JSON line a runtime gate appends per governed firing to
-its **evidence file**, `<tmpdir>/agentic-artifact-gate/<session_id>.jsonl`,
-carrying the gate identifier, terminal state, path, validator output, the text
-surfaced to the model, a reproduction command, and a per-session sequence
-number; machine-local by default and never written inside the working tree
-unless the operator redirects it.
+**Definition:** the one JSON line a runtime gate appends per governed firing
+to its own **evidence file** under the OS temporary directory, keyed by
+session, with a per-session sequence number, the gate identifier, its
+**Gate terminal state** and a reproduction command; machine-local by default
+and never written inside the working tree unless the operator redirects it.
+The artifact-validator gate writes to `agentic-artifact-gate/` and adds the
+path, the validator output and the text surfaced to the model; the **Receipt
+gate** writes to `agentic-sequence-gate/` and adds the action, the head commit
+and tree, the receipt that covered it, the missing receipts and the count of
+unreadable receipts.
 
 _Avoid_: "receipt" (an **Evaluation receipt** is the harness's frozen record; a
 gate line is a candidate input to one, not one); "log" (the line is a

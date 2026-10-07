@@ -75,17 +75,24 @@ false-block rate exceeds the owner's preset threshold.
 
 ## Evidence
 
-- **E1. The owner's most repeated reminder is a pre-approval process check.**
+- **E0. The owner states the need directly.** The owner asked for gates that
+  guarantee the steps happened in sequence, because without them the owner
+  must ask before every approval whether review, audit and publish ran.
+  **Strength: High** (the owner's own request, the subject of this study).
+- **E1. The owner's most repeated reminder is a pre-approval process check
+  (exploratory).**
   The theme "did you run the review, audit, risk analysis, publish?" matches
   61 unique messages in 28 of 52 sessions, the highest of the gateable themes;
   naming the audit (22 sessions) and the review (20) overlap it. The counts are regex matches, an upper bound on true
   checks. Two precision readings exist and both are exploratory, since their
   per-match labels were not retained: the sidecar's hand inspection (about
   73% of messages) and a 15-match spot-check for this study (8 true). They
-  inform the size of the problem but carry no weight in the decision, which
-  rests on the theme ranking first among the gateable themes. **Strength:
-  Medium** (reproduced classification, unretained precision labels, private
-  corpus that over-weights one company repository).
+  inform the size of the problem only. Exploratory: the corpus is private and
+  the extraction and classification scripts are not retained in a durable
+  channel, so a reviewer cannot reproduce the counts from this repository;
+  they carry no weight in the decision, which rests on E0 and on the shadow
+  run. **Strength: Low** (exploratory; classification re-run once in the
+  author's session).
 - **E2. Four steps can leave a machine-checkable receipt; one does today.**
   `ad-audit` already writes `target=<SHA>` in each group file and its gate
   line (`src/skills/claude-code/ad-audit/SKILL.md` lines 69-93). `ad-review`
@@ -98,10 +105,10 @@ false-block rate exceeds the owner's preset threshold.
 - **E3. Some steps cannot be gated.** Grounding, the risk register and a
   frozen evaluation each leave a file, but whether the step was needed is a
   judgment; the question discipline and plain-language reporting are
-  judgment entirely. Of 35 structured questions in the corpus, all 35 put a
-  recommended option first, so a format gate on questions would catch
-  nothing. **Strength: High** for the 35 of 35 count; Medium for the
-  classification of the rest.
+  judgment entirely. In the same exploratory corpus, every structured question counted (35)
+  put a recommended option first, which suggests a format gate on questions
+  would catch little. **Strength: Low** for the count (exploratory, as E1);
+  Medium for the classification of the rest.
 - **E4. Both hosts can run a script before a tool call.** Claude Code
   `PreToolUse` can deny or pass, matches Bash with permission-rule syntax and
   MCP tools by name. Codex `PreToolUse` fires for Bash, `apply_patch` and MCP

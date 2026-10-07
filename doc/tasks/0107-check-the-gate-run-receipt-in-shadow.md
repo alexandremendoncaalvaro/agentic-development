@@ -106,6 +106,59 @@ cases. Fixed in 0b760ac (`git commit`, `git status`, `git stash push`,
 commit by mistake. Fixed: the commit was split before push (29b6dd2), and the
 study lands in its own commit.
 
+### 2026-10-07 — audit at 2dfdf8c
+
+Correction to the entry above: 499986e, the head of the "delta review of
+240fc16..499986e", was rewritten before push when the RESEARCH-0039 draft was
+split out; its content is c367ebc plus 29b6dd2, which are in this branch, and
+0b760ac and later were not re-reviewed by that pass. The mutation-check and
+run-count results in that entry are author-reported: they were observed in the
+authoring session and their output was not retained.
+
+`/ad-audit` of `docs/evidence-gates-study` at 2dfdf8c (groups CV with a
+cross-model second pass in two orders, GH, HK, AGENTS.md, GUIDELINES.md,
+ARCHITECTURE and CONTEXT, ADRs; NET not applicable; every changed file read by
+at least one reviewer, anchors matched; local gate green, 1281 tests): no
+blocker. Every finding, with severity and disposition:
+
+1. CV Major (both CV passes): the transcript counts in RESEARCH-0037 and
+   ADR-0089 rest on a private corpus with unretained scripts. Fixed: labelled
+   exploratory, kept out of decision evidence; the study adds the owner's
+   stated need as E0, and the ADR's context no longer cites the count.
+2. ARCH/CONTEXT Major: **Gate evidence line** and **Gate terminal state**
+   described only the artifact gate. Fixed: both now define each gate's file,
+   fields and closed set of states.
+3. CV Minor (all three CV passes, ADRs): the rewritten 499986e. Fixed: the
+   correction above.
+4. CV Minor (CV, run B): mutation and run counts without artifacts. Fixed:
+   labelled author-reported, here and in GROUND-0038 D3.
+5. CV Minor (run B): GROUND-0038 D3 named 6ec9f9b for test runs on a later
+   tree. Fixed.
+6. ARCH/CONTEXT and GUIDELINES Minor: "rule CV.5" cited from tracked files
+   and a shipped script, unresolvable in the repository. Fixed: removed from
+   CONTEXT, ADR-0089 and `gate-run.mjs`.
+7. GUIDELINES Minor (2.2): torn receipt lines and missing trees were dropped
+   silently. Fixed test-first: the new test failed (field absent), then
+   passed; the evidence line carries `unreadable_receipts`.
+8. ADRs Minor: a failed evidence write was dropped silently. Accepted as a
+   recorded decision (ADR-0089 second addendum): shadow mode may lose a line,
+   never reports a pass, and Task 0110 states the limit.
+9. ADRs Minor: ADR-0089 decision 4 named the ADR-0083 evidence file. Fixed:
+   the addendum names the gate's own file.
+10. ADRs Minor (judgement): ADR-0083 decision 3's validator clause does not
+    fit a receipt gate. Fixed: the amendment now names that clause, in the
+    ADR-0089 and ADR-0083 headers and PROJECTION.
+11. ADRs Nit: PROJECTION did not say decision 1's never-denies stanza still
+    binds receipt gates. Fixed.
+12. HK Minor: the Codex command was only checked structurally. Fixed: a
+    POSIX-only test runs it through `/bin/sh`; it passed, and failed when the
+    script path in `.codex/hooks.json` was broken.
+13. CV Minor (run A): the Paperclip figures in RESEARCH-0039 lack an
+    artifact. Rejected: public data observed in this session through `gh api`,
+    with the reproduction commands in the study's provenance.
+14. CV Nit: no review of the final head. Addressed by this audit; its fixes
+    get a delta re-audit before the pull request.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

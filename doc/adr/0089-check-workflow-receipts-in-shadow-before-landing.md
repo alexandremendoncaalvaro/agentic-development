@@ -3,15 +3,14 @@
 **Status:** accepted
 **Date:** 2026-10-07
 **Deciders:** Alexandre Alvaro
-**Amends:** ADR-0083, decisions 1 and 7, for receipt gates only: a receipt gate may run before a tool call, and may be proposed while the artifact-validator gate stays the only feedback gate. Every other ADR-0083 decision binds it unchanged.
+**Amends:** ADR-0083, decisions 1 and 7 and decision 3's validator clause, for receipt gates only: a receipt gate may run before a tool call, may be proposed while the artifact-validator gate stays the only feedback gate, and checks a receipt's existence and freshness instead of invoking a skill's validator. Every other ADR-0083 decision binds it unchanged.
 **Related:** ADR-0047, ADR-0055, ADR-0074 (the decisions a blocking guard must name); ADR-0072 (digest-bound approval precedent); ADR-0088 (the band may display the result)
 
 ## Context
 
 RESEARCH-0037 found that the owner's most repeated correction is a check made
 just before approving a pull request, a merge or a publication: "did you run
-the review, the audit, the publish pipeline?". It matches in 28 of 52
-sessions, the most of any gateable theme (a regex upper bound). Nothing in the kit can answer that question for the exact code
+the review, the audit, the publish pipeline?". In an exploratory count over the owner's private transcripts it was the most frequent gateable theme; the decision rests on the owner's stated need and on the shadow run, not on that count. Nothing in the kit can answer that question for the exact code
 state or text about to land. `ad-audit` already writes the audited SHA,
 `ad-review` does not, the local gate run leaves no receipt, and `ad-publish`
 shows its approval receipt only in chat.
@@ -38,7 +37,7 @@ before landing and outward actions, starting in shadow mode.
    command and its exit code; `ad-publish` records the destination, the
    SHA-256 of the approved normalized body and the approval time. Receipts are
    local working copies under `.agentic/`; the durable record stays the
-   tracked task Notes or pull request body (rule CV.5).
+   tracked task Notes or pull request body.
 2. **One gate script, both hosts, before the action.** `sequence-gate.mjs`,
    byte-identical in both `ad-hooks` trees, runs on `PreToolUse` and checks:
    a review and an audit receipt for `HEAD` before `gh pr create`, `gh pr
@@ -126,3 +125,18 @@ therefore "its tree is `HEAD^{tree}`, or only receipt-neutral paths differ".
 The evidence file also records `clear` and `runtime-unavailable` lines, so
 coverage can be measured; the false-block count of decision 6 is taken over
 `would-block` lines only.
+
+## Addendum 2026-10-07: evidence file, lost lines, and decision 3
+
+From the audit of the first slice. The receipt gate writes its own evidence
+file, `<tmpdir>/agentic-sequence-gate/<session_id>.jsonl`, with its own
+sequence numbers, beside the artifact gate's rather than inside it (decision
+4 said "the ADR-0083 evidence file"). Each line counts the receipts it could
+not read. If the evidence file cannot be written, shadow mode loses that line
+and still exits 0: it never reports a pass, and a lost line can only lower the
+counts decision 6 reads, which the shadow read-out (Task 0110) states as a
+limit. ADR-0083 decision 3 binds receipt gates in its no-judgment clause; its
+clause that a gate invokes the validator a skill invokes does not apply, since
+a receipt gate checks existence and freshness only, so the amendment header
+now names that clause.
+

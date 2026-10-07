@@ -51,7 +51,7 @@ claude-mods' merge gate is a `PreToolUse` hook on `gh pr merge` and trunk pushes
 - **D1:** `git log --oneline -S'PreToolUse' -- src/skills scripts .claude .codex` returned 07aef5c, cbc9b66 and ce33ab3, none of which wires a `PreToolUse` hook (accessed 2026-10-07 via Bash)
 - **D2:** scratch-repository measurement with git 2.x: `cp .git/index $T/idx; GIT_INDEX_FILE=$T/idx git add -A; GIT_INDEX_FILE=$T/idx git write-tree` before, and `git add -A; git commit; git rev-parse HEAD^{tree}` after, both `8407bc34184a82997ead21d9b6dad34e314c2a7f` (accessed 2026-10-07 via Bash; reproducible with any git on Linux, macOS or Git Bash on Windows)
 
-- **D3:** this repository at 6ec9f9b: `GIT_INDEX_FILE=$T/idx git add -A; git write-tree` from an empty index and from a copy of the real index both gave `7d8b43836cc0c067980f679f0062987005ababb1`, in 0.20 s and 0.03 s real time for 1,019 tracked files; `test/sequence-gate.test.js` failed 4 of 6 runs with the seeded index and passed 10 of 10 with the empty one (accessed 2026-10-07 via Bash, `/usr/bin/time -p`)
+- **D3:** this repository at 6ec9f9b: `GIT_INDEX_FILE=$T/idx git add -A; git write-tree` from an empty index and from a copy of the real index both gave `7d8b43836cc0c067980f679f0062987005ababb1`, in 0.20 s and 0.03 s real time for 1,019 tracked files; the run counts of `test/sequence-gate.test.js`, 4 of 6 failing with the seeded index and 10 of 10 passing with the empty one, were taken on the uncommitted working tree that became 240fc16, and their output was not retained, so they are author-reported (accessed 2026-10-07 via Bash)
 
 ## Limitations and reversal
 
