@@ -194,3 +194,5 @@ Wait for explicit approval of that receipt. Any text, account, or destination
 change invalidates approval. After approval, use only the verified capability for
 that target and do not expand scope. Report the returned URL or the exact failure
 without retrying blindly.
+
+When `ad-hooks`' receipt gate is installed (`<ad-hooks-dir>/scripts/publish-receipt.mjs` exists), record the approval before acting: write the approved publication text to a file, run `node <ad-hooks-dir>/scripts/publish-receipt.mjs record --destination "<exact target>" --body-file <file>`, then post from that same file (`--body-file <file>`), or pass that exact text to a chat tool. The receipt holds the SHA-256 of the normalized text (LF line endings, no trailing whitespace or trailing newlines), which the shadow gate compares with the outgoing body (ADR-0089, GROUND-0041). Record only text the owner approved, and record again after any approved change.

@@ -377,8 +377,16 @@
           "sourceSha": "aa381a001366c562fd4e0230d9121380f677dd88cec9df5e4b6f1af554145731"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/publish-receipt.mjs",
+          "sourceSha": "276f23e367ba6bea85c95d0addd33f6de93cb94479684655ab4c6780427cbc85"
+        },
+        {
+          "path": ".agents/skills/ad-hooks/scripts/review-receipts.mjs",
+          "sourceSha": "65633b0c45ee5537d746c93243ee5673c560a6531ef70509d8a55b87e7905d3c"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "d1956eccf25603f01570177e57c1383475f1101d87a0ddd7bec185ec8d2487b4"
+          "sourceSha": "c7739e917092ad7c2dc27cb52572acd7349d0a39218d55522a2226ec98bc1f6a"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
@@ -386,7 +394,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "2a6f953abab266b5b22df5eb36e114563e88dd5fbfd18cc67b828acf10a5a0a9"
+          "sourceSha": "1079c864638e218d311b2b597454726e8ad5b3c7635e6596a45bcd724ba52e5d"
         }
       ]
     },
@@ -611,7 +619,7 @@
         },
         {
           "path": ".agents/skills/ad-publish/SKILL.md",
-          "sourceSha": "f9deae344903e2215e0f2ad529068d5c847c2bc8458c5dac2be53b5dc46d559d"
+          "sourceSha": "4222ab37be61113b88ad8689a9e024026bb7e47cb0057be178aa962e74f6a882"
         }
       ]
     },

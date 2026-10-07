@@ -305,8 +305,16 @@
           "sourceSha": "aa381a001366c562fd4e0230d9121380f677dd88cec9df5e4b6f1af554145731"
         },
         {
+          "path": ".claude/skills/ad-hooks/scripts/publish-receipt.mjs",
+          "sourceSha": "276f23e367ba6bea85c95d0addd33f6de93cb94479684655ab4c6780427cbc85"
+        },
+        {
+          "path": ".claude/skills/ad-hooks/scripts/review-receipts.mjs",
+          "sourceSha": "65633b0c45ee5537d746c93243ee5673c560a6531ef70509d8a55b87e7905d3c"
+        },
+        {
           "path": ".claude/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "d1956eccf25603f01570177e57c1383475f1101d87a0ddd7bec185ec8d2487b4"
+          "sourceSha": "c7739e917092ad7c2dc27cb52572acd7349d0a39218d55522a2226ec98bc1f6a"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
@@ -314,7 +322,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/SKILL.md",
-          "sourceSha": "7aaa76fdeb92b568e6688b30e74c83ef677c3704ac54abbbe3d35ecbb47f7dc5"
+          "sourceSha": "d41b14b07bfe43ef7f53e7c156cb969bfc7bc9645dc70befe4ce3e05898a6121"
         }
       ]
     },
@@ -503,7 +511,7 @@
         },
         {
           "path": ".claude/skills/ad-publish/SKILL.md",
-          "sourceSha": "bc0c9c2edb1b7b1342ec81d22c011787d5cf91bc71139b1446ad0456c7df2e45"
+          "sourceSha": "343eb9a7eaacf2bce8c7b512da3c14ebf5795365924c4a7bd0d549679c5ff28f"
         }
       ]
     },
