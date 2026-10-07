@@ -38,6 +38,11 @@ Append-only log. Date each entry. Never rewrite past entries.
 Planned with Task 0104 under ADR-0088 (proposed), from RESEARCH-0036's
 shortlist; starts after Task 0104 lands.
 
+### 2026-10-07 — ADR status
+
+ADR-0088 was accepted before Task 0104's implementation (commit c6e3ea7); this
+task now plans under the accepted decision, unchanged.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

@@ -62,6 +62,11 @@ eval/                                repo-only skill trajectory evaluation harne
                                      gate runs inside `npm test`; `live` spawns an
                                      operator-supplied host and never gates anything);
                                      never shipped to npm
+.claude-plugin/marketplace.json      Claude Code marketplace `agentic-development`
+                                     (ADR-0088); never shipped to npm
+plugins/agentic-session/             optional Claude Code companion plugin (context
+                                     band mod); installed with `claude plugin install`,
+                                     never by `agentic`; never shipped to npm
 CHANGELOG.md                         release record (Keep a Changelog), rotated
                                      only by scripts/release.sh
 WORKFLOW.md                          Layer 1 Constitution — philosophy doc, shipped to npm

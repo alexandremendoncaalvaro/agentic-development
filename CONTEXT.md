@@ -689,6 +689,8 @@ roadmap line in [`doc/product/PRD.md`](doc/product/PRD.md).
   **Request kind** and the run policy supply the `skill_invoked` and
   `approval_granted` events a non-interactive stream cannot carry.
 
+- The **Companion plugin** sits beside the **Kit**, never inside it: the `agentic` installer neither installs nor requires it. Its context band is the on-screen counterpart of the `Stop` handoff **Session reminder**, which stays the fallback where the plugin is absent.
+
 - A **Runtime gate** runs on a host lifecycle hook and ends in one **Gate terminal state**; a firing on a **Governed artifact** appends one **Gate evidence line**; the **Runtime layer** is the set of such gates. A gate line is joinable with a **Host stream** through the session id, and may later become an **Evaluation receipt** event, a decision the harness owns.
 
 ## Flagged ambiguities

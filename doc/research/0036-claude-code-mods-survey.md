@@ -34,7 +34,7 @@ A research sidecar read the official mods documentation and Anthropic's sample a
 
 ## Evidence
 
-- **E1 — The ecosystem is large and young; popularity is not measurable.** One catalogue counts 2,685 mods (karanb192/awesome-claude-code-mods, scanned 2026-10-06); apart from a browser pane (3,679 stars) the most-starred mod repositories have 130 stars or fewer; no marketplace publishes installs; editorial lists say their rankings are editorial. **Strength: Medium.**
+- **E1 — The ecosystem is large and young; popularity is not measurable.** One catalogue counts 2,685 mods (karanb192/awesome-claude-code-mods, scanned 2026-10-06); apart from a browser pane (3,679 stars) the most-starred mod repositories have 130 stars or fewer; no marketplace publishes installs; editorial lists say their rankings are editorial. Star and catalogue counts are a point-in-time, exploratory reading (gh api, the dates given), not a durable measure. **Strength: Medium.**
 - **E2 — Most mods are meters, dashboards, renderers or toys; a small group "keeps the agent honest"** (per-turn receipts, merge gates, scope guards). **Strength: Medium** (README reading, mods not run).
 - **E3 — A context figure measured toward auto-compaction is the converged design** (Storybloq's dashboard, context-view) and the engine exposes it (`autoCompactThreshold` in `SessionContextBreakdown`, engine 2.1.289 typings). **Strength: High** for availability, Medium for "matters more".
 - **E4 — Three methodology products built a workflow-stage display** (Storybloq, gsd-status-mod, plan-progress); gsd-status-mod is the closest analogue to the kit. **Strength: Medium.**
@@ -57,8 +57,8 @@ No community mod was run; behaviour comes from READMEs. Install counts would cha
 
 ## Provenance and artifacts
 
-All sources accessed 2026-10-07: code.claude.com/docs/en/plugins/mods (WebFetch); anthropics/claude-code-playground `claude-code/mods` at e9ab132 and anthropics/claude-code `mods/` at 765f236 (gh api); karanb192/awesome-claude-code-mods, hamzafer/claude-code-mods, helenkwok/gsd-status-mod, yash-gadodia/claude-mods, hoobnn/hoobnn-agent-mods, Storybloq/storybloq, zycck/claude-mods (gh api, stars as of that day); editorial lists at stashbase.ai, claudemods.ai, capitalandcompute.net (WebFetch). The sidecar's 21-row candidate table with risk and effort is in the session scratchpad (`research-C-mods-survey.md`), not committed; the graded claims above are the durable record.
+All sources accessed 2026-10-07: code.claude.com/docs/en/plugins/mods (WebFetch); anthropics/claude-code-playground `claude-code/mods` at e9ab132 and anthropics/claude-code `mods/` at 765f236 (gh api); karanb192/awesome-claude-code-mods, hamzafer/claude-code-mods, helenkwok/gsd-status-mod, yash-gadodia/claude-mods, hoobnn/hoobnn-agent-mods, Storybloq/storybloq, zycck/claude-mods (gh api, stars as of that day); editorial lists at stashbase.ai, claudemods.ai, capitalandcompute.net (WebFetch). The sidecar's 21-row candidate table with risk and effort was exploratory and stayed in the session scratchpad (`research-C-mods-survey.md`), not committed; the graded claims above are the durable record, and nothing here depends on that table.
 
 ## Derived decision
 
-ADR-0088 (proposed) adopts the design rule and the three members; Tasks 0104 to 0106 plan them one slice each.
+ADR-0088 (accepted) adopts the design rule and members 1 and 2, planned in Tasks 0104 and 0105. The owner dropped member 3, the display-only receipt, in favour of the shadow mode of evidence gates, a separate gate decision under ADR-0083; Task 0106 is re-scoped to display that shadow result.
