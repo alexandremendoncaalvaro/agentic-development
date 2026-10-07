@@ -58,6 +58,17 @@ Start every unfamiliar repository or fuzzy request with `/ad-next`.
 
 These are routes, not gates. A one-off change should not produce artifacts that do not change the work; a durable or high-risk change should use the documentation and quality checks it needs.
 
+## Optional: Claude Code companion plugin
+
+On Claude Code (2.1.287+ in the terminal, 2.1.286+ in the desktop app) you can add `agentic-session`, an opt-in plugin that draws a context band above the prompt once the session reaches your threshold of the auto-compact point (60% by default, set in `/config`), with an **AD handoff** button that runs `/ad-handoff`:
+
+```bash
+claude plugin marketplace add alexandremendoncaalvaro/agentic-development
+claude plugin install agentic-session@agentic-development
+```
+
+It is separate from the installer above and carries no skills; skills always come from `agentic init`. Codex has no equivalent surface.
+
 ## Find the right detail
 
 - [Installation and maintenance](https://github.com/alexandremendoncaalvaro/agentic-development/blob/main/doc/guides/installation.md) — project, user-level, global CLI, update, and removal.

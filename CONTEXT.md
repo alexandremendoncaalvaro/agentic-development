@@ -626,6 +626,14 @@ names the ownership, not the outcome).
 [`src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs);
 grounded in [`doc/research/0027-ground-artifact-validator-gate.md`](doc/research/0027-ground-artifact-validator-gate.md) (E4).
 
+### Companion plugin
+
+**Definition:** the optional Claude Code plugin `agentic-session`, installed from this repository's marketplace with `claude plugin install`, separate from the `agentic` installer and the npm package. It carries host-native add-ons only, mods that need the screen or the host, never skills (ADR-0088).
+
+_Avoid_: "the kit plugin" or "the agentic plugin" (the kit is installed by `agentic init`; the plugin is an add-on); "mod" for the whole plugin (a mod is the hooks module inside it).
+
+**Related code:** [`plugins/agentic-session/`](plugins/agentic-session/), [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
+
 ### Session reminder
 
 **Definition:** a static or path-keyed instruction that an `ad-hooks` session-lifecycle hook puts in front of the user or the model, with no validator behind it: the `Stop` handoff nudge (ADR-0055), the `UserPromptSubmit` workflow checkpoint (ADR-0074), and the handoff-chip `PostToolUse` reminder (ADR-0087). It always exits 0 and records no gate evidence; the `Stop` nudge keeps only a once-per-session flag file, and the checkpoint and the handoff-chip reminder each carry a kill switch.

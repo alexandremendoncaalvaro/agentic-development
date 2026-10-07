@@ -1,0 +1,14 @@
+{
+  "name": "agentic-development",
+  "description": "Optional Claude Code companion plugins for the Agentic Development kit.",
+  "owner": {
+    "name": "Alexandre Alvaro"
+  },
+  "plugins": [
+    {
+      "name": "agentic-session",
+      "source": "./plugins/agentic-session",
+      "description": "A context band above the prompt, shown only past your threshold, with a one-press /ad-handoff."
+    }
+  ]
+}

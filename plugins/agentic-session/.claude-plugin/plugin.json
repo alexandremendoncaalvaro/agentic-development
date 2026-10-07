@@ -1,0 +1,19 @@
+{
+  "name": "agentic-session",
+  "description": "Agentic Development companion for Claude Code: a context band above the prompt, shown only past your threshold, with a one-press /ad-handoff.",
+  "author": {
+    "name": "Alexandre Alvaro"
+  },
+  "repository": "https://github.com/alexandremendoncaalvaro/agentic-development",
+  "license": "MIT",
+  "userConfig": {
+    "threshold": {
+      "type": "number",
+      "title": "Context band threshold (%)",
+      "description": "Show the band once context reaches this share of the auto-compact point (or of the window when auto-compaction is off). 1 to 99.",
+      "default": 60,
+      "min": 1,
+      "max": 99
+    }
+  }
+}

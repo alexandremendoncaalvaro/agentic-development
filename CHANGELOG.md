@@ -6,6 +6,17 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- An optional Claude Code companion plugin, `agentic-session`, published from
+  this repository's marketplace: a context band above the prompt that appears
+  once the session reaches a configurable share of the auto-compact point (60%
+  by default), with an **AD handoff** button that runs `/ad-handoff`. Install
+  with `claude plugin marketplace add alexandremendoncaalvaro/agentic-development`
+  and `claude plugin install agentic-session@agentic-development`; it is not
+  part of the npm package (ADR-0088, amending ADR-0041; RESEARCH-0036;
+  task-0104).
+
 ### Changed
 
 - Practices from the kit's reference skill repositories, adapted in the kit's
