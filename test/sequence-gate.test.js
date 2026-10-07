@@ -550,6 +550,13 @@ test('sequence-gate: a check runs once per command, so a chained command stays w
 // body's hash before comments and chat sends.
 const PUBLISH_RECEIPT = join(SCRIPTS, 'publish-receipt.mjs');
 
+// A path inside a command line is single-quoted, as a real command needs:
+// unquoted, the shell (and the gate, which reads commands as the shell does)
+// takes a Windows path's backslashes as escapes.
+function quoted(path) {
+  return `'${path}'`;
+}
+
 function approve(repo, body, name = 'approved.md') {
   const file = join(repo, name);
   writeFileSync(file, body);
@@ -564,7 +571,7 @@ function approve(repo, body, name = 'approved.md') {
 test('sequence-gate: a comment posted from the approved file clears the publish check', () => {
   const repo = fixtureRepo();
   const file = approve(repo, 'Approved text.\n');
-  const lines = runGate(repo, `gh pr comment 5 --body-file ${file}`).lines;
+  const lines = runGate(repo, `gh pr comment 5 --body-file ${quoted(file)}`).lines;
   const [publish] = linesFor(lines, 'publish');
   assert.equal(publish.action, 'gh pr comment');
   assert.equal(publish.state, 'clear');
@@ -575,14 +582,20 @@ test('sequence-gate: an edited or never-approved comment body is a publish would
   const repo = fixtureRepo();
   const file = approve(repo, 'Approved text.\n');
   writeFileSync(file, 'Approved text, then edited.\n');
-  const [edited] = linesFor(runGate(repo, `gh pr comment 5 --body-file ${file}`).lines, 'publish');
+  const [edited] = linesFor(
+    runGate(repo, `gh pr comment 5 --body-file ${quoted(file)}`).lines,
+    'publish'
+  );
   assert.equal(edited.state, 'would-block');
   assert.deepEqual(edited.missing, ['publish']);
   assert.match(edited.reproduction, /publish-receipt\.mjs record/);
   const fresh = fixtureRepo();
   const other = join(fresh, 'never.md');
   writeFileSync(other, 'Never approved.\n');
-  const [none] = linesFor(runGate(fresh, `gh pr comment 5 --body-file ${other}`).lines, 'publish');
+  const [none] = linesFor(
+    runGate(fresh, `gh pr comment 5 --body-file ${quoted(other)}`).lines,
+    'publish'
+  );
   assert.equal(none.state, 'would-block');
 });
 
@@ -621,9 +634,9 @@ test('sequence-gate: gh issue comment and gh api comment calls are read the same
   const file = approve(repo, 'Approved text.\n');
   writeFileSync(join(repo, 'payload.json'), JSON.stringify({ body: 'Approved text.' }));
   for (const command of [
-    `gh issue comment 5 --body-file ${file}`,
+    `gh issue comment 5 --body-file ${quoted(file)}`,
     "gh api repos/o/r/issues/5/comments -f body='Approved text.'",
-    `gh api repos/o/r/pulls/5/comments -F body=@${file} -f path=x`,
+    `gh api repos/o/r/pulls/5/comments -F ${quoted(`body=@${file}`)} -f path=x`,
     'gh api -X POST repos/o/r/issues/5/comments --input payload.json',
   ]) {
     const [publish] = linesFor(runGate(repo, command).lines, 'publish');
@@ -755,8 +768,10 @@ test('regression: task-0109 review, a body file the gate cannot read faithfully 
     assert.equal(publish?.state, 'runtime-unavailable', command);
   }
   assert.equal(
-    linesFor(runGate(repo, `cd sub && gh pr comment 1 --body-file ${file}`).lines, 'publish')[0]
-      .state,
+    linesFor(
+      runGate(repo, `cd sub && gh pr comment 1 --body-file ${quoted(file)}`).lines,
+      'publish'
+    )[0].state,
     'clear',
     'an absolute path stays readable after cd'
   );
