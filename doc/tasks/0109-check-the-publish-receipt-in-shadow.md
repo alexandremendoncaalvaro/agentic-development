@@ -279,6 +279,21 @@ stricter `gatesConfig` turns non-object configs into `runtime-unavailable`
 on every check, `MAY_PUBLISH` still covers every handled form, and the
 non-Bash branch is bounded by the wired matchers.
 
+### 2026-10-07 — pull request 163 and the Windows CI failure
+
+Pull request 163 opened with the approved body (posted body identical to
+the approved file, hash `721bba31fb6a1bc1`). CI failed on Windows only, in
+four publish tests (Node 22.13 and 24). Hypotheses, ranked: the unquoted
+Windows path's backslashes read as escapes; the `~` in `RUNNER~1`;
+`isAbsolute` rejecting `C:`. The first was confirmed locally: `tokenize`
+turned `C:\Users\RUNNER~1\AppData\approved.md` into
+`C:UsersRUNNER~1AppDataapproved.md`, as bash does (`echo C:\Users\x` prints
+`C:Usersx`), and kept it whole in single quotes. The gate was right; the tests
+put raw paths into commands. Fixed in 7445b92: paths are single-quoted. The
+local gap is closed in 144cc64: `test/windows-paths.test.js` fails on any host
+when a gate test interpolates a path unquoted; unquoting one call turned it
+red. Local gate: `npm run verify` exit 0, 1325 tests.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
