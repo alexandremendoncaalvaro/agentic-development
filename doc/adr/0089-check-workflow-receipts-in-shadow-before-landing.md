@@ -177,7 +177,9 @@ gate cannot read before the command runs (a shell expansion, standard input,
 an editor, a path resolved after a `cd` or under `~`, a non-regular or
 oversized file) logs `runtime-unavailable`. Decision 2's "chat send" is, in
 this slice, the Slack connector's `slack_send_message`; another chat tool
-logs nothing until it is added. `githubCommands` in `.agentic/gates.json`
+logs nothing until it is added. That is a coverage limit of this slice, not
+a retirement: decision 2 binds unchanged. The Slack hook rests on both hosts'
+documentation and simulated events; a live send has not been observed. `githubCommands` in `.agentic/gates.json`
 names the wrappers a repository runs `gh` under, for every pull request and
 comment check; this repository sets `gh` and `ghp`, so Task 0110's shadow
 window starts after this slice merges.

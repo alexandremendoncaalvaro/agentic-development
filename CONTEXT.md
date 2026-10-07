@@ -645,9 +645,11 @@ session, with a per-session sequence number, the gate identifier, its
 and never written inside the working tree unless the operator redirects it.
 The artifact-validator gate writes to `agentic-artifact-gate/` and adds the
 path, the validator output and the text surfaced to the model; the **Receipt
-gate** writes to `agentic-sequence-gate/` and adds the action, the head commit
-and tree, the receipt that covered it, the missing receipts and the count of
-unreadable receipts.
+gate** writes to `agentic-sequence-gate/` and adds the action, the receipt
+that covered it, the missing receipts and the count of unreadable receipts,
+plus the head commit and tree for a commit receipt or the outgoing body's
+SHA-256 for a publish receipt; a `runtime-unavailable` line carries the check
+and its output instead.
 
 _Avoid_: "receipt" (an **Evaluation receipt** is the harness's frozen record; a
 gate line is a candidate input to one, not one); "log" (the line is a

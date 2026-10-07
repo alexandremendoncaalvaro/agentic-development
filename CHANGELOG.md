@@ -23,7 +23,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   head commit (GROUND-0040, task-0108). A chained command now runs the checks of
   every landing action in it, each once.
 - The shadow receipt gate checks the publish receipt before `gh pr comment`,
-  `gh issue comment`, `gh api` comment calls and a Slack chat send: after the
+  `gh issue comment`, `gh api` comment calls and a Slack chat send (wired from
+  both hosts' documentation, not yet observed on a live send): after the
   owner approves a text, `/ad-publish` records the SHA-256 of its normalized
   body with `scripts/publish-receipt.mjs`, and the gate compares the outgoing
   body with it. `githubCommands` in `.agentic/gates.json` names the wrappers a
