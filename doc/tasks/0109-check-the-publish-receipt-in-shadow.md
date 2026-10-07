@@ -294,6 +294,31 @@ local gap is closed in 144cc64: `test/windows-paths.test.js` fails on any host
 when a gate test interpolates a path unquoted; unquoting one call turned it
 red. Local gate: `npm run verify` exit 0, 1325 tests.
 
+### 2026-10-07 — review and re-audit of the CI fix at c46fb02
+
+Combined review and CV re-audit of e77285d..c46fb02: no blocker. The CV
+reviewer (reviewer-reported) reproduced the `tokenize` and bash behaviour,
+unquoted a call in a disposable copy and saw the guard fail naming the line,
+ran the suite to 1325 of 1325, and saw CI on pull request 163 at 144cc64 pass
+on all four jobs. Findings, with dispositions:
+
+- Standards Concern: the guard misses `--body-file=${...}`, a flag and path
+  split across lines, other path-bearing forms, and other test files.
+  Accepted as a stated limit: it covers every call site today; widening it
+  is left for when a new form appears.
+- Standards Notes: `quoted()` does not escape an embedded single quote
+  (accepted: CI temp paths carry none); quoting the `.env` names was for
+  consistency, not Windows (accepted); keeping the gate's shell-faithful
+  reading is right (agreed).
+- Standards Note: the entry above did not label "unquoting one call turned
+  it red" or name the tree. Labelled: author-observed, and reproduced by the
+  CV reviewer; the 1325-test gate ran on 144cc64's tree; the CI run is
+  37691974829.
+- CV Nit: "posted body identical" holds byte for byte through the REST API
+  (`gh api .../pulls/163` compared in Python with the approved file); the
+  reviewer's one-line difference came from a different read of the body.
+  Accepted with that evidence.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
