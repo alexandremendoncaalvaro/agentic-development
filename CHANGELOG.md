@@ -20,8 +20,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   only in receipt-neutral paths, so rewording or amending a reviewed commit
   keeps it fresh. `.agentic/gates.json` can turn a check off, or replace the
   review receipt by a bounded local command that reads a bot's review for the
-  head commit (GROUND-0040, task-0108). A chained command now logs the checks
-  of every landing action in it.
+  head commit (GROUND-0040, task-0108). A chained command now runs the checks of
+  every landing action in it, each once.
 - An optional Claude Code companion plugin, `agentic-session`, published from
   this repository's marketplace: a context band above the prompt that appears
   once the session reaches a configurable share of the auto-compact point (60%

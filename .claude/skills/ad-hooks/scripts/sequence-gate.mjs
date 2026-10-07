@@ -200,8 +200,9 @@ export const MAX_COMMIT_RECEIPTS = 20;
  * Commit receipts under `.agentic/reviews/`, oldest first by file name (an
  * ISO timestamp prefix), from the newest `MAX_COMMIT_RECEIPTS` files only:
  * the directory is never pruned, and resolving every file made the hook's
- * cost grow with it (task-0108 Notes). Each file ending in `suffix` whose target, read by
- * `targetOf`, is a full commit SHA, resolved to that commit's tree. A file
+ * cost grow with it (task-0108 Notes). Each file ending in `suffix` whose
+ * target, read by `targetOf`, is a full commit SHA, resolved to that commit's
+ * tree. A file
  * with no target (written before receipts existed) or a working-tree target
  * is no receipt; an unparsable file, any other target or a commit that cannot
  * be resolved is counted as unreadable.
@@ -327,7 +328,7 @@ function commandCheck(check, setting, cwd) {
     receipt: run.status === 0 ? 'command' : null,
     missing: run.status === 0 ? [] : [check],
     unreadable_receipts: 0,
-    reproduction: argv.join(' '),
+    reproduction: JSON.stringify(argv),
   };
 }
 
@@ -371,7 +372,12 @@ function main() {
   if (actions.length === 0) return;
 
   const cwd = typeof event.cwd === 'string' && event.cwd ? event.cwd : process.cwd();
-  for (const [action, check] of actions.flatMap((a) => a.checks.map((c) => [a, c]))) {
+  // Each check runs once per command, logged against the first action that
+  // needs it, so a chained command runs a bot-review command once.
+  const firstNeeding = new Map();
+  for (const a of actions)
+    for (const c of a.checks) if (!firstNeeding.has(c)) firstNeeding.set(c, a);
+  for (const [check, action] of firstNeeding) {
     if (checkSetting(cwd, check) === false) continue;
     let result;
     try {

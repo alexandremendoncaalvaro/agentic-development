@@ -448,7 +448,7 @@ test('regression: task-0108 review, a chained command logs the checks of every l
   const lines = runGate(repo, 'git push -u origin x && gh pr create --fill').lines;
   assert.deepEqual(
     lines.map((line) => `${line.action}:${line.check}`),
-    ['git push:gate-run', 'gh pr create:gate-run', 'gh pr create:review', 'gh pr create:audit']
+    ['git push:gate-run', 'gh pr create:review', 'gh pr create:audit']
   );
 });
 
@@ -530,4 +530,18 @@ test('sequence-gate: a check examines at most the newest receipts, so its cost s
   const [review] = linesFor(runGate(repo, 'gh pr merge').lines, 'review');
   assert.equal(review.state, 'would-block');
   assert.equal(review.unreadable_receipts, 20);
+});
+
+test('sequence-gate: a check runs once per command, so a chained command stays within the hook budget', () => {
+  const repo = fixtureRepo();
+  const counter = join(repo, 'runs.txt');
+  const appendRun = `require('node:fs').appendFileSync(${JSON.stringify(counter)}, 'x')`;
+  writeGates(repo, { checks: { review: { command: ['node', '-e', appendRun] } } });
+  const lines = runGate(repo, 'gh pr ready 12 && gh pr merge 12').lines;
+  assert.equal(readFileSync(counter, 'utf8'), 'x');
+  assert.deepEqual(
+    lines.map((line) => `${line.action}:${line.check}`),
+    ['gh pr ready:review', 'gh pr ready:audit']
+  );
+  assert.equal(lines[0].reproduction, JSON.stringify(['node', '-e', appendRun]));
 });
