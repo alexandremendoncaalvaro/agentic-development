@@ -65,7 +65,7 @@ None between sources. The open trade-off is internal: the mod layer's value agai
 ## Limitations and what would reverse the conclusion
 
 - Small chip corpus; Codex sessions not in the store. A larger corpus showing misses inside `/ad-handoff` runs would shift weight back to skill text.
-- Unverified: whether Claude Code reads agent-plugins.org manifests; exact event keys for skill-frontmatter hooks; whether Codex's status line accepts a custom command.
+- Unverified: whether a mod's `$.mcp.call` can reach the desktop `spawn_task` server (settled by the spike below, E14); whether Claude Code reads agent-plugins.org manifests; exact event keys for skill-frontmatter hooks; whether Codex's status line accepts a custom command.
 - A spike showing no gain from mods over hooks closes step 3.
 
 ## Provenance and artifacts
@@ -103,4 +103,4 @@ not load them. The step-1 reminder (ADR-0087) stays the portable baseline.
 
 ## Derived decision
 
-None yet. Step 1 needs a task plus a short nudge ADR (or a validator pairing under ADR-0083). Step 3 would amend ADR-0041.
+Step 1 became the handoff-chip reminder of ADR-0087. Step 3 became ADR-0088, which amends ADR-0041 to ship the optional `agentic-session` companion plugin.

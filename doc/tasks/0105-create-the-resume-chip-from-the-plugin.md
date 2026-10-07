@@ -5,7 +5,7 @@
 **Scope ref:** doc/product/PRD.md (Next tier, Optional Claude Code companion plugin)
 **Evidence ref:** doc/research/0035-ground-claude-code-session-plugin.md
 **Owner:** Alexandre Alvaro
-**Execution:** AFK
+**Execution:** HITL
 **Spec ref:**
 **Board ref:**
 
@@ -16,6 +16,11 @@ handoff is written; the model still has to act. RESEARCH-0033 E14 showed a mod
 reaches the desktop task server that owns `spawn_task`, so the
 `agentic-session` plugin can create the chip itself on the write, making every
 handoff resumable in one click whether or not the model remembers.
+
+The hook acts after the write succeeds: it never blocks, denies or rewrites the
+tool call, and adds only a note to the result's context. That keeps it inside
+ADR-0088 item 3, which excludes members that block work, and outside ADR-0083's
+gate rules. The live check needs the owner, so the task is HITL.
 
 ## Acceptance Criteria
 

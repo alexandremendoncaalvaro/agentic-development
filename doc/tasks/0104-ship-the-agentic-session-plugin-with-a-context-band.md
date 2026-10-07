@@ -40,7 +40,7 @@ Slice 1 — the band (this task):
 - [x] Docs: README install section, ARCHITECTURE pattern, CONTEXT term, CHANGELOG.
 - [x] `/ad-review` (first pass, on the uncommitted implementation over c6e3ea7).
 - [x] `/ad-audit` at 43a558f; its fixes applied.
-- [ ] `/ad-review` of the final branch, verdicts recorded with severity, disposition and target SHA.
+- [x] `/ad-review` of the final branch, verdicts recorded with severity, disposition and target SHA.
 - [ ] `/ad-commit`; PR and merge on the owner's approval; CI green on Ubuntu and Windows.
 
 Slices 2 and 3 are Tasks 0105 (resume chip) and 0106 (verify-before-done
@@ -140,11 +140,60 @@ disposition:
 13. GH note: Windows and Node 22.13 are proven only by CI after the push.
     Open until CI runs.
 
+### 2026-10-07 — second review and CV re-audit at 2f5bee2
+
+Reviewed target: `origin/main` (a6c4f61) to 2f5bee2 for the two-axis
+fresh-context review, and the fix delta 43a558f..2f5bee2 for the CV re-audit
+(rule file `grounding-and-claims.md` sha256 051b1dd5...e6). Every finding, with
+severity and disposition:
+
+Spec axis: no Blocker or Major.
+
+- Nit: Task 0105 needs a tool-result hook while ADR-0088 item 4 says the band
+  intercepts no tool call. Accepted: Task 0105's Context now says the hook never
+  blocks or rewrites the call and only adds context to the result.
+- Nit: Task 0105 was AFK though its live check needs the owner. Accepted:
+  marked HITL.
+
+Standards axis:
+
+- Minor: `register.mjs` discarded the `$.prompt.submit` promise, so a rejected
+  submit escaped unlogged. Fixed test-first: the new test failed with the
+  unhandled `submit refused`, then passed once the rejection is logged to the
+  debug log.
+- Minor: RESEARCH-0033 removed an Unverified item instead of marking it settled,
+  and its Derived decision still said "none yet". Fixed: the item is restored
+  and marked settled by E14; Derived decision names ADR-0087 and ADR-0088.
+- Nit: the "draws and submits only" test read `register.mjs` source with
+  regexes. Fixed: it now drives `register` with a fake `on` and `$`, asserts
+  the registered events, the right-aligned layout and the submitted
+  `/ad-handoff`.
+- Nit: Tasks 0105/0106 Notes say ADR-0088 was proposed. Rejected, as the
+  reviewer also concluded: the Notes are append-only and a later entry records
+  the acceptance.
+
+CV re-audit: no Blocker.
+
+- Minor (CV.5): the blob identity for the live check is a present-time reading
+  of the dev-mod copy, not a digest taken when the owner attested. Accepted as
+  a residual limit: the attestation stays owner-attested with no retained
+  artifact, and no further claim is made about the loaded state.
+- Minor (CV.7): "fixed test-first" for fix 12 is not checkable from history,
+  since the test and the fix share commit 0f869a9. Accepted: the red run was
+  observed in this session and recorded alongside, not before; the reviewer
+  reproduced the red against 43a558f's `register.mjs` (0 logs, expected 1). The
+  same holds for the submit fix in the next commit.
+- Nit (CV.5): the first review's verdicts are not quoted. No change: it is an
+  open question by design, superseded by this review.
+
+Plugin tests: 14 of 14 pass after the fixes; `claude plugin validate` (engine
+2.1.289) passes and lists `$.ui.log` via `logFailure`.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
 - [ ] Status updated to `done` and Notes log closes the task
