@@ -38,6 +38,10 @@ Append-only log. Date each entry. Never rewrite past entries.
 Planned with ADR-0089 (proposed) from RESEARCH-0037. Implementation waits for
 the owner's acceptance of ADR-0089 and approval of this plan.
 
+### 2026-10-07 — plan approved
+
+The owner accepted ADR-0089 and approved this plan.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

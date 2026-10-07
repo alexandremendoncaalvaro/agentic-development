@@ -1,9 +1,9 @@
 # ADR-0089: Check workflow receipts before landing and outward actions, in shadow first
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-10-07
 **Deciders:** Alexandre Alvaro
-**Would amend (on acceptance):** ADR-0083, decisions 1 and 7, for receipt gates only: a receipt gate may run before a tool call, and may be proposed while the artifact-validator gate stays the only feedback gate. Every other ADR-0083 decision binds it unchanged.
+**Amends:** ADR-0083, decisions 1 and 7, for receipt gates only: a receipt gate may run before a tool call, and may be proposed while the artifact-validator gate stays the only feedback gate. Every other ADR-0083 decision binds it unchanged.
 **Related:** ADR-0047, ADR-0055, ADR-0074 (the decisions a blocking guard must name); ADR-0072 (digest-bound approval precedent); ADR-0088 (the band may display the result)
 
 ## Context
@@ -58,11 +58,11 @@ before landing and outward actions, starting in shadow mode.
 5. **No judgment.** The gate never checks whether a review was good, whether
    grounding was needed, or whether a question was warranted (ADR-0083
    decision 3).
-6. **Flip criterion, preregistered.** Before the shadow run starts, the owner
-   sets, per check, the minimum number of labelled would-block events, the
-   maximum false-block rate, and the window. The recommended values are at
-   least 20 labelled events, at most one false block among them, and at most
-   four weeks. A would-block event is labelled true when the receipt was
+6. **Flip criterion, preregistered.** The owner set it on 2026-10-07, before
+   any shadow run, as a design choice: per check, at least 20 labelled
+   would-block events, at most one false block among them, within a window of
+   at most four weeks. A check that does not reach 20 events in the window
+   stays in shadow. A would-block event is labelled true when the receipt was
    really missing for that state. Enforcing a check is a later ADR that cites
    its measured rate against this criterion, names ADR-0047, ADR-0055 and
    ADR-0074, and specifies a deny message that carries the fix and an override

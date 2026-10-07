@@ -37,6 +37,13 @@ Append-only log. Date each entry. Never rewrite past entries.
 Planned with ADR-0089 (proposed) from RESEARCH-0037. Implementation waits for
 the owner's acceptance of ADR-0089 and approval of this plan.
 
+### 2026-10-07 — criterion set
+
+The owner accepted ADR-0089 and set the flip criterion before any run: per
+check, at least 20 labelled would-block events, at most one false block among
+them, within at most four weeks; a check short of 20 events stays in shadow.
+The owner also approved the plan of Tasks 0107 to 0110.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
