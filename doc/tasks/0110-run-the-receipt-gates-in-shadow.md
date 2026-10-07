@@ -68,6 +68,18 @@ are logged once, against `gh pr ready`; no `gh pr merge` line appears. Read a
 missing later-action line in a chained command as covered by the first, not
 as a gate that did not fire.
 
+### 2026-10-07 — inputs from Task 0109
+
+The shadow window starts after Task 0109 merges: from then on this
+repository's `.agentic/gates.json` names `ghp`, so the owner's pull request
+and comment commands are seen; before it, they were not. The publish check
+covers `gh pr comment`, `gh issue comment`, `gh api` comment calls and the
+Slack connector's `slack_send_message` only; a post through another chat
+tool, or a `gh` flag form the gate does not parse (`-fbody=...`), leaves no
+line, so the read-out cannot count it either way. A `runtime-unavailable`
+publish line means the body was not readable before the command ran; label
+it separately from would-block.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

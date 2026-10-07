@@ -166,3 +166,19 @@ With the addenda above, three phrases no longer bind as written: decision 3's
 ADR-0083 evidence file" (the gate writes its own), and decision 7's "the
 check is off for that repository" (an impossible read logs
 `runtime-unavailable`). Everything else in those decisions binds.
+
+## Addendum 2026-10-07: publish receipt and GitHub CLI wrappers
+
+From Task 0109 and its review. The publish receipt holds the SHA-256 of the
+approved body normalized to LF line endings without trailing whitespace or
+trailing newlines; `ad-publish` records it through `ad-hooks`'
+`publish-receipt.mjs` and posts from the same file (GROUND-0041). A body the
+gate cannot read before the command runs (a shell expansion, standard input,
+an editor, a path resolved after a `cd` or under `~`, a non-regular or
+oversized file) logs `runtime-unavailable`. Decision 2's "chat send" is, in
+this slice, the Slack connector's `slack_send_message`; another chat tool
+logs nothing until it is added. `githubCommands` in `.agentic/gates.json`
+names the wrappers a repository runs `gh` under, for every pull request and
+comment check; this repository sets `gh` and `ghp`, so Task 0110's shadow
+window starts after this slice merges.
+
