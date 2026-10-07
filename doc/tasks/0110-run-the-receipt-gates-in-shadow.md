@@ -44,6 +44,30 @@ check, at least 20 labelled would-block events, at most one false block among
 them, within at most four weeks; a check short of 20 events stays in shadow.
 The owner also approved the plan of Tasks 0107 to 0110.
 
+### 2026-10-07 — labelling inputs from Task 0108
+
+Task 0108's audit found two cases the read-out must label, not count blindly.
+`gh pr ready <n>` and `gh pr merge <n>` are compared with the local `HEAD`,
+which is that pull request's head only when its branch is checked out; a line
+for another pull request does not describe it. A chained command logs the
+checks of each landing action in it, so `git push && gh pr create` writes two
+gate-run lines for one state; count it once per state.
+
+### 2026-10-07 — labelling inputs, corrected
+
+Corrects the entry above after Task 0108's re-review: a chained command now
+runs each check once, against the first landing action that needs it, so
+`git push && gh pr create` writes one gate-run line, not two. A third input:
+each check reads only the newest 20 receipt files, so a covering receipt with
+more than 20 newer ones reads as missing; label such a line false.
+
+### 2026-10-07 — chained pull request actions
+
+From Task 0108's final review: in `gh pr ready && gh pr merge` both checks
+are logged once, against `gh pr ready`; no `gh pr merge` line appears. Read a
+missing later-action line in a chained command as covered by the first, not
+as a gate that did not fire.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

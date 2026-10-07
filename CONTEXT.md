@@ -241,19 +241,27 @@ _Avoid_: "review snapshot" (snapshot implies frozen-in-time database state); "re
 
 ### Review verdicts
 
-**Definition:** the markdown file `ad-review` writes to `.agentic/reviews/<ISO>-<scope>-verdicts.md` at review time, carrying both reviewers' reports verbatim under the Standards and Spec headings. The **Review handoff** proves what a reviewer was given; the verdicts file proves what the review found. A contemporaneous artifact on the reviewing machine, not durable evidence: it shares the gitignored `.agentic/reviews/` directory, so a finding that must outlive the machine is quoted into the tracked record or labelled an open question.
+**Definition:** the markdown file `ad-review` writes to `.agentic/reviews/<ISO>-<scope>-verdicts.md` at review time, opening with a `Target-SHA:` line that names the reviewed commit (or `none (working tree)`) and carrying both reviewers' reports verbatim under the Standards and Spec headings. The `Target-SHA:` line makes it the review **Workflow receipt** the **Receipt gate** reads. The **Review handoff** proves what a reviewer was given; the verdicts file proves what the review found. A contemporaneous artifact on the reviewing machine, not durable evidence: it shares the gitignored `.agentic/reviews/` directory, so a finding that must outlive the machine is quoted into the tracked record or labelled an open question.
 
 _Avoid_: "review report" (the reply in the session is the report; this is its persisted copy); "verdict file" without the qualifier (the audit's verdict trail is a different producer); "durable evidence" (it is not versioned).
 
-**Related code:** [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md).
+**Related code:** [`src/skills/claude-code/ad-review/SKILL.md`](src/skills/claude-code/ad-review/SKILL.md), [`src/skills/codex/ad-review/SKILL.md`](src/skills/codex/ad-review/SKILL.md), [`src/skills/claude-code/ad-hooks/scripts/sequence-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/sequence-gate.mjs).
 
 ### Audit handoff
 
 **Definition:** the markdown file `ad-audit` writes to `.agentic/reviews/<ISO>-audit-<scope>.md` (Claude Code: one per dispatched rule-group; Codex: one combined audit trail). Carries the target plus the resolved rule-set slice each `audit-group-reviewer` receives — one rule-group's rules, the tree/SHA, and the critical tag. Serves as the audit trail for the maximum-gate audit and the context packet for a user-spawned reviewer escalation. It also carries the `Gate:` line: the result of the full quality gate the orchestrator runs once before the review, whose output sits beside it as `<ISO>-audit-gate.log`. Ephemeral per-audit artifact; shares the `.agentic/reviews/` directory (and its `.gitignore` entry) with the Review handoff.
 
-_Avoid_: conflating it with the **Review handoff** — same directory, different producer (`ad-audit` vs `ad-review`) and shape (per-rule-group vs per-axis).
+_Avoid_: conflating it with the **Review handoff** — same directory, different producer (`ad-audit` vs `ad-review`) and shape (per-rule-group vs per-axis); or with the **Audit summary**, which `ad-audit` writes after the verdict, not before dispatch.
 
 **Related code:** [`src/skills/claude-code/ad-audit/SKILL.md`](src/skills/claude-code/ad-audit/SKILL.md), [`src/skills/codex/ad-audit/SKILL.md`](src/skills/codex/ad-audit/SKILL.md), [`.agentic/reviews/`](.agentic/reviews/).
+
+### Audit summary
+
+**Definition:** the JSON file `ad-audit` writes once per audit to `.agentic/reviews/<ISO>-audit-<scope>-summary.json`: the audited commit as `target` (or `none (working tree)`), the time, the scope, and every finding's id, severity and disposition, rewritten as dispositions change. It is the audit **Workflow receipt** the **Receipt gate** reads, which checks that an audit ran for the state, never its findings. A local working copy in the gitignored `.agentic/reviews/`; the tracked task Notes or pull request carry the dispositions.
+
+_Avoid_: "audit trail" (that is the **Audit handoff**); "audit verdict" (the summary records findings, and an audit never emits an approve verdict).
+
+**Related code:** [`src/skills/claude-code/ad-audit/SKILL.md`](src/skills/claude-code/ad-audit/SKILL.md), [`src/skills/codex/ad-audit/SKILL.md`](src/skills/codex/ad-audit/SKILL.md), [`src/skills/claude-code/ad-hooks/scripts/sequence-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/sequence-gate.mjs).
 
 ### Rule-set layer
 
@@ -584,9 +592,10 @@ decision recorded in [`doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md
 
 **Definition:** a machine-readable record that a workflow step ran for an exact
 state: the local CI-mirror run for a working-copy git tree (the gate-run
-receipt, in `.agentic/receipts/gate-run.jsonl`), and, as ADR-0089's later
-slices land, a review or audit for a commit and an outward-text approval for a
-body hash. A local working copy; the durable record stays the tracked task
+receipt, in `.agentic/receipts/gate-run.jsonl`), a review or audit for a
+commit (the `Target-SHA:` line of an `ad-review` verdicts file and the
+`target` of an `ad-audit` summary, both under `.agentic/reviews/`), and, as
+ADR-0089's last slice lands, an outward-text approval for a body hash. A local working copy; the durable record stays the tracked task
 Notes or pull request body, which quote what the step found.
 
 _Avoid_: bare "receipt" (an **Evaluation receipt** is the harness's frozen
@@ -629,7 +638,7 @@ on the artifact); "pass" for an unowned event (nothing was checked).
 ### Gate evidence line
 
 **Definition:** the one JSON line a runtime gate appends per governed firing
-to its own **evidence file** under the OS temporary directory, keyed by
+(for the **Receipt gate**, per check of an action) to its own **evidence file** under the OS temporary directory, keyed by
 session, with a per-session sequence number, the gate identifier, its
 **Gate terminal state** and a reproduction command; machine-local by default
 and never written inside the working tree unless the operator redirects it.

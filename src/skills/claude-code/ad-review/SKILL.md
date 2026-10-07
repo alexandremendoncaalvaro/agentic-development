@@ -135,7 +135,7 @@ Present the two sub-agents' reports verbatim, under explicit headings, in this o
 
 Do **not** merge or rerank findings — the two axes are deliberately separate so the user can see them independently. Do **not** synthesize an overall "approve" verdict.
 
-**Persist the verdicts before presenting them.** Write both sub-agents' reports verbatim, under the same two headings, to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the handoffs. A handoff proves what the reviewer was given; only the persisted output proves what the reviewer found. Write the file at review time, in this step, never as a reconstruction afterwards. The file is a contemporaneous artifact on the reviewing machine, not durable evidence: `.agentic/reviews/` is gitignored by design. A "review found X" claim that must outlive the machine quotes the finding into the tracked record (the task's Notes, the pull request) or carries an OPEN QUESTION label.
+**Persist the verdicts before presenting them.** Write both sub-agents' reports verbatim, under the same two headings, to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the handoffs. Begin the file with one line, `Target-SHA: <full SHA>`, naming the commit at the end of the reviewed range (`git rev-parse <range end>`, never a later `HEAD`), or `Target-SHA: none (working tree)` for uncommitted work. That line is the review receipt `ad-hooks`' shadow receipt gate reads before `gh pr create`, `gh pr ready` and `gh pr merge` (ADR-0089): it counts while the commit's tree equals `HEAD`'s or differs only in receipt-neutral paths, and a working-tree review never counts. A handoff proves what the reviewer was given; only the persisted output proves what the reviewer found. Write the file at review time, in this step, never as a reconstruction afterwards. The file is a contemporaneous artifact on the reviewing machine, not durable evidence: `.agentic/reviews/` is gitignored by design. A "review found X" claim that must outlive the machine quotes the finding into the tracked record (the task's Notes, the pull request) or carries an OPEN QUESTION label.
 
 End with a one-line aggregate summary:
 
@@ -148,7 +148,7 @@ Reference both persisted handoff paths in your reply so the user can audit what 
 ## Output contract
 
 - Two persisted handoff files at `.agentic/reviews/<ISO>-<scope>-standards.md` and `.agentic/reviews/<ISO>-<scope>-spec.md` (the latter may be a single-line "no spec source provided" stub).
-- One persisted verdicts file at `.agentic/reviews/<ISO>-<scope>-verdicts.md` carrying both sub-agents' reports verbatim, written before the aggregated reply.
+- One persisted verdicts file at `.agentic/reviews/<ISO>-<scope>-verdicts.md` opening with its `Target-SHA:` line and carrying both sub-agents' reports verbatim, written before the aggregated reply.
 - Two parallel `Task` invocations of `fresh-context-reviewer`, each with its axis-bounded handoff (or one invocation if Spec was skipped).
 - Aggregated reply under `## Standards Findings` and `## Spec Findings` headings, verbatim, no cross-axis re-ranking.
 - One-line aggregate summary at the end with counts per axis and the worst single finding.

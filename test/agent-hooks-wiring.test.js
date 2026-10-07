@@ -418,7 +418,8 @@ if (process.platform === 'win32') {
       });
       assert.equal(run.status, 0, `shadow mode exits 0; stderr: ${run.stderr}`);
       assert.equal(run.stdout, '');
-      const line = JSON.parse(readFileSync(join(evidence, 'wiring-codex.jsonl'), 'utf8'));
+      const [first] = readFileSync(join(evidence, 'wiring-codex.jsonl'), 'utf8').split('\n');
+      const line = JSON.parse(first);
       assert.equal(line.action, 'gh pr create');
       assert.equal(line.state, 'would-block');
     } finally {
