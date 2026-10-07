@@ -1,9 +1,9 @@
 # Task `0109`: Check the publish receipt before outward posts, in shadow
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md (decisions 1 and 2, publish check)
-**Evidence ref:**
+**Evidence ref:** doc/research/0041-ground-publish-receipt-check.md
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
 **Spec ref:**
