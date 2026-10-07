@@ -366,7 +366,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/handoff-chip.mjs",
-          "sourceSha": "97088fcaf9111bf332ec4c9d5fa96fc4805bc1accf53b853cec6392c4953ca0a"
+          "sourceSha": "23ad4852e275fa3acabbd9b4e58951d7494808095f5d85859e66e733e5ae53c5"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/handoff-nudge.mjs",
@@ -378,7 +378,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "349d758d227bdd1ae1616b9ab42046ed7bd36063ca89f356cf429613a277cf61"
+          "sourceSha": "c658b3d20685299c637d5a91bf8ff4c2dce678edee55a66a63a3de377258b604"
         }
       ]
     },

@@ -3,8 +3,8 @@
  * Session-lifecycle handoff-chip reminder for ad-hooks (ADR-0087). Wired as a
  * `PostToolUse` hook on file writes on both hosts. When the written path is a
  * Markdown file directly under an `agentic-handoffs` directory, it prints
- * `hookSpecificOutput.additionalContext` on exit 0, which both hosts place in
- * the model's context (GROUND-0034 E2), telling the model to offer the resume
+ * `hookSpecificOutput.additionalContext` on exit 0, which both hosts document as
+ * model context (GROUND-0034 E2; observed on Claude Code), telling the model to offer the resume
  * chip, or the path and a fresh-session prompt where no chip tool exists.
  *
  * It keys on the write, not on `/ad-handoff`, because the measured chip miss
@@ -63,7 +63,7 @@ export function handoffPath(event, cwd) {
 
 export function reminder(path) {
   return (
-    `A handoff was written to ${path}. If this host has a background-task chip tool ` +
+    `A session handoff was written to ${path}. If this host has a background-task chip tool ` +
     '(for example spawn_task in the Claude Code desktop app), offer the handoff as a resume chip, ' +
     'once, in your reply (when /ad-handoff is running, its report step is that offer): its prompt ' +
     `must stand alone and tell the next session to read ${path} first and follow ` +

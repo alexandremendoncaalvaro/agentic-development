@@ -2058,7 +2058,7 @@ for (const agent of ['claude-code', 'codex']) {
       );
     });
 
-    test(`skill ${agent}/${name}: description carries no tag-like text`, () => {
+    test(`regression: task-0095 skill ${agent}/${name}: description carries no tag-like text`, () => {
       const match = fm.description.match(TAG_LIKE);
       assert.equal(
         match,

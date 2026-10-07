@@ -3,12 +3,13 @@
 **Status:** proposed
 **Date:** 2026-10-06
 **Deciders:** Alexandre Alvaro
+**Related:** ADR-0055, ADR-0074 (same reminder class); ADR-0083 (not amended: this reminder is outside its gate rules)
 
 ## Context
 
-`/ad-handoff` tells the agent to offer a one-click resume chip on hosts that have one (the Claude Code desktop `spawn_task` tool). RESEARCH-0033 measured adherence on the owner's transcripts: every desktop session that invoked the skill offered the chip, and the only miss was a handoff written directly to the handoff directory without the skill. Text inside the skill cannot reach a handoff that bypasses the skill, and a hook declared in the skill's frontmatter registers only when the skill runs (ADR-0074, Alternatives).
+`/ad-handoff` tells the agent to offer a one-click resume chip on hosts that have one (the Claude Code desktop `spawn_task` tool). An exploratory measurement in RESEARCH-0033 over the owner's private transcripts found: every desktop session that invoked the skill offered the chip, and the only miss was a handoff written directly to the handoff directory without the skill. Text inside the skill cannot reach a handoff that bypasses the skill, and a hook declared in the skill's frontmatter registers only when the skill runs (ADR-0074, Alternatives).
 
-Both hosts fire `PostToolUse` after a file write and place `hookSpecificOutput.additionalContext` in the model's context on exit 0 (GROUND-0034 E2). The kit's session tier already has two static reminders (ADR-0055, ADR-0074) and one validator gate (ADR-0083). This reminder runs no validator, so it is not a gate under ADR-0083 Decision 3, and ADR-0083 Decision 7's one-gate-at-a-time rule does not apply to it; it is a nudge in the class of ADR-0055 and ADR-0074.
+Both hosts fire `PostToolUse` after a file write and place `hookSpecificOutput.additionalContext` in the model's context on exit 0 (GROUND-0034 E2); this was observed on Claude Code and is documented, not yet observed, on Codex. The kit's session tier already has two static reminders (ADR-0055, ADR-0074) and one validator gate (ADR-0083). This reminder runs no validator, so it is not a gate under ADR-0083 Decision 3, and ADR-0083 Decision 7's one-gate-at-a-time rule does not apply to it; it is a nudge in the class of ADR-0055 and ADR-0074.
 
 ## Decision
 

@@ -223,6 +223,14 @@ _Avoid_: "context dump" (passive — `ad-handoff` curates, doesn't dump); "sessi
 
 **Related code:** [`src/skills/claude-code/ad-handoff/SKILL.md`](src/skills/claude-code/ad-handoff/SKILL.md), [`src/skills/codex/ad-handoff/SKILL.md`](src/skills/codex/ad-handoff/SKILL.md).
 
+### Resume chip
+
+**Definition:** a one-click suggested task, rendered by a host's background-task chip tool (`spawn_task` in the Claude Code desktop app), that starts a fresh session whose prompt tells it to read a **Session handoff** first and follow its Resume protocol. Offered by `ad-handoff` on hosts that have the tool and reminded by the handoff-chip **Session reminder** (ADR-0087); the handoff file stays the durable artifact.
+
+_Avoid_: "chip" alone in specs and ADRs (the host UI has other chips); "resume prompt" as a synonym (the prompt is printed text; the chip is the host affordance that carries it).
+
+**Related code:** [`src/skills/claude-code/ad-handoff/SKILL.md`](src/skills/claude-code/ad-handoff/SKILL.md), [`src/skills/claude-code/ad-hooks/scripts/handoff-chip.mjs`](src/skills/claude-code/ad-hooks/scripts/handoff-chip.mjs).
+
 ### Review handoff
 
 **Definition:** the markdown file `ad-review` writes to `.agentic/reviews/<ISO>-<scope>{,-standards,-spec}.md`. Carries the diff plus the spec slice the fresh-context reviewer receives. Serves as the audit trail for the review — the user can replay the review against an updated diff or share it with a teammate. Ephemeral per-review artifact; `.agentic/reviews/` belongs in `.gitignore`. On Claude Code, two files (`-standards.md` + `-spec.md`) when two-axis runs; on Codex, one combined file (per ADR-0007 Addendum 2026-05-24).
@@ -617,6 +625,14 @@ names the ownership, not the outcome).
 **Related code:** the owner map in
 [`src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs`](src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs);
 grounded in [`doc/research/0027-ground-artifact-validator-gate.md`](doc/research/0027-ground-artifact-validator-gate.md) (E4).
+
+### Session reminder
+
+**Definition:** a static or path-keyed instruction that an `ad-hooks` session-lifecycle hook puts in front of the user or the model, with no validator behind it: the `Stop` handoff nudge (ADR-0055), the `UserPromptSubmit` workflow checkpoint (ADR-0074), and the handoff-chip `PostToolUse` reminder (ADR-0087). It always exits 0, records no evidence, and carries a kill switch.
+
+_Avoid_: "gate" or **Runtime gate** (a gate runs an existing validator and records evidence, ADR-0083; a reminder does neither); "enforcement" (a reminder only informs).
+
+**Related code:** [`src/skills/claude-code/ad-hooks/scripts/handoff-nudge.mjs`](src/skills/claude-code/ad-hooks/scripts/handoff-nudge.mjs), [`workflow-checkpoint.mjs`](src/skills/claude-code/ad-hooks/scripts/workflow-checkpoint.mjs), [`handoff-chip.mjs`](src/skills/claude-code/ad-hooks/scripts/handoff-chip.mjs).
 
 ### Runtime layer
 

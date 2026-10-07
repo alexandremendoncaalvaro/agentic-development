@@ -30,7 +30,7 @@ Not applicable: this is a survey question. The one measurable sub-claim (whether
 
 ## Method
 
-A research sidecar did a blob-less clone of each reference into the session scratchpad on 2026-10-06, diffed against the baseline commit or date the kit's own records cite, read every new or changed `SKILL.md` bearing on a kit skill, then read the kit file that would cover it. Official docs were fetched the same day. The author re-verified the two highest-stakes claims in the kit tree: the twelve descriptions (`grep -ln '^description:.*<' src/skills/*/*/SKILL.md` returns 12) and the dangling "minimised repro" (`ad-diagnose/SKILL.md` lines 123 and 127, no earlier Minimise step). Claims are graded per WORKFLOW §17.
+A research sidecar did a blob-less clone of each reference into the session scratchpad on 2026-10-06, diffed against the baseline commit or date the kit's own records cite, read every new or changed `SKILL.md` bearing on a kit skill, then read the kit file that would cover it. Official docs were fetched the same day. The author re-verified the two highest-stakes claims in the kit tree: the twelve descriptions (`grep -ln '^description:.*<' src/skills/*/*/SKILL.md` returns 12) and the dangling "minimised repro" (`ad-diagnose/SKILL.md` lines 123 and 127, no earlier Minimise step). The delta counts are reproducible from the public repositories: `git rev-list --count 9f2e0bd..6fd9479` in mattpocock/skills (451); `git rev-list --count --since=2026-09-17 HEAD` at the 2026-10-06 HEAD of dotnet/skills (93) and adewale/skill-eval-harness (234); `--since=2026-09-09` in github/spec-kit at `62b6fcf` (191); `git rev-list --count 34040c9..HEAD` in anthropics/skills (3) and `5bf4e78..HEAD` in obra/superpowers (1); `find skills -name SKILL.md | wc -l` gives 38 in mattpocock/skills at `6fd9479`. Claims are graded per WORKFLOW §17.
 
 ## Evidence
 
@@ -48,7 +48,7 @@ A research sidecar did a blob-less clone of each reference into the session scra
 
 ### Delta
 
-mattpocock/skills: 451 commits since the May absorption, 28 to 38 skills, 13 renamed or removed, 23 added (HEAD `6fd9479`, 2026-10-06). dotnet/skills: 93 commits. adewale: 234. spec-kit: 50, almost all ecosystem plumbing. anthropics/skills: 3, all in `claude-api`. superpowers: 1 plus v6.4.1 content. openai/skills: 0.
+mattpocock/skills: 451 commits since the May absorption, 28 to 38 skills, 13 renamed or removed, 23 added (HEAD `6fd9479`, 2026-10-06). dotnet/skills: 93 commits. adewale: 234. spec-kit: 191, almost all ecosystem plumbing (2 touch `templates/`). anthropics/skills: 3, all in `claude-api`. superpowers: 1 plus v6.4.1 content. openai/skills: 0.
 
 ### Graded claims
 

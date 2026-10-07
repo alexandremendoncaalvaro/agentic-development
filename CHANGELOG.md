@@ -12,7 +12,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   handoff-chip `PostToolUse` reminder on both hosts: when a handoff file is
   written under `agentic-handoffs/`, with or without `/ad-handoff`, the model
   is told to offer the one-click resume chip where the host has one, or the
-  path and a fresh-session prompt where it does not; `/ad-handoff` on Claude
+  path and a fresh-session prompt where it does not (observed on Claude Code;
+  documented, not yet observed, on Codex); `/ad-handoff` on Claude
   Code makes the chip a numbered report step (ADR-0087, GROUND-0034,
   task-0096).
 - `/ad-commit` on Claude Code and Codex bundles `cited-records.mjs`, a

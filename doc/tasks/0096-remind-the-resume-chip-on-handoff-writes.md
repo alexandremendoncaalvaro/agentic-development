@@ -70,6 +70,43 @@ and ADR-0087 records why the `Stop` nudge stays as it is; the stale
 separate correction, left for its own task. ADR-0087 stays proposed until
 the owner accepts it.
 
+### 2026-10-06 — audit dispositions and live check on the final script
+
+The earlier live check is superseded: the reminder text changed after it
+(review fix, then the audit's vocabulary fix), and a digest alone is not
+inspectable evidence. Re-run on the final script, blob
+`425dec522a083d17ccdb4d9f3b42fe87185623d7` (`git hash-object
+src/skills/claude-code/ad-hooks/scripts/handoff-chip.mjs`), with Claude Code
+2.1.227 in this repository, which wires the hook in `.claude/settings.json`:
+
+    claude -p "Use the Write tool to write the single line 'live check' to the file $TMPDIR/agentic-handoffs/<ISO>-livecheck.md. After the write, quote verbatim any additional context or hook text you received about that write, or say NONE if there was none. Do nothing else." --allowedTools Write
+
+The model replied with the hook text, labelled by the host as
+"PostToolUse:Write hook additional context", beginning "A session handoff was
+written to /var/folders/.../agentic-handoffs/20261007T022346Z-livecheck.md. If
+this host has a background-task chip tool ... offer the handoff as a resume
+chip, once, in your reply" and ending "check it against the template of that
+skill first." The test file was deleted afterwards. Codex delivery remains
+documented, not observed: the operator's Codex CLI could not start a trial
+(Task 0083), and the record says so wherever it names Codex.
+
+The review files named above are local and gitignored by design; the findings
+and dispositions quoted in this log are the durable record. ADR-0087 and
+GROUND-0034 were recorded alongside the code, in one commit, not before it.
+
+`/ad-audit` dispositions, all fixed in the follow-up commit: GROUND-0034 and
+RESEARCH-0033 grade the transcript measurement as exploratory (a private
+corpus a reviewer cannot reopen), and GROUND-0034 drops to Conditional;
+RESEARCH-0032 gives the commands that reproduce its delta counts and corrects
+spec-kit's count from 50 to 191; ADR-0087 names its relation to ADR-0055,
+ADR-0074 and ADR-0083; `CONTEXT.md` gains **Resume chip** and **Session
+reminder**, and `ARCHITECTURE.md` places reminders beside the runtime gates;
+the reminder says "session handoff"; both `ad-hooks` descriptions and the
+script-path paragraph name the new member and both hosts' configuration
+files. Not changed, with reason: the silent exit on unreadable stdin follows
+the documented reminder contract of ADR-0074 (a reminder that cannot read its
+input must not break the session).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

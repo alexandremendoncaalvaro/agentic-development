@@ -65,6 +65,19 @@ Notes left as they are: the check covers `description` only (no skill uses
 `when_to_use`), and `summary:` keeps its placeholders because it is not a
 skill description.
 
+### 2026-10-06 — audit dispositions
+
+The fresh-context review files named above are local and gitignored by
+design (`.agentic/reviews/`); the findings and their dispositions quoted in
+this log are the durable record. The `/ad-audit` over this change, run with
+the research studies and Task 0096 on one branch, raised two items here:
+the per-skill tag test is now named `regression: task-0095 ...` (GUIDELINES
+§9.5), and `ARCHITECTURE.md` lists the tag ban among the caps
+`test/skills.test.js` holds. The red-before-green order is not checkable by
+commit ancestry, because test and fix landed in one commit; the auditors
+re-derived it independently, the shipped matcher flags 12 of 92 descriptions
+at `1fedcfd` and none after the change.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

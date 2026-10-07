@@ -3,20 +3,20 @@
 **Status:** recorded
 **Decision:** A zero-dependency Node script in the `ad-hooks` session tier, wired as a `PostToolUse` hook on file writes on both hosts, recovers the written path with the artifact gate's own `recoverPaths`, and, when the path is a Markdown file under an `agentic-handoffs` directory, prints `hookSpecificOutput.additionalContext` on exit 0 telling the model to offer the resume chip where the host has one and the path plus a fresh-session prompt where it does not.
 **Decision ref:** doc/adr/0087-remind-the-resume-chip-on-handoff-writes.md
-**Confidence:** Strong
+**Confidence:** Conditional
 
 ## Decision and confidence
 
-The measured failure is a handoff written without `/ad-handoff`, so the reminder must key on the effect, a handoff file being written, not on the skill being invoked. Both hosts expose a `PostToolUse` event after a file write, and both document the same JSON field, `hookSpecificOutput.additionalContext`, as text placed in the model's context on exit 0, while plain stdout is ignored for that event. One byte-identical script therefore serves both hosts, which is the ADR-0083 shape for a session-tier member. The kit already recovers written paths from both hosts' tool input in `artifact-gate.mjs`, so the new script reuses that function instead of a second parser. Axis-2: Strong; the change is opt-in, reversible by removing one settings block, and every load-bearing claim rests on primary documentation plus a validated reference or an in-repo precedent.
+The measured failure is a handoff written without `/ad-handoff`, so the reminder must key on the effect, a handoff file being written, not on the skill being invoked. Both hosts expose a `PostToolUse` event after a file write, and both document the same JSON field, `hookSpecificOutput.additionalContext`, as text placed in the model's context on exit 0, while plain stdout is ignored for that event. One byte-identical script therefore serves both hosts, which is the ADR-0083 shape for a session-tier member. The kit already recovers written paths from both hosts' tool input in `artifact-gate.mjs`, so the new script reuses that function instead of a second parser. Axis-2: Conditional. The mechanism (E2, E3) rests on primary documentation plus a validated reference or an in-repo precedent, and was observed on Claude Code; the motivating miss (E1) is an exploratory measurement, and Codex delivery is documented, not observed. Mitigation: the change is opt-in, carries a kill switch, and is removed by deleting one settings block.
 
 ## Evidence
 
 ### E1 — Handoffs written outside the skill are the only observed chip miss
 
-**Strength:** High
+**Strength:** Medium
 **Provenance:** C1
 
-On the owner's transcripts, six of six desktop sessions that invoked `/ad-handoff` offered the chip; the one desktop handoff without a chip was written directly to the handoff directory without the skill while the chip tool was available (C1). A trigger on the skill cannot reach that case; a trigger on the write can.
+On the owner's transcripts, six of six desktop sessions that invoked `/ad-handoff` offered the chip; the one desktop handoff without a chip was written directly to the handoff directory without the skill while the chip tool was available (C1). A trigger on the skill cannot reach that case; a trigger on the write can. Exploratory: the corpus is the owner's private session store, not reopenable by a reviewer.
 
 ### E2 — Both hosts deliver `hookSpecificOutput.additionalContext` from a `PostToolUse` hook to the model on exit 0
 
@@ -40,8 +40,8 @@ Claude Code documents the JSON shape with `hookEventName: "PostToolUse"` and `ad
 - **C1:** `doc/research/0033-host-native-enforcement-layer.md`, E1, the chip-adherence measurement over the owner's transcripts (accessed 2026-10-06 via Read)
 - **C2:** `src/skills/claude-code/ad-hooks/scripts/artifact-gate.mjs:77-94`, `recoverPaths` for both hosts' tool input (accessed 2026-10-06 via Read)
 - **C3:** `src/skills/claude-code/ad-hooks/scripts/workflow-checkpoint.mjs:40-86`, kill switch, object-only stdin, exit 0 always (accessed 2026-10-06 via Read)
-- **C4:** `src/skills/claude-code/ad-handoff/SKILL.md:85-86,154`, the handoff directory and file name (accessed 2026-10-06 via grep)
-- **D1:** `git log --oneline -S'spawn_task' -- src/skills` returns only 0bd4eae, the commit that added the chip paragraph to `/ad-handoff`; no hook script mentions it (accessed 2026-10-06 via Bash)
+- **C4:** `src/skills/claude-code/ad-handoff/SKILL.md:85-86,154` (line 155 after this change adds a report step), the handoff directory and file name (accessed 2026-10-06 via grep)
+- **D1:** `git log --oneline -S'spawn_task' -- src/skills` returned only 0bd4eae before this change, the commit that added the chip paragraph to `/ad-handoff`; no hook script mentioned it (accessed 2026-10-06 via Bash)
 
 ## Limitations and reversal
 
