@@ -56,9 +56,11 @@ async function takeReading($, state) {
   try {
     const { context } = await $.session.usage({ breakdown: 'summary' });
     state.fill = fillReading(context);
-  } catch {
-    // Fail closed (ADR-0088): with no fresh reading the band is not drawn.
+  } catch (error) {
+    // Fail closed (ADR-0088): with no fresh reading the band is not drawn;
+    // the reason goes to the debug log, never on screen.
     state.fill = null;
+    $.ui.log(`agentic-session: no context reading (${error?.message ?? error})`, { to: 'debug' });
   }
   $.ui.invalidate('ui.render');
 }

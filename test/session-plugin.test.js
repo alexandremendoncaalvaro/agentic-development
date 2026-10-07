@@ -124,3 +124,24 @@ test('the npm package does not ship the plugin or the marketplace', () => {
     assert.ok(!/^(plugins|\.claude-plugin)\b/.test(entry), `package.json#files ships ${entry}`);
   }
 });
+
+test('a failed reading hides the band and logs the reason to the debug log only', async () => {
+  const { register } = await import(join(PLUGIN, 'hooks', 'register.mjs'));
+  const hooks = {};
+  register((event, ...rest) => (hooks[event] = rest.at(-1)), { threshold: 1 });
+  const logs = [];
+  const $ = {
+    session: {
+      usage: async () => {
+        throw new Error('usage unavailable');
+      },
+    },
+    ui: { invalidate: () => {}, log: (text, options) => logs.push({ text, options }) },
+  };
+  await hooks['session.start']($, {}, async () => undefined);
+  assert.equal(logs.length, 1);
+  assert.match(logs[0].text, /usage unavailable/);
+  assert.deepEqual(logs[0].options, { to: 'debug' });
+  const drawn = hooks['ui.render']($, { hasSurvey: false }, () => 'engine band');
+  assert.equal(drawn, 'engine band', 'the engine band stands when no reading exists');
+});
