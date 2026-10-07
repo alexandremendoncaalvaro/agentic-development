@@ -428,3 +428,21 @@ if (process.platform === 'win32') {
     }
   });
 }
+
+// Task 0109, GROUND-0041: the same gate also runs before a chat send, so the
+// publish check sees its text. Both hosts match MCP tools by name.
+test('agent hooks wiring: a PreToolUse entry matched on the chat-send tool runs the sequence gate', () => {
+  const send = 'mcp__335bdfe7-204b__slack_send_message';
+  for (const file of ['.claude/settings.json', '.codex/hooks.json']) {
+    const config = JSON.parse(readFileSync(join(KIT_ROOT, file), 'utf8'));
+    const entry = (config.hooks?.PreToolUse ?? []).find(
+      (e) => e.matcher !== 'Bash' && new RegExp(`^(?:${e.matcher})$`).test(send)
+    );
+    assert.ok(entry, `${file}: a PreToolUse entry matches ${send}`);
+    assert.ok(
+      entry.hooks.some((h) => /sequence-gate\.mjs/.test(h.command)),
+      `${file}: the entry runs sequence-gate.mjs`
+    );
+    assert.ok(!new RegExp(`^(?:${entry.matcher})$`).test('mcp__x__slack_read_channel'));
+  }
+});

@@ -594,8 +594,9 @@ decision recorded in [`doc/adr/0083-bound-the-runtime-layer-to-feedback-gates.md
 state: the local CI-mirror run for a working-copy git tree (the gate-run
 receipt, in `.agentic/receipts/gate-run.jsonl`), a review or audit for a
 commit (the `Target-SHA:` line of an `ad-review` verdicts file and the
-`target` of an `ad-audit` summary, both under `.agentic/reviews/`), and, as
-ADR-0089's last slice lands, an outward-text approval for a body hash. A local working copy; the durable record stays the tracked task
+`target` of an `ad-audit` summary, both under `.agentic/reviews/`), and an
+outward-text approval for the SHA-256 of a normalized body (the publish
+receipt, in `.agentic/receipts/publish.jsonl`, recorded by `ad-publish`). A local working copy; the durable record stays the tracked task
 Notes or pull request body, which quote what the step found.
 
 _Avoid_: bare "receipt" (an **Evaluation receipt** is the harness's frozen

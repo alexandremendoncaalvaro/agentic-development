@@ -545,3 +545,180 @@ test('sequence-gate: a check runs once per command, so a chained command stays w
   );
   assert.equal(lines[0].reproduction, JSON.stringify(['node', '-e', appendRun]));
 });
+
+// Task 0109, GROUND-0041: the publish receipt, matched by the normalized
+// body's hash before comments and chat sends.
+const PUBLISH_RECEIPT = join(SCRIPTS, 'publish-receipt.mjs');
+
+function approve(repo, body, name = 'approved.md') {
+  const file = join(repo, name);
+  writeFileSync(file, body);
+  execFileSync(
+    'node',
+    [PUBLISH_RECEIPT, 'record', '--destination', 'github:o/r#5', '--body-file', file],
+    { cwd: repo, encoding: 'utf8', env: cleanEnv() }
+  );
+  return file;
+}
+
+test('sequence-gate: a comment posted from the approved file clears the publish check', () => {
+  const repo = fixtureRepo();
+  const file = approve(repo, 'Approved text.\n');
+  const lines = runGate(repo, `gh pr comment 5 --body-file ${file}`).lines;
+  const [publish] = linesFor(lines, 'publish');
+  assert.equal(publish.action, 'gh pr comment');
+  assert.equal(publish.state, 'clear');
+  assert.equal(publish.receipt, 'github:o/r#5');
+});
+
+test('sequence-gate: an edited or never-approved comment body is a publish would-block', () => {
+  const repo = fixtureRepo();
+  const file = approve(repo, 'Approved text.\n');
+  writeFileSync(file, 'Approved text, then edited.\n');
+  const [edited] = linesFor(runGate(repo, `gh pr comment 5 --body-file ${file}`).lines, 'publish');
+  assert.equal(edited.state, 'would-block');
+  assert.deepEqual(edited.missing, ['publish']);
+  assert.match(edited.reproduction, /publish-receipt\.mjs record/);
+  const fresh = fixtureRepo();
+  const other = join(fresh, 'never.md');
+  writeFileSync(other, 'Never approved.\n');
+  const [none] = linesFor(runGate(fresh, `gh pr comment 5 --body-file ${other}`).lines, 'publish');
+  assert.equal(none.state, 'would-block');
+});
+
+test('sequence-gate: a quoted --body, -b or --body= literal is read as the comment body', () => {
+  const repo = fixtureRepo();
+  approve(repo, "Looks good, it's ready.\n");
+  for (const command of [
+    `gh pr comment 5 --body "Looks good, it's ready."`,
+    `gh pr comment 5 -b 'Looks good, it'\\''s ready.'`,
+    `gh pr comment 5 --body="Looks good, it's ready." && echo done`,
+  ]) {
+    const [publish] = linesFor(runGate(repo, command).lines, 'publish');
+    assert.equal(publish?.state, 'clear', command);
+  }
+});
+
+test('sequence-gate: a body in a quoted heredoc is read; any other expansion is runtime-unavailable', () => {
+  const repo = fixtureRepo();
+  approve(repo, 'Line one.\n\nLine $two, kept literal.\n');
+  const heredoc = `gh pr comment 5 --body "$(cat <<'EOF'\nLine one.\n\nLine $two, kept literal.\nEOF\n)"`;
+  assert.equal(linesFor(runGate(repo, heredoc).lines, 'publish')[0].state, 'clear');
+  for (const command of [
+    'gh pr comment 5 --body "$BODY"',
+    'gh pr comment 5 --body-file -',
+    'gh issue comment 5 --editor',
+    'gh pr comment 5',
+  ]) {
+    const [publish] = linesFor(runGate(repo, command).lines, 'publish');
+    assert.equal(publish?.state, 'runtime-unavailable', command);
+  }
+  assert.deepEqual(runGate(repo, 'gh pr comment 5 --delete-last --yes').lines, []);
+});
+
+test('sequence-gate: gh issue comment and gh api comment calls are read the same way', () => {
+  const repo = fixtureRepo();
+  const file = approve(repo, 'Approved text.\n');
+  writeFileSync(join(repo, 'payload.json'), JSON.stringify({ body: 'Approved text.' }));
+  for (const command of [
+    `gh issue comment 5 --body-file ${file}`,
+    "gh api repos/o/r/issues/5/comments -f body='Approved text.'",
+    `gh api repos/o/r/pulls/5/comments -F body=@${file} -f path=x`,
+    'gh api -X POST repos/o/r/issues/5/comments --input payload.json',
+  ]) {
+    const [publish] = linesFor(runGate(repo, command).lines, 'publish');
+    assert.equal(publish?.state, 'clear', command);
+  }
+  assert.deepEqual(runGate(repo, 'gh api repos/o/r/issues/5/comments --paginate').lines, []);
+});
+
+function runEvent(repo, toolName, toolInput) {
+  const evidenceDir = mkdtempSync(join(tmpdir(), 'sequence-gate-evidence-'));
+  const event = {
+    hook_event_name: 'PreToolUse',
+    session_id: 'sess-mcp',
+    cwd: repo,
+    tool_name: toolName,
+    tool_input: toolInput,
+  };
+  execFileSync('node', [SEQUENCE_GATE], {
+    input: JSON.stringify(event),
+    encoding: 'utf8',
+    env: cleanEnv({ AD_SEQUENCE_GATE_EVIDENCE_DIR: evidenceDir }),
+  });
+  const file = join(evidenceDir, 'sess-mcp.jsonl');
+  return existsSync(file)
+    ? readFileSync(file, 'utf8')
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => JSON.parse(line))
+    : [];
+}
+
+test('sequence-gate: a chat send tool is checked against the publish receipt', () => {
+  const repo = fixtureRepo();
+  approve(repo, 'Shipped the gate.\n');
+  const send = 'mcp__335bdfe7-204b__slack_send_message';
+  const [clear] = runEvent(repo, send, { channel_id: 'C1', message: 'Shipped the gate.' });
+  assert.equal(clear.action, 'chat send');
+  assert.equal(clear.host_tool, send);
+  assert.equal(clear.state, 'clear');
+  const [edited] = runEvent(repo, send, { channel_id: 'C1', message: 'Shipped it.' });
+  assert.equal(edited.state, 'would-block');
+  assert.deepEqual(runEvent(repo, 'mcp__x__slack_read_channel', { channel_id: 'C1' }), []);
+});
+
+test('sequence-gate: gates.json turns the publish check off, and a missing body file names its action', () => {
+  const repo = fixtureRepo();
+  const [missing] = runGate(repo, 'gh pr comment 5 --body-file nowhere.md').lines;
+  assert.equal(missing.action, 'gh pr comment');
+  assert.equal(missing.state, 'runtime-unavailable');
+  writeGates(repo, { checks: { publish: false } });
+  assert.deepEqual(runGate(repo, 'gh pr comment 5 --body "x"').lines, []);
+});
+
+test('sequence-gate: normalization absorbs line endings and trailing whitespace, nothing else', () => {
+  const repo = fixtureRepo();
+  approve(repo, 'Title\n\n- item one\n- item two\n');
+  const send = 'mcp__s__slack_send_message';
+  const state = (message) => runEvent(repo, send, { channel_id: 'C', message })[0].state;
+  assert.equal(state('Title\r\n\r\n- item one  \r\n- item two\t\n\n\n'), 'clear');
+  assert.equal(
+    state('Title\n- item one\n- item two'),
+    'would-block',
+    'an interior blank line removed'
+  );
+  assert.equal(
+    state('\nTitle\n\n- item one\n- item two'),
+    'would-block',
+    'a leading blank line added'
+  );
+  assert.equal(
+    state('Title\n\n- item one\n-  item two'),
+    'would-block',
+    'interior spacing changed'
+  );
+});
+
+test('publish-receipt: a malformed invocation exits 64 and records nothing', () => {
+  const repo = fixtureRepo();
+  const run = spawnSync('node', [PUBLISH_RECEIPT, 'record', '--destination', 'x'], {
+    cwd: repo,
+    encoding: 'utf8',
+    env: cleanEnv(),
+  });
+  assert.equal(run.status, 64);
+  assert.equal(existsSync(join(repo, '.agentic', 'receipts', 'publish.jsonl')), false);
+});
+
+test('sequence-gate: gates.json names the GitHub CLI wrappers a repository uses', () => {
+  const repo = fixtureRepo();
+  assert.deepEqual(runGate(repo, 'ghp pr merge 5').lines, []);
+  writeGates(repo, { githubCommands: ['gh', 'ghp'] });
+  const checksOf = (command) => runGate(repo, command).lines.map((l) => `${l.action}:${l.check}`);
+  assert.deepEqual(checksOf('GH_HOST=github.com ghp pr merge 5'), [
+    'gh pr merge:review',
+    'gh pr merge:audit',
+  ]);
+  assert.deepEqual(checksOf('ghp pr comment 5 --body "x"'), ['gh pr comment:publish']);
+});

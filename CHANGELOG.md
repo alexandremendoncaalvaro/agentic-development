@@ -22,6 +22,12 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   review receipt by a bounded local command that reads a bot's review for the
   head commit (GROUND-0040, task-0108). A chained command now runs the checks of
   every landing action in it, each once.
+- The shadow receipt gate checks the publish receipt before `gh pr comment`,
+  `gh issue comment`, `gh api` comment calls and a Slack chat send: after the
+  owner approves a text, `/ad-publish` records the SHA-256 of its normalized
+  body with `scripts/publish-receipt.mjs`, and the gate compares the outgoing
+  body with it. `githubCommands` in `.agentic/gates.json` names the wrappers a
+  repository runs `gh` under (GROUND-0041, task-0109).
 - An optional Claude Code companion plugin, `agentic-session`, published from
   this repository's marketplace: a context band above the prompt that appears
   once the session reaches a configurable share of the auto-compact point (60%
