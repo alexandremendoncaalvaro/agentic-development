@@ -762,7 +762,7 @@ test('regression: task-0109 review, a body file the gate cannot read faithfully 
   );
 });
 
-test('sequence-gate: each publication in a chained command is checked; unrelated commands log nothing', () => {
+test('regression: task-0109 review, each publication in a chained command is checked; unrelated commands log nothing', () => {
   const repo = fixtureRepo();
   approve(repo, 'Approved text.\n');
   const lines = runGate(
@@ -778,7 +778,7 @@ test('sequence-gate: each publication in a chained command is checked; unrelated
   }
 });
 
-test('publish-receipt: a body file it cannot read is reported in one line, never a stack trace', () => {
+test('regression: task-0109 review, the recorder reports an unreadable body file in one line, never a stack trace', () => {
   const repo = fixtureRepo();
   const run = spawnSync(
     'node',
@@ -787,4 +787,33 @@ test('publish-receipt: a body file it cannot read is reported in one line, never
   );
   assert.equal(run.status, 1);
   assert.match(run.stderr, /^publish-receipt: no receipt recorded \(.+\)\n$/);
+});
+
+test('regression: task-0109 audit, a cd inside a subshell or group still makes a relative body file unreadable', () => {
+  const repo = fixtureRepo();
+  approve(repo, 'Approved text.\n', 'b.md');
+  mkdirSync(join(repo, 'sub'));
+  for (const command of [
+    '( cd sub; gh pr comment 1 --body-file b.md )',
+    '{ cd sub; gh pr comment 1 --body-file b.md; }',
+  ]) {
+    assert.equal(
+      linesFor(runGate(repo, command).lines, 'publish')[0]?.state,
+      'runtime-unavailable',
+      command
+    );
+  }
+});
+
+test('regression: task-0109 audit, the gate never reads .env or .npmrc named as a body file', () => {
+  const repo = fixtureRepo();
+  for (const name of ['.env', '.env.local', '.npmrc']) {
+    writeFileSync(join(repo, name), 'TOKEN=x\n');
+    const [publish] = linesFor(
+      runGate(repo, `gh pr comment 1 --body-file ${name}`).lines,
+      'publish'
+    );
+    assert.equal(publish.state, 'runtime-unavailable', name);
+    assert.match(publish.output, /not read/, name);
+  }
 });

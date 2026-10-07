@@ -75,7 +75,7 @@ export function recordPublishReceipt(cwd, { destination, bodyFile }) {
   return receipt;
 }
 
-/** The newest receipt whose hash equals the outgoing body's, or null. */
+/** The evidence for one outgoing body: `clear` when a receipt has its hash. */
 export function checkPublish(cwd, body) {
   const root = repositoryRoot(cwd);
   const sha256 = bodyHash(body);
@@ -97,6 +97,47 @@ export function checkPublish(cwd, body) {
 const OPERATORS = ['&&', '||', ';', '|', '&', '\n'];
 const QUOTED_HEREDOC = /^\$\(cat <<-?(['"])([A-Za-z_]\w*)\1\n([\s\S]*?)\n\2\n?\)/;
 
+// A single-quoted string: literal up to the closing quote.
+function singleQuoted(command, start) {
+  const close = command.indexOf("'", start + 1);
+  const end = close === -1 ? command.length : close;
+  return { text: command.slice(start + 1, end), unreadable: false, end };
+}
+
+// A double-quoted string. "$(cat <<'EOF' ... EOF)" with a quoted delimiter is
+// literal text, less the trailing newlines the substitution drops; any other
+// `$` or backtick makes the word unreadable.
+function doubleQuoted(command, start) {
+  let text = '';
+  let unreadable = false;
+  let i = start + 1;
+  for (; i < command.length && command[i] !== '"'; i += 1) {
+    const heredoc = QUOTED_HEREDOC.exec(command.slice(i));
+    const next = command[i + 1];
+    if (heredoc) {
+      text += heredoc[3].replace(/\n+$/, '');
+      i += heredoc[0].length - 1;
+    } else if (command[i] === '\\' && next === '\n') {
+      i += 1;
+    } else if (command[i] === '\\' && '"\\$`'.includes(next)) {
+      text += next;
+      i += 1;
+    } else {
+      unreadable ||= command[i] === '$' || command[i] === '`';
+      text += command[i];
+    }
+  }
+  return { text, unreadable, end: i };
+}
+
+// One unquoted character or escape: a line continuation adds nothing.
+function bare(command, start) {
+  const char = command[start];
+  if (char !== '\\') return { text: char, unreadable: char === '$' || char === '`', end: start };
+  if (command[start + 1] === '\n') return { text: '', unreadable: false, end: start + 1 };
+  return { text: command[start + 1] ?? '', unreadable: false, end: start + 1 };
+}
+
 /**
  * Split a shell command into words and operators, without running anything.
  * Quotes and backslash escapes are honoured; a word that holds a parameter
@@ -106,63 +147,32 @@ const QUOTED_HEREDOC = /^\$\(cat <<-?(['"])([A-Za-z_]\w*)\1\n([\s\S]*?)\n\2\n?\)
 export function tokenize(command) {
   const items = [];
   let word = null;
-  const begin = () => {
-    if (!word) word = { value: '', unreadable: false };
-  };
-  const end = () => {
+  const close = () => {
     if (word) items.push(word);
     word = null;
   };
   for (let i = 0; i < command.length; i += 1) {
-    const char = command[i];
-    const op = OPERATORS.find((o) => command.startsWith(o, i));
-    if (op) {
-      end();
-      items.push({ op });
-      i += op.length - 1;
-    } else if (char === ' ' || char === '\t') {
-      end();
-    } else if (char === "'") {
-      begin();
-      const close = command.indexOf("'", i + 1);
-      const stop = close === -1 ? command.length : close;
-      word.value += command.slice(i + 1, stop);
-      i = stop;
-    } else if (char === '"') {
-      begin();
-      for (i += 1; i < command.length && command[i] !== '"'; i += 1) {
-        // "$(cat <<'EOF' ... EOF)": a quoted delimiter keeps the text literal,
-        // and the substitution drops trailing newlines.
-        const heredoc = QUOTED_HEREDOC.exec(command.slice(i));
-        if (heredoc) {
-          word.value += heredoc[3].replace(/\n+$/, '');
-          i += heredoc[0].length - 1;
-          continue;
-        }
-        if (command[i] === '\\' && command[i + 1] === '\n') {
-          i += 1;
-        } else if (command[i] === '\\' && '"\\$`'.includes(command[i + 1])) {
-          word.value += command[i + 1];
-          i += 1;
-        } else {
-          if (command[i] === '$' || command[i] === '`') word.unreadable = true;
-          word.value += command[i];
-        }
-      }
-    } else if (char === '\\' && command[i + 1] === '\n') {
-      // A line continuation: the shell drops both characters.
-      i += 1;
-    } else if (char === '\\') {
-      begin();
-      word.value += command[i + 1] ?? '';
-      i += 1;
-    } else {
-      begin();
-      if (char === '$' || char === '`') word.unreadable = true;
-      word.value += char;
+    const operator = OPERATORS.find((candidate) => command.startsWith(candidate, i));
+    if (operator) {
+      close();
+      items.push({ op: operator });
+      i += operator.length - 1;
+      continue;
     }
+    if (command[i] === ' ' || command[i] === '\t') {
+      close();
+      continue;
+    }
+    const reader = { "'": singleQuoted, '"': doubleQuoted }[command[i]] ?? bare;
+    const part = reader(command, i);
+    if (part.text || part.unreadable || reader !== bare) {
+      word ??= { value: '', unreadable: false };
+      word.value += part.text;
+      word.unreadable ||= part.unreadable;
+    }
+    i = part.end;
   }
-  end();
+  close();
   return items;
 }
 
@@ -215,6 +225,10 @@ export const MAX_BODY_BYTES = 1024 * 1024;
 // missing receipt.
 function bodyFromFile(action, value, context) {
   if (value.startsWith('~')) return { action, unreadable: `${value} is expanded by the shell` };
+  // AGENTS.md: the agent never reads these, and neither does its hook.
+  if (/(^|\/)(\.env(\.[^/]*)?|\.npmrc)$/.test(value)) {
+    return { action, unreadable: `${value} is not read by the gate` };
+  }
   if (!isAbsolute(value) && context.changedDirectory) {
     return { action, unreadable: `${value} is relative to a directory changed earlier` };
   }
@@ -284,7 +298,11 @@ export function outgoingPublications(event, cwd, githubCommands = ['gh']) {
   const publications = [];
   const context = { cwd, changedDirectory: false };
   for (const words of segments(tokenize(command))) {
-    const program = words.find((w) => !/^\w+=/.test(w.value))?.value;
+    // The first word after any assignment, with a subshell or group opener
+    // stripped: `( cd sub; ...)` changes directory too.
+    const program = words
+      .map((word) => word.value.replace(/^[({]+/, ''))
+      .find((value) => value && !/^\w+=/.test(value));
     if (['cd', 'pushd', 'popd'].includes(program)) context.changedDirectory = true;
     const at = words.findIndex((w) => githubCommands.includes(w.value));
     if (at === -1) continue;

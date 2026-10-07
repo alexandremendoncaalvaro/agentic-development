@@ -306,15 +306,15 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/publish-receipt.mjs",
-          "sourceSha": "a3712e664603d96192e2efba990d26264631c7804e173b584a3acd0cac20473e"
+          "sourceSha": "0d9976d06fa73bef82db7a85d51865c35a023ebefbf91a9d81564a2902e05365"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/review-receipts.mjs",
-          "sourceSha": "65633b0c45ee5537d746c93243ee5673c560a6531ef70509d8a55b87e7905d3c"
+          "sourceSha": "6abdbf19cbcdc079bcac5a179d06a4e94e338f2afb0e53499b61a56d32504026"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "ee071bda841844514ee6a9e4ea023b15aed0d2274381c31291f56cf57ded56ba"
+          "sourceSha": "621a5bc7ca4d9553395636ab16e8b86e9aca75037565c75112869c4486125d09"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",

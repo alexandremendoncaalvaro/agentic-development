@@ -44,7 +44,6 @@
  * Zero dependencies; byte-identical in both host trees.
  */
 
-import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -52,7 +51,7 @@ import { pathToFileURL } from 'node:url';
 import { appendEvidence } from './artifact-gate.mjs';
 import { git, headTree, readReceipts, repositoryRoot } from './gate-run.mjs';
 import { checkPublish, outgoingPublications } from './publish-receipt.mjs';
-import { readAuditReceipts, readReviewReceipts } from './review-receipts.mjs';
+import { commandCheck, readAuditReceipts, readReviewReceipts } from './review-receipts.mjs';
 
 export const GATE_ID = 'sequence-gate';
 export const DEFAULT_RECEIPT_NEUTRAL = ['doc/tasks/**'];
@@ -121,7 +120,9 @@ function gatesConfig(root) {
 
 /**
  * The names the repository runs the GitHub CLI under: plain words only, so a
- * name can never widen the match; `gh` when unset or unreadable.
+ * name can never widen the match. `gh` when unset or unreadable; a broken
+ * `gates.json` still surfaces, as the runtime-unavailable line of every check
+ * that reads it.
  */
 function githubCommands(cwd) {
   try {
@@ -245,54 +246,6 @@ export const checkAudit = commitReceiptCheck(
   'run /ad-audit on the range ending at HEAD'
 );
 
-export const DEFAULT_COMMAND_TIMEOUT_SECONDS = 10;
-// A design choice, under the 30 seconds this repository's Codex wiring gives
-// the hook, leaving room for its git calls.
-export const MAX_COMMAND_TIMEOUT_SECONDS = 20;
-
-/**
- * A repository whose review is done by a bot or harness names, in
- * `.agentic/gates.json`, a local command that exits 0 when that evidence
- * exists for the commit in `AGENTIC_HEAD_SHA`. The command is bounded well
- * under the hosts' 600-second hook timeout (GROUND-0040 E1).
- */
-function commandCheck(check, setting, cwd) {
-  // ADR-0089 decision 7 lets bot evidence stand in for a review only.
-  if (check !== 'review') throw new Error(`a command replaces the review only, not ${check}`);
-  const seconds = setting.timeoutSeconds ?? DEFAULT_COMMAND_TIMEOUT_SECONDS;
-  if (typeof seconds !== 'number' || !(seconds > 0 && seconds <= MAX_COMMAND_TIMEOUT_SECONDS)) {
-    throw new Error(`timeoutSeconds must be above 0 and at most ${MAX_COMMAND_TIMEOUT_SECONDS}`);
-  }
-  // An argument list, run without a shell (GUIDELINES 12.5); a pipeline
-  // belongs in a script the list names.
-  const argv = setting.command;
-  if (!Array.isArray(argv) || argv.length === 0 || !argv.every((a) => typeof a === 'string')) {
-    throw new Error('command must be a non-empty argument list of strings');
-  }
-  const root = repositoryRoot(cwd);
-  const head = git(root, ['rev-parse', 'HEAD']);
-  const run = spawnSync(argv[0], argv.slice(1), {
-    cwd: root,
-    stdio: 'ignore',
-    timeout: seconds * 1000,
-    env: { ...process.env, AGENTIC_HEAD_SHA: head },
-  });
-  // Not reading the evidence is not evidence that it is missing.
-  if (run.error || run.status === null) {
-    throw new Error(`${check} command timed out or did not run: ${run.error?.code ?? run.signal}`);
-  }
-  return {
-    check,
-    state: run.status === 0 ? 'clear' : 'would-block',
-    head,
-    tree: headTree(root),
-    receipt: run.status === 0 ? 'command' : null,
-    missing: run.status === 0 ? [] : [check],
-    unreadable_receipts: 0,
-    reproduction: JSON.stringify(argv),
-  };
-}
-
 const CHECKS = { 'gate-run': checkGateRun, review: checkReview, audit: checkAudit };
 
 function runCheck(check, cwd) {
@@ -326,6 +279,7 @@ function logPublication(event, cwd) {
       host_tool: event.tool_name,
       ...result,
     });
+  if (checkSetting(cwd, 'publish') === false) return;
   let publications;
   try {
     publications = outgoingPublications(event, cwd, githubCommands(cwd));
@@ -337,7 +291,7 @@ function logPublication(event, cwd) {
     });
     return;
   }
-  if (publications.length === 0 || checkSetting(cwd, 'publish') === false) return;
+  if (publications.length === 0) return;
   for (const publication of publications) {
     let result;
     try {

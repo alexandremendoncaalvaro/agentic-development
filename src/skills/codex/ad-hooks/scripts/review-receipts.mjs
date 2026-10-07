@@ -7,14 +7,16 @@
  * `.agentic/reviews/`: a verdicts file whose first line is `Target-SHA:
  * <commit>`, and an audit summary JSON whose `target` names one. Each
  * receipt is resolved to its commit's tree, which `sequence-gate.mjs`
- * compares with HEAD's.
+ * compares with HEAD's. A repository whose review is done by a bot names a
+ * command instead (`commandCheck`, ADR-0089 decision 7).
  *
  * Zero dependencies; byte-identical in both host trees.
  */
 
+import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { git } from './gate-run.mjs';
+import { git, headTree, repositoryRoot } from './gate-run.mjs';
 
 export const REVIEWS_DIR = join('.agentic', 'reviews');
 const SHA = /^[0-9a-f]{40}$/;
@@ -75,4 +77,52 @@ export function readReviewReceipts(root) {
 /** `ad-audit` summary files, by their `target` field. */
 export function readAuditReceipts(root) {
   return readCommitReceipts(root, '-summary.json', (text) => JSON.parse(text)?.target ?? null);
+}
+
+export const DEFAULT_COMMAND_TIMEOUT_SECONDS = 10;
+// A design choice, under the 30 seconds this repository's Codex wiring gives
+// the hook, leaving room for its git calls.
+export const MAX_COMMAND_TIMEOUT_SECONDS = 20;
+
+/**
+ * A repository whose review is done by a bot or harness names, in
+ * `.agentic/gates.json`, a local command that exits 0 when that evidence
+ * exists for the commit in `AGENTIC_HEAD_SHA`. The command is bounded well
+ * under the hosts' 600-second hook timeout (GROUND-0040 E1).
+ */
+export function commandCheck(check, setting, cwd) {
+  // ADR-0089 decision 7 lets bot evidence stand in for a review only.
+  if (check !== 'review') throw new Error(`a command replaces the review only, not ${check}`);
+  const seconds = setting.timeoutSeconds ?? DEFAULT_COMMAND_TIMEOUT_SECONDS;
+  if (typeof seconds !== 'number' || !(seconds > 0 && seconds <= MAX_COMMAND_TIMEOUT_SECONDS)) {
+    throw new Error(`timeoutSeconds must be above 0 and at most ${MAX_COMMAND_TIMEOUT_SECONDS}`);
+  }
+  // An argument list, run without a shell (GUIDELINES 12.5); a pipeline
+  // belongs in a script the list names.
+  const argv = setting.command;
+  if (!Array.isArray(argv) || argv.length === 0 || !argv.every((a) => typeof a === 'string')) {
+    throw new Error('command must be a non-empty argument list of strings');
+  }
+  const root = repositoryRoot(cwd);
+  const head = git(root, ['rev-parse', 'HEAD']);
+  const run = spawnSync(argv[0], argv.slice(1), {
+    cwd: root,
+    stdio: 'ignore',
+    timeout: seconds * 1000,
+    env: { ...process.env, AGENTIC_HEAD_SHA: head },
+  });
+  // Not reading the evidence is not evidence that it is missing.
+  if (run.error || run.status === null) {
+    throw new Error(`${check} command timed out or did not run: ${run.error?.code ?? run.signal}`);
+  }
+  return {
+    check,
+    state: run.status === 0 ? 'clear' : 'would-block',
+    head,
+    tree: headTree(root),
+    receipt: run.status === 0 ? 'command' : null,
+    missing: run.status === 0 ? [] : [check],
+    unreadable_receipts: 0,
+    reproduction: JSON.stringify(argv),
+  };
 }
