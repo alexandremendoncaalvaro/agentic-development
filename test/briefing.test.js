@@ -509,3 +509,28 @@ test('treats a task with no approval and no code yet as known, not as cannot tel
   assert.equal(result.approval.firstImplementingCommit, null);
   assert.ok(!result.cannotTell.includes('approval'));
 });
+
+test('does not read a note that only mentions deviations as a deviation', () => {
+  const repo = fixtureRepo();
+  write(
+    repo,
+    'doc/tasks/0001-fixture-task.md',
+    task({
+      notes: [
+        '### 2026-10-01 — slice 1',
+        '',
+        'Tests cover deviation entries and the deviations its Notes record.',
+        '',
+        '### 2026-10-02 — implementation',
+        '',
+        'Deviation from AC 1: the receipt is written by a postverify script.',
+        '',
+      ].join('\n'),
+    })
+  );
+
+  assert.deepEqual(
+    briefing(repo).deviations.map((d) => d.heading),
+    ['2026-10-02 — implementation']
+  );
+});

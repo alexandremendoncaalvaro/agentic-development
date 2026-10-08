@@ -14,8 +14,9 @@
  *     `main` touched (`newest-commit-ahead`); else null.
  *   - plan `{ done, open }`, acceptance and definitionOfDone `{ done, open }`
  *     (done as a count): the task's checkbox items.
- *   - deviations: Notes entries whose heading or text names a deviation or
- *     "beyond the ask", `{ heading, text }`.
+ *   - deviations: Notes entries whose heading names a deviation or "beyond
+ *     the ask", or whose text records one ("deviation from", "deliberate" or
+ *     "stated deviation", "beyond the ask"), `{ heading, text }`.
  *   - approval: the Notes entry approving the plan, the commit that added it,
  *     the first commit ahead of `main` touching anything outside `doc/` and
  *     the agent hosts' configuration directories, and
@@ -44,7 +45,11 @@ import { pathToFileURL } from 'node:url';
 import { surveyReport } from './survey.mjs';
 
 const ARTIFACT_FILE = /^\d{4}-.*\.md$/;
-const DEVIATION = /deviat|beyond the ask/i;
+// A heading that names a deviation is one; in an entry's text only the
+// phrasings tasks use to record one count, so a note that merely mentions
+// deviations is not one.
+const DEVIATION_HEADING = /deviat|beyond the ask/i;
+const DEVIATION_TEXT = /\bdeviat\w* from\b|\b(?:deliberate|stated) deviation\b|\bbeyond the ask\b/i;
 const APPROVED = /plan approved|approves? (?:this|the) plan/i;
 // Paths whose change is not implementation: records, and the agent hosts'
 // own configuration and install state.
@@ -297,7 +302,7 @@ export function briefingReport({ repoRoot, sessionId = null, env = process.env }
     acceptance: active ? openItems(section(active.body, 'Acceptance Criteria')) : null,
     definitionOfDone: active ? openItems(section(active.body, 'Definition of Done')) : null,
     deviations: active
-      ? notes.filter((n) => DEVIATION.test(n.heading) || DEVIATION.test(n.text))
+      ? notes.filter((n) => DEVIATION_HEADING.test(n.heading) || DEVIATION_TEXT.test(n.text))
       : null,
     approval: order,
     roadmap: progress,
