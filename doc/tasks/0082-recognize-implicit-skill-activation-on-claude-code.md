@@ -30,6 +30,7 @@ scored the same way, so today the live lane cannot pass a case it should pass.
 - [ ] A trial that carries both a `Skill` record and a `SKILL.md` read reports one invocation, not two.
 - [ ] The pilot's captured stream, or a fixture faithful to it, is a test case, so the defect cannot return silently.
 - [ ] GROUND-0025 and ADR-0080 record which reading now binds and what measured it.
+- [ ] Moved from Task 0083: one artifact-gate firing is joined with a hook record in a stream captured through the live lane (`eval/run.mjs live`), with an evaluation case whose fixture carries the gate wiring; the Codex leg runs once the operator's Codex CLI can start a trial.
 
 ## Plan
 
@@ -45,6 +46,12 @@ Held out of task-0081 deliberately. That task built the lane and ran the pilot;
 this changes how every existing case is graded, which is a semantic change to
 merged behavior and deserves its own design, review, and blast-radius
 discussion rather than riding along in the branch that discovered it.
+
+### 2026-10-08 — scope added from Task 0083
+
+The owner-approved backlog redefinition closed Task 0083 and moved its last
+open criterion here, the live-lane join of a gate firing, since this task
+already owns the live lane's reading of what a trial invoked.
 
 ## Definition of Done
 

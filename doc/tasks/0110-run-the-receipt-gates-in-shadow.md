@@ -97,12 +97,12 @@ PRISM-0042 is frozen: SHA-256 `be6aca8e5c4d61a184cf7a8517dbd9b7d71d7459a984c6319
 Set-up, recorded here because it lives outside the repository: the owner's
 `~/.claude/settings.json` sets `AD_SEQUENCE_GATE_EVIDENCE_DIR` to
 `~/.agentic/evidence/sequence-gate/` and adds a `PreToolUse` entry (Bash and
-the Slack send tool) running `~/.agentic/gates/bl-platform-shadow.mjs`, which
-calls the gate pinned at 3671059 (`~/.agentic/gates/3671059/`) for bl-platform
-sessions only; nothing is committed to bl-platform. Weekly and at the end,
+the Slack send tool) running the company wrapper under `~/.agentic/gates/`, which
+calls the gate pinned at 3671059 (`~/.agentic/gates/3671059/`) for company-repository
+sessions only; nothing is committed to the company repository. Weekly and at the end,
 `~/.agentic/gates/copy-out-0110.sh` copies the evidence, receipts and
 transcripts to `~/.agentic/evidence/0110-copies/<time>/` with a SHA256SUMS
-file; a baseline copy ran at 2026-10-07T22:21:31Z (1013 files). bl-platform
+file; a baseline copy ran at 2026-10-07T22:21:31Z (1013 files). The company repository
 events enter the decision only once a kit that records receipts is installed
 at user scope there; until then the installed published release records none.
 
@@ -116,19 +116,19 @@ Assurance (ad-prism, material evaluation):
   the design-choice labels and the population limits.
 - Candidate 3 (`928f8389…`): a fresh-context verification found twelve of the
   fourteen assessable findings resolved and raised new ones. Confirmed and
-  corrected: bl-platform's checks are true by construction until its kit
+  corrected: the company repository's checks are true by construction until its kit
   records receipts; the decision reads the combined in-decision count; ADR-0089
   decision 6 governs removal below 20 events; weekly copy-out of receipts and
   transcripts; mixed groups labelled false; question-to-state matching; file
   hashes of the wrapper and pinned gate; Codex evidence not collected.
   Rejected with evidence: "the test event did not go through the wrapper" (it
-  ran from a bl-platform worktree, head 5ecb134, and the same event from this
+  ran from a company-repository worktree, head 5ecb134, and the same event from this
   repository wrote nothing).
 - Verification verdict: conditional. The final plan validates and is frozen,
   and the corrections trace to the findings; it was not re-reviewed after the
   last corrections.
 - Fit-for-purpose verdict: conditional. Fit for this repository's decision;
-  bl-platform contributes only after its kit records receipts, and the Slack
+  the company repository contributes only after its kit records receipts, and the Slack
   check has no live observation.
 
 Reviewer-run results above are reviewer-reported.
@@ -140,8 +140,8 @@ tasks 0108 and 0109 and is published under `latest`. It was installed at user
 scope on 2026-10-08 (`~/.claude/agentic-state.json` records 1.2.0, and
 `gate-run.mjs`, `review-receipts.mjs`, `publish-receipt.mjs` and
 `sequence-gate.mjs` are present under `~/.claude/skills/ad-hooks/scripts/`),
-so bl-platform events enter the decision from 2026-10-08 onward; earlier
-bl-platform events stay out of it. The gate itself remains pinned at 3671059.
+so company-repository events enter the decision from 2026-10-08 onward; earlier
+company-repository events stay out of it. The gate itself remains pinned at 3671059.
 `~/.agentic/kit/WORKFLOW.md` was not refreshed: it is a byte-identical copy of
 v1.0.0's file that the installer does not recognise and preserves.
 
@@ -152,9 +152,35 @@ From the task 0111 branch audit (CV.7): the evaluation was frozen at
 frozen file was committed later, in f947dfd at 2026-10-08T03:34Z (00:34
 -03:00). The committed file hashes to the recorded value, so the content is
 the frozen one; the commit is recorded alongside the window's start, not
-before it. The set-up outside the repository (the bl-platform wrapper, the
+before it. The set-up outside the repository (the company repository wrapper, the
 pinned gate, the copy-out script, the settings entry and the baseline copy)
 remains verifiable only on the owner's machine, by the hashes recorded above.
+
+### 2026-10-08 — copy-out scheduled
+
+The owner approved scheduling the copy-out. A user LaunchAgent,
+`~/Library/LaunchAgents/com.ale.agentic.copyout-0110.plist`, runs
+`~/.agentic/gates/copy-out-0110.sh` every Monday at 09:00 local time and once
+on 4 November at 20:00 local time (23:00Z, after the window closes at
+22:21:42Z); its output goes to `~/.agentic/evidence/0110-copies/launchd.log`.
+launchd runs a missed time after the machine wakes. A run started through
+launchd on 2026-10-08 exited 0 and copied 1115 files with their hashes to
+`~/.agentic/evidence/0110-copies/20261008T165431Z/`. The November entry
+recurs yearly, so the job is to be unloaded after the read-out
+(`launchctl bootout gui/$(id -u)/com.ale.agentic.copyout-0110`).
+
+### 2026-10-08 — company name redacted
+
+The owner asked that this public repository not name the company or its
+repository. Every mention in this task, in PRISM-0042 and in GROUND-0009 now
+reads "the company repository" (or "the company SLIM plugin"), and wrapper
+paths name only their directory; earlier entries above were edited for this
+alone, as a privacy exception to the append-only rule. PRISM-0042's hash
+changes with the names only, from `be6aca8e…fbdcee` (13,770 bytes, the frozen
+plan) to `f4b61b40…ea0534` (13,830 bytes); `git diff` of the redaction commit
+shows that no measure, rule or threshold changed. The names reached the
+repository because commits from a linked worktree ran the leak-guard without
+its denylist (Task 0113).
 
 ## Definition of Done
 
