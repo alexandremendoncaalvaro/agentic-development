@@ -54,3 +54,15 @@ Revisit trigger: Claude Code documents a way to inject context once per task ins
 
 Before implementation the owner described the flow they run by hand: risk analysis first, then ground, then TDD with a review after each slice and an audit after each large block, a three-line summary plus a checklist roadmap (done / remaining) at the start of every session without reciting the rules, and a resume chip (or a fresh-session prompt where chips are unavailable) at the end. The checkpoint carries exactly that sequence, so its size is about 700 characters rather than the 600 estimated above; the test caps it at 900. The static, exit-0, kill-switch, and Claude-Code-only decisions are unchanged.
 
+
+## Addendum 2026-10-08: the installed kit version
+
+The checkpoint is no longer wholly static. After the fixed text it adds one
+line, "Installed agentic kit: <version> (<scope> scope).", read from the kit's
+state file under the event's `cwd` (the project install) or the home
+directory (the user install), so an agent running an old installed copy sees
+it; a skill copy that predated a step had silently skipped it twice (Task
+0099). The line is read locally, adds no network call, depends on the session
+and never on the prompt, and is omitted when no state file names a version.
+Exit 0, the kill switch, the no-coercion decision and the 900-character cap
+stand.
