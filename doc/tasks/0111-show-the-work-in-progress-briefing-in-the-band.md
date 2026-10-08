@@ -109,6 +109,40 @@ Known limit, as GROUND-0043 states: with several tasks in progress the newest
 commit ahead of main decides, so on this branch the script names task 0110
 until a commit touches this task.
 
+### 2026-10-08 — slice 1 review and corrections
+
+`/ad-review` on f784266..1e63877, both axes with fresh context: no Blockers;
+three Standards and three Spec Concerns, all accepted and fixed test first:
+
+- Standards: "task files with CRLF line endings silently lose all their
+  checkbox items" (reproduced by the reviewer); `section` now splits on
+  `\r?\n`.
+- Standards: "`git log --name-only` quotes non-ASCII paths", so a docs-only
+  commit read as implementing; git now runs with `core.quotePath=false`.
+- Standards: a failing git was invisible; `cannotTell` now names `git` when
+  the commits ahead of `main` cannot be listed. A stale local `main` against
+  `origin/main` stays with Task 0100.
+- Spec: "a consumer reading `cannotTell` is never told the approval order is
+  unknown"; it now names `approval` then.
+- Spec: a missing evidence file "would show 'nothing would block' rather than
+  'cannot tell'"; it is now null and named in `cannotTell`.
+- Spec and Standards: the newest-commit fallback could name a `proposed` or
+  `blocked` task; it now picks only among `in-progress` tasks. This narrows
+  GROUND-0043's wording to its stated intent, several tasks in progress.
+
+Notes taken: the evidence path rule is pinned to `sequence-gate.mjs`'s
+`evidencePathFor` by a test that failed when the gate's character class was
+changed; the script header states that the approval entry is found by heading
+only; the CHANGELOG no longer says the band and `/ad-brief` read the script
+before slices 2 and 3. Correction to the slice 1 entry: "within the band's
+budget" has no stated budget behind it; the measured cost is the record, and
+slice 2 judges it against the band's refresh points. Not taken: removing the
+fixtures' temporary directories, which `test/sequence-gate.test.js` does not do
+either.
+
+After the corrections: 22 tests in `test/briefing.test.js`, `npm run verify`
+1347 of 1347, mutation sweep 39 mutants with the same 7 equivalent survivors.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
