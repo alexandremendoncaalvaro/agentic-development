@@ -1,9 +1,9 @@
 # Task `0110`: Run the receipt gates in shadow and read out the flip criterion
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md (decision 6, shadow run)
-**Evidence ref:**
+**Evidence ref:** doc/research/0042-prism-receipt-gates-shadow-run.md
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
 **Spec ref:**
@@ -18,14 +18,14 @@ would-block event (the RESEARCH-0037 hypothesis).
 
 ## Acceptance Criteria
 
-- [ ] Before the run: the owner's per-check criterion (minimum labelled events, maximum false-block rate, window) is recorded in these Notes; the evaluation is frozen with `ad-prism` before the first session counts.
+- [x] Before the run: the owner's per-check criterion (minimum labelled events, maximum false-block rate, window) is recorded in these Notes; the evaluation is frozen with `ad-prism` before the first session counts.
 - [ ] The gates run in this repository and the company repository for the window; each would-block event is labelled true or false by the owner or a fresh-context reviewer.
 - [ ] The read-out reports, per check: events, false-block rate against the criterion, the share of the owner's pre-approval checks that had a preceding would-block event, any session the gate stalled, and the limit that a failed evidence write loses its line (ADR-0089 second addendum), with the count of `unreadable_receipts` seen, read as a lower bound (the gate stops counting once a receipt covers the action).
 - [ ] Each check is marked "propose enforcement", "keep in shadow" or "remove", with the evidence; enforcement itself is a later ADR.
 
 ## Plan
 
-- [ ] Freeze the evaluation (`/ad-prism`) with the owner's criterion.
+- [x] Freeze the evaluation (`/ad-prism`) with the owner's criterion.
 - [ ] Run, label, read out; record the result in these Notes and in RESEARCH-0037 or its successor.
 
 ## Notes
@@ -86,6 +86,75 @@ From Task 0109's audit: a publication wrapped in `bash -c "..."`, a command
 whose verbs are quoted (`"gh" "pr" "comment"`), and a flag glued to its value
 (`-bhi`, `-fbody=x`) leave no line or an unreadable one. Count them neither
 way; list them with the other unparsed forms in the read-out.
+
+### 2026-10-07 — evaluation frozen, window open
+
+PRISM-0042 is frozen: SHA-256 `be6aca8e5c4d61a184cf7a8517dbd9b7d71d7459a984c6319efbdb6003fbdcee`
+(13,770 bytes; `freeze-artifact.mjs`; `validate-plan.mjs` valid), at
+2026-10-07T22:21:42Z. The window runs four weeks from then, to
+2026-11-04T22:21:42Z; earlier events are excluded and listed.
+
+Set-up, recorded here because it lives outside the repository: the owner's
+`~/.claude/settings.json` sets `AD_SEQUENCE_GATE_EVIDENCE_DIR` to
+`~/.agentic/evidence/sequence-gate/` and adds a `PreToolUse` entry (Bash and
+the Slack send tool) running `~/.agentic/gates/bl-platform-shadow.mjs`, which
+calls the gate pinned at 3671059 (`~/.agentic/gates/3671059/`) for bl-platform
+sessions only; nothing is committed to bl-platform. Weekly and at the end,
+`~/.agentic/gates/copy-out-0110.sh` copies the evidence, receipts and
+transcripts to `~/.agentic/evidence/0110-copies/<time>/` with a SHA256SUMS
+file; a baseline copy ran at 2026-10-07T22:21:31Z (1013 files). bl-platform
+events enter the decision only once a kit that records receipts is installed
+at user scope there; until then the installed published release records none.
+
+Assurance (ad-prism, material evaluation):
+
+- Candidate 1 (`cfc9d82a…`): a fresh-context skeptical review raised three
+  Blockers and twelve other findings. Confirmed and corrected: the evidence
+  directory, the company repository, the remove rule, the early stop, the
+  independent unit, labelling reproducibility, the question codebook, the
+  stall source, the claim-rule alignment, the window start, the next gate,
+  the design-choice labels and the population limits.
+- Candidate 3 (`928f8389…`): a fresh-context verification found twelve of the
+  fourteen assessable findings resolved and raised new ones. Confirmed and
+  corrected: bl-platform's checks are true by construction until its kit
+  records receipts; the decision reads the combined in-decision count; ADR-0089
+  decision 6 governs removal below 20 events; weekly copy-out of receipts and
+  transcripts; mixed groups labelled false; question-to-state matching; file
+  hashes of the wrapper and pinned gate; Codex evidence not collected.
+  Rejected with evidence: "the test event did not go through the wrapper" (it
+  ran from a bl-platform worktree, head 5ecb134, and the same event from this
+  repository wrote nothing).
+- Verification verdict: conditional. The final plan validates and is frozen,
+  and the corrections trace to the findings; it was not re-reviewed after the
+  last corrections.
+- Fit-for-purpose verdict: conditional. Fit for this repository's decision;
+  bl-platform contributes only after its kit records receipts, and the Slack
+  check has no live observation.
+
+Reviewer-run results above are reviewer-reported.
+
+### 2026-10-08 — receipt-recording kit installed at user scope
+
+Release 1.2.0 (tag `v1.2.0`, release commit 69d83d3, pull request 164) carries
+tasks 0108 and 0109 and is published under `latest`. It was installed at user
+scope on 2026-10-08 (`~/.claude/agentic-state.json` records 1.2.0, and
+`gate-run.mjs`, `review-receipts.mjs`, `publish-receipt.mjs` and
+`sequence-gate.mjs` are present under `~/.claude/skills/ad-hooks/scripts/`),
+so bl-platform events enter the decision from 2026-10-08 onward; earlier
+bl-platform events stay out of it. The gate itself remains pinned at 3671059.
+`~/.agentic/kit/WORKFLOW.md` was not refreshed: it is a byte-identical copy of
+v1.0.0's file that the installer does not recognise and preserves.
+
+### 2026-10-08 — when the freeze was committed
+
+From the task 0111 branch audit (CV.7): the evaluation was frozen at
+2026-10-07T22:21:42Z by its SHA-256 (`be6aca8e…`, 13,770 bytes), and the
+frozen file was committed later, in f947dfd at 2026-10-08T03:34Z (00:34
+-03:00). The committed file hashes to the recorded value, so the content is
+the frozen one; the commit is recorded alongside the window's start, not
+before it. The set-up outside the repository (the bl-platform wrapper, the
+pinned gate, the copy-out script, the settings entry and the baseline copy)
+remains verifiable only on the owner's machine, by the hashes recorded above.
 
 ## Definition of Done
 

@@ -4,6 +4,7 @@
 **Date:** 2026-10-07
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0041, its "do not package the kit as a Claude Code plugin" clause only, through the revisit trigger ADR-0041 names
+**Amended by:** ADR-0090, items 3 and 8, for the work-in-progress briefing: a display of the kit's own briefing script may summarize the work in progress, and ADR-0090 is the workflow-stage segment's own decision.
 
 ## Context
 

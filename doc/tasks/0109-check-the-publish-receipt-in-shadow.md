@@ -1,6 +1,6 @@
 # Task `0109`: Check the publish receipt before outward posts, in shadow
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0089-check-workflow-receipts-in-shadow-before-landing.md (decisions 1 and 2, publish check)
 **Evidence ref:** doc/research/0041-ground-publish-receipt-check.md
@@ -27,7 +27,7 @@ unchanged.
 
 - [x] `/ad-ground` how each outward command carries its body; red, then green (`/ad-tdd`).
 - [x] `ad-publish` text; CHANGELOG.
-- [ ] `/ad-review`; `/ad-audit`; `/ad-commit`; PR on the owner's approval.
+- [x] `/ad-review`; `/ad-audit`; `/ad-commit`; PR on the owner's approval.
 
 ## Notes
 
@@ -319,6 +319,14 @@ on all four jobs. Findings, with dispositions:
   reviewer's one-line difference came from a different read of the body.
   Accepted with that evidence.
 
+### 2026-10-07 — Closed
+
+The owner approved the pull request text (posted body identical to the
+approved file through the REST API, hash `721bba31fb6a1bc1`) and the merge.
+Pull request 163 passed CI on Ubuntu and Windows with Node 22.13 and 24 at
+18d1389 and merged as 3671059 with a merge commit, which keeps every SHA
+these Notes cite. Task 0110's shadow window starts at 3671059.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
@@ -326,4 +334,4 @@ All Acceptance Criteria checked, plus:
 - [x] Local tests pass (or N/A documented in Notes)
 - [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [x] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Status updated to `done` and Notes log closes the task

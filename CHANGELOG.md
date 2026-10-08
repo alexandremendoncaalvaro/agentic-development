@@ -6,6 +6,22 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `/ad-next` ships `scripts/briefing.mjs` on both hosts: one JSON briefing of
+  the active task (and the rule that chose it), its open plan, acceptance and
+  Definition of Done items, the deviations its Notes record, whether the plan
+  approval preceded the first implementing commit, roadmap progress, and the
+  session's receipt-gate shadow result; it says what it cannot tell instead of
+  guessing. The `agentic-session` pane and `/ad-brief` read it
+  (ADR-0090, GROUND-0043, task-0111).
+- The `agentic-session` plugin adds `/agentic-briefing`, which opens that
+  briefing in a pane: the task and its status, the next plan step, progress
+  bars, health marks for plan approval, deviations and the gate, and the open
+  items as checklists. It runs the installed script on session start, after
+  each turn and after a compaction, and draws nothing when the script is absent
+  or fails; the band keeps only the context reading (ADR-0090, task-0111).
+
 ## [1.2.0] - 2026-10-08
 
 ### Added

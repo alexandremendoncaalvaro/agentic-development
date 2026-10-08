@@ -1,0 +1,64 @@
+{
+  "task": {
+    "slug": "0111-show-the-work-in-progress-briefing-in-the-band",
+    "rule": "newest-commit-ahead",
+    "status": "in-progress"
+  },
+  "plan": {
+    "done": [
+      "Owner accepts ADR-0090 and approves this plan.",
+      "Slice 1, the script: red, then green (`/ad-tdd`) on fixture repositories; parity; measure its run time."
+    ],
+    "open": [
+      "Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).",
+      "Slice 3, `/ad-brief` reads the script; Task 0106's criteria close with slice 1's gate result.",
+      "`/ad-review` per slice; `/ad-audit` before the pull request; `/ad-commit`; PR on the owner's approval."
+    ]
+  },
+  "acceptance": {
+    "done": 2,
+    "open": [
+      "The `agentic-session` plugin runs the script on session start, after each main-loop turn and after a compaction, shows one line in the band (task, stage, open items) and the full briefing in a pane opened by `/agentic-briefing`; it computes nothing, injects nothing, blocks nothing, and draws nothing when the script is absent or fails.",
+      "`/ad-brief` reads the same script, on both hosts.",
+      "Tests: the script on fixture repositories (one active task, none, several, a deviation entry, a missing roadmap, an unreadable file); the plugin's pure module on recorded script output (band line, pane rows, absent script)."
+    ]
+  },
+  "definitionOfDone": {
+    "done": 0,
+    "open": [
+      "Local tests pass (or N/A documented in Notes)",
+      "Code review completed (human or fresh-context reviewer per WORKFLOW §10)",
+      "No orphan `TODO`/`FIXME` introduced",
+      "Status updated to `done` and Notes log closes the task"
+    ]
+  },
+  "deviations": [],
+  "approval": {
+    "entry": "2026-10-07 — plan approved",
+    "approvedIn": "3f52979e286a7639eb19253f6cfca7440bcfd8a6",
+    "firstImplementingCommit": "6c43079853617dcd63c48f42e0a360d9c0a69fa5",
+    "precedesFirstImplementingCommit": true
+  },
+  "roadmap": {
+    "prdStatus": "accepted",
+    "tasksDone": 66,
+    "tasksTotal": 79
+  },
+  "gate": {
+    "lines": 10,
+    "wouldBlock": 6,
+    "last": {
+      "at": "2026-10-08T04:19:53.963Z",
+      "action": "git push",
+      "check": "gate-run",
+      "state": "clear"
+    },
+    "lastWouldBlock": {
+      "at": "2026-10-08T03:18:27.792Z",
+      "action": "gh pr merge",
+      "check": "audit"
+    }
+  },
+  "unreadable": [],
+  "cannotTell": []
+}
