@@ -31,16 +31,16 @@ Sequenced by the owner on 2026-10-07: after Task 0109, together with Task
 ## Acceptance Criteria
 
 - [x] `briefing.mjs` (both hosts, byte-identical) prints one JSON briefing: active task and the rule that chose it, status, plan items done and open, open acceptance criteria and Definition of Done items, whether the plan's approval entry precedes the first implementing commit, the deviations its Notes record, roadmap progress from the survey, and the receipt gate's latest shadow result for the session (Task 0106); it degrades instead of throwing and says "cannot tell" when a fact is missing.
-- [ ] The `agentic-session` plugin runs the script on session start, after each main-loop turn and after a compaction, shows one line in the band (task, stage, open items) and the full briefing in a pane opened by `/agentic-briefing`; it computes nothing, injects nothing, blocks nothing, and draws nothing when the script is absent or fails.
+- [x] The `agentic-session` plugin runs the script on session start, after each main-loop turn and after a compaction, and shows the full briefing in a pane opened by `/agentic-briefing` (the band keeps only the context reading, per the ADR-0090 addendum of 2026-10-08); it computes nothing, injects nothing, blocks nothing, and draws nothing when the script is absent or fails.
 - [ ] `/ad-brief` reads the same script, on both hosts.
 - [x] The cost of a run on this repository is measured (median of repeated runs) before the band ships, and stated.
-- [ ] Tests: the script on fixture repositories (one active task, none, several, a deviation entry, a missing roadmap, an unreadable file); the plugin's pure module on recorded script output (band line, pane rows, absent script).
+- [x] Tests: the script on fixture repositories (one active task, none, several, a deviation entry, a missing roadmap, an unreadable file); the plugin's pure module on recorded script output (pane model, absent script).
 
 ## Plan
 
 - [x] Owner accepts ADR-0090 and approves this plan.
 - [x] Slice 1, the script: red, then green (`/ad-tdd`) on fixture repositories; parity; measure its run time.
-- [ ] Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).
+- [x] Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).
 - [ ] Slice 3, `/ad-brief` reads the script; Task 0106's criteria close with slice 1's gate result.
 - [ ] `/ad-review` per slice; `/ad-audit` before the pull request; `/ad-commit`; PR on the owner's approval.
 
@@ -165,6 +165,39 @@ tests closed 5 (8 left). The `doc/` exclusion list removed one mutant (38,
 reader, which became a null check, and added the `orderUnknown` and
 `cannotTell` operators, all killed (41 mutants, 7 survivors: six `??` swaps
 and the CLI entry guard). `npm run verify`: 1348 of 1348.
+
+### 2026-10-08 — slice 2, the pane
+
+The plugin runs the installed `ad-next/scripts/briefing.mjs` (the project
+install first, then the user install) with the session id, on session start,
+after each main-loop turn and after a compaction, and draws nothing when the
+script is absent, fails or prints anything but a JSON object.
+
+Owner live check, in the desktop app, through a hot-reloaded copy of the
+plugin with this session moved to this worktree: the first version showed a
+one-line summary in the band and plain text in the pane. The owner rejected
+both: the pane "ficou bem pobre", like a text file, and the band line took
+room and "me confunde mais do que me ajuda". The briefing moved to the pane
+only, reached through `/agentic-briefing`; the band is again ADR-0088's
+context band. This is an owner decision, recorded as the ADR-0090 addendum of
+2026-10-08, and the second criterion above is amended to match. The second
+version's pane draws a header card with a status mark, a next-step card,
+progress bars (SVG on the desktop, cell bars on the terminal), colored health
+marks for plan approval, deviations and the gate, and the details as Markdown
+checklists. The owner approved it ("agora sim!"). Observed at one pane width
+only; the host contract seats a pane that a command opens at any width.
+
+Found on the way, in slice 1's script: a note that only mentions deviations
+read as one (the slice 1 entry listing its deviation tests). The text rule now
+takes "deviation from", "deliberate" or "stated deviation" and "beyond the
+ask", which flags exactly the seven real deviations across this repository's
+tasks; headings still count on any mention.
+
+Validated with the 2.1.289 engine's `claude plugin validate` (the 2.1.266 CLI
+on PATH refuses `session.compact`, which the published plugin already hooks).
+Mutation sweep over the plugin modules: every surviving mutant is a `??` to
+`||` swap on a value that is never an empty string. `npm run verify`: 1365 of
+1365.
 
 ## Definition of Done
 

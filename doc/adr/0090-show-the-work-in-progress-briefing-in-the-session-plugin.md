@@ -70,3 +70,16 @@ Negative / trade-offs:
 - **A status line entry only** — rejected as the whole answer: one line cannot
   hold the plan stage, deviations and done condition; it may carry the
   one-line summary.
+
+## Addendum 2026-10-08: the briefing lives in the pane, not the band
+
+The owner's live check of task 0111's slice 2 changed decision 2. The
+one-line summary above the prompt took room and confused more than it
+helped, so the band keeps only its ADR-0088 role: the context reading and the
+handoff button past the threshold. The briefing is drawn only in the pane
+that `/agentic-briefing` opens, the shortcut the owner asked for. The pane
+lays the script's output out as a header card, the next plan step, progress
+bars, colored health marks, and the Markdown checklists. The run points of
+decision 2 (session start, each main-loop turn, after a compaction) and the
+rule that the plugin computes no fact stand. The status-line alternative is
+not taken either.
