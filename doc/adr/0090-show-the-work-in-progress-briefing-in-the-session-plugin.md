@@ -83,3 +83,12 @@ bars, colored health marks, and the Markdown checklists. The run points of
 decision 2 (session start, each main-loop turn, after a compaction) and the
 rule that the plugin computes no fact stand. The status-line alternative is
 not taken either.
+
+## Addendum 2026-10-08: the gate result is session-scoped
+
+Decision 3's "the band and the skill cannot disagree" holds for every fact
+except the receipt gate's result, which the script reads for one session.
+The pane passes its own session id; `/ad-brief` passes one only when it is
+known, since no environment variable exposes it to the model, and otherwise
+carries the gate as an unknown fact. Both read the same script, so a fact
+either shows is the same fact.

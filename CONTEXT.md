@@ -677,11 +677,19 @@ grounded in [`doc/research/0027-ground-artifact-validator-gate.md`](doc/research
 
 ### Companion plugin
 
-**Definition:** the optional Claude Code plugin `agentic-session`, installed from this repository's marketplace with `claude plugin install`, separate from the `agentic` installer and the npm package. It carries host-native add-ons only, mods that need the screen or the host, never skills (ADR-0088).
+**Definition:** the optional Claude Code plugin `agentic-session`, installed from this repository's marketplace with `claude plugin install`, separate from the `agentic` installer and the npm package. It carries host-native add-ons only, mods that need the screen or the host, never skills (ADR-0088): the context band and the `/agentic-briefing` pane (ADR-0090).
 
 _Avoid_: "the kit plugin" or "the agentic plugin" (the kit is installed by `agentic init`; the plugin is an add-on); "mod" for the whole plugin (a mod is the hooks module inside it).
 
 **Related code:** [`plugins/agentic-session/`](plugins/agentic-session/), [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json).
+
+### Work-in-progress briefing
+
+**Definition:** the JSON that `ad-next/scripts/briefing.mjs` prints for the active task: the task and the stated rule that chose it, plan items, open acceptance criteria and Definition of Done items, recorded deviations, the plan approval's order against the first implementing commit, roadmap progress, and the session's receipt-gate result, with every fact it cannot establish listed in `cannotTell`. The **Companion plugin**'s briefing pane, opened by `/agentic-briefing`, and standalone `ad-brief` read it; neither computes a fact of its own (ADR-0090).
+
+_Avoid_: "the band" for the briefing (the band above the prompt carries only the context reading and the handoff button, per the ADR-0090 addendum); "status line" (a single line cannot hold the briefing); "brief" for the script output (the brief is `ad-brief`'s plain-language report, built from it).
+
+**Related code:** [`src/skills/claude-code/ad-next/scripts/briefing.mjs`](src/skills/claude-code/ad-next/scripts/briefing.mjs), [`plugins/agentic-session/hooks/briefing-view.mjs`](plugins/agentic-session/hooks/briefing-view.mjs).
 
 ### Session reminder
 
@@ -738,7 +746,7 @@ roadmap line in [`doc/product/PRD.md`](doc/product/PRD.md).
   **Request kind** and the run policy supply the `skill_invoked` and
   `approval_granted` events a non-interactive stream cannot carry.
 
-- The **Companion plugin** sits beside the **Kit**, never inside it: the `agentic` installer neither installs nor requires it. Its context band is the on-screen counterpart of the `Stop` handoff **Session reminder**, which stays the fallback where the plugin is absent.
+- The **Companion plugin** sits beside the **Kit**, never inside it: the `agentic` installer neither installs nor requires it. Its context band is the on-screen counterpart of the `Stop` handoff **Session reminder**, which stays the fallback where the plugin is absent. Its briefing pane displays the **Work-in-progress briefing**, the same output standalone `ad-brief` reads.
 
 - A **Receipt gate** reads a **Workflow receipt** and writes **Gate evidence lines**; neither the receipt nor the line is an **Evaluation receipt**.
 
