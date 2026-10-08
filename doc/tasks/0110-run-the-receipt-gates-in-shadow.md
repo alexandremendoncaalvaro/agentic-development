@@ -133,6 +133,18 @@ Assurance (ad-prism, material evaluation):
 
 Reviewer-run results above are reviewer-reported.
 
+### 2026-10-08 — receipt-recording kit installed at user scope
+
+Release 1.2.0 (tag `v1.2.0`, release commit 69d83d3, pull request 164) carries
+tasks 0108 and 0109 and is published under `latest`. It was installed at user
+scope on 2026-10-08 (`~/.claude/agentic-state.json` records 1.2.0, and
+`gate-run.mjs`, `review-receipts.mjs`, `publish-receipt.mjs` and
+`sequence-gate.mjs` are present under `~/.claude/skills/ad-hooks/scripts/`),
+so bl-platform events enter the decision from 2026-10-08 onward; earlier
+bl-platform events stay out of it. The gate itself remains pinned at 3671059.
+`~/.agentic/kit/WORKFLOW.md` was not refreshed: it is a byte-identical copy of
+v1.0.0's file that the installer does not recognise and preserves.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
