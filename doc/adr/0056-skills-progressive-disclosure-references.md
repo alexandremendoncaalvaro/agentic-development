@@ -46,3 +46,11 @@ Neutral:
 * **Leave all reference material inline** — rejected. It is the direct cause of oversized always-loaded bodies (the "too large to be followed" failure this audit targets) and of the duplicate/dangling templates.
 * **Keep the shared top-level `templates/` and make the installer copy it into consumer repos** — rejected. More intrusive (it drops files at the consumer's repo root), and it runs against the host packaging model, which puts a skill's resources *inside* the skill. A per-skill `references/` file is self-contained and already ships.
 * **One template file shared by several skills** — rejected as unnecessary coupling. Each artifact type maps to one owning skill; sharing reintroduces a cross-skill dependency and the same "where does the shared file install" question this decision removes.
+
+## Addendum 2026-10-08: name the scope in decision 4
+
+Decision 4's "re-synced via `node bin/agentic.js update --yes`" names no
+scope, and a bare `update` targets the user-scope install, not this
+repository's dogfood copies. The re-sync is
+`node bin/agentic.js update --scope project --agent both --yes` from this
+repository's root (Task 0102, the same correction as ADR-0057's addendum).
