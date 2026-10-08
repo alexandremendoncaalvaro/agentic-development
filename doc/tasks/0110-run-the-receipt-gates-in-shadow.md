@@ -145,6 +145,17 @@ bl-platform events stay out of it. The gate itself remains pinned at 3671059.
 `~/.agentic/kit/WORKFLOW.md` was not refreshed: it is a byte-identical copy of
 v1.0.0's file that the installer does not recognise and preserves.
 
+### 2026-10-08 — when the freeze was committed
+
+From the task 0111 branch audit (CV.7): the evaluation was frozen at
+2026-10-07T22:21:42Z by its SHA-256 (`be6aca8e…`, 13,770 bytes), and the
+frozen file was committed later, in f947dfd at 2026-10-08T03:34Z (00:34
+-03:00). The committed file hashes to the recorded value, so the content is
+the frozen one; the commit is recorded alongside the window's start, not
+before it. The set-up outside the repository (the bl-platform wrapper, the
+pinned gate, the copy-out script, the settings entry and the baseline copy)
+remains verifiable only on the owner's machine, by the hashes recorded above.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

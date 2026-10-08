@@ -271,6 +271,61 @@ block"; the overclaim is gone, and the static test pins both. Notes taken:
 the test's order check now anchors on the manual search, and the script
 header no longer names the band.
 
+### 2026-10-08 — branch audit
+
+`/ad-audit` on origin/main..f26649d (30 files): 12 groups dispatched (CV,
+critical, with two cross-model passes in reordered rule and file order; HK;
+AGENTS.md; GUIDELINES.md; ARCHITECTURE.md; CONTEXT.md; ADR-0030, 0048, 0057,
+0088, 0089, 0090), the machine store's .NET and GitHub CI groups and the
+other ADRs N/A as untouched. Gate: `npm run verify` 1374 of 1374. Every
+reviewer's anchors matched. No blockers.
+
+Fixed:
+
+- Major, ARCHITECTURE.md: the companion-plugin bullet and the boundary rule
+  did not describe the pane, `/agentic-briefing`, or the plugin's dependency
+  on the installed script path; minor and nit, the project-evidence bullet,
+  Observability and the test layout missed the briefing script. All updated,
+  with the guards named (`scriptCandidates`, `evidencePathFor`).
+- CV.8 (both cross-model passes; minor to major): "flags exactly the seven
+  real deviations" was false at HEAD, because the slice 2 entry quotes the
+  trigger phrases and read as an eighth deviation. Quoted spans and
+  backticked spans are now left out of the text match (regression test). The
+  enumeration, re-run with the script's patterns over every `doc/tasks/*.md`
+  Notes entry, now gives seven: tasks 0048 (two), 0080 (two), 0107, 0108 and
+  0109; the 0111 entries no longer match.
+- CV.3 (pass A): ADR-0090 decision 3 still said the band and the skill
+  "cannot disagree"; a second addendum states that the receipt gate's result
+  is session-scoped, and `doc/adr/PROJECTION.md` gains the ADR-0090 row.
+- CV.1 (pass A, nit): commit f26649d carried code under a `docs(task)`
+  subject, because the `fix(ad-brief)` subject was 74 characters, the
+  commit-msg gate refused it, and the refusal was filtered out of the output.
+  The unpushed commit was split into 5045d46 (fix) and d059cf9 (docs).
+- GUIDELINES 2.2 (judgement-call): a failed read of `doc/tasks/` other than
+  absence is now named in `unreadable` (regression test). GUIDELINES 9.5: the
+  tests added by fixes now carry the `regression: task-0111` prefix.
+- CONTEXT.md (judgement-calls): a Work-in-progress briefing entry, and the
+  Companion plugin entry names the pane.
+
+Refuted with evidence: the primary CV pass's major CV.5 finding that the
+reviewed range head 9598663 "already contains the fix". `git show
+41004fb:` and `9598663:src/skills/claude-code/ad-brief/SKILL.md` contain no
+`--session` (0 matches each); the fix landed after the review.
+
+Accepted as recorded, not changed: the cost and mutation figures above are
+exploratory. The measurement loop and the mutation runner were scratch
+scripts outside the repository; the figures are not decision evidence beyond
+the criterion's "measured and stated". The owner's live check is quoted from
+the session with no artifact, and the narrow-width check stays pending. The
+plugin contract statement behind the rejected "command may vanish" finding is
+the plugin-authoring skill's text for build 2.1.289: "A reload is a fresh load
+of the module: `register` runs again and `session.start` fires again." The
+session-id check was `env | grep -iE "session|claude"` in this session, which
+listed no session id variable. The hard-coded `main` base stays with Task
+0100, and the awaited run, bounded by its 10-second timeout, with the
+measured median above. Not taken: the short parameter names (`b`, `el`),
+a style nit in small pure functions.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
