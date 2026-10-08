@@ -1,6 +1,6 @@
 # Task `0111`: Show the work-in-progress briefing in the band
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0090-show-the-work-in-progress-briefing-in-the-session-plugin.md
 **Evidence ref:** doc/research/0043-ground-work-in-progress-briefing-band.md
@@ -42,7 +42,7 @@ Sequenced by the owner on 2026-10-07: after Task 0109, together with Task
 - [x] Slice 1, the script: red, then green (`/ad-tdd`) on fixture repositories; parity; measure its run time.
 - [x] Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).
 - [x] Slice 3, `/ad-brief` reads the script; Task 0106's criteria close with slice 1's gate result.
-- [ ] `/ad-review` per slice; `/ad-audit` before the pull request; `/ad-commit`; PR on the owner's approval.
+- [x] `/ad-review` per slice; `/ad-audit` before the pull request; `/ad-commit`; PR on the owner's approval.
 
 ## Notes
 
@@ -364,11 +364,19 @@ instead, which they reported.
 The owner approved the pane at the narrow width ("tudo aprovado"), which
 closes slice 2's live check; the agent did not observe that width itself.
 
+### 2026-10-08 — closed
+
+Pull request 165 merged as 2a1a5dc after CI passed on Ubuntu and Windows,
+Node 22.13 and 24, at 69c0535; the owner approved its text and the merge.
+From the audit, one rule-set candidate went to `/ad-level-up` (extend CV.6:
+a commit or push landed only when its exit status was read) and one skill
+change to Task 0112 (rebuild rule text on a re-audit).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
