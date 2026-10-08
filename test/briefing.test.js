@@ -361,7 +361,7 @@ test('still briefs outside a git repository, without the commit-order fact', () 
   assert.ok(result.cannotTell.includes('git'));
 });
 
-test('treats an evidence line that is not an object as corrupt', () => {
+test('regression: task-0111 treats an evidence line that is not an object as corrupt', () => {
   const repo = fixtureRepo();
   const evidence = mkdtempSync(join(tmpdir(), 'briefing-evidence-'));
   writeFileSync(
@@ -421,7 +421,7 @@ test('cannot tell the order while the approval entry is not yet committed', () =
   assert.ok(!result.cannotTell.includes('git'));
 });
 
-test('does not count an agent-config-only commit as implementing', () => {
+test('regression: task-0111 does not count an agent-config-only commit as implementing', () => {
   const repo = fixtureRepo();
   write(repo, 'doc/tasks/0001-fixture-task.md', task());
   commit(repo, 'docs: add the task');
@@ -438,7 +438,7 @@ test('does not count an agent-config-only commit as implementing', () => {
   assert.equal(result.approval.precedesFirstImplementingCommit, true);
 });
 
-test('reads checkbox items and Notes from a task file with CRLF line endings', () => {
+test('regression: task-0111 reads checkbox items and Notes from a task file with CRLF line endings', () => {
   const repo = fixtureRepo();
   const body = task({
     plan: '- [x] Done item.\n- [ ] Open item.\n',
@@ -454,7 +454,7 @@ test('reads checkbox items and Notes from a task file with CRLF line endings', (
   ]);
 });
 
-test('does not count a docs-only commit with a non-ASCII path as implementing', () => {
+test('regression: task-0111 does not count a docs-only commit with a non-ASCII path as implementing', () => {
   const repo = fixtureRepo();
   write(repo, 'doc/tasks/0001-fixture-task.md', task());
   commit(repo, 'docs: add the task');
@@ -467,7 +467,7 @@ test('does not count a docs-only commit with a non-ASCII path as implementing', 
   assert.equal(briefing(repo).approval.firstImplementingCommit, null);
 });
 
-test('never names a proposed task touched by the newest commit as the active one', () => {
+test('regression: task-0111 never names a proposed task touched by the newest commit as the active one', () => {
   const repo = fixtureRepo();
   write(repo, 'doc/tasks/0001-fixture-task.md', task());
   write(repo, 'doc/tasks/0002-other-task.md', task());
@@ -496,7 +496,7 @@ test('reads the evidence file at the path the sequence gate writes it to', () =>
   assert.equal(briefing(repo, ['--session', sessionId], env).gate.lines, 1);
 });
 
-test('treats a task with no approval and no code yet as known, not as cannot tell', () => {
+test('regression: task-0111 treats a task with no approval and no code yet as known, not as cannot tell', () => {
   const repo = fixtureRepo();
   write(repo, 'doc/tasks/0001-fixture-task.md', task());
   commit(repo, 'docs: add the task');
@@ -511,7 +511,7 @@ test('treats a task with no approval and no code yet as known, not as cannot tel
   assert.ok(!result.cannotTell.includes('approval'));
 });
 
-test('does not read a note that only mentions deviations as a deviation', () => {
+test('regression: task-0111 does not read a note that only mentions deviations as a deviation', () => {
   const repo = fixtureRepo();
   write(
     repo,
@@ -534,4 +534,32 @@ test('does not read a note that only mentions deviations as a deviation', () => 
     briefing(repo).deviations.map((d) => d.heading),
     ['2026-10-02 — implementation']
   );
+});
+
+test('regression: task-0111 does not read a deviation phrase quoted in a note as a deviation', () => {
+  const repo = fixtureRepo();
+  write(
+    repo,
+    'doc/tasks/0001-fixture-task.md',
+    task({
+      notes: [
+        '### 2026-10-01 — rule',
+        '',
+        'The text rule now takes "deviation from" and `beyond the ask` as markers.',
+        '',
+      ].join('\n'),
+    })
+  );
+
+  assert.deepEqual(briefing(repo).deviations, []);
+});
+
+test('regression: task-0111 audit names an unreadable task directory instead of hiding it', () => {
+  const repo = fixtureRepo();
+  write(repo, 'doc/tasks', 'not a directory\n');
+
+  const result = briefing(repo);
+
+  assert.equal(result.task, null);
+  assert.ok(result.unreadable.some((u) => u.path === 'doc/tasks' && u.code === 'ENOTDIR'));
 });

@@ -16,7 +16,8 @@
  *     (done as a count): the task's checkbox items.
  *   - deviations: Notes entries whose heading names a deviation or "beyond
  *     the ask", or whose text records one ("deviation from", "deliberate" or
- *     "stated deviation", "beyond the ask"), `{ heading, text }`.
+ *     "stated deviation", "beyond the ask") outside quotes or backticks,
+ *     `{ heading, text }`.
  *   - approval: the Notes entry approving the plan, the commit that added it,
  *     the first commit ahead of `main` touching anything outside `doc/` and
  *     the agent hosts' configuration directories, and
@@ -94,7 +95,9 @@ function readTasks(repoRoot, unreadable) {
     names = readdirSync(join(repoRoot, 'doc', 'tasks'))
       .filter((name) => ARTIFACT_FILE.test(name))
       .sort();
-  } catch {
+  } catch (error) {
+    if (error.code !== 'ENOENT')
+      unreadable.push({ path: 'doc/tasks', code: error.code ?? 'unknown' });
     return [];
   }
   const tasks = [];
@@ -153,6 +156,12 @@ function noteEntries(lines) {
     heading,
     text: body.filter(Boolean).join(' '),
   }));
+}
+
+// A phrase quoted in a note ("deviation from", `beyond the ask`) names the
+// rule, not a deviation, so quoted spans are left out of the text match.
+function unquoted(text) {
+  return text.replace(/"[^"]*"|`[^`]*`/g, '');
 }
 
 // --- Facts --------------------------------------------------------------------
@@ -307,7 +316,9 @@ export function briefingReport({ repoRoot, sessionId = null, env = process.env }
     acceptance: active ? openItems(section(active.body, 'Acceptance Criteria')) : null,
     definitionOfDone: active ? openItems(section(active.body, 'Definition of Done')) : null,
     deviations: active
-      ? notes.filter((n) => DEVIATION_HEADING.test(n.heading) || DEVIATION_TEXT.test(n.text))
+      ? notes.filter(
+          (n) => DEVIATION_HEADING.test(n.heading) || DEVIATION_TEXT.test(unquoted(n.text))
+        )
       : null,
     approval: order,
     roadmap: progress,

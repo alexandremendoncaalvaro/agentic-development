@@ -469,7 +469,7 @@ test('progressSvg fills the bar in proportion, for the desktop', () => {
   assert.match(progressSvg({ done: 0, total: 0 }, 200), /<rect [^>]*class="fill"[^>]*width="0"/);
 });
 
-test('paneModel shows what the script could not tell instead of a known state', () => {
+test('regression: task-0111 paneModel shows what the script could not tell instead of a known state', () => {
   const model = paneModel({
     ...recorded('active-task'),
     approval: { entry: null, precedesFirstImplementingCommit: null },
@@ -503,7 +503,7 @@ test('paneModel rates a gate with no would-block line as clear', () => {
   });
 });
 
-test('a slower earlier script run never overwrites a newer briefing', async () => {
+test('regression: task-0111 a slower earlier script run never overwrites a newer briefing', async () => {
   const releases = [];
   const { hooks, $ } = await loadPlugin(99, FULL, {
     script: {
@@ -546,7 +546,7 @@ test('detailsMarkdown cuts a long block at a line boundary and says so', () => {
   assert.match(md.split('\n\n_Cut')[0], /\.$/, 'the cut lands after a whole line');
 });
 
-test('a script run still in flight at /clear never brings the old briefing back', async () => {
+test('regression: task-0111 a script run still in flight at /clear never brings the old briefing back', async () => {
   const releases = [];
   const { hooks, $ } = await loadPlugin(99, FULL, {
     script: { path: USER_SCRIPT, result: () => new Promise((resolve) => releases.push(resolve)) },
@@ -561,14 +561,14 @@ test('a script run still in flight at /clear never brings the old briefing back'
   assert.match(findElement(pane, 'Text').props.children, /No briefing/);
 });
 
-test('paneModel and detailsMarkdown tolerate a briefing without cannotTell', () => {
+test('regression: task-0111 paneModel and detailsMarkdown tolerate a briefing without cannotTell', () => {
   const { cannotTell, ...older } = recorded('active-task');
   void cannotTell;
   assert.equal(paneModel(older).health[0].label, 'Plan approval');
   assert.equal(detailsMarkdown({ ...older, task: null, unreadable: [] }, 50), '');
 });
 
-test('detailsMarkdown cuts a single long line without dropping into a garbled slice', () => {
+test('regression: task-0111 detailsMarkdown cuts a single long line without dropping into a garbled slice', () => {
   const md = detailsMarkdown(
     { ...recorded('active-task'), plan: { done: [], open: ['x'.repeat(3000)] } },
     500
