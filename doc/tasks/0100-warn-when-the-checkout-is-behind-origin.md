@@ -20,14 +20,14 @@ fetched, without a network call.
 
 ## Acceptance Criteria
 
-- [ ] The project-state packet reports the checkout's branch or detached state and its ahead/behind counts against the default branch's remote-tracking ref, from local refs only.
-- [ ] A detached or behind checkout is surfaced as a confidence limit that `ad-roadmap`, `ad-next` and `ad-brief` pass on.
-- [ ] Tests cover detached, behind, and current checkouts with fixture repositories.
+- [x] The project-state packet reports the checkout's branch or detached state and its ahead/behind counts against the default branch's remote-tracking ref, from local refs only.
+- [x] A detached or behind checkout is surfaced as a confidence limit that `ad-roadmap`, `ad-next` and `ad-brief` pass on.
+- [x] Tests cover detached, behind, and current checkouts with fixture repositories.
 
 ## Plan
 
-- [ ] Red in `test/skill-scripts.test.js`.
-- [ ] Green in `project-state.mjs` (both hosts, byte-identical) and the three consumers' text.
+- [x] Red in `test/skill-scripts.test.js`.
+- [x] Green in `project-state.mjs` (both hosts, byte-identical) and the three consumers' text.
 - [ ] `CHANGELOG.md`; `/ad-review`; `/ad-commit`.
 
 ## Notes
@@ -42,6 +42,20 @@ Routed from the `/ad-level-up` curation of 2026-10-07, which the owner approved 
 
 The owner approved the kit hygiene batch ("ok"), built in one branch with
 Tasks 0112 and 0113.
+
+### 2026-10-08 — built
+
+`project-state.mjs` (both hosts, byte-identical) adds `checkout` to the
+packet: `branch` or `detached`, the base from `refs/remotes/origin/HEAD` (or
+`origin/main`, then `origin/master`), and `ahead`/`behind` from
+`git rev-list --left-right --count`, all from local refs; null outside git.
+`ad-project-state` documents the field, and `ad-next`, `ad-roadmap` and
+`ad-brief` carry a detached or behind checkout as a confidence limit. Tests:
+two regression tests on a cloned fixture (behind; current, detached and
+non-git), red first; swapping `ahead` and `behind` turned both red; a static
+test pins the confidence-limit sentence in the three consumers on both hosts.
+The work-in-progress briefing script still compares against a hard-coded
+`main`; reading this packet's base there is left for later.
 
 ## Definition of Done
 
