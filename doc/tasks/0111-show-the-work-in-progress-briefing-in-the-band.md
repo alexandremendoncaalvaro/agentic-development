@@ -199,6 +199,44 @@ Mutation sweep over the plugin modules: every surviving mutant is a `??` to
 `||` swap on a value that is never an empty string. `npm run verify`: 1365 of
 1365.
 
+### 2026-10-08 — slice 2 review and corrections
+
+`/ad-review` on 59913f7..b03d7ce, both axes with fresh context: no Blockers.
+Accepted and fixed test first:
+
+- Standards: "a fact the script could not establish reads as a known, healthy
+  state" (a green "not approved yet" when git is unavailable). The pane now
+  shows the script's `cannotTell` facts: plan approval "cannot tell" with its
+  reason, and a Roadmap health row when no PRD exists. Spec raised the same
+  gap for the roadmap.
+- Spec: Task 0106 asks for "which step would have blocked". The script's gate
+  summary adds `lastWouldBlock`, and the pane names it ("latest: audit before
+  gh pr merge"); a session with no would-block line reads "none of N checks
+  would block".
+- Standards: "a slow run that finishes after a newer one overwrites
+  `state.briefing` with stale data"; a run counter now drops a superseded
+  result. The handlers still await the run, bounded by its 10-second timeout;
+  the measured median is 267 ms.
+- Both axes: the plugin and marketplace descriptions still said the band
+  carries the briefing; reworded.
+- Notes taken: the status mark's color follows the status (in progress,
+  done, blocked, other); the Markdown block is cut at a line boundary with a
+  visible note instead of mid-line; a stale comment fixed; the test file's
+  module imports merged.
+
+Not taken, with evidence: "the command may vanish" after a reload. The host's
+plugin-authoring contract states that a reload runs `register` again and fires
+`session.start` again, which registers the command. Kept as a decision: with
+no script the pane the owner opens shows one line saying why, instead of an
+empty frame; "draws nothing" in the second criterion applies to the band
+and to unasked drawing. Open: the owner observed the pane at one width only;
+the narrow-width check stays pending on the owner.
+
+After the corrections: `npm run verify` 1370 of 1370; the plugin mutation
+sweep leaves only equivalent survivors (`??` to `||` on values never empty,
+and `surface === 'desktop' && Svg`, since only the desktop table carries
+`Svg`).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
