@@ -27,14 +27,14 @@
     "done": 0,
     "open": [
       "Local tests pass (or N/A documented in Notes)",
-      "Code review completed (human or fresh-context reviewer per WORKFLOW \u00a710)",
+      "Code review completed (human or fresh-context reviewer per WORKFLOW §10)",
       "No orphan `TODO`/`FIXME` introduced",
       "Status updated to `done` and Notes log closes the task"
     ]
   },
   "deviations": [],
   "approval": {
-    "entry": "2026-10-07 \u2014 plan approved",
+    "entry": "2026-10-07 — plan approved",
     "approvedIn": "3f52979e286a7639eb19253f6cfca7440bcfd8a6",
     "firstImplementingCommit": "6c43079853617dcd63c48f42e0a360d9c0a69fa5",
     "precedesFirstImplementingCommit": true

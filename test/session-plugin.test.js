@@ -545,3 +545,34 @@ test('detailsMarkdown cuts a long block at a line boundary and says so', () => {
   assert.match(md, /\n\n_Cut to fit the pane; the task file has the rest\._$/);
   assert.match(md.split('\n\n_Cut')[0], /\.$/, 'the cut lands after a whole line');
 });
+
+test('a script run still in flight at /clear never brings the old briefing back', async () => {
+  const releases = [];
+  const { hooks, $ } = await loadPlugin(99, FULL, {
+    script: { path: USER_SCRIPT, result: () => new Promise((resolve) => releases.push(resolve)) },
+  });
+  const inFlight = hooks['turn.complete']($, {}, async () => undefined);
+  await new Promise((resolve) => setImmediate(resolve));
+  await hooks['session.end']($, {}, async () => undefined);
+  releases[0](clean(recorded('active-task')));
+  await inFlight;
+
+  const pane = hooks['ui.render:Pane:agentic-briefing']($, { surface: 'terminal' });
+  assert.match(findElement(pane, 'Text').props.children, /No briefing/);
+});
+
+test('paneModel and detailsMarkdown tolerate a briefing without cannotTell', () => {
+  const { cannotTell, ...older } = recorded('active-task');
+  void cannotTell;
+  assert.equal(paneModel(older).health[0].label, 'Plan approval');
+  assert.equal(detailsMarkdown({ ...older, task: null, unreadable: [] }, 50), '');
+});
+
+test('detailsMarkdown cuts a single long line without dropping into a garbled slice', () => {
+  const md = detailsMarkdown(
+    { ...recorded('active-task'), plan: { done: [], open: ['x'.repeat(3000)] } },
+    500
+  );
+  assert.ok(md.length <= 500);
+  assert.match(md, /_Cut to fit the pane; the task file has the rest\._$/);
+});

@@ -9,8 +9,8 @@ function taskNumber(slug) {
 }
 
 // The script's briefing from a $.process.run result, or null when the run
-// failed, was cut, or printed anything but a JSON object: the band then draws
-// nothing rather than a guess.
+// failed, was cut, or printed anything but a JSON object: the pane then shows
+// no briefing rather than a guess.
 export function readBriefing(result) {
   if (!result || result.exitCode !== 0 || result.isStdoutTruncated) return null;
   try {
@@ -52,7 +52,7 @@ function nextStep(plan) {
     : { step: item.slice(0, cut).trim(), detail: item.slice(cut + 1).trim() };
 }
 
-function approvalHealth(approval, cannotTell) {
+function approvalHealth(approval, cannotTell = []) {
   if (cannotTell.includes('approval')) {
     const value = cannotTell.includes('git')
       ? 'cannot tell: commits ahead of main not listed'
@@ -149,8 +149,9 @@ const CUT_NOTE = '\n\n_Cut to fit the pane; the task file has the rest._';
 export function detailsMarkdown(b, limit = 10_000) {
   const full = fullDetails(b);
   if (full.length <= limit) return full;
-  const room = full.slice(0, limit - CUT_NOTE.length);
-  return `${room.slice(0, room.lastIndexOf('\n'))}${CUT_NOTE}`;
+  const room = full.slice(0, Math.max(0, limit - CUT_NOTE.length));
+  const lineEnd = room.lastIndexOf('\n');
+  return `${lineEnd === -1 ? room : room.slice(0, lineEnd)}${CUT_NOTE}`;
 }
 
 function fullDetails(b) {

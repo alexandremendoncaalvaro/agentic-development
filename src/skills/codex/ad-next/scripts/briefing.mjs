@@ -27,8 +27,8 @@
  *   - roadmap: `{ prdStatus, tasksDone, tasksTotal }` from the survey; null
  *     without `doc/product/PRD.md`.
  *   - gate: the session's receipt-gate shadow evidence (Task 0106),
- *     `{ lines, wouldBlock, last, lastWouldBlock }`; null without `--session` or without an
- *     evidence file for it.
+ *     `{ lines, wouldBlock, last, lastWouldBlock }`; null without
+ *     `--session` or without an evidence file for it.
  *   - unreadable: `{ path, code }` for every existing file it could not read
  *     or parse; cannotTell: the facts above that are null for lack of input,
  *     and `git` when the commits ahead of `main` cannot be listed.

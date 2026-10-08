@@ -279,6 +279,7 @@ async function firstInstalled($, paths) {
 function clearReadings($, state) {
   state.fill = null;
   state.briefing = null;
+  state.briefingRun += 1;
   $.ui.invalidate('ui.render');
 }
 
