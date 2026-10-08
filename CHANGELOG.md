@@ -6,6 +6,16 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `/ad-next` ships `scripts/briefing.mjs` on both hosts: one JSON briefing of
+  the active task (and the rule that chose it), its open plan, acceptance and
+  Definition of Done items, the deviations its Notes record, whether the plan
+  approval preceded the first implementing commit, roadmap progress, and the
+  session's receipt-gate shadow result; it says what it cannot tell instead of
+  guessing. It is the source for the `agentic-session` band and `/ad-brief`
+  (ADR-0090, GROUND-0043, task-0111).
+
 ## [1.2.0] - 2026-10-08
 
 ### Added

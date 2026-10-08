@@ -440,6 +440,10 @@
           "sourceSha": "8e12e75ba9222861157c082bf3c357a62cbf09b5dde1c8a4a550a7b292740232"
         },
         {
+          "path": ".agents/skills/ad-next/scripts/briefing.mjs",
+          "sourceSha": "539ecbcda3deb06bf82dc9e541452936a66d6d6f2763c8c9dc97339c2b12afe4"
+        },
+        {
           "path": ".agents/skills/ad-next/scripts/survey.mjs",
           "sourceSha": "aceee0c801aab43bd055cebef77a44d43168b4f1fbe39dc0fa5be71f69589c71"
         },
