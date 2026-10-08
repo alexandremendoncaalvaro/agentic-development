@@ -127,7 +127,7 @@ Tier is editable as the project matures (append a rationale paragraph; do not de
 ### 3.3 Size Guidelines
 
 - Files: ~200 lines target; ~400 review threshold. A file past it states its reason in review; a split is preferred when a cohesive seam exists.
-- Functions: ~50 lines target; 100 hard.
+- Functions: ~50 lines target; ~100 review threshold. A function past it states its reason in review; a split is preferred when a cohesive seam exists. No tool enforces it (Task 0103, after the file threshold of Task 0091).
 - Cyclomatic complexity: ≤10 per function (informational).
 
 The file threshold is a review heuristic, not a gate: no tool enforces it, and `src/` and `test/` both carry files past it that no review split. A reviewer who meets one asks for the reason and the seam; a finding that only cites the line count is not a defect.
