@@ -1,8 +1,8 @@
 # Task `0111`: Show the work-in-progress briefing in the band
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-07
-**Scope ref:** doc/adr/0090-show-the-work-in-progress-briefing-in-the-session-plugin.md (proposed)
+**Scope ref:** doc/adr/0090-show-the-work-in-progress-briefing-in-the-session-plugin.md
 **Evidence ref:** doc/research/0043-ground-work-in-progress-briefing-band.md
 **Owner:** Alexandre Alvaro
 **Execution:** HITL
@@ -38,7 +38,7 @@ Sequenced by the owner on 2026-10-07: after Task 0109, together with Task
 
 ## Plan
 
-- [ ] Owner accepts ADR-0090 and approves this plan.
+- [x] Owner accepts ADR-0090 and approves this plan.
 - [ ] Slice 1, the script: red, then green (`/ad-tdd`) on fixture repositories; parity; measure its run time.
 - [ ] Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).
 - [ ] Slice 3, `/ad-brief` reads the script; Task 0106's criteria close with slice 1's gate result.
@@ -63,6 +63,11 @@ own decision, so ADR-0090 is drafted (proposed) to amend them for a display of
 the kit's own script. The criteria above replace the provisional ones; the
 plan waits for the owner's acceptance of ADR-0090 and approval. Task 0106 (the
 gate's shadow result in the band) is folded into slice 1 and closes with it.
+
+### 2026-10-07 — plan approved
+
+The owner accepted ADR-0090 and approved this plan. Implementation starts with
+slice 1 in a new session.
 
 ## Definition of Done
 

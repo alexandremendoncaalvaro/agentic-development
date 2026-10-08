@@ -1,6 +1,6 @@
 # ADR-0090: Show the work-in-progress briefing in the session plugin
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-10-07
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0088, items 3 and 8, for one member only: a display of the kit's own briefing script may summarize the work in progress, and this record is the workflow-stage segment's own decision. Every other ADR-0088 item binds it unchanged.
