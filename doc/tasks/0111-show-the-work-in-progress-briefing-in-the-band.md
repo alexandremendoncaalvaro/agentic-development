@@ -143,6 +143,29 @@ either.
 After the corrections: 22 tests in `test/briefing.test.js`, `npm run verify`
 1347 of 1347, mutation sweep 39 mutants with the same 7 equivalent survivors.
 
+### 2026-10-08 — slice 1 delta re-review
+
+Fresh-context re-review of 1e63877..1a2da0f on both axes: every prior finding
+resolved, except the hard-coded `main` base, which stays with Task 0100. No
+Blockers. One new Spec Concern, accepted and fixed test first: with no
+approval entry and no implementing commit "`cannotTell` now lists `approval`",
+although that state is known (the plan is not approved yet, nothing is built);
+`approval` is now named only when git cannot list the commits or the entry is
+not committed yet.
+
+Carried to slice 2: a session whose gate is wired but has gated nothing yet
+reads "cannot tell", the same as an unwired gate; Task 0106's "nothing when
+none would" display needs a way to tell them apart. GROUND-0043's wording of
+the fallback rule stays as recorded; the narrowing to in-progress tasks is
+stated in the script header and in the review entry above.
+
+Mutation counts reconciled: slice 1 started at 39 mutants, 13 survivors; its
+tests closed 5 (8 left). The `doc/` exclusion list removed one mutant (38,
+8). The review corrections removed the `?? ''` survivor in the evidence
+reader, which became a null check, and added the `orderUnknown` and
+`cannotTell` operators, all killed (41 mutants, 7 survivors: six `??` swaps
+and the CLI entry guard). `npm run verify`: 1348 of 1348.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
