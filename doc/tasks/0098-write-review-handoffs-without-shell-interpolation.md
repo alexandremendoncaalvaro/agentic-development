@@ -1,6 +1,6 @@
 # Task `0098`: Write review handoffs without shell interpolation
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0045-review-calibration-by-handoff-fidelity.md (review handoffs); applies to `ad-review` Step 4 and `ad-audit` Step 3
 **Evidence ref:**
@@ -38,6 +38,11 @@ Append-only log. Date each entry. Never rewrite past entries.
 ### 2026-10-07
 
 Routed from the `/ad-level-up` curation of 2026-10-07, which the owner approved in chat; it supersedes the unmerged task-0094 draft for this item.
+
+### 2026-10-08 — plan approved
+
+The owner approved the kit hygiene batch ("ok"), built in one branch with
+Tasks 0112 and 0113.
 
 ## Definition of Done
 

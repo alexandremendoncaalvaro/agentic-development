@@ -1,6 +1,6 @@
 # Task `0099`: Show the installed kit version at the checkpoint
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0074-user-prompt-submit-workflow-checkpoint-hook.md
 **Evidence ref:**
@@ -40,6 +40,11 @@ Append-only log. Date each entry. Never rewrite past entries.
 ### 2026-10-07
 
 Routed from the `/ad-level-up` curation of 2026-10-07, which the owner approved in chat; it supersedes the unmerged task-0094 draft for this item.
+
+### 2026-10-08 — plan approved
+
+The owner approved the kit hygiene batch ("ok"), built in one branch with
+Tasks 0112 and 0113.
 
 ## Definition of Done
 
