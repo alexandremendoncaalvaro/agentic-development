@@ -487,3 +487,63 @@ test('main: a missing denylist skips the content scan but still blocks rules/ pa
   stage(repo, 'rules/a.md', 'x\n');
   assert.equal(runGuard(repo.dir), 1, 'the path check does not depend on the denylist');
 });
+
+// Task 0113: the denylist is gitignored, so a linked worktree has none of its
+// own; the guard must still read the main worktree's list.
+function linkedWorktree(repo) {
+  stage(repo, 'seed.md', 'seed\n');
+  repo.git('-c', 'core.hooksPath=/dev/null', 'commit', '-q', '-m', 'seed', '--no-verify');
+  const dir = mkdtempSync(join(tmpdir(), 'leak-guard-wt-'));
+  rmSync(dir, { recursive: true, force: true });
+  repo.git('worktree', 'add', '-q', dir);
+  const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'pipe' });
+  return { dir, git };
+}
+
+test("regression: task-0113 a linked worktree blocks a marker from the main worktree's denylist", (t) => {
+  const repo = scratchRepo();
+  const worktree = linkedWorktree(repo);
+  t.after(() => {
+    rmSync(worktree.dir, { recursive: true, force: true });
+    rmSync(repo.dir, { recursive: true, force: true });
+  });
+  stage(worktree, 'leak.md', `prose mentioning ${MARKER} inline\n`);
+  assert.equal(runGuard(worktree.dir), 1);
+});
+
+test("regression: task-0113 a worktree's own denylist adds to the main worktree's, never replaces it", (t) => {
+  const repo = scratchRepo();
+  const worktree = linkedWorktree(repo);
+  t.after(() => {
+    rmSync(worktree.dir, { recursive: true, force: true });
+    rmSync(repo.dir, { recursive: true, force: true });
+  });
+  mkdirSync(join(worktree.dir, '.agentic'), { recursive: true });
+  writeFileSync(join(worktree.dir, '.agentic', 'leak-denylist.txt'), 'WORKTREE-ONLY-MARKER\n');
+
+  stage(worktree, 'main-marker.md', `mentions ${MARKER}\n`);
+  assert.equal(runGuard(worktree.dir), 1, "the main worktree's marker still blocks");
+  worktree.git('rm', '-q', '--cached', 'main-marker.md');
+  stage(worktree, 'own-marker.md', 'mentions WORKTREE-ONLY-MARKER\n');
+  assert.equal(runGuard(worktree.dir), 1, "the worktree's own marker blocks too");
+});
+
+test('regression: task-0113 the guard says when no denylist is found anywhere', (t) => {
+  const repo = scratchRepo({ denylist: null });
+  t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
+  stage(repo, 'ok.md', 'nothing sensitive here\n');
+  const cwd = process.cwd();
+  const write = process.stderr.write;
+  const lines = [];
+  process.stderr.write = (text) => lines.push(String(text)) > 0;
+  let code;
+  try {
+    process.chdir(repo.dir);
+    code = main();
+  } finally {
+    process.stderr.write = write;
+    process.chdir(cwd);
+  }
+  assert.equal(code, 0, 'no denylist is not a reason to block');
+  assert.equal(lines.filter((l) => /no leak denylist found/.test(l)).length, 1);
+});

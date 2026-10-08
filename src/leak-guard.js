@@ -229,6 +229,25 @@ function git(args, repoRoot) {
   });
 }
 
+/**
+ * Where the gitignored denylist can live: this working tree's root and, for a
+ * linked worktree, the main worktree's root (the parent of the common `.git`),
+ * since an ignored file is never shared between worktrees (task 0113).
+ */
+function denylistPaths(repoRoot) {
+  const paths = [join(repoRoot, DENYLIST_REL)];
+  const commonDir = git(
+    ['rev-parse', '--path-format=absolute', '--git-common-dir'],
+    repoRoot
+  ).trim();
+  const mainRoot = dirname(commonDir);
+  // git prints forward slashes on every platform, Windows included.
+  if (/[\\/]\.git$/.test(commonDir) && mainRoot !== repoRoot) {
+    paths.push(join(mainRoot, DENYLIST_REL));
+  }
+  return paths;
+}
+
 /** CLI entry: gather staged state from git, apply the policy, print + exit fail-closed. */
 export function main() {
   try {
@@ -254,10 +273,16 @@ export function main() {
     );
     const addedLines = extractAddedLines(contentDiff);
 
-    const denylistPath = join(repoRoot, DENYLIST_REL);
-    const denylistPatterns = existsSync(denylistPath)
-      ? loadDenylist(readFileSync(denylistPath, 'utf8'))
-      : [];
+    const found = denylistPaths(repoRoot).filter((path) => existsSync(path));
+    if (found.length === 0) {
+      process.stderr.write(
+        `leak-guard: no leak denylist found (${DENYLIST_REL} in this or the main worktree); ` +
+          'only the rules/ and symlink checks ran.\n'
+      );
+    }
+    const denylistPatterns = [
+      ...new Set(found.flatMap((path) => loadDenylist(readFileSync(path, 'utf8')))),
+    ];
 
     const readSymlinkTarget = (entry) => git(['cat-file', 'blob', entry.dstSha], repoRoot).trim();
 
