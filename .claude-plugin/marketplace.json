@@ -8,7 +8,7 @@
     {
       "name": "agentic-session",
       "source": "./plugins/agentic-session",
-      "description": "A context band above the prompt, shown only past your threshold, with a one-press /ad-handoff."
+      "description": "A band above the prompt with the work-in-progress briefing and, past your threshold, the context reading with a one-press /ad-handoff; /agentic-briefing opens the full briefing in a pane."
     }
   ]
 }
