@@ -18,12 +18,12 @@ limits are optional.
 
 ## Acceptance Criteria
 
-- [ ] §3.3 states the function size as a review threshold, or a lint rule enforces it and the text says so.
-- [ ] `npm run verify` passes.
+- [x] §3.3 states the function size as a review threshold, or a lint rule enforces it and the text says so.
+- [x] `npm run verify` passes.
 
 ## Plan
 
-- [ ] Decide threshold text versus lint rule against Task 0091's precedent.
+- [x] Decide threshold text versus lint rule against Task 0091's precedent.
 - [ ] Edit §3.3; `/ad-review`; `/ad-commit`.
 
 ## Notes
@@ -38,6 +38,15 @@ Routed from the `/ad-level-up` curation of 2026-10-07, which the owner approved 
 
 The owner approved the kit hygiene batch ("ok"), built in one branch with
 Tasks 0112 and 0113.
+
+### 2026-10-08 — built
+
+Text, not a lint rule, on Task 0091's precedent for the file ceiling:
+GUIDELINES §3.3 now reads "~100 review threshold" with the same "states its
+reason in review" wording. Left as is: `ad-guidelines`' consumer default "~50
+lines target / 100 hard" is a value each project confirms or overrides when
+it writes its own GUIDELINES and may enforce with a lint rule, so it is not
+this repository asserting an unchecked limit.
 
 ## Definition of Done
 

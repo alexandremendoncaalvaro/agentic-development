@@ -19,14 +19,14 @@ installs.
 
 ## Acceptance Criteria
 
-- [ ] ADR-0057 carries an addendum that names `--scope project` in a disposable directory for the scratch check.
-- [ ] Every skill or doc that repeats the scratch-init step names the scope too.
-- [ ] `npm run verify` passes.
+- [x] ADR-0057 carries an addendum that names `--scope project` in a disposable directory for the scratch check.
+- [x] Every skill or doc that repeats the scratch-init step names the scope too.
+- [x] `npm run verify` passes.
 
 ## Plan
 
-- [ ] Grep for the scratch-init instruction across `doc/` and `src/skills/`.
-- [ ] Addendum plus the textual fixes.
+- [x] Grep for the scratch-init instruction across `doc/` and `src/skills/`.
+- [x] Addendum plus the textual fixes.
 - [ ] `/ad-review`; `/ad-commit`.
 
 ## Notes
@@ -41,6 +41,15 @@ Routed from the `/ad-level-up` curation of 2026-10-07, which the owner approved 
 
 The owner approved the kit hygiene batch ("ok"), built in one branch with
 Tasks 0112 and 0113.
+
+### 2026-10-08 — built
+
+`git grep` across the tree outside `doc/tasks/` found the unscoped scratch
+`init` only in ADR-0057's decision 4, and the same unscoped
+`update --yes` re-sync in ADR-0057's and ADR-0056's decision 4. Both ADRs
+carry an addendum naming `--scope project` (and, for the scratch check, a
+disposable directory), with PROJECTION rows. AGENTS.md already names the
+scope for the dogfood re-sync.
 
 ## Definition of Done
 
