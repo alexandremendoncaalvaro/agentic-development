@@ -1,6 +1,6 @@
 # Task `0112`: Rebuild each group's rule text on a re-audit
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-08
 **Scope ref:** doc/adr/0047-absorb-team-practices-determinism-reaudit.md (re-audit), doc/adr/0036-ad-audit-maximum-gate.md
 **Evidence ref:**
@@ -43,6 +43,11 @@ Append-only log. Date each entry. Never rewrite past entries.
 ### 2026-10-08
 
 Proposed from Task 0111's branch re-audit; the owner approved opening it.
+
+### 2026-10-08 — plan approved
+
+The owner approved the kit hygiene batch ("ok"); this task follows Task 0113
+in it.
 
 ## Definition of Done
 
