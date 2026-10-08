@@ -306,6 +306,22 @@ export async function installSkills({
         skillFiles.push({ path: relForReport, sourceSha: decision.sourceSha });
       }
 
+      // A file the previous install recorded but the kit no longer ships
+      // (Task 0101): remove it when unchanged, keep and report it when the
+      // user edited it, and stop tracking it either way.
+      const shipped = new Set(skillFiles.map((f) => f.path));
+      for (const [path, recordedSha] of prevByPath) {
+        if (shipped.has(path)) continue;
+        const abs = join(cwd, path);
+        if (!existsSync(abs)) continue;
+        if (sha256Of(abs) === recordedSha) {
+          if (!dryRun) unlinkSync(abs);
+          actions.push({ type: 'removed', path, agent });
+        } else {
+          actions.push({ type: 'dropped-kept', path, agent });
+        }
+      }
+
       nextSkills[skill] = {
         version: kitVersion ?? prevSkill?.version ?? null,
         files: skillFiles,

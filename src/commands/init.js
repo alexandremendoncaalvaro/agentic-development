@@ -40,6 +40,8 @@ const ACTION_SYMBOL = {
   unchanged: '·',
   kept: '·',
   skipped: '!',
+  removed: '-',
+  'dropped-kept': '!',
 };
 
 const ROOT_DOC_LABEL = {

@@ -46,6 +46,7 @@ const ACTION_SYMBOL = {
   removed: '-',
   'removed-missing': '?',
   'orphan-kept': '?',
+  'dropped-kept': '!',
   'migration-removed': '-',
   'migration-kept': '!',
   'migration-state-removed': '-',

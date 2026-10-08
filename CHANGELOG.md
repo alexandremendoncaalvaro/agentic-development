@@ -16,6 +16,12 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   unquoted heredoc, which can rewrite escapes or run an embedded diff's
   backtick spans (task-0098).
 
+### Fixed
+
+- `update` removes a file a kit skill no longer ships when the installed copy
+  is unchanged, and keeps and reports one the user edited (`!`), instead of
+  leaving the stale copy behind (task-0101).
+
 ## [1.3.0] - 2026-10-08
 
 ### Added
