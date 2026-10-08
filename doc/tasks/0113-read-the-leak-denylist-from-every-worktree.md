@@ -1,6 +1,6 @@
 # Task `0113`: Read the leak denylist from every worktree
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-08
 **Scope ref:** doc/adr/0033-house-ip-leak-guard.md
 **Evidence ref:**
@@ -40,6 +40,10 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 Proposed after the company-name leak. As a stopgap, the linked worktree used
 in this session links the main checkout's denylist.
+
+### 2026-10-08 — plan approved
+
+The owner approved starting the kit hygiene batch with this task ("ok").
 
 ## Definition of Done
 
