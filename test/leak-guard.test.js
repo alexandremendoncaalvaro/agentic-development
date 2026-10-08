@@ -393,6 +393,12 @@ test('findViolations with no denylist patterns still enforces rules/ and symlink
 // in git's diff shape breaks the test rather than silently opening the gate.
 
 const MARKER = 'ACME-INTERNAL-CODENAME';
+const GIT_VARS = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE'];
+const cleanGitEnv = () => {
+  const env = { ...process.env };
+  for (const name of GIT_VARS) delete env[name];
+  return env;
+};
 
 function scratchRepo({ denylist = MARKER } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'leak-guard-'));
@@ -411,6 +417,10 @@ function scratchRepo({ denylist = MARKER } = {}) {
 function runGuard(dir) {
   const cwd = process.cwd();
   const write = process.stderr.write;
+  // A leaked GIT_DIR would point main()'s git calls at this repository
+  // (AGENTS.md Gotchas), so the guard runs with the git variables removed.
+  const saved = Object.fromEntries(GIT_VARS.map((name) => [name, process.env[name]]));
+  for (const name of GIT_VARS) delete process.env[name];
   process.stderr.write = () => true;
   try {
     process.chdir(dir);
@@ -418,6 +428,9 @@ function runGuard(dir) {
   } finally {
     process.stderr.write = write;
     process.chdir(cwd);
+    for (const [name, value] of Object.entries(saved)) {
+      if (value !== undefined) process.env[name] = value;
+    }
   }
 }
 
@@ -495,8 +508,13 @@ function linkedWorktree(repo) {
   repo.git('-c', 'core.hooksPath=/dev/null', 'commit', '-q', '-m', 'seed', '--no-verify');
   const dir = mkdtempSync(join(tmpdir(), 'leak-guard-wt-'));
   rmSync(dir, { recursive: true, force: true });
-  repo.git('worktree', 'add', '-q', dir);
-  const git = (...args) => execFileSync('git', args, { cwd: dir, stdio: 'pipe' });
+  execFileSync('git', ['worktree', 'add', '-q', dir], {
+    cwd: repo.dir,
+    stdio: 'pipe',
+    env: cleanGitEnv(),
+  });
+  const git = (...args) =>
+    execFileSync('git', args, { cwd: dir, stdio: 'pipe', env: cleanGitEnv() });
   return { dir, git };
 }
 
@@ -535,6 +553,8 @@ test('regression: task-0113 the guard says when no denylist is found anywhere', 
   const cwd = process.cwd();
   const write = process.stderr.write;
   const lines = [];
+  const saved = Object.fromEntries(GIT_VARS.map((name) => [name, process.env[name]]));
+  for (const name of GIT_VARS) delete process.env[name];
   process.stderr.write = (text) => lines.push(String(text)) > 0;
   let code;
   try {
@@ -543,6 +563,9 @@ test('regression: task-0113 the guard says when no denylist is found anywhere', 
   } finally {
     process.stderr.write = write;
     process.chdir(cwd);
+    for (const [name, value] of Object.entries(saved)) {
+      if (value !== undefined) process.env[name] = value;
+    }
   }
   assert.equal(code, 0, 'no denylist is not a reason to block');
   assert.equal(lines.filter((l) => /no leak denylist found/.test(l)).length, 1);

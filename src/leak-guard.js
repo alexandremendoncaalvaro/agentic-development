@@ -236,12 +236,17 @@ function git(args, repoRoot) {
  */
 function denylistPaths(repoRoot) {
   const paths = [join(repoRoot, DENYLIST_REL)];
-  const commonDir = git(
-    ['rev-parse', '--path-format=absolute', '--git-common-dir'],
-    repoRoot
-  ).trim();
+  let commonDir;
+  try {
+    // Plain --git-common-dir (no --path-format, which needs git 2.31) prints a
+    // path relative to the working tree in the main worktree, absolute in a
+    // linked one; resolving against the root handles both.
+    commonDir = resolve(repoRoot, git(['rev-parse', '--git-common-dir'], repoRoot).trim());
+  } catch {
+    // Without the common dir only the working tree's own list can be read.
+    return paths;
+  }
   const mainRoot = dirname(commonDir);
-  // git prints forward slashes on every platform, Windows included.
   if (/[\\/]\.git$/.test(commonDir) && mainRoot !== repoRoot) {
     paths.push(join(mainRoot, DENYLIST_REL));
   }
