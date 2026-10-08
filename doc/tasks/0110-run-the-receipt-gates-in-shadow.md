@@ -156,6 +156,19 @@ before it. The set-up outside the repository (the bl-platform wrapper, the
 pinned gate, the copy-out script, the settings entry and the baseline copy)
 remains verifiable only on the owner's machine, by the hashes recorded above.
 
+### 2026-10-08 — copy-out scheduled
+
+The owner approved scheduling the copy-out. A user LaunchAgent,
+`~/Library/LaunchAgents/com.ale.agentic.copyout-0110.plist`, runs
+`~/.agentic/gates/copy-out-0110.sh` every Monday at 09:00 local time and once
+on 4 November at 20:00 local time (23:00Z, after the window closes at
+22:21:42Z); its output goes to `~/.agentic/evidence/0110-copies/launchd.log`.
+launchd runs a missed time after the machine wakes. A run started through
+launchd on 2026-10-08 exited 0 and copied 1115 files with their hashes to
+`~/.agentic/evidence/0110-copies/20261008T165431Z/`. The November entry
+recurs yearly, so the job is to be unloaded after the read-out
+(`launchctl bootout gui/$(id -u)/com.ale.agentic.copyout-0110`).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

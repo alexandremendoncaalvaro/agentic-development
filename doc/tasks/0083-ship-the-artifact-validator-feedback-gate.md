@@ -1,6 +1,6 @@
 # Task `0083`: Ship the artifact-validator feedback gate on both hosts
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-09-21
 **Scope ref:** doc/specs/0008-surface-validator-failures-during-the-turn.md
 **Evidence ref:** doc/research/0027-ground-artifact-validator-gate.md (study: doc/research/0026-runtime-layer-deterministic-host-hooks.md)
@@ -42,7 +42,7 @@ and 0082; that branch merged the same day, so the sequence is contiguous.
 - [x] `ad-hooks/SKILL.md` on both hosts documents the gate as the third session-lifecycle member with the same key-facts shape as the first two, the Claude Code wiring block for `PostToolUse` with an `Edit|Write` matcher, and the Codex wiring block for `.codex/hooks.json`; the Codex body no longer states that the tier is out of scope on Codex.
 - [x] This repository's `.claude/settings.json` and `.codex/hooks.json` wire the gate against the in-tree script.
 - [x] One governed write on Claude Code with the gate wired returns the validator's message to the model inside the turn and leaves a matching evidence line, kept private and with its digest recorded here.
-- [ ] The same firing is joined with a hook record in a stream captured through the live lane (`eval/run.mjs live`, on `main` since pull request 145), which needs an evaluation case whose fixture carries the gate wiring, and the Codex leg runs once the operator's Codex CLI can start a trial.
+- [x] The same firing is joined with a hook record in a stream captured through the live lane (`eval/run.mjs live`, on `main` since pull request 145), which needs an evaluation case whose fixture carries the gate wiring, and the Codex leg runs once the operator's Codex CLI can start a trial. Moved to Task 0082 on 2026-10-08 (owner-approved backlog redefinition); not claimed here.
 - [x] `CHANGELOG.md` records the new tier member.
 
 ## Plan
@@ -53,7 +53,7 @@ and 0082; that branch merged the same day, so the sequence is contiguous.
 - [x] Green: write `artifact-gate.mjs`; copy byte-identical to the Codex tree; parity test.
 - [x] Update `ad-hooks/SKILL.md` on both hosts; wire this repository's hook configuration for both hosts; refresh dogfood installs.
 - [x] Verify live on Claude Code through the live lane with the gate wired; record the capture digest and the evidence line in Notes.
-- [ ] `CHANGELOG.md`; `/ad-review`; `/ad-audit`; `/ad-commit`.
+- [x] `CHANGELOG.md`; `/ad-review`; `/ad-audit`; `/ad-commit`.
 
 ## Notes
 
@@ -284,11 +284,21 @@ should tell the orchestrator to freeze edits to the target while a fan-out
 runs, or to snapshot per group; `ad-review` on a machine whose installed
 skill copy predates the verdict-persistence step silently skips it, which
 argues for the checkpoint hook naming the installed kit version.
+### 2026-10-08 — closed
+
+Closed in the owner-approved backlog redefinition. The gate shipped on both
+hosts with its review, audit and re-audit recorded above (CHANGELOG entry
+under the runtime layer), and ADR-0083 is accepted. The one open criterion,
+joining a firing with a hook record through the live lane, needs an
+evaluation case whose fixture carries the gate wiring and a working Codex
+CLI for the Codex leg; it moves to Task 0082, which owns the live lane's
+skill-activation reading, so it is tracked there, not claimed here.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
