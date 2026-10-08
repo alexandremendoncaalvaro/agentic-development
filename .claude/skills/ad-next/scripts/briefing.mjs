@@ -261,6 +261,13 @@ function gateEvidence(sessionId, env, unreadable) {
   };
 }
 
+// The order is unknown when git cannot list the commits or the approval entry
+// is not committed yet; no approval and no code yet is a known state.
+function orderUnknown(order, commits) {
+  if (!order || order.precedesFirstImplementingCommit !== null) return false;
+  return !commits || order.entry !== null;
+}
+
 // --- Report -------------------------------------------------------------------
 
 /**
@@ -300,7 +307,7 @@ export function briefingReport({ repoRoot, sessionId = null, env = process.env }
       ...(active ? [] : ['task']),
       ...(progress ? [] : ['roadmap']),
       ...(gate ? [] : ['gate']),
-      ...(order && order.precedesFirstImplementingCommit === null ? ['approval'] : []),
+      ...(orderUnknown(order, commits) ? ['approval'] : []),
       ...(commits ? [] : ['git']),
     ],
   };

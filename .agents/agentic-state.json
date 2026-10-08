@@ -441,7 +441,7 @@
         },
         {
           "path": ".agents/skills/ad-next/scripts/briefing.mjs",
-          "sourceSha": "91cdbe531f57e4adc5acf23c0ded51009074f7ddf4ad91a1e7d73bb9b0c91bdc"
+          "sourceSha": "fd5e6023253e3f27f82ecfbffb4616bf8785211824abb86d38c956e4c4854c68"
         },
         {
           "path": ".agents/skills/ad-next/scripts/survey.mjs",

@@ -494,3 +494,18 @@ test('reads the evidence file at the path the sequence gate writes it to', () =>
 
   assert.equal(briefing(repo, ['--session', sessionId], env).gate.lines, 1);
 });
+
+test('treats a task with no approval and no code yet as known, not as cannot tell', () => {
+  const repo = fixtureRepo();
+  write(repo, 'doc/tasks/0001-fixture-task.md', task());
+  commit(repo, 'docs: add the task');
+  git(repo, 'switch', '-q', '-c', 'feat/work');
+  write(repo, 'doc/tasks/0001-fixture-task.md', task({ notes: '### 2026-10-01\n\nGrounded.\n' }));
+  commit(repo, 'docs: ground the task');
+
+  const result = briefing(repo);
+
+  assert.equal(result.approval.entry, null);
+  assert.equal(result.approval.firstImplementingCommit, null);
+  assert.ok(!result.cannotTell.includes('approval'));
+});
