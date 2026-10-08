@@ -254,6 +254,26 @@ test('decision-maker briefing composition is one-way and visible in the workflow
   }
 });
 
+test('a standalone brief reads the work-in-progress briefing script on both hosts', () => {
+  // ADR-0090 decision 3, task-0111 slice 3: the agentic-session pane and
+  // /ad-brief read the same script, so they cannot disagree.
+  for (const [agent, root] of [
+    ['claude-code', '.claude'],
+    ['codex', '.agents'],
+  ]) {
+    const brief = readFileSync(join(SKILLS_ROOT, agent, 'ad-brief', 'SKILL.md'), 'utf8');
+    const standalone =
+      brief.match(/Build a standalone brief[\s\S]*?Accept a specialist fact packet/)?.[0] ?? '';
+    const script = `node ${root}/skills/ad-next/scripts/briefing.mjs`;
+    assert.ok(standalone.includes(script), `${agent} standalone brief must run ${script}`);
+    assert.ok(
+      standalone.indexOf(script) < standalone.search(/active task/i),
+      `${agent} must read the script before locating the active task by hand`
+    );
+    assert.match(standalone, /`cannotTell`/, `${agent} must carry the script's cannot-tell facts`);
+  }
+});
+
 test('project-state collection is shared, bounded, and one-way on both hosts', () => {
   const flows = readFileSync(join(__dirname, '..', 'WORKFLOW-FLOWS.md'), 'utf8');
   const section = flows.match(/^## Return To Active Work$([\s\S]*?)(?=^## )/m)?.[1] ?? '';

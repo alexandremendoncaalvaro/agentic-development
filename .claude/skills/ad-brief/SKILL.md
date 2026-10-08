@@ -29,9 +29,19 @@ and the smallest sufficient live project evidence:
    `git branch --show-current`, and inspect the most recent commit with
    `git log -1 --oneline`. Read a focused diff only when it changes the meaning
    of the current result.
-3. Find the active task from a changed task file, then an explicit
-   `in-progress` status, then the task touched by the recent commit. Read its
-   Context, current plan state, acceptance criteria, and completion gates.
+3. Run `node .claude/skills/ad-next/scripts/briefing.mjs` from the repository
+   root (if `ad-next` loaded from another base directory, substitute it) and
+   take its JSON as the task evidence: the active task and the rule that chose
+   it, plan items done and open, open acceptance criteria and Definition of
+   Done items, recorded deviations, whether the plan approval preceded the
+   first implementing commit, roadmap progress, and unreadable files. Every
+   entry in `cannotTell` is an unknown fact in the packet, never a guess; the
+   `agentic-session` pane draws the same output, so the two cannot disagree.
+   Read the active task's Context for the rationale the script does not carry.
+   Only when the script is absent or fails, find the active task by hand: a
+   changed task file, then an explicit `in-progress` status, then the task
+   touched by the recent commit; read its Context, plan state, acceptance
+   criteria, and completion gates.
 4. Follow only load-bearing references from that active task to its spec, ADR or
    other governing decision, and PRD or product context. Stop when the project,
    final objective, current target, rationale, and done condition are clear.

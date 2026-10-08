@@ -13,7 +13,7 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   Definition of Done items, the deviations its Notes record, whether the plan
   approval preceded the first implementing commit, roadmap progress, and the
   session's receipt-gate shadow result; it says what it cannot tell instead of
-  guessing. The `agentic-session` pane reads it, and `/ad-brief` will
+  guessing. The `agentic-session` pane and `/ad-brief` read it
   (ADR-0090, GROUND-0043, task-0111).
 - The `agentic-session` plugin adds `/agentic-briefing`, which opens that
   briefing in a pane: the task and its status, the next plan step, progress

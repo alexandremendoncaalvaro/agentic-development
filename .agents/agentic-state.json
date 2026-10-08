@@ -125,7 +125,7 @@
         },
         {
           "path": ".agents/skills/ad-brief/SKILL.md",
-          "sourceSha": "9ea7e799806608e66ced86bfc79587d81f7dcda65e0e157ef29f4627db2efe48"
+          "sourceSha": "4e4de26f1d708490146448ea2d99f7c83e4a4187a107976305b0ee787633b7c0"
         }
       ]
     },
@@ -441,7 +441,7 @@
         },
         {
           "path": ".agents/skills/ad-next/scripts/briefing.mjs",
-          "sourceSha": "3f33304e63eea50563ae0900ed8f8c398e1d7aab1a9b2c256ff49cd84f53f30e"
+          "sourceSha": "e2f19687633346ec37aef98771c797075198be5404406fe126fa4f78877e0640"
         },
         {
           "path": ".agents/skills/ad-next/scripts/survey.mjs",
