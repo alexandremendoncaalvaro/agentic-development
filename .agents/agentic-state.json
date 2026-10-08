@@ -390,7 +390,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
-          "sourceSha": "ed4fdb3a3540f3f823d54b1c049cef680c20fd2d9324b5cf3cb6fee2bdcc32b2"
+          "sourceSha": "4b3885b21f75bc61b44009cdf91cacaccf25fe08e7c8d3dbf91a4d5ea46289c2"
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",

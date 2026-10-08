@@ -20,6 +20,9 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   remote-tracking ref, from local refs only; `/ad-next`, `/ad-roadmap` and
   `/ad-brief` carry a detached or behind checkout as a confidence limit
   (task-0100).
+- The `ad-hooks` workflow checkpoint ends with the installed kit version and
+  scope, read from the project's or the user's state file, so an agent on a
+  stale install sees it (task-0099).
 
 ### Fixed
 

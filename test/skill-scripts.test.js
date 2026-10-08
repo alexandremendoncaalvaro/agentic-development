@@ -4216,6 +4216,53 @@ test('workflow-checkpoint: AD_WORKFLOW_CHECKPOINT=0 kill switch → silent exit 
   assert.equal(runCheckpoint(PROMPT_EVENT, { AD_WORKFLOW_CHECKPOINT: '0' }), '');
 });
 
+// Task 0099: the checkpoint names the installed kit version it can resolve,
+// so a stale install is visible; nothing is added when none is found.
+function checkpointIn({ projectVersion = null, userVersion = null } = {}) {
+  const root = mkdtempSync(join(tmpdir(), 'agentic-checkpoint-version-'));
+  const cwd = join(root, 'project');
+  const home = join(root, 'home');
+  mkdirSync(join(cwd, '.claude'), { recursive: true });
+  mkdirSync(join(home, '.claude'), { recursive: true });
+  if (projectVersion) {
+    writeFileSync(
+      join(cwd, '.claude', 'agentic-state.json'),
+      JSON.stringify({ kitVersion: projectVersion })
+    );
+  }
+  if (userVersion) {
+    writeFileSync(
+      join(home, '.claude', 'agentic-state.json'),
+      JSON.stringify({ kitVersion: userVersion })
+    );
+  }
+  const event = JSON.stringify({ hook_event_name: 'UserPromptSubmit', cwd, prompt: 'x' });
+  try {
+    return runCheckpoint(event, { HOME: home, USERPROFILE: home });
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+test('regression: task-0099 workflow-checkpoint names the project install version first', () => {
+  const out = checkpointIn({ projectVersion: '9.9.9', userVersion: '1.0.0' });
+  assert.match(out, /\nInstalled agentic kit: 9\.9\.9 \(project scope\)\.\n$/);
+  assert.ok(out.length <= 900, `checkpoint must stay under 900 chars; got ${out.length}`);
+});
+
+test('regression: task-0099 workflow-checkpoint falls back to the user install version', () => {
+  assert.match(
+    checkpointIn({ userVersion: '1.3.0' }),
+    /\nInstalled agentic kit: 1\.3\.0 \(user scope\)\.\n$/
+  );
+});
+
+test('regression: task-0099 workflow-checkpoint adds nothing when no install state is found', () => {
+  const out = checkpointIn();
+  assert.doesNotMatch(out, /Installed agentic kit/);
+  assert.match(out, /^Workflow checkpoint \(agentic kit\)/);
+});
+
 // --- ad-hooks session-lifecycle handoff-chip reminder (ADR-0087) ---
 // PostToolUse: `hookSpecificOutput.additionalContext` on exit 0 reaches the
 // model on both hosts (GROUND-0034 E2). The claude-code copy is executed;

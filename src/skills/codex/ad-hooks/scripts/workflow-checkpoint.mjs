@@ -4,7 +4,8 @@
  * a Claude Code `UserPromptSubmit` hook: plain-text stdout on exit 0 is added
  * to the model's context before it processes the prompt (verified against
  * https://code.claude.com/docs/en/hooks). The event has no matcher and fires
- * on every prompt, so the checkpoint is static and never inspects the prompt.
+ * on every prompt, so the checkpoint never inspects the prompt; its text is fixed,
+ * followed by the installed kit version when a state file names one (Task 0099).
  *
  * Skills and CLAUDE.md are advisory; this hook is the deterministic delivery of
  * the kit's pipeline (de-risk or sharpen, ground, TDD, review per slice, audit
@@ -24,6 +25,8 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export const CHECKPOINT = [
@@ -43,7 +46,9 @@ export const CHECKPOINT = [
  * Any other value, including unset, keeps it on.
  */
 export function isEnabled(env) {
-  const raw = String(env.AD_WORKFLOW_CHECKPOINT ?? '').trim().toLowerCase();
+  const raw = String(env.AD_WORKFLOW_CHECKPOINT ?? '')
+    .trim()
+    .toLowerCase();
   return !(raw === '0' || raw === 'false' || raw === 'off');
 }
 
@@ -65,20 +70,54 @@ function readStdin() {
  * silence rather than a crash or a stray message.
  */
 export function isHookEvent(raw) {
+  return parseEvent(raw) !== null;
+}
+
+function parseEvent(raw) {
   const text = String(raw ?? '').trim();
-  if (!text) return false;
+  if (!text) return null;
   try {
     const event = JSON.parse(text);
-    return event !== null && typeof event === 'object' && !Array.isArray(event);
+    return event !== null && typeof event === 'object' && !Array.isArray(event) ? event : null;
   } catch {
-    return false;
+    return null;
   }
+}
+
+const STATE_DIRS = ['.claude', '.agents'];
+
+function recordedVersion(root) {
+  for (const dir of STATE_DIRS) {
+    try {
+      const state = JSON.parse(readFileSync(join(root, dir, 'agentic-state.json'), 'utf8'));
+      if (typeof state?.kitVersion === 'string' && state.kitVersion) return state.kitVersion;
+    } catch {
+      // An absent or unreadable state file names no version.
+    }
+  }
+  return null;
+}
+
+/**
+ * The installed kit version this session runs (Task 0099): the project
+ * install under the event's `cwd` wins over the user install, as the
+ * installer resolves them; read locally, never from the network. Null when
+ * neither state file names a version.
+ */
+export function installedKit(event, home = homedir()) {
+  const project = typeof event?.cwd === 'string' ? recordedVersion(event.cwd) : null;
+  if (project) return { version: project, scope: 'project' };
+  const user = recordedVersion(home);
+  return user ? { version: user, scope: 'user' } : null;
 }
 
 function main() {
   if (!isEnabled(process.env)) return;
-  if (!isHookEvent(readStdin())) return;
-  process.stdout.write(`${CHECKPOINT}\n`);
+  const event = parseEvent(readStdin());
+  if (!event) return;
+  const kit = installedKit(event, process.env.HOME || process.env.USERPROFILE || homedir());
+  const line = kit ? `\nInstalled agentic kit: ${kit.version} (${kit.scope} scope).` : '';
+  process.stdout.write(`${CHECKPOINT}${line}\n`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

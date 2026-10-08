@@ -318,11 +318,11 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
-          "sourceSha": "ed4fdb3a3540f3f823d54b1c049cef680c20fd2d9324b5cf3cb6fee2bdcc32b2"
+          "sourceSha": "4b3885b21f75bc61b44009cdf91cacaccf25fe08e7c8d3dbf91a4d5ea46289c2"
         },
         {
           "path": ".claude/skills/ad-hooks/SKILL.md",
-          "sourceSha": "878fe13cc24061a350d6fd25bf7e24e6af8307068654925054aa8e44f6521a48"
+          "sourceSha": "2573e58d9e91e5e975acd247e2012f442fbc21ed47988335e43c8dd9b2d1c258"
         }
       ]
     },
