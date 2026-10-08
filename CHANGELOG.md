@@ -6,6 +6,12 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- `/ad-audit`'s re-audit rebuilds every group handoff's rule text from the
+  files at the re-audit target and names that SHA, instead of reusing a prior
+  pass's handoff (task-0112).
+
 ## [1.3.0] - 2026-10-08
 
 ### Added

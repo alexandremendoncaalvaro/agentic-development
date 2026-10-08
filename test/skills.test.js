@@ -254,6 +254,25 @@ test('decision-maker briefing composition is one-way and visible in the workflow
   }
 });
 
+test('regression: task-0112 a re-audit rebuilds each group handoff from the files at its target', () => {
+  // Task 0111's re-audit reused the first pass's handoffs, so two groups'
+  // inline rule text predated the fixes under review.
+  for (const agent of ['claude-code', 'codex']) {
+    const audit = readFileSync(join(SKILLS_ROOT, agent, 'ad-audit', 'SKILL.md'), 'utf8');
+    const reaudit = audit.slice(audit.search(/RE-AUDIT/));
+    assert.match(
+      reaudit,
+      /rebuild[\s\S]{0,200}rule text[\s\S]{0,200}at the re-audit target[\s\S]{0,120}never[\s\S]{0,40}prior handoff/i,
+      `${agent} re-audit must rebuild rule text from the target, never a prior handoff`
+    );
+    assert.match(
+      reaudit,
+      /names? the (?:target )?SHA (?:its|the) rule text was read at/i,
+      `${agent} re-audit handoff must name the SHA its rule text was read at`
+    );
+  }
+});
+
 test('a standalone brief reads the work-in-progress briefing script on both hosts', () => {
   // ADR-0090 decision 3, task-0111 slice 3: the agentic-session pane and
   // /ad-brief read the same script, so they cannot disagree.
