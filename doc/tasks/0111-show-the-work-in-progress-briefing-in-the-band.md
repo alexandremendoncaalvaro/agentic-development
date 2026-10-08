@@ -258,6 +258,19 @@ remains the fallback when the script is absent or fails. A static test in
 `test/skills.test.js` pins the command, its order before the manual search,
 and `cannotTell`. Task 0106 closes with this task's audit.
 
+### 2026-10-08 — slice 3 review
+
+`/ad-review` on 6add09a..9598663, fresh context on both axes: no Blockers.
+Both axes raised the same Concern, accepted: `/ad-brief` ran the script
+without `--session`, so it "can never show the evidence-gate result", while
+its text said the pane and the brief "cannot disagree". No environment
+variable exposes the session id to the model (checked in this session), so
+the brief now adds `--session <session-id>` when the id is known and
+otherwise carries the gate as an unknown fact, never as "nothing would
+block"; the overclaim is gone, and the static test pins both. Notes taken:
+the test's order check now anchors on the manual search, and the script
+header no longer names the band.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
