@@ -267,10 +267,16 @@ test('a standalone brief reads the work-in-progress briefing script on both host
     const script = `node ${root}/skills/ad-next/scripts/briefing.mjs`;
     assert.ok(standalone.includes(script), `${agent} standalone brief must run ${script}`);
     assert.ok(
-      standalone.indexOf(script) < standalone.search(/active task/i),
+      standalone.indexOf(script) < standalone.search(/find the active task by hand/i),
       `${agent} must read the script before locating the active task by hand`
     );
     assert.match(standalone, /`cannotTell`/, `${agent} must carry the script's cannot-tell facts`);
+    assert.match(
+      standalone,
+      /`--session <session-id>`[\s\S]*gate[\s\S]*unknown/i,
+      `${agent} must pass a known session id and treat the gate as unknown without one`
+    );
+    assert.doesNotMatch(standalone, /cannot disagree/i, `${agent} must not overclaim agreement`);
   }
 });
 

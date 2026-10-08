@@ -5,8 +5,8 @@
  *
  *   node <skill-base-dir>/scripts/briefing.mjs [--session <session-id>]
  *
- * Prints one JSON object for the agentic-session plugin's band and pane and
- * for /ad-brief; the plugin displays it and computes nothing itself.
+ * Prints one JSON object for the agentic-session plugin's pane and for
+ * /ad-brief; the plugin displays it and computes nothing itself.
  *
  *   - task: the active task, `{ slug, rule, status }`. The rule is stated, not
  *     inferred: the single `in-progress` task (`single-in-progress`); else,

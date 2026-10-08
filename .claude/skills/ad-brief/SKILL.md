@@ -30,13 +30,16 @@ and the smallest sufficient live project evidence:
    `git log -1 --oneline`. Read a focused diff only when it changes the meaning
    of the current result.
 3. Run `node .claude/skills/ad-next/scripts/briefing.mjs` from the repository
-   root (if `ad-next` loaded from another base directory, substitute it) and
-   take its JSON as the task evidence: the active task and the rule that chose
-   it, plan items done and open, open acceptance criteria and Definition of
-   Done items, recorded deviations, whether the plan approval preceded the
-   first implementing commit, roadmap progress, and unreadable files. Every
-   entry in `cannotTell` is an unknown fact in the packet, never a guess; the
-   `agentic-session` pane draws the same output, so the two cannot disagree.
+   root (if `ad-next` loaded from another base directory, substitute it), adding
+   `--session <session-id>` when the session id is known, and take its JSON as
+   the task evidence: the active task and the rule that chose it, plan items
+   done and open, open acceptance criteria and Definition of Done items,
+   recorded deviations, whether the plan approval preceded the first
+   implementing commit, roadmap progress, the receipt gate's shadow result for
+   that session, and unreadable files. Every entry in `cannotTell` is an
+   unknown fact in the packet, never a guess; without a session id the gate is
+   one of them, never "nothing would block". The `agentic-session` pane reads
+   the same script with its own session id.
    Read the active task's Context for the rationale the script does not carry.
    Only when the script is absent or fails, find the active task by hand: a
    changed task file, then an explicit `in-progress` status, then the task
