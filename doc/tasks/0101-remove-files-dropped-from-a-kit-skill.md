@@ -20,14 +20,14 @@ same unchanged-file rule `removeOrphanSkills` applies.
 
 ## Acceptance Criteria
 
-- [ ] `update` removes a file recorded in state that the kit no longer ships, when the file is unchanged from its recorded digest.
-- [ ] A user-edited dropped file is kept and reported, never deleted silently.
-- [ ] Tests in `test/update.test.js` cover both cases.
+- [x] `update` removes a file recorded in state that the kit no longer ships, when the file is unchanged from its recorded digest.
+- [x] A user-edited dropped file is kept and reported, never deleted silently.
+- [x] Tests in `test/update.test.js` cover both cases.
 
 ## Plan
 
-- [ ] Red in `test/update.test.js`.
-- [ ] Green in `src/lib/install.js`.
+- [x] Red in `test/update.test.js`.
+- [x] Green in `src/lib/install.js`.
 - [ ] `CHANGELOG.md`; `/ad-review`; `/ad-commit`.
 
 ## Notes
@@ -42,6 +42,24 @@ Routed from the `/ad-level-up` curation of 2026-10-07, which the owner approved 
 
 The owner approved the kit hygiene batch ("ok"), built in one branch with
 Tasks 0112 and 0113.
+
+### 2026-10-08 — built
+
+`installSkills` now compares each skill's previously recorded files with the
+files it ships: a dropped file that still matches its recorded digest is
+removed (`-`), an edited one is kept and reported as `dropped-kept` (`!`),
+and both leave the state. `update` and `init` both print the two actions;
+`init` lacked the symbols and would have printed "undefined", caught by a
+regression test that spawns the CLI. Three regression tests in
+`test/update.test.js`; flipping the digest comparison turned both
+`installSkills` tests red, and removing `init`'s symbols turned the CLI test
+red. The fix needs the dropped file in the previous state, and each update
+rewrites the state with shipped files only, so a file dropped before this fix
+is no longer recorded and stays. The owner's user-scope Claude Code install
+still had `ad-spike/references/spike-adr-template.md`, unrecorded and
+byte-identical to the kit's copy before 86ab36d dropped it; it was deleted
+by hand on 2026-10-08. Other consumers with such a leftover keep it until a
+named migration removes it by fingerprint, which is not part of this task.
 
 ## Definition of Done
 
