@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-08
+
 ### Added
 
 - `/ad-next` ships `scripts/briefing.mjs` on both hosts: one JSON briefing of
