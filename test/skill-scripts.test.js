@@ -4710,3 +4710,90 @@ if (process.platform === 'win32' || process.getuid?.() === 0) {
     }
   });
 }
+
+// Task 0100: the packet says how far the checkout is from its default
+// branch's remote-tracking ref, from local refs only.
+function gitIn(cwd, ...args) {
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  return execFileSync(
+    'git',
+    ['-c', 'user.name=fixture', '-c', 'user.email=fixture@example.test', ...args],
+    { cwd, encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'pipe'] }
+  ).trim();
+}
+
+function clonedCheckout() {
+  const root = mkdtempSync(join(tmpdir(), 'agentic-project-state-checkout-'));
+  const origin = join(root, 'origin');
+  mkdirSync(origin);
+  gitIn(origin, 'init', '-q', '-b', 'main');
+  writeFileSync(join(origin, 'a.txt'), 'one\n');
+  gitIn(origin, 'add', '-A');
+  gitIn(origin, 'commit', '-qm', 'one');
+  const clone = join(root, 'clone');
+  gitIn(root, 'clone', '-q', origin, clone);
+  const advanceOrigin = (name) => {
+    writeFileSync(join(origin, `${name}.txt`), `${name}\n`);
+    gitIn(origin, 'add', '-A');
+    gitIn(origin, 'commit', '-qm', name);
+  };
+  return { root, origin, clone, advanceOrigin };
+}
+
+const NO_SOURCES = (dir) => ({
+  AGENTIC_PROJECT_SOURCES_FILE: join(dir, 'absent.json'),
+  HOME: dir,
+  USERPROFILE: dir,
+});
+
+test('regression: task-0100 project-state reports a checkout behind origin from fetched refs', () => {
+  const repo = clonedCheckout();
+  try {
+    repo.advanceOrigin('two');
+    repo.advanceOrigin('three');
+    gitIn(repo.clone, 'fetch', '-q');
+    const report = runProjectState(repo.clone, NO_SOURCES(repo.root));
+    assert.deepEqual(report.checkout, {
+      branch: 'main',
+      detached: false,
+      base: 'origin/main',
+      ahead: 0,
+      behind: 2,
+    });
+  } finally {
+    rmSync(repo.root, { recursive: true, force: true });
+  }
+});
+
+test('regression: task-0100 project-state reports current, detached and non-git checkouts', () => {
+  const repo = clonedCheckout();
+  const plain = mkdtempSync(join(tmpdir(), 'agentic-project-state-nogit-'));
+  try {
+    assert.deepEqual(runProjectState(repo.clone, NO_SOURCES(repo.root)).checkout, {
+      branch: 'main',
+      detached: false,
+      base: 'origin/main',
+      ahead: 0,
+      behind: 0,
+    });
+
+    repo.advanceOrigin('two');
+    gitIn(repo.clone, 'fetch', '-q');
+    gitIn(repo.clone, 'checkout', '-q', '--detach', 'HEAD');
+    assert.deepEqual(runProjectState(repo.clone, NO_SOURCES(repo.root)).checkout, {
+      branch: null,
+      detached: true,
+      base: 'origin/main',
+      ahead: 0,
+      behind: 1,
+    });
+
+    assert.equal(runProjectState(plain, NO_SOURCES(plain)).checkout, null);
+  } finally {
+    rmSync(repo.root, { recursive: true, force: true });
+    rmSync(plain, { recursive: true, force: true });
+  }
+});

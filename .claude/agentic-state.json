@@ -101,7 +101,7 @@
         },
         {
           "path": ".claude/skills/ad-brief/SKILL.md",
-          "sourceSha": "03ea5425da7a6f349d4dd74a4ae3285e79e5a06af3251cb8f580900f5522689a"
+          "sourceSha": "0676c9836849279ff6878c87dc635c3c6ca906682737bb2f290065f489c5c912"
         }
       ]
     },
@@ -365,7 +365,7 @@
         },
         {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "85be250f3c2a5f2e501e5c3317aa8a3c1e0fe53ab4f56e07186d4d9d40e1a2d0"
+          "sourceSha": "9a510e39b0bc1cddd4c407fb9d12ac4f4ca8f2876da405dbe9f88ccf79deafc0"
         }
       ]
     },
@@ -470,11 +470,11 @@
         },
         {
           "path": ".claude/skills/ad-project-state/scripts/project-state.mjs",
-          "sourceSha": "5d08d9d4ca16f9e67b37888d48d5083ddcabece17144abf7345492fbb50cbbf5"
+          "sourceSha": "2dc7bf19d4972bfba116108bd7a557ec722f782cb95c850710a722c6852fa19e"
         },
         {
           "path": ".claude/skills/ad-project-state/SKILL.md",
-          "sourceSha": "6c15c38ef1ed3497857449417d6770db7d9e4d0272ce166b8a81d31b83bacd17"
+          "sourceSha": "64524e9d99992d503aa04938ff98fc16cb004f184a855ddd9869c1b3ffcac9e1"
         }
       ]
     },
@@ -617,7 +617,7 @@
         },
         {
           "path": ".claude/skills/ad-roadmap/SKILL.md",
-          "sourceSha": "f505a5b6adebcb581d9c584e26ea7bd420402ab8bd1c37028687f1ddb4de177e"
+          "sourceSha": "b8480926dc9738a02565b31883fbe9c5ce1454988a989b0e5e5bcf29daefbeb1"
         }
       ]
     },

@@ -99,6 +99,35 @@ function originRemotes(repoRoot, environment) {
   }
 }
 
+// The checkout against its default branch's remote-tracking ref, from local
+// refs only (no fetch): a state read from a stale or detached tree says so
+// (Task 0100). Null outside a git repository.
+function checkoutState(repoRoot, environment) {
+  const env = cleanGitEnvironment(environment);
+  const git = (args) => command('git', args, repoRoot, env);
+  if (!git(['rev-parse', '--is-inside-work-tree']).ok) return null;
+  const branch = git(['symbolic-ref', '--short', '-q', 'HEAD']);
+  const head = git(['symbolic-ref', '--short', '-q', 'refs/remotes/origin/HEAD']);
+  const base = head.ok
+    ? head.stdout
+    : ['origin/main', 'origin/master'].find(
+        (ref) => git(['rev-parse', '--verify', '-q', ref]).ok
+      ) || null;
+  let ahead = null;
+  let behind = null;
+  if (base) {
+    const counts = git(['rev-list', '--left-right', '--count', `HEAD...${base}`]);
+    if (counts.ok) [ahead, behind] = counts.stdout.split(/\s+/).map(Number);
+  }
+  return {
+    branch: branch.ok && branch.stdout ? branch.stdout : null,
+    detached: !(branch.ok && branch.stdout),
+    base,
+    ahead,
+    behind,
+  };
+}
+
 function configurationFailure(path, code, message) {
   return { sourceId: 'configuration', code, path, message };
 }
@@ -403,6 +432,7 @@ export function projectStateReport({ repoRoot = process.cwd(), environment = pro
       matchedRemote: null,
     },
     sources: resolvedSources,
+    checkout: checkoutState(repoRoot, environment),
     failures,
   };
 }

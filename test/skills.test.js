@@ -254,6 +254,19 @@ test('decision-maker briefing composition is one-way and visible in the workflow
   }
 });
 
+test('regression: task-0100 state skills pass a detached or behind checkout on as a confidence limit', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    for (const skill of ['ad-roadmap', 'ad-next', 'ad-brief']) {
+      const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+      assert.match(
+        body,
+        /`checkout`[\s\S]{0,160}(?:detached|behind)[\s\S]{0,200}confidence limit/i,
+        `${agent} ${skill} must carry the packet's checkout state as a confidence limit`
+      );
+    }
+  }
+});
+
 test('regression: task-0098 review and audit handoffs are written without shell interpolation', () => {
   // zsh echo turned a \\b into a backspace (Task 0092), and an unquoted
   // heredoc ran the backtick spans of an embedded diff as commands.

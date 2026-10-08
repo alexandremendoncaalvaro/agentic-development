@@ -15,6 +15,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   tool or a program that writes the bytes as given, never with `echo` or an
   unquoted heredoc, which can rewrite escapes or run an embedded diff's
   backtick spans (task-0098).
+- `/ad-project-state`'s packet reports the checkout's branch or detached
+  state and how far it is ahead of or behind its default branch's
+  remote-tracking ref, from local refs only; `/ad-next`, `/ad-roadmap` and
+  `/ad-brief` carry a detached or behind checkout as a confidence limit
+  (task-0100).
 
 ### Fixed
 

@@ -125,7 +125,7 @@
         },
         {
           "path": ".agents/skills/ad-brief/SKILL.md",
-          "sourceSha": "56730aadc0e78143d7d091887f7b50837ae3a8f549b4308e05d1d31e22047bf3"
+          "sourceSha": "ddcca369bf10ba6bde9f9cf93fa6e751a7b9e842dabf5aa560a9d17a0ba299e3"
         }
       ]
     },
@@ -449,7 +449,7 @@
         },
         {
           "path": ".agents/skills/ad-next/SKILL.md",
-          "sourceSha": "e69c7d66cfbdc9e0c138b8bbdc13dfbfda1771ac3207717bf8945fadcb0654d1"
+          "sourceSha": "2c5ed0ecaa95b61fe4c8baef709f37b0f5df3d93f55237a7fbf89c94bf2216cb"
         }
       ]
     },
@@ -574,11 +574,11 @@
         },
         {
           "path": ".agents/skills/ad-project-state/scripts/project-state.mjs",
-          "sourceSha": "5d08d9d4ca16f9e67b37888d48d5083ddcabece17144abf7345492fbb50cbbf5"
+          "sourceSha": "2dc7bf19d4972bfba116108bd7a557ec722f782cb95c850710a722c6852fa19e"
         },
         {
           "path": ".agents/skills/ad-project-state/SKILL.md",
-          "sourceSha": "1d801cfa062ccd0b5483b86b29b53ac3c597fcb5b4d30b7517c6abb6a89ea0ff"
+          "sourceSha": "7832c9695a8e19703466711505e7164ecd93756d5a37f719c387ceb69c8c9967"
         }
       ]
     },
@@ -753,7 +753,7 @@
         },
         {
           "path": ".agents/skills/ad-roadmap/SKILL.md",
-          "sourceSha": "aa7ccfdcdcd39939face27747f4052b2e2bbadca262cbb92bf448ec47a3f8457"
+          "sourceSha": "737fc88237e3f832f989dd90f2721a912ed5e57e70708985608bc31056de880a"
         }
       ]
     },

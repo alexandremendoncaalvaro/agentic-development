@@ -24,7 +24,7 @@ and the smallest sufficient live project evidence:
 1. Invoke `/ad-project-state` and preserve its selected source roles,
    provenance, observation time, bounded work summaries, and failures. This
    supplies project-wide activity; it does not replace the repository checks
-   below or authorize publication.
+   below or authorize publication. When its `checkout` is detached or behind its base, the brief carries that as a confidence limit.
 2. Run `git status --short`, read the current branch with
    `git branch --show-current`, and inspect the most recent commit with
    `git log -1 --oneline`. Read a focused diff only when it changes the meaning
