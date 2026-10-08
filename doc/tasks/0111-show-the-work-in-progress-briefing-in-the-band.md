@@ -326,6 +326,39 @@ listed no session id variable. The hard-coded `main` base stays with Task
 measured median above. Not taken: the short parameter names (`b`, `el`),
 a style nit in small pure functions.
 
+### 2026-10-08 — branch re-audit
+
+Re-audit of 99356ec (tree e4c3adb), the seven groups the fixes touched (CV,
+critical, with two cross-model passes; ARCHITECTURE.md; CONTEXT.md; ADR-0030;
+ADR-0057; ADR-0090; GUIDELINES.md); HK, AGENTS.md, ADR-0048, ADR-0088 and
+ADR-0089 keep their first-pass verdicts, since the fixes did not touch their
+subjects. Gate: `npm run verify` 1376 of 1376. No blockers, no violations.
+
+The first audit's target f26649d was rewritten into 5045d46 and d059cf9;
+d059cf9 has f26649d's tree (c4f14afe), so its findings apply unchanged. The
+19 findings with their severity and the re-audit's disposition: 1 major,
+2 major, 3 minor, 4 minor, 5 nit (ARCHITECTURE.md) resolved; 6 major (CV.8)
+resolved, re-enumerated at HEAD as seven; 7 minor (CV.3) resolved; 8 nit
+(CV.1) resolved, tree-identical split; 9 major (CV.5) rejection upheld;
+10 minor (CV.5) accepted as exploratory; 11 minor (CV.7) resolved; 12 minor
+(CV.5) accepted, disclosed; 13 minor (CV.1) resolved; 14 minor and 15 minor
+(GUIDELINES.md) resolved; 16 nit rejected; 17 minor and 18 minor accepted;
+19 minor (CONTEXT.md) resolved. The slice 2 entry's "exactly the seven" holds
+again at HEAD, corrected by the branch audit entry above.
+
+New in the re-audit, all minor: ADR-0057 decision 4 asks for a scratch
+`init` that shows a new script installs, and none was recorded. Run at
+99356ec in a scratch repository with `init --agent both --scope project -y`:
+`briefing.mjs` installed under `.claude/` and `.agents/`, both `ad-brief`
+copies carry `--session <session-id>`, the script ran there and reported
+`task`, `roadmap`, `gate` and `git` as unknown; the user-scope install was
+untouched. Also minor: the pane's one-line "No briefing" message against
+decision 2's "draws nothing" (recorded above as a decision); two test files
+missing from ARCHITECTURE.md's test layout, a gap already on main; and a
+process slip in this audit: the re-audit handoffs reused the first pass's
+inline rule text, so two reviewers audited against the files on disk
+instead, which they reported.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

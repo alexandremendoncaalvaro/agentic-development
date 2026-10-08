@@ -1,6 +1,6 @@
 # Task `0106`: Show the evidence-gate shadow result in the band
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-07
 **Scope ref:** doc/product/PRD.md (Next tier, Optional Claude Code companion plugin)
 **Evidence ref:** doc/research/0035-ground-claude-code-session-plugin.md
@@ -33,7 +33,7 @@ acceptance criteria are written against that ADR's receipt format.
 ## Plan
 
 - [x] Wait for the evidence-gates ADR and its shadow-mode slice; then red, then green in `test/session-plugin.test.js` and the plugin's pure module.
-- [ ] Live check; docs; `/ad-review`; `/ad-audit`; `/ad-commit`.
+- [x] Live check; docs; `/ad-review`; `/ad-audit`; `/ad-commit`.
 
 ## Notes
 
@@ -73,11 +73,18 @@ addendum of 2026-10-08), so the criteria above are amended to the pane. Tests:
 `test/session-plugin.test.js` (the pane's gate row in each state). The audit
 before the pull request remains.
 
+### 2026-10-08 — closed
+
+Task 0111's branch audit and re-audit covered this display (no blockers;
+`npm run verify` 1376 of 1376 at 99356ec). The owner saw the gate row in the
+pane during Task 0111's live check. Closed; the pull request lands it with
+Task 0111.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
