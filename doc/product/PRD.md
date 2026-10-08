@@ -2,7 +2,7 @@
 
 Status: accepted
 Created: 2026-05-11
-Updated: 2026-09-21
+Updated: 2026-10-08
 Owner: Alexandre Alvaro
 
 ## Product
@@ -62,15 +62,16 @@ Multi-feature scope tiers. Delivered capability is listed once; pending work rem
 - **MVP tier — Layer 4 Spec.** `ad-spec` feature-level specs at `doc/specs/`.
 - **MVP tier — Layer 5 Plan/Decisions.** `ad-architecture`, `ad-adr`, `ad-task` — ARCHITECTURE, ADRs, tasks.
 - **MVP tier — Workflow-operational core.** `ad-philosophy`, `ad-ground`, `ad-grill-me`, `ad-spike`, `ad-tdg`, `ad-tdd`, `ad-diagnose`, `ad-review`, `ad-audit`, `ad-level-up`, `ad-next`, `ad-drift`, `ad-deepen`, `ad-commit`, `ad-pr`, `ad-merge`, `ad-release`, `ad-hooks`, `ad-handoff`, `ad-subagent`, `ad-research`, `ad-derisk`, `ad-prism`, `ad-roadmap`, `ad-question-me`, `ad-voice`, and `ad-voice-tune`.
-- **Next tier — AGENTS ↔ GUIDELINES reciprocity automation.** `ad-bootstrap` writes pointer stubs (instead of inline rules) when `GUIDELINES.md` exists; `ad-drift` flags duplication.
-- **Next tier — Community-facing docs (`CONTRIBUTING.md` / `SECURITY.md`) scaffolds.** GitHub-conventional companion to `AGENTS.md`.
-- **Next tier — Optional runtime layer of deterministic host hooks.** Run the kit's existing artifact validators from the native lifecycle hooks of Claude Code and Codex, feed a failure back to the agent within the turn, and record the gate's evidence in a shape the skill eval harness can grade. Feedback-first, opt-in, skills-only mode stays valid; a blocking guard or a repair loop is a later slice behind its own decision. Grounded in `doc/research/0026-runtime-layer-deterministic-host-hooks.md`.
-- **Next tier — Optional Claude Code companion plugin.** The owner chose plugin-marketplace distribution for host-native add-ons on 2026-10-07: an opt-in Claude Code plugin, published from this repository's marketplace, beside the `agentic` installer and never replacing it. Its first member is a context band that appears above a configurable fill threshold with a one-press `/ad-handoff`. Skills stay installer-distributed. Grounded in `doc/research/0033-host-native-enforcement-layer.md` (spike result) and `doc/research/0035-ground-claude-code-session-plugin.md`.
+- **Shipped tier — AGENTS ↔ GUIDELINES reciprocity automation.** `ad-bootstrap` writes pointer stubs (instead of inline rules) when `GUIDELINES.md` exists; `ad-drift` flags duplication (its `constitutionReciprocity` scan).
+- **Shipped tier — Community-facing docs (`CONTRIBUTING.md` / `SECURITY.md`) scaffolds.** GitHub-conventional companion to `AGENTS.md`, shipped as `ad-community-docs`.
+- **Shipped tier — Optional runtime layer of deterministic host hooks.** Run the kit's existing artifact validators from the native lifecycle hooks of Claude Code and Codex, feed a failure back to the agent within the turn, and record the gate's evidence in a shape the skill eval harness can grade. Feedback-first, opt-in, skills-only mode stays valid; a blocking guard or a repair loop is a later slice behind its own decision. Grounded in `doc/research/0026-runtime-layer-deterministic-host-hooks.md`; shipped as the `ad-hooks` artifact-validator gate under ADR-0083.
+- **Shipped tier — Optional Claude Code companion plugin.** The owner chose plugin-marketplace distribution for host-native add-ons on 2026-10-07: an opt-in Claude Code plugin, published from this repository's marketplace, beside the `agentic` installer and never replacing it. Its first member is a context band that appears above a configurable fill threshold with a one-press `/ad-handoff`. Skills stay installer-distributed. Grounded in `doc/research/0033-host-native-enforcement-layer.md` (spike result) and `doc/research/0035-ground-claude-code-session-plugin.md`; shipped under ADR-0088, with the work-in-progress briefing pane added under ADR-0090.
 - **Later tier — Per-language guideline presets.** `ad-guidelines` ships canned templates for Rust / Python / Go / TypeScript / C++ beyond the current per-language detection.
-- **Later tier — Skill eval harness.** Trajectory eval per `WORKFLOW.md` §13, applied to each shipped skill against a fixture corpus.
-- **Later tier — Example-grounded publication and reporting.** Investigate separate `ad-publish` and `ad-report` skills that use a shared, human-curated exemplar library to produce audience-aware collaboration posts and standalone reports while preserving the owner's voice through `ad-voice`.
+- **Next tier — Skill eval harness coverage.** Trajectory eval per `WORKFLOW.md` §13, applied to each shipped skill against a fixture corpus. The harness itself shipped under ADR-0080 (`eval/`, replay and live lanes); the corpus covers a subset of the shipped skills, so per-skill coverage remains.
+- **Shipped tier — Example-grounded publication and reporting.** Separate `ad-publish` and `ad-report` skills that use a shared, human-curated exemplar library to produce audience-aware collaboration posts and standalone reports while preserving the owner's voice through `ad-voice`.
 - **Shipped tier — Configurable project evidence sources.** State-reading skills keep the repository as the zero-configuration baseline and may reconcile explicitly configured GitHub issues and pull requests through one shared, provenance-bearing fact packet.
-- **Current tier — 1.0 release readiness.** `main` is the sole development branch. ADR-0078 requires the MVP feature surface, the Node 22.13 / 24 compatibility matrix, one shared lint/format/test/dependency-audit gate, verified repository secret controls, and clean own-dogfood review, audit, drift, and package evidence before publication.
+- **Shipped tier — 1.0 release readiness.** `main` is the sole development branch. ADR-0078 requires the MVP feature surface, the Node 22.13 / 24 compatibility matrix, one shared lint/format/test/dependency-audit gate, verified repository secret controls, and clean own-dogfood review, audit, drift, and package evidence before publication. Released as 1.0.0; 1.2.0 is the latest release.
+- **Current tier — Workflow receipt gates, evaluated in shadow.** The receipt gates of ADR-0089 log, without blocking, whether a landing action's required step left a receipt; a frozen evaluation (`doc/research/0042-prism-receipt-gates-shadow-run.md`) decides which checks may later enforce.
 
 ## Constraints
 
