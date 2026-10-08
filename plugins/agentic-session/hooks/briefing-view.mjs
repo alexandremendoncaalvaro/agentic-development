@@ -1,31 +1,11 @@
-// The briefing's display rule, kept free of the engine interface so node:test
+// The briefing pane's model, kept free of the engine interface so node:test
 // covers it (ADR-0090, task-0111). register.mjs feeds it the JSON that the
-// kit's ad-next/scripts/briefing.mjs prints; nothing here computes a fact.
+// kit's ad-next/scripts/briefing.mjs prints and draws what it returns; nothing
+// here establishes a fact the script did not report.
 
 // The task's number from its slug, `0111-show-...` -> `0111`.
 function taskNumber(slug) {
   return slug.split('-')[0];
-}
-
-// A plan item up to its first colon: `Slice 2, the band and the pane: red...`
-// names the step without its detail.
-function stepName(item) {
-  return item.split(':')[0].trim();
-}
-
-export function briefingLine(briefing) {
-  const { task, plan, acceptance, deviations, approval, gate } = briefing;
-  const gatePart = gate ? [`gate: ${gate.wouldBlock} would-block`] : [];
-  if (!task) return ['No single active task', ...gatePart].join(' · ');
-  const parts = [`Task ${taskNumber(task.slug)} ${task.status}`];
-  if (plan.open.length) parts.push(`next: ${stepName(plan.open[0])}`);
-  parts.push(`plan ${plan.done.length}/${plan.done.length + plan.open.length}`);
-  parts.push(`${acceptance.open.length} criteria open`);
-  if (deviations.length) {
-    parts.push(`${deviations.length} deviation${deviations.length === 1 ? '' : 's'}`);
-  }
-  if (approval.precedesFirstImplementingCommit === false) parts.push('code before plan approval');
-  return [...parts, ...gatePart].join(' · ');
 }
 
 // The script's briefing from a $.process.run result, or null when the run
@@ -54,73 +34,129 @@ const RULES = {
   'newest-commit-ahead': 'newest commit ahead of main',
 };
 
-const box = (done) => (done ? '[x]' : '[ ]');
+// A task title from its slug: `0111-show-the-work-in-progress-...` ->
+// `Show the work in progress ...`.
+function taskTitle(slug) {
+  const words = slug.split('-').slice(1).join(' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
 
-function approvalLines(approval) {
+function nextStep(plan) {
+  if (!plan.open.length) return null;
+  const item = plan.open[0];
+  const cut = item.indexOf(':');
+  return cut === -1
+    ? { step: item.trim(), detail: '' }
+    : { step: item.slice(0, cut).trim(), detail: item.slice(cut + 1).trim() };
+}
+
+function approvalHealth(approval) {
   const order = approval.precedesFirstImplementingCommit;
-  if (!approval.entry) {
-    return [order === false ? 'none recorded, and code is committed' : 'none recorded yet'];
+  if (order === true) return { value: 'before the first code', level: 'ok' };
+  if (order === false) {
+    const value = approval.entry ? 'after code was committed' : 'missing, and code is committed';
+    return { value, level: 'warn' };
   }
-  if (order === true) return [approval.entry, 'recorded before the first implementing commit'];
-  if (order === false) return [approval.entry, 'recorded after code was committed'];
-  return [approval.entry, 'cannot tell the order'];
+  return approval.entry
+    ? { value: 'order unknown', level: 'unknown' }
+    : { value: 'not approved yet', level: 'ok' };
 }
 
-function taskSections(b) {
-  return [
-    {
-      title: 'Task',
-      lines: [b.task.slug, `${b.task.status}, chosen by: ${RULES[b.task.rule] ?? b.task.rule}`],
-    },
-    {
-      title: 'Plan',
-      lines: [
-        ...b.plan.done.map((item) => `${box(true)} ${item}`),
-        ...b.plan.open.map((item) => `${box(false)} ${item}`),
-      ],
-    },
-    { title: 'Open criteria', lines: b.acceptance.open.map((item) => `${box(false)} ${item}`) },
-    {
-      title: 'Definition of Done',
-      lines: b.definitionOfDone.open.map((item) => `${box(false)} ${item}`),
-    },
-    { title: 'Plan approval', lines: approvalLines(b.approval) },
-    {
-      title: 'Deviations',
-      lines: b.deviations.length
-        ? b.deviations.map((d) => `${d.heading}: ${d.text}`)
-        : ['none recorded'],
-    },
-  ];
+function gateHealth(gate) {
+  if (!gate) return { value: 'no evidence for this session', level: 'unknown' };
+  return {
+    value: `${gate.wouldBlock} of ${gate.lines} checks would block`,
+    level: gate.wouldBlock ? 'warn' : 'ok',
+  };
 }
 
-// The pane's sections, in reading order; a fact the briefing could not
-// establish reads "cannot tell" with its reason, never a default value.
-export function paneSections(b) {
-  const sections = b.task
-    ? taskSections(b)
-    : [{ title: 'Task', lines: ['cannot tell: no single in-progress task'] }];
-  sections.push({
-    title: 'Roadmap',
-    lines: b.roadmap
-      ? [
-          `${b.roadmap.tasksDone} of ${b.roadmap.tasksTotal} tasks done (PRD ${b.roadmap.prdStatus})`,
-        ]
-      : ['cannot tell: no doc/product/PRD.md'],
-  });
-  sections.push({
-    title: 'Gate (shadow)',
-    lines: b.gate
-      ? [
-          `${b.gate.lines} checks logged, ${b.gate.wouldBlock} would-block`,
-          ...(b.gate.last
-            ? [`last: ${b.gate.last.action}, ${b.gate.last.check}, ${b.gate.last.state}`]
-            : []),
-        ]
-      : ['cannot tell: no evidence for this session'],
-  });
+// The pane's model: what the pane draws, derived only from the briefing.
+export function paneModel(b) {
+  const progress = [];
+  if (b.task) {
+    progress.push(
+      { label: 'Plan', done: b.plan.done.length, total: b.plan.done.length + b.plan.open.length },
+      {
+        label: 'Criteria',
+        done: b.acceptance.done,
+        total: b.acceptance.done + b.acceptance.open.length,
+      },
+      {
+        label: 'Definition of Done',
+        done: b.definitionOfDone.done,
+        total: b.definitionOfDone.done + b.definitionOfDone.open.length,
+      }
+    );
+  }
+  if (b.roadmap) {
+    progress.push({
+      label: 'Roadmap tasks',
+      done: b.roadmap.tasksDone,
+      total: b.roadmap.tasksTotal,
+    });
+  }
+  const health = [];
+  if (b.task) {
+    health.push({ label: 'Plan approval', ...approvalHealth(b.approval) });
+    health.push(
+      b.deviations.length
+        ? { label: 'Deviations', value: `${b.deviations.length} recorded`, level: 'warn' }
+        : { label: 'Deviations', value: 'none recorded', level: 'ok' }
+    );
+  }
+  health.push({ label: 'Gate (shadow)', ...gateHealth(b.gate) });
+  return {
+    header: b.task
+      ? {
+          number: taskNumber(b.task.slug),
+          title: taskTitle(b.task.slug),
+          status: b.task.status,
+          chosenBy: RULES[b.task.rule] ?? b.task.rule,
+        }
+      : null,
+    next: b.task ? nextStep(b.plan) : null,
+    progress,
+    health,
+  };
+}
+
+const checklist = (items, done) => items.map((item) => `- [${done ? 'x' : ' '}] ${item}`);
+
+// The pane's detail block, as Markdown: checklists the surface draws as such.
+export function detailsMarkdown(b) {
+  const blocks = [];
+  if (b.task) {
+    blocks.push(['#### Plan', ...checklist(b.plan.done, true), ...checklist(b.plan.open, false)]);
+    if (b.acceptance.open.length) {
+      blocks.push(['#### Open criteria', ...checklist(b.acceptance.open, false)]);
+    }
+    if (b.definitionOfDone.open.length) {
+      blocks.push(['#### Definition of Done', ...checklist(b.definitionOfDone.open, false)]);
+    }
+    if (b.deviations.length) {
+      blocks.push(['#### Deviations', ...b.deviations.map((d) => `- **${d.heading}**: ${d.text}`)]);
+    }
+  }
   if (b.unreadable.length) {
-    sections.push({ title: 'Unreadable', lines: b.unreadable.map((u) => `${u.path} (${u.code})`) });
+    blocks.push(['#### Unreadable', ...b.unreadable.map((u) => `- \`${u.path}\` (${u.code})`)]);
   }
-  return sections;
+  return blocks.map((lines) => `${lines.join('\n')}\n`).join('\n');
+}
+
+const share = ({ done, total }) => (total > 0 ? Math.min(1, done / total) : 0);
+
+export function progressText(item, cells) {
+  const filled = Math.round(share(item) * cells);
+  return `${'█'.repeat(filled)}${'░'.repeat(cells - filled)} ${item.done}/${item.total}`;
+}
+
+// A rounded bar: the track in a muted tone, the fill in the accent.
+export function progressSvg(item, width) {
+  const filled = Math.round(share(item) * width);
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="8" viewBox="0 0 ${width} 8">` +
+    `<rect class="track" x="0" y="0" width="${width}" height="8" rx="4" fill="#8884"/>` +
+    `<rect class="fill" x="0" y="0" width="${filled}" height="8" rx="4" fill="#d97757"/>` +
+    '</svg>'
+  );
 }

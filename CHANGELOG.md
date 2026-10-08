@@ -13,15 +13,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   Definition of Done items, the deviations its Notes record, whether the plan
   approval preceded the first implementing commit, roadmap progress, and the
   session's receipt-gate shadow result; it says what it cannot tell instead of
-  guessing. The `agentic-session` band and `/ad-brief` will read it
+  guessing. The `agentic-session` pane reads it, and `/ad-brief` will
   (ADR-0090, GROUND-0043, task-0111).
-- The `agentic-session` plugin shows that briefing in its band above the prompt
-  (task, next plan step, open items, deviations, code before plan approval, the
-  gate's would-block count), and `/agentic-briefing` opens the full briefing in
-  a pane. The band runs the installed script on session start, after each turn
-  and after a compaction, and draws nothing when the script is absent or fails;
-  the context reading and the handoff button still appear only past the
-  threshold (ADR-0090, task-0111).
+- The `agentic-session` plugin adds `/agentic-briefing`, which opens that
+  briefing in a pane: the task and its status, the next plan step, progress
+  bars, health marks for plan approval, deviations and the gate, and the open
+  items as checklists. It runs the installed script on session start, after
+  each turn and after a compaction, and draws nothing when the script is absent
+  or fails; the band keeps only the context reading (ADR-0090, task-0111).
 
 ## [1.2.0] - 2026-10-08
 

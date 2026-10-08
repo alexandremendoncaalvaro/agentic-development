@@ -1,16 +1,23 @@
-// agentic-session: a band above the prompt with the work-in-progress briefing
-// and, past the user's threshold, the context reading with a one-press
-// /ad-handoff (ADR-0088, ADR-0090, tasks 0104 and 0111); /agentic-briefing
-// opens the full briefing in a pane. Shaped on Anthropic's token-weather
-// sample: read on session start, after each main-loop turn and after a
-// compaction, never on every draw. The briefing is the kit script's output,
-// displayed as printed; the plugin computes no fact. The engine reads on(...)
-// and $.noun.method(...) from source, so they are spelled literally, and
-// helpers that take $ are top-level functions. A threshold changed in /config
-// reloads the module with the new options.
+// agentic-session: a context band above the prompt with a one-press
+// /ad-handoff, drawn only at or above the user's threshold (ADR-0088,
+// task-0104), and /agentic-briefing, which opens the work-in-progress briefing
+// in a pane (ADR-0090, task-0111). Shaped on Anthropic's token-weather sample:
+// read on session start, after each main-loop turn and after a compaction,
+// never on every draw. The briefing is the kit script's output, drawn as
+// printed; the plugin establishes no fact. The engine reads on(...) and
+// $.noun.method(...) from source, so they are spelled literally, and helpers
+// that take $ are top-level functions. A threshold changed in /config reloads
+// the module with the new options.
 
 import { HANDOFF_LABEL, bandLabel, fillReading, normalizeThreshold, shouldShow } from './band.mjs';
-import { briefingLine, paneSections, readBriefing, scriptCandidates } from './briefing-view.mjs';
+import {
+  detailsMarkdown,
+  paneModel,
+  progressSvg,
+  progressText,
+  readBriefing,
+  scriptCandidates,
+} from './briefing-view.mjs';
 
 const PANE = 'agentic-briefing';
 const PANE_TITLE = 'Briefing';
@@ -53,55 +60,149 @@ export function register(on, options) {
   });
 
   on('ui.render', { component: 'AbovePrompt' }, ($, e, next) => {
-    const showContext = shouldShow(state.fill, threshold);
-    if (e.hasSurvey || (!state.briefing && !showContext)) return next(e);
+    if (e.hasSurvey || !shouldShow(state.fill, threshold)) return next(e);
     const { Box, Text, Button } = $.ui.resolve(e);
-    const children = [];
-    if (state.briefing) {
-      children.push(
-        Text({ dimColor: true, wrap: 'truncate-end', children: briefingLine(state.briefing) })
-      );
-    }
-    if (showContext) {
-      children.push(
-        Box({
-          flexDirection: 'row',
-          children: [
-            Text({ dimColor: true, children: bandLabel(state.fill) }),
-            Button({ key: 'handoff', label: HANDOFF_LABEL, onPress: () => submitHandoff($) }),
-          ],
-        })
-      );
-    }
-    return Box({ flexDirection: 'row', justifyContent: 'space-between', paddingX: 1, children });
+    return Box({
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingX: 1,
+      children: [
+        Text({ dimColor: true, children: bandLabel(state.fill) }),
+        Button({ key: 'handoff', label: HANDOFF_LABEL, onPress: () => submitHandoff($) }),
+      ],
+    });
   });
 
-  on('ui.render', { component: 'Pane', requestId: PANE }, ($, e) => {
-    const { Box, Text } = $.ui.resolve(e);
-    if (!state.briefing) {
-      return Box({
-        flexDirection: 'column',
-        children: [
-          Text({
-            dimColor: true,
-            children: 'No briefing: the kit script is not installed or did not run.',
-          }),
-        ],
-      });
-    }
+  on('ui.render', { component: 'Pane', requestId: PANE }, ($, e) => drawPane($, e, state.briefing));
+}
+
+const LEVEL_COLOR = { ok: 'green', warn: 'yellow', unknown: 'gray' };
+const ACCENT = '#d97757';
+const BAR_PX = 160;
+const BAR_CELLS = 16;
+const MARKDOWN_LIMIT = 10_000;
+
+function drawPane($, e, briefing) {
+  const el = $.ui.resolve(e);
+  const { Box, Text } = el;
+  if (!briefing) {
     return Box({
-      flexDirection: 'column',
-      children: paneSections(state.briefing).map((section) =>
-        Box({
-          flexDirection: 'column',
-          marginBottom: 1,
-          children: [
-            Text({ bold: true, children: section.title }),
-            ...section.lines.map((line) => Text({ children: line })),
-          ],
-        })
-      ),
+      padding: 1,
+      children: [
+        Text({
+          dimColor: true,
+          children: 'No briefing: the kit script is not installed or did not run.',
+        }),
+      ],
     });
+  }
+  const model = paneModel(briefing);
+  const details = detailsMarkdown(briefing).slice(0, MARKDOWN_LIMIT);
+  return Box({
+    flexDirection: 'column',
+    gap: 1,
+    paddingX: 1,
+    children: [
+      headerCard(el, model),
+      ...(model.next ? [nextCard(el, model.next)] : []),
+      ...(model.progress.length
+        ? [
+            section(
+              el,
+              'Progress',
+              model.progress.map((p) => progressRow(el, e, p))
+            ),
+          ]
+        : []),
+      section(
+        el,
+        'Health',
+        model.health.map((h) => healthRow(el, h))
+      ),
+      ...(details && el.Markdown ? [el.Markdown({ text: details })] : []),
+    ],
+  });
+}
+
+function headerCard({ Box, Text }, model) {
+  if (!model.header) {
+    return Box({
+      borderStyle: 'round',
+      paddingX: 1,
+      children: [Text({ bold: true, children: 'No single active task' })],
+    });
+  }
+  const { number, title, status, chosenBy } = model.header;
+  return Box({
+    flexDirection: 'column',
+    borderStyle: 'round',
+    paddingX: 1,
+    children: [
+      Box({
+        flexDirection: 'row',
+        gap: 1,
+        children: [
+          Text({ bold: true, color: ACCENT, children: `Task ${number}` }),
+          Text({ backgroundColor: 'green', color: 'black', children: ` ${status} ` }),
+        ],
+      }),
+      Text({ bold: true, children: title }),
+      Text({ dimColor: true, children: `Active because: ${chosenBy}` }),
+    ],
+  });
+}
+
+function nextCard({ Box, Text }, next) {
+  return Box({
+    flexDirection: 'column',
+    borderStyle: 'round',
+    borderColor: ACCENT,
+    paddingX: 1,
+    children: [
+      Text({ dimColor: true, bold: true, children: 'NEXT STEP' }),
+      Text({ bold: true, children: next.step }),
+      ...(next.detail ? [Text({ dimColor: true, children: next.detail })] : []),
+    ],
+  });
+}
+
+function section({ Box, Text }, title, rows) {
+  return Box({
+    flexDirection: 'column',
+    children: [Text({ dimColor: true, bold: true, children: title.toUpperCase() }), ...rows],
+  });
+}
+
+function progressRow({ Box, Text, Svg }, e, item) {
+  const bar =
+    e.surface === 'desktop' && Svg
+      ? [
+          Svg({
+            source: progressSvg(item, BAR_PX),
+            alt: `${item.done} of ${item.total}`,
+            width: BAR_PX,
+            height: 8,
+          }),
+          Text({ children: `${item.done}/${item.total}` }),
+        ]
+      : [Text({ children: progressText(item, BAR_CELLS) })];
+  return Box({
+    flexDirection: 'row',
+    gap: 1,
+    alignItems: 'center',
+    children: [Box({ width: 20, children: [Text({ children: item.label })] }), ...bar],
+  });
+}
+
+function healthRow({ Box, Text }, item) {
+  return Box({
+    flexDirection: 'row',
+    gap: 1,
+    children: [
+      Text({ color: LEVEL_COLOR[item.level], children: '●' }),
+      Box({ width: 18, children: [Text({ bold: true, children: item.label })] }),
+      Text({ children: item.value }),
+    ],
   });
 }
 

@@ -231,51 +231,12 @@ test('a failed reading hides the band and logs the reason to the debug log only'
   assert.equal(drawn, 'engine band', 'the engine band stands when no reading exists');
 });
 
-// ADR-0090, task-0111 slice 2: the briefing's display rule, on output recorded
-// from ad-next/scripts/briefing.mjs. The plugin computes no fact itself.
-const { briefingLine, paneSections, readBriefing, scriptCandidates } = await import(
+// ADR-0090, task-0111 slice 2: the briefing pane's model, on output recorded
+// from ad-next/scripts/briefing.mjs. The plugin establishes no fact itself.
+const { readBriefing, scriptCandidates } = await import(
   pathToFileURL(join(PLUGIN, 'hooks', 'briefing-view.mjs')).href
 );
 const recorded = (name) => readJson(join(ROOT, 'test', 'fixtures', 'briefing', `${name}.json`));
-
-test('briefingLine names the task, its next plan item and what is open', () => {
-  assert.equal(
-    briefingLine(recorded('active-task')),
-    'Task 0111 in-progress · next: Slice 2, the band and the pane · plan 2/5 · 3 criteria open · gate: 6 would-block'
-  );
-});
-
-test('briefingLine flags code before the plan approval and recorded deviations', () => {
-  const briefing = {
-    ...recorded('active-task'),
-    gate: null,
-    deviations: [{ heading: '2026-10-02 — deviation', text: 'Kept the old parser.' }],
-    approval: {
-      entry: null,
-      approvedIn: null,
-      firstImplementingCommit: 'abc',
-      precedesFirstImplementingCommit: false,
-    },
-  };
-  assert.equal(
-    briefingLine(briefing),
-    'Task 0111 in-progress · next: Slice 2, the band and the pane · plan 2/5 · 3 criteria open · 1 deviation · code before plan approval'
-  );
-});
-
-test('briefingLine says when the briefing cannot tell the active task', () => {
-  const briefing = {
-    ...recorded('active-task'),
-    task: null,
-    plan: null,
-    acceptance: null,
-    definitionOfDone: null,
-    deviations: null,
-    approval: null,
-    cannotTell: ['task'],
-  };
-  assert.equal(briefingLine(briefing), 'No single active task · gate: 6 would-block');
-});
 
 test('readBriefing takes the script output only from a clean run that printed a JSON object', () => {
   const stdout = JSON.stringify(recorded('active-task'));
@@ -300,108 +261,9 @@ test('scriptCandidates looks for the project install first, then the user instal
   ]);
 });
 
-test('paneSections lays out every fact, naming what the briefing cannot tell', () => {
-  const sections = paneSections(recorded('active-task'));
-  const byTitle = Object.fromEntries(sections.map((s) => [s.title, s.lines]));
-
-  assert.deepEqual(
-    sections.map((s) => s.title),
-    [
-      'Task',
-      'Plan',
-      'Open criteria',
-      'Definition of Done',
-      'Plan approval',
-      'Deviations',
-      'Roadmap',
-      'Gate (shadow)',
-    ]
-  );
-  assert.deepEqual(byTitle.Task, [
-    '0111-show-the-work-in-progress-briefing-in-the-band',
-    'in-progress, chosen by: newest commit ahead of main',
-  ]);
-  assert.equal(byTitle.Plan[0], '[x] Owner accepts ADR-0090 and approves this plan.');
-  assert.equal(byTitle.Plan.length, 5);
-  assert.equal(
-    byTitle['Open criteria'][0].startsWith('[ ] The `agentic-session` plugin runs'),
-    true
-  );
-  assert.equal(byTitle['Definition of Done'].length, 4);
-  assert.deepEqual(byTitle['Plan approval'], [
-    '2026-10-07 — plan approved',
-    'recorded before the first implementing commit',
-  ]);
-  assert.deepEqual(byTitle.Deviations, ['none recorded']);
-  assert.deepEqual(byTitle.Roadmap, ['66 of 79 tasks done (PRD accepted)']);
-  assert.deepEqual(byTitle['Gate (shadow)'], [
-    '9 checks logged, 6 would-block',
-    'last: git push, gate-run, clear',
-  ]);
-});
-
-test('paneSections says cannot tell for missing facts and lists unreadable files', () => {
-  const sections = paneSections({
-    task: null,
-    plan: null,
-    acceptance: null,
-    definitionOfDone: null,
-    deviations: null,
-    approval: null,
-    roadmap: null,
-    gate: null,
-    unreadable: [{ path: 'doc/tasks/0002-x.md', code: 'EISDIR' }],
-    cannotTell: ['task', 'roadmap', 'gate'],
-  });
-  assert.deepEqual(sections, [
-    { title: 'Task', lines: ['cannot tell: no single in-progress task'] },
-    { title: 'Roadmap', lines: ['cannot tell: no doc/product/PRD.md'] },
-    { title: 'Gate (shadow)', lines: ['cannot tell: no evidence for this session'] },
-    { title: 'Unreadable', lines: ['doc/tasks/0002-x.md (EISDIR)'] },
-  ]);
-});
-
-test('paneSections states each plan-approval order the briefing can report', () => {
-  const approvalOf = (approval) =>
-    paneSections({ ...recorded('active-task'), approval }).find((s) => s.title === 'Plan approval')
-      .lines;
-  const entry = '2026-10-07 — plan approved';
-  assert.deepEqual(approvalOf({ entry, precedesFirstImplementingCommit: false }), [
-    entry,
-    'recorded after code was committed',
-  ]);
-  assert.deepEqual(approvalOf({ entry, precedesFirstImplementingCommit: null }), [
-    entry,
-    'cannot tell the order',
-  ]);
-  assert.deepEqual(approvalOf({ entry: null, precedesFirstImplementingCommit: false }), [
-    'none recorded, and code is committed',
-  ]);
-  assert.deepEqual(approvalOf({ entry: null, precedesFirstImplementingCommit: null }), [
-    'none recorded yet',
-  ]);
-});
-
 const USER_SCRIPT = '/home/ale/.claude/skills/ad-next/scripts/briefing.mjs';
 const PROJECT_SCRIPT = '/work/repo/.claude/skills/ad-next/scripts/briefing.mjs';
 const clean = (briefing) => ({ exitCode: 0, stdout: JSON.stringify(briefing), stderr: '' });
-
-test('the band shows the installed script briefing even below the context threshold', async () => {
-  const { hooks, runs, $ } = await loadPlugin(99, FULL, {
-    script: { path: USER_SCRIPT, result: clean(recorded('active-task')) },
-  });
-  await hooks['session.start']($, {}, async () => undefined);
-
-  assert.deepEqual(runs, [
-    {
-      argv: ['node', USER_SCRIPT, '--session', 'sess-1'],
-      init: { cwd: '/work/repo', timeoutMs: 10_000 },
-    },
-  ]);
-  const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
-  assert.equal(findElement(band, 'Text').props.children, briefingLine(recorded('active-task')));
-  assert.equal(findElement(band, 'Button'), null, 'no handoff button below the threshold');
-});
 
 test('the project install of the script wins over the user install', async () => {
   const { hooks, runs, $ } = await loadPlugin(99, FULL, {
@@ -433,9 +295,31 @@ test('without an installed script nothing runs and nothing is logged', async () 
   );
 });
 
-test('/agentic-briefing opens the pane, which lays out the briefing sections', async () => {
+test('the script runs with the session id in the project root, and the band stays the context band', async () => {
+  const { hooks, runs, $ } = await loadPlugin(99, FULL, {
+    script: { path: USER_SCRIPT, result: clean(recorded('active-task')) },
+  });
+  await hooks['session.start']($, {}, async () => undefined);
+  assert.deepEqual(runs, [
+    {
+      argv: ['node', USER_SCRIPT, '--session', 'sess-1'],
+      init: { cwd: '/work/repo', timeoutMs: 10_000 },
+    },
+  ]);
+  const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
+  assert.equal(band, 'engine band', 'below the threshold the band draws nothing of its own');
+});
+
+test('/agentic-briefing opens the pane, which draws the header, progress, health and details', async () => {
   const { hooks, commands, opened, $ } = await loadPlugin(99, FULL, {
     script: { path: USER_SCRIPT, result: clean(recorded('active-task')) },
+  });
+  $.ui.resolve = () => ({
+    Box: (props) => ({ type: 'Box', props }),
+    Text: (props) => ({ type: 'Text', props }),
+    Button: (props) => ({ type: 'Button', props }),
+    Svg: (props) => ({ type: 'Svg', props }),
+    Markdown: (props) => ({ type: 'Markdown', props }),
   });
   await hooks['session.start']($, {}, async () => undefined);
   assert.equal(commands[0].name, 'agentic-briefing');
@@ -443,12 +327,31 @@ test('/agentic-briefing opens the pane, which lays out the briefing sections', a
   await hooks['command.run:agentic-briefing']($, {});
   assert.deepEqual(opened, [{ id: 'agentic-briefing', title: 'Briefing' }]);
 
-  const pane = hooks['ui.render:Pane:agentic-briefing']($, {});
-  const titles = pane.props.children.map((section) => section.props.children[0].props.children);
-  assert.deepEqual(
-    titles,
-    paneSections(recorded('active-task')).map((s) => s.title)
-  );
+  const pane = hooks['ui.render:Pane:agentic-briefing']($, { surface: 'desktop' });
+  const texts = [];
+  const walk = (node) => {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'Text') texts.push(node.props.children);
+    for (const child of [node.props?.children].flat()) walk(child);
+  };
+  walk(pane);
+  assert.ok(texts.includes('Task 0111'));
+  assert.ok(texts.includes('Show the work in progress briefing in the band'));
+  assert.ok(texts.includes('Slice 2, the band and the pane'));
+  assert.ok(texts.includes('6 of 9 checks would block'));
+  assert.equal(findElement(pane, 'Svg').props.alt, '2 of 5');
+  assert.match(findElement(pane, 'Markdown').props.text, /^#### Plan/);
+});
+
+test('on the terminal the pane draws text bars instead of SVG', async () => {
+  const { hooks, $ } = await loadPlugin(99, FULL, {
+    script: { path: USER_SCRIPT, result: clean(recorded('active-task')) },
+  });
+  await hooks['session.start']($, {}, async () => undefined);
+  const pane = hooks['ui.render:Pane:agentic-briefing']($, { surface: 'terminal' });
+  assert.equal(findElement(pane, 'Svg'), null);
+  const texts = JSON.stringify(pane);
+  assert.match(texts, /██████░░░░░░░░░░ 2\/5/);
 });
 
 test('the pane says when there is no briefing to show', async () => {
@@ -456,4 +359,118 @@ test('the pane says when there is no briefing to show', async () => {
   await hooks['session.start']($, {}, async () => undefined);
   const pane = hooks['ui.render:Pane:agentic-briefing']($, {});
   assert.match(findElement(pane, 'Text').props.children, /No briefing/);
+});
+
+const { paneModel } = await import(pathToFileURL(join(PLUGIN, 'hooks', 'briefing-view.mjs')).href);
+
+test('paneModel turns the briefing into a header, a next step, progress and health', () => {
+  const model = paneModel(recorded('active-task'));
+  assert.deepEqual(model.header, {
+    number: '0111',
+    title: 'Show the work in progress briefing in the band',
+    status: 'in-progress',
+    chosenBy: 'newest commit ahead of main',
+  });
+  assert.deepEqual(model.next, {
+    step: 'Slice 2, the band and the pane',
+    detail:
+      "red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).",
+  });
+  assert.deepEqual(model.progress, [
+    { label: 'Plan', done: 2, total: 5 },
+    { label: 'Criteria', done: 2, total: 5 },
+    { label: 'Definition of Done', done: 0, total: 4 },
+    { label: 'Roadmap tasks', done: 66, total: 79 },
+  ]);
+  assert.deepEqual(model.health, [
+    { label: 'Plan approval', value: 'before the first code', level: 'ok' },
+    { label: 'Deviations', value: 'none recorded', level: 'ok' },
+    { label: 'Gate (shadow)', value: '6 of 9 checks would block', level: 'warn' },
+  ]);
+});
+
+test('paneModel rates each plan-approval order the briefing can report', () => {
+  const approvalOf = (approval) =>
+    paneModel({ ...recorded('active-task'), approval }).health.find(
+      (h) => h.label === 'Plan approval'
+    );
+  const entry = '2026-10-07 — plan approved';
+  assert.deepEqual(approvalOf({ entry, precedesFirstImplementingCommit: false }), {
+    label: 'Plan approval',
+    value: 'after code was committed',
+    level: 'warn',
+  });
+  assert.deepEqual(approvalOf({ entry: null, precedesFirstImplementingCommit: false }), {
+    label: 'Plan approval',
+    value: 'missing, and code is committed',
+    level: 'warn',
+  });
+  assert.deepEqual(approvalOf({ entry, precedesFirstImplementingCommit: null }), {
+    label: 'Plan approval',
+    value: 'order unknown',
+    level: 'unknown',
+  });
+  assert.deepEqual(approvalOf({ entry: null, precedesFirstImplementingCommit: null }), {
+    label: 'Plan approval',
+    value: 'not approved yet',
+    level: 'ok',
+  });
+});
+
+test('paneModel without an active task keeps only the roadmap and the gate', () => {
+  const model = paneModel({
+    ...recorded('active-task'),
+    task: null,
+    plan: null,
+    acceptance: null,
+    definitionOfDone: null,
+    deviations: null,
+    approval: null,
+    gate: null,
+  });
+  assert.equal(model.header, null);
+  assert.equal(model.next, null);
+  assert.deepEqual(model.progress, [{ label: 'Roadmap tasks', done: 66, total: 79 }]);
+  assert.deepEqual(model.health, [
+    { label: 'Gate (shadow)', value: 'no evidence for this session', level: 'unknown' },
+  ]);
+});
+
+const { detailsMarkdown } = await import(
+  pathToFileURL(join(PLUGIN, 'hooks', 'briefing-view.mjs')).href
+);
+
+test('detailsMarkdown renders the plan, open items and deviations as checklists', () => {
+  const md = detailsMarkdown({
+    ...recorded('active-task'),
+    deviations: [{ heading: '2026-10-02 — deviation', text: 'Kept the old parser.' }],
+    unreadable: [{ path: 'doc/tasks/0002-x.md', code: 'EISDIR' }],
+  });
+  assert.match(md, /^#### Plan\n- \[x\] Owner accepts ADR-0090 and approves this plan\.\n/);
+  assert.match(md, /\n- \[ \] Slice 2, the band and the pane: red/);
+  assert.match(md, /\n#### Open criteria\n- \[ \] The `agentic-session` plugin runs/);
+  assert.match(md, /\n#### Definition of Done\n- \[ \] Local tests pass/);
+  assert.match(md, /\n#### Deviations\n- \*\*2026-10-02 — deviation\*\*: Kept the old parser\.\n/);
+  assert.match(md, /\n#### Unreadable\n- `doc\/tasks\/0002-x\.md` \(EISDIR\)/);
+});
+
+test('detailsMarkdown is empty without an active task or unreadable files', () => {
+  assert.equal(detailsMarkdown({ ...recorded('active-task'), task: null, unreadable: [] }), '');
+});
+
+const { progressSvg, progressText } = await import(
+  pathToFileURL(join(PLUGIN, 'hooks', 'briefing-view.mjs')).href
+);
+
+test('progressText draws a cell bar with the count, for the terminal', () => {
+  assert.equal(progressText({ done: 2, total: 5 }, 10), '████░░░░░░ 2/5');
+  assert.equal(progressText({ done: 0, total: 4 }, 8), '░░░░░░░░ 0/4');
+  assert.equal(progressText({ done: 0, total: 0 }, 4), '░░░░ 0/0');
+});
+
+test('progressSvg fills the bar in proportion, for the desktop', () => {
+  const svg = progressSvg({ done: 66, total: 79 }, 200);
+  assert.match(svg, /^<svg [^>]*width="200" height="8"/);
+  assert.match(svg, /<rect [^>]*width="167"/, 'filled share: round(200 * 66 / 79)');
+  assert.match(progressSvg({ done: 0, total: 0 }, 200), /<rect [^>]*class="fill"[^>]*width="0"/);
 });
