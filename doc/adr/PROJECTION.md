@@ -6,7 +6,7 @@ Without this file, learning which architectural decisions still bind costs one p
 
 ## Default
 
-All 66 accepted ADRs bind in full, except the twenty-four below, which bind except for the named part.
+All 66 accepted ADRs bind in full, except the twenty-five below, which bind except for the named part.
 
 No ADR in this directory has been deprecated or superseded as a whole document. A `proposed` ADR is not counted here and does not appear until it is accepted — it binds nothing until then, and its acceptance is the change to what binds that adds it (see *The rule that keeps it true*).
 
@@ -38,8 +38,9 @@ No ADR in this directory has been deprecated or superseded as a whole document. 
 | [0088](0088-ship-an-optional-claude-code-companion-plugin.md) | Item 3's exclusion of a member that summarizes the work, and item 8's open question on a workflow-stage segment, for the work-in-progress briefing only | Every other item: the plugin stays additive, Claude-Code-only, display-only, and any blocking member needs its own decision | [ADR-0090](0090-show-the-work-in-progress-briefing-in-the-session-plugin.md), declared as a header pair |
 | [0089](0089-check-workflow-receipts-in-shadow-before-landing.md) | Decision 3's "when its SHA is `HEAD`", decision 4's "the ADR-0083 evidence file" and decision 7's "the check is off for that repository" | Every decision otherwise: receipts are fresh by tree or receipt-neutral paths, the gate writes its own evidence file, and an impossible bot-review read logs `runtime-unavailable` while `"review": false` turns the check off | Its own addenda of 2026-10-07, after Tasks 0107 and 0108 |
 | [0090](0090-show-the-work-in-progress-briefing-in-the-session-plugin.md) | Decision 2's one-line summary in the band, and decision 3's "the band and the skill cannot disagree" for the receipt gate's session-scoped result | Every decision otherwise: one zero-dependency kit script, a display-only plugin that runs it at session start, each main-loop turn and after a compaction, `/ad-brief` reading the same script, and Codex falling back to `/ad-brief` | Its own addenda of 2026-10-08, after Task 0111's live check and review |
+| [0033](0033-house-ip-leak-guard.md) | The Consequences line "Absent the local file, the denylist check is a no-op", and item 1's reading of the working tree's denylist alone | Every decision otherwise: the gitignored local denylist, the `rules/` and symlink checks, the client-side fail-closed hook, and no CI re-check | Its own addendum of 2026-10-08, after Task 0113 |
 
-Two shapes appear above and they are checked differently. A **cross-record** amendment (0035, 0065, 0088) declares itself as a header-field pair — `Amends:` on one side, `Amended by:` on the other — which makes it verifiable without reading prose. A **self**-amendment (0007, 0047, 0080, 0089, 0090) has no second record to pair with: the record corrects itself in a dated addendum, marks the dead stanza in place, and this page is what makes it discoverable from the directory rather than only from inside the file. One record (0007) carries one of each, one per retired part, which is why the corrector column and not the row is the unit to read.
+Two shapes appear above and they are checked differently. A **cross-record** amendment (0035, 0065, 0088) declares itself as a header-field pair — `Amends:` on one side, `Amended by:` on the other — which makes it verifiable without reading prose. A **self**-amendment (0007, 0033, 0047, 0080, 0089, 0090) has no second record to pair with: the record corrects itself in a dated addendum, marks the dead stanza in place, and this page is what makes it discoverable from the directory rather than only from inside the file. One record (0007) carries one of each, one per retired part, which is why the corrector column and not the row is the unit to read.
 
 ## Verifying this page
 
