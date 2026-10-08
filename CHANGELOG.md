@@ -11,6 +11,10 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 - `/ad-audit`'s re-audit rebuilds every group handoff's rule text from the
   files at the re-audit target and names that SHA, instead of reusing a prior
   pass's handoff (task-0112).
+- `/ad-review` and `/ad-audit` write their handoffs with the host's file-write
+  tool or a program that writes the bytes as given, never with `echo` or an
+  unquoted heredoc, which can rewrite escapes or run an embedded diff's
+  backtick spans (task-0098).
 
 ## [1.3.0] - 2026-10-08
 

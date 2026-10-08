@@ -254,6 +254,21 @@ test('decision-maker briefing composition is one-way and visible in the workflow
   }
 });
 
+test('regression: task-0098 review and audit handoffs are written without shell interpolation', () => {
+  // zsh echo turned a \\b into a backspace (Task 0092), and an unquoted
+  // heredoc ran the backtick spans of an embedded diff as commands.
+  for (const agent of ['claude-code', 'codex']) {
+    for (const skill of ['ad-review', 'ad-audit']) {
+      const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+      assert.match(
+        body,
+        /file-write tool or a program that writes the bytes as given[\s\S]{0,60}never[\s\S]{0,40}`echo`[\s\S]{0,40}unquoted heredoc/i,
+        `${agent} ${skill} must name an interpretation-free write path for handoffs`
+      );
+    }
+  }
+});
+
 test('regression: task-0112 a re-audit rebuilds each group handoff from the files at its target', () => {
   // Task 0111's re-audit reused the first pass's handoffs, so two groups'
   // inline rule text predated the fixes under review.

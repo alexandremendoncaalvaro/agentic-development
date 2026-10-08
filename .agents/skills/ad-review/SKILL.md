@@ -82,7 +82,7 @@ Step 3 — read Spec source. In this order, take the first that resolves:
 
 If nothing resolves, mark Spec as `no spec source provided`. The Spec axis output will say so explicitly and report no findings.
 
-Step 4 — write the audit-trail handoff. Persist the assembled context at `.agentic/reviews/<ISO-timestamp>-<scope-slug>.md` (single file, not two). `<scope-slug>` encodes the review target (`branch-vs-main`, `pr-42`, `commit-abc1234`, `working-tree`). Create the directory if missing.
+Step 4 — write the audit-trail handoff. Persist the assembled context at `.agentic/reviews/<ISO-timestamp>-<scope-slug>.md` (single file, not two). `<scope-slug>` encodes the review target (`branch-vs-main`, `pr-42`, `commit-abc1234`, `working-tree`). Create the directory if missing. Write each file with the host's file-write tool or a program that writes the bytes as given, never with `echo` or an unquoted heredoc: either one can rewrite a backslash escape or run the backtick spans of an embedded diff as commands (Task 0098).
 
 File body:
 

@@ -95,7 +95,7 @@ target=<the Step 0 SHA>
 === END HANDOFF ===
 ```
 
-Persist each handoff to `.agentic/reviews/<ISO-timestamp>-audit-<group-slug>.md` (create the dir if missing; advise `.gitignore` for `.agentic/reviews/`). If the target spans >50 files, ask the user to narrow scope before dispatching — cost compounds across groups.
+Persist each handoff to `.agentic/reviews/<ISO-timestamp>-audit-<group-slug>.md` (create the dir if missing; advise `.gitignore` for `.agentic/reviews/`). Write each file with the host's file-write tool or a program that writes the bytes as given, never with `echo` or an unquoted heredoc: either one can rewrite a backslash escape or run the backtick spans of an embedded diff as commands (Task 0098). If the target spans >50 files, ask the user to narrow scope before dispatching — cost compounds across groups.
 
 ## Step 4 — Fan out one reviewer per group, in parallel
 

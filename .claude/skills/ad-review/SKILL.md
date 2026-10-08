@@ -105,7 +105,7 @@ If Step 2 found no spec, write the Spec handoff as a single block: `no spec sour
 
 ## Step 4 — Persist both handoffs to disk
 
-Write both files to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-{standards,spec}.md` at the repo root. Create the directory if it does not exist. The `<scope-slug>` encodes the review target (`branch-vs-main`, `pr-42`, `commit-abc1234`, `working-tree`).
+Write both files to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-{standards,spec}.md` at the repo root. Create the directory if it does not exist. The `<scope-slug>` encodes the review target (`branch-vs-main`, `pr-42`, `commit-abc1234`, `working-tree`). Write each file with the host's file-write tool or a program that writes the bytes as given, never with `echo` or an unquoted heredoc: either one can rewrite a backslash escape or run the backtick spans of an embedded diff as commands (Task 0098).
 
 After write, print `wc -l <path>` alongside each handoff path so the user has a sanity-check value. Verify the handoff-integrity gate from Step 0 still holds: the commit-message section must have exactly `N` `### <sha>` entries where `N = git rev-list --count <range>`. If it doesn't, do not dispatch — re-scope and rebuild.
 

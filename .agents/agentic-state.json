@@ -75,7 +75,7 @@
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "d58ebfec6b4901b35dad8c342acacd23342ee074e11d9f3d1d258321ef5c6b90"
+          "sourceSha": "547a7d1c38993dfd8b9662760a60db686dfae44a71f8eea4e4e0cb51d40c2dc2"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
@@ -732,7 +732,7 @@
         },
         {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "5b4f750540dfdd6495d4fa079bab4b24ad41b583e096c535dbdf96447e05e2d5"
+          "sourceSha": "60b6bd48ea0d75b4d31abb7618191e6cf49544abddc12529cfad37d2d2fab040"
         },
         {
           "path": ".codex/agents/fresh-context-reviewer.toml",
