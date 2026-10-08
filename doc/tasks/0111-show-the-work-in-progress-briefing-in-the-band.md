@@ -31,8 +31,8 @@ Sequenced by the owner on 2026-10-07: after Task 0109, together with Task
 ## Acceptance Criteria
 
 - [x] `briefing.mjs` (both hosts, byte-identical) prints one JSON briefing: active task and the rule that chose it, status, plan items done and open, open acceptance criteria and Definition of Done items, whether the plan's approval entry precedes the first implementing commit, the deviations its Notes record, roadmap progress from the survey, and the receipt gate's latest shadow result for the session (Task 0106); it degrades instead of throwing and says "cannot tell" when a fact is missing.
-- [x] The `agentic-session` plugin runs the script on session start, after each main-loop turn and after a compaction, and shows the full briefing in a pane opened by `/agentic-briefing` (the band keeps only the context reading, per the ADR-0090 addendum of 2026-10-08); it computes nothing, injects nothing, blocks nothing, and draws nothing when the script is absent or fails.
-- [ ] `/ad-brief` reads the same script, on both hosts.
+- [x] The `agentic-session` plugin runs the script on session start, after each main-loop turn and after a compaction, and shows the full briefing in a pane opened by `/agentic-briefing` (the band keeps only the context reading, per the ADR-0090 addendum of 2026-10-08); it computes nothing, injects nothing, blocks nothing, and draws nothing unasked when the script is absent or fails (the pane the owner opens then says why, in one line).
+- [x] `/ad-brief` reads the same script, on both hosts.
 - [x] The cost of a run on this repository is measured (median of repeated runs) before the band ships, and stated.
 - [x] Tests: the script on fixture repositories (one active task, none, several, a deviation entry, a missing roadmap, an unreadable file); the plugin's pure module on recorded script output (pane model, absent script).
 
@@ -40,8 +40,8 @@ Sequenced by the owner on 2026-10-07: after Task 0109, together with Task
 
 - [x] Owner accepts ADR-0090 and approves this plan.
 - [x] Slice 1, the script: red, then green (`/ad-tdd`) on fixture repositories; parity; measure its run time.
-- [x] Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).
-- [ ] Slice 3, `/ad-brief` reads the script; Task 0106's criteria close with slice 1's gate result.
+- [ ] Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).
+- [x] Slice 3, `/ad-brief` reads the script; Task 0106's criteria close with slice 1's gate result.
 - [ ] `/ad-review` per slice; `/ad-audit` before the pull request; `/ad-commit`; PR on the owner's approval.
 
 ## Notes
@@ -236,6 +236,27 @@ After the corrections: `npm run verify` 1370 of 1370; the plugin mutation
 sweep leaves only equivalent survivors (`??` to `||` on values never empty,
 and `surface === 'desktop' && Svg`, since only the desktop table carries
 `Svg`).
+
+### 2026-10-08 — slice 2 delta re-review, slice 3
+
+Slice 2 delta re-review (b03d7ce..6add09a), fresh context on both axes: no
+Blockers. One new Standards Concern, fixed test first: "`session.end` sets
+`state.briefing = null` but does not advance `briefingRun`", so a run in
+flight at `/clear` could bring the old briefing back; `clearReadings` now
+advances the counter. Notes taken: the pane tolerates a briefing without
+`cannotTell` (a project install and a user install can differ in version);
+the Markdown cut handles a single long line; a stale comment, the script
+header's wrap, and the fixture's escaped characters fixed. Spec Notes taken:
+the second criterion now states the one-line message in the pane the owner
+opens, and slice 2's plan item is unchecked again because the narrow-width
+live check is still pending on the owner.
+
+Slice 3: `/ad-brief`'s standalone brief, on both hosts, runs the briefing
+script first and takes its JSON as the task evidence, carrying every
+`cannotTell` entry as an unknown fact; the manual search for the active task
+remains the fallback when the script is absent or fails. A static test in
+`test/skills.test.js` pins the command, its order before the manual search,
+and `cannotTell`. Task 0106 closes with this task's audit.
 
 ## Definition of Done
 
