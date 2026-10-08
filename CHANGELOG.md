@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-08
+
 ### Added
 
 - `/ad-hooks` ships a shadow receipt gate on both hosts (ADR-0089): after the
