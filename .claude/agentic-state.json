@@ -357,7 +357,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-next/scripts/briefing.mjs",
-          "sourceSha": "539ecbcda3deb06bf82dc9e541452936a66d6d6f2763c8c9dc97339c2b12afe4"
+          "sourceSha": "91cdbe531f57e4adc5acf23c0ded51009074f7ddf4ad91a1e7d73bb9b0c91bdc"
         },
         {
           "path": ".claude/skills/ad-next/scripts/survey.mjs",

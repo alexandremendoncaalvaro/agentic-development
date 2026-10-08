@@ -10,8 +10,8 @@
  *
  *   - task: the active task, `{ slug, rule, status }`. The rule is stated, not
  *     inferred: the single `in-progress` task (`single-in-progress`); else,
- *     among unfinished tasks, the one the newest commit ahead of `main`
- *     touched (`newest-commit-ahead`); else null.
+ *     among several `in-progress` tasks, the one the newest commit ahead of
+ *     `main` touched (`newest-commit-ahead`); else null.
  *   - plan `{ done, open }`, acceptance and definitionOfDone `{ done, open }`
  *     (done as a count): the task's checkbox items.
  *   - deviations: Notes entries whose heading or text names a deviation or
@@ -19,13 +19,18 @@
  *   - approval: the Notes entry approving the plan, the commit that added it,
  *     the first commit ahead of `main` touching anything outside `doc/` and
  *     the agent hosts' configuration directories, and
- *     whether the approval preceded it (null when it cannot tell).
+ *     whether the approval preceded it (null when it cannot tell). The entry
+ *     is found by its heading only (`plan approved`, `approves the plan`), the
+ *     convention recent tasks follow; an approval worded otherwise reads as
+ *     absent.
  *   - roadmap: `{ prdStatus, tasksDone, tasksTotal }` from the survey; null
  *     without `doc/product/PRD.md`.
  *   - gate: the session's receipt-gate shadow evidence (Task 0106),
- *     `{ lines, wouldBlock, last }`; null without `--session`.
+ *     `{ lines, wouldBlock, last }`; null without `--session` or without an
+ *     evidence file for it.
  *   - unreadable: `{ path, code }` for every existing file it could not read
- *     or parse; cannotTell: the facts above that are null for lack of input.
+ *     or parse; cannotTell: the facts above that are null for lack of input,
+ *     and `git` when the commits ahead of `main` cannot be listed.
  *
  * Zero dependencies, Node-only; every probe degrades instead of throwing.
  * Byte-identical in both host trees.
@@ -59,14 +64,15 @@ function readContent(path, label, unreadable) {
 }
 
 // Read-only git, degrading to null. GIT_DIR / GIT_WORK_TREE / GIT_INDEX_FILE
-// are stripped so a linked worktree cannot redirect the calls (AGENTS.md).
+// are stripped so a linked worktree cannot redirect the calls (AGENTS.md);
+// core.quotePath=false keeps non-ASCII paths unquoted for prefix matching.
 function git(repoRoot, args) {
   const env = { ...process.env };
   delete env.GIT_DIR;
   delete env.GIT_WORK_TREE;
   delete env.GIT_INDEX_FILE;
   try {
-    return execFileSync('git', args, {
+    return execFileSync('git', ['-c', 'core.quotePath=false', ...args], {
       cwd: repoRoot,
       encoding: 'utf8',
       env,
@@ -104,7 +110,7 @@ function parseStatus(body) {
 
 // The lines under `## <heading>`, up to the next `## ` heading.
 function section(body, heading) {
-  const lines = body.split('\n');
+  const lines = body.split(/\r?\n/);
   const start = lines.findIndex((line) => line.trim() === `## ${heading}`);
   if (start === -1) return [];
   const rest = lines.slice(start + 1);
@@ -149,7 +155,7 @@ function noteEntries(lines) {
 function activeTask(repoRoot, tasks) {
   const inProgress = tasks.filter((t) => t.status === 'in-progress');
   if (inProgress.length === 1) return { task: inProgress[0], rule: 'single-in-progress' };
-  const open = new Map(tasks.filter((t) => t.status !== 'done').map((t) => [t.slug, t]));
+  const open = new Map(inProgress.map((t) => [t.slug, t]));
   const touched = git(repoRoot, [
     'log',
     '--format=',
@@ -183,9 +189,8 @@ function commitsAhead(repoRoot) {
 
 // An approval committed on main precedes every commit ahead of it; with no
 // approval entry, any implementing commit is out of order.
-function approval(repoRoot, slug, notes) {
+function approval(repoRoot, slug, notes, commits) {
   const entry = notes.find((n) => APPROVED.test(n.heading)) ?? null;
-  const commits = commitsAhead(repoRoot);
   const implementing = commits?.findIndex((c) =>
     c.paths.some((p) => !NOT_IMPLEMENTING.some((prefix) => p.startsWith(prefix)))
   );
@@ -227,11 +232,13 @@ function roadmap(survey) {
 }
 
 // Read from the file sequence-gate.mjs appends to, by its directory and name
-// rule; a line that is not a JSON object marks the file corrupt.
+// rule; a line that is not a JSON object marks the file corrupt. No file is
+// null: nothing gated yet and a gate not wired look the same.
 function gateEvidence(sessionId, env, unreadable) {
   const dir = env.AD_SEQUENCE_GATE_EVIDENCE_DIR || join(tmpdir(), 'agentic-sequence-gate');
   const file = `${String(sessionId).replace(/[^A-Za-z0-9._-]/g, '_')}.jsonl`;
-  const raw = readContent(join(dir, file), file, unreadable) ?? '';
+  const raw = readContent(join(dir, file), file, unreadable);
+  if (raw === null) return null;
   const lines = [];
   let corrupt = false;
   for (const text of raw.split('\n')) {
@@ -275,6 +282,8 @@ export function briefingReport({ repoRoot, sessionId = null, env = process.env }
   const chosen = activeTask(repoRoot, tasks);
   const active = chosen?.task ?? null;
   const notes = active ? noteEntries(section(active.body, 'Notes')) : [];
+  const commits = commitsAhead(repoRoot);
+  const order = active ? approval(repoRoot, active.slug, notes, commits) : null;
   return {
     task: active ? { slug: active.slug, rule: chosen.rule, status: active.status } : null,
     plan: active ? checkboxes(section(active.body, 'Plan')) : null,
@@ -283,7 +292,7 @@ export function briefingReport({ repoRoot, sessionId = null, env = process.env }
     deviations: active
       ? notes.filter((n) => DEVIATION.test(n.heading) || DEVIATION.test(n.text))
       : null,
-    approval: active ? approval(repoRoot, active.slug, notes) : null,
+    approval: order,
     roadmap: progress,
     gate,
     unreadable,
@@ -291,6 +300,8 @@ export function briefingReport({ repoRoot, sessionId = null, env = process.env }
       ...(active ? [] : ['task']),
       ...(progress ? [] : ['roadmap']),
       ...(gate ? [] : ['gate']),
+      ...(order && order.precedesFirstImplementingCommit === null ? ['approval'] : []),
+      ...(commits ? [] : ['git']),
     ],
   };
 }

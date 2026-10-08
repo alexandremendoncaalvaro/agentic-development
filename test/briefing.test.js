@@ -5,6 +5,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { evidencePathFor } from '../src/skills/claude-code/ad-hooks/scripts/sequence-gate.mjs';
 
 // ADR-0090, task-0111, GROUND-0043: the work-in-progress briefing, exercised
 // through its command line on fixture repositories. The claude-code copy
@@ -310,8 +311,11 @@ test("summarises the session's shadow gate evidence, or cannot tell without a se
     },
   });
 
+  // No evidence file reads the same whether nothing was gated yet or the
+  // hook is not wired, so it is "cannot tell", never a clean gate.
   const freshSession = briefing(repo, ['--session', 'sess-2'], env);
-  assert.deepEqual(freshSession.gate, { lines: 0, wouldBlock: 0, last: null });
+  assert.equal(freshSession.gate, null);
+  assert.ok(freshSession.cannotTell.includes('gate'));
   assert.deepEqual(freshSession.unreadable, []);
 
   const noSession = briefing(repo, [], env);
@@ -352,6 +356,8 @@ test('still briefs outside a git repository, without the commit-order fact', () 
   assert.equal(result.task.slug, '0001-fixture-task');
   assert.equal(result.approval.entry, '2026-10-01 — plan approved');
   assert.equal(result.approval.precedesFirstImplementingCommit, null);
+  assert.ok(result.cannotTell.includes('approval'));
+  assert.ok(result.cannotTell.includes('git'));
 });
 
 test('treats an evidence line that is not an object as corrupt', () => {
@@ -410,6 +416,8 @@ test('cannot tell the order while the approval entry is not yet committed', () =
 
   assert.equal(result.approval.approvedIn, null);
   assert.equal(result.approval.precedesFirstImplementingCommit, null);
+  assert.ok(result.cannotTell.includes('approval'));
+  assert.ok(!result.cannotTell.includes('git'));
 });
 
 test('does not count an agent-config-only commit as implementing', () => {
@@ -427,4 +435,62 @@ test('does not count an agent-config-only commit as implementing', () => {
 
   assert.equal(result.approval.firstImplementingCommit, null);
   assert.equal(result.approval.precedesFirstImplementingCommit, true);
+});
+
+test('reads checkbox items and Notes from a task file with CRLF line endings', () => {
+  const repo = fixtureRepo();
+  const body = task({
+    plan: '- [x] Done item.\n- [ ] Open item.\n',
+    notes: '### 2026-10-02 — deviation: kept the parser\n\nWindows paths.\n',
+  }).replace(/\n/g, '\r\n');
+  write(repo, 'doc/tasks/0001-fixture-task.md', body);
+
+  const result = briefing(repo);
+
+  assert.deepEqual(result.plan, { done: ['Done item.'], open: ['Open item.'] });
+  assert.deepEqual(result.deviations, [
+    { heading: '2026-10-02 — deviation: kept the parser', text: 'Windows paths.' },
+  ]);
+});
+
+test('does not count a docs-only commit with a non-ASCII path as implementing', () => {
+  const repo = fixtureRepo();
+  write(repo, 'doc/tasks/0001-fixture-task.md', task());
+  commit(repo, 'docs: add the task');
+  git(repo, 'switch', '-q', '-c', 'feat/work');
+  write(repo, 'doc/research/résumé.md', 'notes\n');
+  commit(repo, 'docs: add a research note');
+  write(repo, 'doc/tasks/0001-fixture-task.md', task({ notes: APPROVAL }));
+  commit(repo, 'docs: approve the plan');
+
+  assert.equal(briefing(repo).approval.firstImplementingCommit, null);
+});
+
+test('never names a proposed task touched by the newest commit as the active one', () => {
+  const repo = fixtureRepo();
+  write(repo, 'doc/tasks/0001-fixture-task.md', task());
+  write(repo, 'doc/tasks/0002-other-task.md', task());
+  commit(repo, 'docs: add two tasks');
+  git(repo, 'switch', '-q', '-c', 'feat/work');
+  write(repo, 'doc/tasks/0001-fixture-task.md', task({ notes: '### 2026-10-01\n\nWork.\n' }));
+  commit(repo, 'docs: touch the first task');
+  write(repo, 'doc/tasks/0003-new-task.md', task({ status: 'proposed' }));
+  commit(repo, 'docs: propose a new task');
+
+  const result = briefing(repo);
+
+  assert.equal(result.task.slug, '0001-fixture-task');
+});
+
+test('reads the evidence file at the path the sequence gate writes it to', () => {
+  const repo = fixtureRepo();
+  const env = { AD_SEQUENCE_GATE_EVIDENCE_DIR: mkdtempSync(join(tmpdir(), 'briefing-evidence-')) };
+  const sessionId = 'odd/session-id x';
+  const file = evidencePathFor(sessionId, env);
+  writeFileSync(
+    file,
+    '{"seq":1,"at":"t1","action":"git push","check":"gate-run","state":"clear"}\n'
+  );
+
+  assert.equal(briefing(repo, ['--session', sessionId], env).gate.lines, 1);
 });

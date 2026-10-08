@@ -13,7 +13,7 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   Definition of Done items, the deviations its Notes record, whether the plan
   approval preceded the first implementing commit, roadmap progress, and the
   session's receipt-gate shadow result; it says what it cannot tell instead of
-  guessing. It is the source for the `agentic-session` band and `/ad-brief`
+  guessing. The `agentic-session` band and `/ad-brief` will read it
   (ADR-0090, GROUND-0043, task-0111).
 
 ## [1.2.0] - 2026-10-08
