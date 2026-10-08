@@ -66,7 +66,7 @@ C5 is the retained artifact: the session transcript records the checkpoint as a 
 
 - **A1:** Claude Code hooks reference, https://code.claude.com/docs/en/hooks, sections "UserPromptSubmit", common input fields, exit-code table, matcher table, settings shape, `${CLAUDE_PROJECT_DIR}` placeholder (accessed 2026-09-09 via WebFetch)
 - **A2:** Anthropic, "Steering Claude Code: skills, hooks, rules, subagents, and more", https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more, 2026-06-18 (accessed 2026-09-09 via WebFetch by the research subagent)
-- **B1:** SLIM plugin `hooks/user-prompt-skill-nudge.sh` (boostlingo/slim 2.0.0, installed at `~/.claude/plugins/cache/slim/slim/1.2.1/hooks/`): `UserPromptSubmit` command hook, "Exit 0; stdout is appended to context", parses `prompt` and `cwd` from stdin JSON (accessed 2026-09-09 via Read)
+- **B1:** SLIM plugin `hooks/user-prompt-skill-nudge.sh` (the company SLIM plugin 2.0.0, installed at `~/.claude/plugins/cache/slim/slim/1.2.1/hooks/`): `UserPromptSubmit` command hook, "Exit 0; stdout is appended to context", parses `prompt` and `cwd` from stdin JSON (accessed 2026-09-09 via Read)
 - **B2:** Scott Spence, "Claude Code skills don't auto-activate", https://scottspence.com/posts/claude-code-skills-dont-auto-activate, 2025-11-06 (accessed 2026-09-09 via WebFetch by the research subagent)
 - **B3:** obra/superpowers, `SessionStart` hook injecting the `using-superpowers` router, https://github.com/obra/superpowers (accessed 2026-09-09 via WebFetch by the research subagent)
 - **C1:** This session's first prompt carried a `<slim-skill-nudge>` block produced by B1's hook, visible to the model as context (accessed 2026-09-09 via the live session)
