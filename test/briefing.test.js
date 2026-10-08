@@ -309,6 +309,7 @@ test("summarises the session's shadow gate evidence, or cannot tell without a se
       check: 'review',
       state: 'would-block',
     },
+    lastWouldBlock: { at: '2026-10-08T00:00:03Z', action: 'gh pr create', check: 'review' },
   });
 
   // No evidence file reads the same whether nothing was gated yet or the

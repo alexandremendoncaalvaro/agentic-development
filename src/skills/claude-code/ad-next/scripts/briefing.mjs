@@ -27,7 +27,7 @@
  *   - roadmap: `{ prdStatus, tasksDone, tasksTotal }` from the survey; null
  *     without `doc/product/PRD.md`.
  *   - gate: the session's receipt-gate shadow evidence (Task 0106),
- *     `{ lines, wouldBlock, last }`; null without `--session` or without an
+ *     `{ lines, wouldBlock, last, lastWouldBlock }`; null without `--session` or without an
  *     evidence file for it.
  *   - unreadable: `{ path, code }` for every existing file it could not read
  *     or parse; cannotTell: the facts above that are null for lack of input,
@@ -259,10 +259,15 @@ function gateEvidence(sessionId, env, unreadable) {
   }
   if (corrupt) unreadable.push({ path: file, code: 'INVALID_JSON' });
   const last = lines.at(-1);
+  const blocked = lines.filter((l) => l.state === 'would-block');
+  const lastBlocked = blocked.at(-1);
   return {
     lines: lines.length,
-    wouldBlock: lines.filter((l) => l.state === 'would-block').length,
+    wouldBlock: blocked.length,
     last: last ? { at: last.at, action: last.action, check: last.check, state: last.state } : null,
+    lastWouldBlock: lastBlocked
+      ? { at: lastBlocked.at, action: lastBlocked.action, check: lastBlocked.check }
+      : null,
   };
 }
 

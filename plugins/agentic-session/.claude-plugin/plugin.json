@@ -1,6 +1,6 @@
 {
   "name": "agentic-session",
-  "description": "Agentic Development companion for Claude Code: a band above the prompt with the work-in-progress briefing, the context reading past your threshold with a one-press /ad-handoff, and /agentic-briefing for the full briefing in a pane.",
+  "description": "Agentic Development companion for Claude Code: a context band above the prompt, shown only past your threshold, with a one-press /ad-handoff, and /agentic-briefing, which opens the work-in-progress briefing in a pane.",
   "author": {
     "name": "Alexandre Alvaro"
   },

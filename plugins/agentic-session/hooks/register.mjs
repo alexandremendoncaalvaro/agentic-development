@@ -26,7 +26,7 @@ const SCRIPT_TIMEOUT_MS = 10_000;
 
 export function register(on, options) {
   const threshold = normalizeThreshold(options?.threshold);
-  const state = { fill: null, briefing: null };
+  const state = { fill: null, briefing: null, briefingRun: 0 };
 
   on('session.start', async ($, e, next) => {
     const result = await next(e);
@@ -76,11 +76,10 @@ export function register(on, options) {
   on('ui.render', { component: 'Pane', requestId: PANE }, ($, e) => drawPane($, e, state.briefing));
 }
 
-const LEVEL_COLOR = { ok: 'green', warn: 'yellow', unknown: 'gray' };
+const LEVEL_COLOR = { ok: 'green', warn: 'yellow', unknown: 'gray', active: '#d97757' };
 const ACCENT = '#d97757';
 const BAR_PX = 160;
 const BAR_CELLS = 16;
-const MARKDOWN_LIMIT = 10_000;
 
 function drawPane($, e, briefing) {
   const el = $.ui.resolve(e);
@@ -97,7 +96,7 @@ function drawPane($, e, briefing) {
     });
   }
   const model = paneModel(briefing);
-  const details = detailsMarkdown(briefing).slice(0, MARKDOWN_LIMIT);
+  const details = detailsMarkdown(briefing);
   return Box({
     flexDirection: 'column',
     gap: 1,
@@ -132,7 +131,7 @@ function headerCard({ Box, Text }, model) {
       children: [Text({ bold: true, children: 'No single active task' })],
     });
   }
-  const { number, title, status, chosenBy } = model.header;
+  const { number, title, status, statusLevel, chosenBy } = model.header;
   return Box({
     flexDirection: 'column',
     borderStyle: 'round',
@@ -143,7 +142,11 @@ function headerCard({ Box, Text }, model) {
         gap: 1,
         children: [
           Text({ bold: true, color: ACCENT, children: `Task ${number}` }),
-          Text({ backgroundColor: 'green', color: 'black', children: ` ${status} ` }),
+          Text({
+            backgroundColor: LEVEL_COLOR[statusLevel],
+            color: 'black',
+            children: ` ${status} `,
+          }),
         ],
       }),
       Text({ bold: true, children: title }),
@@ -236,14 +239,19 @@ async function takeReading($, state) {
 }
 
 // Fail closed (ADR-0090): no installed script, a failed run or output that is
-// not a briefing leaves the briefing out of the band.
+// not a briefing leaves the pane without a briefing.
 async function takeBriefing($, state) {
+  // A run that finishes after a newer one started is dropped, never drawn.
+  const run = ++state.briefingRun;
+  const settle = (briefing) => {
+    if (run === state.briefingRun) state.briefing = briefing;
+  };
   try {
     const root = await $.session.root();
     const home = (await $.env.get('HOME')) || (await $.env.get('USERPROFILE'));
     const script = await firstInstalled($, scriptCandidates(root, home));
     if (!script) {
-      state.briefing = null;
+      settle(null);
       return;
     }
     const sessionId = await $.session.id();
@@ -251,10 +259,11 @@ async function takeBriefing($, state) {
       cwd: root,
       timeoutMs: SCRIPT_TIMEOUT_MS,
     });
-    state.briefing = readBriefing(result);
-    if (!state.briefing) logFailure($, 'briefing unreadable', `exit ${result.exitCode}`);
+    const briefing = readBriefing(result);
+    settle(briefing);
+    if (!briefing) logFailure($, 'briefing unreadable', `exit ${result.exitCode}`);
   } catch (error) {
-    state.briefing = null;
+    settle(null);
     logFailure($, 'no briefing', error);
   }
 }

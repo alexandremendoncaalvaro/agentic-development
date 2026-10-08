@@ -34,6 +34,8 @@ const RULES = {
   'newest-commit-ahead': 'newest commit ahead of main',
 };
 
+const STATUS_LEVEL = { 'in-progress': 'active', done: 'ok', blocked: 'warn' };
+
 // A task title from its slug: `0111-show-the-work-in-progress-...` ->
 // `Show the work in progress ...`.
 function taskTitle(slug) {
@@ -50,7 +52,13 @@ function nextStep(plan) {
     : { step: item.slice(0, cut).trim(), detail: item.slice(cut + 1).trim() };
 }
 
-function approvalHealth(approval) {
+function approvalHealth(approval, cannotTell) {
+  if (cannotTell.includes('approval')) {
+    const value = cannotTell.includes('git')
+      ? 'cannot tell: commits ahead of main not listed'
+      : 'cannot tell: approval not committed yet';
+    return { value, level: 'unknown' };
+  }
   const order = approval.precedesFirstImplementingCommit;
   if (order === true) return { value: 'before the first code', level: 'ok' };
   if (order === false) {
@@ -64,9 +72,13 @@ function approvalHealth(approval) {
 
 function gateHealth(gate) {
   if (!gate) return { value: 'no evidence for this session', level: 'unknown' };
+  if (!gate.wouldBlock) return { value: `none of ${gate.lines} checks would block`, level: 'ok' };
+  const latest = gate.lastWouldBlock
+    ? `; latest: ${gate.lastWouldBlock.check} before ${gate.lastWouldBlock.action}`
+    : '';
   return {
-    value: `${gate.wouldBlock} of ${gate.lines} checks would block`,
-    level: gate.wouldBlock ? 'warn' : 'ok',
+    value: `${gate.wouldBlock} of ${gate.lines} checks would block${latest}`,
+    level: 'warn',
   };
 }
 
@@ -97,12 +109,19 @@ export function paneModel(b) {
   }
   const health = [];
   if (b.task) {
-    health.push({ label: 'Plan approval', ...approvalHealth(b.approval) });
+    health.push({ label: 'Plan approval', ...approvalHealth(b.approval, b.cannotTell) });
     health.push(
       b.deviations.length
         ? { label: 'Deviations', value: `${b.deviations.length} recorded`, level: 'warn' }
         : { label: 'Deviations', value: 'none recorded', level: 'ok' }
     );
+  }
+  if (!b.roadmap) {
+    health.push({
+      label: 'Roadmap',
+      value: 'cannot tell: no doc/product/PRD.md',
+      level: 'unknown',
+    });
   }
   health.push({ label: 'Gate (shadow)', ...gateHealth(b.gate) });
   return {
@@ -111,6 +130,7 @@ export function paneModel(b) {
           number: taskNumber(b.task.slug),
           title: taskTitle(b.task.slug),
           status: b.task.status,
+          statusLevel: STATUS_LEVEL[b.task.status] ?? 'unknown',
           chosenBy: RULES[b.task.rule] ?? b.task.rule,
         }
       : null,
@@ -123,7 +143,17 @@ export function paneModel(b) {
 const checklist = (items, done) => items.map((item) => `- [${done ? 'x' : ' '}] ${item}`);
 
 // The pane's detail block, as Markdown: checklists the surface draws as such.
-export function detailsMarkdown(b) {
+const CUT_NOTE = '\n\n_Cut to fit the pane; the task file has the rest._';
+
+// The Markdown element takes at most 10000 characters.
+export function detailsMarkdown(b, limit = 10_000) {
+  const full = fullDetails(b);
+  if (full.length <= limit) return full;
+  const room = full.slice(0, limit - CUT_NOTE.length);
+  return `${room.slice(0, room.lastIndexOf('\n'))}${CUT_NOTE}`;
+}
+
+function fullDetails(b) {
   const blocks = [];
   if (b.task) {
     blocks.push(['#### Plan', ...checklist(b.plan.done, true), ...checklist(b.plan.open, false)]);
