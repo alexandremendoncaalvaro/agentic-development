@@ -22,15 +22,15 @@ makes the gap visible.
 
 ## Acceptance Criteria
 
-- [ ] The checkpoint names the kit version recorded in the installed state file it can resolve, and says nothing extra when none is found.
-- [ ] The hook stays offline, exit 0, and within its existing size cap; no network call is added.
-- [ ] A test covers the found and not-found cases.
-- [ ] ADR-0074 gains an addendum or a short ADR records the change, since it alters the checkpoint's static content.
+- [x] The checkpoint names the kit version recorded in the installed state file it can resolve, and says nothing extra when none is found.
+- [x] The hook stays offline, exit 0, and within its existing size cap; no network call is added.
+- [x] A test covers the found and not-found cases.
+- [x] ADR-0074 gains an addendum or a short ADR records the change, since it alters the checkpoint's static content.
 
 ## Plan
 
-- [ ] Ground: where the installed state lives per scope (`src/lib/state.js`).
-- [ ] Red, then green in `test/skill-scripts.test.js` and the script.
+- [x] Ground: where the installed state lives per scope (`src/lib/state.js`).
+- [x] Red, then green in `test/skill-scripts.test.js` and the script.
 - [ ] `CHANGELOG.md`; `/ad-review`; `/ad-commit`.
 
 ## Notes
@@ -45,6 +45,18 @@ Routed from the `/ad-level-up` curation of 2026-10-07, which the owner approved 
 
 The owner approved the kit hygiene batch ("ok"), built in one branch with
 Tasks 0112 and 0113.
+
+### 2026-10-08 — built
+
+`workflow-checkpoint.mjs` (both hosts, byte-identical) appends
+"Installed agentic kit: <version> (<scope> scope)." after its fixed text,
+reading `agentic-state.json` under the event's `cwd` (`.claude/`, then
+`.agents/`) before the home directory, as the installer's scopes resolve; no
+network call, exit 0 and the kill switch unchanged, the line omitted when no
+state names a version. Three regression tests in `test/skill-scripts.test.js`
+(project wins, user fallback, nothing found), two red before the change; the
+900-character cap holds. ADR-0074's addendum and its PROJECTION row record
+that the content is no longer wholly static; `ad-hooks` documents the line.
 
 ## Definition of Done
 
