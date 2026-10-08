@@ -40,7 +40,7 @@ Sequenced by the owner on 2026-10-07: after Task 0109, together with Task
 
 - [x] Owner accepts ADR-0090 and approves this plan.
 - [x] Slice 1, the script: red, then green (`/ad-tdd`) on fixture repositories; parity; measure its run time.
-- [ ] Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).
+- [x] Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).
 - [x] Slice 3, `/ad-brief` reads the script; Task 0106's criteria close with slice 1's gate result.
 - [ ] `/ad-review` per slice; `/ad-audit` before the pull request; `/ad-commit`; PR on the owner's approval.
 
@@ -358,6 +358,11 @@ missing from ARCHITECTURE.md's test layout, a gap already on main; and a
 process slip in this audit: the re-audit handoffs reused the first pass's
 inline rule text, so two reviewers audited against the files on disk
 instead, which they reported.
+
+### 2026-10-08 — narrow-width check
+
+The owner approved the pane at the narrow width ("tudo aprovado"), which
+closes slice 2's live check; the agent did not observe that width itself.
 
 ## Definition of Done
 
