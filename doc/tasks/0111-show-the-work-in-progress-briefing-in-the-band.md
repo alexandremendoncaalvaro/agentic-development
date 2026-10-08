@@ -30,16 +30,16 @@ Sequenced by the owner on 2026-10-07: after Task 0109, together with Task
 
 ## Acceptance Criteria
 
-- [ ] `briefing.mjs` (both hosts, byte-identical) prints one JSON briefing: active task and the rule that chose it, status, plan items done and open, open acceptance criteria and Definition of Done items, whether the plan's approval entry precedes the first implementing commit, the deviations its Notes record, roadmap progress from the survey, and the receipt gate's latest shadow result for the session (Task 0106); it degrades instead of throwing and says "cannot tell" when a fact is missing.
+- [x] `briefing.mjs` (both hosts, byte-identical) prints one JSON briefing: active task and the rule that chose it, status, plan items done and open, open acceptance criteria and Definition of Done items, whether the plan's approval entry precedes the first implementing commit, the deviations its Notes record, roadmap progress from the survey, and the receipt gate's latest shadow result for the session (Task 0106); it degrades instead of throwing and says "cannot tell" when a fact is missing.
 - [ ] The `agentic-session` plugin runs the script on session start, after each main-loop turn and after a compaction, shows one line in the band (task, stage, open items) and the full briefing in a pane opened by `/agentic-briefing`; it computes nothing, injects nothing, blocks nothing, and draws nothing when the script is absent or fails.
 - [ ] `/ad-brief` reads the same script, on both hosts.
-- [ ] The cost of a run on this repository is measured (median of repeated runs) before the band ships, and stated.
+- [x] The cost of a run on this repository is measured (median of repeated runs) before the band ships, and stated.
 - [ ] Tests: the script on fixture repositories (one active task, none, several, a deviation entry, a missing roadmap, an unreadable file); the plugin's pure module on recorded script output (band line, pane rows, absent script).
 
 ## Plan
 
 - [x] Owner accepts ADR-0090 and approves this plan.
-- [ ] Slice 1, the script: red, then green (`/ad-tdd`) on fixture repositories; parity; measure its run time.
+- [x] Slice 1, the script: red, then green (`/ad-tdd`) on fixture repositories; parity; measure its run time.
 - [ ] Slice 2, the band and the pane: red, then green in the plugin's pure module; live check in the desktop app (owner-observed, at a width that seats the pane and one that does not).
 - [ ] Slice 3, `/ad-brief` reads the script; Task 0106's criteria close with slice 1's gate result.
 - [ ] `/ad-review` per slice; `/ad-audit` before the pull request; `/ad-commit`; PR on the owner's approval.
@@ -68,6 +68,46 @@ gate's shadow result in the band) is folded into slice 1 and closes with it.
 
 The owner accepted ADR-0090 and approved this plan. Implementation starts with
 slice 1 in a new session.
+
+### 2026-10-08 — slice 1, the script
+
+`ad-next/scripts/briefing.mjs` ships on both hosts, byte-identical, beside
+`survey.mjs` (ADR-0090 decision 1), with 18 tests in `test/briefing.test.js`
+on fixture repositories: one in-progress task, none, several (newest commit
+ahead of main), deviation entries, the approval before, after, on main, in
+the same commit as the first code, uncommitted and absent, an agent-config-only
+commit, a missing PRD, the session's gate evidence with and without a session,
+an unreadable task file, corrupt and non-object evidence lines, and a
+directory outside git. `npm run verify` passed (1343 of 1343 tests).
+
+Decisions taken in the build, each a stated rule:
+
+- `--session <id>` selects the gate evidence file; without it the gate is
+  "cannot tell". The summary is the session's line count, its would-block
+  count and the last line, because one action writes one line per check.
+- An implementing commit touches a path outside `doc/` and the agent hosts'
+  `.claude/`, `.agents/`, `.codex/` and `.agentic/`. The first run on this
+  repository flagged task 0110 out of order on the commit that only refreshed
+  `.claude/agentic-state.json`; the exclusion and its test came from that
+  observation.
+- An approval recorded in the same commit as the first code does not precede
+  it; an uncommitted approval is "cannot tell".
+- Roadmap progress is the survey's task counts, and "cannot tell" without
+  `doc/product/PRD.md`.
+
+Operator mutation sweep: 38 mutants, 8 survive, all searched and equivalent:
+seven `??` to `||` swaps whose left side is never a falsy non-nullish value
+(an object, a non-empty string, or null), and the CLI entry guard
+`process.argv[1] &&`, which is always truthy when the script runs as a command.
+
+Cost on this repository (Apple M5 Pro, Node 24.16.0, with `--session`): median
+267 ms over 21 runs, minimum 165 ms; one cold run took 3.8 s. Once per turn,
+that is within the band's budget; slice 2 runs it on session start, after each
+main-loop turn and after a compaction, never per draw.
+
+Known limit, as GROUND-0043 states: with several tasks in progress the newest
+commit ahead of main decides, so on this branch the script names task 0110
+until a commit touches this task.
 
 ## Definition of Done
 
