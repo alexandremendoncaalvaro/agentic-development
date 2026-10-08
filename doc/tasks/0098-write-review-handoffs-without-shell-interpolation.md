@@ -21,14 +21,14 @@ path that cannot interpret the content.
 
 ## Acceptance Criteria
 
-- [ ] Both skills, on both hosts, say to write a handoff with the host's file-write tool or a program that writes the bytes as given, never with `echo` or an unquoted heredoc.
-- [ ] A test locks the instruction on both hosts.
-- [ ] The dogfood installs are refreshed and `npm run verify` passes.
+- [x] Both skills, on both hosts, say to write a handoff with the host's file-write tool or a program that writes the bytes as given, never with `echo` or an unquoted heredoc.
+- [x] A test locks the instruction on both hosts.
+- [x] The dogfood installs are refreshed and `npm run verify` passes.
 
 ## Plan
 
-- [ ] Red: a test in `test/skills.test.js`.
-- [ ] Green: edit both hosts' `ad-review` Step 4 and `ad-audit` Step 3.
+- [x] Red: a test in `test/skills.test.js`.
+- [x] Green: edit both hosts' `ad-review` Step 4 and `ad-audit` Step 3.
 - [ ] `CHANGELOG.md`; `/ad-review`; `/ad-commit`.
 
 ## Notes
@@ -43,6 +43,14 @@ Routed from the `/ad-level-up` curation of 2026-10-07, which the owner approved 
 
 The owner approved the kit hygiene batch ("ok"), built in one branch with
 Tasks 0112 and 0113.
+
+### 2026-10-08 — built
+
+Both hosts' `ad-review` Step 4 and `ad-audit` handoff step now say to write
+each handoff with the host's file-write tool or a program that writes the
+bytes as given, never with `echo` or an unquoted heredoc. A regression test
+in `test/skills.test.js` locks the sentence in all four files; it was red
+before the edit.
 
 ## Definition of Done
 
