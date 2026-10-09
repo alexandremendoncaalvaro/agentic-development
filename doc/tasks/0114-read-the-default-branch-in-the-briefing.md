@@ -1,6 +1,6 @@
 # Task `0114`: Read the default branch in the briefing script
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-09
 **Scope ref:** doc/adr/0090-show-the-work-in-progress-briefing-in-the-session-plugin.md
 **Evidence ref:**
@@ -37,6 +37,10 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 Opened from the kit hygiene batch review (Standards note on Task 0100: a
 deferred item needs a tracked work item).
+
+### 2026-10-09 — plan approved
+
+The owner approved working this task next ("Pode ser prossiga"), on the Plan as written. The base is resolved as `ad-project-state` does (`origin/HEAD`, then `origin/main`, then `origin/master`), with a copy of that rule in the script: a skill script cannot import another skill's script (ADR-0057 decision 3). With none resolved the briefing keeps comparing against `main`.
 
 ## Definition of Done
 
