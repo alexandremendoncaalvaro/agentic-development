@@ -242,8 +242,12 @@ function denylistPaths(repoRoot) {
     // path relative to the working tree in the main worktree, absolute in a
     // linked one; resolving against the root handles both.
     commonDir = resolve(repoRoot, git(['rev-parse', '--git-common-dir'], repoRoot).trim());
-  } catch {
-    // Without the common dir only the working tree's own list can be read.
+  } catch (error) {
+    // Without the common dir only the working tree's own list can be read;
+    // say so, since a main worktree's list may be the one that matters.
+    process.stderr.write(
+      `leak-guard: could not locate the main worktree (${error.status ?? error.code ?? error.message}); only this working tree's denylist applies.\n`
+    );
     return paths;
   }
   const mainRoot = dirname(commonDir);

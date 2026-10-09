@@ -61,4 +61,5 @@ denylist check is a no-op" no longer holds: with no list in either place
 the guard prints one line saying so, and the `rules/` and symlink checks
 still fire. A layout without a `.git` common directory (a bare repository's
 worktree, a submodule's worktree under `.git/modules/`, or a
-`--separate-git-dir` checkout) reads only the working tree's own list.
+`--separate-git-dir` checkout) reads only the working tree's own list, and
+so does a run whose `--git-common-dir` lookup fails, which says so on stderr.

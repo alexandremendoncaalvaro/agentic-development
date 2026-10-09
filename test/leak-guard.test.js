@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { delimiter, join } from 'node:path';
 import {
   loadDenylist,
   parseRawDiff,
@@ -545,6 +545,48 @@ test("regression: task-0113 a worktree's own denylist adds to the main worktree'
   stage(worktree, 'own-marker.md', 'mentions WORKTREE-ONLY-MARKER\n');
   assert.equal(runGuard(worktree.dir), 1, "the worktree's own marker blocks too");
 });
+
+// A POSIX shell shim stands in for a git that cannot report the common dir.
+test(
+  'regression: task-0113 the guard says when it cannot read the main worktree',
+  { skip: process.platform === 'win32' },
+  (t) => {
+    const repo = scratchRepo();
+    t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
+    stage(repo, 'ok.md', 'nothing sensitive here\n');
+    const realGit = execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim();
+    const shimDir = join(repo.dir, '.shim');
+    mkdirSync(shimDir);
+    writeFileSync(
+      join(shimDir, 'git'),
+      `#!/bin/sh\nfor a in "$@"; do [ "$a" = --git-common-dir ] && exit 128; done\nexec "${realGit}" "$@"\n`,
+      { mode: 0o755 }
+    );
+    const cwd = process.cwd();
+    const write = process.stderr.write;
+    const lines = [];
+    const saved = Object.fromEntries(
+      [...GIT_VARS, 'PATH'].map((name) => [name, process.env[name]])
+    );
+    for (const name of GIT_VARS) delete process.env[name];
+    process.env.PATH = `${shimDir}${delimiter}${process.env.PATH}`;
+    process.stderr.write = (text) => lines.push(String(text)) > 0;
+    let code;
+    try {
+      process.chdir(repo.dir);
+      code = main();
+    } finally {
+      process.stderr.write = write;
+      process.chdir(cwd);
+      for (const [name, value] of Object.entries(saved)) {
+        if (value === undefined) delete process.env[name];
+        else process.env[name] = value;
+      }
+    }
+    assert.equal(code, 0, "the working tree's own list still applies");
+    assert.equal(lines.filter((l) => /could not locate the main worktree/.test(l)).length, 1);
+  }
+);
 
 test('regression: task-0113 the guard says when no denylist is found anywhere', (t) => {
   const repo = scratchRepo({ denylist: null });
