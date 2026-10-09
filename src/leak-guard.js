@@ -247,7 +247,7 @@ function denylistPaths(repoRoot) {
     return paths;
   }
   const mainRoot = dirname(commonDir);
-  if (/[\\/]\.git$/.test(commonDir) && mainRoot !== repoRoot) {
+  if (/[\\/]\.git$/.test(commonDir) && resolve(mainRoot) !== resolve(repoRoot)) {
     paths.push(join(mainRoot, DENYLIST_REL));
   }
   return paths;
