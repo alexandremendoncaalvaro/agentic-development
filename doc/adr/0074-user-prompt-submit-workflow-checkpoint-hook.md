@@ -59,10 +59,12 @@ Before implementation the owner described the flow they run by hand: risk analys
 
 The checkpoint is no longer wholly static. After the fixed text it adds one
 line, "Installed agentic kit: <version> (<scope> scope).", read from the kit's
-state file under the event's `cwd` (the project install) or the home
-directory (the user install), so an agent running an old installed copy sees
+state file in the nearest project install at or above the event's `cwd`,
+stopping below the home directory, or else in the home directory (the user
+install), so an agent running an old installed copy sees
 it; a skill copy that predated a step had silently skipped it twice (Task
 0099). The line is read locally, adds no network call, depends on the session
-and never on the prompt, and is omitted when no state file names a version.
+and never on the prompt, and is omitted when no state file names a version. A state file in a cloned
+repository is untrusted, so a value that is not version-shaped is left out.
 Exit 0, the kill switch, the no-coercion decision and the 900-character cap
 stand.

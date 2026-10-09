@@ -127,7 +127,7 @@ Tier is editable as the project matures (append a rationale paragraph; do not de
 ### 3.3 Size Guidelines
 
 - Files: ~200 lines target; ~400 review threshold. A file past it states its reason in review; a split is preferred when a cohesive seam exists.
-- Functions: ~50 lines target; ~100 review threshold. A function past it states its reason in review; a split is preferred when a cohesive seam exists. No tool enforces it (Task 0103, after the file threshold of Task 0091).
+- Functions: ~50 lines target; ~100 review threshold. A function past it states its reason in review; a split is preferred when a cohesive seam exists. No tool enforces it.
 - Cyclomatic complexity: ≤10 per function (informational).
 
 The file threshold is a review heuristic, not a gate: no tool enforces it, and `src/` and `test/` both carry files past it that no review split. A reviewer who meets one asks for the reason and the seam; a finding that only cites the line count is not a defect.
@@ -260,7 +260,7 @@ Pure helpers in `src/lib/` — `detect.js`, `install.js`, `rootdoc.js`, `state.j
 
 ### 9.4 Integration Tests
 
-Run `node bin/agentic.js init` / `update` against a tmp directory. Assert on the resulting file tree, state file contents, AGENTS.md managed-section markers.
+Run `node bin/agentic.js init --scope project` / `update --scope project` against a tmp directory; without `--scope project` either command targets the user-scope install (ADR-0057). Assert on the resulting file tree, state file contents, AGENTS.md managed-section markers.
 
 Fixtures live under `test/fixtures/`. Keep total fixture size minimal — under 100 KB. Generate brownfield state inline in tests when possible.
 

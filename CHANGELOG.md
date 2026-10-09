@@ -10,20 +10,20 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 - `/ad-audit`'s re-audit rebuilds every group handoff's rule text from the
   files at the re-audit target and names that SHA, instead of reusing a prior
-  pass's handoff (task-0112).
+  pass's handoff (task-0112, ADR-0047).
 - `/ad-review` and `/ad-audit` write their handoffs with the host's file-write
   tool or a program that writes the bytes as given, never with `echo` or an
   unquoted heredoc, which can rewrite escapes or run an embedded diff's
-  backtick spans (task-0098).
+  backtick spans (task-0098, ADR-0036).
 - `/ad-project-state`'s packet reports the checkout's branch or detached
   state and how far it is ahead of or behind its default branch's
   remote-tracking ref, from local refs only; `/ad-next`, `/ad-roadmap` and
   `/ad-brief` carry a detached or behind checkout as a confidence limit
-  (task-0100).
+  (task-0100, ADR-0079).
 - The `ad-hooks` workflow checkpoint ends with the installed kit version and
   scope, read from the nearest project install at or above the session's
   directory or else the user's state file, so an agent on a stale install
-  sees it; a value that is not version-shaped is left out (task-0099).
+  sees it; a value that is not version-shaped is left out (task-0099, ADR-0074).
 
 ### Fixed
 
@@ -33,7 +33,7 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   alone (task-0101).
 - The repository's leak-guard reads the denylist from the main worktree as
   well as a linked one, and says so when it finds none, so a commit from a
-  worktree is checked against the same list (task-0113).
+  worktree is checked against the same list (task-0113, ADR-0033).
 
 ## [1.3.0] - 2026-10-08
 
