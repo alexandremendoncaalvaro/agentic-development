@@ -44,7 +44,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { surveyReport } from './survey.mjs';
+import { resolveBase, surveyReport } from './survey.mjs';
 
 const ARTIFACT_FILE = /^\d{4}-.*\.md$/;
 // A heading that names a deviation is one; in an entry's text only the
@@ -167,17 +167,9 @@ function unquoted(text) {
 
 // --- Facts --------------------------------------------------------------------
 
-// The branch the work is compared against, resolved as ad-project-state does
-// (Task 0100): the remote's default branch, else origin/main, else
-// origin/master, from local refs only; `main` when none resolves (Task 0114).
+// The branch the work is compared against: the survey's rule (Task 0114).
 function baseRef(repoRoot) {
-  const head = git(repoRoot, ['symbolic-ref', '--short', '-q', 'refs/remotes/origin/HEAD']);
-  if (head) return head;
-  return (
-    ['origin/main', 'origin/master'].find(
-      (ref) => git(repoRoot, ['rev-parse', '--verify', '-q', ref]) !== null
-    ) ?? 'main'
-  );
+  return resolveBase((args) => git(repoRoot, args));
 }
 
 function activeTask(repoRoot, tasks) {

@@ -357,11 +357,11 @@
       "files": [
         {
           "path": ".claude/skills/ad-next/scripts/briefing.mjs",
-          "sourceSha": "b3d244bb08dccace89a805483a75606fa5b26d1b67a0211321cd09d6c99ea910"
+          "sourceSha": "86c187366e06372bc5123410dc59f095d05b39ecdfa92177fbaafd423aaa6b8d"
         },
         {
           "path": ".claude/skills/ad-next/scripts/survey.mjs",
-          "sourceSha": "a66b07a35dd675f82f72feb1d469823e560a459504590e5757e4c28389b56905"
+          "sourceSha": "7b35dc644a2ec95621f6da13863b24a6274c843757fcf7df07c9c779841c9147"
         },
         {
           "path": ".claude/skills/ad-next/SKILL.md",
