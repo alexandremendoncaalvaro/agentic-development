@@ -64,7 +64,7 @@ stopping below the home directory, or else in the home directory (the user
 install), so an agent running an old installed copy sees
 it; a skill copy that predated a step had silently skipped it twice (Task
 0099). The line is read locally, adds no network call, depends on the session
-and never on the prompt, and is omitted when no state file names a version. A state file in a cloned
+and never on the prompt, and is omitted when no state file exists. A state file in a cloned
 repository is untrusted, so a value that is not version-shaped is never echoed.
 A state file that is unreadable, invalid or names no version is reported as
 "unknown" with the reason, never treated as absent.

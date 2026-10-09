@@ -1,6 +1,6 @@
 # Task `0102`: Name the scope in the scratch install check
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0057-skills-deterministic-steps-as-scripts.md (Decision 4)
 **Evidence ref:**
@@ -27,7 +27,7 @@ installs.
 
 - [x] Grep for the scratch-init instruction across `doc/` and `src/skills/`.
 - [x] Addendum plus the textual fixes.
-- [ ] `/ad-review`; `/ad-commit`.
+- [x] `/ad-review`; `/ad-commit`.
 
 ## Notes
 
@@ -69,11 +69,15 @@ Re-audit of six groups at `ae477da` (architecture, guidelines, glossary, ADR-007
 
 - Re-audit minor (CV.8): the recorded search did not return the hits the note listed. Its actual output, `git grep -nE 'bin/agentic\.js (init|update)|scratch .?init'` with the stated exclusions and `--scope` lines removed: AGENTS.md 16, 17 and 83 (setup lines and the PROJECTION pointer), ADR-0056 and ADR-0057 decision 4 and their addenda (the record of this very fix), PROJECTION.md 42 (its row), two `eval/receipts` command strings (recorded trial data) and `package.json` 26 (`init --help` in the smoke test). None is a scratch install step; README and `doc/guides/installation.md` match only `agentic (init|update)`, as consumer setup.
 
+### 2026-10-09 — closed
+
+Done. Fresh-context two-axis review at `16e6aba`; `/ad-audit` of 19 rule groups at `23252ae`; re-audit of six groups at `ae477da`; delta re-audit of the guidelines and claims groups at `548b44f`. None found a Blocker. The delta re-audit's last findings: ADR-0074 still said the line is omitted when no state file names a version (minor, fixed: omitted only when no state file exists); red-first claims lacked retained output (minor, fixed: the runner lines are quoted below where this task claims red first); the batch-wide findings table is in the pull request body. Gate `npm run verify` exit 0, 1396 of 1396.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task

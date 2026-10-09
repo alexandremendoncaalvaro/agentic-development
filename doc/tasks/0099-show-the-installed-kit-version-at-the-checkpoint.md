@@ -1,6 +1,6 @@
 # Task `0099`: Show the installed kit version at the checkpoint
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-07
 **Scope ref:** doc/adr/0074-user-prompt-submit-workflow-checkpoint-hook.md
 **Evidence ref:**
@@ -31,7 +31,7 @@ makes the gap visible.
 
 - [x] Ground: where the installed state lives per scope (`src/lib/state.js`).
 - [x] Red, then green in `test/skill-scripts.test.js` and the script.
-- [ ] `CHANGELOG.md`; `/ad-review`; `/ad-commit`.
+- [x] `CHANGELOG.md`; `/ad-review`; `/ad-commit`.
 
 ## Notes
 
@@ -84,11 +84,17 @@ Re-audit of six groups at `ae477da` (architecture, guidelines, glossary, ADR-007
 
 - Re-audit minor (GUIDELINES 2.2): swallowing an unreadable state file contradicts the rule that a content-reading probe surfaces its failure; the earlier "Accepted" is withdrawn. Fixed: the checkpoint now prints "unknown" with the reason (unreadable, invalid JSON, or no version-shaped value) and never echoes the value. Two regression tests, red first; turning invalid JSON or a bad value back into "absent" turned 1 of 7 red each (falsification log, round 2).
 
+### 2026-10-09 — closed
+
+Done. Fresh-context two-axis review at `16e6aba`; `/ad-audit` of 19 rule groups at `23252ae`; re-audit of six groups at `ae477da`; delta re-audit of the guidelines and claims groups at `548b44f`. None found a Blocker. The delta re-audit's last findings: ADR-0074 still said the line is omitted when no state file names a version (minor, fixed: omitted only when no state file exists); red-first claims lacked retained output (minor, fixed: the runner lines are quoted below where this task claims red first); the batch-wide findings table is in the pull request body. Gate `npm run verify` exit 0, 1396 of 1396.
+
+Red first, as the runner printed before each fix: before 0ebed99, `not ok 4 - ... finds the project install from a subdirectory` and `not ok 5 - ... drops a version that is not version-shaped` (`# fail 2`); before 4fb69ba, `not ok 6 - ... never echoes a value that is not version-shaped` and `not ok 7 - ... says when the state file is unreadable` (`# fail 2`). The earlier "two regression tests" for 4fb69ba means one new test and one rewritten (nit, corrected here).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
-- [ ] Status updated to `done` and Notes log closes the task
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
+- [x] Status updated to `done` and Notes log closes the task
