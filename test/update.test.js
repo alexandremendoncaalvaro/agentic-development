@@ -1155,6 +1155,39 @@ test('regression: task-0101 update keeps and reports a dropped file the user edi
   }
 });
 
+test('regression: task-0101 a file moved to another skill is neither removed nor reported', async () => {
+  const dir = mkScratch();
+  try {
+    const first = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['ad-review', 'ad-spike'],
+      kitVersion: '0.1.0-test',
+    });
+    const moved = '.claude/agents/fresh-context-reviewer.md';
+    const state = first.nextStates['claude-code'];
+    const entry = state.skills['ad-review'].files.find((f) => f.path === moved);
+    state.skills['ad-review'].files = state.skills['ad-review'].files.filter((f) => f !== entry);
+    state.skills['ad-spike'].files.push(entry);
+    const result = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['ad-review', 'ad-spike'],
+      previousStates: { 'claude-code': state },
+      kitVersion: '0.2.0-test',
+    });
+    assert.equal(existsSync(join(dir, moved)), true);
+    assert.deepEqual(
+      result.actions
+        .filter((a) => a.path === moved && (a.type === 'removed' || a.type === 'dropped-kept'))
+        .map((a) => a.type),
+      []
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('regression: task-0101 a re-run init reports a removed dropped file with its symbol', () => {
   const dir = mkScratch();
   try {
