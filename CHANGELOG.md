@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-09
+
 ### Changed
 
 - `/ad-audit`'s re-audit rebuilds every group handoff's rule text from the
