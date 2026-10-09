@@ -87,6 +87,13 @@ Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the
 
 Falsification lane on `23252ae` (scratch worktree, one mutation at a time, restored after each; log `.agentic/reviews/20261009T065600Z-audit-falsification.log`): keeping only the first list turned 2 of 3 tests red; comparing unresolved roots survived on macOS, as expected, since only Windows separators differ.
 
+### 2026-10-09 — re-audit corrections
+
+Re-audit of six groups at `ae477da` (architecture, guidelines, glossary, ADR-0074, ADR-0049, and the claims group twice across two models): no Blocker. The earlier note's pointer to a batch-wide table "in the pull request body" named a body that does not exist yet; the batch-wide facts are: the first audit ran 19 rule groups at `23252ae` with the critical claims group three times across two models, neither audit found a Blocker, and the pull request body will repeat this once opened.
+
+- Re-audit minor (CV.1): the commit message of 6a26b1d and the first line of this task's record state the Windows forward-slash behaviour as fact; it is the reviewer's reading, not observed here. The resolved comparison is harmless on every platform, and the remote Windows CI leg of the pull request is its evidence.
+- Re-audit minor (GUIDELINES 2.2/2.5): the silent fallback when `--git-common-dir` fails contradicts the rule; the earlier "Accepted" is withdrawn. Fixed: the guard says on stderr that it could not locate the main worktree. Regression test with a git shim (skipped on Windows, where the shim is a POSIX script), red first; removing the message turned 1 of 4 red (falsification log, round 2).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

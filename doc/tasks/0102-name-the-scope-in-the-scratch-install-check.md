@@ -63,6 +63,12 @@ Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the
 - Review Note: ADR-0056 and ADR-0057 did not mark decision 4 in place. Fixed in 23252ae.
 - Review Note: no changelog entry. Accepted: no shipped behaviour changed.
 
+### 2026-10-09 — re-audit corrections
+
+Re-audit of six groups at `ae477da` (architecture, guidelines, glossary, ADR-0074, ADR-0049, and the claims group twice across two models): no Blocker. The earlier note's pointer to a batch-wide table "in the pull request body" named a body that does not exist yet; the batch-wide facts are: the first audit ran 19 rule groups at `23252ae` with the critical claims group three times across two models, neither audit found a Blocker, and the pull request body will repeat this once opened.
+
+- Re-audit minor (CV.8): the recorded search did not return the hits the note listed. Its actual output, `git grep -nE 'bin/agentic\.js (init|update)|scratch .?init'` with the stated exclusions and `--scope` lines removed: AGENTS.md 16, 17 and 83 (setup lines and the PROJECTION pointer), ADR-0056 and ADR-0057 decision 4 and their addenda (the record of this very fix), PROJECTION.md 42 (its row), two `eval/receipts` command strings (recorded trial data) and `package.json` 26 (`init --help` in the smoke test). None is a scratch install step; README and `doc/guides/installation.md` match only `agentic (init|update)`, as consumer setup.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

@@ -59,6 +59,10 @@ Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the
 - Review Note (Standards and Spec): status and Plan boxes still open. Fixed when this task closes.
 - Audit minor: the changelog entry cited no ADR. Fixed (ADR-0036).
 
+### 2026-10-09 — re-audit corrections
+
+Re-audit of six groups at `ae477da` (architecture, guidelines, glossary, ADR-0074, ADR-0049, and the claims group twice across two models): no Blocker. The earlier note's pointer to a batch-wide table "in the pull request body" named a body that does not exist yet; the batch-wide facts are: the first audit ran 19 rule groups at `23252ae` with the critical claims group three times across two models, neither audit found a Blocker, and the pull request body will repeat this once opened.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

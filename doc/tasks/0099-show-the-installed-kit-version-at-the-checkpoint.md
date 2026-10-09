@@ -78,6 +78,12 @@ Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the
 
 Falsification lane on `23252ae` (scratch worktree, one mutation at a time, restored after each; log `.agentic/reviews/20261009T065600Z-audit-falsification.log`): removing the home stop turned 1 of 6 tests red; accepting any string as a version turned 1 of 6 red.
 
+### 2026-10-09 — re-audit corrections
+
+Re-audit of six groups at `ae477da` (architecture, guidelines, glossary, ADR-0074, ADR-0049, and the claims group twice across two models): no Blocker. The earlier note's pointer to a batch-wide table "in the pull request body" named a body that does not exist yet; the batch-wide facts are: the first audit ran 19 rule groups at `23252ae` with the critical claims group three times across two models, neither audit found a Blocker, and the pull request body will repeat this once opened.
+
+- Re-audit minor (GUIDELINES 2.2): swallowing an unreadable state file contradicts the rule that a content-reading probe surfaces its failure; the earlier "Accepted" is withdrawn. Fixed: the checkpoint now prints "unknown" with the reason (unreadable, invalid JSON, or no version-shaped value) and never echoes the value. Two regression tests, red first; turning invalid JSON or a bad value back into "absent" turned 1 of 7 red each (falsification log, round 2).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

@@ -23,7 +23,9 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 - The `ad-hooks` workflow checkpoint ends with the installed kit version and
   scope, read from the nearest project install at or above the session's
   directory or else the user's state file, so an agent on a stale install
-  sees it; a value that is not version-shaped is left out (task-0099, ADR-0074).
+  sees it; a value that is not version-shaped is never echoed, and an
+  unreadable state file is reported as unknown with its reason (task-0099,
+  ADR-0074).
 
 ### Fixed
 
@@ -32,8 +34,9 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   leaving the stale copy behind; a file that moved to another skill is left
   alone (task-0101).
 - The repository's leak-guard reads the denylist from the main worktree as
-  well as a linked one, and says so when it finds none, so a commit from a
-  worktree is checked against the same list (task-0113, ADR-0033).
+  well as a linked one, and says so when it finds none or cannot locate the
+  main worktree, so a commit from a worktree is checked against the same list
+  (task-0113, ADR-0033).
 
 ## [1.3.0] - 2026-10-08
 
