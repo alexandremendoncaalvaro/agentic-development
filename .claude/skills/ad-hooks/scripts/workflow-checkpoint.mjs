@@ -89,41 +89,62 @@ const STATE_DIRS = ['.claude', '.agents'];
 // value reaches the model's context.
 const VERSION_SHAPE = /^[0-9A-Za-z.+-]{1,32}$/;
 
-function recordedVersion(root) {
+// What the first state file found under `root` says: a version, or why it
+// names none. Null when no state file exists there. An unreadable file is
+// reported, never treated as absent (GUIDELINES 2.2).
+function recordedState(root) {
   for (const dir of STATE_DIRS) {
+    let text;
     try {
-      const state = JSON.parse(readFileSync(join(root, dir, 'agentic-state.json'), 'utf8'));
-      if (VERSION_SHAPE.test(state?.kitVersion)) return state.kitVersion;
-    } catch {
-      // An absent or unreadable state file names no version.
+      text = readFileSync(join(root, dir, 'agentic-state.json'), 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') continue;
+      return { problem: `state file unreadable: ${error.code ?? 'error'}` };
     }
+    let state;
+    try {
+      state = JSON.parse(text);
+    } catch {
+      return { problem: 'state file is not valid JSON' };
+    }
+    return VERSION_SHAPE.test(state?.kitVersion)
+      ? { version: state.kitVersion }
+      : { problem: 'state file names no version' };
   }
   return null;
 }
 
 // The nearest project install at or above `cwd`, stopping below `home` so
 // the user install is never read as a project one.
-function projectVersion(cwd, home) {
+function projectState(cwd, home) {
   const stop = resolve(home);
   for (let dir = resolve(cwd); dir !== stop; dir = dirname(dir)) {
-    const version = recordedVersion(dir);
-    if (version) return version;
+    const found = recordedState(dir);
+    if (found) return found;
     if (dirname(dir) === dir) break;
   }
   return null;
 }
 
 /**
- * The installed kit version this session runs (Task 0099): the nearest
- * project install at or above the event's `cwd` wins over the user install,
- * as the installer resolves them; read locally, never from the network. Null
- * when no state file names a version.
+ * The installed kit this session runs (Task 0099): the nearest project install
+ * at or above the event's `cwd` wins over the user install, as the installer
+ * resolves them; read locally, never from the network. Each result carries its
+ * scope and either the version or the problem that hides it. Null when no
+ * state file exists.
  */
 export function installedKit(event, home = homedir()) {
-  const project = typeof event?.cwd === 'string' ? projectVersion(event.cwd, home) : null;
-  if (project) return { version: project, scope: 'project' };
-  const user = recordedVersion(home);
-  return user ? { version: user, scope: 'user' } : null;
+  const project = typeof event?.cwd === 'string' ? projectState(event.cwd, home) : null;
+  if (project) return { ...project, scope: 'project' };
+  const user = recordedState(home);
+  return user ? { ...user, scope: 'user' } : null;
+}
+
+function kitLine(kit) {
+  if (!kit) return '';
+  return kit.version
+    ? `\nInstalled agentic kit: ${kit.version} (${kit.scope} scope).`
+    : `\nInstalled agentic kit: unknown (${kit.scope} scope; ${kit.problem}).`;
 }
 
 function main() {
@@ -131,8 +152,7 @@ function main() {
   const event = parseEvent(readStdin());
   if (!event) return;
   const kit = installedKit(event, process.env.HOME || process.env.USERPROFILE || homedir());
-  const line = kit ? `\nInstalled agentic kit: ${kit.version} (${kit.scope} scope).` : '';
-  process.stdout.write(`${CHECKPOINT}${line}\n`);
+  process.stdout.write(`${CHECKPOINT}${kitLine(kit)}\n`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
