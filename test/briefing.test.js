@@ -142,7 +142,7 @@ test('says it cannot tell the task when none is in progress', () => {
   assert.ok(result.cannotTell.includes('task'));
 });
 
-test('picks the task the newest commit ahead of main touched when several are in progress', () => {
+test('picks the task the newest commit ahead of the base branch touched when several are in progress', () => {
   const repo = fixtureRepo();
   write(repo, 'doc/tasks/0001-fixture-task.md', task());
   write(repo, 'doc/tasks/0002-other-task.md', task());

@@ -361,11 +361,11 @@
         },
         {
           "path": ".claude/skills/ad-next/scripts/survey.mjs",
-          "sourceSha": "aceee0c801aab43bd055cebef77a44d43168b4f1fbe39dc0fa5be71f69589c71"
+          "sourceSha": "a66b07a35dd675f82f72feb1d469823e560a459504590e5757e4c28389b56905"
         },
         {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "9a510e39b0bc1cddd4c407fb9d12ac4f4ca8f2876da405dbe9f88ccf79deafc0"
+          "sourceSha": "b81a043834ffaae17d24c243a663953f11b9c6726157f9c1ffac4d47577e8a8d"
         }
       ]
     },
