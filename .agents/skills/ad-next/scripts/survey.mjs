@@ -96,7 +96,7 @@ function readContent(repoRoot, rel, unreadable) {
  * in backticks).
  */
 function parseStatus(body) {
-  const m = body.match(/^\*{0,2}Status:\*{0,2}[ \t]*([A-Za-z][A-Za-z-]*)/mi);
+  const m = body.match(/^\*{0,2}Status:\*{0,2}[ \t]*([A-Za-z][A-Za-z-]*)/im);
   return m ? m[1].toLowerCase() : null;
 }
 
@@ -266,7 +266,9 @@ function surveyTests(repoRoot, unreadable) {
       }
     }
   }
-  if (['Cargo.toml', 'go.mod', 'pyproject.toml', 'setup.py'].some((f) => isFile(join(repoRoot, f)))) {
+  if (
+    ['Cargo.toml', 'go.mod', 'pyproject.toml', 'setup.py'].some((f) => isFile(join(repoRoot, f)))
+  ) {
     return true;
   }
   return ['test', 'tests'].some((d) =>
@@ -283,7 +285,11 @@ function surveyTests(repoRoot, unreadable) {
 
 function surveyHooks(repoRoot) {
   if (isDir(join(repoRoot, '.husky'))) return true;
-  if (['lefthook.yml', 'lefthook.yaml', '.pre-commit-config.yaml'].some((f) => isFile(join(repoRoot, f)))) {
+  if (
+    ['lefthook.yml', 'lefthook.yaml', '.pre-commit-config.yaml'].some((f) =>
+      isFile(join(repoRoot, f))
+    )
+  ) {
     return true;
   }
   // A real (non-sample) hook installed under .git/hooks/.
@@ -325,14 +331,34 @@ function surveyGit(repoRoot) {
     }
   };
   const branch = git(['rev-parse', '--abbrev-ref', 'HEAD']);
-  const aheadRaw = git(['rev-list', '--count', 'main..HEAD']);
+  const base = resolveBase(git);
+  // `aheadOfMain` keeps its name for consumers; `base` names the ref.
+  const aheadRaw = git(['rev-list', '--count', `${base}..HEAD`]);
   const ahead = aheadRaw === null ? null : Number.parseInt(aheadRaw, 10);
   const porcelain = git(['status', '--porcelain']);
   return {
     branch: branch || null,
+    base,
     aheadOfMain: Number.isInteger(ahead) ? ahead : null,
     dirty: porcelain === null ? null : porcelain.length > 0,
   };
+}
+
+/**
+ * The branch work is compared against, resolved as ad-project-state does: the
+ * remote's default branch, else origin/main, else origin/master, from local
+ * refs only; `main` when none resolves (Task 0114). `git` runs one git
+ * command and returns its trimmed stdout, or null when it fails. The survey
+ * and the briefing share this rule so they never disagree on the base.
+ */
+export function resolveBase(git) {
+  return (
+    git(['symbolic-ref', '--short', '-q', 'refs/remotes/origin/HEAD']) ||
+    ['origin/main', 'origin/master'].find(
+      (ref) => git(['rev-parse', '--verify', '-q', ref]) !== null
+    ) ||
+    'main'
+  );
 }
 
 /**

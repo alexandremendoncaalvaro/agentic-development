@@ -42,7 +42,7 @@ Layer status is evidence; scenario determines the right next step.
 - **Product-framed greenfield:** PRD exists, but no meaningful code yet. This is where `/ad-bootstrap`, `/ad-guidelines`, optional `/ad-design`, then `/ad-spec` become the normal sequence.
 - **Brownfield:** meaningful code exists and the scan can summarize the current product behavior. Existing code can supply product and architecture evidence; `/ad-bootstrap` is scan-first here and may precede PRD backfill.
 - **Feature planning:** PRD/spec artifacts exist and have downstream gaps (accepted PRD with no specs, accepted spec with no tasks).
-- **Implementation in progress:** dirty tree, branch ahead of `main`, in-progress tasks, blocked tasks, or proposed ADRs.
+- **Implementation in progress:** dirty tree, branch ahead of its base branch, in-progress tasks, blocked tasks, or proposed ADRs.
 - **Configured implementation in progress:** the primary project-state source
   reports open work, or a returned pull request names the current branch. This
   remains implementation in progress even when repository-local task artifacts
@@ -65,7 +65,7 @@ Render six sections in the output order below, narrating the survey's facts. Use
 
 **Layer 5 — Plans / Decisions** (`architecture`, `adrs`, `tasks`). A missing `ARCHITECTURE.md` (`architecture: false`) is a finding only when meaningful system patterns exist or a spec creates load-bearing constraints — not the first step in fresh greenfield. Report `adrs.counts` by status and flag every `adrs.proposed` slug — they need a decision. Report `tasks.counts` by status and list `tasks.active` (in-progress + blocked) with slug and `specRef`. Flag `tasks.orphans` when an unfinished task has neither a repository-local `Scope ref` nor `Spec ref`; a Board ref is supplemental and cannot remove that finding. Completed legacy tasks are history, not navigation findings. Route a real orphan to `/ad-drift` (Step 4) rather than dumping a long slug list.
 
-**Layer 6 — Code** (`git`, `code`). Branch + `aheadOfMain` commits ahead of `main`; tests / hooks / CI wired (`code.tests` / `code.hooks` / `code.ci`).
+**Layer 6 — Code** (`git`, `code`). Branch + `aheadOfMain` commits ahead of the base branch (`git.base`: the remote default branch, `main` when none resolves); tests / hooks / CI wired (`code.tests` / `code.hooks` / `code.ci`).
 
 ## Step 3 — Cross-cut signals
 
@@ -111,7 +111,7 @@ A single Markdown message structured as:
 ## ad-next
 
 **Kit:** v<X.Y.Z> (or not installed)
-**Branch:** <name> (<n> commits ahead of main)
+**Branch:** <name> (<n> commits ahead of <base>)
 **Scenario:** <detected scenario>
 **Evidence:** <primary source, observed time, and material source failure or none>
 

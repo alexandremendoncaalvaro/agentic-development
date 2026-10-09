@@ -357,15 +357,15 @@
       "files": [
         {
           "path": ".claude/skills/ad-next/scripts/briefing.mjs",
-          "sourceSha": "38765920294edea0a711e6bea7c351d2d336fcf56059ee05198c20a72eb8ffaf"
+          "sourceSha": "86c187366e06372bc5123410dc59f095d05b39ecdfa92177fbaafd423aaa6b8d"
         },
         {
           "path": ".claude/skills/ad-next/scripts/survey.mjs",
-          "sourceSha": "aceee0c801aab43bd055cebef77a44d43168b4f1fbe39dc0fa5be71f69589c71"
+          "sourceSha": "7b35dc644a2ec95621f6da13863b24a6274c843757fcf7df07c9c779841c9147"
         },
         {
           "path": ".claude/skills/ad-next/SKILL.md",
-          "sourceSha": "9a510e39b0bc1cddd4c407fb9d12ac4f4ca8f2876da405dbe9f88ccf79deafc0"
+          "sourceSha": "b81a043834ffaae17d24c243a663953f11b9c6726157f9c1ffac4d47577e8a8d"
         }
       ]
     },

@@ -6,6 +6,16 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Fixed
+
+- The work-in-progress briefing compares the work against the repository's
+  default branch, as `/ad-project-state` resolves it, instead of a hard-coded
+  `main`, so it names the active task and the plan-approval order in a
+  repository whose default branch has another name (task-0114, ADR-0090).
+- The `/ad-next` survey counts the commits ahead of that same base branch and
+  names it as `git.base`, instead of always counting against `main`
+  (task-0114).
+
 ## [1.4.0] - 2026-10-09
 
 ### Changed

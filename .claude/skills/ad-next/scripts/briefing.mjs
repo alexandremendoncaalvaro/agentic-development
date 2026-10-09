@@ -11,7 +11,8 @@
  *   - task: the active task, `{ slug, rule, status }`. The rule is stated, not
  *     inferred: the single `in-progress` task (`single-in-progress`); else,
  *     among several `in-progress` tasks, the one the newest commit ahead of
- *     `main` touched (`newest-commit-ahead`); else null.
+ *     the base branch touched (`newest-commit-ahead`); else null. The base is
+ *     the remote's default branch, `main` when none resolves (Task 0114).
  *   - plan `{ done, open }`, acceptance and definitionOfDone `{ done, open }`
  *     (done as a count): the task's checkbox items.
  *   - deviations: Notes entries whose heading names a deviation or "beyond
@@ -19,7 +20,7 @@
  *     "stated deviation", "beyond the ask") outside quotes or backticks,
  *     `{ heading, text }`.
  *   - approval: the Notes entry approving the plan, the commit that added it,
- *     the first commit ahead of `main` touching anything outside `doc/` and
+ *     the first commit ahead of the base branch touching anything outside `doc/` and
  *     the agent hosts' configuration directories, and
  *     whether the approval preceded it (null when it cannot tell). The entry
  *     is found by its heading only (`plan approved`, `approves the plan`), the
@@ -32,7 +33,7 @@
  *     `--session` or without an evidence file for it.
  *   - unreadable: `{ path, code }` for every existing file it could not read
  *     or parse; cannotTell: the facts above that are null for lack of input,
- *     and `git` when the commits ahead of `main` cannot be listed.
+ *     and `git` when the commits ahead of the base branch cannot be listed.
  *
  * Zero dependencies, Node-only; every probe degrades instead of throwing.
  * Byte-identical in both host trees.
@@ -43,7 +44,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { surveyReport } from './survey.mjs';
+import { resolveBase, surveyReport } from './survey.mjs';
 
 const ARTIFACT_FILE = /^\d{4}-.*\.md$/;
 // A heading that names a deviation is one; in an entry's text only the
@@ -166,6 +167,11 @@ function unquoted(text) {
 
 // --- Facts --------------------------------------------------------------------
 
+// The branch the work is compared against: the survey's rule (Task 0114).
+function baseRef(repoRoot) {
+  return resolveBase((args) => git(repoRoot, args));
+}
+
 function activeTask(repoRoot, tasks) {
   const inProgress = tasks.filter((t) => t.status === 'in-progress');
   if (inProgress.length === 1) return { task: inProgress[0], rule: 'single-in-progress' };
@@ -174,7 +180,7 @@ function activeTask(repoRoot, tasks) {
     'log',
     '--format=',
     '--name-only',
-    'main..HEAD',
+    `${baseRef(repoRoot)}..HEAD`,
     '--',
     'doc/tasks',
   ]);
@@ -188,9 +194,15 @@ function activeTask(repoRoot, tasks) {
   return null;
 }
 
-// Commits ahead of main, oldest first, each with the paths it touched.
+// Commits ahead of the base branch, oldest first, each with the paths it touched.
 function commitsAhead(repoRoot) {
-  const raw = git(repoRoot, ['log', '--reverse', '--format=%x00%H', '--name-only', 'main..HEAD']);
+  const raw = git(repoRoot, [
+    'log',
+    '--reverse',
+    '--format=%x00%H',
+    '--name-only',
+    `${baseRef(repoRoot)}..HEAD`,
+  ]);
   if (raw === null) return null;
   return raw
     .split('\0')

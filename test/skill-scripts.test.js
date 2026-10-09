@@ -1646,6 +1646,29 @@ test('survey: git ahead-of-main count and branch come from a real repo', () => {
   }
 });
 
+test('regression: task-0114 survey counts commits ahead of a default branch that is not main', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-trunk-'));
+  try {
+    const git = gitInit(dir);
+    git('checkout', '-q', '-b', 'trunk');
+    writeFileSync(join(dir, 'a.txt'), 'a');
+    git('add', 'a.txt');
+    git('commit', '-m', 'first');
+    git('update-ref', 'refs/remotes/origin/trunk', 'HEAD');
+    git('symbolic-ref', 'refs/remotes/origin/HEAD', 'refs/remotes/origin/trunk');
+    git('checkout', '-q', '-b', 'feature');
+    writeFileSync(join(dir, 'b.txt'), 'b');
+    git('add', 'b.txt');
+    git('commit', '-m', 'second');
+
+    const s = runSurvey(dir);
+    assert.equal(s.git.base, 'origin/trunk');
+    assert.equal(s.git.aheadOfMain, 1, 'one commit ahead of the default branch');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('survey: spec↔task reciprocity flags stuck specs and orphan tasks', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-survey-recip-'));
   try {

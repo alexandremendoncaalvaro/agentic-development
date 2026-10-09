@@ -31,7 +31,7 @@ export function scriptCandidates(root, home) {
 
 const RULES = {
   'single-in-progress': 'the only in-progress task',
-  'newest-commit-ahead': 'newest commit ahead of main',
+  'newest-commit-ahead': 'newest commit ahead of the base branch',
 };
 
 const STATUS_LEVEL = { 'in-progress': 'active', done: 'ok', blocked: 'warn' };
@@ -55,7 +55,7 @@ function nextStep(plan) {
 function approvalHealth(approval, cannotTell = []) {
   if (cannotTell.includes('approval')) {
     const value = cannotTell.includes('git')
-      ? 'cannot tell: commits ahead of main not listed'
+      ? 'cannot tell: commits ahead of the base branch not listed'
       : 'cannot tell: approval not committed yet';
     return { value, level: 'unknown' };
   }

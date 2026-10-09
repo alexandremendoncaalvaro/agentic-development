@@ -367,7 +367,7 @@ test('paneModel turns the briefing into a header, a next step, progress and heal
     title: 'Show the work in progress briefing in the band',
     status: 'in-progress',
     statusLevel: 'active',
-    chosenBy: 'newest commit ahead of main',
+    chosenBy: 'newest commit ahead of the base branch',
   });
   assert.deepEqual(model.next, {
     step: 'Slice 2, the band and the pane',
@@ -480,7 +480,7 @@ test('regression: task-0111 paneModel shows what the script could not tell inste
     model.health.find((h) => h.label === 'Plan approval'),
     {
       label: 'Plan approval',
-      value: 'cannot tell: commits ahead of main not listed',
+      value: 'cannot tell: commits ahead of the base branch not listed',
       level: 'unknown',
     }
   );
