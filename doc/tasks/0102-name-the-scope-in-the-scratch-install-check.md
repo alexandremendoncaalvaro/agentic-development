@@ -51,6 +51,10 @@ carry an addendum naming `--scope project` (and, for the scratch check, a
 disposable directory), with PROJECTION rows. AGENTS.md already names the
 scope for the dogfood re-sync.
 
+### 2026-10-09 — batch review
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: ADR-0056 and ADR-0057 mark their decision 4 in place as amended by the addendum, as PROJECTION requires of a self-amendment.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

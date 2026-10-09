@@ -58,6 +58,10 @@ state names a version. Three regression tests in `test/skill-scripts.test.js`
 900-character cap holds. ADR-0074's addendum and its PROJECTION row record
 that the content is no longer wholly static; `ad-hooks` documents the line.
 
+### 2026-10-09 — batch review
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: the project install was read only at the session's exact directory; the checkpoint now walks up to the nearest project install, stopping below the home directory so the user install is never named as a project one (two regression tests; removing the home stop turned one red). Fixed: a state file in a cloned repository is untrusted, so a version that is not version-shaped (`^[0-9A-Za-z.+-]{1,32}$`) is left out (regression test with a multi-line value). Kept: `.claude` is read before `.agents`; both record the same kit version in a dual install.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

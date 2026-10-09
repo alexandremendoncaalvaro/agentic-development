@@ -70,6 +70,10 @@ read one file twice, harmless since the patterns are de-duplicated; the
 warning prints on every commit in a clone without a list, which is the
 intended signal.
 
+### 2026-10-09 — batch review
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: the same-root check compared a forward-slash `--show-toplevel` path with a `resolve`d one, which never matches on Windows; both sides are resolved now. The ADR-0033 addendum names the submodule and `--separate-git-dir` layouts that read only their own list, and the dead Consequences line is marked in place.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

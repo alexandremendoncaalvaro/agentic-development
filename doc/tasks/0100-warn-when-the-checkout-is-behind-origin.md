@@ -57,6 +57,10 @@ test pins the confidence-limit sentence in the three consumers on both hosts.
 The work-in-progress briefing script still compares against a hard-coded
 `main`; reading this packet's base there is left for later.
 
+### 2026-10-09 — batch review
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Refuted: a feature branch behind its default branch is a real confidence limit for `ad-next`, `ad-roadmap` and `ad-brief`, since tasks merged there are invisible in the checkout; the limit stays on any branch. Fixed: the deferred briefing base is now tracked as Task 0114.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

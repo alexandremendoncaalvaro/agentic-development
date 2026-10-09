@@ -61,6 +61,10 @@ byte-identical to the kit's copy before 86ab36d dropped it; it was deleted
 by hand on 2026-10-08. Other consumers with such a leftover keep it until a
 named migration removes it by fingerprint, which is not part of this task.
 
+### 2026-10-09 — batch review
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: the dropped-file pass ran per skill, so a file that moved to another skill was removed or falsely reported; it now runs once per agent after every skill is written, against the paths all skills ship (regression test, red first). Fixed: a recorded path that is not a regular file, or resolves outside the install root, is skipped instead of aborting the update or unlinking outside it.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

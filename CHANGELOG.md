@@ -21,14 +21,19 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   `/ad-brief` carry a detached or behind checkout as a confidence limit
   (task-0100).
 - The `ad-hooks` workflow checkpoint ends with the installed kit version and
-  scope, read from the project's or the user's state file, so an agent on a
-  stale install sees it (task-0099).
+  scope, read from the nearest project install at or above the session's
+  directory or else the user's state file, so an agent on a stale install
+  sees it; a value that is not version-shaped is left out (task-0099).
 
 ### Fixed
 
 - `update` removes a file a kit skill no longer ships when the installed copy
   is unchanged, and keeps and reports one the user edited (`!`), instead of
-  leaving the stale copy behind (task-0101).
+  leaving the stale copy behind; a file that moved to another skill is left
+  alone (task-0101).
+- The repository's leak-guard reads the denylist from the main worktree as
+  well as a linked one, and says so when it finds none, so a commit from a
+  worktree is checked against the same list (task-0113).
 
 ## [1.3.0] - 2026-10-08
 

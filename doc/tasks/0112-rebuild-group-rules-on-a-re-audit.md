@@ -27,14 +27,14 @@ rule-set line.
 
 ## Acceptance Criteria
 
-- [ ] `/ad-audit` on both hosts states that a re-audit rebuilds every group handoff's GROUP RULES text from the files at the re-audit target SHA, never from a prior handoff.
-- [ ] The re-audit handoff names the target SHA its rule text was read at, so a reviewer can compare it with the files on disk.
-- [ ] A static test in `test/skills.test.js` pins the instruction on both hosts.
+- [x] `/ad-audit` on both hosts states that a re-audit rebuilds every group handoff's GROUP RULES text from the files at the re-audit target SHA, never from a prior handoff.
+- [x] The re-audit handoff names the target SHA its rule text was read at, so a reviewer can compare it with the files on disk.
+- [x] A static test in `test/skills.test.js` pins the instruction on both hosts.
 
 ## Plan
 
-- [ ] Amend Step 0's re-audit paragraph and Step 3 in `src/skills/claude-code/ad-audit/SKILL.md` and the Codex twin; run `/ad-tdd` with the static test first.
-- [ ] `node bin/agentic.js update --scope project --agent both --yes`; `npm run verify`; `/ad-review`.
+- [x] Amend Step 0's re-audit paragraph and Step 3 in `src/skills/claude-code/ad-audit/SKILL.md` and the Codex twin; run `/ad-tdd` with the static test first.
+- [x] `node bin/agentic.js update --scope project --agent both --yes`; `npm run verify`; `/ad-review`.
 
 ## Notes
 
@@ -48,6 +48,14 @@ Proposed from Task 0111's branch re-audit; the owner approved opening it.
 
 The owner approved the kit hygiene batch ("ok"); this task follows Task 0113
 in it.
+
+### 2026-10-08 — built
+
+Step 0's re-audit paragraph on both hosts states that a re-audit rebuilds every group handoff's rule text from the files at the re-audit target SHA, never from a prior handoff, and names that SHA; a static test in `test/skills.test.js` pins it on both hosts (red first).
+
+### 2026-10-09 — batch review
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: the second criterion was met only in Step 0's prose; the handoff template now carries a `Rule text read at: <SHA>` line on both hosts, and the static test pins it (red first).
 
 ## Definition of Done
 

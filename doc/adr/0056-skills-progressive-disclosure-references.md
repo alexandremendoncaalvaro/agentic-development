@@ -21,7 +21,7 @@ We will adopt progressive disclosure as the skill-authoring standard for both ho
 1. The `SKILL.md` body stays a lean, imperative overview. Reference material — copy-paste templates, long worked examples, rationale/background prose, exhaustive checklists, and format specifications — moves into bundled `references/*.md`, linked **one level deep** from the body (no reference-to-reference nesting, which causes partial reads).
 2. Each artifact-drafting skill carries its template in its own `references/<artifact>-template.md`, **not** the top-level `templates/` directory. `templates/` does not install into consumer repos; a skill-local `references/` file does. This makes each template a single canonical copy that ships with its skill.
 3. Reference files longer than 100 lines carry a table of contents at the top.
-4. Every change is made in both `src/skills/claude-code/` and `src/skills/codex/` and re-synced via `node bin/agentic.js update --yes`, with `npm test` green.
+4. Every change is made in both `src/skills/claude-code/` and `src/skills/codex/` and re-synced via `node bin/agentic.js update --yes`, with `npm test` green. **(Scope named — see Addendum 2026-10-08.)**
 
 ## Consequences
 
