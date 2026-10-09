@@ -315,27 +315,7 @@ export async function installSkills({
       };
     }
 
-    // A file the previous install recorded but no skill of this agent ships
-    // any more (Task 0101): remove it when unchanged, keep and report it when
-    // the user edited it, and stop tracking it either way. It runs after every
-    // skill is written, so a file that moved to another skill is left alone.
-    const shipped = new Set(Object.values(nextSkills).flatMap((s) => s.files.map((f) => f.path)));
-    for (const [path, recordedSha] of previouslyRecorded) {
-      if (shipped.has(path)) continue;
-      const abs = resolve(cwd, path);
-      if (
-        !abs.startsWith(resolve(cwd) + PATH_SEP) ||
-        !statSync(abs, { throwIfNoEntry: false })?.isFile()
-      ) {
-        continue;
-      }
-      if (sha256Of(abs) === recordedSha) {
-        if (!dryRun) unlinkSync(abs);
-        actions.push({ type: 'removed', path, agent });
-      } else {
-        actions.push({ type: 'dropped-kept', path, agent });
-      }
-    }
+    removeDroppedFiles({ cwd, agent, previouslyRecorded, nextSkills, dryRun, actions });
 
     nextStates[agent] = {
       schemaVersion: SCHEMA_VERSION,
@@ -562,4 +542,25 @@ export function installKitDocs({ targetDir, dryRun = false, force = false }) {
   }
 
   return actions;
+}
+
+// A file the previous install recorded but no skill of this agent ships any
+// more (Task 0101): remove it when unchanged, keep and report it when the user
+// edited it, and stop tracking it either way. It runs after every skill is
+// written, so a file that moved to another skill is left alone.
+function removeDroppedFiles({ cwd, agent, previouslyRecorded, nextSkills, dryRun, actions }) {
+  const root = resolve(cwd);
+  const shipped = new Set(Object.values(nextSkills).flatMap((s) => s.files.map((f) => f.path)));
+  for (const [path, recordedSha] of previouslyRecorded) {
+    if (shipped.has(path)) continue;
+    const installedPath = resolve(root, path);
+    const insideRoot = installedPath.startsWith(root + PATH_SEP);
+    if (!insideRoot || !statSync(installedPath, { throwIfNoEntry: false })?.isFile()) continue;
+    if (sha256Of(installedPath) === recordedSha) {
+      if (!dryRun) unlinkSync(installedPath);
+      actions.push({ type: 'removed', path, agent });
+    } else {
+      actions.push({ type: 'dropped-kept', path, agent });
+    }
+  }
 }
