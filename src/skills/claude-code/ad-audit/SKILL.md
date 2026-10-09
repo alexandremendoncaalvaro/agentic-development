@@ -80,6 +80,7 @@ with the expectation is itself a finding, never proceeded past silently.
 Gate: <command> → <exit status>, <pass/fail summary>; log: <path>; target=<SHA>
 
 --- GROUP RULES ---
+Rule text read at: <SHA>  (the target SHA these rule files were read at; on a re-audit, the re-audit target)
 <the full text of this group's rules — from the repo binding doc / ADR / machine store>
 
 --- CRITICAL? ---

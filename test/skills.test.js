@@ -298,6 +298,11 @@ test('regression: task-0112 a re-audit rebuilds each group handoff from the file
       /names? the (?:target )?SHA (?:its|the) rule text was read at/i,
       `${agent} re-audit handoff must name the SHA its rule text was read at`
     );
+    assert.match(
+      audit,
+      /Rule text read at: <SHA>/,
+      `${agent} handoff template must carry the SHA its rule text was read at`
+    );
   }
 });
 

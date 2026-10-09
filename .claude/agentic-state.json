@@ -63,7 +63,7 @@
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "5d1f55b6bd95fd2618660e59216c0b67b6a28d4d4802c137b19b67b6bbac5b6d"
+          "sourceSha": "4214f0a2c5512c8e36ac395eb31f370197af814e759588025554977d9613a54d"
         }
       ]
     },
@@ -318,7 +318,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
-          "sourceSha": "4b3885b21f75bc61b44009cdf91cacaccf25fe08e7c8d3dbf91a4d5ea46289c2"
+          "sourceSha": "314ad8ecabddfcadb0abb6bf6f29586e57d5d6803616be6b714521f4e77d4c24"
         },
         {
           "path": ".claude/skills/ad-hooks/SKILL.md",

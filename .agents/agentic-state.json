@@ -75,7 +75,7 @@
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "547a7d1c38993dfd8b9662760a60db686dfae44a71f8eea4e4e0cb51d40c2dc2"
+          "sourceSha": "55b26a6dd92c28fb703643b1287c4da9359375d3e153a166bf3fd3e164138285"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
@@ -390,7 +390,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
-          "sourceSha": "4b3885b21f75bc61b44009cdf91cacaccf25fe08e7c8d3dbf91a4d5ea46289c2"
+          "sourceSha": "314ad8ecabddfcadb0abb6bf6f29586e57d5d6803616be6b714521f4e77d4c24"
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
