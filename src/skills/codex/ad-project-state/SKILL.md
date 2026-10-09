@@ -35,6 +35,10 @@ Interpret the packet as follows:
 - `sources` always retains the repository baseline. Each source declares its
   `role`, `status`, `observedAt`, and `provenance`; configured GitHub sources add
   bounded issue and pull-request metadata without bodies.
+- `checkout` is the working tree's `branch` (or `detached`), its default
+  branch's remote-tracking `base`, and its `ahead` and `behind` counts, from
+  local refs only; it is null outside a git repository. A detached or behind
+  checkout is a confidence limit the caller passes on (Task 0100).
 - `failures` records configuration or provider failures independently. A partial
   or unavailable GitHub source lowers confidence but never erases readable local
   evidence.

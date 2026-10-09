@@ -18,7 +18,7 @@ The `UserPromptSubmit` event fires on every user prompt; plain-text stdout from 
 We will add a second member to the `ad-hooks` session-lifecycle tier: a **workflow-checkpoint `UserPromptSubmit` hook**.
 
 - **Mechanism.** A zero-dependency Node script, `scripts/workflow-checkpoint.mjs`, shipped beside `ad-hooks/SKILL.md` in both host trees (byte-parity, as `handoff-nudge.mjs`). On each prompt it reads the event JSON from stdin and prints a short, imperative checkpoint to stdout, then exits 0. It never exits 2 and never blocks a prompt.
-- **Content.** The checkpoint is static, at most about 600 characters, and names the chain by slash command: a fuzzy ask goes to `/ad-grill-me`; non-trivial code runs `/ad-ground` then `/ad-tdd` (or `/ad-tdg` when the strategy is the unknown); before landing, `/ad-review`, or `/ad-audit` for team-bound work; commits go through `/ad-commit`. Trivial requests are told to skip. Imperative wording, per the measured failure of polite reminders.
+- **Content.** The checkpoint is static (**no longer wholly static — see Addendum 2026-10-08**), at most about 600 characters, and names the chain by slash command: a fuzzy ask goes to `/ad-grill-me`; non-trivial code runs `/ad-ground` then `/ad-tdd` (or `/ad-tdg` when the strategy is the unknown); before landing, `/ad-review`, or `/ad-audit` for team-bound work; commits go through `/ad-commit`. Trivial requests are told to skip. Imperative wording, per the measured failure of polite reminders.
 - **Kill switch.** `AD_WORKFLOW_CHECKPOINT=0` in the environment silences the hook; a malformed or empty stdin also yields silence and exit 0.
 - **Scaffolding.** The `ad-hooks` tier documents the wiring and merges a `UserPromptSubmit` block into `.claude/settings.json` without clobbering existing hooks. The script path is resolved at scaffold time from the directory the skill was loaded from, for both this hook and the existing `Stop` hook, replacing the hard-coded project path.
 - **Verification before code.** The `UserPromptSubmit` stdout-as-context contract is confirmed against the live host and recorded as the task's ground record before the script is written, the way ADR-0055 verified `Stop`.
@@ -54,3 +54,19 @@ Revisit trigger: Claude Code documents a way to inject context once per task ins
 
 Before implementation the owner described the flow they run by hand: risk analysis first, then ground, then TDD with a review after each slice and an audit after each large block, a three-line summary plus a checklist roadmap (done / remaining) at the start of every session without reciting the rules, and a resume chip (or a fresh-session prompt where chips are unavailable) at the end. The checkpoint carries exactly that sequence, so its size is about 700 characters rather than the 600 estimated above; the test caps it at 900. The static, exit-0, kill-switch, and Claude-Code-only decisions are unchanged.
 
+
+## Addendum 2026-10-08: the installed kit version
+
+The checkpoint is no longer wholly static. After the fixed text it adds one
+line, "Installed agentic kit: <version> (<scope> scope).", read from the kit's
+state file in the nearest project install at or above the event's `cwd`,
+stopping below the home directory, or else in the home directory (the user
+install), so an agent running an old installed copy sees
+it; a skill copy that predated a step had silently skipped it twice (Task
+0099). The line is read locally, adds no network call, depends on the session
+and never on the prompt, and is omitted when no state file exists. A state file in a cloned
+repository is untrusted, so a value that is not version-shaped is never echoed.
+A state file that is unreadable, invalid or names no version is reported as
+"unknown" with the reason, never treated as absent.
+Exit 0, the kill switch, the no-coercion decision and the 900-character cap
+stand.

@@ -10,7 +10,7 @@ import {
   unlinkSync,
 } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { basename, dirname, join, relative, sep as PATH_SEP } from 'node:path';
+import { basename, dirname, join, relative, resolve, sep as PATH_SEP } from 'node:path';
 import { SCHEMA_VERSION } from './state.js';
 import { retiredSkillsForAgent } from './skill-migrations.js';
 
@@ -215,6 +215,7 @@ export async function installSkills({
   for (const agent of agents) {
     const prev = previousStates[agent] ?? null;
     const nextSkills = {};
+    const previouslyRecorded = [];
 
     for (const skill of skills) {
       const { layout, subagentSet, walked } = resolveSkillSource(agent, skill);
@@ -306,11 +307,15 @@ export async function installSkills({
         skillFiles.push({ path: relForReport, sourceSha: decision.sourceSha });
       }
 
+      for (const [path, recordedSha] of prevByPath) previouslyRecorded.push([path, recordedSha]);
+
       nextSkills[skill] = {
         version: kitVersion ?? prevSkill?.version ?? null,
         files: skillFiles,
       };
     }
+
+    removeDroppedFiles({ cwd, agent, previouslyRecorded, nextSkills, dryRun, actions });
 
     nextStates[agent] = {
       schemaVersion: SCHEMA_VERSION,
@@ -537,4 +542,25 @@ export function installKitDocs({ targetDir, dryRun = false, force = false }) {
   }
 
   return actions;
+}
+
+// A file the previous install recorded but no skill of this agent ships any
+// more (Task 0101): remove it when unchanged, keep and report it when the user
+// edited it, and stop tracking it either way. It runs after every skill is
+// written, so a file that moved to another skill is left alone.
+function removeDroppedFiles({ cwd, agent, previouslyRecorded, nextSkills, dryRun, actions }) {
+  const root = resolve(cwd);
+  const shipped = new Set(Object.values(nextSkills).flatMap((s) => s.files.map((f) => f.path)));
+  for (const [path, recordedSha] of previouslyRecorded) {
+    if (shipped.has(path)) continue;
+    const installedPath = resolve(root, path);
+    const insideRoot = installedPath.startsWith(root + PATH_SEP);
+    if (!insideRoot || !statSync(installedPath, { throwIfNoEntry: false })?.isFile()) continue;
+    if (sha256Of(installedPath) === recordedSha) {
+      if (!dryRun) unlinkSync(installedPath);
+      actions.push({ type: 'removed', path, agent });
+    } else {
+      actions.push({ type: 'dropped-kept', path, agent });
+    }
+  }
 }

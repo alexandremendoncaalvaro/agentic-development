@@ -24,7 +24,7 @@ We will adopt an agent-vs-script policy for both host trees.
 1. Deterministic, consistency-critical sub-steps in a skill are bundled as `scripts/` the agent **executes**, with explicit execute-vs-read intent stated in the body ("run X" vs "see X"). Scripts follow "solve, don't defer" — they handle their own error conditions and document their constants rather than punting to the model.
 2. Genuine judgment workflows stay high-freedom text and are **out of scope**: grounding, grilling, code review, diagnosis reasoning, TDD/TDG, and posture (`ad-philosophy`). Scripting them would over-constrain reasoning where high freedom is correct.
 3. Deterministic logic reused across skills — next-`NNNN` numbering, `gh`/git preflight, and repo/stack detection — is factored so it is not re-derived per skill. Whether that is a per-skill copy or one shared module is an explicit sub-decision at rollout. Host-divergent helpers (e.g. `ad-rules` resolving `~/.codex/AGENTS.md` vs `~/.claude/CLAUDE.md`) are authored per host, never shared across trees.
-4. Every change is made in both `src/skills/` trees, re-synced via `node bin/agentic.js update --yes`, with `npm test` green, and each new script verified to install into a consumer via `npm pack --dry-run` plus a scratch `init`.
+4. Every change is made in both `src/skills/` trees, re-synced via `node bin/agentic.js update --yes`, with `npm test` green, and each new script verified to install into a consumer via `npm pack --dry-run` plus a scratch `init`. **(Scope named — see Addendum 2026-10-08.)**
 
 ## Consequences
 
@@ -49,3 +49,14 @@ Neutral:
 * **Keep narrating deterministic steps in prose** — rejected. It is re-derived every run, drifts between skills, and is less reliable than executed code; it contradicts the grounded degrees-of-freedom guidance the kit already follows elsewhere.
 * **Script everything, including judgment workflows** — rejected. Grounding, review, and diagnosis need high freedom; encoding them as low-freedom scripts would degrade exactly the skills whose value is open-ended reasoning.
 * **Defer the policy and decide skill-by-skill during edits** — rejected. Without a recorded convention the edits drift one skill at a time; this ADR sets the standard the `scripts/` rollout follows, the same way ADR-0056 sets it for `references/`.
+
+## Addendum 2026-10-08: name the scope in decision 4
+
+Decision 4's "re-synced via `node bin/agentic.js update --yes`" and "a scratch
+`init`" name no scope, and a bare `init` or `update` targets the user-scope
+install: on 2026-09-30 an unscoped scratch `init` rewrote the owner's
+machine-global skills with an unmerged branch's kit (Task 0092). The dogfood
+re-sync is `node bin/agentic.js update --scope project --agent both --yes`
+from this repository's root, and the scratch check is
+`node bin/agentic.js init --agent both --scope project -y` run inside a
+disposable directory (Task 0102).

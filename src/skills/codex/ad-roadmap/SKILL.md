@@ -27,7 +27,7 @@ Rules (read first):
 Project scope — load the plan.
 - In project scope, invoke `/ad-project-state` before choosing the plan evidence.
   Preserve its primary/supporting roles, observation time, provenance, and any
-  failure as reconciliation inputs. Task scope stays anchored to the explicitly
+  failure as reconciliation inputs. When the packet's `checkout` is detached or behind its base, report that as a confidence limit: the roadmap reflects that checkout, not the default branch. Task scope stays anchored to the explicitly
   selected repository task and does not recollect project sources.
 - Keep the broad scan bounded: read roadmap sections, frontmatter, artifact references, and checkbox lines. Do not read full document bodies.
 - Read `Status:` and `## Roadmap` from `doc/product/PRD.md`. MVP / Next / Later tiers are the spine; each roadmap line is one item to classify.

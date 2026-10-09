@@ -1088,3 +1088,126 @@ test('update on legacy install (no state) → falls through to byte-compare, the
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// Task 0101: a file a kit skill dropped (Task 0090 removed ad-spike's
+// spike-adr-template.md) must not linger in an existing install.
+async function installWithDroppedFile(dir, content) {
+  const first = await installSkills({
+    cwd: dir,
+    agents: ['claude-code'],
+    skills: ['ad-spike'],
+    kitVersion: '0.1.0-test',
+  });
+  const dropped = '.claude/skills/ad-spike/dropped-template.md';
+  writeFileSync(join(dir, dropped), content);
+  const state = first.nextStates['claude-code'];
+  state.skills['ad-spike'].files.push({ path: dropped, sourceSha: sha256('kit body\n') });
+  return { dropped, state };
+}
+
+test('regression: task-0101 update removes an unchanged file the kit no longer ships', async () => {
+  const dir = mkScratch();
+  try {
+    const { dropped, state } = await installWithDroppedFile(dir, 'kit body\n');
+    const result = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['ad-spike'],
+      previousStates: { 'claude-code': state },
+      kitVersion: '0.2.0-test',
+    });
+    assert.deepEqual(
+      result.actions.filter((a) => a.path === dropped).map((a) => a.type),
+      ['removed']
+    );
+    assert.equal(existsSync(join(dir, dropped)), false);
+    assert.equal(
+      result.nextStates['claude-code'].skills['ad-spike'].files.some((f) => f.path === dropped),
+      false
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('regression: task-0101 update keeps and reports a dropped file the user edited', async () => {
+  const dir = mkScratch();
+  try {
+    const { dropped, state } = await installWithDroppedFile(dir, 'my own notes\n');
+    const result = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['ad-spike'],
+      previousStates: { 'claude-code': state },
+      kitVersion: '0.2.0-test',
+    });
+    assert.deepEqual(
+      result.actions.filter((a) => a.path === dropped).map((a) => a.type),
+      ['dropped-kept']
+    );
+    assert.equal(readFileSync(join(dir, dropped), 'utf8'), 'my own notes\n');
+    assert.equal(
+      result.nextStates['claude-code'].skills['ad-spike'].files.some((f) => f.path === dropped),
+      false
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('regression: task-0101 a file moved to another skill is neither removed nor reported', async () => {
+  const dir = mkScratch();
+  try {
+    const first = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['ad-review', 'ad-spike'],
+      kitVersion: '0.1.0-test',
+    });
+    const moved = '.claude/agents/fresh-context-reviewer.md';
+    const state = first.nextStates['claude-code'];
+    const entry = state.skills['ad-review'].files.find((f) => f.path === moved);
+    state.skills['ad-review'].files = state.skills['ad-review'].files.filter((f) => f !== entry);
+    state.skills['ad-spike'].files.push(entry);
+    const result = await installSkills({
+      cwd: dir,
+      agents: ['claude-code'],
+      skills: ['ad-review', 'ad-spike'],
+      previousStates: { 'claude-code': state },
+      kitVersion: '0.2.0-test',
+    });
+    assert.equal(existsSync(join(dir, moved)), true);
+    assert.deepEqual(
+      result.actions
+        .filter((a) => a.path === moved && (a.type === 'removed' || a.type === 'dropped-kept'))
+        .map((a) => a.type),
+      []
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('regression: task-0101 a re-run init reports a removed dropped file with its symbol', () => {
+  const dir = mkScratch();
+  try {
+    runInit(dir, ['--agent', 'claude-code', '-y']);
+    const dropped = '.claude/skills/ad-spike/dropped-template.md';
+    writeFileSync(join(dir, dropped), 'kit body\n');
+    const state = loadState(dir, 'claude-code');
+    state.skills['ad-spike'].files.push({ path: dropped, sourceSha: sha256('kit body\n') });
+    saveState(dir, 'claude-code', state);
+
+    // Non-interactive init writes its per-file lines to stderr.
+    const run = spawnSync(
+      'node',
+      [BIN, 'init', '--scope', 'project', '--agent', 'claude-code', '-y'],
+      { cwd: dir, encoding: 'utf8' }
+    );
+    const out = `${run.stdout}${run.stderr}`;
+    assert.match(out, new RegExp(`^- ${dropped.replace(/[.]/g, '\\.')}$`, 'm'));
+    assert.doesNotMatch(out, /undefined/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

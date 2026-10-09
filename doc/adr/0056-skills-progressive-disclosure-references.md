@@ -21,7 +21,7 @@ We will adopt progressive disclosure as the skill-authoring standard for both ho
 1. The `SKILL.md` body stays a lean, imperative overview. Reference material — copy-paste templates, long worked examples, rationale/background prose, exhaustive checklists, and format specifications — moves into bundled `references/*.md`, linked **one level deep** from the body (no reference-to-reference nesting, which causes partial reads).
 2. Each artifact-drafting skill carries its template in its own `references/<artifact>-template.md`, **not** the top-level `templates/` directory. `templates/` does not install into consumer repos; a skill-local `references/` file does. This makes each template a single canonical copy that ships with its skill.
 3. Reference files longer than 100 lines carry a table of contents at the top.
-4. Every change is made in both `src/skills/claude-code/` and `src/skills/codex/` and re-synced via `node bin/agentic.js update --yes`, with `npm test` green.
+4. Every change is made in both `src/skills/claude-code/` and `src/skills/codex/` and re-synced via `node bin/agentic.js update --yes`, with `npm test` green. **(Scope named — see Addendum 2026-10-08.)**
 
 ## Consequences
 
@@ -46,3 +46,11 @@ Neutral:
 * **Leave all reference material inline** — rejected. It is the direct cause of oversized always-loaded bodies (the "too large to be followed" failure this audit targets) and of the duplicate/dangling templates.
 * **Keep the shared top-level `templates/` and make the installer copy it into consumer repos** — rejected. More intrusive (it drops files at the consumer's repo root), and it runs against the host packaging model, which puts a skill's resources *inside* the skill. A per-skill `references/` file is self-contained and already ships.
 * **One template file shared by several skills** — rejected as unnecessary coupling. Each artifact type maps to one owning skill; sharing reintroduces a cross-skill dependency and the same "where does the shared file install" question this decision removes.
+
+## Addendum 2026-10-08: name the scope in decision 4
+
+Decision 4's "re-synced via `node bin/agentic.js update --yes`" names no
+scope, and a bare `update` targets the user-scope install, not this
+repository's dogfood copies. The re-sync is
+`node bin/agentic.js update --scope project --agent both --yes` from this
+repository's root (Task 0102, the same correction as ADR-0057's addendum).

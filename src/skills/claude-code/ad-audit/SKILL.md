@@ -19,7 +19,7 @@ State exactly what is under review and which tree it rests on — the tree is pa
 - **Tree/SHA:** working-tree vs `origin/main` vs a deployed env. `git fetch origin main` and name the SHA under audit.
 - **Changed files (diff/branch/PR targets):** enumerate them (`git diff --name-only <range>`) — this list is the file-coverage axis Step 7 checks (ADR-0046). Bulk assets (fixtures, vendored, generated) may be bucketed as a named class rather than listed one by one — but a bucket clears N/A only after a spot-check of representative samples or a mechanical verification of the class, never on the label alone.
 
-**Re-audit (prior trail exists — ADR-0047).** Check `.agentic/reviews/` for a prior trail on this same target. If one exists, this run is a RE-AUDIT: load the latest trail and carry every prior finding into Step 7 with a mandatory disposition — **resolved** (evidence of the fix) · **refuted** (evidence it was wrong) · **still-open**. A prior finding that silently disappears invalidates the re-audit; findings are threads, not snapshots.
+**Re-audit (prior trail exists — ADR-0047).** Check `.agentic/reviews/` for a prior trail on this same target. If one exists, this run is a RE-AUDIT: load the latest trail and carry every prior finding into Step 7 with a mandatory disposition — **resolved** (evidence of the fix) · **refuted** (evidence it was wrong) · **still-open**. A prior finding that silently disappears invalidates the re-audit; findings are threads, not snapshots. A re-audit rebuilds every group handoff's rule text from the files at the re-audit target SHA, never from a prior handoff, and each handoff names the target SHA its rule text was read at (task 0112: a reused handoff carried rule text older than the fixes it reviewed).
 
 When the host exposes `AskUserQuestion`, confirm the target as a multi-choice card.
 
@@ -80,6 +80,7 @@ with the expectation is itself a finding, never proceeded past silently.
 Gate: <command> → <exit status>, <pass/fail summary>; log: <path>; target=<SHA>
 
 --- GROUP RULES ---
+Rule text read at: <SHA>  (the target SHA these rule files were read at; on a re-audit, the re-audit target)
 <the full text of this group's rules — from the repo binding doc / ADR / machine store>
 
 --- CRITICAL? ---
@@ -95,7 +96,7 @@ target=<the Step 0 SHA>
 === END HANDOFF ===
 ```
 
-Persist each handoff to `.agentic/reviews/<ISO-timestamp>-audit-<group-slug>.md` (create the dir if missing; advise `.gitignore` for `.agentic/reviews/`). If the target spans >50 files, ask the user to narrow scope before dispatching — cost compounds across groups.
+Persist each handoff to `.agentic/reviews/<ISO-timestamp>-audit-<group-slug>.md` (create the dir if missing; advise `.gitignore` for `.agentic/reviews/`). Write each file with the host's file-write tool or a program that writes the bytes as given, never with `echo` or an unquoted heredoc: either one can rewrite a backslash escape or run the backtick spans of an embedded diff as commands (Task 0098). If the target spans >50 files, ask the user to narrow scope before dispatching — cost compounds across groups.
 
 ## Step 4 — Fan out one reviewer per group, in parallel
 

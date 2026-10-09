@@ -26,7 +26,7 @@ Every field is an objective fact, and the survey never crashes: a missing direct
 The survey targets the single-product / single-context layout. For a multi-product (`product.productMap: true`) or multi-context (`domain.contextMap: true`) repo it reports the index file's presence but does not enumerate the per-product / per-context files — read those yourself when the map is present.
 
 Then invoke `/ad-project-state` and read its provenance-bearing fact packet
-before any scenario classification. The deterministic survey remains the
+before any scenario classification. When its `checkout` is detached or behind its base, carry that as a confidence limit: the survey reads that checkout, not the default branch. The deterministic survey remains the
 repository-detail source; the shared resolver adds the configured evidence role,
 freshness, GitHub issue or pull-request summaries, and independent failures. Do
 not query a provider directly or treat an unavailable external source as an empty

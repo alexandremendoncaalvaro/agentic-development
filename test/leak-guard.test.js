@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { delimiter, join } from 'node:path';
 import {
   loadDenylist,
   parseRawDiff,
@@ -393,6 +393,12 @@ test('findViolations with no denylist patterns still enforces rules/ and symlink
 // in git's diff shape breaks the test rather than silently opening the gate.
 
 const MARKER = 'ACME-INTERNAL-CODENAME';
+const GIT_VARS = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE'];
+const cleanGitEnv = () => {
+  const env = { ...process.env };
+  for (const name of GIT_VARS) delete env[name];
+  return env;
+};
 
 function scratchRepo({ denylist = MARKER } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'leak-guard-'));
@@ -411,6 +417,10 @@ function scratchRepo({ denylist = MARKER } = {}) {
 function runGuard(dir) {
   const cwd = process.cwd();
   const write = process.stderr.write;
+  // A leaked GIT_DIR would point main()'s git calls at this repository
+  // (AGENTS.md Gotchas), so the guard runs with the git variables removed.
+  const saved = Object.fromEntries(GIT_VARS.map((name) => [name, process.env[name]]));
+  for (const name of GIT_VARS) delete process.env[name];
   process.stderr.write = () => true;
   try {
     process.chdir(dir);
@@ -418,6 +428,9 @@ function runGuard(dir) {
   } finally {
     process.stderr.write = write;
     process.chdir(cwd);
+    for (const [name, value] of Object.entries(saved)) {
+      if (value !== undefined) process.env[name] = value;
+    }
   }
 }
 
@@ -486,4 +499,116 @@ test('main: a missing denylist skips the content scan but still blocks rules/ pa
   repo.git('reset', '-q');
   stage(repo, 'rules/a.md', 'x\n');
   assert.equal(runGuard(repo.dir), 1, 'the path check does not depend on the denylist');
+});
+
+// Task 0113: the denylist is gitignored, so a linked worktree has none of its
+// own; the guard must still read the main worktree's list.
+function linkedWorktree(repo) {
+  stage(repo, 'seed.md', 'seed\n');
+  repo.git('-c', 'core.hooksPath=/dev/null', 'commit', '-q', '-m', 'seed', '--no-verify');
+  const dir = mkdtempSync(join(tmpdir(), 'leak-guard-wt-'));
+  rmSync(dir, { recursive: true, force: true });
+  execFileSync('git', ['worktree', 'add', '-q', dir], {
+    cwd: repo.dir,
+    stdio: 'pipe',
+    env: cleanGitEnv(),
+  });
+  const git = (...args) =>
+    execFileSync('git', args, { cwd: dir, stdio: 'pipe', env: cleanGitEnv() });
+  return { dir, git };
+}
+
+test("regression: task-0113 a linked worktree blocks a marker from the main worktree's denylist", (t) => {
+  const repo = scratchRepo();
+  const worktree = linkedWorktree(repo);
+  t.after(() => {
+    rmSync(worktree.dir, { recursive: true, force: true });
+    rmSync(repo.dir, { recursive: true, force: true });
+  });
+  stage(worktree, 'leak.md', `prose mentioning ${MARKER} inline\n`);
+  assert.equal(runGuard(worktree.dir), 1);
+});
+
+test("regression: task-0113 a worktree's own denylist adds to the main worktree's, never replaces it", (t) => {
+  const repo = scratchRepo();
+  const worktree = linkedWorktree(repo);
+  t.after(() => {
+    rmSync(worktree.dir, { recursive: true, force: true });
+    rmSync(repo.dir, { recursive: true, force: true });
+  });
+  mkdirSync(join(worktree.dir, '.agentic'), { recursive: true });
+  writeFileSync(join(worktree.dir, '.agentic', 'leak-denylist.txt'), 'WORKTREE-ONLY-MARKER\n');
+
+  stage(worktree, 'main-marker.md', `mentions ${MARKER}\n`);
+  assert.equal(runGuard(worktree.dir), 1, "the main worktree's marker still blocks");
+  worktree.git('rm', '-q', '--cached', 'main-marker.md');
+  stage(worktree, 'own-marker.md', 'mentions WORKTREE-ONLY-MARKER\n');
+  assert.equal(runGuard(worktree.dir), 1, "the worktree's own marker blocks too");
+});
+
+// A POSIX shell shim stands in for a git that cannot report the common dir.
+test(
+  'regression: task-0113 the guard says when it cannot read the main worktree',
+  { skip: process.platform === 'win32' },
+  (t) => {
+    const repo = scratchRepo();
+    t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
+    stage(repo, 'ok.md', 'nothing sensitive here\n');
+    const realGit = execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim();
+    const shimDir = join(repo.dir, '.shim');
+    mkdirSync(shimDir);
+    writeFileSync(
+      join(shimDir, 'git'),
+      `#!/bin/sh\nfor a in "$@"; do [ "$a" = --git-common-dir ] && exit 128; done\nexec "${realGit}" "$@"\n`,
+      { mode: 0o755 }
+    );
+    const cwd = process.cwd();
+    const write = process.stderr.write;
+    const lines = [];
+    const saved = Object.fromEntries(
+      [...GIT_VARS, 'PATH'].map((name) => [name, process.env[name]])
+    );
+    for (const name of GIT_VARS) delete process.env[name];
+    process.env.PATH = `${shimDir}${delimiter}${process.env.PATH}`;
+    process.stderr.write = (text) => lines.push(String(text)) > 0;
+    let code;
+    try {
+      process.chdir(repo.dir);
+      code = main();
+    } finally {
+      process.stderr.write = write;
+      process.chdir(cwd);
+      for (const [name, value] of Object.entries(saved)) {
+        if (value === undefined) delete process.env[name];
+        else process.env[name] = value;
+      }
+    }
+    assert.equal(code, 0, "the working tree's own list still applies");
+    assert.equal(lines.filter((l) => /could not locate the main worktree/.test(l)).length, 1);
+  }
+);
+
+test('regression: task-0113 the guard says when no denylist is found anywhere', (t) => {
+  const repo = scratchRepo({ denylist: null });
+  t.after(() => rmSync(repo.dir, { recursive: true, force: true }));
+  stage(repo, 'ok.md', 'nothing sensitive here\n');
+  const cwd = process.cwd();
+  const write = process.stderr.write;
+  const lines = [];
+  const saved = Object.fromEntries(GIT_VARS.map((name) => [name, process.env[name]]));
+  for (const name of GIT_VARS) delete process.env[name];
+  process.stderr.write = (text) => lines.push(String(text)) > 0;
+  let code;
+  try {
+    process.chdir(repo.dir);
+    code = main();
+  } finally {
+    process.stderr.write = write;
+    process.chdir(cwd);
+    for (const [name, value] of Object.entries(saved)) {
+      if (value !== undefined) process.env[name] = value;
+    }
+  }
+  assert.equal(code, 0, 'no denylist is not a reason to block');
+  assert.equal(lines.filter((l) => /no leak denylist found/.test(l)).length, 1);
 });

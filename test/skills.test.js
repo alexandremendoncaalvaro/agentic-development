@@ -254,6 +254,58 @@ test('decision-maker briefing composition is one-way and visible in the workflow
   }
 });
 
+test('regression: task-0100 state skills pass a detached or behind checkout on as a confidence limit', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    for (const skill of ['ad-roadmap', 'ad-next', 'ad-brief']) {
+      const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+      assert.match(
+        body,
+        /`checkout`[\s\S]{0,160}(?:detached|behind)[\s\S]{0,200}confidence limit/i,
+        `${agent} ${skill} must carry the packet's checkout state as a confidence limit`
+      );
+    }
+  }
+});
+
+test('regression: task-0098 review and audit handoffs are written without shell interpolation', () => {
+  // zsh echo turned a \\b into a backspace (Task 0092), and an unquoted
+  // heredoc ran the backtick spans of an embedded diff as commands.
+  for (const agent of ['claude-code', 'codex']) {
+    for (const skill of ['ad-review', 'ad-audit']) {
+      const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+      assert.match(
+        body,
+        /file-write tool or a program that writes the bytes as given[\s\S]{0,60}never[\s\S]{0,40}`echo`[\s\S]{0,40}unquoted heredoc/i,
+        `${agent} ${skill} must name an interpretation-free write path for handoffs`
+      );
+    }
+  }
+});
+
+test('regression: task-0112 a re-audit rebuilds each group handoff from the files at its target', () => {
+  // Task 0111's re-audit reused the first pass's handoffs, so two groups'
+  // inline rule text predated the fixes under review.
+  for (const agent of ['claude-code', 'codex']) {
+    const audit = readFileSync(join(SKILLS_ROOT, agent, 'ad-audit', 'SKILL.md'), 'utf8');
+    const reaudit = audit.slice(audit.search(/RE-AUDIT/));
+    assert.match(
+      reaudit,
+      /rebuild[\s\S]{0,200}rule text[\s\S]{0,200}at the re-audit target[\s\S]{0,120}never[\s\S]{0,40}prior handoff/i,
+      `${agent} re-audit must rebuild rule text from the target, never a prior handoff`
+    );
+    assert.match(
+      reaudit,
+      /names? the (?:target )?SHA (?:its|the) rule text was read at/i,
+      `${agent} re-audit handoff must name the SHA its rule text was read at`
+    );
+    assert.match(
+      audit,
+      /Rule text read at: <SHA>/,
+      `${agent} handoff template must carry the SHA its rule text was read at`
+    );
+  }
+});
+
 test('a standalone brief reads the work-in-progress briefing script on both hosts', () => {
   // ADR-0090 decision 3, task-0111 slice 3: the agentic-session pane and
   // /ad-brief read the same script, so they cannot disagree.

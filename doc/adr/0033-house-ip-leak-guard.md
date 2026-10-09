@@ -37,7 +37,7 @@ Positive:
 Negative / trade-offs:
 
 - The guard is a client-side lefthook hook, so it is a policy-backed local control, not a technical impossibility: `--no-verify` (or unset hooks) can bypass it, and WORKFLOW §11 forbids that — the same footing as every other gate in this repo. There is deliberately no CI re-check, because by the time content reaches CI on a public ref it has already leaked (see Alternatives).
-- One more local-setup step: contributors must copy `.agentic/leak-denylist.example.txt` to `.agentic/leak-denylist.txt`. Absent the local file, the denylist check is a no-op — the `rules/` and symlink checks still fire.
+- One more local-setup step: contributors must copy `.agentic/leak-denylist.example.txt` to `.agentic/leak-denylist.txt`. Absent the local file, the denylist check is a no-op — the `rules/` and symlink checks still fire. **(Superseded for linked worktrees — see Addendum 2026-10-08.)**
 - False positives are possible when denylist patterns are broad. Patterns are tuned locally by whoever owns them; the cost of a false positive is a blocked commit, not lost work.
 - Content matching is per-line literal substring, so a marker split across lines or living in a binary blob is not caught by the content scan (the path check still applies). The guard is a backstop, not a complete exfiltration control.
 - The guard reads staged content on every commit, adding a small fixed latency to the commit path.
@@ -48,3 +48,18 @@ Negative / trade-offs:
 * `.gitignore` only — offers no protection against pasted prose or against a repo-escaping symlink committed as a dereferenced copy.
 * A CI-only check — fires after the content is already pushed to a public repo, which is too late; the leak has already happened.
 * Manual review discipline as the sole control — fails silently and permanently on the first miss; the whole point is a deterministic backstop that does not depend on the author remembering.
+
+## Addendum 2026-10-08: the denylist in linked worktrees
+
+Item 1's local denylist is gitignored, so a linked worktree never has the
+main checkout's copy, and its commits ran the guard with no markers; the
+company's name reached three public files that way (Task 0113). The guard
+now reads `.agentic/leak-denylist.txt` from the working tree's root and from
+the main worktree's root, found through `git rev-parse --git-common-dir`,
+and applies both lists. The Consequences line "Absent the local file, the
+denylist check is a no-op" no longer holds: with no list in either place
+the guard prints one line saying so, and the `rules/` and symlink checks
+still fire. A layout without a `.git` common directory (a bare repository's
+worktree, a submodule's worktree under `.git/modules/`, or a
+`--separate-git-dir` checkout) reads only the working tree's own list, and
+so does a run whose `--git-common-dir` lookup fails, which says so on stderr.
