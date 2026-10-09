@@ -47,9 +47,9 @@ function commit(repo, message) {
   git(repo, 'commit', '-qm', message);
 }
 
-function fixtureRepo() {
+function fixtureRepo(branch = 'main') {
   const repo = mkdtempSync(join(tmpdir(), 'briefing-repo-'));
-  git(repo, 'init', '-q', '-b', 'main');
+  git(repo, 'init', '-q', '-b', branch);
   write(repo, 'README.md', 'fixture\n');
   commit(repo, 'base');
   return repo;
@@ -159,6 +159,23 @@ test('picks the task the newest commit ahead of main touched when several are in
 
   assert.equal(result.task.slug, '0002-other-task');
   assert.equal(result.task.rule, 'newest-commit-ahead');
+});
+
+test('regression: task-0114 compares against the default branch when it is not main', () => {
+  const repo = fixtureRepo('trunk');
+  write(repo, 'doc/tasks/0001-fixture-task.md', task());
+  write(repo, 'doc/tasks/0002-other-task.md', task());
+  commit(repo, 'docs: add two tasks');
+  git(repo, 'update-ref', 'refs/remotes/origin/trunk', 'HEAD');
+  git(repo, 'symbolic-ref', 'refs/remotes/origin/HEAD', 'refs/remotes/origin/trunk');
+  git(repo, 'switch', '-q', '-c', 'feat/work');
+  write(repo, 'doc/tasks/0002-other-task.md', task({ notes: '### 2026-10-02\n\nNewer.\n' }));
+  commit(repo, 'docs: touch the second task');
+
+  const result = briefing(repo);
+
+  assert.equal(result.task?.slug, '0002-other-task');
+  assert.equal(result.task?.rule, 'newest-commit-ahead');
 });
 
 test('reports the Notes entries that record a deviation, with their text', () => {
