@@ -26,7 +26,7 @@
 
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export const CHECKPOINT = [
@@ -85,12 +85,15 @@ function parseEvent(raw) {
 }
 
 const STATE_DIRS = ['.claude', '.agents'];
+// A state file in a cloned repository is untrusted: only a version-shaped
+// value reaches the model's context.
+const VERSION_SHAPE = /^[0-9A-Za-z.+-]{1,32}$/;
 
 function recordedVersion(root) {
   for (const dir of STATE_DIRS) {
     try {
       const state = JSON.parse(readFileSync(join(root, dir, 'agentic-state.json'), 'utf8'));
-      if (typeof state?.kitVersion === 'string' && state.kitVersion) return state.kitVersion;
+      if (VERSION_SHAPE.test(state?.kitVersion)) return state.kitVersion;
     } catch {
       // An absent or unreadable state file names no version.
     }
@@ -98,14 +101,26 @@ function recordedVersion(root) {
   return null;
 }
 
+// The nearest project install at or above `cwd`, stopping below `home` so
+// the user install is never read as a project one.
+function projectVersion(cwd, home) {
+  const stop = resolve(home);
+  for (let dir = resolve(cwd); dir !== stop; dir = dirname(dir)) {
+    const version = recordedVersion(dir);
+    if (version) return version;
+    if (dirname(dir) === dir) break;
+  }
+  return null;
+}
+
 /**
- * The installed kit version this session runs (Task 0099): the project
- * install under the event's `cwd` wins over the user install, as the
- * installer resolves them; read locally, never from the network. Null when
- * neither state file names a version.
+ * The installed kit version this session runs (Task 0099): the nearest
+ * project install at or above the event's `cwd` wins over the user install,
+ * as the installer resolves them; read locally, never from the network. Null
+ * when no state file names a version.
  */
 export function installedKit(event, home = homedir()) {
-  const project = typeof event?.cwd === 'string' ? recordedVersion(event.cwd) : null;
+  const project = typeof event?.cwd === 'string' ? projectVersion(event.cwd, home) : null;
   if (project) return { version: project, scope: 'project' };
   const user = recordedVersion(home);
   return user ? { version: user, scope: 'user' } : null;
