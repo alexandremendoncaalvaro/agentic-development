@@ -23,6 +23,7 @@ briefing on `main` (Task 0100 Notes).
 
 - [ ] The briefing compares against the same base `ad-project-state` resolves, and falls back to the current behaviour when none resolves.
 - [ ] A regression test on a fixture whose default branch is not `main` names the active task.
+- [ ] The `ad-next` survey counts the commits ahead of the same base and names that base, with a regression test on a non-`main` fixture.
 
 ## Plan
 
@@ -41,6 +42,10 @@ deferred item needs a tracked work item).
 ### 2026-10-09 — plan approved
 
 The owner approved working this task next ("Pode ser prossiga"), on the Plan as written. The base is resolved as `ad-project-state` does (`origin/HEAD`, then `origin/main`, then `origin/master`), with a copy of that rule in the script: a skill script cannot import another skill's script (ADR-0057 decision 3). With none resolved the briefing keeps comparing against `main`.
+
+### 2026-10-09 — scope extended to the survey
+
+The review of the briefing fix found the same hard-coded `main..HEAD` in `ad-next/scripts/survey.mjs` (its `aheadOfMain` count). It is the same defect in the sibling script, so this task takes it rather than opening another: the survey resolves the base the same way, keeps the `aheadOfMain` field for its consumers, and adds a `base` field naming the ref it compared against.
 
 ## Definition of Done
 
