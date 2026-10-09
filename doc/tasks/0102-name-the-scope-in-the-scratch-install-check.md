@@ -55,6 +55,14 @@ scope for the dogfood re-sync.
 
 Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: ADR-0056 and ADR-0057 mark their decision 4 in place as amended by the addendum, as PROJECTION requires of a self-amendment.
 
+### 2026-10-09 — review and audit record
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the `/ad-audit` of `origin/main..23252ae` (19 rule groups, the critical claims group run three times across two models; gate `npm run verify` exit 0, 1394 of 1394). Neither found a Blocker. Batch-wide findings and the full table are in the pull request body. Findings for this task, as severity, finding, disposition:
+
+- Audit major: GUIDELINES §9.4 still ran `init` / `update` against a tmp directory without a scope, so the built note's "only in ADR-0057" was wrong. Fixed: §9.4 names `--scope project`. The search behind this note: `git grep -nE 'bin/agentic\.js (init|update)|scratch .?init'` excluding `doc/tasks`, `CHANGELOG.md`, `doc/research`, the dogfood copies and `test`, keeping lines without `--scope`; the remaining hits (AGENTS.md quick start, README, `doc/guides/installation.md`) are consumer setup, not scratch checks.
+- Review Note: ADR-0056 and ADR-0057 did not mark decision 4 in place. Fixed in 23252ae.
+- Review Note: no changelog entry. Accepted: no shipped behaviour changed.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

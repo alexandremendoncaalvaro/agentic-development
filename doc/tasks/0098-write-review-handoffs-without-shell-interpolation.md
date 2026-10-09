@@ -52,6 +52,13 @@ bytes as given, never with `echo` or an unquoted heredoc. A regression test
 in `test/skills.test.js` locks the sentence in all four files; it was red
 before the edit.
 
+### 2026-10-09 — review and audit record
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the `/ad-audit` of `origin/main..23252ae` (19 rule groups, the critical claims group run three times across two models; gate `npm run verify` exit 0, 1394 of 1394). Neither found a Blocker. Batch-wide findings and the full table are in the pull request body. Findings for this task, as severity, finding, disposition:
+
+- Review Note (Standards and Spec): status and Plan boxes still open. Fixed when this task closes.
+- Audit minor: the changelog entry cited no ADR. Fixed (ADR-0036).
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

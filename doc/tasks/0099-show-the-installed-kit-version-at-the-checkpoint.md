@@ -62,6 +62,22 @@ that the content is no longer wholly static; `ad-hooks` documents the line.
 
 Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: the project install was read only at the session's exact directory; the checkpoint now walks up to the nearest project install, stopping below the home directory so the user install is never named as a project one (two regression tests; removing the home stop turned one red). Fixed: a state file in a cloned repository is untrusted, so a version that is not version-shaped (`^[0-9A-Za-z.+-]{1,32}$`) is left out (regression test with a multi-line value). Kept: `.claude` is read before `.agents`; both record the same kit version in a dual install.
 
+### 2026-10-09 — review and audit record
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the `/ad-audit` of `origin/main..23252ae` (19 rule groups, the critical claims group run three times across two models; gate `npm run verify` exit 0, 1394 of 1394). Neither found a Blocker. Batch-wide findings and the full table are in the pull request body. Findings for this task, as severity, finding, disposition:
+
+- Review Concern: the recorded version reached model context unvalidated. Fixed in 0ebed99 (version-shaped values only).
+- Review Concern (both axes): the project install was read only at the exact `cwd`. Fixed in 0ebed99 (walk up, stop below home).
+- Review Note: `isEnabled` reflowed. Accepted: Prettier formatting, no behaviour change.
+- Review Note: `.claude` is read before `.agents`. Accepted: both record the same kit version in a dual install.
+- Review Note: ADR-0074's dead stanza not marked. Fixed in 23252ae.
+- Audit minor: the ADR-0074 addendum still said `cwd` only. Fixed: it names the walk-up, the home stop and the version shape.
+- Audit minor: an unreadable state file is swallowed. Accepted: ADR-0074 makes the checkpoint fail silent and the line optional; an error marker in model context would be noise.
+- Audit minor: the lookup repeats the installer's. Accepted: a skill script cannot import `src/lib`, and ADR-0057 decision 3 allows a per-skill copy.
+- Audit minor: CONTEXT.md called the checkpoint static, and PROJECTION.md left 0074 out of the self-amendment list. Fixed.
+
+Falsification lane on `23252ae` (scratch worktree, one mutation at a time, restored after each; log `.agentic/reviews/20261009T065600Z-audit-falsification.log`): removing the home stop turned 1 of 6 tests red; accepting any string as a version turned 1 of 6 red.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

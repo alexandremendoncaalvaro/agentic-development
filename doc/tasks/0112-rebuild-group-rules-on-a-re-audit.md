@@ -57,6 +57,16 @@ Step 0's re-audit paragraph on both hosts states that a re-audit rebuilds every 
 
 Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: the second criterion was met only in Step 0's prose; the handoff template now carries a `Rule text read at: <SHA>` line on both hosts, and the static test pins it (red first).
 
+### 2026-10-09 — review and audit record
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the `/ad-audit` of `origin/main..23252ae` (19 rule groups, the critical claims group run three times across two models; gate `npm run verify` exit 0, 1394 of 1394). Neither found a Blocker. Batch-wide findings and the full table are in the pull request body. Findings for this task, as severity, finding, disposition:
+
+- Review Concern: the task record never said the change was built. Fixed (built note, boxes).
+- Review Concern: the handoff template had no rule-text SHA field. Fixed in 0f2948b.
+- Audit minor: CONTEXT.md's audit handoff entry omitted it. Fixed.
+
+Falsification lane on `23252ae` (scratch worktree, one mutation at a time, restored after each; log `.agentic/reviews/20261009T065600Z-audit-falsification.log`): removing the template line turned 1 of 1 test red.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

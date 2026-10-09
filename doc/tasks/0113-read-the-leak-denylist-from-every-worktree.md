@@ -74,6 +74,19 @@ intended signal.
 
 Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: the same-root check compared a forward-slash `--show-toplevel` path with a `resolve`d one, which never matches on Windows; both sides are resolved now. The ADR-0033 addendum names the submodule and `--separate-git-dir` layouts that read only their own list, and the dead Consequences line is marked in place.
 
+### 2026-10-09 — review and audit record
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the `/ad-audit` of `origin/main..23252ae` (19 rule groups, the critical claims group run three times across two models; gate `npm run verify` exit 0, 1394 of 1394). Neither found a Blocker. Batch-wide findings and the full table are in the pull request body. Findings for this task, as severity, finding, disposition:
+
+- Review Note: the same-root check never matched on Windows. Fixed in 6a26b1d. The forward-slash behaviour is the reviewer's reading, not observed here; the remote Windows CI leg is its evidence.
+- Review Note: submodule and `--separate-git-dir` layouts read only their own list. Fixed: the ADR-0033 addendum names them.
+- Review Note: no changelog entry. Fixed.
+- Audit minor: a failing `--git-common-dir` falls back silently. Accepted: it runs only after `--show-toplevel` succeeded in the same repository, and the none-found line still fires.
+- Audit minor: the live check in the linked worktree ("blocked, exit 1") is a session observation; read it as author-observed.
+- The earlier "built and reviewed" entry reviewed the task's own commits before 16e6aba; its findings are the two it names.
+
+Falsification lane on `23252ae` (scratch worktree, one mutation at a time, restored after each; log `.agentic/reviews/20261009T065600Z-audit-falsification.log`): keeping only the first list turned 2 of 3 tests red; comparing unresolved roots survived on macOS, as expected, since only Windows separators differ.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

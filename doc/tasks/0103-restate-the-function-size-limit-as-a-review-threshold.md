@@ -48,6 +48,13 @@ lines target / 100 hard" is a value each project confirms or overrides when
 it writes its own GUIDELINES and may enforce with a lint rule, so it is not
 this repository asserting an unchecked limit.
 
+### 2026-10-09 — review and audit record
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the `/ad-audit` of `origin/main..23252ae` (19 rule groups, the critical claims group run three times across two models; gate `npm run verify` exit 0, 1394 of 1394). Neither found a Blocker. Batch-wide findings and the full table are in the pull request body. Findings for this task, as severity, finding, disposition:
+
+- Review Note: no changelog entry. Accepted: GUIDELINES.md is not shipped.
+- Audit nit: the "(Task 0103 ...)" reference was decoration. Fixed: removed.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

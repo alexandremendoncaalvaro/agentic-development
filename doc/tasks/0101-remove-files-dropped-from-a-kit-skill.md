@@ -65,6 +65,23 @@ named migration removes it by fingerprint, which is not part of this task.
 
 Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Fixed: the dropped-file pass ran per skill, so a file that moved to another skill was removed or falsely reported; it now runs once per agent after every skill is written, against the paths all skills ship (regression test, red first). Fixed: a recorded path that is not a regular file, or resolves outside the install root, is skipped instead of aborting the update or unlinking outside it.
 
+### 2026-10-09 — review and audit record
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the `/ad-audit` of `origin/main..23252ae` (19 rule groups, the critical claims group run three times across two models; gate `npm run verify` exit 0, 1394 of 1394). Neither found a Blocker. Batch-wide findings and the full table are in the pull request body. Findings for this task, as severity, finding, disposition:
+
+- Review Concern: the dropped-file pass ran per skill, so a file moved to another skill was removed or falsely reported. Fixed in d8b1d23.
+- Review Note: a recorded path that is a directory or escapes the root could abort or unlink outside. Fixed in d8b1d23.
+- Review Note: the `init` symbols are outside the criteria. Accepted as in scope (an `undefined` print).
+- Review Note: files dropped before this fix are no longer in state and stay. Accepted, as the criterion is limited to recorded files.
+- Audit major: ARCHITECTURE.md's Skill installation pattern did not say `update` removes dropped files. Fixed.
+- Audit minor: `installSkills` past the ~100-line threshold. Partly fixed: the removal pass is now `removeDroppedFiles`, leaving `installSkills` at 127 lines against 123 on `origin/main`; the rest is the per-file decision loop, one cohesive seam.
+- Audit minor: a non-interactive `update` deletes an unchanged kit file that git tracks. Accepted: the installer already rewrites unchanged tracked kit files non-interactively, and ADR-0051 scopes its refusal to the root doc.
+- Audit nit: the name `abs`. Fixed (`installedPath`).
+- Audit nit: the containment check is lexical. Accepted: the state file is local and trusted.
+- Audit minor: the hand deletion of `spike-adr-template.md` is a machine-local observation; read it as author-observed.
+
+Falsification lane on `23252ae` (scratch worktree, one mutation at a time, restored after each; log `.agentic/reviews/20261009T065600Z-audit-falsification.log`): inverting the digest comparison turned 3 of 4 tests red; dropping the shipped-path check turned 1 of 4 red.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

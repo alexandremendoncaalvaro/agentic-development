@@ -61,6 +61,19 @@ The work-in-progress briefing script still compares against a hard-coded
 
 Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes, verdicts at `.agentic/reviews/20261008T231440Z-commit-range-batch-verdicts.md`), no Blocker. Refuted: a feature branch behind its default branch is a real confidence limit for `ad-next`, `ad-roadmap` and `ad-brief`, since tasks merged there are invisible in the checkout; the limit stays on any branch. Fixed: the deferred briefing base is now tracked as Task 0114.
 
+### 2026-10-09 — review and audit record
+
+Fresh-context review of `origin/main..16e6aba` (Standards and Spec axes) and the `/ad-audit` of `origin/main..23252ae` (19 rule groups, the critical claims group run three times across two models; gate `npm run verify` exit 0, 1394 of 1394). Neither found a Blocker. Batch-wide findings and the full table are in the pull request body. Findings for this task, as severity, finding, disposition:
+
+- Review Note: `behind` fires on every feature branch. Refuted: tasks merged on the default branch are invisible in that checkout, so the confidence limit is real on any branch.
+- Review Note: the briefing's hard-coded `main` was deferred untracked. Fixed: Task 0114.
+- Audit minor: ADR-0079's packet list does not name `checkout`. Accepted: the field is additive within that decision; `ad-project-state` and CONTEXT.md now describe it.
+- Audit minor: CONTEXT.md's packet entry omitted the field. Fixed.
+- Audit nit: `ad-brief` names skills it never calls. Accepted: those are prohibitions and pointers.
+- Audit minor: the changelog entry cited no ADR. Fixed (ADR-0079).
+
+Falsification lane on `23252ae` (scratch worktree, one mutation at a time, restored after each; log `.agentic/reviews/20261009T065600Z-audit-falsification.log`): swapping `ahead` and `behind` turned 2 of 2 tests red.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
