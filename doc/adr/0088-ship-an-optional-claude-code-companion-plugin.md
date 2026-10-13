@@ -19,7 +19,7 @@ We will publish an **optional Claude Code companion plugin**, `agentic-session`,
 1. **Additive channel.** The plugin lives at `plugins/agentic-session/`, listed by `.claude-plugin/marketplace.json` at the repository root (marketplace `agentic-development`). Users opt in with `claude plugin marketplace add alexandremendoncaalvaro/agentic-development` and `claude plugin install agentic-session@agentic-development`. The `agentic` installer, the npm package and its contents are unchanged; neither path requires the other.
 2. **Host-native add-ons only.** The plugin carries what only a host-native surface can do (mods). It carries no skill and no subagent: skills stay installer-distributed under the flat `ad-` prefix, so ADR-0041's prefix and dual-host install decisions stand.
 3. **Only what needs the screen or the host.** A member exists because it must draw, or must reach the host (RESEARCH-0036). A gate that needs neither stays a settings hook shared by both hosts under ADR-0083, because a mod is Claude-Code-only. Members that would duplicate a kit skill (summaries, next-step suggestions, reviewer status) or block work are out.
-4. **First member: a threshold context band.** It reads the fill from `$.session.usage()` on session start, on each main-loop turn and after a compaction, and drops it when the session ends, measured toward the auto-compact point when auto-compaction is on and toward the model's window otherwise, and draws a band above the prompt with that percentage and an `AD handoff` button that submits `/ad-handoff`, only while the fill is at or above a `userConfig` number threshold (default 60, bounds 1 to 99, a design choice the owner can change in `/config`). Below the threshold it draws nothing. It intercepts no tool call and changes no prompt. The ADR-0055 `Stop` handoff nudge stays as it is: it is the portable fallback for Codex and for Claude Code without the plugin, and the band is its on-screen counterpart where the plugin is installed.
+4. **First member: a threshold context band.** It reads the fill from `$.session.usage()` on session start, on each main-loop turn and after a compaction, and drops it when the session ends, measured toward the auto-compact point when auto-compaction is on and toward the model's window otherwise, and draws a band above the prompt with that percentage and an `AD handoff` button that submits `/ad-handoff`, only while the fill is at or above a `userConfig` number threshold (default 60, bounds 1 to 99, a design choice the owner can change in `/config`; **default now 80 and an opt-in clear-and-continue — see Addendum 2026-10-13**). Below the threshold it draws nothing. It intercepts no tool call and changes no prompt. The ADR-0055 `Stop` handoff nudge stays as it is: it is the portable fallback for Codex and for Claude Code without the plugin, and the band is its on-screen counterpart where the plugin is installed.
 5. **One more member, planned.** A resume chip the plugin creates on a session-handoff write, through the desktop task server, with the ADR-0087 reminder kept as the portable fallback; it lands as its own slice after the band. A display-only verify-before-done receipt was considered and dropped by the owner in favour of the shadow mode of evidence gates, which is a gate concern under ADR-0083 and gets its own decision; the band may later display that shadow result.
 6. **Claude Code only, by nature.** Codex has no drawing surface for mods (RESEARCH-0033 E9); a Codex companion is out of scope until one exists.
 7. **Version floor stated.** The plugin needs Claude Code 2.1.287 in the terminal or 2.1.286 in the desktop app; the install instructions say so.
@@ -44,3 +44,22 @@ Negative / trade-offs:
 - **Package the whole kit as a plugin** — rejected: ADR-0041's reasons (dual-host parity, the flat prefix, the installer's three-way diff) still hold for skills.
 - **A personal mod outside the kit** — rejected by the owner, who wants it in the kit.
 - **Show the band always** — rejected by the owner: it should appear only when it is useful.
+
+## Addendum 2026-10-13: a later band and an opt-in clear-and-continue
+
+The owner found the band on screen too often at 60% and wanted it from about
+80%; the default threshold is now 80, still bounded 1 to 99 and changeable in
+`/config`. The band also carries a "clear and continue" box, off by default
+and remembered in the plugin's store: with it on, the `AD handoff` press
+submits `/ad-handoff` as before and, once that turn ends, finds the handoff
+file written since the press under `${TMPDIR}/agentic-handoffs`, runs `/clear`
+through `$.command.run`, and submits a prompt that resumes from that file.
+When no handoff file was written it clears nothing and says so (Task 0115).
+A spike on Claude Code 2.1.289 showed a plugin's `$.command.run` runs the
+built-in `/clear` (the session ends with reason `clear` and continues under a
+new id) and that a `$.prompt.submit` after it runs in the new session.
+
+The member still intercepts no tool call and rewrites no prompt; the clear is
+an owner-chosen action, the same kind as the existing one-press submit, not a
+blocking member, so item 3's rule that a blocking member needs its own
+decision is unchanged.
