@@ -9,7 +9,18 @@
 // that take $ are top-level functions. A threshold changed in /config reloads
 // the module with the new options.
 
-import { HANDOFF_LABEL, bandLabel, fillReading, normalizeThreshold, shouldShow } from './band.mjs';
+import {
+  CLEAR_KEY,
+  HANDOFF_LABEL,
+  bandLabel,
+  clearLabel,
+  fillReading,
+  handoffDirs,
+  newestHandoff,
+  normalizeThreshold,
+  resumePrompt,
+  shouldShow,
+} from './band.mjs';
 import {
   detailsMarkdown,
   paneModel,
@@ -26,18 +37,21 @@ const SCRIPT_TIMEOUT_MS = 10_000;
 
 export function register(on, options) {
   const threshold = normalizeThreshold(options?.threshold);
-  const state = { fill: null, briefing: null, briefingRun: 0 };
+  const state = { fill: null, briefing: null, briefingRun: 0, clearAfter: false, pending: null };
 
   on('session.start', async ($, e, next) => {
     const result = await next(e);
     await registerCommand($);
+    state.clearAfter = (await $.store.get(CLEAR_KEY).catch(() => false)) === true;
     await refresh($, state);
     return result;
   });
 
   on('turn.complete', async ($, e, next) => {
     const result = await next(e);
-    if (!e.agentId) await refresh($, state);
+    if (e.agentId) return result;
+    await refresh($, state);
+    if (state.pending) await clearAndResume($, state);
     return result;
   });
 
@@ -68,7 +82,24 @@ export function register(on, options) {
       paddingX: 1,
       children: [
         Text({ dimColor: true, children: bandLabel(state.fill) }),
-        Button({ key: 'handoff', label: HANDOFF_LABEL, onPress: () => submitHandoff($) }),
+        Box({
+          flexDirection: 'row',
+          gap: 1,
+          children: [
+            Button({
+              key: 'handoff',
+              label: HANDOFF_LABEL,
+              onPress: () => submitHandoff($, state),
+            }),
+            Button({
+              key: 'clear-after',
+              label: clearLabel(state.clearAfter),
+              plain: true,
+              dimColor: !state.clearAfter,
+              onPress: () => toggleClearAfter($, state),
+            }),
+          ],
+        }),
       ],
     });
   });
@@ -283,10 +314,50 @@ function clearReadings($, state) {
   $.ui.invalidate('ui.render');
 }
 
-function submitHandoff($) {
-  $.prompt
-    .submit({ text: '/ad-handoff', asUser: true })
-    .catch((error) => logFailure($, 'handoff not submitted', error));
+function submitHandoff($, state) {
+  // With the box on, the handoff's own turn is followed by a clear and a
+  // resume (task-0115); the press time tells its file from older ones.
+  state.pending = state.clearAfter ? { since: Date.now() } : null;
+  $.prompt.submit({ text: '/ad-handoff', asUser: true }).catch((error) => {
+    state.pending = null;
+    logFailure($, 'handoff not submitted', error);
+  });
+}
+
+function toggleClearAfter($, state) {
+  state.clearAfter = !state.clearAfter;
+  $.store
+    .set(CLEAR_KEY, state.clearAfter)
+    .catch((error) => logFailure($, 'clear-and-continue not saved', error));
+  $.ui.invalidate('ui.render');
+}
+
+// Runs once, after the turn the handoff ran in: clears only when that turn
+// wrote a handoff file, so a session is never cleared with nothing to resume.
+async function clearAndResume($, state) {
+  const { since } = state.pending;
+  state.pending = null;
+  const tmpdir = await $.env.get('TMPDIR');
+  let path = null;
+  for (const dir of handoffDirs(tmpdir)) {
+    const entries = await $.fs.list(dir).catch(() => []);
+    const name = newestHandoff(entries, since);
+    if (name) {
+      path = `${dir}/${name}`;
+      break;
+    }
+  }
+  if (!path) {
+    $.ui.toast('AD handoff: no handoff file was written, so the session was not cleared.');
+    return;
+  }
+  try {
+    await $.command.run({ command: 'clear' });
+    await $.prompt.submit({ text: resumePrompt(path), asUser: true });
+  } catch (error) {
+    $.ui.toast(`AD handoff: could not clear and resume; the handoff is at ${path}.`);
+    logFailure($, 'clear and resume failed', error);
+  }
 }
 
 function logFailure($, what, error) {

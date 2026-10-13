@@ -1,7 +1,7 @@
 // The band's rule, kept free of the engine interface so node:test covers it
 // (ADR-0088, task-0104). register.mjs feeds it what $.session.usage() returns.
 
-export const DEFAULT_THRESHOLD = 60;
+export const DEFAULT_THRESHOLD = 80;
 
 // Names the kit's skill, so the press is recognisably Agentic Development's handoff.
 export const HANDOFF_LABEL = 'AD handoff';
@@ -35,4 +35,32 @@ export function shouldShow(fill, threshold) {
 export function bandLabel(fill) {
   const against = fill.basis === 'auto-compact' ? 'the auto-compact point' : 'the window';
   return `Context ${fill.percent}% of ${against}`;
+}
+
+// The opt-in box that clears the session after a handoff (task-0115).
+export const CLEAR_KEY = 'clearAfterHandoff';
+
+export function clearLabel(on) {
+  return `${on ? '[x]' : '[ ]'} clear and continue`;
+}
+
+// Where ad-handoff writes: ${TMPDIR:-/tmp}/agentic-handoffs.
+export function handoffDirs(tmpdir) {
+  const base = (tmpdir || '/tmp').replace(/\/+$/, '');
+  return [...new Set([`${base}/agentic-handoffs`, '/tmp/agentic-handoffs'])];
+}
+
+// The newest handoff file written at or after `sinceMs`, by name; null when
+// none was, so the session is never cleared without a handoff to resume from.
+export function newestHandoff(entries, sinceMs) {
+  const written = entries
+    .filter((e) => e.kind === 'file' && e.name.endsWith('.md') && e.mtimeMs >= sinceMs)
+    .sort((a, b) => b.mtimeMs - a.mtimeMs);
+  return written[0]?.name ?? null;
+}
+
+// The prompt that resumes the cleared session, as ad-handoff's own resume
+// chip words it.
+export function resumePrompt(path) {
+  return `Read ${path} first and follow its Resume protocol before any work, then continue with its recommended first action.`;
 }
