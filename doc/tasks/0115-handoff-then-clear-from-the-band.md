@@ -46,6 +46,14 @@ Append-only log. Date each entry. Never rewrite past entries.
 
 The owner approved this plan ("prossiga"). If the spike shows a plugin cannot run `/clear`, the fallback is to fill the prompt box with the resume prompt so the owner clears and presses Enter.
 
+### 2026-10-13 — spike: a plugin can clear and resume
+
+A throwaway plugin loaded with `--plugin-dir` into a headless Claude Code 2.1.289 run (the app's binary; the terminal's `claude` is 2.1.227, too old for module hooks). After the first turn it called `$.command.run({ command: 'clear' })`, which resolved `{"text":""}` while `session.end` fired with reason `clear`; the session id changed. A `$.prompt.submit({ asUser: true })` after it ran in the new session and the model answered `SPIKE-RESUMED`. The fallback (filling the prompt box) is not needed. Handoffs land in `${TMPDIR}/agentic-handoffs` on this machine, so the plugin lists that directory after the handoff turn, rather than hooking the Write call: ADR-0088 keeps the plugin from intercepting tool calls.
+
+### 2026-10-13 — built
+
+Test first: six regression tests in `test/session-plugin.test.js` (newest handoff since the press, the resume prompt, box on, box off, no file, the remembered toggle) plus the 80% default; red before the code except the box-off case, which is today's behaviour. Five mutations (ignore the press time, accept any file, clear without a file, ignore the box, skip the clear) each turned one test red. ADR-0088 gains a dated addendum, PROJECTION follows.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
