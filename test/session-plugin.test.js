@@ -184,7 +184,7 @@ const FULL = async () => ({
   context: { tokens: 90000, window: 200000 },
 });
 
-test('the plugin draws and submits only: it hooks no tool call and rewrites no prompt', async () => {
+test('the plugin draws and runs the handoff only: it hooks no tool call and rewrites no prompt', async () => {
   const { hooks, submitted, ran, $ } = await loadPlugin(1, FULL);
   assert.deepEqual(Object.keys(hooks).sort(), [
     'command.run:agentic-briefing',
