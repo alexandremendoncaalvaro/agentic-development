@@ -16,7 +16,7 @@ import {
   clearLabel,
   fillReading,
   handoffDirs,
-  newestHandoff,
+  handoffsSince,
   normalizeThreshold,
   resumePrompt,
   shouldShow,
@@ -47,11 +47,28 @@ export function register(on, options) {
     return result;
   });
 
+  // The first main-loop turn to start after the press is the handoff's own:
+  // the submit queues until the session is idle (task-0115).
+  on('turn.start', async ($, e, next) => {
+    const result = await next(e);
+    if (!e.agentId && state.pending && !state.pending.turnId) {
+      state.pending = { turnId: e.turnId, since: Date.now() };
+    }
+    return result;
+  });
+
   on('turn.complete', async ($, e, next) => {
     const result = await next(e);
     if (e.agentId) return result;
     await refresh($, state);
-    if (state.pending) await clearAndResume($, state);
+    const pending = state.pending;
+    if (pending?.turnId && pending.turnId === e.turnId) {
+      state.pending = null;
+      // Run after this hook returns: the clear ends the session.
+      void clearAndResume($, pending, e.reason).catch((error) =>
+        logFailure($, 'clear and resume failed', error)
+      );
+    }
     return result;
   });
 
@@ -64,6 +81,7 @@ export function register(on, options) {
   // /clear ends the session with no session.start after it: drop the readings.
   on('session.end', async ($, e, next) => {
     const result = await next(e);
+    state.pending = null;
     clearReadings($, state);
     return result;
   });
@@ -317,7 +335,7 @@ function clearReadings($, state) {
 function submitHandoff($, state) {
   // With the box on, the handoff's own turn is followed by a clear and a
   // resume (task-0115); the press time tells its file from older ones.
-  state.pending = state.clearAfter ? { since: Date.now() } : null;
+  state.pending = state.clearAfter ? { turnId: null } : null;
   $.prompt.submit({ text: '/ad-handoff', asUser: true }).catch((error) => {
     state.pending = null;
     logFailure($, 'handoff not submitted', error);
@@ -332,31 +350,43 @@ function toggleClearAfter($, state) {
   $.ui.invalidate('ui.render');
 }
 
-// Runs once, after the turn the handoff ran in: clears only when that turn
-// wrote a handoff file, so a session is never cleared with nothing to resume.
-async function clearAndResume($, state) {
-  const { since } = state.pending;
-  state.pending = null;
-  const tmpdir = await $.env.get('TMPDIR');
-  let path = null;
+// Runs once, after the handoff's own turn: clears only when that turn ended
+// normally and wrote exactly one handoff file, so a session is never cleared
+// with nothing, or someone else's work, to resume from.
+async function clearAndResume($, pending, reason) {
+  if (reason !== 'answer') {
+    $.ui.toast('AD handoff: the handoff did not finish, so the session was not cleared.');
+    return;
+  }
+  const tmpdir = await $.env.get('TMPDIR').catch(() => undefined);
+  const found = [];
   for (const dir of handoffDirs(tmpdir)) {
     const entries = await $.fs.list(dir).catch(() => []);
-    const name = newestHandoff(entries, since);
-    if (name) {
-      path = `${dir}/${name}`;
-      break;
-    }
+    for (const name of handoffsSince(entries, pending.since)) found.push(`${dir}/${name}`);
   }
-  if (!path) {
+  if (found.length === 0) {
     $.ui.toast('AD handoff: no handoff file was written, so the session was not cleared.');
     return;
   }
+  if (found.length > 1) {
+    $.ui.toast('AD handoff: more than one new handoff file, so the session was not cleared.');
+    return;
+  }
+  const [path] = found;
   try {
     await $.command.run({ command: 'clear' });
+  } catch (error) {
+    $.ui.toast(`AD handoff: the session was not cleared; the handoff is at ${path}.`);
+    logFailure($, 'clear failed', error);
+    return;
+  }
+  try {
     await $.prompt.submit({ text: resumePrompt(path), asUser: true });
   } catch (error) {
-    $.ui.toast(`AD handoff: could not clear and resume; the handoff is at ${path}.`);
-    logFailure($, 'clear and resume failed', error);
+    $.ui.toast(
+      `AD handoff: the session was cleared, but the resume prompt was not sent; resume from ${path}.`
+    );
+    logFailure($, 'resume prompt not submitted', error);
   }
 }
 

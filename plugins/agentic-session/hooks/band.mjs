@@ -50,13 +50,14 @@ export function handoffDirs(tmpdir) {
   return [...new Set([`${base}/agentic-handoffs`, '/tmp/agentic-handoffs'])];
 }
 
-// The newest handoff file written at or after `sinceMs`, by name; null when
-// none was, so the session is never cleared without a handoff to resume from.
-export function newestHandoff(entries, sinceMs) {
-  const written = entries
+// The handoff files written at or after `sinceMs`, newest first, by name. The
+// caller clears only when exactly one is found: none means the handoff wrote
+// nothing, several mean another session wrote one in the same window.
+export function handoffsSince(entries, sinceMs) {
+  return entries
     .filter((e) => e.kind === 'file' && e.name.endsWith('.md') && e.mtimeMs >= sinceMs)
-    .sort((a, b) => b.mtimeMs - a.mtimeMs);
-  return written[0]?.name ?? null;
+    .sort((a, b) => b.mtimeMs - a.mtimeMs)
+    .map((e) => e.name);
 }
 
 // The prompt that resumes the cleared session, as ad-handoff's own resume

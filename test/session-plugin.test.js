@@ -16,7 +16,7 @@ const {
   bandLabel,
   DEFAULT_THRESHOLD,
   HANDOFF_LABEL,
-  newestHandoff,
+  handoffsSince,
   resumePrompt,
 } = await import(pathToFileURL(join(PLUGIN, 'hooks', 'band.mjs')).href);
 
@@ -252,7 +252,15 @@ const press = (band, key) =>
     .find((b) => b.props.key === key)
     .props.onPress();
 
-test('regression: task-0115 newestHandoff picks the newest handoff written since the press', () => {
+// One main-loop turn: its start, then its end with the given reason.
+async function runTurn(hooks, $, turnId, reason = 'answer') {
+  await hooks['turn.start']($, { turnId }, async () => undefined);
+  await hooks['turn.complete']($, { turnId, reason }, async () => undefined);
+  await tick();
+  await tick();
+}
+
+test('regression: task-0115 handoffsSince lists handoffs written since a time, newest first', () => {
   const entries = [
     { name: 'old.md', kind: 'file', mtimeMs: 50 },
     { name: 'a.md', kind: 'file', mtimeMs: 120 },
@@ -260,9 +268,8 @@ test('regression: task-0115 newestHandoff picks the newest handoff written since
     { name: 'notes.txt', kind: 'file', mtimeMs: 200 },
     { name: 'dir.md', kind: 'directory', mtimeMs: 300 },
   ];
-  assert.equal(newestHandoff(entries, 100), 'b.md');
-  assert.equal(newestHandoff(entries, 160), null);
-  assert.equal(newestHandoff([], 0), null);
+  assert.deepEqual(handoffsSince(entries, 100), ['b.md', 'a.md']);
+  assert.deepEqual(handoffsSince(entries, 160), []);
 });
 
 test('regression: task-0115 the resume prompt names the handoff and its Resume protocol', () => {
@@ -280,8 +287,7 @@ test('regression: task-0115 with the box on, the handoff is followed by a clear 
   const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
   press(band, 'handoff');
   await tick();
-  await hooks['turn.complete']($, {}, async () => undefined);
-  await tick();
+  await runTurn(hooks, $, 't1');
   assert.deepEqual(ran, [{ command: 'clear' }]);
   assert.equal(submitted.length, 2);
   assert.deepEqual(submitted[0], { text: '/ad-handoff', asUser: true });
@@ -297,8 +303,7 @@ test('regression: task-0115 with the box off, the button only hands off', async 
   const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
   press(band, 'handoff');
   await tick();
-  await hooks['turn.complete']($, {}, async () => undefined);
-  await tick();
+  await runTurn(hooks, $, 't1');
   assert.deepEqual(ran, []);
   assert.deepEqual(submitted, [{ text: '/ad-handoff', asUser: true }]);
 });
@@ -312,8 +317,7 @@ test('regression: task-0115 with no handoff file the session is left as it was',
   const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
   press(band, 'handoff');
   await tick();
-  await hooks['turn.complete']($, {}, async () => undefined);
-  await tick();
+  await runTurn(hooks, $, 't1');
   assert.deepEqual(ran, []);
   assert.equal(submitted.length, 1);
   assert.equal(toasts.length, 1);
@@ -331,6 +335,42 @@ test('regression: task-0115 the clear-and-continue box toggles and is remembered
   assert.equal(store.clearAfterHandoff, true);
   band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
   assert.match(box().props.label, /^\[x\]/);
+});
+
+// Press with the box on and return the plugin, before any turn runs.
+async function pressWithBoxOn(options) {
+  const plugin = await loadPlugin(1, FULL, { stored: { clearAfterHandoff: true }, ...options });
+  const { hooks, $ } = plugin;
+  await hooks['session.start']($, {}, async () => undefined);
+  press(hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'), 'handoff');
+  await tick();
+  return plugin;
+}
+const oneNewFile = () => [{ name: 'h.md', kind: 'file', mtimeMs: Date.now() + 1000 }];
+
+test('regression: task-0115 a turn already running at the press does not trigger the clear', async () => {
+  const plugin = await loadPlugin(1, FULL, {
+    handoffs: oneNewFile,
+    stored: { clearAfterHandoff: true },
+  });
+  const { hooks, ran, toasts, $ } = plugin;
+  await hooks['session.start']($, {}, async () => undefined);
+  await hooks['turn.start']($, { turnId: 'busy' }, async () => undefined);
+  press(hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'), 'handoff');
+  await tick();
+  await hooks['turn.complete']($, { turnId: 'busy', reason: 'answer' }, async () => undefined);
+  await tick();
+  assert.deepEqual(ran, []);
+  assert.deepEqual(toasts, []);
+  await runTurn(hooks, $, 'handoff-turn');
+  assert.deepEqual(ran, [{ command: 'clear' }]);
+});
+
+test('regression: task-0115 an interrupted handoff turn clears nothing', async () => {
+  const { hooks, ran, toasts, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
+  await runTurn(hooks, $, 't1', 'aborted');
+  assert.deepEqual(ran, []);
+  assert.match(toasts[0], /did not finish/);
 });
 
 test('the npm package does not ship the plugin or the marketplace', () => {
