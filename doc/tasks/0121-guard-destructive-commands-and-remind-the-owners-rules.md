@@ -129,3 +129,11 @@ joins the next line, pinned by a test. Concern, a guard inside a group or an
 documented in ADR-0094 as a conservative block. Note, `echo $(git commit)`
 no longer seen: documented. Note, `p\kill` and `pkill -P 1 <name>`:
 accepted for a closed, non-adversarial list.
+
+### 2026-10-15 — delta review of 3605652
+
+No blocker. Concern, the continuation join ran before heredoc and comment
+removal, so a heredoc body or a comment line ending in `|`, `&&` or `||`
+pulled in the next line: fixed by joining last, pinned by tests for both
+shapes and for a trailing `|`. The replay over the local corpus gives the
+same verdicts as before the change.

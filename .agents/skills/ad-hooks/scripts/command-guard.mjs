@@ -26,22 +26,23 @@ import { pathToFileURL } from 'node:url';
 
 const SHELL_TOOLS = new Set(['Bash', 'PowerShell']);
 
-// Join line continuations (a trailing backslash, `&&`, `||` or `|`), remove
-// heredoc bodies, then quoted strings and comments in one pass, so whichever
-// opens first wins: an apostrophe inside double quotes or a comment stays
-// literal, and a `#` inside quotes starts no comment.
+// Remove heredoc bodies, then quoted strings and comments in one pass, so
+// whichever opens first wins: an apostrophe inside double quotes or a comment
+// stays literal, and a `#` inside quotes starts no comment. Only then join
+// line continuations (a trailing backslash, `&&`, `||` or `|`), so a body or
+// a comment line ending in one never pulls in the next line.
 export function stripLiterals(command) {
-  let text = String(command)
-    .replace(/\\\r?\n/g, ' ')
-    .replace(/(&&|\|\||\|)[ \t]*\r?\n/g, '$1 ');
-  text = text.replace(
+  const text = String(command).replace(
     /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1[^\n]*\n[\s\S]*?\n\s*\2(?=\n|$)/g,
     '<<HEREDOC'
   );
-  return text.replace(/'[^']*'|"(?:\\.|[^"\\])*"|(?<=^|[\s;&|(])#[^\n]*/gm, (match) => {
-    if (match[0] === '#') return '';
-    return match[0] === "'" ? "''" : '""';
-  });
+  return text
+    .replace(/'[^']*'|"(?:\\.|[^"\\])*"|(?<=^|[\s;&|(])#[^\n]*/gm, (match) => {
+      if (match[0] === '#') return '';
+      return match[0] === "'" ? "''" : '""';
+    })
+    .replace(/\\\r?\n/g, ' ')
+    .replace(/(&&|\|\||\|)[ \t]*\r?\n/g, '$1 ');
 }
 
 // The words of each simple command: split at operators, background `&`,

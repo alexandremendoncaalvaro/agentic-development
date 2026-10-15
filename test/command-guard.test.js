@@ -66,6 +66,8 @@ const DENIED = [
   ['if npm test; then echo ok; else git commit -m x; fi', 'commit-after-semicolon'],
   ['npm test; ( cd sub && git commit -m x )', 'commit-after-semicolon'],
   ['for p in $(pgrep -f server); do pkill -TERM -P $p; done', 'kill-by-name'],
+  ['# a note |\npkill node', 'kill-by-name'],
+  ['# run && \npkill node', 'kill-by-name'],
 ];
 
 const ALLOWED = [
@@ -103,6 +105,10 @@ const ALLOWED = [
   'pkill -P 54608',
   'npm test &&\n  git commit -m x',
   'npm test ||\n  echo failed',
+  'ps aux |\n  grep node',
+  'cat > f <<EOF\npkill node |\nEOF\necho done',
+  'npm test && git commit -F - <<EOF\n| a | b |\n| pkill node |\nEOF',
+  'cat > n <<EOF\nnpm test |\nEOF\ngit commit -m x',
   'pkill -TERM -P 1234 -f worker',
 ];
 
