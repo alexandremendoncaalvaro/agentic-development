@@ -6,7 +6,7 @@ Without this file, learning which architectural decisions still bind costs one p
 
 ## Default
 
-All 72 accepted ADRs bind in full, except the twenty-nine below, which bind except for the named part.
+All 73 accepted ADRs bind in full, except the thirty below, which bind except for the named part.
 
 No ADR in this directory has been deprecated or superseded as a whole document. A `proposed` ADR is not counted here and does not appear until it is accepted — it binds nothing until then, and its acceptance is the change to what binds that adds it (see *The rule that keeps it true*).
 
@@ -43,6 +43,7 @@ No ADR in this directory has been deprecated or superseded as a whole document. 
 | [0085](0085-gate-skill-effects-inside-the-skill.md) | Decision 3's 350-character per-description cap | The effect-gate rule, the empty host-block exception set, the 1,024-character specification maximum, use case first, and no whole-collection total | [ADR-0093](0093-cap-skill-descriptions-at-200-characters.md) |
 | [0070](0070-persist-grounded-decision-evidence.md) | Decision 1's single shape for every receipt; decision 4's checks without tier rules | Every other decision: the durable receipt, its links, the separation from `ad-research`, the structural validator and the universal rule | [ADR-0095](0095-grade-evidence-from-a-starting-tier.md) |
 | [0056](0056-skills-progressive-disclosure-references.md) | Decision 4's unscoped "`update --yes`" re-sync | Every decision otherwise: progressive disclosure through `references/`, made in both host trees with `npm test` green | Its own addendum of 2026-10-08, after Task 0102 |
+| [0079](0079-compose-configurable-project-evidence.md) | The closed schema at `schemaVersion` 1 only | Every decision otherwise: two configuration layers, repository and GitHub sources, bounded list queries, no executable content; version 2 adds an optional, declarative `process` block reported in the fact packet | [ADR-0097](0097-describe-the-delivery-process-as-configuration.md) |
 
 Two shapes appear above and they are checked differently. A **cross-record** amendment (0035, 0065, 0085, 0088) declares itself as a header-field pair — `Amends:` on one side, `Amended by:` on the other — which makes it verifiable without reading prose. A **self**-amendment (0007, 0033, 0047, 0053, 0056, 0057, 0074, 0080, 0089, 0090) has no second record to pair with: the record corrects itself in a dated addendum, marks the dead stanza in place, and this page is what makes it discoverable from the directory rather than only from inside the file. Four records (0007, 0053, 0074, 0089) carry one of each, one per retired part, which is why the corrector column and not the row is the unit to read.
 
