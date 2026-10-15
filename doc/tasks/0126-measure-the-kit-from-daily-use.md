@@ -17,7 +17,7 @@ Every eval receipt is synthetic, so the kit's effect is unmeasured. The owner de
 
 - [x] A repo-only script reads local session transcripts and prints aggregate metrics per period: reviewer and auditor dispatches per session and per pull request, review rounds, owner corrections on standing rules, and CI failures per pull request; it prints no transcript text.
 - [x] Its metrics and comparison rule are frozen with `ad-prism` before the baseline is read.
-- [ ] The baseline for 2026-09-15 to 2026-10-15 is recorded in a doc/research study, aggregates only.
+- [x] The baseline for 2026-09-15 to 2026-10-15 is recorded in a doc/research study, aggregates only.
 - [ ] The follow-up date is recorded; the re-run and a new /insights report close the study.
 
 ## Plan
@@ -44,3 +44,12 @@ tooling). PRISM-0045 freezes the measures, the lexicon (in the script) and
 the decision rule, whose thresholds are labelled a design choice; it is
 committed before the baseline is read. Follow-up run on or after 2026-11-16
 for 2026-10-16 to 2026-11-15, with a new /insights report.
+
+### 2026-10-15 — baseline
+
+Run at 218457d after the freeze: 216 sessions, 119 pull requests, 398
+reviewer and 1085 auditor dispatches (3.34 and 9.12 per pull request), 46 CI
+failure reads (0.39 per pull request), 90 owner messages correcting a
+standing rule (0.42 per session). Recorded in RESEARCH-0046, aggregates only.
+The follow-up date is 2026-11-16; the last criterion and the Plan item close
+then, with the re-run and a new /insights report.
