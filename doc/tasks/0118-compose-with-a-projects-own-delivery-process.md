@@ -86,3 +86,12 @@ reads the process before Step 1, follows `process.records.task` with the same
 branches and states its posting step, and its output contract covers both
 destinations. Concern accepted: these are text contracts; the recorded
 end-to-end run stays open.
+
+### 2026-10-15 — delta review of 2b29a32
+
+Prior findings resolved. One concern on both axes, fixed: `ad-derisk` posted
+to an issue for an `external` or absent record, unlike the other three
+skills; it now shows the handoff and writes nothing there, and posts only for
+`issue-comment` (an assertion went red, then green). Notes accepted: ADR-0097
+decision 4 says an issue-comment record is validated, which holds for ground
+records; the work-item drafts are shown, not validated.

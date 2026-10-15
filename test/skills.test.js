@@ -160,6 +160,7 @@ test('static contract: ad-next routes by issue stage, ad-derisk follows the work
     const derisk = skillText(agent, 'ad-derisk');
     assert.match(derisk, /`lifecycleOwner` is `external`/);
     assert.match(derisk, /`process\.records\.task`/);
+    assert.match(derisk, /With `external` or no record, show its `handoff` text and write nothing/);
     assert.match(
       derisk,
       /post it with `gh issue comment` on the work item the owner names only after the owner approves/
