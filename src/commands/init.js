@@ -6,14 +6,8 @@ import { dirname, join } from 'node:path';
 import { detectAgents, detectMode } from '../lib/detect.js';
 import { bundledSkills, installKitDocs, installSkills } from '../lib/install.js';
 import { saveState, loadState, userLevelInstallPath } from '../lib/state.js';
-import {
-  updateRootDoc,
-  rootDocAppendPrompt,
-  rootDocReplacePrompt,
-  trackedRootDocSkipNotice,
-} from '../lib/rootdoc.js';
-import { trackedState } from '../lib/git.js';
-import { offerKitExclude } from './kit-exclude.js';
+import { updateRootDoc } from '../lib/rootdoc.js';
+import { formatInstallReport, offerKitExclude, rootDocConfirmers } from '../lib/install-flow.js';
 import { configureGlobalConstitution, globalKitPath } from '../lib/global-rules.js';
 import { resolveScope, targetForScope } from '../lib/scope.js';
 
@@ -33,25 +27,15 @@ const AGENT_LABEL = {
   codex: 'Codex',
 };
 
-const ACTION_SYMBOL = {
-  created: '+',
-  replaced: '~',
-  updated: '~',
-  unchanged: '·',
-  kept: '·',
-  skipped: '!',
-  removed: '-',
-  'dropped-kept': '!',
-};
+// Prompts and warnings for the shared install flow (src/lib/install-flow.js).
+async function ask(prompt) {
+  const answer = await p.confirm(prompt);
+  return !p.isCancel(answer) && answer;
+}
 
-const ROOT_DOC_LABEL = {
-  appended: '+ ',
-  updated: '~ ',
-  unchanged: '· ',
-  skipped: '! ',
-  'kept-stale': '! ',
-  absent: '',
-};
+function warn(line) {
+  process.stderr.write(`${line}\n`);
+}
 
 function resolveAgents(flagValue) {
   if (flagValue === 'both') return ['claude-code', 'codex'];
@@ -155,40 +139,16 @@ export async function initCommand(opts) {
 
   const skillDisplayOrder = [...installedSkillSet].sort();
 
-  // A non-interactive run has nobody to ask, so it must not decide for the
-  // team: a tracked root doc is shared with everyone who clones the repo
-  // (ADR-0051). Unknown tracking state keeps the prior behaviour. Shared by
-  // both root-doc write paths — appending a new section and replacing a stale
-  // one are the same hazard on the same file.
-  const allowUnattendedRootDocWrite = (path) => {
-    if (opts.forceRootDoc) return true;
-    if (trackedState(cwd, path) !== 'tracked') return true;
-    process.stderr.write(trackedRootDocSkipNotice(path) + '\n');
-    return false;
-  };
-
-  const confirmAppend = interactive
-    ? async (path) => {
-        // Message and default come from rootDocAppendPrompt so the decision is
-        // unit-tested; a TTY-less suite cannot drive p.confirm itself.
-        const answer = await p.confirm(rootDocAppendPrompt(path, trackedState(cwd, path)));
-        if (p.isCancel(answer)) return false;
-        return answer;
-      }
-    : async (path) => allowUnattendedRootDocWrite(path);
-
-  // Distinct from the `confirmReplace` passed to installSkills above: that one
-  // resolves a skill-file conflict and receives a question, this one receives
-  // the root doc's name. A tracked doc names the sharing risk and defaults to
-  // no (ADR-0051 Decision 2); an untracked doc keeps the prior behaviour of
-  // silently regenerating the kit's own section.
-  const confirmRootDocReplace = interactive
-    ? async (path) => {
-        if (trackedState(cwd, path) !== 'tracked') return true;
-        const answer = await p.confirm(rootDocReplacePrompt(path));
-        return !p.isCancel(answer) && answer;
-      }
-    : async (path) => allowUnattendedRootDocWrite(path);
+  // A tracked root doc is shared with everyone who clones the repo (ADR-0051):
+  // an unattended run writes it only under --force-root-doc.
+  const { confirmAppend, confirmReplace: confirmRootDocReplace } = rootDocConfirmers({
+    cwd,
+    interactive,
+    forceRootDoc: Boolean(opts.forceRootDoc),
+    untrackedReplace: 'allow',
+    ask,
+    warn,
+  });
 
   const rootDocAction =
     scope === 'project'
@@ -212,23 +172,19 @@ export async function initCommand(opts) {
           cwd,
           paths: [...new Set(allActions.map((a) => a.path))],
           interactive,
+          ask,
+          warn,
         })
       : 0;
 
-  const lines = allActions.map((a) => `${ACTION_SYMBOL[a.type]} ${a.path}`);
-  if (rootDocAction.type !== 'absent') {
-    lines.push(`${ROOT_DOC_LABEL[rootDocAction.type]}${rootDocAction.path}`);
-  }
-  if (excluded > 0) {
-    lines.push(`! .git/info/exclude (+${excluded})`);
-  }
   const userInstall = scope === 'user' || cwd === homedir() ? null : userLevelInstallPath();
-  if (userInstall) {
-    lines.push(
-      `note: agentic is also installed at the user level (${userInstall}); ` +
-        `a project install is only needed to pin a version or share it via the repo.`
-    );
-  }
+  const lines = formatInstallReport({
+    actions: allActions,
+    rootDocAction,
+    excluded,
+    tagAgent: false,
+    userInstall,
+  });
 
   if (interactive) {
     p.note(lines.join('\n'), 'Result');

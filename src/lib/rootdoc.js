@@ -165,6 +165,18 @@ export function rootDocReplacePrompt(path) {
  * the wording — the part most likely to drift between two call sites — lives in
  * one place; the trivial guard that calls it stays local to each command.
  */
+/**
+ * The prompt before regenerating a managed section that diverged on disk in an
+ * untracked root doc: the edits between the markers would be lost, so the
+ * default is no.
+ */
+export function rootDocDivergedPrompt(path) {
+  return {
+    message: `${path}: managed section diverged on disk. Regenerate it? (any edits between the agentic-managed-skills markers will be lost)`,
+    initialValue: false,
+  };
+}
+
 export function trackedRootDocSkipNotice(path) {
   return (
     `skipped ${path}: tracked by git, so the managed section would be ` +
