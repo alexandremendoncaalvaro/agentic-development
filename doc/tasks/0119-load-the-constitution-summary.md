@@ -1,6 +1,6 @@
 # Task `0119`: Load the Constitution's summary, not its full text
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-15
 **Scope ref:** doc/adr/0092-load-the-constitution-summary-not-its-full-text.md
 **Evidence ref:** doc/research/0044-ground-review-economy-and-context-budget.md
@@ -17,13 +17,13 @@ The kit audit of 2026-10-15 measured 104,210 bytes of always-loaded instructions
 
 - [x] `configureGlobalConstitution` writes the TL;DR of the kit's `WORKFLOW.md` inline with a digest line and the full text's path, for both hosts.
 - [x] It replaces the earlier import-only block and an unedited managed block, and still skips a hand-edited one.
-- [ ] `npm run verify` green.
-- [ ] Machine: `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` carry the new block; Codex's `@` lines become an explicit read instruction; the company-repository composition moves to its own file, read only in that repository; the duplicated memory entries are removed. The always-loaded total is measured before and after, and a Codex session started after the change shows the summary text in its injected instructions.
+- [x] `npm run verify` green.
+- [x] Machine: `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` carry the new block; Codex's `@` lines become an explicit read instruction; the company-repository composition moves to its own file, read only in that repository; the duplicated memory entries are removed. The always-loaded total is measured before and after, and a Codex session started after the change shows the summary text in its injected instructions.
 
 ## Plan
 
 - [x] Tests first in `test/global-rules.test.js`; then `src/lib/global-rules.js`; `test/init.test.js` unchanged, its marker assertion still holds.
-- [ ] After merge: apply on this machine, measure, report the diff of the owner's files for his commit.
+- [x] After merge: apply on this machine, measure, report the diff of the owner's files for his commit.
 
 ## Notes
 
@@ -62,3 +62,13 @@ for both hosts: `updated` on the first run, `unchanged` on the second.
   CLI under mise is broken (its package files are missing), so the check
   waits for the owner's next Codex session: its rollout file should contain
   "Context is the product" and no `@/Users/ale/.agentic/kit/WORKFLOW.md` line.
+
+### 2026-10-15 — Codex session observed, done
+
+The local Codex CLI's package files were missing; reinstalling it through
+the owner's mise configuration (`npm:@openai/codex`, now 0.162.1) restored
+it. A `codex exec` session started after the change
+(`~/.codex/sessions/2026/10/15/rollout-2026-10-15T09-53-39-*.jsonl`)
+carries "Context is the product" and the explicit read instruction, and no
+`@/Users/ale/.agentic/kit/WORKFLOW.md` line. The owner's rule files were
+merged in `ales-workflow` pull request #24.
