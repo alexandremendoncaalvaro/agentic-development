@@ -1,6 +1,6 @@
 ---
 name: ad-update
-description: Preview and safely update the machine-global Agentic Development kit. Use when the user asks to update agentic, refresh installed skills, get the latest kit, sync the engineering skills, inspect kit drift, or invokes `/ad-update`. Project scope is explicit; preserves local edits unless the user explicitly requests force.
+description: 'Preview and safely update the installed agentic kit, keeping local edits. Use on "update agentic", "refresh skills", "get the latest kit".'
 summary: Preview and safely apply the current machine-global Agentic Development kit update, preserving local skill edits by default.
 allowed-tools: Read, Bash
 ---

@@ -1,6 +1,6 @@
 ---
 name: ad-commit
-description: Land the current work as atomic Conventional Commits with a DCO Signed-off-by trailer — scope intake, stage-split when concerns mix, message draft, sign and write. Use when a verified change is ready to land or on "commit this", "stage and commit", "split this commit", "sign off". Never bypasses hooks.
+description: 'Commit verified work as atomic Conventional Commits with sign-off. Use on "commit this", "stage and commit", "split this commit".'
 summary: Atomic Conventional Commits with DCO `Signed-off-by` sign-off. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.
 ---
 

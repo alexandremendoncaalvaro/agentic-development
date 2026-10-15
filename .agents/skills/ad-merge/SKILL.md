@@ -1,6 +1,6 @@
 ---
 name: ad-merge
-description: Check a pull request (CI, review, mergeability), merge once the owner confirms. Use on "merge this PR".
+description: 'Check a pull request (CI, review, mergeability), merge once the owner confirms. Use on "merge this PR".'
 summary: Evaluate and merge a GitHub pull request. Four phases — preflight, evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`.
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: ad-diagnose
-description: Disciplined diagnosis for hard bugs and performance regressions — build a feedback loop, reproduce, rank 3-5 falsifiable hypotheses, instrument, fix with a regression test. Use on "this is broken", "debug this", "find the bug", "performance regression", "build a repro".
+description: 'Diagnose a hard bug or performance regression: feedback loop, reproduce, ranked hypotheses, fix with a regression test. Use on "this is broken", "debug this", "regression".'
 summary: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.
 allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 ---

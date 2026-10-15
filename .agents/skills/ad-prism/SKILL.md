@@ -1,6 +1,6 @@
 ---
 name: ad-prism
-description: Design, interpret, refine, and audit decision-focused evaluations. Use when asking how to evaluate a change, define measures or decision rules, test fit for purpose, interpret results, or audit evaluation claims. Routes open research, uncertain techniques, repository-rule audits, reports, and publications to their specialist skills.
+description: 'Design, interpret or audit an evaluation: measures, decision rules, fitness for purpose. Use on "how do we evaluate this", "decision rule", "audit these results".'
 summary: Decision-focused evaluation design, interpretation, refinement, and methodology audit with an optional project domain adapter.
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: ad-tdd
-description: Test-driven implementation — red, green, refactor with one behavior per test through public interfaces; tracer bullet first, horizontal slicing rejected. Use when implementing behavior that is test-expressible; "TDD", "test first", "write a failing test", "tracer bullet".
+description: 'Test-driven implementation: red, green, refactor, one behavior per test through public interfaces. Use on "TDD", "test first", "write a failing test".'
 summary: Test-Driven Development per WORKFLOW §16. Red-green-refactor as deterministic LLM guardrail. Four steps — plan, tracer bullet, incremental loop with refactor on green, close-out. Tests verify behavior through public interfaces. Horizontal slicing rejected.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---

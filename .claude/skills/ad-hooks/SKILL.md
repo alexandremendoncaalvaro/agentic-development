@@ -1,6 +1,6 @@
 ---
 name: ad-hooks
-description: "Scaffold deterministic quality gates: pre-commit (lint, format, secret-scan) and pre-push (build, tests) fitted to the stack, plus session hooks (Stop handoff nudge, workflow checkpoint, PostToolUse artifact gate and handoff-chip reminder). Use to wire hooks, set up quality gates, or prevent --no-verify bypass."
+description: 'Scaffold deterministic quality gates: git hooks fitted to the stack plus session hooks. Use to wire hooks, set up quality gates, or stop --no-verify bypasses.'
 summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit + pre-push, runner detected from stack signals — plus a session-lifecycle tier (a Stop handoff nudge, a UserPromptSubmit workflow checkpoint, and dual-host PostToolUse artifact gate and handoff-chip reminder).
 allowed-tools: Read, Write, Glob, Bash
 ---

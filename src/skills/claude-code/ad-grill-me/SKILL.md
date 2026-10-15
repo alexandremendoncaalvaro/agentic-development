@@ -1,6 +1,6 @@
 ---
 name: ad-grill-me
-description: Interview before research — challenge a fuzzy ask against the codebase, one question at a time with a recommended answer, until the decision tree is resolved. Use when the ask is vague, bundles decisions, or lacks a success condition; "grill me", "challenge my assumptions", "what should I clarify".
+description: 'Interview a fuzzy ask one question at a time, each with a recommended answer, until it is sharp. Use on "grill me", "challenge my assumptions", "what should I clarify".'
 summary: Interview-before-research grilling session — one question at a time with recommendation, codebase-first, sharpens vocabulary against `CONTEXT.md`, captures terms via `ad-domain` and decisions via `ad-adr` (three-criteria rule). Upstream of `ad-ground`.
 allowed-tools: Read, Glob, Grep, Bash
 ---
