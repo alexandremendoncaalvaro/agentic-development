@@ -213,3 +213,13 @@ are the ones #176 merges; 3671059 is kept for the excluded earlier events.
 That repository has no `.agentic/gates.json`, so under ADR-0091 its sessions
 log no audit line until it names `auditPaths` locally. The evidence
 directory, the copy-out job and the criterion are unchanged.
+
+### 2026-10-15 — window open
+
+Pull request #176 merged at 2026-10-15T12:54:19Z, so the new window runs to
+2026-11-12T12:54:19Z. The company repository now names its high-risk paths
+in a machine-local `.agentic/gates.json` (excluded from Git, copied to its
+existing worktrees): database migrations, infrastructure, CI workflows, the
+SLIM cycle gates, the gateway, and the authentication, security and SSO
+code. A worktree created later has no copy and logs no audit line; the
+read-out labels such sessions.

@@ -1,6 +1,6 @@
 # Task `0117`: Review the uncovered delta once, and audit by risk
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-10-15
 **Scope ref:** doc/adr/0091-review-the-uncovered-delta-once.md
 **Evidence ref:** doc/research/0044-ground-review-economy-and-context-budget.md
@@ -23,7 +23,7 @@ The kit audit of 2026-10-15 found that no skill reads the coverage ledger, a fix
 - [x] This repository's `.agentic/gates.json` names its high-risk paths.
 - [x] ADR-0091 accepted with the projection and the `Amended by:` lines on ADR-0036, ADR-0074 and ADR-0089 in the same commit.
 - [x] Task 0110 records the window restart at this change's merge.
-- [ ] `npm run verify` green; dogfood install refreshed.
+- [x] `npm run verify` green; dogfood install refreshed.
 
 ## Plan
 
@@ -31,7 +31,7 @@ The kit audit of 2026-10-15 found that no skill reads the coverage ledger, a fix
 - [x] Checkpoint text and its test.
 - [x] `ad-review`, `ad-audit` and `ad-hooks` skill text in both hosts; skill tests that pin the changed contract lines.
 - [x] `.agentic/gates.json` `auditPaths`; ADR acceptance and projection; task 0110 Notes.
-- [ ] Delta review of the range, one audit of the gate change (it is enforcement tooling), local gate, pull request.
+- [x] Delta review of the range, one audit of the gate change (it is enforcement tooling), local gate, pull request.
 
 ## Notes
 
@@ -128,3 +128,8 @@ observed.
 - minor, rejected: the projection's cross-record example list
   "(0035, 0065, 0088)" is unchanged from `origin/main` and is not introduced
   by this branch; the second pass read the four-record count as correct.
+
+### 2026-10-15 — merged
+
+Pull request #176 merged at 2026-10-15T12:54:19Z (2880f7c) with all four CI
+legs green; the gate ran 1410 of 1410 locally on every state reviewed.
