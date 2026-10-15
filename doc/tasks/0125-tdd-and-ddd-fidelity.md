@@ -85,3 +85,10 @@ dogfood mirrors) count once; the term pattern is built once per term. The
 skill heading names `CONTEXT-MAP.md` too, and the CHANGELOG keeps one
 `### Added`. Note accepted: path-like and skill-name aliases stay as hits
 for `ad-drift` to judge.
+
+### 2026-10-15 — delta review of 176a6e8
+
+Every prior finding resolved. Accepted as known limits of an advisory check:
+when a Markdown file and a code file are byte-identical, the first in
+tracked order is kept, so the code copy can go unscanned; a map target with
+a space inside angle brackets is ignored.
