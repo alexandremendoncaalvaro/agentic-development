@@ -5236,7 +5236,7 @@ test('drift-scan: glossary lists canonical terms no tracked file uses outside th
 test('drift-scan: glossary reads the per-context files a CONTEXT-MAP links', () => {
   const dir = glossaryRepo({
     'CONTEXT-MAP.md':
-      '# Context map\n\n- [Voice](voice/CONTEXT.md)\n- [Billing](billing/CONTEXT.md)\n',
+      '# Context map\n\n- [Voice](voice/CONTEXT.md#terms)\n- [Billing](billing/CONTEXT.md)\n',
     'voice/CONTEXT.md': GLOSSARY,
     'billing/CONTEXT.md':
       '# Billing\n\n### Invoice run\n\n**Definition:** a batch.\n\n_Avoid_: "bill batch".\n',
@@ -5273,5 +5273,44 @@ test('drift-scan: glossary is empty without a CONTEXT.md and says why outside a 
   } finally {
     rmSync(plain, { recursive: true, force: true });
     rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary resolves map link forms to tracked files only, and falls back to the root glossary with the unresolved links named', () => {
+  const dir = glossaryRepo({
+    'CONTEXT-MAP.md':
+      '# Map\n\n- [A](<a/CONTEXT.md> "Voice")\n- [B](b\\CONTEXT.md)\n- [Out](../outside/CONTEXT.md)\n',
+    'a/CONTEXT.md': GLOSSARY,
+    'b/CONTEXT.md': '# B\n\n### Invoice run\n\n**Definition:** a batch.\n',
+  });
+  const fallback = glossaryRepo({
+    'CONTEXT-MAP.md': '# Map\n\n- [Gone](gone/CONTEXT.md)\n',
+    'CONTEXT.md': GLOSSARY,
+  });
+  try {
+    const resolved = runScan(dir).glossary;
+    assert.deepEqual(resolved.contexts, ['a/CONTEXT.md', 'b/CONTEXT.md']);
+    assert.deepEqual(resolved.unresolvedLinks, ['../outside/CONTEXT.md']);
+    const fell = runScan(fallback).glossary;
+    assert.deepEqual(fell.contexts, ['CONTEXT.md']);
+    assert.deepEqual(fell.unresolvedLinks, ['gone/CONTEXT.md']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+    rmSync(fallback, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary counts byte-identical copies of a file once', () => {
+  const dir = glossaryRepo({
+    'CONTEXT.md': GLOSSARY,
+    'src/voice.js': 'export const teamVoice = 1;\n',
+    'mirror/voice.js': 'export const teamVoice = 1;\n',
+  });
+  try {
+    const [hit] = runScan(dir).glossary.aliasesInCode;
+    assert.equal(hit.count, 1);
+    assert.deepEqual(hit.files, ['mirror/voice.js']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 });

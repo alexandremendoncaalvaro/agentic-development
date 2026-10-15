@@ -8,13 +8,6 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
-- `ad-drift` reports glossary drift: aliases `CONTEXT.md` says to avoid that
-  tracked code still uses, and canonical terms nothing uses, reading the
-  per-context files of a `CONTEXT-MAP.md`; advisory, judged per hit
-  (task-0125).
-
-### Added
-
 - `ad-hooks` ships a command guard on `PreToolUse` (both hosts) that denies
   killing processes by name and a `git commit` chained after a check with `;`
   or a newline, naming the fix in the reason; an exploratory replay of 65,432
@@ -28,6 +21,10 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   when the npm account's two-factor mode does not cover writes. The `ad-hooks` receipt
   gate logs a shadow `release` check before `npm publish` and the GitHub
   release (task-0122, ADR-0096).
+- `ad-drift` reports glossary drift: aliases `CONTEXT.md` says to avoid that
+  tracked code still uses, and canonical terms nothing uses, reading the
+  per-context files of a `CONTEXT-MAP.md`; advisory, judged per hit
+  (task-0125).
 
 ### Changed
 

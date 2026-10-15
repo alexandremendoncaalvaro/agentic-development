@@ -382,17 +382,26 @@ function trackedFiles(repoRoot) {
   return result.stdout.split('\0').filter(Boolean);
 }
 
-// The glossary files: the per-context files a CONTEXT-MAP.md links, else the
-// root CONTEXT.md.
-function glossaryFiles(repoRoot, unreadable) {
+// The glossary files: the tracked per-context files a CONTEXT-MAP.md links
+// (angle brackets, titles, anchors and backslashes accepted), else the root
+// CONTEXT.md. A link that resolves to no tracked file, or outside the
+// repository, is named in `unresolved`; when none resolves, the root
+// glossary is read instead.
+function glossaryFiles(repoRoot, tracked, unreadable) {
+  const root = tracked.has('CONTEXT.md') ? ['CONTEXT.md'] : [];
   const map = readContent(repoRoot, 'CONTEXT-MAP.md', unreadable);
-  if (map) {
-    const linked = [...map.matchAll(/\(([^)\s]*CONTEXT\.md)\)|`([^`\s]*CONTEXT\.md)`/g)]
-      .map((m) => posix.normalize(m[1] ?? m[2]))
-      .filter((path) => isFile(join(repoRoot, path)));
-    return [...new Set(linked)].sort();
+  if (!map) return { contexts: root, unresolved: null };
+  const targets = [...map.matchAll(/\]\(\s*<?([^)>\s]+)>?(?:\s+"[^"]*")?\s*\)|`([^`\s]+)`/g)]
+    .map((m) => (m[1] ?? m[2]).replace(/[#?].*$/, '').replace(/\\/g, '/'))
+    .filter((target) => /(^|\/)CONTEXT\.md$/.test(target));
+  const contexts = [];
+  const unresolved = [];
+  for (const target of [...new Set(targets)]) {
+    const path = posix.normalize(target);
+    if (tracked.has(path) && !path.startsWith('..') && !path.startsWith('/')) contexts.push(path);
+    else unresolved.push(target);
   }
-  return isFile(join(repoRoot, 'CONTEXT.md')) ? ['CONTEXT.md'] : [];
+  return { contexts: contexts.length > 0 ? contexts.sort() : root, unresolved };
 }
 
 function glossaryTerms(text) {
@@ -424,12 +433,17 @@ function phrasePattern(phrase) {
 }
 
 function scanGlossary(repoRoot, unreadable) {
-  const contexts = glossaryFiles(repoRoot, unreadable);
-  if (contexts.length === 0) return { contexts: [], aliasesInCode: [], unusedTerms: [] };
   const files = trackedFiles(repoRoot);
   if (files === null) {
-    return { contexts, aliasesInCode: [], unusedTerms: [], skipped: 'not a git repository' };
+    const contexts = isFile(join(repoRoot, 'CONTEXT.md')) ? ['CONTEXT.md'] : [];
+    const result = { contexts, aliasesInCode: [], unusedTerms: [] };
+    return contexts.length > 0 ? { ...result, skipped: 'not a git repository' } : result;
   }
+  const { contexts, unresolved } = glossaryFiles(repoRoot, new Set(files), unreadable);
+  const base = unresolved === null ? {} : { unresolvedLinks: unresolved };
+  if (contexts.length === 0) return { contexts: [], aliasesInCode: [], unusedTerms: [], ...base };
+  // Byte-identical copies (an installed mirror of a source tree) count once.
+  const seen = new Set();
   const texts = [];
   for (const path of files) {
     if (contexts.includes(path) || path === 'CONTEXT-MAP.md') continue;
@@ -439,16 +453,16 @@ function scanGlossary(repoRoot, unreadable) {
       continue;
     }
     const text = readContent(repoRoot, path, unreadable);
-    if (text.includes('\0')) continue;
+    if (text.includes('\0') || seen.has(text)) continue;
+    seen.add(text);
     texts.push({ path, text, code: !/\.(md|markdown)$/i.test(path) });
   }
   const aliasesInCode = [];
   const unusedTerms = [];
   for (const context of contexts) {
     for (const { term, aliases } of glossaryTerms(readContent(repoRoot, context, unreadable))) {
-      if (!texts.some(({ text }) => phrasePattern(term).test(text))) {
-        unusedTerms.push({ context, term });
-      }
+      const termPattern = phrasePattern(term);
+      if (!texts.some(({ text }) => termPattern.test(text))) unusedTerms.push({ context, term });
       for (const alias of aliases) {
         const pattern = phrasePattern(alias);
         const hits = texts
@@ -466,7 +480,7 @@ function scanGlossary(repoRoot, unreadable) {
       }
     }
   }
-  return { contexts, aliasesInCode, unusedTerms };
+  return { contexts, aliasesInCode, unusedTerms, ...base };
 }
 
 /**

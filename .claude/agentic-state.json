@@ -209,11 +209,11 @@
       "files": [
         {
           "path": ".claude/skills/ad-drift/scripts/drift-scan.mjs",
-          "sourceSha": "f8eb7c4531349698b59a48dc971e35520215d0e0f3d634af7023d031528c159c"
+          "sourceSha": "1a124a4b3adadd1872135a22292f54456aaafe0f7ee35f223af40d280ccfceb3"
         },
         {
           "path": ".claude/skills/ad-drift/SKILL.md",
-          "sourceSha": "937ea863908e68769fffdbab7010c47df758d332b645ac178fe321d8f7b8de25"
+          "sourceSha": "b1e5b13b6c1df9546a10c9af8e1db2bdb9abf89e805120859359e49e59caf3cf"
         }
       ]
     },

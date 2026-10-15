@@ -74,3 +74,14 @@ lines; a fifth fixture pinned that only the items outside the parentheses
 are aliases, which left 18 hits and one unused term (Evaluation domain
 adapter). The check stays advisory: `ad-drift` (both hosts) reads each hit
 and reports only a concept named by the avoided alias.
+
+### 2026-10-15 — review of 38043f1
+
+Two-axis review, no blocker. Fixed, each pinned by a test first: map links
+with anchors, angle brackets, titles or backslashes now resolve; a link to
+no tracked file or outside the repository is named in `unresolvedLinks`, and
+when none resolves the root `CONTEXT.md` is read; byte-identical copies (the
+dogfood mirrors) count once; the term pattern is built once per term. The
+skill heading names `CONTEXT-MAP.md` too, and the CHANGELOG keeps one
+`### Added`. Note accepted: path-like and skill-name aliases stay as hits
+for `ad-drift` to judge.
