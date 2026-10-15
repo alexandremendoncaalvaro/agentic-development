@@ -131,3 +131,20 @@ test('an unedited summary block follows a changed TL;DR; an edited one is kept',
     rmSync(kitRoot, { recursive: true, force: true });
   }
 });
+
+test('a summary block saved with CRLF line endings is still recognised and refreshed', () => {
+  const home = mkHome();
+  const kitRoot = mkKit('1. **Context is the product.**');
+  try {
+    const path = join(home, '.codex/AGENTS.md');
+    configureGlobalConstitution({ agent: 'codex', home, kitRoot });
+    writeFileSync(path, readFileSync(path, 'utf8').replace(/\n/g, '\r\n'));
+
+    assert.equal(configureGlobalConstitution({ agent: 'codex', home, kitRoot }).type, 'updated');
+    assert.equal(configureGlobalConstitution({ agent: 'codex', home, kitRoot }).type, 'unchanged');
+    assert.match(readFileSync(path, 'utf8'), /Context is the product/);
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+    rmSync(kitRoot, { recursive: true, force: true });
+  }
+});

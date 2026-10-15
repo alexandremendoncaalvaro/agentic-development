@@ -227,15 +227,30 @@ export function checkGateRun(cwd) {
   };
 }
 
+function isAncestor(root, ancestor, commit) {
+  try {
+    git(root, ['merge-base', '--is-ancestor', ancestor, commit]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * The review receipts that cover their whole range: a full review, or a delta
- * review whose base an earlier one of these covers (ADR-0091 decision 3).
+ * review whose base is an ancestor of its target and an earlier one of these
+ * covers (ADR-0091 decision 3).
  * Receipts arrive oldest first, so a chain resolves in one pass.
  */
 function chainedReviews(root, receipts) {
   const chained = [];
   for (const receipt of receipts) {
-    if (!receipt.baseTree || newestCovering(root, receipt.baseTree, chained).receipt) {
+    if (!receipt.base) {
+      chained.push(receipt);
+    } else if (
+      isAncestor(root, receipt.base, receipt.sha) &&
+      newestCovering(root, receipt.baseTree, chained).receipt
+    ) {
       chained.push(receipt);
     }
   }

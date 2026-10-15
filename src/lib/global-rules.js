@@ -91,7 +91,11 @@ export function configureGlobalConstitution({
     return { type: 'unchanged', path: pathForReport, agent };
   }
 
-  const inner = body.slice(start + MARKER_START.length + 1, end);
+  // An editor or git autocrlf may have saved the block with CRLF endings.
+  const inner = body
+    .slice(start + MARKER_START.length, end)
+    .replace(/\r\n/g, '\n')
+    .replace(/^\n/, '');
   if (!isUnedited(inner, workflowPath)) {
     return { type: 'skipped', path: pathForReport, agent };
   }

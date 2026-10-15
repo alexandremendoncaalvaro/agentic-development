@@ -18,7 +18,7 @@ The kit audit of 2026-10-15 scored review economy 1.6 of 4: no skill reads the c
 - [x] The receipt gate logs no audit line for a pull request action when no changed path matches `auditPaths` in `.agentic/gates.json`, and logs the audit check as before when one does.
 - [x] The gate counts a review receipt with `Base-SHA:` only when an earlier review receipt covers that base; an unchained delta reads as would-block.
 - [x] `ad-review` (both hosts) reads the coverage ledger first, reviews only the uncovered delta after a covered review, and writes `Base-SHA:` for a delta.
-- [x] `ad-audit` (both hosts) is described for high-risk or uncovered work, re-audits only changed groups, and runs one critical second pass on a model other than the first, recorded in the trail.
+- [x] `ad-audit` (both hosts) reads the coverage ledger first, is described for high-risk or uncovered work, re-audits only changed groups, and runs one critical second pass on a model other than the first, recorded in the trail.
 - [x] The workflow checkpoint names review of the uncovered delta and audit by risk.
 - [x] This repository's `.agentic/gates.json` names its high-risk paths.
 - [x] ADR-0091 accepted with the projection and the `Amended by:` lines on ADR-0036, ADR-0074 and ADR-0089 in the same commit.
@@ -51,3 +51,21 @@ checkpoint test asserted the new fifth line red, then green. Skill text
 changed in both hosts; ADR-0091 and ADR-0092 accepted with the projection.
 On this branch the real gate asks for the audit, because it changes
 `src/skills/*/ad-hooks/scripts/**`.
+
+### 2026-10-15 — review of 10a48ca and dispositions
+
+Two-axis fresh-context review of origin/main..10a48ca: no Blockers, four
+Concerns.
+
+- Fixed: `ad-audit` lacked the ledger-first step ADR-0091 decision 1 names;
+  both hosts now read the coverage ledger and state the audit triggers.
+- Fixed, test first: a delta receipt now counts only when its `Base-SHA:` is
+  an ancestor of its target.
+- Fixed, test first (task 0119): the summary block saved with CRLF endings is
+  still recognised and refreshed.
+- Rejected: dropping the local `main`/`master` fallback in `defaultBranch`.
+  The remote refs are tried first; a local name is used only where no remote
+  default exists, and then it is the only base available. The gate is shadow
+  and the read-out labels each line.
+- Noted for the 0110 read-out: "audit not expected" leaves no line, the same
+  as a check turned off.

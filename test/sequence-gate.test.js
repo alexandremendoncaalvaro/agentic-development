@@ -975,3 +975,14 @@ test('sequence-gate: a malformed Base-SHA is counted as unreadable', () => {
   assert.equal(review.state, 'would-block');
   assert.equal(review.unreadable_receipts, 1);
 });
+
+test('sequence-gate: a delta review whose covered base is not an ancestor of its target is a would-block', () => {
+  const repo = fixtureRepo();
+  git(repo, 'switch', '-q', '-c', 'side', 'main');
+  const side = commitChange(repo, 'side work\n');
+  writeReview(repo, side, '20261015T100000Z');
+  git(repo, 'switch', '-q', 'feature');
+  const head = commitChange(repo, 'fix one\n');
+  writeDeltaReview(repo, head, side, '20261015T110000Z');
+  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'review')[0].state, 'would-block');
+});

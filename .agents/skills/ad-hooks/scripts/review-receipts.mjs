@@ -68,7 +68,10 @@ function readCommitReceipts(root, suffix, targetOf, baseOf = () => undefined) {
     }
     try {
       const receipt = { sha, tree: git(root, ['rev-parse', `${sha}^{tree}`]) };
-      if (base !== undefined) receipt.baseTree = git(root, ['rev-parse', `${base}^{tree}`]);
+      if (base !== undefined) {
+        receipt.base = base;
+        receipt.baseTree = git(root, ['rev-parse', `${base}^{tree}`]);
+      }
       receipts.push(receipt);
     } catch {
       unreadable += 1;
