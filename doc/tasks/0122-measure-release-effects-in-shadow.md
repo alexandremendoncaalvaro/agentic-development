@@ -48,3 +48,31 @@ the tag (ADR-0096 decision 3). `npm profile get --json` on the owner's
 account read `tfa.mode` = `auth-and-writes` on 2026-10-15, the field the
 preflight step reads; the step is prose, since it needs the network and a
 login.
+
+### 2026-10-15 — review and audit of bbded9c
+
+Two-axis review and the audit of the enforcement-tooling groups (CV on two
+models, HK, GH): no blocker. Findings and dispositions:
+
+- Concern (Standards), a `package.json` without a name gave a false `clear`:
+  fixed, the check is `runtime-unavailable` unless both name and version
+  are strings; pinned by a test.
+- Concern (Standards), a per-stage approval without the package identity
+  wrote an empty receipt: fixed, no receipt and `unavailable: missing
+  package name or version`; pinned by a test.
+- Minor violation (CV, second model), the built entry's "Nine tests went
+  red" is wrong: eight of the nine failed before the code; the negative case
+  "an unapproved or mismatched plan writes no release receipt" passes on the
+  base by construction. Corrected here, since this log is append-only.
+- Judgement-call (CV), the `tfa.mode` observation had no retained artifact:
+  the redacted output of `npm profile get --json` on 2026-10-15 was
+  `{'tfa': {'pending': None, 'mode': 'auth-and-writes'}, 'name': '...',
+  'email': '...', ...}`.
+- Judgement-call (CV), the release frequency had no recorded window: ADR-0096
+  now names the six tags and the command.
+- Judgement-call (CV), the preflight warning is prose: the CHANGELOG now
+  says the step tells the agent to warn.
+- Notes accepted and recorded in ADR-0096: workspace publish forms are not
+  seen, a dry-run publish is logged, a receipt keeps the first approval time.
+  `pnpm publish` and `yarn publish` are now pinned by a test.
+- HK, GH: no finding.

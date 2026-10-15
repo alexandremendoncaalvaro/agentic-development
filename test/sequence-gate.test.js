@@ -1050,3 +1050,23 @@ test('sequence-gate: without a package.json the release check is runtime-unavail
   const release = linesFor(runGate(repo, 'npm publish').lines, 'release');
   assert.equal(release[0].state, 'runtime-unavailable');
 });
+
+test('sequence-gate: a package.json without a name or version makes the release check runtime-unavailable', () => {
+  const repo = mkdtempSync(join(tmpdir(), 'sequence-gate-release-'));
+  git(repo, 'init', '-q', '-b', 'main');
+  writeFileSync(join(repo, 'package.json'), '{"version":"1.0.0"}\n');
+  const dir = join(repo, '.git', 'agentic');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, 'release.jsonl'), '{"version":"1.0.0","scope":"x"}\n');
+  const release = linesFor(runGate(repo, 'npm publish').lines, 'release');
+  assert.equal(release[0].state, 'runtime-unavailable');
+});
+
+test('sequence-gate: pnpm and yarn publish are release actions too', () => {
+  const repo = releaseRepo();
+  for (const command of ['pnpm publish', 'yarn publish']) {
+    const [line] = linesFor(runGate(repo, command).lines, 'release');
+    assert.equal(line.action, 'npm publish');
+    assert.equal(line.state, 'would-block');
+  }
+});

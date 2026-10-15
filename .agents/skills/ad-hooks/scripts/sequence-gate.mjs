@@ -314,6 +314,9 @@ const RELEASE_RECEIPT_WINDOW = 20;
 export function checkRelease(cwd) {
   const root = repositoryRoot(cwd);
   const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+  if (typeof manifest?.name !== 'string' || typeof manifest?.version !== 'string') {
+    throw new Error('package.json names no package name and version');
+  }
   const commonDir = resolve(root, git(root, ['rev-parse', '--git-common-dir']));
   const file = join(commonDir, 'agentic', 'release.jsonl');
   const lines = existsSync(file)

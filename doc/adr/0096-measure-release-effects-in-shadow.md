@@ -8,12 +8,12 @@
 
 ## Context
 
-`ad-release` publishes to npm and creates a GitHub Release behind one approval written in prose and carried as JSON. A hook in the skill's own frontmatter would fire only after the skill was invoked and would trust a receipt the agent writes, so it would not stop an agent that skips the skill. The npm one-time password is the barrier an agent cannot forge, and it covers a publish only when the account's two-factor mode is `auth-and-writes`. ADR-0083 and ADR-0089 require a measured false-block rate before any block, and ADR-0089 decision 6's criterion of 20 events in four weeks cannot be reached at the kit's release frequency (six tags in the thirty days before this decision).
+`ad-release` publishes to npm and creates a GitHub Release behind one approval written in prose and carried as JSON. A hook in the skill's own frontmatter would fire only after the skill was invoked and would trust a receipt the agent writes, so it would not stop an agent that skips the skill. The npm one-time password is the barrier an agent cannot forge, and it covers a publish only when the account's two-factor mode is `auth-and-writes`. ADR-0083 and ADR-0089 require a measured false-block rate before any block, and ADR-0089 decision 6's criterion of 20 events in four weeks cannot be reached at the kit's release frequency (six release tags, v1.1.0 to v1.5.0, created 2026-09-16 to 2026-10-15 by `git tag --sort=creatordate`).
 
 ## Decision
 
-1. An approved release plan, or a per-stage approval of `npm-publish` or `github-release`, makes `release-plan.mjs` append one receipt to `<git common dir>/agentic/release.jsonl`: package, version, plan digest (null for a per-stage approval), scope and time. An unchanged approval is not appended again; outside a git repository the planner reports the receipt as unavailable and still returns its command.
-2. The `ad-hooks` receipt gate logs a `release` check before `npm publish`, `pnpm publish`, `yarn publish` and `<gh> release create`: `clear` when one of the newest 20 receipts names the `package.json` name and version, else `would-block`; no `package.json` is `runtime-unavailable`. Shadow only, like every ADR-0089 check.
+1. An approved release plan, or a per-stage approval of `npm-publish` or `github-release`, makes `release-plan.mjs` append one receipt to `<git common dir>/agentic/release.jsonl`: package, version, plan digest (null for a per-stage approval), scope and time. An unchanged approval is not appended again, so a receipt keeps the time of the first approval; an approval without a package name and version, or outside a git repository, the planner reports the receipt as unavailable and still returns its command.
+2. The `ad-hooks` receipt gate logs a `release` check before `npm publish`, `pnpm publish`, `yarn publish` and `<gh> release create`: `clear` when one of the newest 20 receipts names the `package.json` name and version, else `would-block`; a `package.json` that is missing or names no package name and version is `runtime-unavailable`. Shadow only, like every ADR-0089 check.
 3. The receipt sits in the git directory every worktree shares because `ad-release` publishes from a disposable worktree at the tag, where a receipt under `.agentic/` of the checkout is not visible.
 4. `ad-release` preflight reads `npm profile get --json` and warns when `tfa.mode` is not `auth-and-writes`.
 5. No release check blocks. At release frequency the shadow log is read per release, as an audit trail, not against ADR-0089 decision 6.
@@ -29,7 +29,7 @@ Positive:
 Negative:
 
 - The receipt is written by the agent that runs the planner, so it shows that the approval step ran, not that the owner approved; the one-time password remains the real barrier.
-- A `--dry-run` publish is logged like a real one.
+- A `--dry-run` publish is logged like a real one, and a publish written with options before the verb (`npm --workspace a publish`, `pnpm -r publish`) is not seen.
 
 ## Alternatives Considered
 

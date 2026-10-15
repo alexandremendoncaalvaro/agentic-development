@@ -1371,6 +1371,24 @@ test('release-plan: a per-stage publish approval leaves a receipt naming the sta
   assert.equal(receipt.digest, null);
 });
 
+test('release-plan: a per-stage approval without the package identity writes no receipt', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'release-plan-receipt-'));
+  gitInit(dir);
+  const withoutName = { ...RELEASE_CONTEXT };
+  delete withoutName.packageName;
+  const result = runReleasePlan(
+    {
+      ...withoutName,
+      completed: ['local-release', 'branch-push', 'tag-push'],
+      merged: true,
+      confirmation: { stage: 'npm-publish', approved: true },
+    },
+    dir
+  );
+  assert.equal(result.releaseReceipt, 'unavailable: missing package name or version');
+  assert.deepEqual(releaseReceipts(dir), []);
+});
+
 test('release-plan: outside a git repository an approval reports the receipt as unavailable', () => {
   const preview = runReleasePlan(RELEASE_CONTEXT);
   const result = runReleasePlan({

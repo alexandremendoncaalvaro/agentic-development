@@ -168,6 +168,10 @@ function releaseReceiptFile() {
 }
 
 function recordRelease(state, digest, scope) {
+  const identified = [state.packageName, state.packageVersion].every(
+    (value) => typeof value === 'string' && value.length > 0
+  );
+  if (!identified) return 'unavailable: missing package name or version';
   try {
     const file = releaseReceiptFile();
     const receipt = { package: state.packageName, version: state.packageVersion, digest, scope };
