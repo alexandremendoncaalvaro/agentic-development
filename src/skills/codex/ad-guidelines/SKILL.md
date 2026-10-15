@@ -12,9 +12,7 @@ Layer 1 Constitution trinity member. Lazy lifecycle owner of `GUIDELINES.md` at 
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when the user wants to scope or update project-level engineering standards: new project, existing rules buried in AGENTS.md, stack change, Object Calisthenics tier review.
-
-Route elsewhere when:
+Not for:
 
 - Scope is system structure → `ad-architecture`.
 - Scope is product → `ad-prd`.

@@ -12,9 +12,7 @@ PRD is product-level scope, not feature-level scope. A feature spec (`ad-spec`, 
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when the user wants to scope or update product-level context: new product framing, existing PRD update, cross-feature constraint surfaced.
-
-Route elsewhere when:
+Not for:
 
 - Scope is one feature → `ad-spec` (Layer 4).
 - Scope is a vocabulary question → `ad-domain` (Layer 2).

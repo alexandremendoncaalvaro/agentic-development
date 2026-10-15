@@ -12,9 +12,7 @@ Implements ADR-0024 and ADR-0032 (`doc/adr/0032-ci-failure-is-local-gate-gap.md`
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when one or more atomic commits exist on the current branch ahead of the base, or the user asks to "open a PR", "submit a PR", "create a pull request".
-
-Route elsewhere when:
+Not for:
 - The branch has uncommitted or unsplit work → `ad-commit` first.
 - The user wants to merge an already-open PR → `ad-merge`.
 

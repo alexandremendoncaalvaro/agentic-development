@@ -11,7 +11,7 @@ It exists because the practitioner's cross-project rules live in the host's glob
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when the user asks to load, see, list, or refresh the rules in force, asks what governs the current work, says "The Rules" or an equivalent rules correction, or starts in a repo whose conventions they have not read.
+Step 0 — classify the request. Run when the user asks to load, see, list, or refresh the rules in force, asks what governs the current work, says "The Rules" or an equivalent rules correction, or starts in a repo whose conventions they have not read.
 
 Classify the request before reporting:
 

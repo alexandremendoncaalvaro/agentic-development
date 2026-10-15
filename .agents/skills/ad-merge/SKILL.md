@@ -12,9 +12,7 @@ Implements ADR-0025. Evaluates a PR's mergeability and performs the merge via `g
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when a PR is open against the repo and the user wants to land it, or the user asks "merge this PR", "evaluate the PR", "is it mergeable".
-
-Route elsewhere when:
+Not for:
 - No PR exists yet → `ad-pr` first.
 - Commits are not on the branch yet → `ad-commit` first.
 

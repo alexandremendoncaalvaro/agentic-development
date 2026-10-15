@@ -54,3 +54,10 @@ and allows a lead sentence plus two of scope; the five longest CONTEXT.md
 definitions were trimmed (the "Review verdicts" one now names `Base-SHA:`).
 The changed WORKFLOW.md hash joins the legacy-migration list, as the
 current development copy, so the migration test keeps recognizing it.
+
+### 2026-10-15 — review of 9573e0e
+
+The Codex `ad-tdd` gained the "rename the tests with the code" line, and both
+hosts now say the list grows as cycles reveal behaviors, matching §16. Five
+definitions were trimmed against the four the criterion names; the fifth
+("Two-axis review") was the longest of all and is kept trimmed.

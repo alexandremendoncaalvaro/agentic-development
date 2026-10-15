@@ -48,3 +48,13 @@ four held real content and were renamed instead (`ad-release` preconditions,
 release-plan rules). `ad-hooks` is now 11,339 bytes, its session tier in
 `references/session-tier.md`. `ad-project-state` is `user-invocable: false`
 (menu hygiene only; its description stays in the listing).
+
+### 2026-10-15 — review of 9573e0e
+
+Corrects the entry above: the regime step was also in 13 Codex skills, as
+inline text the heading-only test missed (spec review Blocker). The test now
+matches "confirm regime" in any form; the Codex steps became "Not for" lists,
+with `ad-release` and `ad-rules` renamed to their real step. Stale regime and
+Step 4 references in the `ad-tdd` and `ad-tdg` summaries and output
+contracts were updated, and `ad-hooks` states its session-hook approval step
+in the skill body again (standards review, ADR-0085).

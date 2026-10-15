@@ -13,12 +13,7 @@ Codex subagents and sessions do not share the parent conversation history by mag
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when at least one holds:
-- The user says "handoff", "hand off", "wrap up", "compact this", "save context", "pass to another agent", "I need to `/clear`".
-- The session has run long enough that context-window pressure is imminent or stated.
-- The user is about to switch agents (Codex → Claude Code, or back) and wants the work to continue.
-
-Route elsewhere when:
+Not for:
 - The work is finishable in the current turn → finish it; do not pre-emptively hand off.
 - The handoff target is a specific artifact (PRD / spec / task / ADR) → write that artifact via the matching `ad-*` skill instead. Handoffs do not replace persistent decision records.
 - The user wants to commit work-in-progress → `ad-commit` or finish the change first.

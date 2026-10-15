@@ -1,7 +1,7 @@
 ---
 name: ad-tdd
 description: Test-driven implementation — red, green, refactor with one behavior per test through public interfaces; tracer bullet first, horizontal slicing rejected. Use when implementing behavior that is test-expressible; "TDD", "test first", "write a failing test", "tracer bullet".
-summary: Test-Driven Development per WORKFLOW §16. Red-green-refactor as deterministic LLM guardrail. Five phases — confirm regime, plan, tracer bullet, incremental loop, refactor. Tests verify behavior through public interfaces. Horizontal slicing rejected.
+summary: Test-Driven Development per WORKFLOW §16. Red-green-refactor as deterministic LLM guardrail. Four steps — plan, tracer bullet, incremental loop with refactor on green, close-out. Tests verify behavior through public interfaces. Horizontal slicing rejected.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -29,7 +29,7 @@ Before writing a test or a line of code:
 1. **Read `CONTEXT.md`** if it exists — anchor the test names and interface vocabulary in the project's ubiquitous language. When a domain term changes, the model changed: rename the tests with the code.
 2. **Confirm the public interface.** What is the smallest surface the caller needs to know? Types, ordering constraints, error modes. Interface design is testability design.
 3. **Identify deepening opportunities** (small interface over deep implementation per WORKFLOW §8). Surface-area-light interfaces are easier to test against and survive refactors.
-4. **List the behaviors to test, not the implementation steps.** Pick the **first** behavior — the one that proves end-to-end the path works. The rest are deferred until the tracer bullet lands.
+4. **List the behaviors to test, not the implementation steps.** Pick the **first** behavior — the one that proves end-to-end the path works. The rest wait on the list until the tracer bullet lands; add behaviors the cycles reveal.
 5. **Stateful unit: write the state × event table.** When the unit keeps state between calls (a tracker, latch, observer, coordinator), list every state, every event that can reach it, and the same-instant, tie, and inclusive/exclusive boundary variant of each before the first test. Each cell becomes a behavior in the list or an explicit N/A with its reason. Review passes over a new state machine find the next unlisted cell one round at a time; the table finds them up front.
 6. **Test Dependency Map (TDM) for existing code.** If the change modifies existing code, list the tests already covering the surface and run them to establish the green baseline. New-code changes skip the existing-tests TDM and write the first test fresh.
 7. **Get user approval on the plan.** One sentence — "I'll test behavior X first via interface Y, then iterate." User confirms or steers before any test is written.
@@ -97,18 +97,17 @@ If any checkbox fails, fix it before writing the next test. The cycle's contract
 
 No file written. Output is structured conversation:
 
-1. Confirmation of regime (Step 0 — TDD, or routed elsewhere).
-2. Vertical plan (Step 1) — interface, behaviors-to-test list, first behavior, approval.
-3. Tracer bullet (Step 2) — test, red, minimum code, green.
-4. Per-behavior incremental loop (Step 3).
-5. Refactor pass with rationale (Step 4).
-6. Per-cycle checklist confirmation.
+1. Vertical plan (Step 1) — interface, behaviors-to-test list, first behavior, approval.
+2. Tracer bullet (Step 2) — test, red, minimum code, green.
+3. Per-behavior incremental loop (Step 3).
+4. Close-out with rationale (Step 4): deepening and, for a stateful unit, the mutation sweep.
+5. Per-cycle checklist confirmation.
 
 When the change is committed, the behaviors covered, the deepening that surfaced, and the rejected couplings (if any) go into the commit message body. When a task file exists, the same content lands in the task's `Notes` log under a dated entry.
 
 ## Next
 
-- After Step 4 refactor passes: use `/ad-commit` to land one or a small handful of behavior-shaped tests with their implementation; commits stay atomic.
+- After the close-out (Step 4): use `/ad-commit` to land one or a small handful of behavior-shaped tests with their implementation; commits stay atomic.
 - `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10. TDD verifies the implementation against tested behaviors; §10 review checks coupling, edge cases, spec drift the tests did not cover.
 - If the cycle surfaced a refactor opportunity larger than the GREEN-phase refactor allows: `/ad-deepen` (WORKFLOW §8), when the design friction is load-bearing.
 - If multiple tests fail in unexpected ways during the cycle (not the predicted RED for the new test): `/ad-diagnose` to investigate the regression before continuing the TDD loop.

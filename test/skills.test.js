@@ -104,11 +104,8 @@ for (const agent of ['claude-code', 'codex']) {
       const bytes = Buffer.byteLength(body);
       assert.ok(lines <= BODY_LINE_CAP, `SKILL.md has ${lines} lines; cap ${BODY_LINE_CAP}`);
       assert.ok(bytes <= BODY_BYTE_CAP, `SKILL.md has ${bytes} bytes; cap ${BODY_BYTE_CAP}`);
-      assert.doesNotMatch(
-        body,
-        /^## (Step|Phase) 0 — Confirm regime/m,
-        'routing belongs in a "Not for" list'
-      );
+      // Both forms: the Claude Code heading and the Codex inline step.
+      assert.doesNotMatch(body, /confirm regime/i, 'routing belongs in a "Not for" list');
       assert.doesNotMatch(body, /less mature/, 'outdated Codex auto-trigger warning');
     });
   }

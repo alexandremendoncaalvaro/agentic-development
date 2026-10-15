@@ -1,7 +1,7 @@
 ---
 name: ad-tdd
 description: Test-driven implementation — red, green, refactor with one behavior per test through public interfaces; tracer bullet first, horizontal slicing rejected. Use when implementing behavior that is test-expressible; "TDD", "test first", "write a failing test", "tracer bullet".
-summary: Test-Driven Development per WORKFLOW §16. Red-green-refactor as deterministic LLM guardrail. Five phases — confirm regime, plan, tracer bullet, incremental loop, refactor. Tests verify behavior through public interfaces. Horizontal slicing rejected.
+summary: Test-Driven Development per WORKFLOW §16. Red-green-refactor as deterministic LLM guardrail. Four steps — plan, tracer bullet, incremental loop with refactor on green, close-out. Tests verify behavior through public interfaces. Horizontal slicing rejected.
 ---
 
 <background_information>
@@ -16,9 +16,7 @@ Distinction from `ad-tdg`: TDD focuses on driving code through one test at a tim
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. TDD is for the *behavior-known, test-expressible* regime. Run the skill when the change has a clear behavior to express as a test up front (a new API capability, a bug-driven regression test, a refactor with a known contract) AND a test runner is wired.
-
-Route elsewhere when:
+Not for:
 
 - The outcome is known but the *implementation strategy* has multiple plausible paths → `ad-tdg` (WORKFLOW §9).
 - The *technique itself* is uncertain across multiple plausible approaches → `ad-spike` (WORKFLOW §14).
@@ -27,10 +25,10 @@ Route elsewhere when:
 
 Step 1 — plan vertically. Before writing a test or a line of code:
 
-- Read `CONTEXT.md` if it exists — anchor test names and interface vocabulary in the project's ubiquitous language.
+- Read `CONTEXT.md` if it exists — anchor test names and interface vocabulary in the project's ubiquitous language. When a domain term changes, the model changed: rename the tests with the code.
 - Confirm the public interface. What is the smallest surface the caller needs to know? Types, ordering constraints, error modes.
 - Identify deepening opportunities (small interface over deep implementation per WORKFLOW §8). Surface-area-light interfaces are easier to test against and survive refactors.
-- List the behaviors to test, not the implementation steps. Pick the **first** behavior — the one that proves end-to-end the path works. The rest are deferred until the tracer bullet lands.
+- List the behaviors to test, not the implementation steps. Pick the **first** behavior — the one that proves end-to-end the path works. The rest wait on the list until the tracer bullet lands; add behaviors the cycles reveal.
 - Stateful unit: write the state × event table. When the unit keeps state between calls (a tracker, latch, observer, coordinator), list every state, every event that can reach it, and the same-instant, tie, and inclusive/exclusive boundary variant of each before the first test. Each cell becomes a behavior in the list or an explicit N/A with its reason. Review passes over a new state machine find the next unlisted cell one round at a time; the table finds them up front.
 - Test Dependency Map (TDM) for existing code. If the change modifies existing code, list the tests already covering the surface and run them to establish the green baseline. New-code changes skip the TDM and write the first test fresh.
 - Get user approval on the plan. One sentence — "I'll test behavior X first via interface Y, then iterate."
@@ -83,7 +81,7 @@ Interview UX: for plan approval and coupling-acceptance prompts, use Codex's `re
 </instructions>
 
 <output_contract>
-No file written. Output is structured conversation: regime confirmation, vertical plan (interface + behaviors-to-test + first behavior + approval), tracer bullet (test + red + minimum code + green), per-behavior incremental loop, refactor pass with rationale, per-cycle checklist confirmation.
+No file written. Output is structured conversation: vertical plan (interface + behaviors-to-test + first behavior + approval), tracer bullet (test + red + minimum code + green), per-behavior incremental loop with refactor on green, close-out with rationale, per-cycle checklist confirmation.
 
 When the change is committed, the behaviors covered, the deepening that surfaced, and the rejected couplings (if any) go into the commit message body. When a task file exists, the same content lands in the task's `Notes` log under a dated entry.
 

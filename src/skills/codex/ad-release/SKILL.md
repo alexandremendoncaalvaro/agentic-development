@@ -11,7 +11,7 @@ Only one root npm package released through GitHub is supported. It never switche
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run for a release-ready root npm package when the user asks to prepare a release, publish a tagged version, create its GitHub Release, or resume a partial release.
+Step 0 — preconditions. Run for a release-ready root npm package when the user asks to prepare a release, publish a tagged version, create its GitHub Release, or resume a partial release.
 
 Stop without mutation when the repository lacks `package.json`, `package-lock.json`, `CHANGELOG.md`, a GitHub remote, `package.json#scripts.release`, or explicit `package.json#publishConfig.tag`. The configured script must accept `patch`, `minor`, `major`, or `prerelease` and `--dry-run`. Route a repository without that contract to its maintainer; do not invent a release script.
 

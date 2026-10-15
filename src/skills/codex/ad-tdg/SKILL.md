@@ -13,9 +13,7 @@ Non-negotiables (read first): never edit the TDM tests to make them pass — the
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. TDG is for the *technique-known, implementation-strategy-uncertain* regime. Run the skill only when the canonical approach is settled (via `ad-ground` or prior knowledge) AND multiple implementation strategies could produce the expected output with different trade-offs along readability / performance / testability axes.
-
-Route elsewhere when:
+Not for:
 - The *technique itself* is uncertain across multiple plausible approaches → `ad-spike` (WORKFLOW §14). Spike validates technique with golden fixture + per-stage debug; TDG validates implementation with ground-truth pair + TDM.
 - The path is fully obvious (one-line fix, mechanical refactor, byte-for-byte port) → TDG is overkill; proceed directly without the skill.
 - No tests cover the surface and the project does not yet have a test runner wired → consider `ad-hooks` for project gates first; TDG depends on a verifiable green baseline.
@@ -92,12 +90,11 @@ Verification rules:
 <output_contract>
 No file written. Output is structured conversation:
 
-1. Confirmation of regime (Step 0 — TDG or routed elsewhere).
-2. Ground-truth pair (Step 1).
-3. TDM list with green-baseline confirmation (Step 2).
-4. Three candidates with trade-off table (Step 3).
-5. Selection by criterion + rejection notes (Step 4).
-6. Implementation + verification result (Step 5).
+1. Ground-truth pair (Step 1).
+2. TDM list with green-baseline confirmation (Step 2).
+3. Three candidates with trade-off table (Step 3).
+4. Selection by criterion + rejection notes (Step 4).
+5. Implementation + verification result (Step 5).
 
 When the change is committed, the ground-truth pair, criterion, and rejection notes go into the commit message body. When a task file exists, the same content also lands in the task's `Notes` log under a dated entry.
 </output_contract>

@@ -11,9 +11,7 @@ Non-negotiables (read first): DCO `Signed-off-by` on every commit, never a `Co-A
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when the user wants to land changes as commits and the working tree has staged or unstaged changes worth committing, or the user asks for "commit", "stage", "split this commit", "sign off".
-
-Route elsewhere when:
+Not for:
 - The user wants to open a PR after committing → continue with `ad-pr` after this skill finishes.
 - The user wants to merge an open PR → `ad-merge`.
 - The diff is unfinished work that should not land yet → say so; do not commit speculatively.
