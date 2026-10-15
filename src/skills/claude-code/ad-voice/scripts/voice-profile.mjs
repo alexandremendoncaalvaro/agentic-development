@@ -46,7 +46,9 @@ export function parseProfileMarkdown(markdown) {
     throw new Error('profile must contain exactly one fenced json data block');
   }
   if (
-    !/^# Personal voice profile[ \t]*\r?\n\r?\n## Profile data[ \t]*\r?\n\r?\n```json[ \t]*\r?\n[\s\S]*?\r?\n```[ \t]*(?:\r?\n)?$/.test(markdown)
+    !/^# Personal voice profile[ \t]*\r?\n\r?\n## Profile data[ \t]*\r?\n\r?\n```json[ \t]*\r?\n[\s\S]*?\r?\n```[ \t]*(?:\r?\n)?$/.test(
+      markdown
+    )
   ) {
     throw new Error('profile must contain only the canonical title and Profile data section');
   }
@@ -127,16 +129,13 @@ export function validateProfile(profile) {
   }
   if (
     profile.languages !== undefined &&
-    (!profile.languages || typeof profile.languages !== 'object' || Array.isArray(profile.languages))
+    (!profile.languages ||
+      typeof profile.languages !== 'object' ||
+      Array.isArray(profile.languages))
   ) {
     errors.push('languages must be an object');
   } else if (profile.languages) {
-    rejectUnknownFields(
-      profile.languages,
-      ['conversation', 'publication'],
-      'languages',
-      errors
-    );
+    rejectUnknownFields(profile.languages, ['conversation', 'publication'], 'languages', errors);
     for (const field of ['conversation', 'publication']) {
       if (!(field in profile.languages)) {
         errors.push(`languages.${field} is required`);
@@ -173,13 +172,9 @@ export function validateProfile(profile) {
       if (!Array.isArray(pattern?.scope?.languages) || !pattern.scope.languages.length) {
         errors.push(`patterns[${index}].scope.languages must be a non-empty array`);
       } else if (
-        pattern.scope.languages.some(
-          (language) => typeof language !== 'string' || !language.trim()
-        )
+        pattern.scope.languages.some((language) => typeof language !== 'string' || !language.trim())
       ) {
-        errors.push(
-          `patterns[${index}].scope.languages must contain only non-empty strings`
-        );
+        errors.push(`patterns[${index}].scope.languages must contain only non-empty strings`);
       }
       const scopeDimensions = [
         'languages',
@@ -207,14 +202,16 @@ export function validateProfile(profile) {
           Array.isArray(values) &&
           values.some((value) => typeof value !== 'string' || !value.trim())
         ) {
-          errors.push(
-            `patterns[${index}].scope.${dimension} must contain only non-empty strings`
-          );
+          errors.push(`patterns[${index}].scope.${dimension} must contain only non-empty strings`);
         }
       }
       if (
-        !['observed', 'explicit-preference', 'functional-equivalent', 'community-observed']
-          .includes(pattern?.provenance?.basis)
+        ![
+          'observed',
+          'explicit-preference',
+          'functional-equivalent',
+          'community-observed',
+        ].includes(pattern?.provenance?.basis)
       ) {
         errors.push(`patterns[${index}].provenance.basis is unsupported`);
       }
@@ -236,9 +233,7 @@ export function validateProfile(profile) {
         !Array.isArray(pattern?.provenance?.evidenceLanguages) ||
         !pattern.provenance.evidenceLanguages.length
       ) {
-        errors.push(
-          `patterns[${index}].provenance.evidenceLanguages must be a non-empty array`
-        );
+        errors.push(`patterns[${index}].provenance.evidenceLanguages must be a non-empty array`);
       } else if (
         pattern.provenance.evidenceLanguages.some(
           (language) => typeof language !== 'string' || !language.trim()
@@ -252,14 +247,13 @@ export function validateProfile(profile) {
         typeof pattern?.provenance?.sourceSummary !== 'string' ||
         !pattern.provenance.sourceSummary.trim()
       ) {
-        errors.push(
-          `patterns[${index}].provenance.sourceSummary must be a non-empty string`
-        );
+        errors.push(`patterns[${index}].provenance.sourceSummary must be a non-empty string`);
       }
-      if (!Number.isInteger(pattern?.provenance?.sourceCount) || pattern.provenance.sourceCount < 1) {
-        errors.push(
-          `patterns[${index}].provenance.sourceCount must be a positive integer`
-        );
+      if (
+        !Number.isInteger(pattern?.provenance?.sourceCount) ||
+        pattern.provenance.sourceCount < 1
+      ) {
+        errors.push(`patterns[${index}].provenance.sourceCount must be a positive integer`);
       }
       if (!['low', 'medium', 'high'].includes(pattern?.provenance?.confidence)) {
         errors.push(`patterns[${index}].provenance.confidence is unsupported`);
@@ -267,24 +261,13 @@ export function validateProfile(profile) {
       if (pattern?.provenance?.approved !== true) {
         errors.push(`patterns[${index}].provenance.approved must be true`);
       }
-      if (
-        pattern?.layer === 'identity' &&
-        pattern?.provenance?.authorClass !== 'owner'
-      ) {
+      if (pattern?.layer === 'identity' && pattern?.provenance?.authorClass !== 'owner') {
         errors.push(`patterns[${index}] identity provenance must use authorClass owner`);
       }
-      if (
-        pattern?.layer === 'accommodation' &&
-        pattern?.provenance?.authorClass !== 'community'
-      ) {
-        errors.push(
-          `patterns[${index}] accommodation provenance must use authorClass community`
-        );
+      if (pattern?.layer === 'accommodation' && pattern?.provenance?.authorClass !== 'community') {
+        errors.push(`patterns[${index}] accommodation provenance must use authorClass community`);
       }
-      if (
-        pattern?.layer === 'context' &&
-        pattern?.provenance?.authorClass !== 'owner'
-      ) {
+      if (pattern?.layer === 'context' && pattern?.provenance?.authorClass !== 'owner') {
         errors.push(`patterns[${index}] context provenance must use authorClass owner`);
       }
       if (
@@ -311,9 +294,7 @@ export function validateProfile(profile) {
         Array.isArray(evidenceLanguages) &&
         appliedLanguages.some((language) => !evidenceLanguages.includes(language))
       ) {
-        errors.push(
-          `patterns[${index}] accommodation evidence must cover every target language`
-        );
+        errors.push(`patterns[${index}] accommodation evidence must cover every target language`);
       }
       if (
         pattern?.layer !== 'accommodation' &&
@@ -413,10 +394,14 @@ function main() {
       explicitPath: optionValue(args, '--profile'),
     });
     process.stdout.write(
-      `${JSON.stringify({
-        ...resolved,
-        exists: existsSync(resolved.profilePath),
-      }, null, 2)}\n`
+      `${JSON.stringify(
+        {
+          ...resolved,
+          exists: existsSync(resolved.profilePath),
+        },
+        null,
+        2
+      )}\n`
     );
     return;
   }
@@ -428,13 +413,17 @@ function main() {
     const profile = parseProfileMarkdown(readFileSync(resolved.profilePath, 'utf8'));
     const errors = validateProfile(profile);
     process.stdout.write(
-      `${JSON.stringify({
-        valid: errors.length === 0,
-        profilePath: resolved.profilePath,
-        patterns: Array.isArray(profile.patterns) ? profile.patterns.length : 0,
-        examples: Array.isArray(profile.examples) ? profile.examples.length : 0,
-        errors,
-      }, null, 2)}\n`
+      `${JSON.stringify(
+        {
+          valid: errors.length === 0,
+          profilePath: resolved.profilePath,
+          patterns: Array.isArray(profile.patterns) ? profile.patterns.length : 0,
+          examples: Array.isArray(profile.examples) ? profile.examples.length : 0,
+          errors,
+        },
+        null,
+        2
+      )}\n`
     );
     if (errors.length) process.exitCode = 1;
     return;

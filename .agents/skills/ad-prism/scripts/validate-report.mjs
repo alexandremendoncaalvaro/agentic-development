@@ -37,7 +37,9 @@ export function validateReport(path) {
     const errors = headings
       .map((match) => match[1])
       .filter((heading) => INSTRUCTION_HEADINGS.has(normalizedHeading(heading)))
-      .map((heading) => `Visible heading exposes an editorial instruction: ${JSON.stringify(heading)}`);
+      .map(
+        (heading) => `Visible heading exposes an editorial instruction: ${JSON.stringify(heading)}`
+      );
     const warnings = [];
     let localImages = 0;
     let remoteImages = 0;

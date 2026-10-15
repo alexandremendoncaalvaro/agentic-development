@@ -103,9 +103,7 @@ export function probeReport({ machineStore, repoRoot }) {
     lines.push('PROJECT: absent');
   }
   lines.push('BINDING DOCS:');
-  lines.push(
-    ...BINDING_DOCS.filter((doc) => existsSync(join(repoRoot, doc))).sort()
-  );
+  lines.push(...BINDING_DOCS.filter((doc) => existsSync(join(repoRoot, doc))).sort());
   for (const dir of ADR_DIRS) {
     const abs = join(repoRoot, dir);
     if (isDirectory(abs)) {
@@ -116,8 +114,7 @@ export function probeReport({ machineStore, repoRoot }) {
 }
 
 function main() {
-  const machineStore =
-    process.env.AGENTIC_RULES_DIR || join(homedir(), '.agentic', 'rules');
+  const machineStore = process.env.AGENTIC_RULES_DIR || join(homedir(), '.agentic', 'rules');
   console.log(probeReport({ machineStore, repoRoot: process.cwd() }));
 }
 

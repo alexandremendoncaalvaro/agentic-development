@@ -38,13 +38,7 @@ const ANGLE_PLACEHOLDER_WORDS = new Set([
   'task',
   'verdict',
 ]);
-const METHOD_SOURCE_FIELDS = [
-  'Source',
-  'Supports',
-  'Contribution',
-  'Adaptation',
-  'Retained limit',
-];
+const METHOD_SOURCE_FIELDS = ['Source', 'Supports', 'Contribution', 'Adaptation', 'Retained limit'];
 
 function hasPlaceholder(line) {
   if (TEXT_PLACEHOLDER.test(line)) return true;
@@ -52,7 +46,10 @@ function hasPlaceholder(line) {
   for (const match of line.matchAll(/<([^>\n]+)>/g)) {
     const content = match[1].trim();
     if (/^(?:https?:\/\/|mailto:)[^\s<>]+$/i.test(content)) continue;
-    const firstWord = content.split(/\s+/, 1)[0].replace(/[.,:;?!]+$/, '').toLocaleLowerCase('en-US');
+    const firstWord = content
+      .split(/\s+/, 1)[0]
+      .replace(/[.,:;?!]+$/, '')
+      .toLocaleLowerCase('en-US');
     if (ANGLE_PLACEHOLDER_WORDS.has(firstWord)) return true;
   }
 
@@ -101,8 +98,8 @@ function validateMethodSources(sourceText) {
     const start = heading.index + heading[0].length;
     const end = headings[index + 1]?.index ?? sourceText.length;
     const body = sourceText.slice(start, end);
-    const missing = METHOD_SOURCE_FIELDS.filter((field) =>
-      !new RegExp(`^-\\s+${field.replace(' ', '\\s+')}\\s*:\\s*\\S`, 'im').test(body)
+    const missing = METHOD_SOURCE_FIELDS.filter(
+      (field) => !new RegExp(`^-\\s+${field.replace(' ', '\\s+')}\\s*:\\s*\\S`, 'im').test(body)
     );
     ids.push(id);
     if (seenIds.has(id)) {

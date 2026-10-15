@@ -64,7 +64,8 @@ function main() {
       packageLock: packageLock.exists,
       changelog: {
         exists: changelog.exists,
-        hasUnreleased: changelog.text === null ? null : /^## \[Unreleased\]\s*$/m.test(changelog.text),
+        hasUnreleased:
+          changelog.text === null ? null : /^## \[Unreleased\]\s*$/m.test(changelog.text),
       },
     },
     git: {

@@ -73,8 +73,14 @@ const born = hasHead();
 
 function locations(directory) {
   // --no-renames reports a record moved into place as an addition.
-  const cached = gitLines(['diff', '--cached', '--no-renames', '--name-status', '--', `${directory}/`])
-    .map((line) => line.split('\t'));
+  const cached = gitLines([
+    'diff',
+    '--cached',
+    '--no-renames',
+    '--name-status',
+    '--',
+    `${directory}/`,
+  ]).map((line) => line.split('\t'));
   const added = cached.filter(([status]) => status === 'A').map(([, path]) => path);
   return {
     added,
@@ -87,7 +93,10 @@ function locations(directory) {
           ? readdirSync(join(root, directory)).map((name) => `${directory}/${name}`)
           : [],
       ],
-      ['archived', born ? gitLines(['log', '--format=', '--name-only', '--', `${directory}/`]) : []],
+      [
+        'archived',
+        born ? gitLines(['log', '--format=', '--name-only', '--', `${directory}/`]) : [],
+      ],
     ],
     changedInIndex: new Map(cached.map(([status, path]) => [path, status])),
     changedOnDisk: new Set(gitLines(['diff', '--name-only', '--', `${directory}/`])),
@@ -132,7 +141,8 @@ function readMessage(source) {
 }
 
 const message = readMessage(process.argv[2]);
-if (message === null) fail('usage: cited-records.mjs <message-file | -> (the draft commit message)');
+if (message === null)
+  fail('usage: cited-records.mjs <message-file | -> (the draft commit message)');
 const seen = new Set();
 const records = [];
 try {

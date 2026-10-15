@@ -97,9 +97,8 @@ function gitState(repoRoot, errors) {
   };
   const branch = git(['rev-parse', '--abbrev-ref', 'HEAD'], 'git branch');
   const upstream = git(['rev-parse', '--abbrev-ref', '@{u}'], 'git upstream');
-  const aheadRaw = upstream === null
-    ? null
-    : git(['rev-list', '--count', '@{u}..HEAD'], 'git ahead-of-upstream');
+  const aheadRaw =
+    upstream === null ? null : git(['rev-list', '--count', '@{u}..HEAD'], 'git ahead-of-upstream');
   const ahead = aheadRaw === null ? null : Number.parseInt(aheadRaw, 10);
   return {
     branch: branch === 'HEAD' ? null : branch,
@@ -170,13 +169,22 @@ function viewPullRequest(gh, repoRoot, env, target, errors) {
 function mergeReport(gh, repoRoot, env, target, errors) {
   const { pullRequest, pullRequestState } = viewPullRequest(gh, repoRoot, env, target, errors);
   if (pullRequest === null) {
-    return { pullRequest: null, pullRequestState, checks: [], mergeMethods: null, targetRepository: null };
+    return {
+      pullRequest: null,
+      pullRequestState,
+      checks: [],
+      mergeMethods: null,
+      targetRepository: null,
+    };
   }
 
   const repository = repositoryFromPrUrl(pullRequest.url);
   const checks = commandJson(
     gh,
-    withRepository(['pr', 'checks', target || String(pullRequest.number), '--json', CHECK_FIELDS], repository),
+    withRepository(
+      ['pr', 'checks', target || String(pullRequest.number), '--json', CHECK_FIELDS],
+      repository
+    ),
     repoRoot,
     env,
     'gh pr checks',
@@ -215,20 +223,23 @@ export function ghPreflight({ repoRoot, operation, target }) {
   if (!version.ok) {
     errors.push({ probe: 'gh --version', code: version.code });
   }
-  const authenticated = version.ok
-    ? command(gh, ['auth', 'status'], repoRoot, env).ok
-    : null;
+  const authenticated = version.ok ? command(gh, ['auth', 'status'], repoRoot, env).ok : null;
   if (version.ok && authenticated === false) {
     errors.push({ probe: 'gh auth status', code: 'AUTH_FAILED' });
   }
 
   const git = gitState(repoRoot, errors);
-  const baseBranch = authenticated === true
-    ? defaultBranch(gh, repoRoot, env, errors)
-    : null;
-  const merge = authenticated === true && operation === 'merge'
-    ? mergeReport(gh, repoRoot, env, target, errors)
-    : { pullRequest: null, pullRequestState: 'not-requested', checks: [], mergeMethods: null, targetRepository: null };
+  const baseBranch = authenticated === true ? defaultBranch(gh, repoRoot, env, errors) : null;
+  const merge =
+    authenticated === true && operation === 'merge'
+      ? mergeReport(gh, repoRoot, env, target, errors)
+      : {
+          pullRequest: null,
+          pullRequestState: 'not-requested',
+          checks: [],
+          mergeMethods: null,
+          targetRepository: null,
+        };
 
   return {
     operation,
@@ -242,7 +253,9 @@ export function ghPreflight({ repoRoot, operation, target }) {
 
 function main() {
   const [operation, target] = process.argv.slice(2);
-  process.stdout.write(`${JSON.stringify(ghPreflight({ repoRoot: process.cwd(), operation, target }), null, 2)}\n`);
+  process.stdout.write(
+    `${JSON.stringify(ghPreflight({ repoRoot: process.cwd(), operation, target }), null, 2)}\n`
+  );
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

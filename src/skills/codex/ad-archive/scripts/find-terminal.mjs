@@ -53,14 +53,14 @@ function readContent(repoRoot, rel, unreadable) {
 
 // First status token, lowercased (`superseded by ADR-0027` → `superseded`).
 function parseStatus(body) {
-  const m = body.match(/^\*{0,2}Status:\*{0,2}[ \t]*([A-Za-z][A-Za-z-]*)/mi);
+  const m = body.match(/^\*{0,2}Status:\*{0,2}[ \t]*([A-Za-z][A-Za-z-]*)/im);
   return m ? m[1].toLowerCase() : null;
 }
 
 // The artifact's creation date — `Created:` (specs / PRDs) or `Date:` (ADRs /
 // tasks), bold or plain — or null.
 function parseCreated(body) {
-  const m = body.match(/^\*{0,2}(?:Created|Date):\*{0,2}[ \t]*([0-9]{4}-[0-9]{2}-[0-9]{2})/mi);
+  const m = body.match(/^\*{0,2}(?:Created|Date):\*{0,2}[ \t]*([0-9]{4}-[0-9]{2}-[0-9]{2})/im);
   return m ? m[1] : null;
 }
 
@@ -72,12 +72,14 @@ function parseTitle(body) {
   // Strip a leading artifact-type prefix — `task-0001:` / `ADR-0019:` /
   // `Task \`0001\`:` (optional backticks around the number). Anchored to the
   // known type words so a real title like `Fix 500: ...` is NOT mis-stripped.
-  return m[1].replace(/^(?:task|adr|spec|prd)[-\s`]*\d{3,4}`?[ \t]*:[ \t]*/i, '').trim() || m[1].trim();
+  return (
+    m[1].replace(/^(?:task|adr|spec|prd)[-\s`]*\d{3,4}`?[ \t]*:[ \t]*/i, '').trim() || m[1].trim()
+  );
 }
 
 // The supersession target `ADR-NNNN` declared in the Status line, or null.
 function supersededTarget(body) {
-  const statusLine = (body.match(/^\*{0,2}Status:.*$/mi) ?? [''])[0];
+  const statusLine = (body.match(/^\*{0,2}Status:.*$/im) ?? [''])[0];
   const m = statusLine.match(/superseded by\s+(ADR-\d{4})/i);
   return m ? m[1].toUpperCase() : null;
 }
@@ -98,7 +100,9 @@ function readCandidate(repoRoot, rel, unreadable) {
 // Terminal artifacts in a NNNN-numbered layer whose status is in `terminal`.
 function terminalIn(repoRoot, dir, terminal, unreadable) {
   const out = [];
-  for (const name of listDir(join(repoRoot, ...dir)).filter((n) => ARTIFACT_FILE.test(n)).sort()) {
+  for (const name of listDir(join(repoRoot, ...dir))
+    .filter((n) => ARTIFACT_FILE.test(n))
+    .sort()) {
     const rel = join(...dir, name);
     const body = readCandidate(repoRoot, rel, unreadable);
     if (body === null) continue;
@@ -123,7 +127,9 @@ function terminalIn(repoRoot, dir, terminal, unreadable) {
 // the PRODUCT-MAP index is not itself an archivable record.
 function terminalPrds(repoRoot, unreadable) {
   const out = [];
-  for (const name of listDir(join(repoRoot, 'doc', 'product')).filter((n) => n.endsWith('.md')).sort()) {
+  for (const name of listDir(join(repoRoot, 'doc', 'product'))
+    .filter((n) => n.endsWith('.md'))
+    .sort()) {
     if (name === 'PRODUCT-MAP.md') continue;
     const rel = join('doc', 'product', name);
     const body = readCandidate(repoRoot, rel, unreadable);
