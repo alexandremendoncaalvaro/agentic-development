@@ -286,7 +286,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/references/session-tier.md",
-          "sourceSha": "2c9d4161b370cdeea6b4bfbe763f3639d35fa5608347d39b1254ce0f9ed73f73"
+          "sourceSha": "d0e9df5e864c93481f64d594c2293f18c6e22a2e7bc1f2a6227a3d95d1505c3c"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/artifact-gate.mjs",
@@ -318,7 +318,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "83cdb1b8226764a636a2898437ad73ecce63a543f13d71c108ec5e32f8d89fcf"
+          "sourceSha": "8bcdcbe78636e2d64cd0574d3df230fee5dbabd1084e2cacf29991be7927bf8c"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
@@ -537,7 +537,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-release/scripts/release-plan.mjs",
-          "sourceSha": "99df63c2d9b6d233e0b3095dd8ea898765d44db3c14396dfac26670557b43ee4"
+          "sourceSha": "08b0697295c072346d877e13aad0c8bb5167caa2c7c6de78ced0e18d24a1aa04"
         },
         {
           "path": ".claude/skills/ad-release/scripts/release-state.mjs",
@@ -549,7 +549,7 @@
         },
         {
           "path": ".claude/skills/ad-release/SKILL.md",
-          "sourceSha": "5bf0c71c3ccebba9366cd194e1479b942aff200466e7cc515285bb9815f25941"
+          "sourceSha": "cd6e42750b183302f8560833075fbb4d3d9b01f62640177c39df016586eb4430"
         }
       ]
     },

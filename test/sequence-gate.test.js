@@ -986,3 +986,67 @@ test('sequence-gate: a delta review whose covered base is not an ancestor of its
   writeDeltaReview(repo, head, side, '20261015T110000Z');
   assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'review')[0].state, 'would-block');
 });
+
+// Task 0122, ADR-0096: a shadow `release` check before npm publish and a
+// GitHub release, against the receipt an approved release plan leaves in the
+// git directory every worktree shares.
+function releaseRepo(version = '1.2.3') {
+  const repo = mkdtempSync(join(tmpdir(), 'sequence-gate-release-'));
+  git(repo, 'init', '-q', '-b', 'main');
+  writeFileSync(
+    join(repo, 'package.json'),
+    `${JSON.stringify({ name: '@example/package', version })}\n`
+  );
+  git(repo, 'add', '-A');
+  git(repo, 'commit', '-qm', 'release');
+  return repo;
+}
+
+function writeReleaseReceipt(repo, version) {
+  const dir = join(repo, '.git', 'agentic');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, 'release.jsonl'),
+    `${JSON.stringify({ at: '2026-10-15T00:00:00Z', package: '@example/package', version, digest: 'd', scope: 'release-plan' })}\n`
+  );
+}
+
+test('sequence-gate: npm publish without a release receipt would block, in shadow', () => {
+  const repo = releaseRepo();
+  const { stdout, lines } = runGate(repo, 'npm publish');
+  assert.equal(stdout, '');
+  const release = linesFor(lines, 'release');
+  assert.equal(release.length, 1);
+  assert.equal(release[0].action, 'npm publish');
+  assert.equal(release[0].state, 'would-block');
+});
+
+test('sequence-gate: a release receipt for the package version clears npm publish and gh release create', () => {
+  const repo = releaseRepo();
+  writeReleaseReceipt(repo, '1.2.3');
+  assert.equal(linesFor(runGate(repo, 'npm publish').lines, 'release')[0].state, 'clear');
+  const github = linesFor(runGate(repo, 'gh release create v1.2.3 --verify-tag').lines, 'release');
+  assert.equal(github[0].action, 'gh release create');
+  assert.equal(github[0].state, 'clear');
+});
+
+test('sequence-gate: a receipt for another version does not clear the release', () => {
+  const repo = releaseRepo('1.2.4');
+  writeReleaseReceipt(repo, '1.2.3');
+  assert.equal(linesFor(runGate(repo, 'npm publish').lines, 'release')[0].state, 'would-block');
+});
+
+test('sequence-gate: a publish from a linked worktree reads the shared release receipt', () => {
+  const repo = releaseRepo();
+  writeReleaseReceipt(repo, '1.2.3');
+  const linked = join(mkdtempSync(join(tmpdir(), 'sequence-gate-linked-')), 'tag');
+  git(repo, 'worktree', 'add', '-q', '--detach', linked, 'HEAD');
+  assert.equal(linesFor(runGate(linked, 'npm publish').lines, 'release')[0].state, 'clear');
+});
+
+test('sequence-gate: without a package.json the release check is runtime-unavailable', () => {
+  const repo = mkdtempSync(join(tmpdir(), 'sequence-gate-release-'));
+  git(repo, 'init', '-q', '-b', 'main');
+  const release = linesFor(runGate(repo, 'npm publish').lines, 'release');
+  assert.equal(release[0].state, 'runtime-unavailable');
+});

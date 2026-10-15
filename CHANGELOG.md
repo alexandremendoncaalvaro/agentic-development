@@ -6,6 +6,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `ad-release` leaves a release receipt when its plan is approved, in the git
+  directory every worktree shares, and its preflight warns when the npm
+  account's two-factor mode does not cover writes. The `ad-hooks` receipt
+  gate logs a shadow `release` check before `npm publish` and the GitHub
+  release (task-0122, ADR-0096).
+
 ### Changed
 
 - Every SKILL.md stays under 500 lines and 20,000 bytes; `ad-hooks` moves
