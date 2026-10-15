@@ -1804,6 +1804,93 @@ The receipt proves a cited source exists in the map; it does not prove the sourc
 Run validate-record.mjs, then inspect every cited source.
 `;
 
+// Task 0123: a record that names its stakes is graded from a starting tier.
+function staked(stakes, claimLines) {
+  return VALID_GROUND_RECORD.replace(
+    '**Confidence:** Strong',
+    `**Confidence:** Strong\n**Stakes:** ${stakes}`
+  ).replace('**Strength:** High\n', claimLines);
+}
+
+function groundReport(body) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-tier-'));
+  try {
+    return runGroundRecord(dir, writeGroundRecord(dir, body));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+test('validate-record: a staked claim graded at its tier start is valid', () => {
+  const report = groundReport(
+    staked('medium × reversible', '**Tier:** Measurement\n**Strength:** High\n')
+  );
+  assert.equal(report.valid, true, report.errors.join('; '));
+  assert.deepEqual(report.warnings, []);
+});
+
+test('validate-record: a grade above the tier start needs an Upgrade line', () => {
+  const above = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** High\n')
+  );
+  assert.equal(above.valid, false);
+  assert.match(
+    above.errors.join('\n'),
+    /E1 is graded High above its Primary start \(Medium\): add a line "\*\*Upgrade:\*\* <reason>"/
+  );
+  const justified = groundReport(
+    staked(
+      'medium × reversible',
+      '**Tier:** Primary\n**Strength:** High\n**Upgrade:** two primary sources agree with a measurement\n'
+    )
+  );
+  assert.equal(justified.valid, true, justified.errors.join('; '));
+});
+
+test('validate-record: a staked claim names its tier, and a normative claim is a design choice', () => {
+  const noTier = groundReport(staked('high × irreversible', '**Strength:** Medium\n'));
+  assert.match(
+    noTier.errors.join('\n'),
+    /E1 has no tier: add a line "\*\*Tier:\*\* <Measurement \| Primary \| Secondary \| Single \| Opinion>"/
+  );
+  const design = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** design choice\n')
+  );
+  assert.equal(design.valid, true, design.errors.join('; '));
+});
+
+test('validate-record: a low and reversible record may leave claims ungraded', () => {
+  const short = groundReport(staked('low × reversible', ''));
+  assert.equal(short.valid, true, short.errors.join('; '));
+  const bad = groundReport(staked('modest', '**Tier:** Primary\n**Strength:** Medium\n'));
+  assert.match(
+    bad.errors.join('\n'),
+    /Stakes must be "<low \| medium \| high> × <reversible \| irreversible>"/
+  );
+});
+
+test('validate-record: a grade given in a short record needs its tier', () => {
+  const graded = groundReport(staked('low × reversible', '**Strength:** Medium\n'));
+  assert.equal(graded.valid, false);
+  assert.match(graded.errors.join('\n'), /E1 has no tier/);
+});
+
+test('validate-record: a staked record names design choice as a valid strength', () => {
+  const report = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** Strong\n')
+  );
+  assert.match(
+    report.errors.join('\n'),
+    /E1 has no valid strength: add a line "\*\*Strength:\*\* <High \| Medium \| Low \| Very-low \| design choice>"/
+  );
+});
+
+test('validate-record: a record without stakes keeps the earlier rules and warns', () => {
+  const legacy = groundReport(VALID_GROUND_RECORD);
+  assert.equal(legacy.valid, true);
+  assert.match(legacy.warnings.join('\n'), /no Stakes line/);
+});
+
 test('validate-record: accepts a complete durable ground receipt', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-valid-'));
   try {

@@ -387,13 +387,15 @@ Research (§4-5) gathers sources; it does not, on its own, say how much to trust
 
 **Axis 1 — evidence strength, per claim.** Rank each load-bearing claim against a hierarchy, strongest first:
 
-1. **E1 — Measurement** — a reproducible experiment or benchmark on the real target. The strongest evidence is the one you ran.
-2. **E2 — Primary docs plus a validated reference** — official documentation for the version in use, convergent with a real implementation doing the same thing.
-3. **E3 — Consensus** — three or more reputable, independent sources agree.
-4. **E4 — Single source** — one reputable source, or a majority with relevant dissent.
-5. **E5 — Opinion** — isolated anecdote, undated, or a source of unknown reliability.
+1. **Measurement** (starts High) — a reproducible experiment or benchmark on the real target. The strongest evidence is the one you ran.
+2. **Primary** (starts Medium) — official documentation for the version in use, convergent with a real implementation doing the same thing.
+3. **Secondary** (starts Low) — three or more reputable, independent secondary sources agree.
+4. **Single** (starts Low) — one reputable source, or a majority with relevant dissent.
+5. **Opinion** (starts Very-low) — isolated anecdote, undated, or a source of unknown reliability.
 
-Three modifiers move a claim up or down: **agreement** (independent sources converge, or they conflict), **applicability** (the evidence is about your version, stack, and scale — or a distant analogy), and **recency** (inside the topic's shelf life, or stale). Seal each claim High / Medium / Low / Very-low and record its **provenance** — the citation, its date, and how it was accessed. A claim you cannot source cannot be sealed High. When sources genuinely disagree, do not manufacture a consensus: record the positions side by side, with the evidence for each and the conditions under which each holds. An honest "contested" is worth more than a false "settled".
+Each claim starts at its tier's grade, as in GRADE, where randomized trials start High and observational studies Low.
+
+Five factors lower a claim from its start, after GRADE: **risk of bias** (a vendor describing its own product, a source with a stake in the answer), **inconsistency** (independent sources conflict), **indirectness** (the evidence is about another version, stack or scale, or is past the topic's shelf life — the kit's own placement of recency), **imprecision** (one run, a small sample, a wide spread), and **search bias** (only sources that confirm the hypothesis were looked for). Raising a claim above its start needs a stated reason, such as a large consistent effect. A normative claim — what this project should do — is a design choice, not evidence, and carries no grade. Seal each claim High / Medium / Low / Very-low and record its **provenance** — the citation, its date, and how it was accessed. A claim you cannot source cannot be sealed High. When sources genuinely disagree, do not manufacture a consensus: record the positions side by side, with the evidence for each and the conditions under which each holds. An honest "contested" is worth more than a false "settled".
 
 **Axis 2 — confidence to proceed, per conclusion.** The decision is not the evidence. Combine the aggregated Axis-1 strength with the balance of upside and downside, and with reversibility and blast radius, into one verdict:
 

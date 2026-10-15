@@ -235,15 +235,15 @@
         },
         {
           "path": ".claude/skills/ad-ground/references/record-template.md",
-          "sourceSha": "10a6c0d86b6f7a58478287aa445f8f35b94031c89f42414e73f4c463a1ad92dd"
+          "sourceSha": "da30c45446a03ee9bf3ac7d58d4c91c1ec76531f93a75633669e0c8fee03eb63"
         },
         {
           "path": ".claude/skills/ad-ground/scripts/validate-record.mjs",
-          "sourceSha": "97ea806e6703de1f205f1983d8da2b34b33a9ea1da24aaba5aab1051132a935f"
+          "sourceSha": "f52d9254e1e38cbb2373f6f599a9b68cee89ef57912e518c115b022c401fa0d4"
         },
         {
           "path": ".claude/skills/ad-ground/SKILL.md",
-          "sourceSha": "ec1160006eb2f239c91d8c8703b69fd6926e4cb8063de23830b60d9a09d2f3f3"
+          "sourceSha": "c22a7884842de6a9664ada4ed301de9a22748035add69ed89dc0c139be1e7d06"
         }
       ]
     },
@@ -591,11 +591,11 @@
       "files": [
         {
           "path": ".claude/skills/ad-research/references/research-template.md",
-          "sourceSha": "92282bbc2f8a933057ff49d275bd866328f347d28800d9adc5d431b6eda0364b"
+          "sourceSha": "352fe5221bc4c3e03509a40be346ab8dcc66e1521c6e0f0affb9ddf9e478b769"
         },
         {
           "path": ".claude/skills/ad-research/SKILL.md",
-          "sourceSha": "395e18cd0e0d9d63091fe01e67aeb3c1b3543d4e77c6ea3b0769b462bb29318f"
+          "sourceSha": "15b0bb303f2c320652cda4b558a5cc0e2253661ca3fd3c1f85e2214bad0eeb16"
         }
       ]
     },
