@@ -39,6 +39,23 @@ const DENIED = [
   ['sudo pkill -f server', 'kill-by-name'],
   ['npm test || echo fail; git commit -m x', 'commit-after-semicolon'],
   ['npm run verify; git add -A; git commit -m x', 'commit-after-semicolon'],
+  // Delta review of 01bf454: common agent shapes that evaded.
+  ['true & pkill x', 'kill-by-name'],
+  ['if true; then pkill x; fi', 'kill-by-name'],
+  ['for i in 1; do killall x; done', 'kill-by-name'],
+  ['{ pkill x; }', 'kill-by-name'],
+  ['sudo -u bob pkill x', 'kill-by-name'],
+  ['nice pkill x', 'kill-by-name'],
+  ['timeout 5 pkill x', 'kill-by-name'],
+  ['/usr/bin/pkill x', 'kill-by-name'],
+  ['sudo -n pkill x', 'kill-by-name'],
+  ['nice -n 10 pkill x', 'kill-by-name'],
+  ['xargs -I{} pkill {}', 'kill-by-name'],
+  ['npm test; git --no-pager commit -m x', 'commit-after-semicolon'],
+  ['npm test; sudo git commit -m x', 'commit-after-semicolon'],
+  ['mise exec node@24 -- npm run verify > log; git commit -m x', 'commit-after-semicolon'],
+  ['mise exec node@24 -- pkill node', 'kill-by-name'],
+  ['npm test; if true; then git commit -m x; fi', 'commit-after-semicolon'],
 ];
 
 const ALLOWED = [
@@ -61,6 +78,10 @@ const ALLOWED = [
   'echo pkill is denied',
   'Get-Process python',
   'npm test && git add -A && git commit -m x',
+  '# npm test\ngit commit -m x',
+  'echo npm test; git commit -m x',
+  'npm run verify > log && { grep x log; git add -A && git commit -m y; } || echo RED',
+  'npm test && (git add -A; git commit -m y)',
 ];
 
 for (const [command, rule] of DENIED) {

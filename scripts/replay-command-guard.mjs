@@ -6,12 +6,13 @@
 // local transcripts and prints matched commands, so run it on your own machine.
 // Usage: node scripts/replay-command-guard.mjs [path-to-command-guard.mjs]
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { homedir } from 'node:os';
-const { verdict } = await import(
-  process.argv[2] ??
-    new URL('../src/skills/claude-code/ad-hooks/scripts/command-guard.mjs', import.meta.url).href
-);
+const guardPath = process.argv[2]
+  ? pathToFileURL(resolve(process.argv[2])).href
+  : new URL('../src/skills/claude-code/ad-hooks/scripts/command-guard.mjs', import.meta.url).href;
+const { verdict } = await import(guardPath);
 const root = join(homedir(), '.claude', 'projects');
 let total = 0;
 const denied = new Map();

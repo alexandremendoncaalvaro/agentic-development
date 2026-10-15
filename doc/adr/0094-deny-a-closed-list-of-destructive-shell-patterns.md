@@ -18,7 +18,7 @@ ADR-0083 decision 1 requires a blocking guard to carry its own ADR, name ADR-004
 1. `ad-hooks` ships `scripts/command-guard.mjs`, a `PreToolUse` hook on shell tools (`Bash|PowerShell` on Claude Code, `Bash` on Codex). It denies kill-by-name in command position (`pkill`, `killall`, `taskkill /IM`, `Stop-Process -Name` or `-ProcessName`, `spps`, `Get-Process ... | Stop-Process`, a kill fed by `pgrep`) and a `git commit` joined by `;` or a newline to an earlier check (tests, lint, type check, build, verify) in the same command line, staging steps in between included. Quoted strings and heredoc bodies are removed in one pass before matching, so a word that only appears as an argument or in text passes. The deny reason names the fix: kill the PID you started; chain with `&&`.
 2. The list is closed. A new pattern needs a change to this ADR's decision 1 and a fresh replay.
 3. The guard fails open on malformed input or an internal error, and `AD_COMMAND_GUARD=0` turns it off. It is opt-in through `ad-hooks`, as ADR-0083 decision 6 requires; this repository wires it for dogfood.
-4. Measured false-block rate: `scripts/replay-command-guard.mjs` over 65,269 recorded shell calls from the owner's sessions denied 110 distinct commands — 92 kill-by-name and 18 commits after a check — each a real instance of its pattern; zero false blocks. The corpus also tuned the rule (a first commit rule that ignored checks denied 70 fixture set-ups such as `git init; git add f; git commit`), so the figure is not a held-out estimate.
+4. Measured false-block rate: `scripts/replay-command-guard.mjs` over 65,301 recorded shell calls from the owner's sessions denied 126 distinct commands — 93 kill-by-name and 33 commits after a check — each a real instance of its pattern; zero false blocks. The corpus also tuned the rule (a first commit rule that ignored checks denied 70 fixture set-ups such as `git init; git add f; git commit`), so the figure is not a held-out estimate.
 5. The workflow checkpoint appends "Reply to the owner in <language>; give no date, duration or deadline estimates." when a confirmed voice profile names the conversation language. A `Stop` hook logs, in shadow, a reply whose detected language differs; it never blocks and stores no reply text.
 
 ## Consequences
@@ -32,7 +32,7 @@ Positive:
 Negative:
 
 - A legitimate kill by name now needs a PID lookup first.
-- Commands built at run time, `bash -c` strings and Codex `write_stdin` are not seen; the guard is a guardrail, not a sandbox.
+- Out of scope by design, the guard being a guardrail and not a sandbox: commands inside `bash -c` or `eval` strings, command substitution inside double quotes, commands built at run time, and Codex `write_stdin`. A check and a commit in different repositories on one line count as one chain, a conservative block.
 - The language heuristic tells only Portuguese, English and Spanish apart.
 
 ## Alternatives Considered

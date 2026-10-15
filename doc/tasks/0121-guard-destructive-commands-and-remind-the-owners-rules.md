@@ -67,3 +67,17 @@ own `verify; ...; git commit` commands, all real instances, no false block.
 The detector no longer logs drift for a conversation language it cannot tell
 apart (its fix and test landed together). Codex's `Stop` payload carries
 `last_assistant_message` (learn.chatgpt.com/docs/hooks, read 2026-10-15).
+
+### 2026-10-15 — delta review of 01bf454
+
+Each evasion and false block the delta review reproduced became a failing
+test first, then passed: commands after a single `&`, inside `if`/`for`/
+`while` and `{ }`, behind `sudo -u`, `nice`, `timeout`, `mise exec ... --` or
+a full path; options of each wrapper read by wrapper; a commit after git
+global options or inside a block; a check that is only echoed or commented
+out no longer counts. The replay then showed four false blocks of its own —
+`check && { ...; git commit; }`, where the group runs only after the check
+passes — fixed and pinned by a test. Final replay: 65,301 calls, 126 denied
+(93 kill-by-name, 33 check-then-commit), all real instances. `bash -c`,
+`eval` and substitution inside double quotes stay out of scope, documented
+in ADR-0094.

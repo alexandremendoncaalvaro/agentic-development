@@ -362,7 +362,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/command-guard.mjs",
-          "sourceSha": "f846eb297e90f134682e00cf394d04b03db7f8bb4336204b17ec067fca5710e4"
+          "sourceSha": "abeefa9e3e454ab74a34d9c633e7644a82e4cc255780b38272a3a3d6045918c9"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/detect-hooks.mjs",
