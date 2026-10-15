@@ -69,3 +69,11 @@ Concerns.
   and the read-out labels each line.
 - Noted for the 0110 read-out: "audit not expected" leaves no line, the same
   as a check turned off.
+
+### 2026-10-15 — delta review of 7a87be8
+
+A delta review of 10a48ca..7a87be8 confirmed the three fixes, accepted the
+`defaultBranch` rejection and found no Blocker. ADR-0091 decision 3 now names
+the ancestry requirement the code applies. Accepted as is: a refreshed CRLF
+summary block is written with LF endings (stable on the next run), and a git
+error in the ancestry probe reads as not chained (fails closed in shadow).
