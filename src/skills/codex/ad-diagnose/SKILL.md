@@ -9,17 +9,10 @@ Implements WORKFLOW.md §15 per ADR-0021 (`doc/adr/0021-diagnose-discipline.md`)
 
 The shape is grounded in Kernighan & Pike, *The Practice of Programming* (1999, ch. 5–6) and Karl Popper's falsifiability framing. The Phase-1 framing ("the loop is the skill — everything else is mechanical") is borrowed from `mattpocock/skills` with attribution.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions diagnosing, debugging, a performance regression, or building a repro, invoke this skill manually.
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Diagnose is for *hard bugs and performance regressions where the cause is unclear*. Run when at least one holds:
-- A test is failing and the cause is not obvious from the diff.
-- A symptom is reproducible but the chain of causes is not.
-- A performance regression appeared between two known-good states.
-- The user says "this is broken" / "this is throwing" / "this is slow" without a localized cause.
-
-Route elsewhere when:
+Not for:
 - The bug is one-line obvious (typo, off-by-one) — fix it directly.
 - The bug is a clean ground-truth-pair regression (test was passing, output unchanged, now failing) → `ad-tdg` (WORKFLOW §9).
 - The technique itself is uncertain across multiple plausible approaches → `ad-spike` (WORKFLOW §14).

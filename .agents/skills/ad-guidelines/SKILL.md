@@ -9,13 +9,10 @@ Layer 1 Constitution trinity member. Lazy lifecycle owner of `GUIDELINES.md` at 
 
 `GUIDELINES.md` is the full reference; `AGENTS.md` is the distilled summary. Each AGENTS.md section that has detail points to the corresponding GUIDELINES.md section. The two never duplicate — `ad-drift` flags duplication as drift.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions engineering guidelines, code standards, SOLID, Object Calisthenics, testing strategy, or security policy, invoke this skill manually.
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when the user wants to scope or update project-level engineering standards: new project, existing rules buried in AGENTS.md, stack change, Object Calisthenics tier review.
-
-Route elsewhere when:
+Not for:
 
 - Scope is system structure → `ad-architecture`.
 - Scope is product → `ad-prd`.

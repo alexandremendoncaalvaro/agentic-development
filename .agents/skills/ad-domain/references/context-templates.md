@@ -10,7 +10,7 @@
 ```markdown
 ### <Canonical Noun>
 
-**Definition:** <one-sentence, project-specific, no general programming words>.
+**Definition:** <a lead sentence that stands alone, plus at most two of scope; project-specific, no general programming words>.
 
 _Avoid_: <Alias 1>, <Alias 2>. <Why each is misleading>.
 

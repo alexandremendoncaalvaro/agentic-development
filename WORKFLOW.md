@@ -50,7 +50,7 @@ There are two complementary frames for the artifacts the kit produces. The first
 ### Six-layer artifact stack (purpose)
 
 1. **Constitution** — `WORKFLOW.md` (universal engineering philosophy, kit-shipped), `AGENTS.md` (project-specific compressed rules read every session), and `GUIDELINES.md` (project-specific full engineering reference: Clean Architecture binding, SOLID application, Object Calisthenics tier, code standards, complexity discipline, API rules, performance standards, build system, static analysis, quality gates, testing strategy, git workflow, documentation, security). The trinity answers "how this project is built" at three compression levels — principles, distilled rules, full reference. `AGENTS.md` and `GUIDELINES.md` are project-owned and lazy; `WORKFLOW.md` is kit-shipped.
-2. **Domain** — `CONTEXT.md` at the repo root (or `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos). The project's ubiquitous language: canonical nouns, the aliases to avoid, the relationships between them, and the ambiguities that have already been resolved. Direct application of Domain-Driven Design (Evans, 2003) — when an agent and a human share the project's vocabulary, the agent uses fewer tokens to say more, and the code, tests, and conversation all converge on the same names. Created lazily — first term resolved triggers the file.
+2. **Domain** — `CONTEXT.md` at the repo root (or `CONTEXT-MAP.md` plus per-context `CONTEXT.md` files for multi-context repos). The project's ubiquitous language: canonical nouns, the aliases to avoid (a kit convention adopted from `mattpocock/skills`, not Evans), the relationships between them, and the ambiguities that have already been resolved. Direct application of Domain-Driven Design (Evans, 2003) — when an agent and a human share the project's vocabulary, the agent uses fewer tokens to say more, and the code, tests, and conversation all converge on the same names. Created lazily — first term resolved triggers the file.
 3. **Product** — `doc/product/PRD.md` (single-product) or `doc/product/<slug>.md` plus `doc/product/PRODUCT-MAP.md` (multi-product). Product-level scope: target user, problem, goals, non-goals, success metrics, multi-feature roadmap, cross-feature constraints. One PRD per product; feature specs (Layer 4) inherit target user, success metrics, and constraints from the PRD. Created lazily when a product is being scoped.
 4. **Spec** — `doc/specs/NNNN-<slug>.md`. Feature-level requirements: who the feature is for, what it must do, the measurable success criteria, the explicit non-goals. One spec per feature; multiple tasks implement one spec; specs reference their parent PRD for product-scope inheritance. Industry-aligned with [GitHub Spec Kit](https://github.com/github/spec-kit).
 5. **Plan / Decisions** — `ARCHITECTURE.md` (system patterns and boundaries), `doc/adr/NNNN-*.md` (binding architectural decisions in Michael Nygard's pattern), `doc/tasks/NNNN-*.md` (per-work-unit plan with checkbox acceptance criteria). The *how* of building what the spec asked for. Layer 5 spans three document roles — `ARCHITECTURE.md` is definition, ADRs are decision-record, tasks are tracking — write each per its role, not as a single class.
@@ -347,7 +347,7 @@ Before writing a test or code:
 1. Read `CONTEXT.md` so test names and interface vocabulary land in the project's ubiquitous language.
 2. Confirm the public interface — what does the caller need to know? Types, ordering, error modes. Interface design *is* testability design.
 3. Identify deepening opportunities (Layer 2 vocabulary per §8): small interface, deep implementation.
-4. List the behaviors to test, not the implementation steps. Pick the **first** behavior — the one that proves end-to-end the path works. The rest defer until the tracer bullet lands.
+4. List the behaviors to test, not the implementation steps. Pick the **first** behavior — the one that proves end-to-end the path works. The rest wait on the list until the tracer bullet lands; the list grows as cycles reveal new behaviors.
 5. For a unit that keeps state between calls, write the state × event table: every state, every event that can reach it, and the same-instant, tie, and inclusive/exclusive boundary variant of each. Each cell becomes a behavior in the list or an explicit N/A with its reason; review passes over a new state machine otherwise find the next unlisted cell one round at a time.
 6. Establish the green baseline. For existing code, list the tests already covering the surface (TDM, §9.4) and run them. For new code, write the first test fresh.
 7. Get the user's approval on the plan in one sentence before any test or code is written.
@@ -360,17 +360,19 @@ Do not write a second test until this one is green.
 
 ### Phase 3 — Incremental loop
 
-For each remaining behavior: `RED → minimum code → GREEN`. Three rules:
+For each remaining behavior: `RED → minimum code → GREEN → optional refactor`. Rules:
 
 - **One test at a time.** Bulk-writing all tests first then all implementation is *horizontal slicing* — the named anti-pattern. Bulk-written tests verify *imagined* behavior, not actual behavior; the suite becomes insensitive to real changes and you outrun your headlights, committing to test structure before understanding the implementation.
 - **Only enough code to pass the current test.** Anticipating the next test bloats the implementation and couples it to assumptions not yet verified.
 - **Tests verify behavior through public interfaces.** No private-method tests, no internal-collaborator mocks, no direct database/file-system assertions when the public interface is what the caller uses. A test that breaks on a rename but not on a behavior change was testing implementation, not behavior.
+- **Refactor on green, every cycle.** Tidy what the cycle touched and rerun after each step; never refactor while RED. **Duplication is a hint, not a command** — remove it when it obscures intent, not before a third case shows the shape.
+- **Add each test you discover to the list.** A passing test often reveals another behavior; list it instead of chasing it mid-cycle (Beck, Canon TDD).
 
-### Phase 4 — Refactor
+### Phase 4 — Close-out
 
-Once all planned tests pass: extract duplication, deepen modules (move complexity behind smaller interfaces), apply SOLID where natural. Run tests after each refactor step. **Never refactor while RED** — get to green first, then refactor with the green baseline as the safety net. For a unit that keeps state, sweep operator mutations before its first publication: flip one comparison or logical operator at a time and rerun its tests. Each survivor is a missing test until a distinguishing input has been searched for and none exists; close survivors one at a time through the Phase 3 loop, and record the search beside any survivor kept. A bare "equivalent" is a claim, not a result.
+When the list is empty: deepen modules (move complexity behind smaller interfaces), apply SOLID where natural. Run tests after each refactor step. **Never refactor while RED** — get to green first, then refactor with the green baseline as the safety net. For a unit that keeps state, sweep operator mutations before its first publication: flip one comparison or logical operator at a time and rerun its tests. Each survivor is a missing test until a distinguishing input has been searched for and none exists; close survivors one at a time through the Phase 3 loop, and record the search beside any survivor kept. A bare "equivalent" is a claim, not a result.
 
-The refactor phase is where deepening (§8) happens. Treat tests as a fixed contract; the implementation is free to change shape as long as the contract holds.
+The close-out is where module-level deepening (§8) happens. Treat tests as a fixed contract; the implementation is free to change shape as long as the contract holds.
 
 ### TDD vs TDG — when to use which
 

@@ -15,10 +15,10 @@
 
 ## Acceptance Criteria
 
-- [ ] `ad-tdd` (both hosts) and WORKFLOW §16 refactor inside each cycle, treat duplication as a hint, and add discovered tests to the list (tests); the "survive renames" line and the `_Avoid_` attribution are corrected.
+- [x] `ad-tdd` (both hosts) and WORKFLOW §16 refactor inside each cycle, treat duplication as a hint, and add discovered tests to the list (tests); the "survive renames" line and the `_Avoid_` attribution are corrected.
 - [ ] `ad-drift` reports glossary drift: multi-word or backticked aliases used in tracked code and canonical terms used nowhere, reading per-context files of a CONTEXT-MAP (tests through the CLI); it stays advisory.
 - [x] Tests that only match a skill's text say so in their names, and GUIDELINES names that tier.
-- [ ] `ad-domain` drops the alphabetical rule and allows a lead sentence plus up to two sentences of scope; the four longest CONTEXT.md definitions are trimmed.
+- [x] `ad-domain` drops the alphabetical rule and allows a lead sentence plus up to two sentences of scope; the four longest CONTEXT.md definitions are trimmed.
 
 ## Plan
 
@@ -42,3 +42,22 @@ The planner's classifier gave 49 candidates; 3 run code (an `installSkills`
 unit test, a plugin rendering test, the tag matcher) and keep their names.
 The other 46 now start `static contract:` (after `regression:` where
 present); GUIDELINES §9.5a names the tier.
+
+### 2026-10-15 — Canon TDD and glossary rules
+
+A static-contract test for both `ad-tdd` hosts and WORKFLOW §16 went red,
+then green after the loop gained an optional refactor on green, duplication
+as a hint and the growing test list, with Step 4 renamed close-out. The
+"survive renames" line now says a changed term means renamed tests, and §1
+marks `_Avoid_` as a kit convention. `ad-domain` groups terms by relation
+and allows a lead sentence plus two of scope; the five longest CONTEXT.md
+definitions were trimmed (the "Review verdicts" one now names `Base-SHA:`).
+The changed WORKFLOW.md hash joins the legacy-migration list, as the
+current development copy, so the migration test keeps recognizing it.
+
+### 2026-10-15 — review of 9573e0e
+
+The Codex `ad-tdd` gained the "rename the tests with the code" line, and both
+hosts now say the list grows as cycles reveal behaviors, matching §16. Five
+definitions were trimmed against the four the criterion names; the fifth
+("Two-axis review") was the longest of all and is kept trimmed.

@@ -9,7 +9,6 @@ Implements WORKFLOW.md §14 (Staged Spikes With Golden Fixtures) end-to-end. The
 
 The skill creates `spikes/NNNN-<slug>/` and fills it stage-by-stage. The directory is throwaway by design — when the spike concludes, an ADR records the decision and the spike directory is deleted (promote-or-delete lifecycle).
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions an uncertain technique or asks to evaluate approaches, invoke this skill manually.
 </background_information>
 
 <instructions>

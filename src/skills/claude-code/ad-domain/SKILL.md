@@ -36,7 +36,7 @@ A glossary entry has four parts — see the glossary-entry shape in [references/
 Resolution discipline:
 
 - **Be opinionated.** One canonical name. Others become `_Avoid_` aliases with a one-line reason.
-- **One-sentence definitions.** If it takes a paragraph, the term is not yet sharp.
+- **Short definitions:** a lead sentence that defines the term on its own, plus at most two sentences of scope or exclusions. If it takes a paragraph, the term is not yet sharp.
 - **Project-specific only.** "Customer", "Triage role", "Materialization cascade" qualify. "Service", "Handler", "Controller" do not (those belong to architectural vocabulary per ADR-0020, not domain).
 - **Flag conflicts.** If two terms could mean the same thing, add the conflict to the **Flagged ambiguities** section instead of forcing a premature resolution.
 
@@ -44,7 +44,7 @@ Resolution discipline:
 
 `CONTEXT.md` has three canonical sections — see the CONTEXT.md layout in [references/context-templates.md](references/context-templates.md).
 
-Insert the new term alphabetically under `## Language`. If a relationship clause is implied by the new term, append it to `## Relationships`. If the resolution surfaces an ambiguity rather than closing one, append to `## Flagged ambiguities` and mark the term entry "(resolution pending)".
+Insert the new term under `## Language` next to the terms it relates to. If a relationship clause is implied by the new term, append it to `## Relationships`. If the resolution surfaces an ambiguity rather than closing one, append to `## Flagged ambiguities` and mark the term entry "(resolution pending)".
 
 ## Step 3 — Write or update
 

@@ -11,7 +11,7 @@ Implements ADR-0063 as amended by ADR-0072 and amends ADR-0048's manually perfor
 
 Only one root npm package released through GitHub is supported. It never switches GitHub authentication, reads credential files, surfaces tokens or OTP values, changes npm dist-tags, or retries an irreversible operation blindly.
 
-## Phase 0 — Confirm regime
+## Phase 0 — Preconditions
 
 Run for a release-ready root npm package when the user asks to prepare a release, publish a tagged version, create its GitHub Release, or resume a partial release.
 

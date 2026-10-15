@@ -9,16 +9,11 @@ Process scaffold for compacting a long or near-exhausted session into a handoff 
 
 The skill exists because long sessions accumulate inherited bias (WORKFLOW §12 — "almost right" failures compound) and because session-window pressure forces ad-hoc summarisation that loses the parts the next agent actually needs. Handoffs replace ad-hoc summarisation with a structured artifact.
 
-Codex subagents and sessions do not share the parent conversation history by magic, and `/clear` discards local context. Handoff via the OS temp dir is the durable bridge between Codex sessions or explicit subagent work — treat it as load-bearing, not optional. Codex auto-trigger on description keywords is less mature than Claude Code's; if auto-invocation does not fire when the user mentions handing off, compacting, or `/clear`, invoke this skill manually.
+Codex subagents and sessions do not share the parent conversation history by magic, and `/clear` discards local context. Handoff via the OS temp dir is the durable bridge between Codex sessions or explicit subagent work — treat it as load-bearing, not optional.
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when at least one holds:
-- The user says "handoff", "hand off", "wrap up", "compact this", "save context", "pass to another agent", "I need to `/clear`".
-- The session has run long enough that context-window pressure is imminent or stated.
-- The user is about to switch agents (Codex → Claude Code, or back) and wants the work to continue.
-
-Route elsewhere when:
+Not for:
 - The work is finishable in the current turn → finish it; do not pre-emptively hand off.
 - The handoff target is a specific artifact (PRD / spec / task / ADR) → write that artifact via the matching `ad-*` skill instead. Handoffs do not replace persistent decision records.
 - The user wants to commit work-in-progress → `ad-commit` or finish the change first.

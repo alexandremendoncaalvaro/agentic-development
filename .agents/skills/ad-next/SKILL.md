@@ -9,7 +9,6 @@ Read-only state survey + prioritized next-action recommendations. Mirrors `flutt
 
 The skill writes nothing. Output is recommendations the user copies into the next conversation turn or the next CLI invocation.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user asks about workflow status, invoke this skill manually.
 </background_information>
 
 <instructions>

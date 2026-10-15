@@ -9,7 +9,6 @@ Turns an open question into an evidence-graded conclusion — a study, not code.
 
 Use it for an open question whose answer is knowledge — "should we adopt X?", "is A better than B?", "what is the state of the art on Y?". Not for finding a path to implement an already-decided change (that is ad-ground), and not for validating one uncertain technique (that is ad-spike).
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire on a research question, invoke this skill manually.
 </background_information>
 
 <instructions>

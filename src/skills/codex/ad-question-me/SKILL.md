@@ -11,7 +11,6 @@ Methodology, kept light: Socratic questioning (Paul & Elder), pre-mortem (Klein)
 
 Read-only — the skill may read code, docs, and history to run its grounding filter, but writes nothing.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user asks to be questioned or challenged, invoke this skill manually.
 </background_information>
 
 <instructions>

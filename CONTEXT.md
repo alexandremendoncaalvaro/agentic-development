@@ -197,12 +197,7 @@ _Avoid_: "clean-context review" (non-standard); "independent review" (ambiguous 
 
 ### Two-axis review
 
-**Definition:** the kit's implementation of fresh-context review — splits the review into two independent axes so neither can mask the other:
-
-- **Standards axis** — does the diff conform to AGENTS.md / ARCHITECTURE.md / GUIDELINES.md / CONTEXT.md / accepted ADRs? Bugs, coupling, edge cases, vocabulary drift.
-- **Spec axis** — does the diff match what the originating task / spec / PRD asked for? Missing requirements, scope creep, wrong implementation against quoted spec line.
-
-On Claude Code, the two axes run as parallel `Task` subagent calls with axis-bounded handoffs. On Codex, they run as a single-session pass with axis-separated output (Codex skills cannot programmatically spawn sub-agents — see ADR-0007 Addendum 2026-05-24). Each axis ends with its own verdict; no cross-axis re-ranking; no synthesized "approve".
+**Definition:** the kit's fresh-context review, split into a **Standards axis** (does the diff conform to the binding docs and accepted ADRs) and a **Spec axis** (does it match what the task, spec or PRD asked for), so neither can mask the other. Each axis ends with its own verdict, with no cross-axis re-ranking and no synthesized "approve"; Claude Code runs the axes as parallel subagents, Codex as one pass with axis-separated output.
 
 _Avoid_: "dual review" (ambiguous — could mean two reviewers of the same axis); "Standards/Spec split" (clumsy as a noun phrase); "split review" (unclear what's split).
 
@@ -218,7 +213,7 @@ _Avoid_: using "handoff" without a qualifier (`session` / `review` / `audit`) �
 
 ### Session handoff
 
-**Definition:** the markdown file `ad-handoff` writes to `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md`. Compacts the current agent session — live working-tree state, open artifacts, unresolved decisions, in-flight diff, recent errors, suggested next skills — so a fresh agent (post-`/clear`, agent switch, or context-window pressure) can pick the work up cold. References PRD / spec / task / ADR by path; never duplicates them. Redacts secrets before writing. Per-session OS-temp-dir ephemeral; never committed.
+**Definition:** the markdown file `ad-handoff` writes to `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md` so a fresh agent can resume the session cold. It holds live state, open artifacts, unresolved decisions and next steps, references records by path instead of copying them, and is redacted, ephemeral and never committed.
 
 _Avoid_: "context dump" (passive — `ad-handoff` curates, doesn't dump); "session export" (implies the agent state is portable; only the curated subset is); "handoff file" (acceptable in informal prose but not as the canonical noun).
 
@@ -234,7 +229,7 @@ _Avoid_: "chip" alone in specs and ADRs (the host UI has other chips); "resume p
 
 ### Review handoff
 
-**Definition:** the markdown file `ad-review` writes to `.agentic/reviews/<ISO>-<scope>{,-standards,-spec}.md`. Carries the diff plus the spec slice the fresh-context reviewer receives. Serves as the audit trail for the review — the user can replay the review against an updated diff or share it with a teammate. Ephemeral per-review artifact; `.agentic/reviews/` belongs in `.gitignore`. On Claude Code, two files (`-standards.md` + `-spec.md`) when two-axis runs; on Codex, one combined file (per ADR-0007 Addendum 2026-05-24).
+**Definition:** the markdown file `ad-review` writes to `.agentic/reviews/<ISO>-<scope>{,-standards,-spec}.md` carrying the diff and spec slice a fresh-context reviewer receives. It is the replayable audit trail of the review: one file per axis on Claude Code, one combined file on Codex, kept in the gitignored `.agentic/reviews/`.
 
 _Avoid_: "review snapshot" (snapshot implies frozen-in-time database state); "review log" (log implies append-only history); "review context" (too generic).
 
@@ -242,7 +237,7 @@ _Avoid_: "review snapshot" (snapshot implies frozen-in-time database state); "re
 
 ### Review verdicts
 
-**Definition:** the markdown file `ad-review` writes to `.agentic/reviews/<ISO>-<scope>-verdicts.md` at review time, opening with a `Target-SHA:` line that names the reviewed commit (or `none (working tree)`) and carrying both reviewers' reports verbatim under the Standards and Spec headings. The `Target-SHA:` line makes it the review **Workflow receipt** the **Receipt gate** reads. The **Review handoff** proves what a reviewer was given; the verdicts file proves what the review found. A contemporaneous artifact on the reviewing machine, not durable evidence: it shares the gitignored `.agentic/reviews/` directory, so a finding that must outlive the machine is quoted into the tracked record or labelled an open question.
+**Definition:** the markdown file `ad-review` writes to `.agentic/reviews/<ISO>-<scope>-verdicts.md` at review time, opening with `Target-SHA:` (and `Base-SHA:` for a delta review) and carrying both reviewers' reports verbatim. Those lines make it the review **Workflow receipt** the **Receipt gate** reads; it is a local artifact, so a finding that must outlive the machine is quoted into the tracked record.
 
 _Avoid_: "review report" (the reply in the session is the report; this is its persisted copy); "verdict file" without the qualifier (the audit's verdict trail is a different producer); "durable evidence" (it is not versioned).
 
@@ -250,7 +245,7 @@ _Avoid_: "review report" (the reply in the session is the report; this is its pe
 
 ### Audit handoff
 
-**Definition:** the markdown file `ad-audit` writes to `.agentic/reviews/<ISO>-audit-<scope>.md` (Claude Code: one per dispatched rule-group; Codex: one combined audit trail). Carries the target plus the resolved rule-set slice each `audit-group-reviewer` receives — one rule-group's rules with the SHA they were read at, the tree/SHA, and the critical tag. Serves as the audit trail for the maximum-gate audit and the context packet for a user-spawned reviewer escalation. It also carries the `Gate:` line: the result of the full quality gate the orchestrator runs once before the review, whose output sits beside it as `<ISO>-audit-gate.log`. Ephemeral per-audit artifact; shares the `.agentic/reviews/` directory (and its `.gitignore` entry) with the Review handoff.
+**Definition:** the markdown file `ad-audit` writes to `.agentic/reviews/<ISO>-audit-<scope>.md` carrying the target and one rule-group's rules, read at a named SHA, for an `audit-group-reviewer`. It also carries the `Gate:` line of the full quality gate run once before dispatch, with its log beside it; it shares the gitignored `.agentic/reviews/` directory with the **Review handoff**.
 
 _Avoid_: conflating it with the **Review handoff** — same directory, different producer (`ad-audit` vs `ad-review`) and shape (per-rule-group vs per-axis); or with the **Audit summary**, which `ad-audit` writes after the verdict, not before dispatch.
 

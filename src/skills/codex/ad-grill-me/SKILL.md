@@ -9,17 +9,10 @@ Implements ADR-0022 — the upstream-of-research phase. Process scaffold for sha
 
 No primary file output. Side-effects land in `CONTEXT.md` (via `ad-domain`) and ADRs (via `ad-adr`) — both lazy, both belonging to other skills.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions grilling, interview, fuzzy ask, or "stress test the plan", invoke this skill manually.
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Grill is for the *fuzzy-question, scope-uncertain* regime. Run only when at least one holds:
-- The user's ask uses vague or overloaded vocabulary ("account", "user", "thing", "stuff").
-- The ask bundles ≥2 decisions into one question.
-- The user has not stated the success condition or the failure mode.
-- The same noun is used inconsistently across the request and the codebase.
-
-Route elsewhere when:
+Not for:
 - The question is sharp and research-ready → `ad-ground` (WORKFLOW §4 + §5).
 - The technique is known and the ask is implementation-strategy choice → `ad-tdg` (WORKFLOW §9).
 - The technique itself is uncertain across multiple plausible approaches → `ad-spike` (WORKFLOW §14).

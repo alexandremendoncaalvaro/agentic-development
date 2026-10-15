@@ -11,15 +11,7 @@ Layer 3 of the artifact stack. Lazy lifecycle owner of the PRD (Product Requirem
 
 PRD is product-level scope, not feature-level scope. A feature spec (`ad-spec`, Layer 4) implements *part* of a PRD; a PRD is never implemented by a single task. If the user's ask is single-feature, route to `/ad-spec` instead.
 
-## Step 0 — Confirm regime
-
-Run when the user wants to scope or update product-level context. Triggers:
-
-- New product framing — vision, target user, problem statement, multi-feature roadmap.
-- Existing PRD needs an update — success metric revised, new feature added to roadmap, non-goal flipped.
-- Cross-feature constraint surfaced (regulatory, business, technical-that-binds-across-features) needs a durable home.
-
-Route elsewhere when:
+## Not for
 
 - Scope is one feature → `/ad-spec` (Layer 4).
 - Scope is a vocabulary question → `/ad-domain` (Layer 2).

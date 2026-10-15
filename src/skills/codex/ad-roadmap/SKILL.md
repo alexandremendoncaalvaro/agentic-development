@@ -9,7 +9,6 @@ Read-only progress report for a decision-maker or newcomer. It answers: what are
 
 `ad-next` answers a different question: what the practitioner should do next. `ad-prd` authors or changes the roadmap. Do not absorb either responsibility.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire for a roadmap-progress question, invoke this skill manually.
 </background_information>
 
 <instructions>
