@@ -145,3 +145,12 @@ also dropped the rest of its start line, so `cat <<EOF | pkill node` passed:
 fixed, the start line stays, pinned by a test. Concern, the replay claim is
 not reproducible elsewhere: it is the same exploratory local run named
 above, rerun at each change with no verdict changed.
+
+### 2026-10-15 — delta review of f82feb2
+
+No blocker, no regression. Two concerns predate the change and are accepted
+as known limits of a guardrail that is not a sandbox (ADR-0094): two
+heredocs on one start line strip only the first body, a safe over-block;
+and a `<<` inside quotes, a here-string `<<<` or an arithmetic `<<` followed
+by a matching terminator line still removes what lies between, so a
+contrived command can pass.
