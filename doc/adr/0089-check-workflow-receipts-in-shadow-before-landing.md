@@ -5,6 +5,7 @@
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0083, decisions 1 and 7, decision 3's validator clause and decision 5's every-state-is-recorded clause, for receipt gates only: a receipt gate may run before a tool call, may be proposed while the artifact-validator gate stays the only feedback gate, checks a receipt's existence and freshness instead of invoking a skill's validator, and may lose an evidence line it cannot write (second addendum). Every other ADR-0083 decision binds it unchanged.
 **Amended by:** ADR-0091 — decision 2's audit receipt is expected only when the branch changes an `auditPaths` path, and decision 3's review freshness counts a delta review only when it chains to a covered review.
+**Amended by:** ADR-0096 — decision 2 also checks `npm publish` and `<gh> release create` against a release receipt in the shared git directory.
 **Related:** ADR-0047, ADR-0055, ADR-0074 (the decisions a blocking guard must name); ADR-0072 (digest-bound approval precedent); ADR-0088 (the band may display the result)
 
 ## Context

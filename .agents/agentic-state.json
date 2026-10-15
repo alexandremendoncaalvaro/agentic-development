@@ -361,6 +361,10 @@
           "sourceSha": "87f975c6b6973d112052a2fa3f69a93dada3ee3dd4c2e0116cadb9b341ab536c"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/command-guard.mjs",
+          "sourceSha": "df561a951d02d45e0aa7066ed1cd05fc0d1adad47e0052501bea259ae695c52c"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/detect-hooks.mjs",
           "sourceSha": "f2b49487dc4419efcb2af9b1bcee25844a574ec3e54249022ea23c6d344dc830"
         },
@@ -381,20 +385,24 @@
           "sourceSha": "0d9976d06fa73bef82db7a85d51865c35a023ebefbf91a9d81564a2902e05365"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/reply-language.mjs",
+          "sourceSha": "a2f8039dc073a26f434e8910e221982eba72879e77497e42f1a3278eaf94cb78"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/review-receipts.mjs",
           "sourceSha": "afc8db728ee9361acc4ea3ef04fa1e056a61d614b670fcada0ef5e7641b365a4"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "83cdb1b8226764a636a2898437ad73ecce63a543f13d71c108ec5e32f8d89fcf"
+          "sourceSha": "9d8eb72973f7218c426657b613c88ff99908b6f53abc3d694fd64e734eebe5a4"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
-          "sourceSha": "6f6583233038f53c8891573311b8c00a618c82e278eb02a2e5fd2783ca6f377d"
+          "sourceSha": "65358591e98b95bf3989b2a6aab2296bd1d310469b98026ceb0ecbd7c3f0dc8f"
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "b673e2294c79ff95a3e72fcfad7487b8a469e4f48f660999edae6fe69c70e87e"
+          "sourceSha": "07deb0a8a02e424c369b707336ba3e8a37e621fdc5eb29698e6e5926c057d734"
         }
       ]
     },
@@ -649,7 +657,7 @@
         },
         {
           "path": ".agents/skills/ad-release/scripts/release-plan.mjs",
-          "sourceSha": "99df63c2d9b6d233e0b3095dd8ea898765d44db3c14396dfac26670557b43ee4"
+          "sourceSha": "af474e43ab49a621fadbe98e0b7a4fbb2101ea2df9e30f70bdcca5b25621f6c7"
         },
         {
           "path": ".agents/skills/ad-release/scripts/release-state.mjs",
@@ -661,7 +669,7 @@
         },
         {
           "path": ".agents/skills/ad-release/SKILL.md",
-          "sourceSha": "583c32e5fe71cd9abb8a291db3ad3a4fa2e53a042e48305db07ac86d7f2b42af"
+          "sourceSha": "550b389ffde21953676be116e88676378165b518981f0e4f82cb95825bf12fc4"
         }
       ]
     },

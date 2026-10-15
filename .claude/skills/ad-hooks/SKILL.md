@@ -89,7 +89,7 @@ If the user is wiring CI alongside hooks (GitHub Actions / GitLab CI / Circle), 
 
 ## Session-lifecycle hooks (Claude Code only)
 
-Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; it has five members. The first two are wired on Claude Code only (their Codex extension is a follow-up under ADR-0083); the artifact-validator gate, the handoff-chip reminder and the shadow receipt gate are wired on both hosts because Codex documents the same `PostToolUse` and `PreToolUse` contracts (GROUND-0027, GROUND-0034, GROUND-0038).
+Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; it has seven members. The first two are wired on Claude Code only (their Codex extension is a follow-up under ADR-0083); the artifact-validator gate, the handoff-chip reminder the shadow receipt gate, the command guard and the reply-language detector are wired on both hosts because Codex documents the same `PostToolUse`, `PreToolUse` and `Stop` contracts (GROUND-0027, GROUND-0034, GROUND-0038).
 
 Scaffold a session-lifecycle hook only when the user asked for it: show the exact merged JSON and the target file, and write only after the user approves. Read [references/session-tier.md](references/session-tier.md) before wiring or changing any of these hooks; it holds each hook's contract, wiring and tests:
 
@@ -98,6 +98,8 @@ Scaffold a session-lifecycle hook only when the user asked for it: show the exac
 - Artifact-validator `PostToolUse` gate (ADR-0083, Spec 0008)
 - Handoff-chip `PostToolUse` reminder (ADR-0087)
 - Shadow receipt gate on `PreToolUse` (ADR-0089)
+- Command guard on `PreToolUse` (ADR-0094)
+- Reply-language detector on `Stop` (ADR-0094, shadow)
 - Resolving the script path
 
 ## Output contract

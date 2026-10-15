@@ -1,5 +1,5 @@
 {
-  "description": "Agentic Development dogfood: the ad-hooks artifact-validator gate (ADR-0083, Spec 0008), handoff-chip reminder (ADR-0087) and shadow receipt gate (ADR-0089).",
+  "description": "Agentic Development dogfood: the ad-hooks artifact-validator gate (ADR-0083, Spec 0008), handoff-chip reminder (ADR-0087), shadow receipt gate (ADR-0089), command guard and shadow reply-language detector (ADR-0094).",
   "hooks": {
     "PostToolUse": [
       {
@@ -26,6 +26,11 @@
             "type": "command",
             "command": "node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/sequence-gate.mjs\"",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/command-guard.mjs\"",
+            "timeout": 30
           }
         ]
       },
@@ -35,6 +40,17 @@
           {
             "type": "command",
             "command": "node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/sequence-gate.mjs\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/reply-language.mjs\"",
             "timeout": 30
           }
         ]
