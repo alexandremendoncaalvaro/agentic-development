@@ -13,7 +13,7 @@ Compare one baseline period before the changes with one follow-up period after t
 
 ## Evaluation question
 
-Between the baseline period (2026-09-15 to 2026-10-15) and the follow-up period (2026-10-16 to 2026-11-15), how did reviewer and auditor dispatches per pull request, CI failure reads per pull request, and the owner's standing-rule corrections per session change?
+Between the baseline period [2026-09-15, 2026-10-15) and the follow-up period [2026-10-15, 2026-11-14), both half-open in UTC and 30 days long, how did reviewer and auditor dispatches per pull request, CI failure reads per pull request, and the owner's standing-rule corrections per session change?
 
 ## Claim
 
@@ -29,7 +29,7 @@ Descriptive and comparative for one owner on one machine: the counts describe ho
 ## Tasks
 
 - Normal work in both periods; nothing is staged for the measurement.
-- Run `node eval/daily-use.mjs --from 2026-09-15 --to 2026-10-15` for the baseline after this plan is committed, and `node eval/daily-use.mjs --from 2026-10-16 --to 2026-11-15` on or after 2026-11-16, with the script and lexicon unchanged from the commit that freezes this plan.
+- Run `node eval/daily-use.mjs --from 2026-09-15 --to 2026-10-15` for the baseline after this plan is committed, and `node eval/daily-use.mjs --from 2026-10-15 --to 2026-11-14` on or after 2026-11-14, with the script and lexicon unchanged from the commit that last freezes this plan (see Amendment).
 - The owner runs a new /insights report for the follow-up period; it is read beside the counts, not merged into them.
 
 ## Measures
@@ -63,6 +63,10 @@ Owner corrections per session are reported beside the decision and do not decide
 - A dispatch counts a reviewer started, not a review that changed the outcome.
 - Older transcripts without an `origin` field are read by a fallback rule (a plain message that is not meta and does not open with markup), which may admit some system text.
 - Transcript retention limits the baseline to what the machine still holds.
+
+## Amendment
+
+2026-10-15, before the deciding follow-up run: the first baseline run at 218457d was followed by a fresh-context review that found defects in the instrument, not in the measures. A line copied into a resumed session's file was counted twice; a commit message or echo that mentioned `pr create` or `run view --log-failed` counted as a command; a compacted summary or an interruption marker counted as an owner message in the older-transcript fallback; an impossible date or an empty period ran silently. The script was corrected (duplicate lines skipped by `uuid`, commands matched in command position after quoted text is removed, the two system messages excluded, bad dates and periods refused) and this plan was frozen again before the baseline was read a second time. The measures, the correction lexicon and the decision rule did not change. The periods are stated half-open, so the follow-up starts on 2026-10-15. RESEARCH-0046 records both baseline runs. Review rounds, named in Task 0126's first criterion, are not a separate measure: reviewer dispatches per pull request stand for them, as this plan's measures already said before either run.
 
 ## Sources
 

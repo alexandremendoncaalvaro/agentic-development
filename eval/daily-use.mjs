@@ -13,8 +13,12 @@ import { pathToFileURL } from 'node:url';
 
 const REVIEWER = 'fresh-context-reviewer';
 const AUDITOR = 'audit-group-reviewer';
-const PR_CREATE = /\bpr\s+create\b/;
-const CI_FAILURE_READ = /\brun\s+view\b[^\n]*--log-failed/;
+// A GitHub CLI call in command position (after a separator, assignments and
+// the `rtk`/`env` wrappers), read after quoted text is removed, so a commit
+// message or an echo that mentions the command does not count.
+const GH_CALL = String.raw`(?:^|[;&|\n(])\s*(?:(?:rtk|proxy|env)\s+|[A-Za-z_][A-Za-z0-9_]*=\S*\s+)*(?:gh|ghp)\s+`;
+const PR_CREATE = new RegExp(`${GH_CALL}pr\\s+create\\b`);
+const CI_FAILURE_READ = new RegExp(`${GH_CALL}run\\s+view\\b[^\\n;&|]*--log-failed`);
 
 // The owner's corrections of standing rules, by rule. A message counts once in
 // `ownerCorrections` and once per rule it matches. Frozen with the study's
@@ -34,7 +38,13 @@ function usage() {
 function argument(args, name) {
   const index = args.indexOf(name);
   const value = index === -1 ? undefined : args[index + 1];
-  return /^\d{4}-\d{2}-\d{2}$/.test(value ?? '') ? value : null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value ?? '')) return null;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value) ? value : null;
+}
+
+function unquoted(command) {
+  return command.replace(/'[^']*'|"(?:\\.|[^"\\])*"/g, '""');
 }
 
 function transcriptFiles(dir) {
@@ -67,11 +77,14 @@ function text(content) {
 // in older transcripts without `origin`, a plain message that is not meta and
 // does not open with markup.
 function ownerText(entry) {
-  if (entry.type !== 'user' || entry.isSidechain || entry.isMeta) return null;
+  if (entry.type !== 'user' || entry.isSidechain || entry.isMeta || entry.isCompactSummary) {
+    return null;
+  }
   const body = text(entry.message?.content);
   if (!body) return null;
   if (entry.origin !== undefined) return entry.origin?.kind === 'human' ? body : null;
-  return body.trimStart().startsWith('<') ? null : body;
+  const start = body.trimStart();
+  return start.startsWith('<') || start.startsWith('[Request interrupted') ? null : body;
 }
 
 function toolUses(entry) {
@@ -88,6 +101,9 @@ export function dailyUse({ root, from, to }) {
   const start = Date.parse(`${from}T00:00:00Z`);
   const end = Date.parse(`${to}T00:00:00Z`);
   const sessions = new Set();
+  // A resumed or forked session copies earlier lines into a new file; a line
+  // with a uuid already seen is that copy.
+  const seen = new Set();
   const counts = {
     sessions: 0,
     ownerMessages: 0,
@@ -114,6 +130,10 @@ export function dailyUse({ root, from, to }) {
       }
       const at = Date.parse(entry?.timestamp ?? '');
       if (!(at >= start && at < end)) continue;
+      if (entry.uuid) {
+        if (seen.has(entry.uuid)) continue;
+        seen.add(entry.uuid);
+      }
       if (!entry.isSidechain && entry.sessionId) sessions.add(entry.sessionId);
       const owner = ownerText(entry);
       if (owner !== null) {
@@ -130,7 +150,7 @@ export function dailyUse({ root, from, to }) {
         if ((use.name === 'Agent' || use.name === 'Task') && type === AUDITOR) {
           counts.auditorDispatches += 1;
         }
-        const command = use.name === 'Bash' ? String(use.input?.command ?? '') : '';
+        const command = use.name === 'Bash' ? unquoted(String(use.input?.command ?? '')) : '';
         if (PR_CREATE.test(command)) counts.pullRequestsCreated += 1;
         if (CI_FAILURE_READ.test(command)) counts.ciFailureReads += 1;
       }
@@ -159,7 +179,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const args = process.argv.slice(2);
   const from = argument(args, '--from');
   const to = argument(args, '--to');
-  if (!from || !to) usage();
+  if (!from || !to || from >= to) usage();
   const root = process.env.AGENTIC_TRANSCRIPTS_DIR || join(homedir(), '.claude', 'projects');
+  try {
+    if (!statSync(root).isDirectory()) usage();
+  } catch {
+    usage();
+  }
   process.stdout.write(`${JSON.stringify(dailyUse({ root, from, to }), null, 2)}\n`);
 }

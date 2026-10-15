@@ -128,3 +128,65 @@ test('daily-use: an empty period reports zero counts and null ratios; a bad date
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('daily-use: a repeated entry counts once, a quoted mention is no command, and system text is no owner message', () => {
+  const dispatch = {
+    ...tool('2026-09-20T10:10:00Z', 'Agent', { subagent_type: 'fresh-context-reviewer' }),
+    uuid: 'u-1',
+  };
+  const root = transcripts({
+    'p/a.jsonl': [
+      dispatch,
+      tool('2026-09-20T10:20:00Z', 'Bash', { command: 'git commit -m "fix pr create bug"' }),
+      tool('2026-09-20T10:21:00Z', 'Bash', {
+        command: 'rtk env GH_HOST=github.com ghp pr create --fill',
+      }),
+      tool('2026-09-20T10:22:00Z', 'Bash', { command: 'echo "gh run view 1 --log-failed"' }),
+      {
+        type: 'user',
+        sessionId: 's1',
+        timestamp: '2026-09-20T10:23:00Z',
+        isCompactSummary: true,
+        message: { content: 'summary again' },
+      },
+      {
+        type: 'user',
+        sessionId: 's1',
+        timestamp: '2026-09-20T10:24:00Z',
+        message: { content: '[Request interrupted by user]' },
+      },
+    ],
+    'p/b.jsonl': [dispatch],
+  });
+  try {
+    const { report } = run(root, ['--from', '2026-09-15', '--to', '2026-10-15']);
+    assert.equal(report.counts.reviewerDispatches, 1);
+    assert.equal(report.counts.pullRequestsCreated, 1);
+    assert.equal(report.counts.ciFailureReads, 0);
+    assert.equal(report.counts.ownerMessages, 0);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('daily-use: an impossible date, an empty period or a missing root is a usage error', () => {
+  const root = transcripts({ 'p/s.jsonl': [owner('2026-09-20T00:00:00Z', 'x')] });
+  try {
+    for (const [args, env] of [
+      [['--from', '2026-13-45', '--to', '2026-10-15'], {}],
+      [['--from', '2026-10-15', '--to', '2026-10-15'], {}],
+      [
+        ['--from', '2026-09-15', '--to', '2026-10-15'],
+        { AGENTIC_TRANSCRIPTS_DIR: join(root, 'none') },
+      ],
+    ]) {
+      const result = spawnSync(process.execPath, [SCRIPT, ...args], {
+        encoding: 'utf8',
+        env: { ...process.env, AGENTIC_TRANSCRIPTS_DIR: root, ...env },
+      });
+      assert.equal(result.status, 2, JSON.stringify(args));
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
