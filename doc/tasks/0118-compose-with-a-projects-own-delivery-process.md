@@ -148,3 +148,9 @@ correct GROUND record there lost its `--dir` and was blocked. A GROUND record
 in the configured directory now always gets `--dir`, and every other kind
 stays governed under `doc/research/`; the nested test now also writes a valid
 GROUND record and went red, then green.
+
+### 2026-10-15 — delta review of cbd019f
+
+Both axes ship as-is. Accepted as a known limit: configuring a parent of
+`doc/research/` (such as `doc`) as the research directory hands GROUND
+records under `doc/research/` a `--dir` that does not match them.
