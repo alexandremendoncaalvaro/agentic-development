@@ -22,7 +22,7 @@
 
 ## Plan
 
-- [ ] Receipt in `.agentic/receipts/release.jsonl` from `release-plan.mjs`, gate check in `sequence-gate.mjs`, preflight and ADR in one PR, audited (enforcement tooling).
+- [x] Receipt in `.agentic/receipts/release.jsonl` from `release-plan.mjs`, gate check in `sequence-gate.mjs`, preflight and ADR in one PR, audited (enforcement tooling).
 
 ## Notes
 
@@ -76,3 +76,10 @@ models, HK, GH): no blocker. Findings and dispositions:
   seen, a dry-run publish is logged, a receipt keeps the first approval time.
   `pnpm publish` and `yarn publish` are now pinned by a test.
 - HK, GH: no finding.
+
+### 2026-10-15 — delta review of 3d56ffd
+
+Both axes ship as-is. The Plan line's `.agentic/receipts/release.jsonl` is
+superseded by `<git common dir>/agentic/release.jsonl` (ADR-0096 decision
+3). Note accepted: the gate treats an empty-string name as a name, a
+shadow-only and unlikely case.

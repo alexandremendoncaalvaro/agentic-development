@@ -12,7 +12,7 @@
 
 ## Decision
 
-1. An approved release plan, or a per-stage approval of `npm-publish` or `github-release`, makes `release-plan.mjs` append one receipt to `<git common dir>/agentic/release.jsonl`: package, version, plan digest (null for a per-stage approval), scope and time. An unchanged approval is not appended again, so a receipt keeps the time of the first approval; an approval without a package name and version, or outside a git repository, the planner reports the receipt as unavailable and still returns its command.
+1. An approved release plan, or a per-stage approval of `npm-publish` or `github-release`, makes `release-plan.mjs` append one receipt to `<git common dir>/agentic/release.jsonl`: package, version, plan digest (null for a per-stage approval), scope and time. An unchanged approval is not appended again, so a receipt keeps the time of the first approval. For an approval without a package name and version, or outside a git repository, the planner reports the receipt as unavailable and still returns its command.
 2. The `ad-hooks` receipt gate logs a `release` check before `npm publish`, `pnpm publish`, `yarn publish` and `<gh> release create`: `clear` when one of the newest 20 receipts names the `package.json` name and version, else `would-block`; a `package.json` that is missing or names no package name and version is `runtime-unavailable`. Shadow only, like every ADR-0089 check.
 3. The receipt sits in the git directory every worktree shares because `ad-release` publishes from a disposable worktree at the tag, where a receipt under `.agentic/` of the checkout is not visible.
 4. `ad-release` preflight reads `npm profile get --json` and warns when `tfa.mode` is not `auth-and-writes`.
