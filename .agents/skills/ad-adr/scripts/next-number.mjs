@@ -21,7 +21,9 @@ const ARTIFACT_NUMBER = /^(\d{4})-/;
 
 function validDirectory(directory) {
   if (!directory || isAbsolute(directory)) return false;
-  return !normalize(directory).split(/[\\/]+/).includes('..');
+  return !normalize(directory)
+    .split(/[\\/]+/)
+    .includes('..');
 }
 
 function listEntries(repoRoot, directory, unreadable) {
@@ -37,7 +39,14 @@ function listEntries(repoRoot, directory, unreadable) {
 
 function historyEntries(repoRoot, directory, unreadable) {
   try {
-    if (execFileSync('git', ['rev-parse', '--is-inside-work-tree'], { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() !== 'true') return [];
+    if (
+      execFileSync('git', ['rev-parse', '--is-inside-work-tree'], {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }).trim() !== 'true'
+    )
+      return [];
   } catch {
     if (process.env.GIT_DIR || hasGitMetadata(repoRoot)) {
       unreadable.push({ path: `git-history:${directory}`, code: 'GIT_ERROR' });
@@ -51,7 +60,11 @@ function historyEntries(repoRoot, directory, unreadable) {
     return [];
   }
   try {
-    return execFileSync('git', ['log', '--format=', '--name-only', '--', directory], { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n');
+    return execFileSync('git', ['log', '--format=', '--name-only', '--', directory], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).split('\n');
   } catch {
     unreadable.push({ path: `git-history:${directory}`, code: 'GIT_ERROR' });
     return [];
@@ -60,7 +73,11 @@ function historyEntries(repoRoot, directory, unreadable) {
 
 function headState(repoRoot) {
   try {
-    execFileSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    execFileSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
     return 'present';
   } catch (error) {
     return error.status === 1 ? 'unborn' : 'error';
@@ -81,11 +98,16 @@ export function nextNumber(repoRoot, directory) {
     throw new Error('directory must be a non-empty relative path inside the repository');
   }
   const unreadable = [];
-  const numbers = [...new Set(
-    [...listEntries(repoRoot, directory, unreadable), ...historyEntries(repoRoot, directory, unreadable)]
-      .map((name) => name.split('/').at(-1).match(ARTIFACT_NUMBER)?.[1])
-      .filter(Boolean)
-  )].sort();
+  const numbers = [
+    ...new Set(
+      [
+        ...listEntries(repoRoot, directory, unreadable),
+        ...historyEntries(repoRoot, directory, unreadable),
+      ]
+        .map((name) => name.split('/').at(-1).match(ARTIFACT_NUMBER)?.[1])
+        .filter(Boolean)
+    ),
+  ].sort();
   const highest = numbers.length === 0 ? 0 : Number(numbers.at(-1));
   const exhausted = highest >= 9999;
   return {
@@ -99,7 +121,9 @@ export function nextNumber(repoRoot, directory) {
 
 function main() {
   const directory = process.argv[2];
-  process.stdout.write(String(JSON.stringify(nextNumber(process.cwd(), directory), null, 2)) + '\n');
+  process.stdout.write(
+    String(JSON.stringify(nextNumber(process.cwd(), directory), null, 2)) + '\n'
+  );
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -15,7 +15,8 @@ export function withoutFencedBlocks(text) {
 
       const stripped = line.replace(/^[ \t]*/, '');
       const leadingSpaces = line.length - stripped.length;
-      const markerLength = stripped.length - stripped.replace(new RegExp(`^\\${fenceCharacter}+`), '').length;
+      const markerLength =
+        stripped.length - stripped.replace(new RegExp(`^\\${fenceCharacter}+`), '').length;
       const remainder = stripped.slice(markerLength).trim();
       if (leadingSpaces <= 3 && markerLength >= fenceLength && !remainder) {
         fenceCharacter = null;

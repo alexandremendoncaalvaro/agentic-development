@@ -100,7 +100,7 @@ test('Claude Code skills follow the local closing-section contract', () => {
   }
 });
 
-test('normalized Claude Code editorial skills expose numbered workflow steps', () => {
+test('static contract: normalized Claude Code editorial skills expose numbered workflow steps', () => {
   for (const name of [
     'ad-publish',
     'ad-report',
@@ -131,7 +131,7 @@ test('Claude Code orchestration skills pre-approve their direct tool surface', (
   }
 });
 
-test('Claude Code numbered workflow headings use one vocabulary per skill', () => {
+test('static contract: Claude Code numbered workflow headings use one vocabulary per skill', () => {
   for (const { name, dir } of listSkills('claude-code')) {
     const body = readFileSync(join(dir, 'SKILL.md'), 'utf8');
     const usesSteps = /^## Step \d+/m.test(body);
@@ -160,7 +160,7 @@ test('only ad-adr ships an ADR skeleton on either host', () => {
   }
 });
 
-test('skill authoring and hand-off instructions preserve host and commit contracts', () => {
+test('static contract: skill authoring and hand-off instructions preserve host and commit contracts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const read = (skill) => readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
     const spike = read('ad-spike');
@@ -193,7 +193,7 @@ test('skill authoring and hand-off instructions preserve host and commit contrac
   assert.doesNotMatch(deepen, /\[`src\/foo\.ts:42`\]\([^)]*\)/);
 });
 
-test('skill routing keeps every workflow hand-off discoverable on both hosts', () => {
+test('static contract: skill routing keeps every workflow hand-off discoverable on both hosts', () => {
   const edges = [
     ['ad-ground', ['/ad-tdd', '/ad-tdg']],
     ['ad-task', ['/ad-ground', '/ad-tdd']],
@@ -221,7 +221,7 @@ test('skill routing keeps every workflow hand-off discoverable on both hosts', (
   }
 });
 
-test('decision-maker briefing composition is one-way and visible in the workflow map', () => {
+test('static contract: decision-maker briefing composition is one-way and visible in the workflow map', () => {
   const flows = readFileSync(join(__dirname, '..', 'WORKFLOW-FLOWS.md'), 'utf8');
   const section = flows.match(/^## Return To Active Work$([\s\S]*?)(?=^## )/m)?.[1] ?? '';
 
@@ -267,7 +267,7 @@ test('regression: task-0100 state skills pass a detached or behind checkout on a
   }
 });
 
-test('regression: task-0098 review and audit handoffs are written without shell interpolation', () => {
+test('regression: static contract: task-0098 review and audit handoffs are written without shell interpolation', () => {
   // zsh echo turned a \\b into a backspace (Task 0092), and an unquoted
   // heredoc ran the backtick spans of an embedded diff as commands.
   for (const agent of ['claude-code', 'codex']) {
@@ -282,7 +282,7 @@ test('regression: task-0098 review and audit handoffs are written without shell 
   }
 });
 
-test('regression: task-0112 a re-audit rebuilds each group handoff from the files at its target', () => {
+test('regression: static contract: task-0112 a re-audit rebuilds each group handoff from the files at its target', () => {
   // Task 0111's re-audit reused the first pass's handoffs, so two groups'
   // inline rule text predated the fixes under review.
   for (const agent of ['claude-code', 'codex']) {
@@ -306,7 +306,7 @@ test('regression: task-0112 a re-audit rebuilds each group handoff from the file
   }
 });
 
-test('a standalone brief reads the work-in-progress briefing script on both hosts', () => {
+test('static contract: a standalone brief reads the work-in-progress briefing script on both hosts', () => {
   // ADR-0090 decision 3, task-0111 slice 3: the agentic-session pane and
   // /ad-brief read the same script, so they cannot disagree.
   for (const [agent, root] of [
@@ -393,7 +393,7 @@ test('project-state collection is shared, bounded, and one-way on both hosts', (
   }
 });
 
-test('ad-prism is a discoverable generic evaluation skill on both hosts', () => {
+test('static contract: ad-prism is a discoverable generic evaluation skill on both hosts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     assert.ok(existsSync(skillDir), `${agent} must ship ad-prism`);
@@ -417,7 +417,7 @@ test('ad-prism is a discoverable generic evaluation skill on both hosts', () => 
   }
 });
 
-test('ad-prism separates portable evaluation method from optional project context', () => {
+test('static contract: ad-prism separates portable evaluation method from optional project context', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -455,7 +455,7 @@ test('ad-prism separates portable evaluation method from optional project contex
   }
 });
 
-test('ad-prism applies a domain adapter only inside its declared scope', () => {
+test('static contract: ad-prism applies a domain adapter only inside its declared scope', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -482,7 +482,7 @@ test('ad-prism applies a domain adapter only inside its declared scope', () => {
   }
 });
 
-test('ad-prism keeps evaluation settings independent and bounded to the requested context', () => {
+test('static contract: ad-prism keeps evaluation settings independent and bounded to the requested context', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -512,7 +512,7 @@ test('ad-prism keeps evaluation settings independent and bounded to the requeste
   }
 });
 
-test('ad-prism separates contextual methodology judgment from deterministic gates', () => {
+test('static contract: ad-prism separates contextual methodology judgment from deterministic gates', () => {
   for (const agent of ['claude-code', 'codex']) {
     const methodology = readFileSync(
       join(SKILLS_ROOT, agent, 'ad-prism', 'references', 'methodology.md'),
@@ -635,7 +635,7 @@ test('ad-prism ships a privacy-bounded three-arm replacement protocol', () => {
   }
 });
 
-test('ad-prism freezes and audits material evaluations without collapsing its verdicts', () => {
+test('static contract: ad-prism freezes and audits material evaluations without collapsing its verdicts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -669,7 +669,7 @@ test('ad-prism freezes and audits material evaluations without collapsing its ve
   }
 });
 
-test('ad-prism keeps methodological recommendations grounded in portable sources', () => {
+test('static contract: ad-prism keeps methodological recommendations grounded in portable sources', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -685,7 +685,7 @@ test('ad-prism keeps methodological recommendations grounded in portable sources
   }
 });
 
-test('material evaluation claims compose through ad-prism while ordinary publishing stays light', () => {
+test('static contract: material evaluation claims compose through ad-prism while ordinary publishing stays light', () => {
   for (const agent of ['claude-code', 'codex']) {
     const prism = readFileSync(join(SKILLS_ROOT, agent, 'ad-prism', 'SKILL.md'), 'utf8');
     const publish = readFileSync(join(SKILLS_ROOT, agent, 'ad-publish', 'SKILL.md'), 'utf8');
@@ -718,7 +718,7 @@ test('material evaluation claims compose through ad-prism while ordinary publish
   }
 });
 
-test('evaluation methodology routing is visible from adjacent skills and the workflow map', () => {
+test('static contract: evaluation methodology routing is visible from adjacent skills and the workflow map', () => {
   const flows = readFileSync(join(__dirname, '..', 'WORKFLOW-FLOWS.md'), 'utf8');
   const section = flows.match(/^## Evaluation Design And Assurance$([\s\S]*?)(?=^## )/m)?.[1] ?? '';
 
@@ -789,7 +789,7 @@ test('the canonical skill guide lists every bundled skill exactly once', () => {
   }
 });
 
-test('ad-roadmap explains the delivery story as a newcomer-readable checklist on both hosts', () => {
+test('static contract: ad-roadmap explains the delivery story as a newcomer-readable checklist on both hosts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-roadmap');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -895,7 +895,7 @@ test('ad-roadmap defaults to project scope and uses a separate task template onl
   }
 });
 
-test('ad-roadmap delegates the decision-maker brief and retains its checklist', () => {
+test('static contract: ad-roadmap delegates the decision-maker brief and retains its checklist', () => {
   for (const agent of ['claude-code', 'codex']) {
     const briefDir = join(SKILLS_ROOT, agent, 'ad-brief');
     assert.ok(existsSync(briefDir), `${agent} must ship the ad-brief specialist`);
@@ -970,7 +970,7 @@ test('ad-roadmap templates place the canonical brief before specialist checklist
   }
 });
 
-test('ad-brief restores live session context and escalates only genuine judgment', () => {
+test('static contract: ad-brief restores live session context and escalates only genuine judgment', () => {
   for (const agent of ['claude-code', 'codex']) {
     const briefDir = join(SKILLS_ROOT, agent, 'ad-brief');
     const body = readFileSync(join(briefDir, 'SKILL.md'), 'utf8');
@@ -1046,7 +1046,7 @@ test('ad-brief ships representative evaluations for its three decision outcomes'
   }
 });
 
-test('ad-brief exposes concrete examples for each semantic decision mode', () => {
+test('static contract: ad-brief exposes concrete examples for each semantic decision mode', () => {
   for (const agent of ['claude-code', 'codex']) {
     const briefDir = join(SKILLS_ROOT, agent, 'ad-brief');
     const body = readFileSync(join(briefDir, 'SKILL.md'), 'utf8');
@@ -1066,7 +1066,7 @@ test('ad-brief exposes concrete examples for each semantic decision mode', () =>
   }
 });
 
-test('ad-rules validates the composed brief before correction mode returns', () => {
+test('static contract: ad-rules validates the composed brief before correction mode returns', () => {
   for (const agent of ['claude-code', 'codex']) {
     const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-rules', 'SKILL.md'), 'utf8');
 
@@ -1081,7 +1081,7 @@ test('ad-rules validates the composed brief before correction mode returns', () 
   }
 });
 
-test('ad-merge has a release-only mode that preserves the tagged commit', () => {
+test('static contract: ad-merge has a release-only mode that preserves the tagged commit', () => {
   for (const agent of ['claude-code', 'codex']) {
     const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-merge', 'SKILL.md'), 'utf8');
     assert.match(body, /release-only/i, `${agent} ad-merge must name its release-only mode`);
@@ -1128,7 +1128,7 @@ test('ad-bootstrap templates preserve every AGENTS to GUIDELINES pointer mapping
   }
 });
 
-test('ad-community-docs keeps policy ownership with the maintainer on both hosts', () => {
+test('static contract: ad-community-docs keeps policy ownership with the maintainer on both hosts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-community-docs', 'SKILL.md'), 'utf8');
     assert.match(body, /unreadable\[\]/, `${agent} must surface unreadable policy documents`);
@@ -1138,7 +1138,7 @@ test('ad-community-docs keeps policy ownership with the maintainer on both hosts
   }
 });
 
-test('ad-task requires a local scope anchor before creating a task', () => {
+test('static contract: ad-task requires a local scope anchor before creating a task', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-task');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -1161,7 +1161,7 @@ test('ad-task requires a local scope anchor before creating a task', () => {
   }
 });
 
-test('ad-ground persists a validated evidence receipt before non-trivial work', () => {
+test('static contract: ad-ground persists a validated evidence receipt before non-trivial work', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-ground');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -1200,7 +1200,7 @@ test('ad-ground persists a validated evidence receipt before non-trivial work', 
   }
 });
 
-test('ad-handoff keeps preparation exhaustive but makes the resume brief concise', () => {
+test('static contract: ad-handoff keeps preparation exhaustive but makes the resume brief concise', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-handoff');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -1259,7 +1259,7 @@ test('ad-handoff keeps preparation exhaustive but makes the resume brief concise
   }
 });
 
-test('ad-handoff delegates the resume brief and retains the durable handoff protocol', () => {
+test('static contract: ad-handoff delegates the resume brief and retains the durable handoff protocol', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-handoff');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -1297,7 +1297,7 @@ test('ad-handoff delegates the resume brief and retains the durable handoff prot
   }
 });
 
-test('ad-rules separates inventory from correction and reports the corrected plan', () => {
+test('static contract: ad-rules separates inventory from correction and reports the corrected plan', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-rules');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -1330,7 +1330,7 @@ test('ad-rules separates inventory from correction and reports the corrected pla
   }
 });
 
-test('ad-brief stays private while ad-publish retains every outward-language gate', () => {
+test('static contract: ad-brief stays private while ad-publish retains every outward-language gate', () => {
   for (const agent of ['claude-code', 'codex']) {
     const brief = readFileSync(join(SKILLS_ROOT, agent, 'ad-brief', 'SKILL.md'), 'utf8');
     const publish = readFileSync(join(SKILLS_ROOT, agent, 'ad-publish', 'SKILL.md'), 'utf8');
@@ -1372,7 +1372,7 @@ test('ad-brief stays private while ad-publish retains every outward-language gat
   }
 });
 
-test('GitHub workflow skills reuse their preflight frontend for every GitHub command', () => {
+test('static contract: GitHub workflow skills reuse their preflight frontend for every GitHub command', () => {
   for (const agent of ['claude-code', 'codex']) {
     for (const skill of ['ad-pr', 'ad-merge']) {
       const body = readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
@@ -1607,7 +1607,7 @@ test('every diff-reading reviewer brief carries the platform-identifier guard, o
   }
 });
 
-test('fresh-context reviewers leave the repository unchanged after verification', () => {
+test('static contract: fresh-context reviewers leave the repository unchanged after verification', () => {
   const briefs = [
     'claude-code/ad-review/agents/fresh-context-reviewer.md',
     'codex/ad-review/agents/fresh-context-reviewer.toml',
@@ -1738,7 +1738,7 @@ test('both audit-group-reviewer briefs forbid mutation and hand the lane trigger
 
 // task-0093: parallel reviewers each running the full suite starved one
 // another (Task 0085); the orchestrator runs the gate once, before dispatch.
-test('ad-audit runs the full gate once and reviewers run only targeted tests, on both hosts', () => {
+test('static contract: ad-audit runs the full gate once and reviewers run only targeted tests, on both hosts', () => {
   for (const rel of ['claude-code/ad-audit/SKILL.md', 'codex/ad-audit/SKILL.md']) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
     assert.match(body, /full quality gate once/i, `${rel} lost the gate-once step`);
@@ -1758,7 +1758,7 @@ test('ad-audit runs the full gate once and reviewers run only targeted tests, on
 // and the corrected Codex structured-question line (RESEARCH-0033 E10).
 const bothHosts = (skill) => [`claude-code/${skill}/SKILL.md`, `codex/${skill}/SKILL.md`];
 
-test('ad-diagnose redacts secrets, minimises the repro, and closes Phase 1 on a run red-capable command, on both hosts', () => {
+test('static contract: ad-diagnose redacts secrets, minimises the repro, and closes Phase 1 on a run red-capable command, on both hosts', () => {
   for (const rel of bothHosts('ad-diagnose')) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
     assert.match(body, /redact/i, `${rel} does not ask to redact secrets`);
@@ -1774,7 +1774,7 @@ test('ad-diagnose redacts secrets, minimises the repro, and closes Phase 1 on a 
   }
 });
 
-test('ad-pr offers Evidence and Merge danger sections and an optional diagram, on both hosts', () => {
+test('static contract: ad-pr offers Evidence and Merge danger sections and an optional diagram, on both hosts', () => {
   for (const rel of bothHosts('ad-pr')) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
     assert.match(body, /## Evidence/, `${rel} has no Evidence section`);
@@ -1797,7 +1797,7 @@ test('ad-tdd names the tautological test, on both hosts', () => {
   }
 });
 
-test('expand–contract is the named exception to vertical slicing, in WORKFLOW and ad-task on both hosts', () => {
+test('static contract: expand–contract is the named exception to vertical slicing, in WORKFLOW and ad-task on both hosts', () => {
   for (const rel of bothHosts('ad-task')) {
     assert.match(
       readFileSync(join(SKILLS_ROOT, rel), 'utf8'),
@@ -1809,7 +1809,7 @@ test('expand–contract is the named exception to vertical slicing, in WORKFLOW 
   assert.match(workflow, /expand–contract/, 'WORKFLOW.md lacks the exception');
 });
 
-test('ad-level-up reads session transcripts and routes mechanical violations to a hook or lint rule, on both hosts', () => {
+test('static contract: ad-level-up reads session transcripts and routes mechanical violations to a hook or lint rule, on both hosts', () => {
   for (const rel of bothHosts('ad-level-up')) {
     const body = readFileSync(join(SKILLS_ROOT, rel), 'utf8');
     assert.match(body, /session transcript/i, `${rel} does not accept transcripts as a source`);
@@ -2246,7 +2246,7 @@ test('tag-like matcher flags tags and allows comparisons (task-0095)', () => {
 
 // --- Review verdict durability (task-0078): the review's outputs, not only its inputs, persist ---
 
-test('ad-review persists the reviewer verdicts beside its handoffs at review time, on both hosts', () => {
+test('static contract: ad-review persists the reviewer verdicts beside its handoffs at review time, on both hosts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const body = readFileSync(join(SKILLS_ROOT, agent, 'ad-review', 'SKILL.md'), 'utf8');
     assert.match(
@@ -2262,7 +2262,7 @@ test('ad-review persists the reviewer verdicts beside its handoffs at review tim
   }
 });
 
-test('ad-prism durable plans carry the research-layer header and dated sources, on both hosts', () => {
+test('static contract: ad-prism durable plans carry the research-layer header and dated sources, on both hosts', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-prism');
     const brief = readFileSync(join(skillDir, 'assets', 'evaluation-brief.md'), 'utf8');

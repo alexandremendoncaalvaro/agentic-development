@@ -1379,7 +1379,7 @@ test('release-plan: a resumed release can approve only its remaining effects', (
   assert.deepEqual(approved.execution, ['npm', 'publish']);
 });
 
-test('release plan authorization composes through release PR and merge skills', () => {
+test('static contract: release plan authorization composes through release PR and merge skills', () => {
   for (const host of ['claude-code', 'codex']) {
     const root = join(__dirname, '..', 'src', 'skills', host);
     const release = readFileSync(join(root, 'ad-release', 'SKILL.md'), 'utf8');

@@ -68,7 +68,7 @@ function readContent(repoRoot, rel, unreadable) {
 }
 
 function parseStatus(body) {
-  const match = body?.match(/^\*{0,2}Status:\*{0,2}[ \t]*([A-Za-z][A-Za-z-]*)/mi);
+  const match = body?.match(/^\*{0,2}Status:\*{0,2}[ \t]*([A-Za-z][A-Za-z-]*)/im);
   return match ? match[1].toLowerCase() : null;
 }
 
@@ -101,8 +101,11 @@ const root = gitRoot(cwd) ?? cwd;
 const unreadable = [];
 const anchors = discoverAnchors(root, unreadable);
 const requestedPath = process.argv[2];
-const verification = requestedPath === undefined
-  ? null
-  : { path: requestedPath, valid: anchors.includes(requestedPath) };
+const verification =
+  requestedPath === undefined
+    ? null
+    : { path: requestedPath, valid: anchors.includes(requestedPath) };
 
-console.log(JSON.stringify({ cwd, gitRoot: gitRoot(cwd), anchors, verification, unreadable }, null, 2));
+console.log(
+  JSON.stringify({ cwd, gitRoot: gitRoot(cwd), anchors, verification, unreadable }, null, 2)
+);

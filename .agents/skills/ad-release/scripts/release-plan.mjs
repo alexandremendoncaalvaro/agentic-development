@@ -1,13 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
-const STAGES = [
-  'local-release',
-  'branch-push',
-  'tag-push',
-  'npm-publish',
-  'github-release',
-];
+const STAGES = ['local-release', 'branch-push', 'tag-push', 'npm-publish', 'github-release'];
 
 function input() {
   const text = readFileSync(0, 'utf8');
@@ -206,8 +200,7 @@ function plan(state) {
     };
   }
 
-  const approvedStage =
-    state.confirmation?.stage === stage && state.confirmation.approved === true;
+  const approvedStage = state.confirmation?.stage === stage && state.confirmation.approved === true;
   return {
     next,
     execution: approvedPlan || approvedStage ? commandFor(stage, state) : null,

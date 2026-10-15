@@ -67,7 +67,7 @@ test('report baseline is a valid official-method analytical template', () => {
   }
 });
 
-test('report workflow owns editorial judgment and composes renderers with their gates', () => {
+test('static contract: report workflow owns editorial judgment and composes renderers with their gates', () => {
   for (const agent of ['claude-code', 'codex']) {
     const root = skillRoot('src/skills', agent);
     const skill = readFileSync(join(root, 'SKILL.md'), 'utf8');
