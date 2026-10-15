@@ -48,7 +48,8 @@ Binding decisions live in [`doc/adr/`](doc/adr/). Do not reinvent.
 bin/agentic.js                       npm bin entry (#!/usr/bin/env node)
 src/index.js                         commander program wiring
 src/commands/<verb>.js               one file per CLI command (init, update, menu)
-src/lib/                             pure helpers (detect.js, install.js)
+src/lib/                             library: pure decision cores, file and git I/O
+                                     through injected paths; never prompts or prints
 src/leak-guard.js                    pre-commit house-IP leak-guard (ADR-0033), wired in lefthook.yml
 src/skills/<agent>/<skill>/          skill source — copied into target's
                                      .claude/skills/ or .agents/skills/ at install
