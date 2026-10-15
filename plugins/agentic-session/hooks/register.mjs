@@ -52,7 +52,7 @@ export function register(on, options) {
   // tells the handoff's file from older ones.
   on('turn.start', async ($, e, next) => {
     const result = await next(e);
-    if (!e.agentId && state.pending && !state.pending.turnId) {
+    if (state.pending && !state.pending.turnId) {
       state.pending = { turnId: e.turnId, since: Date.now() };
     }
     return result;
@@ -347,6 +347,8 @@ function submitHandoff($, state) {
 
 function toggleClearAfter($, state) {
   state.clearAfter = !state.clearAfter;
+  // The latest choice wins, even over a handoff already running.
+  if (!state.clearAfter) state.pending = null;
   $.store
     .set(CLEAR_KEY, state.clearAfter)
     .catch((error) => logFailure($, 'clear-and-continue not saved', error));

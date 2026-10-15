@@ -12,9 +12,9 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   default and remembered across sessions. With it on, **AD handoff** runs
   `/ad-handoff`, then clears the session and submits a prompt that resumes
   from the handoff file that turn wrote. When the handoff turn did not finish,
-  wrote no file or more than one, or the clear or the resume prompt is
-  refused, a toast says so and the session is left as the handoff left it
-  (task-0115).
+  wrote no file or more than one, or the clear is refused, a toast says so and
+  the session is left as the handoff left it; when only the resume prompt is
+  refused, the toast names the handoff file to resume from (task-0115).
 
 ### Changed
 

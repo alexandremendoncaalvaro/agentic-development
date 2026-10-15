@@ -50,12 +50,17 @@ export function handoffDirs(tmpdir) {
   return [...new Set([`${base}/agentic-handoffs`, '/tmp/agentic-handoffs'])];
 }
 
+// ad-handoff names its file <UTC stamp>-<slug>.md. The directory may be the
+// shared /tmp, so any other name is not taken: it would reach the model as
+// the person's own words in the resume prompt.
+const HANDOFF_NAME = /^\d{8}T\d{6}Z-[A-Za-z0-9._-]+\.md$/;
+
 // The handoff files written at or after `sinceMs`, newest first, by name. The
 // caller clears only when exactly one is found: none means the handoff wrote
 // nothing, several mean another session wrote one in the same window.
 export function handoffsSince(entries, sinceMs) {
   return entries
-    .filter((e) => e.kind === 'file' && e.name.endsWith('.md') && e.mtimeMs >= sinceMs)
+    .filter((e) => e.kind === 'file' && HANDOFF_NAME.test(e.name) && e.mtimeMs >= sinceMs)
     .sort((a, b) => b.mtimeMs - a.mtimeMs)
     .map((e) => e.name);
 }

@@ -176,7 +176,12 @@ function loadPlugin(threshold, usage, { script = null, handoffs = null, stored =
       },
       command: {
         register: async (spec) => commands.push(spec),
-        run: async (spec) => ran.push(spec),
+        // The real /clear ends the session before it resolves.
+        run: async (spec) => {
+          ran.push(spec);
+          if (spec.command === 'clear')
+            await hooks['session.end']?.($, { reason: 'clear' }, async () => undefined);
+        },
       },
       prompt: { submit: async (input) => submitted.push(input) },
       ui: {
@@ -269,14 +274,26 @@ async function runTurn(hooks, $, turnId, reason = 'answer') {
 
 test('regression: task-0115 handoffsSince lists handoffs written since a time, newest first', () => {
   const entries = [
-    { name: 'old.md', kind: 'file', mtimeMs: 50 },
-    { name: 'a.md', kind: 'file', mtimeMs: 120 },
-    { name: 'b.md', kind: 'file', mtimeMs: 150 },
-    { name: 'notes.txt', kind: 'file', mtimeMs: 200 },
-    { name: 'dir.md', kind: 'directory', mtimeMs: 300 },
+    { name: '20261015T100000Z-old.md', kind: 'file', mtimeMs: 50 },
+    { name: '20261015T110000Z-a.md', kind: 'file', mtimeMs: 100 },
+    { name: '20261015T120000Z-b.md', kind: 'file', mtimeMs: 150 },
+    { name: '20261015T130000Z-notes.txt', kind: 'file', mtimeMs: 200 },
+    { name: '20261015T140000Z-dir.md', kind: 'dir', mtimeMs: 300 },
   ];
-  assert.deepEqual(handoffsSince(entries, 100), ['b.md', 'a.md']);
+  assert.deepEqual(handoffsSince(entries, 100), ['20261015T120000Z-b.md', '20261015T110000Z-a.md']);
   assert.deepEqual(handoffsSince(entries, 160), []);
+});
+
+test('regression: task-0115 handoffsSince takes only names in the shape ad-handoff writes', () => {
+  const at = (name) => ({ name, kind: 'file', mtimeMs: 200 });
+  const entries = [
+    at('notes.md'),
+    at('20261015T120000Z-ok_slug.v2.md'),
+    at('20261015T120000Z-two words.md'),
+    at('20261015T120000Z-line\nbreak.md'),
+    at('2026-10-15-x.md'),
+  ];
+  assert.deepEqual(handoffsSince(entries, 100), ['20261015T120000Z-ok_slug.v2.md']);
 });
 
 test('regression: task-0115 the resume prompt names the handoff and its Resume protocol', () => {
@@ -287,7 +304,7 @@ test('regression: task-0115 the resume prompt names the handoff and its Resume p
 
 test('regression: task-0115 with the box on, the handoff is followed by a clear and a resume', async () => {
   const { hooks, submitted, ran, $ } = await loadPlugin(1, FULL, {
-    handoffs: () => [{ name: 'h.md', kind: 'file', mtimeMs: Date.now() + 1000 }],
+    handoffs: () => [{ name: '20261015T120000Z-h.md', kind: 'file', mtimeMs: Date.now() + 1000 }],
     stored: { clearAfterHandoff: true },
   });
   await hooks['session.start']($, {}, async () => undefined);
@@ -298,12 +315,12 @@ test('regression: task-0115 with the box on, the handoff is followed by a clear 
   assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
   assert.equal(submitted.length, 1);
   assert.equal(submitted[0].asUser, true);
-  assert.match(submitted[0].text, /\/var\/tmp-x\/agentic-handoffs\/h\.md/);
+  assert.match(submitted[0].text, /\/var\/tmp-x\/agentic-handoffs\/20261015T120000Z-h\.md/);
 });
 
 test('regression: task-0115 with the box off, the button only hands off', async () => {
   const { hooks, submitted, ran, $ } = await loadPlugin(1, FULL, {
-    handoffs: () => [{ name: 'h.md', kind: 'file', mtimeMs: Date.now() + 1000 }],
+    handoffs: () => [{ name: '20261015T120000Z-h.md', kind: 'file', mtimeMs: Date.now() + 1000 }],
   });
   await hooks['session.start']($, {}, async () => undefined);
   const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
@@ -355,7 +372,9 @@ async function pressWithBoxOn(options) {
   await tick();
   return plugin;
 }
-const oneNewFile = () => [{ name: 'h.md', kind: 'file', mtimeMs: Date.now() + 1000 }];
+const oneNewFile = () => [
+  { name: '20261015T120000Z-h.md', kind: 'file', mtimeMs: Date.now() + 1000 },
+];
 
 test('regression: task-0115 a turn already running at the press does not trigger the clear', async () => {
   const plugin = await loadPlugin(1, FULL, {
@@ -396,7 +415,9 @@ test('regression: task-0115 handoffDirs reads TMPDIR, then /tmp, without duplica
 
 test('regression: task-0115 a handoff file older than the handoff turn is not resumed from', async () => {
   const { hooks, ran, toasts, $ } = await pressWithBoxOn({
-    handoffs: () => [{ name: 'old.md', kind: 'file', mtimeMs: Date.now() - 60_000 }],
+    handoffs: () => [
+      { name: '20261015T110000Z-old.md', kind: 'file', mtimeMs: Date.now() - 60_000 },
+    ],
   });
   await runTurn(hooks, $, 't1');
   assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
@@ -406,8 +427,8 @@ test('regression: task-0115 a handoff file older than the handoff turn is not re
 test('regression: task-0115 two new handoff files clear nothing', async () => {
   const { hooks, ran, toasts, submitted, $ } = await pressWithBoxOn({
     handoffs: () => [
-      { name: 'mine.md', kind: 'file', mtimeMs: Date.now() + 1000 },
-      { name: 'other.md', kind: 'file', mtimeMs: Date.now() + 2000 },
+      { name: '20261015T120000Z-mine.md', kind: 'file', mtimeMs: Date.now() + 1000 },
+      { name: '20261015T120001Z-other.md', kind: 'file', mtimeMs: Date.now() + 2000 },
     ],
   });
   await runTurn(hooks, $, 't1');
@@ -426,7 +447,7 @@ test('regression: task-0115 a refused clear sends no resume and names the handof
   await runTurn(hooks, $, 't1');
   assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
   assert.deepEqual(submitted, []);
-  assert.match(toasts[0], /not cleared.*\/var\/tmp-x\/agentic-handoffs\/h\.md/);
+  assert.match(toasts[0], /not cleared.*\/var\/tmp-x\/agentic-handoffs\/20261015T120000Z-h\.md/);
   assert.match(logs.at(-1).text, /clear refused/);
 });
 
@@ -437,7 +458,7 @@ test('regression: task-0115 a refused resume prompt says the session was cleared
   };
   await runTurn(hooks, $, 't1');
   assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
-  assert.match(toasts[0], /cleared, but the resume prompt was not sent.*h\.md/);
+  assert.match(toasts[0], /cleared, but the resume prompt was not sent.*-h\.md/);
   assert.match(logs.at(-1).text, /submit refused/);
 });
 
@@ -468,6 +489,34 @@ test('regression: task-0115 a session that ends before the handoff turn arms no 
   await hooks['session.end']($, { reason: 'clear' }, async () => undefined);
   await runTurn(hooks, $, 't1');
   assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+});
+
+test('regression: task-0115 turning the box off after the press clears nothing', async () => {
+  const { hooks, ran, toasts, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'clear-after'
+  );
+  await tick();
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(toasts, []);
+});
+
+test('regression: task-0115 a handoff written in the same millisecond the turn starts counts', async () => {
+  let since = null;
+  const { hooks, ran, $ } = await pressWithBoxOn({
+    handoffs: () => [{ name: '20261015T120000Z-h.md', kind: 'file', mtimeMs: since }],
+  });
+  const realNow = Date.now;
+  Date.now = () => 1_000_000;
+  try {
+    since = 1_000_000;
+    await runTurn(hooks, $, 't1');
+  } finally {
+    Date.now = realNow;
+  }
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
 });
 
 test('regression: task-0115 an unreadable store leaves the box off', async () => {

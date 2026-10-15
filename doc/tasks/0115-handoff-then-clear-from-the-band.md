@@ -36,7 +36,7 @@ the plugin can submit after a clear, so a spike settles that before code.
 - [x] Spike: from a plugin, `$.command.run({ command: 'clear' })` and a `$.prompt.submit` after it; record the result.
 - [x] Default threshold 60 to 80 (`band.mjs`, `plugin.json`).
 - [x] Checkbox and flow (`register.mjs`, pure helpers in `band.mjs`), test first.
-- [ ] ADR-0088 addendum; `/ad-review`; owner live check; PR with auto-merge.
+- [ ] ADR-0088 addendum; `/ad-review`; owner live check; PR with auto-merge. (Addendum and review done; the live check and the PR remain.)
 
 ## Notes
 
@@ -60,11 +60,23 @@ Merged `origin/main` (release 1.6.0) instead of rebasing: one conflict pass, no 
 
 Eight tests added for the paths the WIP left uncovered: the directory list, a file older than the handoff turn, two new files, a refused clear, a refused resume prompt, a handoff command that could not start, a session that ends before the handoff turn, and an unreadable store. The code for those paths was already in the WIP commit, so each was shown to bite by a mutation instead: eight mutations (no dedupe, no time filter, no several-files check, no return after a refused clear, no reset when the command fails, no reset on session end, the store defaulting on, no turn-reason check) each turned its test red; 54 of 54 green after. "The band says so" is a toast from the band's plugin, the same channel task 0116 uses for a press that cannot start; ADR-0088's addendum records it.
 
+### 2026-10-15 — reviewed
+
+Fresh-context review, both axes, at 9051cf9: no Blocker on either axis.
+
+- Standards Concern, a stale arm lets an unrelated turn claim the clear: rejected. The claiming turn must end with an answer and write exactly one new handoff file in `ad-handoff`'s name shape, so a clear only follows a handoff written in that turn, which is what the box asks for; a press whose command cannot start disarms (tested).
+- Standards Concern, the box turned off after the press still clears: fixed, turning it off disarms; test first.
+- Standards Concern, any `.md` in a shared `/tmp` reaches the model as the person's words: fixed, only names shaped `<UTC stamp>-<slug>.md` count; test first.
+- Standards Concern, POSIX-only paths: recorded in the ADR-0088 2026-10-15 addendum; elsewhere the lookup finds nothing and clears nothing, the same limit as `ad-handoff`'s own `${TMPDIR:-/tmp}`.
+- Standards Concern, the fake engine is kinder than the real one: the fake `/clear` now fires `session.end` before it resolves, and a test pins a file stamped in the turn's own start millisecond.
+- Standards Notes: the 0116 change moved to a 2026-10-15 addendum; the dead `agentId` check on `turn.start` dropped; per-session reading of the box recorded here: a toggle in one session reaches another at its next start.
+- Spec Concern, a refused resume cannot leave the session as it was after the handoff: by construction the clear already ran; the toast names the handoff file to resume from, recorded in the addendum and the changelog.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [ ] No orphan `TODO`/`FIXME` introduced
 - [ ] Status updated to `done` and Notes log closes the task
