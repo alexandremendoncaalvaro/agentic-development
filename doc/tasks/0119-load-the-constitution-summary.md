@@ -1,6 +1,6 @@
 # Task `0119`: Load the Constitution's summary, not its full text
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-15
 **Scope ref:** doc/adr/0092-load-the-constitution-summary-not-its-full-text.md
 **Evidence ref:** doc/research/0044-ground-review-economy-and-context-budget.md
@@ -15,16 +15,24 @@ The kit audit of 2026-10-15 measured about 104 KB of always-loaded instructions 
 
 ## Acceptance Criteria
 
-- [ ] `configureGlobalConstitution` writes the TL;DR of the kit's `WORKFLOW.md` inline with a digest line and the full text's path, for both hosts.
-- [ ] It replaces the earlier import-only block and an unedited managed block, and still skips a hand-edited one.
+- [x] `configureGlobalConstitution` writes the TL;DR of the kit's `WORKFLOW.md` inline with a digest line and the full text's path, for both hosts.
+- [x] It replaces the earlier import-only block and an unedited managed block, and still skips a hand-edited one.
 - [ ] `npm run verify` green.
 - [ ] Machine: `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` carry the new block; Codex's `@` lines become an explicit read instruction; the company-repository composition moves to its own file, read only in that repository; the duplicated memory entries are removed. The always-loaded total is measured before and after.
 
 ## Plan
 
-- [ ] Tests first in `test/global-rules.test.js`; then `src/lib/global-rules.js`; `test/init.test.js` expectation.
+- [x] Tests first in `test/global-rules.test.js`; then `src/lib/global-rules.js`; `test/init.test.js` expectation.
 - [ ] After merge: apply on this machine, measure, report the diff of the owner's files for his commit.
 
 ## Notes
 
 Append-only log. Date each entry. Never rewrite past entries.
+
+### 2026-10-15 — plan approved, block built
+
+The owner approved this plan and ADR-0092 on 2026-10-15. Three tests in
+`test/global-rules.test.js` went red (the block still imported the whole
+file), then green with `configureGlobalConstitution` taking a `kitRoot`
+seam: the TL;DR inline, a digest line, the earlier import block and an
+unedited summary block refreshed, a hand-edited block skipped.

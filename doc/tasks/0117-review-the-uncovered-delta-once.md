@@ -1,6 +1,6 @@
 # Task `0117`: Review the uncovered delta once, and audit by risk
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-15
 **Scope ref:** doc/adr/0091-review-the-uncovered-delta-once.md
 **Evidence ref:** doc/research/0044-ground-review-economy-and-context-budget.md
@@ -36,3 +36,8 @@ The kit audit of 2026-10-15 scored review economy 1.6 of 4: no skill reads the c
 ## Notes
 
 Append-only log. Date each entry. Never rewrite past entries.
+
+### 2026-10-15 — plan approved
+
+The owner approved this plan and accepted ADR-0091 on 2026-10-15, with the
+task 0110 shadow window restarting when this change lands.

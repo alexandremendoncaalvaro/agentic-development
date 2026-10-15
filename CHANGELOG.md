@@ -6,6 +6,15 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- The host-global rules file (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`)
+  carries only the TL;DR of `WORKFLOW.md` inline, with the full text's path,
+  instead of importing the whole file: about 49 KB less in every session, and
+  Codex, which expands no import, now receives it. An earlier import block or
+  an unedited summary block is refreshed on `init` and `update`; a hand-edited
+  one is kept and reported (task-0119, ADR-0092).
+
 ### Fixed
 
 - The `agentic-session` band's **AD handoff** button runs `/ad-handoff`; it
