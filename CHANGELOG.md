@@ -8,6 +8,13 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
+- `ad-drift` reports glossary drift: aliases `CONTEXT.md` says to avoid that
+  tracked code still uses, and canonical terms nothing uses, reading the
+  per-context files of a `CONTEXT-MAP.md`; advisory, judged per hit
+  (task-0125).
+
+### Added
+
 - `ad-hooks` ships a command guard on `PreToolUse` (both hosts) that denies
   killing processes by name and a `git commit` chained after a check with `;`
   or a newline, naming the fix in the reason; an exploratory replay of 65,432

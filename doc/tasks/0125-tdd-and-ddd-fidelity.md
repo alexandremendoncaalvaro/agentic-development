@@ -16,7 +16,7 @@
 ## Acceptance Criteria
 
 - [x] `ad-tdd` (both hosts) and WORKFLOW §16 refactor inside each cycle, treat duplication as a hint, and add discovered tests to the list (tests); the "survive renames" line and the `_Avoid_` attribution are corrected.
-- [ ] `ad-drift` reports glossary drift: multi-word or backticked aliases used in tracked code and canonical terms used nowhere, reading per-context files of a CONTEXT-MAP (tests through the CLI); it stays advisory.
+- [x] `ad-drift` reports glossary drift: multi-word or backticked aliases used in tracked code and canonical terms used nowhere, reading per-context files of a CONTEXT-MAP (tests through the CLI); it stays advisory.
 - [x] Tests that only match a skill's text say so in their names, and GUIDELINES names that tier.
 - [x] `ad-domain` drops the alphabetical rule and allows a lead sentence plus up to two sentences of scope; the four longest CONTEXT.md definitions are trimmed.
 
@@ -24,7 +24,7 @@
 
 - [x] PR: test renames.
 - [ ] PR (with the catalog text diet): TDD and glossary text.
-- [ ] PR: glossary drift check.
+- [x] PR: glossary drift check.
 
 ## Notes
 
@@ -61,3 +61,16 @@ The Codex `ad-tdd` gained the "rename the tests with the code" line, and both
 hosts now say the list grows as cycles reveal behaviors, matching §16. Five
 definitions were trimmed against the four the criterion names; the fifth
 ("Two-axis review") was the longest of all and is kept trimmed.
+
+### 2026-10-15 — glossary drift check
+
+Four CLI tests went red (no `glossary` key), then green: aliases in tracked
+non-Markdown files (multi-word, or backticked when single-word; spaced,
+kebab, snake and joined spellings), canonical terms no tracked file uses
+outside the glossary, per-context files a CONTEXT-MAP links, and the empty
+and outside-git cases. On this repository the first run reported 35 alias
+hits, mostly names quoted inside the explanatory parentheses of `_Avoid_`
+lines; a fifth fixture pinned that only the items outside the parentheses
+are aliases, which left 18 hits and one unused term (Evaluation domain
+adapter). The check stays advisory: `ad-drift` (both hosts) reads each hit
+and reports only a concept named by the avoided alias.
