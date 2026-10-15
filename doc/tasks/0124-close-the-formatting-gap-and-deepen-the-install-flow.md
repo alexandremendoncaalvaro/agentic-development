@@ -55,3 +55,11 @@ unchanged. One difference by design: an action type init did not know now
 prints `?` instead of `undefined`, as update already did. GUIDELINES §1.1,
 §2.4 and §9.3, ARCHITECTURE and AGENTS now say the library's decision cores
 are pure and its file and git I/O goes through injected paths.
+
+### 2026-10-15 — review of 2a7876f
+
+Two-axis review, no blocker. Concern, the new prompt split a doc comment from
+`trackedRootDocSkipNotice`: fixed, and that comment no longer says the guard
+stays in each command. Notes accepted: init prints `?` for an unknown action
+type, as update does; the existing exclude test adapted to the injected
+`ask` and `warn`.
