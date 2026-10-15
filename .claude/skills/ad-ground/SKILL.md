@@ -68,6 +68,8 @@ When the host exposes `AskUserQuestion`, render the checkpoint as a structured m
 
 ## Step 5 — Persist the evidence receipt
 
+Where the record goes (ADR-0097): run `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` first. Without a `process.records.research` entry, keep `doc/research/`. With `repo-path` and a `path`, that path replaces `doc/research` everywhere below: in the numbering command, the record path and the validate command, which also takes `--dir <path>`. With `issue-comment`, draft the record in the OS temporary directory, validate it with `--draft`, show it, and post it on the work item only after the owner approves (ADR-0085); then delete the draft. With `external`, show the `handoff` text and write nothing.
+
 Chat citations are not an audit trail. Before the decision directs a non-trivial repository change, write a versioned ground record under `doc/research/`, with a `**Stakes:**` line. A low and reversible record is the short record of quick mode: sources and claims with their provenance, grades optional (a grade, once given, needs its tier); any other stake grades every claim from its tier. It is a receipt for an already-defined implementation path, not an `ad-research` study answering an open question; both share the directory and monotonic number ledger.
 
 When this pass is the Acquire phase of `/ad-research`, the study is already the durable evidence artifact: put the same claim-to-source map in that study and do **not** create a duplicate ground receipt.
