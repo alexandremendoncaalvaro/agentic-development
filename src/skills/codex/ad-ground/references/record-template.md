@@ -4,6 +4,7 @@
 **Decision:** <the implementation path selected>
 **Decision ref:** <task, spec, ADR, or other durable project artifact>
 **Confidence:** <Strong | Conditional | Insufficient>
+**Stakes:** <low | medium | high> × <reversible | irreversible>
 
 ## Decision and confidence
 
@@ -13,7 +14,9 @@
 
 ### E1 — <load-bearing claim>
 
-**Strength:** <High | Medium | Low | Very-low>
+**Tier:** <Measurement | Primary | Secondary | Single | Opinion>
+**Strength:** <High | Medium | Low | Very-low | design choice>
+**Upgrade:** <only when the strength is above the tier's start: the reason>
 **Provenance:** <A1, B1, C1, D1>
 
 <Why those sources support the claim; contested positions stay side by side.>

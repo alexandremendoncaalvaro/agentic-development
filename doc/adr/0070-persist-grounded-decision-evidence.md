@@ -4,6 +4,7 @@
 **Date:** 2026-08-12
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0060
+**Amended by:** ADR-0095 — a record that names low and reversible stakes may leave claims ungraded, and the validator applies tier rules to a record with stakes.
 
 ## Context
 

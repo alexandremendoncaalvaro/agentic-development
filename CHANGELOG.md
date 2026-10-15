@@ -32,6 +32,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   duplication as a hint, and add discovered tests to the list, as in Kent
   Beck's Canon TDD; `ad-domain` groups terms by relation instead of
   alphabetically and allows a lead sentence plus two of scope (task-0125).
+- Evidence is graded from a starting tier, after GRADE: Measurement starts
+  High, Primary Medium, Secondary and Single Low, Opinion Very-low; five
+  factors lower a claim and a raise needs a stated reason; a normative claim
+  is a design choice. A ground record names its stakes, and the validator
+  then requires each claim's tier and an `Upgrade:` line for a grade above
+  its start; a low and reversible record may leave claims ungraded. Records
+  without stakes keep the earlier rules and get a warning. `ad-research`
+  gains an Assess step (task-0123, ADR-0095).
 
 ## [1.5.0] - 2026-10-15
 
