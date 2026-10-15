@@ -108,3 +108,23 @@ pass on `opus` with rules and files reversed; findings, union of both:
   every Note; the verdict files hold the rest.
 - Red-before evidence for the ancestry test: `not ok 70` was observed before
   `isAncestor` existed, in this session's run.
+
+### 2026-10-15 — re-audit of b51a0be and dispositions
+
+A delta review of 7a87be8..b51a0be found nothing on the Standards axis. The
+CV re-audit of d1cfc23..b51a0be ran on both models: six prior findings
+resolved; both passes found ADR-0092 still stating the Codex confirmation as
+observed.
+
+- critical, fixed: ADR-0092 now says task 0119 requires that Codex session.
+- minor, fixed: GROUND-0044 C7 carries the executable scan and its real
+  filter (meta files modified before 2026-10-15); the command reproduces
+  133 `claude-sonnet-5-5`, 111 without override, 22 `sonnet`.
+- minor, fixed: the red-before claim for the ancestry test is now retained.
+  Removing the `isAncestor` clause turned it red (`not ok 1`, 0 pass, 1 fail)
+  and restoring it turned it green, at b51a0be;
+  log `.agentic/reviews/20261015T140000Z-falsify-ancestry.log`, tree clean
+  after.
+- minor, rejected: the projection's cross-record example list
+  "(0035, 0065, 0088)" is unchanged from `origin/main` and is not introduced
+  by this branch; the second pass read the four-record count as correct.

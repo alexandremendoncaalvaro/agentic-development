@@ -21,7 +21,7 @@ The installer writes a managed block into each host's global rules file that imp
 Positive:
 
 - About 49 KB less instruction text in every Claude Code session (55,072 bytes of `WORKFLOW.md` replaced by its 5,685-byte TL;DR).
-- The Codex global file holds the Constitution's summary as text instead of an import line Codex cannot expand, so a Codex session gains about 5.7 KB it never received before; a Codex session observed after the change confirms it (task 0119).
+- The Codex global file holds the Constitution's summary as text instead of an import line Codex cannot expand, so a Codex session is expected to gain about 5.7 KB it never received before; task 0119 requires a Codex session started after the change to confirm it.
 - A kit update refreshes the summary without touching user-owned text.
 
 Negative:
