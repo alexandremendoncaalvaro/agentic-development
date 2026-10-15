@@ -67,7 +67,7 @@ Breaking changes: add `!` after the type/scope and a `BREAKING CHANGE:` footer p
 
 Cited records. When the draft cites a record (`GROUND-`, `RESEARCH-`, `PRISM-`, `ADR-`, `task-`/`Task`, `Spec`/`spec-` plus four digits), pipe the draft into the read-only probe from the repository root:
 
-When `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` configures a `path` for a record kind, pass `--dir <kind>=<path>` for it (kinds `research`, `adr`, `task`, `spec`).
+When `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` configures a `path` for a record kind, pass `--dir <kind>=<path>` for it (kinds `research`, `adr`, `task`, `spec`). A date-named ADR has no number, so a citation such as ADR-0001 cannot resolve to it; cite it by its path.
 
 ```
 node .agents/skills/ad-commit/scripts/cited-records.mjs - <<'EOF'

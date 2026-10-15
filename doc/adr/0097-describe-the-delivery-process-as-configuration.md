@@ -48,7 +48,8 @@ should serve.
 6. Record writers honor `process.records`. `validate-record.mjs` takes `--dir <path>`
    for a configured research directory and `--draft` to check a record kept
    outside the repository before it is posted as an issue comment;
-   `cited-records.mjs` takes `--dir <kind>=<path>`; `ad-adr` follows the
+   `cited-records.mjs` takes `--dir <kind>=<path>`; the artifact gate reads the
+   configured research directory; `ad-adr` follows the
    configured directory and, with `naming: date`, names the file by the date
    with the separator the directory's existing records use.
 
@@ -62,9 +63,10 @@ Positive:
 Negative:
 
 - Stages come only from GitHub labels; another tracker needs a new source type.
-- The artifact gate validates records under `doc/research/` only; a record in a
-  configured directory is checked when its skill runs the validator, not on
-  write.
+- The artifact gate follows a configured research directory for `GROUND-`
+  records only; a `PRISM-` plan is gated only under `doc/research/`.
+- A date-named ADR has no number, so a commit cites it by path, not by
+  `ADR-NNNN`.
 - A misconfigured block is reported and ignored with the rest of the
   configuration, falling back to the repository baseline, as ADR-0079 already
   does for invalid configuration.

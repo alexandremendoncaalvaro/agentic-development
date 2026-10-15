@@ -152,11 +152,16 @@ function readMessage(source) {
 
 const [messageSource, ...options] = process.argv.slice(2);
 for (let index = 0; index < options.length; index += 1) {
-  const [kind, dir] = options[index] === '--dir' ? (options[(index += 1)] ?? '').split('=') : [];
-  const path = (dir ?? '').replaceAll('\\', '/').replace(/\/+$/, '');
+  const option = options[index] === '--dir' ? (options[(index += 1)] ?? '') : '';
+  const split = option.indexOf('=');
+  const kind = split === -1 ? '' : option.slice(0, split);
+  const path = (split === -1 ? '' : option.slice(split + 1))
+    .replaceAll('\\', '/')
+    .replace(/\/+$/, '');
   if (
-    !(kind in directories) ||
+    !Object.hasOwn(directories, kind) ||
     path === '' ||
+    path.includes('=') ||
     /^([A-Za-z]:)?\//.test(path) ||
     path.split('/').includes('..')
   ) {

@@ -76,3 +76,19 @@ after the owner approves. Decided here, from the slice 1 review: `path` is
 read only for `repo-path`. The artifact gate still validates on write only
 under `doc/research/`, a limit ADR-0097 now states. ADR-0097 amends ADR-0070
 and ADR-0060 for the record locations.
+
+### 2026-10-15 — review of 8a2d7bd
+
+Spec found a blocker: the criterion was ticked although the artifact gate
+still governed only `doc/research/`. Fixed rather than descoped: the gate
+reads the configured research directory from the project layer, or the
+machine entry matching the `origin` remote, and validates `GROUND-` records
+there with `--dir`; a malformed or unsafe setting keeps the default; two
+tests went red, then green. Also fixed: `--dir` in `cited-records` splits on
+the first `=`, refuses a path with `=` and an inherited name such as
+`toString`; the `ad-ground` text says the configured path replaces
+`doc/research` in the numbering, record and validate commands; the Codex
+`ad-adr` reads the process before numbering. Recorded as limits in ADR-0097:
+a `PRISM-` plan is gated only under `doc/research/`, and a date-named ADR is
+cited by path. Note accepted: `--draft` reads any path the caller names; it
+only reports validation errors, never the content.

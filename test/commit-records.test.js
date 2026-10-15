@@ -369,12 +369,14 @@ test('cited-records: --dir points a record kind at its configured directory', ()
     assert.deepEqual(JSON.parse(result.stdout).records, [
       { id: 'GROUND-0007', path: 'docs/evidence/0007-ground-moved.md', state: 'in-head' },
     ]);
-    const bad = spawnSync(process.execPath, [SCRIPT, '-', '--dir', 'research=../x'], {
-      cwd: dir,
-      input: 'x',
-      encoding: 'utf8',
-    });
-    assert.equal(bad.status, 1);
-    assert.match(bad.stdout, /--dir needs <kind>=<relative directory>/);
+    for (const option of ['research=../x', 'adr=a=b', 'toString=x']) {
+      const bad = spawnSync(process.execPath, [SCRIPT, '-', '--dir', option], {
+        cwd: dir,
+        input: 'x',
+        encoding: 'utf8',
+      });
+      assert.equal(bad.status, 1, option);
+      assert.match(bad.stdout, /--dir needs <kind>=<relative directory>/);
+    }
   });
 });

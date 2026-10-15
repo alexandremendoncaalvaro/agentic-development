@@ -22,7 +22,12 @@
  *   - Owner map: a `doc/research/` file is routed by its first heading —
  *     `GROUND-` to ad-ground's validate-record.mjs, `PRISM-` to ad-prism's
  *     validate-plan.mjs; anything else, including a `RESEARCH-` study, is
- *     unowned and silent (GROUND-0027 E4).
+ *     unowned and silent (GROUND-0027 E4). When a delivery process
+ *     configures another research directory (`process.records.research`
+ *     with `repo-path` in `.agentic/project-sources.json`, project layer or
+ *     the machine entry matching the `origin` remote; ADR-0097), that
+ *     directory replaces `doc/research/` and only `GROUND-` records are
+ *     routed there, validated with `--dir`.
  *   - Terminal states: `validator-failed` and `runtime-unavailable` exit 2
  *     with stderr; `validator-passed` exits 0 silently; an unowned or
  *     malformed event exits 0 silently and leaves no evidence.
@@ -40,7 +45,7 @@
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync, rmdirSync, statSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { tmpdir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -59,7 +64,65 @@ const OWNERS = [
   },
 ];
 
-const GOVERNED_DIR = join('doc', 'research');
+const DEFAULT_RESEARCH_DIR = 'doc/research';
+
+function readJson(path) {
+  try {
+    return JSON.parse(readFileSync(path, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function originRemotes(cwd) {
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  const run = spawnSync('git', ['remote', 'get-url', '--all', 'origin'], {
+    cwd,
+    env,
+    encoding: 'utf8',
+  });
+  if (run.status !== 0) return [];
+  return run.stdout
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function configuredResearchPath(deliveryProcess) {
+  const record = deliveryProcess?.records?.research;
+  if (record?.destination !== 'repo-path' || typeof record.path !== 'string') return null;
+  const path = record.path.replaceAll('\\', '/').replace(/\/+$/, '');
+  if (!path || /^([A-Za-z]:)?\//.test(path) || path.split('/').includes('..')) return null;
+  return path;
+}
+
+/**
+ * The research directory records are governed in: the configured one, else
+ * `doc/research`. A project file shadows the machine layer; a missing,
+ * malformed or unsafe setting keeps the default, since the gate fails open
+ * on configuration and `ad-project-state` reports configuration errors.
+ */
+export function researchDirectory(cwd, env) {
+  const projectFile = join(cwd, '.agentic', 'project-sources.json');
+  if (existsSync(projectFile)) {
+    const project = readJson(projectFile);
+    return (
+      (project?.schemaVersion === 2 && configuredResearchPath(project.process)) ||
+      DEFAULT_RESEARCH_DIR
+    );
+  }
+  const machine = readJson(
+    env.AGENTIC_PROJECT_SOURCES_FILE ||
+      join(env.HOME || env.USERPROFILE || homedir(), '.agentic', 'project-sources.json')
+  );
+  if (machine?.schemaVersion !== 2 || !Array.isArray(machine.projects)) return DEFAULT_RESEARCH_DIR;
+  const remotes = originRemotes(cwd);
+  const entry = machine.projects.find((project) => remotes.includes(project?.match?.remote));
+  return configuredResearchPath(entry?.process) || DEFAULT_RESEARCH_DIR;
+}
 const PATCH_HEADER = /^\*\*\* (Add File|Update File|Move to): (.+)$/;
 
 /** Sibling-skill root: `<root>/ad-hooks/scripts/artifact-gate.mjs` → `<root>`. */
@@ -98,10 +161,11 @@ export function recoverPaths(event, cwd) {
  * back marked `unreadable` so the gate reports a runtime failure instead of a
  * silent pass (GUIDELINES: never swallow a content-read failure).
  */
-export function resolveOwner(absolutePath, cwd) {
+export function resolveOwner(absolutePath, cwd, directory = DEFAULT_RESEARCH_DIR) {
   const rel = relative(cwd, absolutePath);
   if (escapesRepository(rel)) return null;
-  if (!rel.startsWith(`${GOVERNED_DIR}${sep}`) || !rel.endsWith('.md')) return null;
+  const governed = directory.split('/').join(sep);
+  if (!rel.startsWith(`${governed}${sep}`) || !rel.endsWith('.md')) return null;
   const path = rel.split(sep).join('/');
   let head;
   try {
@@ -111,8 +175,12 @@ export function resolveOwner(absolutePath, cwd) {
     if (error.code === 'ENOENT' || error.code === 'ENOTDIR') return null;
     return { id: 'unknown', validator: null, path, unreadable: error.code ?? 'unknown' };
   }
-  const owner = OWNERS.find((candidate) => candidate.heading.test(head));
-  return owner ? { ...owner, path } : null;
+  const configured = directory !== DEFAULT_RESEARCH_DIR;
+  const owner = OWNERS.find(
+    (candidate) => candidate.heading.test(head) && (!configured || candidate.id === 'ground-record')
+  );
+  if (!owner) return null;
+  return configured ? { ...owner, path, args: ['--dir', directory] } : { ...owner, path };
 }
 
 /** Run the owning validator; classify its outcome without interpreting it. */
@@ -125,7 +193,8 @@ export function runValidator({ owner, root, cwd }) {
     };
   }
   const validator = join(root, owner.validator);
-  const reproduction = `node ${relativeOrAbsolute(validator, cwd)} ${owner.path}`;
+  const args = [owner.path, ...(owner.args ?? [])];
+  const reproduction = `node ${relativeOrAbsolute(validator, cwd)} ${args.join(' ')}`;
   if (!existsSync(validator)) {
     return {
       state: 'runtime-unavailable',
@@ -133,7 +202,7 @@ export function runValidator({ owner, root, cwd }) {
       reproduction,
     };
   }
-  const run = spawnSync(process.execPath, [validator, owner.path], { cwd, encoding: 'utf8' });
+  const run = spawnSync(process.execPath, [validator, ...args], { cwd, encoding: 'utf8' });
   if (run.error) {
     return { state: 'runtime-unavailable', output: String(run.error.message), reproduction };
   }
@@ -313,8 +382,10 @@ function main() {
   const evidenceFile = evidencePathFor(event.session_id, process.env);
   let exitCode = 0;
 
-  for (const absolutePath of recoverPaths(event, cwd)) {
-    const owner = resolveOwner(absolutePath, cwd);
+  const paths = recoverPaths(event, cwd);
+  const directory = paths.length > 0 ? researchDirectory(cwd, process.env) : DEFAULT_RESEARCH_DIR;
+  for (const absolutePath of paths) {
+    const owner = resolveOwner(absolutePath, cwd, directory);
     if (!owner) continue;
     const result = runValidator({ owner, root, cwd });
     let surfaced = surfacedText(result, owner);
