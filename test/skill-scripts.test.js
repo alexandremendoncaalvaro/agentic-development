@@ -5161,3 +5161,156 @@ test('regression: task-0100 project-state reports current, detached and non-git 
     rmSync(plain, { recursive: true, force: true });
   }
 });
+
+// Task 0125: glossary drift — aliases a CONTEXT.md says to avoid that tracked
+// code still uses, and canonical terms used nowhere. Advisory facts only.
+function glossaryRepo(files, tracked = Object.keys(files)) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-glossary-'));
+  const git = gitInit(dir);
+  for (const [path, text] of Object.entries(files)) {
+    mkdirSync(join(dir, dirname(path)), { recursive: true });
+    writeFileSync(join(dir, path), text);
+  }
+  if (tracked.length > 0) git('add', '--', ...tracked);
+  return dir;
+}
+
+const GLOSSARY = `# Glossary
+
+## Language
+
+### Personal voice
+
+**Definition:** the owner's stable signature.
+
+_Avoid_: "team voice" (other people's writing, not \`readFile\`); "persona" (performed identity); \`tone\` (a situational adjustment).
+
+### Accommodation corpus
+
+**Definition:** messages from the target community.
+
+_Avoid_: "style target" (copying phrasing).
+`;
+
+test('drift-scan: glossary reports multi-word and backticked aliases in tracked code, not single-word prose aliases', () => {
+  const dir = glossaryRepo(
+    {
+      'CONTEXT.md': GLOSSARY,
+      'src/voice.js': 'export const teamVoice = readFile;\nconst persona = 2;\nconst tone = 3;\n',
+      'src/other.py': 'TEAM_VOICE = 1\n',
+      'README.md': 'The team voice is described here.\n',
+      'scratch.js': 'const styleTarget = 1;\n',
+    },
+    ['CONTEXT.md', 'src/voice.js', 'src/other.py', 'README.md']
+  );
+  try {
+    const { glossary } = runScan(dir);
+    assert.deepEqual(glossary.contexts, ['CONTEXT.md']);
+    assert.deepEqual(
+      glossary.aliasesInCode.map(({ term, alias, files }) => ({ term, alias, files })),
+      [
+        { term: 'Personal voice', alias: 'team voice', files: ['src/other.py', 'src/voice.js'] },
+        { term: 'Personal voice', alias: 'tone', files: ['src/voice.js'] },
+      ]
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary lists canonical terms no tracked file uses outside the glossary', () => {
+  const dir = glossaryRepo({
+    'CONTEXT.md': GLOSSARY,
+    'doc/voice.md': 'A personal voice adapts to its audience.\n',
+  });
+  try {
+    const { glossary } = runScan(dir);
+    assert.deepEqual(glossary.unusedTerms, [
+      { context: 'CONTEXT.md', term: 'Accommodation corpus' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary reads the per-context files a CONTEXT-MAP links', () => {
+  const dir = glossaryRepo({
+    'CONTEXT-MAP.md':
+      '# Context map\n\n- [Voice](voice/CONTEXT.md#terms)\n- [Billing](billing/CONTEXT.md)\n',
+    'voice/CONTEXT.md': GLOSSARY,
+    'billing/CONTEXT.md':
+      '# Billing\n\n### Invoice run\n\n**Definition:** a batch.\n\n_Avoid_: "bill batch".\n',
+    'billing/run.js': 'const billBatch = [];\nexport const invoiceRun = billBatch;\n',
+  });
+  try {
+    const { glossary } = runScan(dir);
+    assert.deepEqual(glossary.contexts, ['billing/CONTEXT.md', 'voice/CONTEXT.md']);
+    assert.deepEqual(
+      glossary.aliasesInCode.map(({ context, alias }) => ({ context, alias })),
+      [{ context: 'billing/CONTEXT.md', alias: 'bill batch' }]
+    );
+    assert.deepEqual(
+      glossary.unusedTerms.map(({ context, term }) => ({ context, term })),
+      [
+        { context: 'voice/CONTEXT.md', term: 'Personal voice' },
+        { context: 'voice/CONTEXT.md', term: 'Accommodation corpus' },
+      ]
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary is empty without a CONTEXT.md and says why outside a git repository', () => {
+  const plain = mkdtempSync(join(tmpdir(), 'agentic-drift-glossary-'));
+  const repo = glossaryRepo({ 'src/a.js': 'x\n' });
+  try {
+    writeFileSync(join(plain, 'CONTEXT.md'), GLOSSARY);
+    const outside = runScan(plain).glossary;
+    assert.equal(outside.skipped, 'not a git repository');
+    const none = runScan(repo).glossary;
+    assert.deepEqual(none, { contexts: [], aliasesInCode: [], unusedTerms: [] });
+  } finally {
+    rmSync(plain, { recursive: true, force: true });
+    rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary resolves map link forms to tracked files only, and falls back to the root glossary with the unresolved links named', () => {
+  const dir = glossaryRepo({
+    'CONTEXT-MAP.md':
+      '# Map\n\n- [A](<a/CONTEXT.md> "Voice")\n- [B](b\\CONTEXT.md)\n- [Out](../outside/CONTEXT.md)\n',
+    'a/CONTEXT.md': GLOSSARY,
+    'b/CONTEXT.md': '# B\n\n### Invoice run\n\n**Definition:** a batch.\n',
+  });
+  const fallback = glossaryRepo({
+    'CONTEXT-MAP.md': '# Map\n\n- [Gone](gone/CONTEXT.md)\n',
+    'CONTEXT.md': GLOSSARY,
+  });
+  try {
+    const resolved = runScan(dir).glossary;
+    assert.deepEqual(resolved.contexts, ['a/CONTEXT.md', 'b/CONTEXT.md']);
+    assert.deepEqual(resolved.unresolvedLinks, ['../outside/CONTEXT.md']);
+    const fell = runScan(fallback).glossary;
+    assert.deepEqual(fell.contexts, ['CONTEXT.md']);
+    assert.deepEqual(fell.unresolvedLinks, ['gone/CONTEXT.md']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+    rmSync(fallback, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary counts byte-identical copies of a file once', () => {
+  const dir = glossaryRepo({
+    'CONTEXT.md': GLOSSARY,
+    'src/voice.js': 'export const teamVoice = 1;\n',
+    'mirror/voice.js': 'export const teamVoice = 1;\n',
+  });
+  try {
+    const [hit] = runScan(dir).glossary.aliasesInCode;
+    assert.equal(hit.count, 1);
+    assert.deepEqual(hit.files, ['mirror/voice.js']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
