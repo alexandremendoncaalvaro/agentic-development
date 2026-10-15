@@ -75,18 +75,19 @@ model as written, so a slash command through it is not expanded; the resume
 prompt is plain text and still goes through `$.prompt.submit`.
 
 The clear runs only after a handoff turn that ended with an answer and wrote
-exactly one new file in the shape `ad-handoff` names it,
-`<UTC stamp>-<slug>.md`; any other name, or one with a control character or a
-line break, is ignored, because the directory may be the shared `/tmp` and the
-name reaches the model as the person's own words. The check is that file's
-time, not who wrote it: if another session of the same person writes the one
-new handoff during that turn, the band resumes from it. That limit is
-accepted; `ad-handoff`'s own text is not visible to the plugin as the turn
-starts. Turning the box off before that turn ends cancels the clear. When the turn
-did not finish, wrote no such file or more than one, or the clear is refused,
-a toast says so and the session stays as the handoff left it. When the clear
-ran but the resume prompt is refused, the session is already cleared; the
-toast names the handoff file to resume from. The failure notices are toasts
-from the band's plugin, the channel Task 0116 uses for a press that cannot
-start. The directory lookup assumes POSIX paths, as `ad-handoff`'s own
-`${TMPDIR:-/tmp}` does; elsewhere it finds no file and clears nothing.
+exactly one new file in the shape `ad-handoff` names it, `<UTC
+stamp>-<slug>.md`; any other name, or one with a double quote, a control or
+invisible format character or a line break, is ignored, and the resume prompt
+quotes the path, because the directory may be the shared `/tmp` and the name
+reaches the model as the person's own words. The check is that file's time,
+not who wrote it: if another session of the same person writes the one new
+handoff during that turn, the band resumes from it. That limit is accepted;
+`ad-handoff`'s own text is not visible to the plugin as the turn starts.
+Turning the box off before that turn ends cancels the clear. When the turn did
+not finish, wrote no such file or more than one, or the clear is refused, a
+toast says so and the session stays as the handoff left it. When the clear ran
+but the resume prompt is refused, the session is already cleared; the toast
+names the handoff file to resume from. The failure notices are toasts from the
+band's plugin, the channel Task 0116 uses for a press that cannot start. The
+directory lookup assumes POSIX paths, as `ad-handoff`'s own `${TMPDIR:-/tmp}`
+does; elsewhere it finds no file and clears nothing.

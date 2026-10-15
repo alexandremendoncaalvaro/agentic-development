@@ -80,6 +80,10 @@ Fresh-context delta review, both axes, 9051cf9..e218e01: no Blocker; Spec clean,
 - Standards Concern, the earlier entry's "a clear only follows a handoff written in that turn" overstates the check: the code checks the one new well-named file's time since the turn began, not its writer, so another session of the same person writing a handoff in that window would be resumed from. Recorded as an accepted limit in the ADR-0088 2026-10-15 addendum.
 - Standards Note, restore `kind: 'directory'` in the fixture: rejected; the 2.1.295 typings declare `kind: 'file' | 'dir' | 'other'` (claude-code.d.ts:4925), so `'dir'` is the engine's value.
 
+### 2026-10-15 — second delta reviewed
+
+Fresh-context Standards delta review, e218e01..ecf01f6: no Blocker; the two prior Concerns resolved and the rejected Note held. One Concern: a free-text slug with spaces or invisible format characters (a right-to-left override) could carry wording into the resume prompt. Fixed, test first: the filter also refuses `\p{Cf}` and a double quote, and the resume prompt quotes the path. Spec not re-run: the change touches the name filter and records only.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

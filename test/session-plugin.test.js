@@ -292,6 +292,11 @@ test('regression: task-0115 handoffsSince takes only names in the shape ad-hando
     at('20261015T120001Z-two words.md'),
     at('20261015T120002Z-refatoração.md'),
     at('20261015T120000Z-tab\tname.md'),
+    at('20261015T120000Z-nel\u0085name.md'),
+    at('20261015T120000Z-ls\u2028name.md'),
+    at('20261015T120000Z-rlo\u202ename.md'),
+    at('20261015T120000Z-zw\u200bname.md'),
+    at('20261015T120000Z-quote"name.md'),
     at('20261015T120000Z-line\nbreak.md'),
     at('2026-10-15-x.md'),
   ];
@@ -306,6 +311,7 @@ test('regression: task-0115 the resume prompt names the handoff and its Resume p
   const text = resumePrompt('/var/tmp-x/agentic-handoffs/x.md');
   assert.match(text, /\/var\/tmp-x\/agentic-handoffs\/x\.md/);
   assert.match(text, /Resume protocol/);
+  assert.ok(text.startsWith('Read "/var/tmp-x/agentic-handoffs/x.md" first'), 'the path is quoted');
 });
 
 test('regression: task-0115 with the box on, the handoff is followed by a clear and a resume', async () => {
