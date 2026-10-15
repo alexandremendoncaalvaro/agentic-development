@@ -1916,6 +1916,93 @@ The receipt proves a cited source exists in the map; it does not prove the sourc
 Run validate-record.mjs, then inspect every cited source.
 `;
 
+// Task 0123: a record that names its stakes is graded from a starting tier.
+function staked(stakes, claimLines) {
+  return VALID_GROUND_RECORD.replace(
+    '**Confidence:** Strong',
+    `**Confidence:** Strong\n**Stakes:** ${stakes}`
+  ).replace('**Strength:** High\n', claimLines);
+}
+
+function groundReport(body) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-tier-'));
+  try {
+    return runGroundRecord(dir, writeGroundRecord(dir, body));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+test('validate-record: a staked claim graded at its tier start is valid', () => {
+  const report = groundReport(
+    staked('medium × reversible', '**Tier:** Measurement\n**Strength:** High\n')
+  );
+  assert.equal(report.valid, true, report.errors.join('; '));
+  assert.deepEqual(report.warnings, []);
+});
+
+test('validate-record: a grade above the tier start needs an Upgrade line', () => {
+  const above = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** High\n')
+  );
+  assert.equal(above.valid, false);
+  assert.match(
+    above.errors.join('\n'),
+    /E1 is graded High above its Primary start \(Medium\): add a line "\*\*Upgrade:\*\* <reason>"/
+  );
+  const justified = groundReport(
+    staked(
+      'medium × reversible',
+      '**Tier:** Primary\n**Strength:** High\n**Upgrade:** two primary sources agree with a measurement\n'
+    )
+  );
+  assert.equal(justified.valid, true, justified.errors.join('; '));
+});
+
+test('validate-record: a staked claim names its tier, and a normative claim is a design choice', () => {
+  const noTier = groundReport(staked('high × irreversible', '**Strength:** Medium\n'));
+  assert.match(
+    noTier.errors.join('\n'),
+    /E1 has no tier: add a line "\*\*Tier:\*\* <Measurement \| Primary \| Secondary \| Single \| Opinion>"/
+  );
+  const design = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** design choice\n')
+  );
+  assert.equal(design.valid, true, design.errors.join('; '));
+});
+
+test('validate-record: a low and reversible record may leave claims ungraded', () => {
+  const short = groundReport(staked('low × reversible', ''));
+  assert.equal(short.valid, true, short.errors.join('; '));
+  const bad = groundReport(staked('modest', '**Tier:** Primary\n**Strength:** Medium\n'));
+  assert.match(
+    bad.errors.join('\n'),
+    /Stakes must be "<low \| medium \| high> × <reversible \| irreversible>"/
+  );
+});
+
+test('validate-record: a grade given in a short record needs its tier', () => {
+  const graded = groundReport(staked('low × reversible', '**Strength:** Medium\n'));
+  assert.equal(graded.valid, false);
+  assert.match(graded.errors.join('\n'), /E1 has no tier/);
+});
+
+test('validate-record: a staked record names design choice as a valid strength', () => {
+  const report = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** Strong\n')
+  );
+  assert.match(
+    report.errors.join('\n'),
+    /E1 has no valid strength: add a line "\*\*Strength:\*\* <High \| Medium \| Low \| Very-low \| design choice>"/
+  );
+});
+
+test('validate-record: a record without stakes keeps the earlier rules and warns', () => {
+  const legacy = groundReport(VALID_GROUND_RECORD);
+  assert.equal(legacy.valid, true);
+  assert.match(legacy.warnings.join('\n'), /no Stakes line/);
+});
+
 test('validate-record: accepts a complete durable ground receipt', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-valid-'));
   try {
@@ -4288,13 +4375,49 @@ const CHECKPOINT = join(
 
 // execFileSync throws on a non-zero exit, so every call below also asserts
 // the "always exit 0, never block the prompt" contract.
+// No voice profile unless a test supplies one, so the machine's own profile
+// never changes what the suite sees.
+const EMPTY_VOICE_DIR = mkdtempSync(join(tmpdir(), 'agentic-no-voice-'));
+
 function runCheckpoint(input, env = {}) {
   return execFileSync('node', [CHECKPOINT], {
     input,
     encoding: 'utf8',
-    env: { ...process.env, AD_WORKFLOW_CHECKPOINT: '', ...env },
+    env: { ...process.env, AD_WORKFLOW_CHECKPOINT: '', AGENTIC_VOICE_DIR: EMPTY_VOICE_DIR, ...env },
   });
 }
+
+function voiceDir(profile) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-'));
+  writeFileSync(
+    join(dir, 'profile.md'),
+    `# Personal voice profile\n\n## Profile data\n\n\`\`\`json\n${JSON.stringify(profile, null, 2)}\n\`\`\`\n`
+  );
+  return dir;
+}
+
+// Task 0121: the owner's conversation language and the no-estimate rule ride
+// on every prompt when a confirmed voice profile names the language.
+test('workflow-checkpoint: a confirmed voice profile adds the language and no-estimate reminder', () => {
+  const dir = voiceDir({
+    status: 'confirmed',
+    languages: { conversation: 'pt-BR', publication: 'en' },
+  });
+  const out = runCheckpoint(PROMPT_EVENT, { AGENTIC_VOICE_DIR: dir });
+  assert.match(out, /Reply to the owner in pt-BR; give no date, duration or deadline estimates\./);
+});
+
+test('workflow-checkpoint: no reminder without a profile, an unconfirmed one, or one without a language', () => {
+  assert.doesNotMatch(runCheckpoint(PROMPT_EVENT), /Reply to the owner/);
+  for (const profile of [
+    { status: 'draft', languages: { conversation: 'pt-BR' } },
+    { status: 'confirmed' },
+    { status: 'confirmed', languages: { conversation: 'pt-BR; rm -rf /' } },
+  ]) {
+    const out = runCheckpoint(PROMPT_EVENT, { AGENTIC_VOICE_DIR: voiceDir(profile) });
+    assert.doesNotMatch(out, /Reply to the owner/);
+  }
+});
 
 const PROMPT_EVENT = JSON.stringify({
   hook_event_name: 'UserPromptSubmit',

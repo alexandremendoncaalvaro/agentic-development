@@ -24,7 +24,7 @@
 
 ## Evidence
 
-<Each load-bearing claim, sealed High / Medium / Low / Very-low (§17 Axis 1), with its provenance. Where sources disagree, a contested block: position A, position B, the evidence for each, and when each holds.>
+<Each load-bearing claim with its tier (Measurement, Primary, Secondary, Single, Opinion), its grade starting at the tier's start and lowered or raised with a stated reason (§17 Axis 1), or "design choice" for a normative claim, with its provenance. Where sources disagree, a contested block: position A, position B, the evidence for each, and when each holds.>
 
 ## Limitations and what would reverse the conclusion
 
@@ -33,6 +33,10 @@
 ## Provenance and artifacts
 
 <Sources with dates and access method; links to any spike, fixtures, or measurements.>
+
+## Assessment
+
+<Pending until the decision is revisited: what the study got right or wrong, and the trigger that reopens it.>
 
 ## Derived decision
 

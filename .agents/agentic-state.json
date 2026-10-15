@@ -295,15 +295,15 @@
         },
         {
           "path": ".agents/skills/ad-ground/references/record-template.md",
-          "sourceSha": "374df3e6636ea7aa88db3bd0aa6e4af913a2ae5749e13ef59c1005666e66c2d0"
+          "sourceSha": "313857615a3634b40a3d90aaf1314b42ea3f55838a6b3f8c72e332818c9068e4"
         },
         {
           "path": ".agents/skills/ad-ground/scripts/validate-record.mjs",
-          "sourceSha": "97ea806e6703de1f205f1983d8da2b34b33a9ea1da24aaba5aab1051132a935f"
+          "sourceSha": "f52d9254e1e38cbb2373f6f599a9b68cee89ef57912e518c115b022c401fa0d4"
         },
         {
           "path": ".agents/skills/ad-ground/SKILL.md",
-          "sourceSha": "f17361e0908e47dbde7be7cc4de2258a54862bdb2b9a0f93f0e54c445f871dfb"
+          "sourceSha": "423a55ff96a00919d9178846ef69db84a6905a077370c440bfdabdde9ae0181e"
         }
       ]
     },
@@ -361,6 +361,10 @@
           "sourceSha": "87f975c6b6973d112052a2fa3f69a93dada3ee3dd4c2e0116cadb9b341ab536c"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/command-guard.mjs",
+          "sourceSha": "df561a951d02d45e0aa7066ed1cd05fc0d1adad47e0052501bea259ae695c52c"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/detect-hooks.mjs",
           "sourceSha": "f2b49487dc4419efcb2af9b1bcee25844a574ec3e54249022ea23c6d344dc830"
         },
@@ -381,6 +385,10 @@
           "sourceSha": "0d9976d06fa73bef82db7a85d51865c35a023ebefbf91a9d81564a2902e05365"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/reply-language.mjs",
+          "sourceSha": "a2f8039dc073a26f434e8910e221982eba72879e77497e42f1a3278eaf94cb78"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/review-receipts.mjs",
           "sourceSha": "afc8db728ee9361acc4ea3ef04fa1e056a61d614b670fcada0ef5e7641b365a4"
         },
@@ -390,11 +398,11 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
-          "sourceSha": "6f6583233038f53c8891573311b8c00a618c82e278eb02a2e5fd2783ca6f377d"
+          "sourceSha": "65358591e98b95bf3989b2a6aab2296bd1d310469b98026ceb0ecbd7c3f0dc8f"
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "38b043efbf8988586c21e893170bf897b668bd26f913e6376daa75cfe284cf27"
+          "sourceSha": "07deb0a8a02e424c369b707336ba3e8a37e621fdc5eb29698e6e5926c057d734"
         }
       ]
     },
@@ -711,11 +719,11 @@
         },
         {
           "path": ".agents/skills/ad-research/references/research-template.md",
-          "sourceSha": "92282bbc2f8a933057ff49d275bd866328f347d28800d9adc5d431b6eda0364b"
+          "sourceSha": "352fe5221bc4c3e03509a40be346ab8dcc66e1521c6e0f0affb9ddf9e478b769"
         },
         {
           "path": ".agents/skills/ad-research/SKILL.md",
-          "sourceSha": "6d06502f80ed2f2dd211c7b5cc93880b83941ce8a8758b154b1d393907dd9903"
+          "sourceSha": "ed62dfe6af71d38edc91a9bc604f89d756b2d16a0cd3e5bb1320e2ab778b402d"
         }
       ]
     },

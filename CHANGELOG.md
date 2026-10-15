@@ -8,6 +8,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Added
 
+- `ad-hooks` ships a command guard on `PreToolUse` (both hosts) that denies
+  killing processes by name and a `git commit` chained after a check with `;`
+  or a newline, naming the fix in the reason; an exploratory replay of 65,432
+  local Claude Code shell calls denied 135 commands, 134 real instances and
+  one conservative block. The workflow checkpoint names the owner's
+  conversation language and the no-estimate rule when a confirmed voice
+  profile defines it, and a shadow `Stop` hook logs replies in another
+  language without blocking (task-0121, ADR-0094).
 - `ad-release` leaves a release receipt when its plan is approved, in the git
   directory every worktree shares, and its preflight step tells the agent to warn
   when the npm account's two-factor mode does not cover writes. The `ad-hooks` receipt
@@ -29,6 +37,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   duplication as a hint, and add discovered tests to the list, as in Kent
   Beck's Canon TDD; `ad-domain` groups terms by relation instead of
   alphabetically and allows a lead sentence plus two of scope (task-0125).
+- Evidence is graded from a starting tier, after GRADE: Measurement starts
+  High, Primary Medium, Secondary and Single Low, Opinion Very-low; five
+  factors lower a claim and a raise needs a stated reason; a normative claim
+  is a design choice. A ground record names its stakes, and the validator
+  then requires each claim's tier and an `Upgrade:` line for a grade above
+  its start; a low and reversible record may leave claims ungraded. Records
+  without stakes keep the earlier rules and get a warning. `ad-research`
+  gains an Assess step (task-0123, ADR-0095).
 
 ## [1.5.0] - 2026-10-15
 

@@ -9,6 +9,8 @@ Loaded on demand from `ad-hooks/SKILL.md`. Each subsection is one hook of the ti
 - Artifact-validator `PostToolUse` gate (ADR-0083, Spec 0008)
 - Handoff-chip `PostToolUse` reminder (ADR-0087)
 - Shadow receipt gate on `PreToolUse` (ADR-0089)
+- Command guard on `PreToolUse` (ADR-0094)
+- Reply-language detector on `Stop` (ADR-0094, shadow)
 - Resolving the script path
 
 
@@ -149,6 +151,14 @@ Records, before a landing action, whether the workflow step it depends on left a
 * **Evidence only.** It appends one line per check of an action, state `clear`, `would-block` or `runtime-unavailable`, to `<tmpdir>/agentic-sequence-gate/<session_id>.jsonl` (`AD_SEQUENCE_GATE_EVIDENCE_DIR` redirects it). It always exits 0 and prints nothing. `AD_SEQUENCE_GATE=0` silences it. Enforcing any check is a later decision, after the shadow run meets ADR-0089's preset criterion.
 
 Scaffold it in three parts: the receipt hook beside the CI-mirror command, the `.gitignore` line, and the wiring `{ "matcher": "Bash", "hooks": [ { "type": "command", "command": "node \"<ad-hooks-dir>/scripts/sequence-gate.mjs\"" } ] }` under `PreToolUse` in `.claude/settings.json`, and the same with `"timeout": 30` in `.codex/hooks.json`.
+
+## Command guard on `PreToolUse` (ADR-0094)
+
+`scripts/command-guard.mjs` denies a closed list of destructive shell patterns before they run, on both hosts: killing processes by name in command position (`pkill`, `killall`, `taskkill /IM`, `Stop-Process -Name` or `-ProcessName`, `spps`, `Get-Process ... | Stop-Process`, a kill fed by `pgrep`), and a `git commit` joined by `;` or a newline to an earlier check (tests, lint, type check, build, verify) in the same command line, staging steps in between included. `scripts/replay-command-guard.mjs` (repository only) replays it over recorded transcripts to measure false blocks. Quoted strings, heredoc bodies and comments are removed before matching, so text that only mentions a pattern passes; wrappers such as `sudo`, `timeout`, `mise exec ... --` and `rtk` are skipped, and a check guards what follows it through `&&`, `if ...; then` or `|| exit`. A denial prints one `hookSpecificOutput` deny decision whose reason names the fix (kill the PID you started; chain with `&&`). It fails open and `AD_COMMAND_GUARD=0` turns it off. Wire it as a `PreToolUse` entry matched on `Bash|PowerShell` in `.claude/settings.json` and in the `Bash` entry of `.codex/hooks.json`; it is a guardrail, not a sandbox (a command built at run time is not seen).
+
+## Reply-language detector on `Stop` (ADR-0094, shadow)
+
+`scripts/reply-language.mjs` reads the owner's conversation language from a confirmed voice profile (`AGENTIC_VOICE_DIR/profile.md`, else `~/.agentic/voice/profile.md`) and appends a line to `<tmpdir>/agentic-reply-language/<session_id>.jsonl` (`AD_REPLY_LANGUAGE_EVIDENCE_DIR` redirects it) when the reply just shown reads as another language (Portuguese, English or Spanish). It never blocks, prints nothing and stores no reply text; `AD_REPLY_LANGUAGE=0` silences it. Wire it in the `Stop` hooks of both hosts. The same profile adds one line to the workflow checkpoint: "Reply to the owner in <language>; give no date, duration or deadline estimates."
 
 ## Resolving the script path
 
