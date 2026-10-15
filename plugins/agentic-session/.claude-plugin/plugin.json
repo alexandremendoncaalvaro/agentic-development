@@ -1,6 +1,6 @@
 {
   "name": "agentic-session",
-  "description": "Agentic Development companion for Claude Code: a context band above the prompt, shown only past your threshold, with a one-press /ad-handoff, and /agentic-briefing, which opens the work-in-progress briefing in a pane.",
+  "description": "Agentic Development companion for Claude Code: a context band above the prompt, shown only past your threshold, with a one-press /ad-handoff and an opt-in clear-and-continue, and /agentic-briefing, which opens the work-in-progress briefing in a pane.",
   "author": {
     "name": "Alexandre Alvaro"
   },
@@ -11,7 +11,7 @@
       "type": "number",
       "title": "Context band threshold (%)",
       "description": "Show the band once context reaches this share of the auto-compact point (or of the window when auto-compaction is off). 1 to 99.",
-      "default": 60,
+      "default": 80,
       "min": 1,
       "max": 99
     }

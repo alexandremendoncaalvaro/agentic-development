@@ -9,8 +9,17 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 // the band's pure rule and the manifests the marketplace install reads.
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const PLUGIN = join(ROOT, 'plugins', 'agentic-session');
-const { fillReading, normalizeThreshold, shouldShow, bandLabel, DEFAULT_THRESHOLD, HANDOFF_LABEL } =
-  await import(pathToFileURL(join(PLUGIN, 'hooks', 'band.mjs')).href);
+const {
+  fillReading,
+  normalizeThreshold,
+  shouldShow,
+  bandLabel,
+  DEFAULT_THRESHOLD,
+  HANDOFF_LABEL,
+  handoffsSince,
+  handoffDirs,
+  resumePrompt,
+} = await import(pathToFileURL(join(PLUGIN, 'hooks', 'band.mjs')).href);
 
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 
@@ -50,11 +59,11 @@ test('fillReading caps the percentage at 100', () => {
 });
 
 test('normalizeThreshold keeps 1 to 99 and falls back to the default otherwise', () => {
-  assert.equal(DEFAULT_THRESHOLD, 60);
+  assert.equal(DEFAULT_THRESHOLD, 80);
   assert.equal(normalizeThreshold(75), 75);
   assert.equal(normalizeThreshold('40'), 40);
   for (const bad of [undefined, null, '', 'x', 0, 100, -5, 150, Number.NaN]) {
-    assert.equal(normalizeThreshold(bad), 60, String(bad));
+    assert.equal(normalizeThreshold(bad), 80, String(bad));
   }
 });
 
@@ -98,7 +107,7 @@ test('the plugin manifest declares the threshold option and one hooks module tha
       min: threshold?.min,
       max: threshold?.max,
     },
-    { type: 'number', default: 60, min: 1, max: 99 }
+    { type: 'number', default: 80, min: 1, max: 99 }
   );
   assert.equal(typeof threshold.title, 'string');
   assert.equal(typeof threshold.description, 'string');
@@ -112,7 +121,7 @@ test('the plugin manifest declares the threshold option and one hooks module tha
 
 // A fake engine: hooks keyed by event and matcher, and a host with no kit
 // script installed unless `script` gives the path and the run's result.
-function loadPlugin(threshold, usage, { script = null } = {}) {
+function loadPlugin(threshold, usage, { script = null, handoffs = null, stored = {} } = {}) {
   return import(pathToFileURL(join(PLUGIN, 'hooks', 'register.mjs')).href).then(({ register }) => {
     const hooks = {};
     register(
@@ -132,6 +141,7 @@ function loadPlugin(threshold, usage, { script = null } = {}) {
     const commands = [];
     const ran = [];
     const toasts = [];
+    const store = { ...stored };
     const element = (type) => (props) => ({ type, props });
     const $ = {
       session: {
@@ -139,8 +149,20 @@ function loadPlugin(threshold, usage, { script = null } = {}) {
         root: async () => '/work/repo',
         id: async () => 'sess-1',
       },
-      env: { get: async (name) => (name === 'HOME' ? '/home/ale' : undefined) },
+      env: {
+        get: async (name) => ({ HOME: '/home/ale', TMPDIR: '/var/tmp-x/' })[name],
+      },
+      store: {
+        get: async (key) => store[key],
+        set: async (key, value) => {
+          store[key] = value;
+        },
+      },
       fs: {
+        list: async (path) => {
+          if (handoffs && path === '/var/tmp-x/agentic-handoffs') return handoffs();
+          throw new Error('ENOENT');
+        },
         stat: async (path) => {
           if (script && path === script.path) return { size: 1 };
           throw new Error('ENOENT');
@@ -154,7 +176,12 @@ function loadPlugin(threshold, usage, { script = null } = {}) {
       },
       command: {
         register: async (spec) => commands.push(spec),
-        run: async (spec) => ran.push(spec),
+        // The real /clear ends the session before it resolves.
+        run: async (spec) => {
+          ran.push(spec);
+          if (spec.command === 'clear')
+            await hooks['session.end']?.($, { reason: 'clear' }, async () => undefined);
+        },
       },
       prompt: { submit: async (input) => submitted.push(input) },
       ui: {
@@ -165,7 +192,7 @@ function loadPlugin(threshold, usage, { script = null } = {}) {
         resolve: () => ({ Box: element('Box'), Text: element('Text'), Button: element('Button') }),
       },
     };
-    return { hooks, logs, submitted, runs, opened, commands, ran, toasts, $ };
+    return { hooks, logs, submitted, runs, opened, commands, ran, toasts, store, $ };
   });
 }
 
@@ -192,6 +219,7 @@ test('the plugin draws and runs the handoff only: it hooks no tool call and rewr
     'session.end',
     'session.start',
     'turn.complete',
+    'turn.start',
     'ui.render:AbovePrompt',
     'ui.render:Pane:agentic-briefing',
   ]);
@@ -221,6 +249,300 @@ test('a rejected handoff command shows a toast and logs the reason', async () =>
   assert.deepEqual(logs[0].options, { to: 'debug' });
   assert.equal(toasts.length, 1);
   assert.match(toasts[0], /run \/ad-handoff yourself/);
+});
+
+// Task 0115: hand off, clear and continue.
+const tick = () => new Promise((resolve) => setImmediate(resolve));
+const buttons = (tree, found = []) => {
+  if (!tree || typeof tree !== 'object') return found;
+  if (tree.type === 'Button') found.push(tree);
+  for (const child of [tree.props?.children].flat()) buttons(child, found);
+  return found;
+};
+const press = (band, key) =>
+  buttons(band)
+    .find((b) => b.props.key === key)
+    .props.onPress();
+
+// One main-loop turn: its start, then its end with the given reason.
+async function runTurn(hooks, $, turnId, reason = 'answer') {
+  await hooks['turn.start']($, { turnId }, async () => undefined);
+  await hooks['turn.complete']($, { turnId, reason }, async () => undefined);
+  await tick();
+  await tick();
+}
+
+test('regression: task-0115 handoffsSince lists handoffs written since a time, newest first', () => {
+  const entries = [
+    { name: '20261015T100000Z-old.md', kind: 'file', mtimeMs: 50 },
+    { name: '20261015T110000Z-a.md', kind: 'file', mtimeMs: 100 },
+    { name: '20261015T120000Z-b.md', kind: 'file', mtimeMs: 150 },
+    { name: '20261015T130000Z-notes.txt', kind: 'file', mtimeMs: 200 },
+    { name: '20261015T140000Z-dir.md', kind: 'dir', mtimeMs: 300 },
+  ];
+  assert.deepEqual(handoffsSince(entries, 100), ['20261015T120000Z-b.md', '20261015T110000Z-a.md']);
+  assert.deepEqual(handoffsSince(entries, 160), []);
+});
+
+test('regression: task-0115 handoffsSince takes only names in the shape ad-handoff writes, free of control characters', () => {
+  const at = (name) => ({ name, kind: 'file', mtimeMs: 200 });
+  const entries = [
+    at('notes.md'),
+    at('20261015T120000Z-ok_slug.v2.md'),
+    at('20261015T120001Z-two words.md'),
+    at('20261015T120002Z-refatoração.md'),
+    at('20261015T120000Z-tab\tname.md'),
+    at('20261015T120000Z-nel\u0085name.md'),
+    at('20261015T120000Z-ls\u2028name.md'),
+    at('20261015T120000Z-rlo\u202ename.md'),
+    at('20261015T120000Z-zw\u200bname.md'),
+    at('20261015T120000Z-quote"name.md'),
+    at('20261015T120000Z-line\nbreak.md'),
+    at('2026-10-15-x.md'),
+  ];
+  assert.deepEqual(handoffsSince(entries, 100).sort(), [
+    '20261015T120000Z-ok_slug.v2.md',
+    '20261015T120001Z-two words.md',
+    '20261015T120002Z-refatoração.md',
+  ]);
+});
+
+test('regression: task-0115 the resume prompt names the handoff and its Resume protocol', () => {
+  const text = resumePrompt('/var/tmp-x/agentic-handoffs/x.md');
+  assert.match(text, /\/var\/tmp-x\/agentic-handoffs\/x\.md/);
+  assert.match(text, /Resume protocol/);
+  assert.ok(text.startsWith('Read "/var/tmp-x/agentic-handoffs/x.md" first'), 'the path is quoted');
+});
+
+test('regression: task-0115 with the box on, the handoff is followed by a clear and a resume', async () => {
+  const { hooks, submitted, ran, $ } = await loadPlugin(1, FULL, {
+    handoffs: () => [{ name: '20261015T120000Z-h.md', kind: 'file', mtimeMs: Date.now() + 1000 }],
+    stored: { clearAfterHandoff: true },
+  });
+  await hooks['session.start']($, {}, async () => undefined);
+  const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
+  press(band, 'handoff');
+  await tick();
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
+  assert.equal(submitted.length, 1);
+  assert.equal(submitted[0].asUser, true);
+  assert.match(submitted[0].text, /\/var\/tmp-x\/agentic-handoffs\/20261015T120000Z-h\.md/);
+});
+
+test('regression: task-0115 with the box off, the button only hands off', async () => {
+  const { hooks, submitted, ran, $ } = await loadPlugin(1, FULL, {
+    handoffs: () => [{ name: '20261015T120000Z-h.md', kind: 'file', mtimeMs: Date.now() + 1000 }],
+  });
+  await hooks['session.start']($, {}, async () => undefined);
+  const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
+  press(band, 'handoff');
+  await tick();
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(submitted, []);
+});
+
+test('regression: task-0115 with no handoff file the session is left as it was', async () => {
+  const { hooks, submitted, ran, toasts, $ } = await loadPlugin(1, FULL, {
+    handoffs: () => [],
+    stored: { clearAfterHandoff: true },
+  });
+  await hooks['session.start']($, {}, async () => undefined);
+  const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
+  press(band, 'handoff');
+  await tick();
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(submitted, []);
+  assert.equal(toasts.length, 1);
+  assert.match(toasts[0], /no handoff file/i);
+});
+
+test('regression: task-0115 the clear-and-continue box toggles and is remembered', async () => {
+  const { hooks, store, $ } = await loadPlugin(1, FULL);
+  await hooks['session.start']($, {}, async () => undefined);
+  let band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
+  const box = () => buttons(band).find((b) => b.props.key === 'clear-after');
+  assert.match(box().props.label, /^\[ \]/);
+  box().props.onPress();
+  await tick();
+  assert.equal(store.clearAfterHandoff, true);
+  band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'engine band');
+  assert.match(box().props.label, /^\[x\]/);
+});
+
+// Press with the box on and return the plugin, before any turn runs.
+async function pressWithBoxOn(options) {
+  const plugin = await loadPlugin(1, FULL, { stored: { clearAfterHandoff: true }, ...options });
+  const { hooks, $ } = plugin;
+  await hooks['session.start']($, {}, async () => undefined);
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'handoff'
+  );
+  await tick();
+  return plugin;
+}
+const oneNewFile = () => [
+  { name: '20261015T120000Z-h.md', kind: 'file', mtimeMs: Date.now() + 1000 },
+];
+
+test('regression: task-0115 a turn already running at the press does not trigger the clear', async () => {
+  const plugin = await loadPlugin(1, FULL, {
+    handoffs: oneNewFile,
+    stored: { clearAfterHandoff: true },
+  });
+  const { hooks, ran, toasts, $ } = plugin;
+  await hooks['session.start']($, {}, async () => undefined);
+  await hooks['turn.start']($, { turnId: 'busy' }, async () => undefined);
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'handoff'
+  );
+  await tick();
+  await hooks['turn.complete']($, { turnId: 'busy', reason: 'answer' }, async () => undefined);
+  await tick();
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(toasts, []);
+  await runTurn(hooks, $, 'handoff-turn');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
+});
+
+test('regression: task-0115 an interrupted handoff turn clears nothing', async () => {
+  const { hooks, ran, toasts, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
+  await runTurn(hooks, $, 't1', 'aborted');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.match(toasts[0], /did not finish/);
+});
+
+test('regression: task-0115 handoffDirs reads TMPDIR, then /tmp, without duplicates', () => {
+  assert.deepEqual(handoffDirs('/var/tmp-x/'), [
+    '/var/tmp-x/agentic-handoffs',
+    '/tmp/agentic-handoffs',
+  ]);
+  assert.deepEqual(handoffDirs(undefined), ['/tmp/agentic-handoffs']);
+  assert.deepEqual(handoffDirs('/tmp'), ['/tmp/agentic-handoffs']);
+});
+
+test('regression: task-0115 a handoff file older than the handoff turn is not resumed from', async () => {
+  const { hooks, ran, toasts, $ } = await pressWithBoxOn({
+    handoffs: () => [
+      { name: '20261015T110000Z-old.md', kind: 'file', mtimeMs: Date.now() - 60_000 },
+    ],
+  });
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.match(toasts[0], /no handoff file/);
+});
+
+test('regression: task-0115 two new handoff files clear nothing', async () => {
+  const { hooks, ran, toasts, submitted, $ } = await pressWithBoxOn({
+    handoffs: () => [
+      { name: '20261015T120000Z-mine.md', kind: 'file', mtimeMs: Date.now() + 1000 },
+      { name: '20261015T120001Z-other.md', kind: 'file', mtimeMs: Date.now() + 2000 },
+    ],
+  });
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(submitted, []);
+  assert.match(toasts[0], /more than one/);
+});
+
+test('regression: task-0115 a refused clear sends no resume and names the handoff', async () => {
+  const plugin = await pressWithBoxOn({ handoffs: oneNewFile });
+  const { hooks, ran, toasts, submitted, logs, $ } = plugin;
+  $.command.run = async (spec) => {
+    ran.push(spec);
+    throw new Error('clear refused');
+  };
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
+  assert.deepEqual(submitted, []);
+  assert.match(toasts[0], /not cleared.*\/var\/tmp-x\/agentic-handoffs\/20261015T120000Z-h\.md/);
+  assert.match(logs.at(-1).text, /clear refused/);
+});
+
+test('regression: task-0115 a refused resume prompt says the session was cleared and where to resume', async () => {
+  const { hooks, ran, toasts, logs, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
+  $.prompt.submit = async () => {
+    throw new Error('submit refused');
+  };
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
+  assert.match(toasts[0], /cleared, but the resume prompt was not sent.*-h\.md/);
+  assert.match(logs.at(-1).text, /submit refused/);
+});
+
+test('regression: task-0115 a handoff that could not start arms no clear', async () => {
+  const plugin = await loadPlugin(1, FULL, {
+    handoffs: oneNewFile,
+    stored: { clearAfterHandoff: true },
+  });
+  const { hooks, ran, toasts, $ } = plugin;
+  await hooks['session.start']($, {}, async () => undefined);
+  $.command.run = async (spec) => {
+    ran.push(spec);
+    if (spec.command === 'ad-handoff') throw new Error('refused');
+  };
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'handoff'
+  );
+  await tick();
+  await runTurn(hooks, $, 'later');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.equal(toasts.length, 1);
+  assert.match(toasts[0], /run \/ad-handoff yourself/);
+});
+
+test('regression: task-0115 a session that ends before the handoff turn arms no clear', async () => {
+  const { hooks, ran, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
+  await hooks['session.end']($, { reason: 'clear' }, async () => undefined);
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+});
+
+test('regression: task-0115 turning the box off after the press clears nothing', async () => {
+  const { hooks, ran, toasts, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'clear-after'
+  );
+  await tick();
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(toasts, []);
+});
+
+test('regression: task-0115 a handoff written in the same millisecond the turn starts counts', async () => {
+  let since = null;
+  const { hooks, ran, $ } = await pressWithBoxOn({
+    handoffs: () => [{ name: '20261015T120000Z-h.md', kind: 'file', mtimeMs: since }],
+  });
+  const realNow = Date.now;
+  Date.now = () => 1_000_000;
+  try {
+    since = 1_000_000;
+    await runTurn(hooks, $, 't1');
+  } finally {
+    Date.now = realNow;
+  }
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
+});
+
+test('regression: task-0115 an unreadable store leaves the box off', async () => {
+  const { hooks, ran, $ } = await loadPlugin(1, FULL, { handoffs: oneNewFile });
+  $.store.get = async () => {
+    throw new Error('store down');
+  };
+  await hooks['session.start']($, {}, async () => undefined);
+  const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band');
+  assert.match(buttons(band).find((b) => b.props.key === 'clear-after').props.label, /^\[ \]/);
+  press(band, 'handoff');
+  await tick();
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
 });
 
 test('the npm package does not ship the plugin or the marketplace', () => {

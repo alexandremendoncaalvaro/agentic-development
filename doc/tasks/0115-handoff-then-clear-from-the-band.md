@@ -1,0 +1,94 @@
+# Task `0115`: Hand off, clear and continue from the band
+
+**Status:** in-progress
+**Created:** 2026-10-13
+**Scope ref:** doc/adr/0088-ship-an-optional-claude-code-companion-plugin.md
+**Evidence ref:**
+**Owner:** Alexandre Alvaro
+**Execution:** HITL
+**Spec ref:**
+**Board ref:**
+
+## Context
+
+The `agentic-session` band shows the context reading and an "AD handoff"
+button from 60% of the way to the auto-compact point. The owner finds it on
+screen too often and wants it from about 80%. After pressing the button, the
+owner still clears the session and pastes a resume prompt by hand; they want
+an opt-in checkbox that does both: run `/ad-handoff`, wait for it, clear the
+session and submit the resume prompt into the same window.
+
+The plugin API offers `$.prompt.submit` (a prompt as the person's own words),
+`turn.complete`, and `$.command.run` (a slash command as if typed). It does
+not say whether `$.command.run` accepts the built-in `/clear`, nor whether
+the plugin can submit after a clear, so a spike settles that before code.
+
+## Acceptance Criteria
+
+- [x] The band's default threshold is 80% of the auto-compact point; the option still takes 1 to 99.
+- [x] The band carries a "clear and continue" checkbox, off by default and remembered across sessions.
+- [x] With the box on, pressing "AD handoff" runs `/ad-handoff`, then clears the session and submits a prompt that resumes from the handoff file it wrote; with the box off the button behaves as today.
+- [x] If the clear or the resume cannot run, the band says so and leaves the session as it was after the handoff.
+- [ ] Unit tests cover the pure logic; the owner checks the flow live in the desktop app.
+
+## Plan
+
+- [x] Spike: from a plugin, `$.command.run({ command: 'clear' })` and a `$.prompt.submit` after it; record the result.
+- [x] Default threshold 60 to 80 (`band.mjs`, `plugin.json`).
+- [x] Checkbox and flow (`register.mjs`, pure helpers in `band.mjs`), test first.
+- [ ] ADR-0088 addendum; `/ad-review`; owner live check; PR with auto-merge. (Addendum and review done; the live check and the PR remain.)
+
+## Notes
+
+Append-only log. Date each entry. Never rewrite past entries.
+
+### 2026-10-13 — plan approved
+
+The owner approved this plan ("prossiga"). If the spike shows a plugin cannot run `/clear`, the fallback is to fill the prompt box with the resume prompt so the owner clears and presses Enter.
+
+### 2026-10-13 — spike: a plugin can clear and resume
+
+A throwaway plugin loaded with `--plugin-dir` into a headless Claude Code 2.1.289 run (the app's binary; the terminal's `claude` is 2.1.227, too old for module hooks). After the first turn it called `$.command.run({ command: 'clear' })`, which resolved `{"text":""}` while `session.end` fired with reason `clear`; the session id changed. A `$.prompt.submit({ asUser: true })` after it ran in the new session and the model answered `SPIKE-RESUMED`. The fallback (filling the prompt box) is not needed. Handoffs land in `${TMPDIR}/agentic-handoffs` on this machine, so the plugin lists that directory after the handoff turn, rather than hooking the Write call: ADR-0088 keeps the plugin from intercepting tool calls.
+
+### 2026-10-13 — built
+
+Test first: six regression tests in `test/session-plugin.test.js` (newest handoff since the press, the resume prompt, box on, box off, no file, the remembered toggle) plus the 80% default; red before the code except the box-off case, which is today's behaviour. Five mutations (ignore the press time, accept any file, clear without a file, ignore the box, skip the clear) each turned one test red. ADR-0088 gains a dated addendum, PROJECTION follows.
+
+### 2026-10-15 — merged with main and tests completed
+
+Merged `origin/main` (release 1.6.0) instead of rebasing: one conflict pass, no force-push. Task 0116 landed on main meanwhile and changed the press to `$.command.run({ command: 'ad-handoff' })`, because a plugin's `$.prompt.submit` of `/ad-handoff` did nothing in the desktop app; the clear-and-resume flow now arms on that command. The engine 2.1.295 typings say `prompt.submit` sends its text to the model as written, so a slash command through it is not expanded; the resume prompt is plain text, so it still goes through `$.prompt.submit`, which the 2.1.289 spike showed running in the cleared session. The desktop app is the owner's live check.
+
+Eight tests added for the paths the WIP left uncovered: the directory list, a file older than the handoff turn, two new files, a refused clear, a refused resume prompt, a handoff command that could not start, a session that ends before the handoff turn, and an unreadable store. The code for those paths was already in the WIP commit, so each was shown to bite by a mutation instead: eight mutations (no dedupe, no time filter, no several-files check, no return after a refused clear, no reset when the command fails, no reset on session end, the store defaulting on, no turn-reason check) each turned its test red; 54 of 54 green after. "The band says so" is a toast from the band's plugin, the same channel task 0116 uses for a press that cannot start; ADR-0088's addendum records it.
+
+### 2026-10-15 — reviewed
+
+Fresh-context review, both axes, at 9051cf9: no Blocker on either axis.
+
+- Standards Concern, a stale arm lets an unrelated turn claim the clear: rejected. The claiming turn must end with an answer and write exactly one new handoff file in `ad-handoff`'s name shape, so a clear only follows a handoff written in that turn, which is what the box asks for; a press whose command cannot start disarms (tested).
+- Standards Concern, the box turned off after the press still clears: fixed, turning it off disarms; test first.
+- Standards Concern, any `.md` in a shared `/tmp` reaches the model as the person's words: fixed, only names shaped `<UTC stamp>-<slug>.md` count; test first.
+- Standards Concern, POSIX-only paths: recorded in the ADR-0088 2026-10-15 addendum; elsewhere the lookup finds nothing and clears nothing, the same limit as `ad-handoff`'s own `${TMPDIR:-/tmp}`.
+- Standards Concern, the fake engine is kinder than the real one: the fake `/clear` now fires `session.end` before it resolves, and a test pins a file stamped in the turn's own start millisecond.
+- Standards Notes: the 0116 change moved to a 2026-10-15 addendum; the dead `agentId` check on `turn.start` dropped; per-session reading of the box recorded here: a toggle in one session reaches another at its next start.
+- Spec Concern, a refused resume cannot leave the session as it was after the handoff: by construction the clear already ran; the toast names the handoff file to resume from, recorded in the addendum and the changelog.
+
+### 2026-10-15 — delta reviewed
+
+Fresh-context delta review, both axes, 9051cf9..e218e01: no Blocker; Spec clean, every prior finding resolved or held as rejected.
+
+- Standards Concern, the name filter took only `[A-Za-z0-9._-]` while `ad-handoff`'s slug is free text, so `/ad-handoff "merge cleanup"` would read as no file: fixed, the slug takes any character but `/`, a control character or a line break (`\p{Cc}`, U+2028, U+2029); test first.
+- Standards Concern, the earlier entry's "a clear only follows a handoff written in that turn" overstates the check: the code checks the one new well-named file's time since the turn began, not its writer, so another session of the same person writing a handoff in that window would be resumed from. Recorded as an accepted limit in the ADR-0088 2026-10-15 addendum.
+- Standards Note, restore `kind: 'directory'` in the fixture: rejected; the 2.1.295 typings declare `kind: 'file' | 'dir' | 'other'` (claude-code.d.ts:4925), so `'dir'` is the engine's value.
+
+### 2026-10-15 — second delta reviewed
+
+Fresh-context Standards delta review, e218e01..ecf01f6: no Blocker; the two prior Concerns resolved and the rejected Note held. One Concern: a free-text slug with spaces or invisible format characters (a right-to-left override) could carry wording into the resume prompt. Fixed, test first: the filter also refuses `\p{Cf}` and a double quote, and the resume prompt quotes the path. Spec not re-run: the change touches the name filter and records only.
+
+## Definition of Done
+
+All Acceptance Criteria checked, plus:
+
+- [x] Local tests pass (or N/A documented in Notes)
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [ ] No orphan `TODO`/`FIXME` introduced
+- [ ] Status updated to `done` and Notes log closes the task

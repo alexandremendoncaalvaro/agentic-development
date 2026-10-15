@@ -9,7 +9,18 @@
 // that take $ are top-level functions. A threshold changed in /config reloads
 // the module with the new options.
 
-import { HANDOFF_LABEL, bandLabel, fillReading, normalizeThreshold, shouldShow } from './band.mjs';
+import {
+  CLEAR_KEY,
+  HANDOFF_LABEL,
+  bandLabel,
+  clearLabel,
+  fillReading,
+  handoffDirs,
+  handoffsSince,
+  normalizeThreshold,
+  resumePrompt,
+  shouldShow,
+} from './band.mjs';
 import {
   detailsMarkdown,
   paneModel,
@@ -26,18 +37,39 @@ const SCRIPT_TIMEOUT_MS = 10_000;
 
 export function register(on, options) {
   const threshold = normalizeThreshold(options?.threshold);
-  const state = { fill: null, briefing: null, briefingRun: 0 };
+  const state = { fill: null, briefing: null, briefingRun: 0, clearAfter: false, pending: null };
 
   on('session.start', async ($, e, next) => {
     const result = await next(e);
     await registerCommand($);
+    state.clearAfter = (await $.store.get(CLEAR_KEY).catch(() => false)) === true;
     await refresh($, state);
+    return result;
+  });
+
+  // The first main-loop turn to start after the press is the handoff's own:
+  // the command queues until the session is idle (task-0115). Its start time
+  // tells the handoff's file from older ones.
+  on('turn.start', async ($, e, next) => {
+    const result = await next(e);
+    if (state.pending && !state.pending.turnId) {
+      state.pending = { turnId: e.turnId, since: Date.now() };
+    }
     return result;
   });
 
   on('turn.complete', async ($, e, next) => {
     const result = await next(e);
-    if (!e.agentId) await refresh($, state);
+    if (e.agentId) return result;
+    await refresh($, state);
+    const pending = state.pending;
+    if (pending?.turnId && pending.turnId === e.turnId) {
+      state.pending = null;
+      // Run after this hook returns: the clear ends the session.
+      void clearAndResume($, pending, e.reason).catch((error) =>
+        logFailure($, 'clear and resume failed', error)
+      );
+    }
     return result;
   });
 
@@ -50,6 +82,7 @@ export function register(on, options) {
   // /clear ends the session with no session.start after it: drop the readings.
   on('session.end', async ($, e, next) => {
     const result = await next(e);
+    state.pending = null;
     clearReadings($, state);
     return result;
   });
@@ -68,7 +101,24 @@ export function register(on, options) {
       paddingX: 1,
       children: [
         Text({ dimColor: true, children: bandLabel(state.fill) }),
-        Button({ key: 'handoff', label: HANDOFF_LABEL, onPress: () => submitHandoff($) }),
+        Box({
+          flexDirection: 'row',
+          gap: 1,
+          children: [
+            Button({
+              key: 'handoff',
+              label: HANDOFF_LABEL,
+              onPress: () => submitHandoff($, state),
+            }),
+            Button({
+              key: 'clear-after',
+              label: clearLabel(state.clearAfter),
+              plain: true,
+              dimColor: !state.clearAfter,
+              onPress: () => toggleClearAfter($, state),
+            }),
+          ],
+        }),
       ],
     });
   });
@@ -284,12 +334,65 @@ function clearReadings($, state) {
 }
 
 // Runs /ad-handoff as if typed: a plugin's prompt.submit of the same text did
-// nothing in the desktop app (task-0116).
-function submitHandoff($) {
+// nothing in the desktop app (task-0116). With the box on, the handoff's own
+// turn is followed by a clear and a resume (task-0115).
+function submitHandoff($, state) {
+  state.pending = state.clearAfter ? { turnId: null } : null;
   $.command.run({ command: 'ad-handoff' }).catch((error) => {
+    state.pending = null;
     $.ui.toast('AD handoff could not start: run /ad-handoff yourself.');
     logFailure($, 'handoff not run', error);
   });
+}
+
+function toggleClearAfter($, state) {
+  state.clearAfter = !state.clearAfter;
+  // The latest choice wins, even over a handoff already running.
+  if (!state.clearAfter) state.pending = null;
+  $.store
+    .set(CLEAR_KEY, state.clearAfter)
+    .catch((error) => logFailure($, 'clear-and-continue not saved', error));
+  $.ui.invalidate('ui.render');
+}
+
+// Runs once, after the handoff's own turn: clears only when that turn ended
+// normally and wrote exactly one handoff file, so a session is never cleared
+// with nothing, or someone else's work, to resume from.
+async function clearAndResume($, pending, reason) {
+  if (reason !== 'answer') {
+    $.ui.toast('AD handoff: the handoff did not finish, so the session was not cleared.');
+    return;
+  }
+  const tmpdir = await $.env.get('TMPDIR').catch(() => undefined);
+  const found = [];
+  for (const dir of handoffDirs(tmpdir)) {
+    const entries = await $.fs.list(dir).catch(() => []);
+    for (const name of handoffsSince(entries, pending.since)) found.push(`${dir}/${name}`);
+  }
+  if (found.length === 0) {
+    $.ui.toast('AD handoff: no handoff file was written, so the session was not cleared.');
+    return;
+  }
+  if (found.length > 1) {
+    $.ui.toast('AD handoff: more than one new handoff file, so the session was not cleared.');
+    return;
+  }
+  const [path] = found;
+  try {
+    await $.command.run({ command: 'clear' });
+  } catch (error) {
+    $.ui.toast(`AD handoff: the session was not cleared; the handoff is at ${path}.`);
+    logFailure($, 'clear failed', error);
+    return;
+  }
+  try {
+    await $.prompt.submit({ text: resumePrompt(path), asUser: true });
+  } catch (error) {
+    $.ui.toast(
+      `AD handoff: the session was cleared, but the resume prompt was not sent; resume from ${path}.`
+    );
+    logFailure($, 'resume prompt not submitted', error);
+  }
 }
 
 function logFailure($, what, error) {
