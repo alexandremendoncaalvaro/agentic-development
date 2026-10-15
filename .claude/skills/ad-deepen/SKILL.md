@@ -11,17 +11,7 @@ Implements ADR-0020 — the operational counterpart to the WORKFLOW §8 architec
 
 Use this only when design friction is real: repeated behavior, callers that need a stable seam, or a module whose interface exposes too much. Architectural deepening is premature for a one-shot ≤200-line experiment. Per ADR-0020 §4.
 
-## Step 0 — Confirm regime
-
-Deepen is for the *stable-codebase, friction-visible* regime. Run when at least one holds:
-
-- A module's interface is roughly as complex as its implementation (shallow module candidate).
-- A concept is bouncing between modules across recent changes (locality candidate).
-- A test cannot exercise the real bug pattern at the call site (interface-is-test-surface candidate).
-- An adapter has been introduced for a hypothetical second implementation (two-adapters-rule violation).
-- The user explicitly asks "where should this be refactored?" against a stable surface.
-
-Route elsewhere when:
+## Not for
 
 - The change is a one-line fix or mechanical refactor → no scaffold needed.
 - The codebase is a one-shot script (≤200 lines, no callers): deepening is premature; ship the experiment first.

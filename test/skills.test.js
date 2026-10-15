@@ -91,6 +91,46 @@ for (const agent of ['claude-code', 'codex']) {
   }
 }
 
+// Task 0120: the Agent Skills guidance keeps SKILL.md under 500 lines and
+// about 5k tokens; detail moves to references/ loaded on demand.
+const BODY_LINE_CAP = 500;
+const BODY_BYTE_CAP = 20000;
+
+for (const agent of ['claude-code', 'codex']) {
+  for (const { name, dir } of listSkills(agent)) {
+    test(`skill ${agent}/${name}: SKILL.md stays within the body budget and carries no ceremony`, () => {
+      const body = readFileSync(join(dir, 'SKILL.md'), 'utf8');
+      const lines = body.split('\n').length;
+      const bytes = Buffer.byteLength(body);
+      assert.ok(lines <= BODY_LINE_CAP, `SKILL.md has ${lines} lines; cap ${BODY_LINE_CAP}`);
+      assert.ok(bytes <= BODY_BYTE_CAP, `SKILL.md has ${bytes} bytes; cap ${BODY_BYTE_CAP}`);
+      assert.doesNotMatch(
+        body,
+        /^## (Step|Phase) 0 — Confirm regime/m,
+        'routing belongs in a "Not for" list'
+      );
+      assert.doesNotMatch(body, /less mature/, 'outdated Codex auto-trigger warning');
+    });
+  }
+}
+
+// Task 0125: Canon TDD refactors after each green, keeps a test list that
+// grows with discovered tests, and treats duplication as a hint.
+test('static contract: ad-tdd and WORKFLOW §16 declare refactoring inside each cycle', () => {
+  const sources = [
+    ...['claude-code', 'codex'].map((agent) =>
+      readFileSync(join(SKILLS_ROOT, agent, 'ad-tdd', 'SKILL.md'), 'utf8')
+    ),
+    readFileSync(join(REPO_ROOT, 'WORKFLOW.md'), 'utf8'),
+  ];
+  for (const text of sources) {
+    assert.match(text, /Refactor on green, every cycle/);
+    assert.match(text, /Add each test you discover to the list/);
+    assert.match(text, /Duplication is a hint, not a command/);
+    assert.doesNotMatch(text, /Once all planned tests pass/);
+  }
+});
+
 test('Claude Code skills follow the local closing-section contract', () => {
   for (const { name, dir } of listSkills('claude-code')) {
     if (name === 'ad-philosophy') continue;
@@ -384,6 +424,8 @@ test('project-state collection is shared, bounded, and one-way on both hosts', (
         parseFrontmatter(join(projectStateDir, 'SKILL.md'))['disable-model-invocation'],
         true
       );
+      // Task 0120: a helper other skills invoke stays out of the `/` menu.
+      assert.equal(parseFrontmatter(join(projectStateDir, 'SKILL.md'))['user-invocable'], false);
     } else {
       const metadata = yaml.load(
         readFileSync(join(projectStateDir, 'agents', 'openai.yaml'), 'utf8')

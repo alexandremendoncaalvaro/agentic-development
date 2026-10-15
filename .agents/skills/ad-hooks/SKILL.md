@@ -7,7 +7,6 @@ summary: Scaffold deterministic quality gates per WORKFLOW §11 — pre-commit +
 <background_information>
 Scaffolds the deterministic gates `WORKFLOW.md` §11 names. The skill writes config files for a hook runner and updates `AGENTS.md` Quality Gates; it does not execute install scripts. The user runs the runner's one-time bootstrap (`npx husky init`, `lefthook install`, `pre-commit install`) — the skill names the exact command.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user asks about hooks, pre-commit, or quality gates, invoke the skill manually.
 </background_information>
 
 <instructions>

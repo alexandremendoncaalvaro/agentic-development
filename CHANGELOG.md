@@ -6,6 +6,19 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- Every SKILL.md stays under 500 lines and 20,000 bytes; `ad-hooks` moves
+  its session-lifecycle tier to `references/session-tier.md`. The ceremonial
+  "Confirm regime" step becomes a "Not for" routing list (or a named
+  preconditions step where it held real checks), the outdated Codex
+  auto-trigger warning is gone, and `ad-project-state` leaves the Claude Code
+  `/` menu (task-0120).
+- `ad-tdd` and WORKFLOW §16 refactor on green in every cycle, treat
+  duplication as a hint, and add discovered tests to the list, as in Kent
+  Beck's Canon TDD; `ad-domain` groups terms by relation instead of
+  alphabetically and allows a lead sentence plus two of scope (task-0125).
+
 ## [1.5.0] - 2026-10-15
 
 ### Changed

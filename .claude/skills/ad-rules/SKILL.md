@@ -11,7 +11,7 @@ Resolves the rules in force for one of two operations. **Inventory mode** lists 
 
 It exists because the practitioner's cross-project rules live in the host's global instruction file, at a path that differs per machine — often a symlink into a personal workflow repo — so every session opened with the same manual instruction: read this file, bring the topics. Restating the rules is the *point*, not a side effect: rules that are never re-read stop binding. What should not repeat is the path archaeology.
 
-## Step 0 — Confirm regime
+## Step 0 — Classify the request
 
 Run when the user asks to load, see, list, or refresh the rules in force, asks what governs the current work, says "The Rules" or an equivalent rules correction, or is starting in a repo whose conventions they have not read yet.
 

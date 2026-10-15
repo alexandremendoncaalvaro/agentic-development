@@ -7,7 +7,6 @@ summary: Four-source pre-implementation research + versioned claim-to-source evi
 <background_information>
 Implements WORKFLOW §4 + §5 end-to-end as one research pass. The four sources are joined by AND, not OR — every non-trivial change runs the full research pass, then synthesizes a happy path, persists the evidence trail, then justifies any deviation. This skill writes a ground record, never production code.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire on a non-trivial change, invoke this skill manually before implementing.
 </background_information>
 
 <instructions>

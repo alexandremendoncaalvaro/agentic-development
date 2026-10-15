@@ -11,16 +11,7 @@ Implements ADR-0022 — the upstream-of-research phase. Process scaffold for sha
 
 No primary file output. Side-effects land in `CONTEXT.md` (via [`ad-domain`](../ad-domain/SKILL.md)) and ADRs (via [`ad-adr`](../ad-adr/SKILL.md)) — both lazy, both belonging to other skills.
 
-## Step 0 — Confirm regime
-
-Grill is for the *fuzzy-question, scope-uncertain* regime. Run only when at least one of these holds:
-
-- The user's ask uses vague or overloaded vocabulary ("account", "user", "thing", "stuff").
-- The ask bundles ≥2 decisions into one question.
-- The user has not stated the success condition or the failure mode.
-- The same noun is used inconsistently across the request and the codebase.
-
-Route elsewhere when:
+## Not for
 
 - The question is sharp and research-ready → `/ad-ground` (WORKFLOW §4 + §5).
 - The technique is known and the ask is implementation-strategy choice → `/ad-tdg` (WORKFLOW §9).

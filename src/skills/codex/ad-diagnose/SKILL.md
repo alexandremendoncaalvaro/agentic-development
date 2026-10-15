@@ -9,7 +9,6 @@ Implements WORKFLOW.md §15 per ADR-0021 (`doc/adr/0021-diagnose-discipline.md`)
 
 The shape is grounded in Kernighan & Pike, *The Practice of Programming* (1999, ch. 5–6) and Karl Popper's falsifiability framing. The Phase-1 framing ("the loop is the skill — everything else is mechanical") is borrowed from `mattpocock/skills` with attribution.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions diagnosing, debugging, a performance regression, or building a repro, invoke this skill manually.
 </background_information>
 
 <instructions>

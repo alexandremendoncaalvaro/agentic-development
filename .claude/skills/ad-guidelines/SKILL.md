@@ -11,16 +11,7 @@ Layer 1 Constitution trinity member. Lazy lifecycle owner of `GUIDELINES.md` at 
 
 `GUIDELINES.md` is the **full reference**; `AGENTS.md` is the **distilled summary**. Each AGENTS.md section that has detail points to the corresponding GUIDELINES.md section. The two never duplicate — `ad-drift` flags duplication as drift.
 
-## Step 0 — Confirm regime
-
-Run when the user wants to scope or update project-level engineering standards. Triggers:
-
-- New project that needs explicit standards.
-- Existing project with engineering rules buried in `AGENTS.md` — extract and scale.
-- Stack change (new language, new architecture) that needs a guidelines update.
-- Object Calisthenics tier review.
-
-Route elsewhere when:
+## Not for
 
 - Scope is system structure (modules, dependencies, deployment) → `/ad-architecture`.
 - Scope is product (target user, success metrics) → `/ad-prd`.

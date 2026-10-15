@@ -13,14 +13,7 @@ TDD is a deterministic LLM guardrail: a failing test is unambiguous, so "almost 
 
 **Good tests read like a specification.** *"User can checkout with a valid cart"* tells you exactly what capability exists. **Bad tests couple to implementation** — mock internal collaborators, assert on private state, test the *shape* of things (data structures, function signatures) rather than user-facing behavior. A test that breaks on a rename but not on a behavior change was testing implementation, not behavior. A **tautological test** is the same failure in a quieter form: its expected value is recomputed the way the code computes it, so it passes by construction and cannot catch the bug. Take expected values from an independent source — a literal, a worked example, the spec.
 
-## Step 0 — Confirm regime
-
-TDD is for the *behavior-known, test-expressible* regime. Run the skill when:
-
-- The change has a clear behavior to express as a test (a new API capability, a bug-driven regression test, a refactor with a known contract), AND
-- A test runner is wired (the project can execute one test in seconds, not minutes).
-
-Route elsewhere when:
+## Not for
 
 - The outcome (ground-truth pair) is known but the *implementation strategy* between input and output has multiple plausible paths → `/ad-tdg` (WORKFLOW §9). TDD focuses on driving code through one test at a time; TDG picks between three implementation candidates against one ground-truth pair.
 - The *technique itself* is uncertain across multiple plausible approaches → `/ad-spike` (WORKFLOW §14).
@@ -33,7 +26,7 @@ When both TDD and TDG apply (behavior is test-expressible AND multiple implement
 
 Before writing a test or a line of code:
 
-1. **Read `CONTEXT.md`** if it exists — anchor the test names and interface vocabulary in the project's ubiquitous language. Tests that use canonical nouns survive renames; tests that paraphrase break.
+1. **Read `CONTEXT.md`** if it exists — anchor the test names and interface vocabulary in the project's ubiquitous language. When a domain term changes, the model changed: rename the tests with the code.
 2. **Confirm the public interface.** What is the smallest surface the caller needs to know? Types, ordering constraints, error modes. Interface design is testability design.
 3. **Identify deepening opportunities** (small interface over deep implementation per WORKFLOW §8). Surface-area-light interfaces are easier to test against and survive refactors.
 4. **List the behaviors to test, not the implementation steps.** Pick the **first** behavior — the one that proves end-to-end the path works. The rest are deferred until the tracer bullet lands.
@@ -61,8 +54,9 @@ The tracer bullet is the end-to-end proof that the path works. Do not write a se
 For each remaining behavior:
 
 ```
-RED:   Write the next test → run → fail.
-GREEN: Add minimum code to pass → run → green.
+RED:      Write the next test → run → fail.
+GREEN:    Add minimum code to pass → run → green.
+REFACTOR: Optional, on green → run after each step → still green.
 ```
 
 Rules:
@@ -71,19 +65,21 @@ Rules:
 - **Only enough code to pass the current test.** Anticipating the next test bloats the implementation and couples it to assumptions not yet verified.
 - **Tests verify behavior through public interfaces.** No private-method tests, no internal-collaborator mocks, no direct database/file-system assertions when the public interface is what the caller uses. If a test would couple to implementation, surface it and prompt the user — either rewrite to the public surface or accept the coupling explicitly with rationale in the task notes.
 - **Keep the test name behavior-shaped.** *"user can sign in with valid credentials"* — yes. *"calls authenticate() with username arg"* — no.
+- **Refactor on green, every cycle.** Once the test passes, tidy what this cycle touched — names, structure, a helper — and rerun after each step. Never refactor while RED.
+- **Duplication is a hint, not a command.** Remove it when it obscures intent; leave it while a third case has not shown the right shape.
+- **Add each test you discover to the list.** Making a test pass often reveals another behavior or edge case; write it on the list, do not chase it mid-cycle.
 
-## Step 4 — Refactor
+## Step 4 — Close-out
 
-Once all planned tests pass:
+When the list is empty:
 
-- [ ] Extract duplication (DRY) — when two tests duplicate setup or two code paths duplicate logic.
 - [ ] **Deepen** — move complexity behind a smaller interface (WORKFLOW §8 vocabulary). The deletion test applies: a module whose interface is nearly as complex as its implementation is shallow; refactor toward depth.
 - [ ] Apply SOLID where natural; never force-fit a pattern.
 - [ ] Consider what the new code reveals about the existing code — opportunities to deepen pre-existing shallow modules surface during TDD because the new tests pin behavior the old code was implicitly relying on.
 - [ ] Run tests after **each** refactor step. Never refactor while RED — get to GREEN first, then refactor with the green baseline as the safety net.
 - [ ] **Stateful unit: sweep operator mutations before the first publication.** Flip one comparison or logical operator at a time (`<`/`<=`, `>`/`>=`, `==`/`!=`, `&&`/`||`, null checks) in the unit's file and rerun its tests. Each survivor is a missing test until a distinguishing input has been searched for and none exists; close survivors one at a time through the Step 3 loop, and record the search beside any survivor kept. A bare "equivalent" is a claim, not a result.
 
-The refactor phase is where deepening happens. Treat the tests as a fixed contract; the implementation is free to change shape as long as the contract holds.
+The close-out is where module-level deepening happens. Treat the tests as a fixed contract; the implementation is free to change shape as long as the contract holds.
 
 ## Per-cycle checklist
 

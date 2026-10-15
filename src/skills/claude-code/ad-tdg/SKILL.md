@@ -14,14 +14,7 @@ Implements WORKFLOW.md §9 (Outcome-Based Prompting / Test Dependency Map) end-t
 - **Never edit the TDM tests to make them pass** — they are the verification surface; changing them while implementing is the hidden "almost right" WORKFLOW §12 names. If a test is wrong, fix it first as a separate diff.
 - **Type-check passing is not the gate — the test gate is.** Do not declare done before the TDM tests are green.
 
-## Step 0 — Confirm regime
-
-TDG is for the *technique-known, implementation-strategy-uncertain* regime. Run the skill only when:
-
-* The canonical approach is settled (via `ad-ground` or prior knowledge), AND
-* Multiple implementation strategies could produce the expected output with different trade-offs along readability / performance / testability axes.
-
-Route elsewhere when:
+## Not for
 
 * The *technique itself* is uncertain across multiple plausible approaches → `/ad-spike` (WORKFLOW §14). Spike validates technique with golden fixture + per-stage debug; TDG validates implementation with ground-truth pair + TDM.
 * The path is fully obvious (one-line fix, mechanical refactor, byte-for-byte port) → TDG is overkill; proceed directly without the skill.

@@ -9,7 +9,7 @@ Process scaffold for compacting a long or near-exhausted session into a handoff 
 
 The skill exists because long sessions accumulate inherited bias (WORKFLOW §12 — "almost right" failures compound) and because session-window pressure forces ad-hoc summarisation that loses the parts the next agent actually needs. Handoffs replace ad-hoc summarisation with a structured artifact.
 
-Codex subagents and sessions do not share the parent conversation history by magic, and `/clear` discards local context. Handoff via the OS temp dir is the durable bridge between Codex sessions or explicit subagent work — treat it as load-bearing, not optional. Codex auto-trigger on description keywords is less mature than Claude Code's; if auto-invocation does not fire when the user mentions handing off, compacting, or `/clear`, invoke this skill manually.
+Codex subagents and sessions do not share the parent conversation history by magic, and `/clear` discards local context. Handoff via the OS temp dir is the durable bridge between Codex sessions or explicit subagent work — treat it as load-bearing, not optional.
 </background_information>
 
 <instructions>

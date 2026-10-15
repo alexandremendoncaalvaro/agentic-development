@@ -9,16 +9,11 @@ allowed-tools: Read, Bash, Glob, Grep
 
 Implements ADR-0024 and ADR-0032. Opens a PR via `gh pr create` with a uniform body shape (Summary / Test plan / Links). Helper posture on scope, links, and body drafting — warnings surface without refusing. Hard gate on local quality: the skill refuses to open a PR when pre-push / CI-mirror gates exit non-zero (WORKFLOW §11 — CI failure is a local gate gap). No `--no-verify` symmetric bypass; users who need to open a red draft invoke `<github-command> pr create --draft` directly.
 
-## Phase 0 — Confirm regime
+## Phase 0 — Scope
 
 This skill is model-invocable (ADR-0084): the agent may run it when the work is ready, and the outward steps stay behind the owner's approval given in this session: the push in Phase 1 and the draft in Phase 3 are each confirmed once, recommended answer first, before the pull request is opened.
 
-Run when:
-
-- One or more atomic commits exist on the current branch ahead of the base (typically `main`).
-- The user asks to "open a PR", "submit a PR", "create a pull request".
-
-Route elsewhere when:
+Not for:
 
 - The branch has uncommitted or unsplit work → `/ad-commit` first.
 - The user wants to merge an already-open PR → `/ad-merge`.

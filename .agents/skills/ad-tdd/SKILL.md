@@ -13,7 +13,6 @@ Good tests read like a specification. *"User can checkout with a valid cart"* te
 
 Distinction from `ad-tdg`: TDD focuses on driving code through one test at a time (behavior-known regime); TDG picks between three implementation candidates against one ground-truth pair (technique-known, implementation-strategy-uncertain regime). When both apply, use TDD as the outer loop and invoke `ad-tdg` inside the GREEN phase to pick the implementation strategy for that test cycle.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions TDD, red-green-refactor, test-first, tracer bullet, or behavior-not-implementation, invoke this skill manually.
 </background_information>
 
 <instructions>
@@ -49,6 +48,7 @@ Step 3 — incremental loop. For each remaining behavior:
 
 - RED: write the next test → run → fail.
 - GREEN: add minimum code to pass → run → green.
+- REFACTOR: optional, on green → run after each step → still green.
 
 Rules:
 
@@ -57,10 +57,12 @@ Rules:
 - Only enough code to pass the current test. Anticipating the next test bloats the implementation and couples it to assumptions not yet verified.
 - Tests verify behavior through public interfaces. No private-method tests, no internal-collaborator mocks, no direct database/file-system assertions when the public interface is what the caller uses. If a test would couple to implementation, surface it and prompt — either rewrite to the public surface or accept the coupling explicitly with rationale in the task notes.
 - Keep the test name behavior-shaped. *"user can sign in with valid credentials"* — yes. *"calls authenticate() with username arg"* — no.
+- Refactor on green, every cycle. Once the test passes, tidy what this cycle touched — names, structure, a helper — and rerun after each step. Never refactor while RED.
+- Duplication is a hint, not a command. Remove it when it obscures intent; leave it while a third case has not shown the right shape.
+- Add each test you discover to the list. Making a test pass often reveals another behavior or edge case; write it on the list, do not chase it mid-cycle.
 
-Step 4 — refactor. Once all planned tests pass:
+Step 4 — close-out. When the list is empty:
 
-- Extract duplication when two tests duplicate setup or two code paths duplicate logic.
 - Deepen — move complexity behind a smaller interface (WORKFLOW §8 vocabulary). The deletion test applies: a module whose interface is nearly as complex as its implementation is shallow; refactor toward depth.
 - Apply SOLID where natural; never force-fit a pattern.
 - Consider what the new code reveals about the existing code — opportunities to deepen pre-existing shallow modules surface during TDD because the new tests pin behavior the old code was implicitly relying on.

@@ -9,7 +9,6 @@ Implements ADR-0020 (`doc/adr/0020-deep-modules-vocabulary.md`) — operational 
 
 Use this only when design friction is real: repeated behavior, callers that need a stable seam, or a module whose interface exposes too much. Architectural deepening is premature for a one-shot ≤200-line experiment. Per ADR-0020 §4.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions deepening, shallow modules, the deletion test, or the two-adapters rule, invoke this skill manually.
 </background_information>
 
 <instructions>

@@ -9,7 +9,6 @@ A pre-construction de-risking loop. Before building a defined task, enumerate th
 
 Use it when a task is defined (a spec, PRD, or task file exists) and non-trivial, before implementation. Skip it for a genuinely trivial change. It is not a single research pass (that is ad-ground) or a single technique validation (that is ad-spike) — it sequences those under a stop criterion.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire before a build, invoke this skill manually.
 </background_information>
 
 <instructions>

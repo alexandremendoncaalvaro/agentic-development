@@ -9,7 +9,6 @@ Implements ADR-0022 — the upstream-of-research phase. Process scaffold for sha
 
 No primary file output. Side-effects land in `CONTEXT.md` (via `ad-domain`) and ADRs (via `ad-adr`) — both lazy, both belonging to other skills.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions grilling, interview, fuzzy ask, or "stress test the plan", invoke this skill manually.
 </background_information>
 
 <instructions>
