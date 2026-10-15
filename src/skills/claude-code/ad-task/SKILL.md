@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Glob, Bash
 
 Drafts `doc/tasks/<NNNN>-<short-slug>.md` for one tracked task. Format chosen so status changes via single checkbox toggles and Notes is append-only — cheap, reviewable, idempotent edits.
 
-First run `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external` and `process.records.task` is not a `repo-path` record, the team's own delivery process owns work items: show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). A `repo-path` record moves the file to its `path`.
+First run `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external`, the team's own delivery process owns work items and `process.records.task` decides. With `external` or no record, show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). With `issue-comment`, draft it in the OS temporary directory, show it, and post it with `gh issue comment` on the work item the owner names only after the owner approves; then delete the draft. With `repo-path`, write the file under its `path`.
 
 ## Step 0 — Scope preflight
 

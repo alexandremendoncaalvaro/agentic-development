@@ -197,7 +197,7 @@
         },
         {
           "path": ".agents/skills/ad-derisk/SKILL.md",
-          "sourceSha": "8b1b6acb566e6dd13217ce447fa9ac31685e883dfdc9bf2c02f1a542f6b056d1"
+          "sourceSha": "b451eba3250de2dfa31db9979afc54b4e757fe217b41465320a52a50ffb999cb"
         }
       ]
     },
@@ -504,7 +504,7 @@
         },
         {
           "path": ".agents/skills/ad-prd/SKILL.md",
-          "sourceSha": "2d8da7e7ecc108fb7fb61d7a778d3feaa59c89a11dc69c5094b234ddd3224f0a"
+          "sourceSha": "f464a16a19ed1be1b12325634a0377e0643de1d25e1ca22d92ca691dd28e1a3e"
         }
       ]
     },
@@ -812,7 +812,7 @@
         },
         {
           "path": ".agents/skills/ad-spec/SKILL.md",
-          "sourceSha": "661b59ed58dcbacef6454da59ee6ddc10847ea7d0c3c401289b9e183c6ed89a4"
+          "sourceSha": "2c6f06bf7dde87f0036dd4c3240baf86c130598767150274518888ec256d4e9d"
         }
       ]
     },
@@ -875,7 +875,7 @@
         },
         {
           "path": ".agents/skills/ad-task/SKILL.md",
-          "sourceSha": "9e0443cd8a02f057917d1f5b4e5183e81074e9b36c194a6b8abd63fa6ac34916"
+          "sourceSha": "2d093b367df6d0934d9e0696b752a1845ad0185c8f8bb5f029604e1fd54eca45"
         }
       ]
     },

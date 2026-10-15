@@ -12,6 +12,8 @@ Use it when a task is defined (a spec, PRD, or task file exists) and non-trivial
 </background_information>
 
 <instructions>
+First run `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external`, the register goes where `process.records.task` says instead of a task file. With `issue-comment`, `external` or no record, draft it in the OS temporary directory, show it, and post it with `gh issue comment` on the work item the owner names only after the owner approves (ADR-0085); then delete the draft. With `repo-path`, append it to the task file under its `path`.
+
 Step 1 — enumerate the unknowns (risk register). List every assumption that, if wrong, breaks the build: technique ("does library X do Y at our scale?"), integration ("does system Z respond as we expect?"), performance ("does it fit the budget?"), scope ("is this what the user actually wants?"). Each entry carries a description, the impact if it is wrong, and the current uncertainty. Keep the register lightweight — it lives in the task's Notes, not a new artifact.
 
 Step 2 — prioritize by risk. Order by impact times uncertainty. Attack the most dangerous unknown first, not the easiest. Decide each at the last responsible moment — but high-risk unknowns do not wait.
@@ -33,10 +35,8 @@ Interview: ask one question at a time for the risk-register review (which unknow
 </instructions>
 
 <output_contract>
-No new file of its own. The risk register is appended to the task's Notes (never a rewrite); the evidence persists in the spikes and ADRs the loop spawns. The skill reports the resolved register and the stop verdict, cites each retirement's grade per WORKFLOW §17, and writes no code. Documentation Discipline (WORKFLOW §2) applies.
+No new file of its own. The risk register is appended to the task's Notes (under an external lifecycle owner, to the work item the opening rule names instead) (never a rewrite); the evidence persists in the spikes and ADRs the loop spawns. The skill reports the resolved register and the stop verdict, cites each retirement's grade per WORKFLOW §17, and writes no code. Documentation Discipline (WORKFLOW §2) applies.
 </output_contract>
-
-When `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` reports that `lifecycleOwner` is `external`, the register goes to the work item the team's process names instead of a task file: draft it as an issue comment, show it, and post it only after the owner approves (ADR-0085, ADR-0097).
 
 ## Next
 

@@ -74,3 +74,15 @@ team's work item, posted only after the owner approves; `ad-philosophy`
 states the rule to work inside the team's delivery process. The generic
 example and the ADR shipped with slice 1. Still open: the issue-comment
 flow observed end to end in a recorded run.
+
+### 2026-10-15 — review of afd404a
+
+Two-axis review, no blocker. Concerns, fixed and pinned by static-contract
+assertions: `ad-task`, `ad-spec` and `ad-prd` now branch on the record kind
+under an external owner (`external` or none shows the handoff; `issue-comment`
+drafts, shows and posts with `gh issue comment` on the work item the owner
+names only after approval; `repo-path` writes under its path); `ad-derisk`
+reads the process before Step 1, follows `process.records.task` with the same
+branches and states its posting step, and its output contract covers both
+destinations. Concern accepted: these are text contracts; the recorded
+end-to-end run stays open.

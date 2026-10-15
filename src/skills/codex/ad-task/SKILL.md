@@ -9,7 +9,7 @@ Drafts `doc/tasks/<NNNN>-<short-slug>.md` for one tracked task. Format chosen so
 </background_information>
 
 <instructions>
-First run `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external` and `process.records.task` is not a `repo-path` record, the team's own delivery process owns work items: show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). A `repo-path` record moves the file to its `path`.
+First run `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external`, the team's own delivery process owns work items and `process.records.task` decides. With `external` or no record, show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). With `issue-comment`, draft it in the OS temporary directory, show it, and post it with `gh issue comment` on the work item the owner names only after the owner approves; then delete the draft. With `repo-path`, write the file under its `path`.
 
 Step 0 — scope preflight. Establish the **current repository** before naming or drafting anything. From the consumer root, run `node .agents/skills/ad-task/scripts/scope-anchors.mjs` (substitute the skill base path when loaded elsewhere). Read its JSON: `cwd` and `gitRoot` identify the target; `anchors` is the complete allow-list of repository-local sources. If `unreadable` is non-empty, stop until access is resolved.
 

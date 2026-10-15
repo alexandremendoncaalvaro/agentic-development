@@ -145,6 +145,11 @@ test('static contract: ad-task, ad-spec and ad-prd hand off when the lifecycle o
         /show its `handoff` text and write nothing/,
         `${agent}/${skill} hands off`
       );
+      assert.match(
+        text,
+        /With `issue-comment`, draft it in the OS temporary directory, show it, and post it with `gh issue comment` on the work item the owner names only after the owner approves/,
+        `${agent}/${skill} drafts an issue-comment record behind approval`
+      );
     }
   }
 });
@@ -152,7 +157,17 @@ test('static contract: ad-task, ad-spec and ad-prd hand off when the lifecycle o
 test('static contract: ad-next routes by issue stage, ad-derisk follows the work item, ad-philosophy states the rule', () => {
   for (const agent of ['claude-code', 'codex']) {
     assert.match(skillText(agent, 'ad-next'), /each issue's `stage` and its `next` text/);
-    assert.match(skillText(agent, 'ad-derisk'), /`lifecycleOwner` is `external`/);
+    const derisk = skillText(agent, 'ad-derisk');
+    assert.match(derisk, /`lifecycleOwner` is `external`/);
+    assert.match(derisk, /`process\.records\.task`/);
+    assert.match(
+      derisk,
+      /post it with `gh issue comment` on the work item the owner names only after the owner approves/
+    );
+    assert.ok(
+      derisk.indexOf('`lifecycleOwner` is `external`') < derisk.search(/Step 1 — /i),
+      `${agent}/ad-derisk reads the process before Step 1`
+    );
     assert.match(skillText(agent, 'ad-philosophy'), /Work inside the team's delivery process/);
   }
 });
