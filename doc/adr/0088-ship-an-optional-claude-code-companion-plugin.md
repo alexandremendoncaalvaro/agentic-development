@@ -51,10 +51,17 @@ The owner found the band on screen too often at 60% and wanted it from about
 80%; the default threshold is now 80, still bounded 1 to 99 and changeable in
 `/config`. The band also carries a "clear and continue" box, off by default
 and remembered in the plugin's store: with it on, the `AD handoff` press
-submits `/ad-handoff` as before and, once that turn ends, finds the handoff
-file written since the press under `${TMPDIR}/agentic-handoffs`, runs `/clear`
+runs `/ad-handoff` as before and, once that turn ends, finds the handoff file
+written since the turn began under `${TMPDIR}/agentic-handoffs`, runs `/clear`
 through `$.command.run`, and submits a prompt that resumes from that file.
-When no handoff file was written it clears nothing and says so (Task 0115).
+When the turn did not finish, wrote no handoff file or more than one, or the
+clear or the resume prompt is refused, it says so in a toast and leaves the
+session as the handoff left it (Task 0115).
+
+Item 4's "submits `/ad-handoff`" now reads "runs `/ad-handoff`": a plugin's
+`$.prompt.submit` of that text did nothing in the desktop app, so the press
+runs the command through `$.command.run` (Task 0116). The resume prompt is
+plain text, not a slash command, and still goes through `$.prompt.submit`.
 A spike on Claude Code 2.1.289 showed a plugin's `$.command.run` runs the
 built-in `/clear` (the session ends with reason `clear` and continues under a
 new id) and that a `$.prompt.submit` after it runs in the new session.

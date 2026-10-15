@@ -25,17 +25,17 @@ the plugin can submit after a clear, so a spike settles that before code.
 
 ## Acceptance Criteria
 
-- [ ] The band's default threshold is 80% of the auto-compact point; the option still takes 1 to 99.
-- [ ] The band carries a "clear and continue" checkbox, off by default and remembered across sessions.
-- [ ] With the box on, pressing "AD handoff" runs `/ad-handoff`, then clears the session and submits a prompt that resumes from the handoff file it wrote; with the box off the button behaves as today.
-- [ ] If the clear or the resume cannot run, the band says so and leaves the session as it was after the handoff.
+- [x] The band's default threshold is 80% of the auto-compact point; the option still takes 1 to 99.
+- [x] The band carries a "clear and continue" checkbox, off by default and remembered across sessions.
+- [x] With the box on, pressing "AD handoff" runs `/ad-handoff`, then clears the session and submits a prompt that resumes from the handoff file it wrote; with the box off the button behaves as today.
+- [x] If the clear or the resume cannot run, the band says so and leaves the session as it was after the handoff.
 - [ ] Unit tests cover the pure logic; the owner checks the flow live in the desktop app.
 
 ## Plan
 
-- [ ] Spike: from a plugin, `$.command.run({ command: 'clear' })` and a `$.prompt.submit` after it; record the result.
-- [ ] Default threshold 60 to 80 (`band.mjs`, `plugin.json`).
-- [ ] Checkbox and flow (`register.mjs`, pure helpers in `band.mjs`), test first.
+- [x] Spike: from a plugin, `$.command.run({ command: 'clear' })` and a `$.prompt.submit` after it; record the result.
+- [x] Default threshold 60 to 80 (`band.mjs`, `plugin.json`).
+- [x] Checkbox and flow (`register.mjs`, pure helpers in `band.mjs`), test first.
 - [ ] ADR-0088 addendum; `/ad-review`; owner live check; PR with auto-merge.
 
 ## Notes
@@ -54,11 +54,17 @@ A throwaway plugin loaded with `--plugin-dir` into a headless Claude Code 2.1.28
 
 Test first: six regression tests in `test/session-plugin.test.js` (newest handoff since the press, the resume prompt, box on, box off, no file, the remembered toggle) plus the 80% default; red before the code except the box-off case, which is today's behaviour. Five mutations (ignore the press time, accept any file, clear without a file, ignore the box, skip the clear) each turned one test red. ADR-0088 gains a dated addendum, PROJECTION follows.
 
+### 2026-10-15 — merged with main and tests completed
+
+Merged `origin/main` (release 1.6.0) instead of rebasing: one conflict pass, no force-push. Task 0116 landed on main meanwhile and changed the press to `$.command.run({ command: 'ad-handoff' })`, because a plugin's `$.prompt.submit` of `/ad-handoff` did nothing in the desktop app; the clear-and-resume flow now arms on that command. The engine 2.1.295 typings say `prompt.submit` sends its text to the model as written, so a slash command through it is not expanded; the resume prompt is plain text, so it still goes through `$.prompt.submit`, which the 2.1.289 spike showed running in the cleared session. The desktop app is the owner's live check.
+
+Eight tests added for the paths the WIP left uncovered: the directory list, a file older than the handoff turn, two new files, a refused clear, a refused resume prompt, a handoff command that could not start, a session that ends before the handoff turn, and an unreadable store. The code for those paths was already in the WIP commit, so each was shown to bite by a mutation instead: eight mutations (no dedupe, no time filter, no several-files check, no return after a refused clear, no reset when the command fails, no reset on session end, the store defaulting on, no turn-reason check) each turned its test red; 54 of 54 green after. "The band says so" is a toast from the band's plugin, the same channel task 0116 uses for a press that cannot start; ADR-0088's addendum records it.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
-- [ ] Local tests pass (or N/A documented in Notes)
+- [x] Local tests pass (or N/A documented in Notes)
 - [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [ ] No orphan `TODO`/`FIXME` introduced
 - [ ] Status updated to `done` and Notes log closes the task

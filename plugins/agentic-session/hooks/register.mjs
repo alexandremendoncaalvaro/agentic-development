@@ -48,7 +48,8 @@ export function register(on, options) {
   });
 
   // The first main-loop turn to start after the press is the handoff's own:
-  // the submit queues until the session is idle (task-0115).
+  // the command queues until the session is idle (task-0115). Its start time
+  // tells the handoff's file from older ones.
   on('turn.start', async ($, e, next) => {
     const result = await next(e);
     if (!e.agentId && state.pending && !state.pending.turnId) {

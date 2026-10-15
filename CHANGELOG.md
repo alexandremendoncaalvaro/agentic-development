@@ -6,6 +6,21 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- The `agentic-session` band carries a **clear and continue** box, off by
+  default and remembered across sessions. With it on, **AD handoff** runs
+  `/ad-handoff`, then clears the session and submits a prompt that resumes
+  from the handoff file that turn wrote. When the handoff turn did not finish,
+  wrote no file or more than one, or the clear or the resume prompt is
+  refused, a toast says so and the session is left as the handoff left it
+  (task-0115).
+
+### Changed
+
+- The `agentic-session` band appears from 80% of the way to the auto-compact
+  point by default, up from 60%; the option still takes 1 to 99 (task-0115).
+
 ## [1.6.0] - 2026-10-15
 
 ### Added

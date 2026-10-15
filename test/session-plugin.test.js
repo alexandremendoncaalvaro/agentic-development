@@ -17,6 +17,7 @@ const {
   DEFAULT_THRESHOLD,
   HANDOFF_LABEL,
   handoffsSince,
+  handoffDirs,
   resumePrompt,
 } = await import(pathToFileURL(join(PLUGIN, 'hooks', 'band.mjs')).href);
 
@@ -347,7 +348,10 @@ async function pressWithBoxOn(options) {
   const plugin = await loadPlugin(1, FULL, { stored: { clearAfterHandoff: true }, ...options });
   const { hooks, $ } = plugin;
   await hooks['session.start']($, {}, async () => undefined);
-  press(hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'), 'handoff');
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'handoff'
+  );
   await tick();
   return plugin;
 }
@@ -361,7 +365,10 @@ test('regression: task-0115 a turn already running at the press does not trigger
   const { hooks, ran, toasts, $ } = plugin;
   await hooks['session.start']($, {}, async () => undefined);
   await hooks['turn.start']($, { turnId: 'busy' }, async () => undefined);
-  press(hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'), 'handoff');
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'handoff'
+  );
   await tick();
   await hooks['turn.complete']($, { turnId: 'busy', reason: 'answer' }, async () => undefined);
   await tick();
@@ -376,6 +383,105 @@ test('regression: task-0115 an interrupted handoff turn clears nothing', async (
   await runTurn(hooks, $, 't1', 'aborted');
   assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
   assert.match(toasts[0], /did not finish/);
+});
+
+test('regression: task-0115 handoffDirs reads TMPDIR, then /tmp, without duplicates', () => {
+  assert.deepEqual(handoffDirs('/var/tmp-x/'), [
+    '/var/tmp-x/agentic-handoffs',
+    '/tmp/agentic-handoffs',
+  ]);
+  assert.deepEqual(handoffDirs(undefined), ['/tmp/agentic-handoffs']);
+  assert.deepEqual(handoffDirs('/tmp'), ['/tmp/agentic-handoffs']);
+});
+
+test('regression: task-0115 a handoff file older than the handoff turn is not resumed from', async () => {
+  const { hooks, ran, toasts, $ } = await pressWithBoxOn({
+    handoffs: () => [{ name: 'old.md', kind: 'file', mtimeMs: Date.now() - 60_000 }],
+  });
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.match(toasts[0], /no handoff file/);
+});
+
+test('regression: task-0115 two new handoff files clear nothing', async () => {
+  const { hooks, ran, toasts, submitted, $ } = await pressWithBoxOn({
+    handoffs: () => [
+      { name: 'mine.md', kind: 'file', mtimeMs: Date.now() + 1000 },
+      { name: 'other.md', kind: 'file', mtimeMs: Date.now() + 2000 },
+    ],
+  });
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(submitted, []);
+  assert.match(toasts[0], /more than one/);
+});
+
+test('regression: task-0115 a refused clear sends no resume and names the handoff', async () => {
+  const plugin = await pressWithBoxOn({ handoffs: oneNewFile });
+  const { hooks, ran, toasts, submitted, logs, $ } = plugin;
+  $.command.run = async (spec) => {
+    ran.push(spec);
+    throw new Error('clear refused');
+  };
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
+  assert.deepEqual(submitted, []);
+  assert.match(toasts[0], /not cleared.*\/var\/tmp-x\/agentic-handoffs\/h\.md/);
+  assert.match(logs.at(-1).text, /clear refused/);
+});
+
+test('regression: task-0115 a refused resume prompt says the session was cleared and where to resume', async () => {
+  const { hooks, ran, toasts, logs, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
+  $.prompt.submit = async () => {
+    throw new Error('submit refused');
+  };
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
+  assert.match(toasts[0], /cleared, but the resume prompt was not sent.*h\.md/);
+  assert.match(logs.at(-1).text, /submit refused/);
+});
+
+test('regression: task-0115 a handoff that could not start arms no clear', async () => {
+  const plugin = await loadPlugin(1, FULL, {
+    handoffs: oneNewFile,
+    stored: { clearAfterHandoff: true },
+  });
+  const { hooks, ran, toasts, $ } = plugin;
+  await hooks['session.start']($, {}, async () => undefined);
+  $.command.run = async (spec) => {
+    ran.push(spec);
+    if (spec.command === 'ad-handoff') throw new Error('refused');
+  };
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'handoff'
+  );
+  await tick();
+  await runTurn(hooks, $, 'later');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.equal(toasts.length, 1);
+  assert.match(toasts[0], /run \/ad-handoff yourself/);
+});
+
+test('regression: task-0115 a session that ends before the handoff turn arms no clear', async () => {
+  const { hooks, ran, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
+  await hooks['session.end']($, { reason: 'clear' }, async () => undefined);
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+});
+
+test('regression: task-0115 an unreadable store leaves the box off', async () => {
+  const { hooks, ran, $ } = await loadPlugin(1, FULL, { handoffs: oneNewFile });
+  $.store.get = async () => {
+    throw new Error('store down');
+  };
+  await hooks['session.start']($, {}, async () => undefined);
+  const band = hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band');
+  assert.match(buttons(band).find((b) => b.props.key === 'clear-after').props.label, /^\[ \]/);
+  press(band, 'handoff');
+  await tick();
+  await runTurn(hooks, $, 't1');
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
 });
 
 test('the npm package does not ship the plugin or the marketplace', () => {
