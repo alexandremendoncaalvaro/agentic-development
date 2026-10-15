@@ -1,6 +1,6 @@
 # Task `0126`: Measure the kit from daily use
 
-**Status:** proposed
+**Status:** in-progress
 **Created:** 2026-10-15
 **Scope ref:** doc/adr/0091-review-the-uncovered-delta-once.md
 **Evidence ref:** the owner's /insights reports of 2026-10-15
@@ -15,9 +15,9 @@ Every eval receipt is synthetic, so the kit's effect is unmeasured. The owner de
 
 ## Acceptance Criteria
 
-- [ ] A repo-only script reads local session transcripts and prints aggregate metrics per period: reviewer and auditor dispatches per session and per pull request, review rounds, owner corrections on standing rules, and CI failures per pull request; it prints no transcript text.
-- [ ] Its metrics and comparison rule are frozen with `ad-prism` before the baseline is read.
-- [ ] The baseline for 2026-09-15 to 2026-10-15 is recorded in a doc/research study, aggregates only.
+- [x] A repo-only script reads local session transcripts and prints aggregate metrics per period: reviewer and auditor dispatches per session and per pull request (which stand for review rounds), owner corrections on standing rules, and CI failure reads per pull request; it prints no transcript text.
+- [x] Its metrics and comparison rule are frozen with `ad-prism` before the baseline is read.
+- [x] The baseline for 2026-09-15 to 2026-10-15 is recorded in a doc/research study, aggregates only.
 - [ ] The follow-up date is recorded; the re-run and a new /insights report close the study.
 
 ## Plan
@@ -33,3 +33,55 @@ Append-only log. Date each entry. Never rewrite past entries.
 Planned from the kit audit of 2026-10-15 after a read-only verification of
 its claims against the code. The owner approved doing every remaining
 package on 2026-10-15. The owner chose measurement from daily use over paid live trials.
+
+### 2026-10-15 — script and freeze
+
+Two tests went red (script missing), then green: the counts, ratios and
+correction lexicon over fixture transcripts with a secret phrase that never
+reaches the output, and an empty period with a usage error for a bad date.
+The script lives in `eval/` (repo-only measurement, not enforcement
+tooling). PRISM-0045 freezes the measures, the lexicon (in the script) and
+the decision rule, whose thresholds are labelled a design choice; it is
+committed before the baseline is read. Follow-up run on or after 2026-11-16
+for 2026-10-16 to 2026-11-15, with a new /insights report.
+
+### 2026-10-15 — baseline
+
+Run at 218457d after the freeze: 216 sessions, 119 pull requests, 398
+reviewer and 1085 auditor dispatches (3.34 and 9.12 per pull request), 46 CI
+failure reads (0.39 per pull request), 90 owner messages correcting a
+standing rule (0.42 per session). Recorded in RESEARCH-0046, aggregates only.
+The follow-up date is 2026-11-16; the last criterion and the Plan item close
+then, with the re-run and a new /insights report.
+
+### 2026-10-15 — review of 0ec20de and a second freeze
+
+Two-axis review, no blocker. Spec concern: review rounds were named in the
+first criterion but not measured; adding a measure after reading the baseline
+would choose a metric from the data, so the criterion now says what the frozen
+plan measured (dispatches per pull request stand for rounds), recorded here
+as the deviation. Standards concerns, fixed test-first: duplicate lines from
+resumed sessions, quoted mentions counted as commands, system text counted as
+owner messages in the fallback, and silent bad dates or empty periods (two
+tests went red, then green). PRISM-0045 gained an Amendment and was frozen
+again before the second baseline run; measures, lexicon and decision rule are
+unchanged, and the periods are half-open with the follow-up on [2026-10-15,
+2026-11-14). Notes accepted: the interpretive line in RESEARCH-0046 is
+removed; the lexicon stays a proxy.
+
+### 2026-10-15 — corrected baseline
+
+Second run at a6ee778, after the second freeze: 216 sessions, 54 pull
+requests, 389 reviewer and 1082 auditor dispatches (7.2 and 20.04 per pull
+request), 41 CI failure reads (0.76 per pull request), 70 owner messages
+correcting a standing rule (0.32 per session). RESEARCH-0046 records it as
+the baseline and keeps the first run as superseded evidence. The follow-up
+run is due on or after 2026-11-14.
+
+### 2026-10-15 — delta review of 6b74579
+
+Spec ships as-is; the criterion change after the first baseline is a
+disclosed retrofit. Standards concerns, fixed in RESEARCH-0046: corrections
+are stated per message, not per session; the drop in counted pull requests
+is no longer attributed to a cause; the command forms the matcher misses are
+listed as a limit.
