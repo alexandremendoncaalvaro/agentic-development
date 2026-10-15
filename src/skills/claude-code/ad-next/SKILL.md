@@ -1,6 +1,6 @@
 ---
 name: ad-next
-description: Survey the project's artifact stack and recommend prioritized next actions, like flutter doctor. Use when unsure where the work stands; "what's next", "where am I", "project status", "doctor", "what should I do". Read-only.
+description: 'Survey the project''s records and recommend the next actions, like a doctor command. Use on "what''s next", "where am I", "project status". Read-only.'
 summary: State survey + prioritized next-action recommendations across the six-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).
 allowed-tools: Read, Glob, Grep, Bash
 ---

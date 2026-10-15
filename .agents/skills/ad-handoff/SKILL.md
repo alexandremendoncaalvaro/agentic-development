@@ -1,6 +1,6 @@
 ---
 name: ad-handoff
-description: Compact the session into a handoff a fresh agent can resume from, saved to the OS temp dir with live state, open decisions, and next skills. Use when context runs low or on "handoff", "wrap up the session", "save context for next session", "pass to another agent".
+description: 'Compact the session into a handoff a fresh agent can resume from. Use when context runs low or on "handoff", "wrap up the session", "save context for next session".'
 summary: Compact the session into a temporary handoff. Preserves resumable state while the next session opens with a preparation receipt and canonical brief; retains roadmap, lost asks, hygiene, references, and redaction. Never commits.
 ---
 

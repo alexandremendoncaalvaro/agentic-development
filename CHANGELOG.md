@@ -14,6 +14,9 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   preconditions step where it held real checks), the outdated Codex
   auto-trigger warning is gone, and `ad-project-state` leaves the Claude Code
   `/` menu (task-0120).
+- Every skill description is at most 200 characters, use case and trigger
+  phrases first, the same on both hosts: the skill listing falls from about
+  13,600 to 7,099 characters per host (task-0120, ADR-0093).
 - `ad-tdd` and WORKFLOW §16 refactor on green in every cycle, treat
   duplication as a hint, and add discovered tests to the list, as in Kent
   Beck's Canon TDD; `ad-domain` groups terms by relation instead of

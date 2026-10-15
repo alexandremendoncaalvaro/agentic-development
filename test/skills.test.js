@@ -17,7 +17,7 @@ const SKILLS_ROOT = join(__dirname, '..', 'src', 'skills');
 // trigger-first; no whole-collection total is enforced (RESEARCH-0030).
 const HOST_BLOCKED_SKILLS = new Set();
 const SPEC_DESCRIPTION_CAP = 1024;
-const DESCRIPTION_CAP = 350;
+const DESCRIPTION_CAP = 200;
 // The Agent Skills field requirements forbid XML tags in `description`
 // (task-0095, RESEARCH-0032 E1). A tag is a name followed only by bare words
 // or name=value attributes, plus comments, processing instructions and CDATA,

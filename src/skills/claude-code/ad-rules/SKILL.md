@@ -1,6 +1,6 @@
 ---
 name: ad-rules
-description: Resolve the host's global and project rules for inspection or correction. Use when the user asks which rules apply, says "The Rules", asks to refresh the rules, or corrects workflow discipline. Inventory mode lists topics; correction mode reapplies ad-philosophy, repairs the active plan, and returns a plain-language brief. Read-only.
+description: 'List the rules that apply, or reapply them when the work drifts. Use on "which rules apply", "The Rules", "refresh the rules", or a workflow correction. Read-only.'
 summary: Resolve global, repository, and kit rules using two read-only modes. Inventory lists their topics; correction reapplies the existing philosophy commitment, repairs a conflicting active plan, and returns a decision-maker brief.
 allowed-tools: Read, Glob, Grep, Bash
 ---

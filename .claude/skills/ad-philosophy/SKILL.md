@@ -1,6 +1,6 @@
 ---
 name: ad-philosophy
-description: Universal posture for non-trivial work — think before coding, decide when grounded, ground in real patterns, simplicity, surgical changes, verifiable goals, verify before claiming done, report for a decision-maker, documentation discipline. Auto-loads on non-trivial changes, refactors, debugging, and any document writing; "think before coding".
+description: 'Posture for non-trivial work: think first, decide when grounded, keep it simple, verify before claiming done, report for a decision-maker. Auto-loads on changes, debugging, docs.'
 summary: Universal agent guardrails (think, decide when grounded, verify done, report for a decision-maker). Auto-loads as posture on non-trivial work; an explicit `/ad-philosophy` additionally forces a binding statement applying all eight behaviors to the current task.
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: ad-adr
-description: Record one architecture decision as an ADR at doc/adr/NNNN-slug.md (Nygard — context, decision, consequences, alternatives). Use when a binding, hard-to-reverse choice surfaces or the user says "record this decision", "write an ADR", "why did we choose". Status starts proposed.
+description: 'Record a binding, hard-to-reverse architecture decision as an ADR. Use on "record this decision", "write an ADR", "why did we choose".'
 summary: Draft a new ADR at `doc/adr/NNNN-<slug>.md`.
 allowed-tools: Read, Write, Glob, Bash
 ---

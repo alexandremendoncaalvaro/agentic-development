@@ -1,6 +1,6 @@
 ---
 name: ad-prd
-description: Draft or update the Product Requirements Document at doc/product/PRD.md — target user, problem, goals, non-goals, success metrics, roadmap, cross-feature constraints. Use when scoping a product or on "PRD", "product brief", "product vision", "roadmap", "target user". Feature specs inherit from it.
+description: 'Draft or update the product requirements: target user, problem, goals, metrics, roadmap. Use when scoping a product or on "PRD", "product brief", "roadmap".'
 summary: Lazy lifecycle owner of `doc/product/PRD.md` (or `doc/product/<slug>.md` multi-product). Layer 3 — product-level scope (target user, problem, success metrics, multi-feature roadmap) that feature specs inherit from. Distinct from `ad-spec` (feature-level).
 ---
 

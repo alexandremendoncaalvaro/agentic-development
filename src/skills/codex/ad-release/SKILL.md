@@ -1,6 +1,6 @@
 ---
 name: ad-release
-description: "Orchestrate one npm package release (release script, release PR, tag, npm publish, GitHub Release) behind one digest-bound approval from the owner, with per-stage fallback and state-aware resume. Use on \"release this package\", \"publish to npm\", \"prepare a release\", \"resume the release\", \"create the GitHub Release\"."
+description: 'Release one npm package: release script, PR, tag, publish, GitHub Release, behind one approval. Use on "release this package", "publish to npm", "resume the release".'
 summary: Safely orchestrate a single npm package release through its configured release script, PR, tag, npm publish, and GitHub Release with one digest-bound approval and state-aware recovery.
 ---
 

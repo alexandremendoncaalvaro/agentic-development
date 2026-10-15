@@ -1,6 +1,6 @@
 ---
 name: ad-guidelines
-description: "Draft, update, or audit GUIDELINES.md, the full engineering reference: design principles, code standards, complexity, API, build, static analysis, quality gates, testing, git, documentation, security. Scans the toolchain and config first, then asks only real gaps. Use on engineering guidelines, code standards, coding conventions, testing strategy."
+description: 'Draft, update or audit GUIDELINES.md, the engineering reference: standards, testing, gates, git, security. Use on "engineering guidelines", "code standards".'
 summary: Lazy lifecycle owner of `GUIDELINES.md` (Layer 1 Constitution, full engineering reference). Twelve sections — design principles, code standards, complexity, API, performance, build, static analysis, quality gates, testing, git, documentation, security. Pre-suggested defaults from canon + scan-first detection.
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---

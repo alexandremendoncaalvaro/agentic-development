@@ -1,6 +1,6 @@
 ---
 name: ad-tdg
-description: Outcome-based implementation — given input and expected output, generate three strategies and pick one by a single criterion; Test Dependency Map before modifying. Use when the outcome is known but the strategy is not; "TDG", "three approaches", "pick by criterion", "which tests cover this".
+description: 'Outcome-based implementation: from an input and expected output, try three strategies and pick by one criterion. Use on "TDG", "three approaches", "which tests cover this".'
 summary: Outcome-based prompting per WORKFLOW §9. Ground truth pair + Test Dependency Map + three approaches + single-criterion selection, when the technique is known but the implementation strategy is uncertain.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---

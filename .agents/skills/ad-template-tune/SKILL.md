@@ -1,6 +1,6 @@
 ---
 name: ad-template-tune
-description: "Curate durable publication and report templates from authorized examples, keeping owner, community, external, and official provenance apart and storing derived rules, not raw sources. Proposes one delta at a time and writes only the candidate the owner approves. Use to create or improve a publication or report template."
+description: 'Create or improve a publication or report template from authorized examples, one approved change at a time. Use on "improve this template", "new template".'
 summary: Curate publication and report templates from authorized evidence. Keeps author classes separate and writes one explicitly approved, validated delta at a time.
 allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch
 ---
