@@ -10,8 +10,8 @@
  *   - commit-after-semicolon: `git commit` chained after a check (tests, lint,
  *     type check, build, verify) with `;` or a newline, so a failed check does
  *     not stop the commit; use `&&`.
- * Quoted strings and heredoc bodies are removed before matching, so text
- * that only mentions a pattern is allowed.
+ * Quoted strings, heredoc bodies and comments are removed before matching,
+ * so text that only mentions a pattern is allowed.
  *
  * Contract: stdin is the host's PreToolUse event JSON; a denied command
  * prints one `hookSpecificOutput` deny decision with the reason and the fix.
@@ -26,15 +26,20 @@ import { pathToFileURL } from 'node:url';
 
 const SHELL_TOOLS = new Set(['Bash', 'PowerShell']);
 
-// Remove heredoc bodies, then quoted strings in one pass, so whichever quote
-// opens first wins (an apostrophe inside double quotes stays literal).
+// Join backslash line continuations, remove heredoc bodies, then quoted
+// strings and comments in one pass, so whichever opens first wins: an
+// apostrophe inside double quotes or a comment stays literal, and a `#`
+// inside quotes starts no comment.
 export function stripLiterals(command) {
-  let text = String(command);
+  let text = String(command).replace(/\\\r?\n/g, ' ');
   text = text.replace(
     /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1[^\n]*\n[\s\S]*?\n\s*\2(?=\n|$)/g,
     '<<HEREDOC'
   );
-  return text.replace(/'[^']*'|"(?:\\.|[^"\\])*"/g, (match) => (match[0] === "'" ? "''" : '""'));
+  return text.replace(/'[^']*'|"(?:\\.|[^"\\])*"|(?<=^|[\s;&|(])#[^\n]*/gm, (match) => {
+    if (match[0] === '#') return '';
+    return match[0] === "'" ? "''" : '""';
+  });
 }
 
 // The words of each simple command: split at operators, background `&`,
@@ -82,6 +87,13 @@ function commandWords(segment) {
     const word = words[0];
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(word) || KEYWORDS.has(word)) {
       words.shift();
+    } else if (word === 'command' && /^-[vV]$/.test(words[1] ?? '')) {
+      // `command -v name` looks the name up and runs nothing.
+      return [];
+    } else if (word === 'rtk') {
+      // A token-saving proxy: `rtk <cmd>` and `rtk proxy <cmd>` run <cmd>.
+      words.shift();
+      if (words[0] === 'proxy') words.shift();
     } else if (word === 'mise' && words[1] === 'exec' && words.includes('--')) {
       // `mise exec <tools> -- cmd`: the command follows the separator.
       words.splice(0, words.indexOf('--') + 1);
@@ -108,16 +120,16 @@ function commands(text) {
     .filter((words) => words.length > 0);
 }
 
-// Remove shell comments: a `#` that starts a word, to the end of its line.
-function stripComments(text) {
-  return text.replace(/(^|[\s;&|(])#[^\n]*/g, '$1');
-}
-
 function killsByName(text) {
   for (const [name, ...args] of commands(text)) {
     const verb = name.toLowerCase();
     const flags = args.map((a) => a.toLowerCase());
-    if (verb === 'pkill' || verb === 'killall') return true;
+    if (verb === 'killall') return true;
+    // `pkill -P <PID>` is scoped to the children of a known PID; a PID held
+    // in a variable may come from a name lookup, so it stays blocked.
+    if (verb === 'pkill' && !args.some((a, i) => a === '-P' && /^\d+$/.test(args[i + 1] ?? ''))) {
+      return true;
+    }
     if (verb === 'taskkill' && flags.some((f) => f === '/im' || f === '-im')) return true;
     if (
       (verb === 'stop-process' || verb === 'spps') &&
@@ -154,7 +166,7 @@ function isCheck([name, ...args]) {
     const script = args[0] === 'run' ? args[1] : args[0];
     return CHECK_SCRIPT.test(script ?? '');
   }
-  if (name === 'npx') return CHECK_TOOLS.has(args[0]);
+  if (name === 'npx') return CHECK_TOOLS.has(args.find((a) => !a.startsWith('-')));
   if (name === 'node')
     return args.includes('--test') || args.some((a) => /hook-npm-test|run-tests/.test(a));
   if (['dotnet', 'go', 'cargo'].includes(name))
@@ -174,26 +186,45 @@ function isCommit([name, ...args]) {
   return args[i] === 'commit';
 }
 
-// A commit joined by ";" or a newline to an earlier check in the same line:
-// a failed check does not stop it, whatever sits between them.
-function commitAfterSemicolon(text) {
-  // A group after `&&` runs only when what precedes it succeeded: its inner
-  // ";" do not separate it from that check.
-  const guarded = text.replace(
-    /&&\s*([{(])([^{}()]*)([})])/g,
-    (_, open, body, close) => `&& ${open}${body.replace(/;|\n/g, ' && ')}${close}`
-  );
-  const segments = guarded.split(/;|\n/).map((segment) => commands(segment));
+// A check whose failure stops what follows anyway: `check || exit`.
+function unguardedCheck(segment) {
+  return commands(segment).some(isCheck) && !/\|\|\s*(?:exit|return)\b/.test(segment);
+}
+
+// Within one sequence, a commit after ";" or a newline that follows a check.
+function sequenceRunsCommitAfterCheck(text) {
+  const segments = text.split(/;|\n/);
   for (let i = 1; i < segments.length; i += 1) {
-    if (!segments[i].some(isCommit)) continue;
-    if (segments.slice(0, i).some((list) => list.some(isCheck))) return true;
+    if (!commands(segments[i]).some(isCommit)) continue;
+    if (segments.slice(0, i).some(unguardedCheck)) return true;
   }
   return false;
 }
 
+// A commit joined by ";" or a newline to an earlier check: a failed check
+// does not stop it. `if check; then` and `while check; do` guard their body.
+// Groups `{ }` and `( )` are read innermost first: each body is checked on
+// its own, then stands in its parent as the check and commit it contains,
+// so a group after `&&` runs only when what precedes it succeeded.
+const INNERMOST_GROUP = /[{(]([^{}()]*)[})]/;
+
+function commitAfterSemicolon(text) {
+  let rest = text.replace(/(?:;|\n)\s*(then|do)\b/g, ' && $1');
+  for (let group = INNERMOST_GROUP.exec(rest); group; group = INNERMOST_GROUP.exec(rest)) {
+    const body = group[1];
+    if (sequenceRunsCommitAfterCheck(body)) return true;
+    const inner = body.split(/;|\n/).flatMap(commands);
+    const standIn = [inner.some(isCheck) && 'npm test', inner.some(isCommit) && 'git commit']
+      .filter(Boolean)
+      .join(' && ');
+    rest = `${rest.slice(0, group.index)} ${standIn || 'true'} ${rest.slice(group.index + group[0].length)}`;
+  }
+  return sequenceRunsCommitAfterCheck(rest);
+}
+
 /** The guard's decision for one shell command line. */
 export function verdict(command) {
-  const text = stripComments(stripLiterals(command));
+  const text = stripLiterals(command);
   if (killsByName(text)) {
     return {
       deny: true,

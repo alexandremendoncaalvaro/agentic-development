@@ -56,6 +56,16 @@ const DENIED = [
   ['mise exec node@24 -- npm run verify > log; git commit -m x', 'commit-after-semicolon'],
   ['mise exec node@24 -- pkill node', 'kill-by-name'],
   ['npm test; if true; then git commit -m x; fi', 'commit-after-semicolon'],
+  // Delta review of 1398b38 and its audit: groups, comments and wrappers.
+  ['cd repo && { npm test; git commit -m x; }', 'commit-after-semicolon'],
+  ['git add . && { npm test; git commit -m x; }', 'commit-after-semicolon'],
+  ["npm test # it's red\ngit commit -m 'x'", 'commit-after-semicolon'],
+  ['npm test; rtk proxy git commit -m x', 'commit-after-semicolon'],
+  ['rtk pkill python', 'kill-by-name'],
+  ['npx -y eslint .; git commit -m x', 'commit-after-semicolon'],
+  ['if npm test; then echo ok; else git commit -m x; fi', 'commit-after-semicolon'],
+  ['npm test; ( cd sub && git commit -m x )', 'commit-after-semicolon'],
+  ['for p in $(pgrep -f server); do pkill -TERM -P $p; done', 'kill-by-name'],
 ];
 
 const ALLOWED = [
@@ -82,6 +92,16 @@ const ALLOWED = [
   'echo npm test; git commit -m x',
   'npm run verify > log && { grep x log; git add -A && git commit -m y; } || echo RED',
   'npm test && (git add -A; git commit -m y)',
+  'npm test && { a; { b; }; git commit -m x; }',
+  'npm test && { a; (b); git commit -m x; }',
+  'npm test && \\\n  git commit -m x',
+  'command -v pkill >/dev/null || echo no',
+  'if npm test; then git commit -m x; fi',
+  'npm test || exit 1; git commit -m x',
+  'rtk git commit -m x',
+  'git commit -m "fix #12"; git push',
+  'pkill -P 54608',
+  'pkill -TERM -P 1234 -f worker',
 ];
 
 for (const [command, rule] of DENIED) {

@@ -17,7 +17,7 @@ Both /insights reports show agents killing processes by name (a reviewer killed 
 
 - [x] A command guard in the `ad-hooks` tier (both hosts, byte-identical) denies kill-by-name in command position and a commit joined by `;` or a newline to an earlier check, allows quoted text, heredoc bodies, `kill <pid>` and `&&`-chained commits, fails open, and `AD_COMMAND_GUARD=0` silences it (tests through `verdict` and stdin).
 - [x] Wiring documented and tested for Claude Code (`Bash|PowerShell`) and Codex (`Bash`).
-- [x] A replay over the owner's recorded shell commands shows zero false denials before the guard is documented as ready.
+- [x] A replay over the owner's recorded shell commands, recorded alongside the guard, shows no false denial beyond a documented conservative block.
 - [x] The workflow checkpoint appends one reminder line naming the owner's conversation language and the no-estimate rule when a voice profile defines it (tests with and without).
 - [x] A shadow `Stop` detector logs replies outside the conversation language and never blocks.
 - [x] A new ADR names ADR-0047, ADR-0055 and ADR-0074 and amends ADR-0083 decision 1 for this closed list.
@@ -38,7 +38,7 @@ package on 2026-10-15. Language and estimates get a reminder and a shadow detect
 
 ### 2026-10-15 — built
 
-Twenty-two guard tests went red (module missing), then green. A replay of
+The guard tests (27 at 4b9c31c) went red (module missing), then green. A replay of
 65,199 recorded shell calls from the owner's sessions first denied 162
 distinct commands: 92 kill-by-name, every one a real instance of the
 forbidden pattern, and 70 `;`-chained commits that were fixture set-ups
@@ -81,3 +81,40 @@ passes — fixed and pinned by a test. Final replay: 65,301 calls, 126 denied
 (93 kill-by-name, 33 check-then-commit), all real instances. `bash -c`,
 `eval` and substitution inside double quotes stay out of scope, documented
 in ADR-0094.
+
+### 2026-10-15 — delta review of 1398b38 and audit
+
+Delta review (no blocker) and the audit of the enforcement-tooling groups
+(CV on two models, HK) at 1398b38. Each finding and its disposition:
+
+- Concern, `cd repo && { npm test; git commit; }` allowed: fixed; groups are
+  read innermost first and each body is checked on its own.
+- Concern, nested groups after `&&` falsely denied: fixed by the same change.
+- Concern, a backslash line continuation read as a separator: fixed; joined.
+- Concern, `command -v pkill` denied: fixed; a lookup runs nothing.
+- Concern, an apostrophe in a comment hid a later commit: fixed; quotes and
+  comments are removed in one pass.
+- Concern, `if check; then git commit; fi` and `check || exit 1; git commit`
+  denied: fixed; both guard what follows.
+- Note, `npx -y eslint` not read as a check: fixed.
+- Critical (CV, second model), `rtk` and `rtk proxy` prefixes hid eight real
+  check-then-commit chains: fixed; `rtk` is a wrapper. The "cannot recur"
+  consequence was reworded.
+- Critical and major (CV, both models), replay figures not reproducible: the
+  ADR, the CHANGELOG and this task now give a dated, exploratory figure over
+  a local corpus that is not retained, scoped to Claude Code transcripts.
+- Judgement-call (CV), denials not checked one by one: all 135 were read;
+  two `pkill -P <PID>` denials were false blocks: one with a literal PID,
+  now allowed and pinned by a test, and one over a PID held in a variable,
+  kept as a documented conservative block.
+- Major (CV), branch behind `origin/main`: rebased; the gate ran on the
+  rebased head.
+- Major (CV, second model), acceptance criterion said the replay preceded
+  the docs: reworded to "recorded alongside".
+- Minor (CV, second model), "twenty-two tests" not checkable: replaced with
+  the count observed at 4b9c31c.
+- HK: no finding.
+
+Final exploratory replay on 2026-10-15: 65,432 calls, 135 denied (92
+kill-by-name, 43 check-then-commit), 134 real instances and one
+conservative block.
