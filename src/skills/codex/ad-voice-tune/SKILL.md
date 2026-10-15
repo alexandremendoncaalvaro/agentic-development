@@ -1,6 +1,6 @@
 ---
 name: ad-voice-tune
-description: "Create or refine the owner's machine-local voice profile from owner samples or authorized conversations, separating identity from community accommodation and storing derived patterns. Negotiates sources before private reads, proposes one delta at a time, writes only after explicit approval. Use on \"calibrate my voice\", \"learn from this correction\"."
+description: 'Create or refine the owner''s voice profile from approved samples, one approved change at a time. Use on "calibrate my voice", "learn from this correction".'
 summary: Calibrate the local personal-voice profile from authorized owner and community evidence. Separates identity from accommodation, retains derived patterns by default, and writes one explicitly approved delta at a time.
 ---
 

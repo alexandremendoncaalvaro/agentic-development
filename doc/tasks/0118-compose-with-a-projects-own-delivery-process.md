@@ -2,7 +2,7 @@
 
 **Status:** proposed
 **Created:** 2026-10-15
-**Scope ref:** doc/adr/0093-compose-with-a-projects-own-delivery-process.md (to be written)
+**Scope ref:** a new ADR on composing with a project's delivery process (to be written)
 **Evidence ref:** doc/research/0045 (to be written)
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
@@ -20,7 +20,7 @@ The kit writes records to fixed repository paths and assumes it owns the deliver
 - [ ] `ad-project-state` reads milestones and annotates each issue with its configured stage and next action; an offline `--process` flag prints the resolved block.
 - [ ] Record writers use the configured location: the ground validator accepts a draft outside the repository; the artifact gate, cited-records and `ad-adr` (date naming) follow the config; an `issue-comment` destination drafts, validates, asks the owner, then posts.
 - [ ] `ad-task`, `ad-spec` and `ad-prd` refuse when their destination is external and print the handoff; `ad-next` routes by stage when the lifecycle owner is external; `ad-derisk` writes to the configured work item; `ad-philosophy` states the generic rule.
-- [ ] A generic issue-staged example ships; no methodology is named in kit logic; ADR-0093 records the principle.
+- [ ] A generic issue-staged example ships; no methodology is named in kit logic; a new ADR records the principle.
 
 ## Plan
 

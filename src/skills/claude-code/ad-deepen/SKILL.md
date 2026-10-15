@@ -1,6 +1,6 @@
 ---
 name: ad-deepen
-description: Find deepening opportunities (Ousterhout/Feathers — module, interface, depth, seam, adapter) and propose refactors with deletion-test framing. Use when code feels shallow or pass-through; "deepen", "refactor for depth", "shallow module", "deletion test", "two-adapters rule".
+description: 'Find shallow modules and propose deepening refactors (interface, depth, seam, deletion test). Use on "deepen", "refactor for depth", "shallow module".'
 summary: Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one. Pairs with `ad-drift`.
 allowed-tools: Read, Glob, Grep, Bash
 ---

@@ -1,6 +1,6 @@
 ---
 name: ad-project-state
-description: Resolve repository and configured GitHub evidence into a bounded, provenance-bearing project-state packet. Use when ad-next, project ad-roadmap, or standalone ad-brief needs current work from local artifacts plus issues or pull requests; "project sources", "GitHub-backed state". Read-only.
+description: 'Resolve local records and configured GitHub issues and PRs into a bounded project-state packet for the state skills. Use from ad-next, ad-roadmap or ad-brief. Read-only.'
 user-invocable: false
 summary: Shared read-only source resolver for state-reading skills. Combines the repository baseline with configured GitHub issue and pull-request metadata, preserving precedence, provenance, freshness, and partial failures.
 allowed-tools: Read, Bash

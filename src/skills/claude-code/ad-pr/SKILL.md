@@ -1,6 +1,6 @@
 ---
 name: ad-pr
-description: Open a pull request in the repo body shape once the owner approves the draft. Use on "open a PR".
+description: 'Open a pull request in the repo body shape once the owner approves the draft. Use on "open a PR".'
 summary: Open a GitHub pull request with a uniform body shape (Summary / Test plan / Links). Four phases — preflight (`gh` auth + branch pushed), scope assembly, draft body, open + report URL. Title format = Conventional Commits.
 allowed-tools: Read, Bash, Glob, Grep
 ---

@@ -1,6 +1,6 @@
 ---
 name: ad-report
-description: "Draft, review, render, or verify a standalone analytical report from approved templates (Markdown, HTML, DOCX, PDF, slides, visualizations), preserving facts and asking before any export beyond the agreed local target. Use when the user wants a report from findings and evidence, or an existing analysis restructured for an audience."
+description: 'Draft, render or verify a standalone analytical report from findings and evidence. Use when the user wants a report or an analysis restructured for an audience.'
 summary: Draft or review standalone analytical reports from approved templates, then compose the available renderer and its visual and accessibility verification workflow.
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: ad-brief
-description: Create a read-only decision-maker brief from live project and session state or a settled fact packet. Use when the user says "brief me", "give me a summary", "catch me up", "where are we?", asks what is happening now and why, or needs a plain-language boss report before continuing.
+description: 'Plain-language decision-maker brief of where the work stands and what needs the owner. Use on "brief me", "catch me up", "where are we?", "summarize".'
 summary: Read-only decision-maker briefing from live project/session evidence or facts supplied by another skill. Restores context, meaning, direction, completion conditions, blockers, and genuine owner decisions in plain language.
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: ad-roadmap
-description: Read-only roadmap report — reconciles roadmap tiers against specs and tasks, then explains the main delivery front, current work, next front, blockers, and progress as a plain-language Markdown checklist. Use on "how much is done", "are we on track", "progress report", "percent complete", "what's shipped".
+description: 'Read-only progress report: delivered and remaining work as a plain-language checklist. Use on "how much is done", "are we on track", "progress report".'
 summary: Read-only roadmap report that reconciles specs and tasks, composes the canonical decision-maker brief, then adds a project- or task-scoped checklist of delivered and remaining work.
 allowed-tools: Read, Glob, Grep, Bash
 ---

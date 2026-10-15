@@ -17,14 +17,14 @@ Skill descriptions total about 13.6k characters per host against a listing budge
 
 - [x] A test caps every SKILL.md at 500 lines and 20,000 bytes on both hosts; `ad-hooks` moves its session tier to a reference file.
 - [x] No SKILL.md carries the "Confirm regime" step or the Codex "less mature" warning (tests); routing lines survive as one "Not for" line.
-- [ ] Every description is at most 200 characters, use case and triggers first (test); a new ADR amends ADR-0085 decision 3.
+- [x] Every description is at most 200 characters, use case and triggers first (test); a new ADR amends ADR-0085 decision 3.
 - [x] `ad-project-state` is not user-invocable on Claude Code (test).
 - [ ] After merge, the listing probe of RESEARCH-0030 is rerun; if the listing still overflows, `ad-hooks` documents the `skillOverrides` name-only opt-in for setup skills (ADR-0085 item 4).
 
 ## Plan
 
 - [x] PR: body cap, reference split, ceremony removal (tests first).
-- [ ] PR: description cap 200 with the ADR and every rewrite.
+- [x] PR: description cap 200 with the ADR and every rewrite.
 - [ ] Listing probe after release.
 
 ## Notes
@@ -58,3 +58,11 @@ with `ad-release` and `ad-rules` renamed to their real step. Stale regime and
 Step 4 references in the `ad-tdd` and `ad-tdg` summaries and output
 contracts were updated, and `ad-hooks` states its session-hook approval step
 in the skill body again (standards review, ADR-0085).
+
+### 2026-10-15 — description cap
+
+Lowering the cap to 200 turned 88 cases red (44 skills on two hosts). Every
+description was rewritten as use case then trigger phrases, the same text on
+both hosts (the four that differed by host now match); they total 7,099
+characters per host, down from about 13,600. ADR-0093 amends ADR-0085
+decision 3. The listing probe waits for the release.

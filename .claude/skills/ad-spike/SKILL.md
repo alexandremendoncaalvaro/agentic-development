@@ -1,6 +1,6 @@
 ---
 name: ad-spike
-description: Scaffold a staged spike with golden fixtures when the spec is clear but the technique is uncertain — discovery, fixture, gated pipeline with per-stage debug artifacts, two-layer evaluation. Use on "spike", "which library", "evaluate approaches", "golden fixture", "uncertain technique".
+description: 'Staged spike with golden fixtures when the technique is uncertain across plausible approaches. Use on "spike", "which library", "evaluate approaches".'
 summary: Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.
 allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch, WebSearch
 ---

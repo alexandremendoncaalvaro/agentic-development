@@ -1,6 +1,6 @@
 ---
 name: ad-domain
-description: Create or update CONTEXT.md, the project's ubiquitous language — canonical nouns, aliases to avoid, relationships, resolved ambiguities. Use when a vocabulary question is settled or the user says "glossary", "what should we call", "naming drift", "domain term".
+description: 'Create or update CONTEXT.md, the project''s glossary of canonical terms and aliases to avoid. Use on "glossary", "what should we call", "naming drift", "domain term".'
 summary: Lazy lifecycle owner of `CONTEXT.md` (Layer 2 — ubiquitous language per Evans 2003). Captures canonical project-specific nouns with aliases-to-avoid, relationships, and flagged ambiguities. Single-context or `CONTEXT-MAP.md` multi-context.
 ---
 
