@@ -30,6 +30,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   tracked code still uses, and canonical terms nothing uses, reading the
   per-context files of a `CONTEXT-MAP.md`; advisory, judged per hit
   (task-0125).
+- With a configured external lifecycle owner, `ad-task`, `ad-spec` and
+  `ad-prd` hand off to the team's process instead of writing, `ad-next`
+  recommends by issue stage, `ad-derisk` posts its register on the team's
+  work item after approval, and `ad-philosophy` states the rule to work
+  inside the team's delivery process (task-0118, ADR-0097).
 
 ### Changed
 

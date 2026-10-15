@@ -19,14 +19,14 @@ The kit writes records to fixed repository paths and assumes it owns the deliver
 - [x] The config accepts an optional `process` block (schema version 2; version 1 still accepted): lifecycle owner, per-record destination (`repo-path`, `issue-comment`, `external`), directory and naming (`sequence`, `date`), opaque handoff text, and label-to-stage-to-next mappings.
 - [x] `ad-project-state` reads milestones and annotates each issue with its configured stage and next action; an offline `--process` flag prints the resolved block.
 - [ ] Record writers use the configured location: the ground validator accepts a draft outside the repository; the artifact gate, cited-records and `ad-adr` (date naming) follow the config; an `issue-comment` destination drafts, validates, asks the owner, then posts.
-- [ ] `ad-task`, `ad-spec` and `ad-prd` refuse when their destination is external and print the handoff; `ad-next` routes by stage when the lifecycle owner is external; `ad-derisk` writes to the configured work item; `ad-philosophy` states the generic rule.
-- [ ] A generic issue-staged example ships; no methodology is named in kit logic; a new ADR records the principle.
+- [x] `ad-task`, `ad-spec` and `ad-prd` refuse when their destination is external and print the handoff; `ad-next` routes by stage when the lifecycle owner is external; `ad-derisk` writes to the configured work item; `ad-philosophy` states the generic rule.
+- [x] A generic issue-staged example ships; no methodology is named in kit logic; a new ADR records the principle.
 
 ## Plan
 
 - [x] Slice 1: resolver schema v2, `--process`, milestone and stage annotation, docs and example (tests first).
 - [ ] Slice 2: record writers and validator draft mode (tests first).
-- [ ] Slice 3: planning skills, navigation and the philosophy rule.
+- [x] Slice 3: planning skills, navigation and the philosophy rule.
 - [ ] Review per slice, audit only where `auditPaths` match, pull requests.
 
 ## Notes
@@ -62,3 +62,15 @@ the `process` global. Deferred to slice 2, where a record writer first reads
 it: whether `repo-path` requires `path` and other destinations forbid it.
 Notes accepted: `--process` prints a smaller packet with the same schema
 version; an empty `stages` list is valid.
+
+### 2026-10-15 — slice 3, handoffs and navigation
+
+Two static-contract tests went red, then green. With `lifecycleOwner:
+external`, `ad-task`, `ad-spec` and `ad-prd` (both hosts) read the process
+first and, unless the record kind is a `repo-path` record, show the
+configured handoff and write nothing; `ad-next` recommends from each issue's
+stage and its next text; `ad-derisk` drafts its register as a comment on the
+team's work item, posted only after the owner approves; `ad-philosophy`
+states the rule to work inside the team's delivery process. The generic
+example and the ADR shipped with slice 1. Still open: the issue-comment
+flow observed end to end in a recorded run.

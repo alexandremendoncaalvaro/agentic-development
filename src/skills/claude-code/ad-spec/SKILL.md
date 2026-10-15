@@ -9,6 +9,8 @@ allowed-tools: Read, Write, Glob, Bash
 
 Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: `draft` → `accepted` → `shipped` | `superseded by SPEC-NNNN`. Spec is the layer-4 artifact in the kit's six-layer stack — Constitution (`AGENTS.md` + `WORKFLOW.md`) → Domain (`CONTEXT.md`) → Product (`doc/product/PRD.md`) → **Spec (this skill)** → Plan/Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Multiple tasks implement one spec; ADRs may be driven by spec constraints. The Domain layer (`CONTEXT.md`, ubiquitous language per Evans 2003) is the source of canonical nouns the spec must use; if the spec introduces a new noun, resolve it through `CONTEXT.md` first. The Product layer (`PRD.md`) is the source of target user, product-level success metrics, and cross-feature constraints the spec inherits from; a feature spec whose target user or success metric contradicts the PRD is drift that `ad-drift` flags.
 
+First run `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external` and `process.records.spec` is not a `repo-path` record, the team's own delivery process owns specs: show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). A `repo-path` record moves the file to its `path`.
+
 ## Step 1 — Determine NNNN and slug
 
 Run `node .claude/skills/ad-spec/scripts/next-number.mjs doc/specs` from the consumer root. Use JSON `next` as NNNN; it preserves archived gaps. If `unreadable` is non-empty, stop until access is resolved; if `exhausted` is true, stop for a numbering decision. If loaded elsewhere, substitute the skill base path. Slug: kebab-case, ≤6 words, derived from the feature title.

@@ -21,6 +21,8 @@ Not for:
 
 A spike or one-off change does not need a PRD. If the user invokes `ad-prd`, their request establishes that a durable product contract is in scope; write only the scope the work needs.
 
+First run `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external` and `process.records.prd` is not a `repo-path` record, the team's own delivery process owns the product record: show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). A `repo-path` record moves the file to its `path`.
+
 Step 1 — codebase-first scan. Before asking a single question, look. The repo often answers half the fields.
 
 - Check `doc/product/` — does a PRD already exist?

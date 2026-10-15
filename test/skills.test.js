@@ -128,6 +128,35 @@ test('static contract: ad-tdd and WORKFLOW §16 declare refactoring inside each 
   }
 });
 
+// Task 0118 slice 3, ADR-0097: with an external lifecycle owner, the kit's
+// work-item skills hand off instead of writing, and navigation reads stages.
+function skillText(agent, skill) {
+  return readFileSync(join(SKILLS_ROOT, agent, skill, 'SKILL.md'), 'utf8');
+}
+
+test('static contract: ad-task, ad-spec and ad-prd hand off when the lifecycle owner is external', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    for (const skill of ['ad-task', 'ad-spec', 'ad-prd']) {
+      const text = skillText(agent, skill);
+      assert.match(text, /project-state\.mjs --process/, `${agent}/${skill} reads the process`);
+      assert.match(text, /`lifecycleOwner` is `external`/, `${agent}/${skill} names the owner`);
+      assert.match(
+        text,
+        /show its `handoff` text and write nothing/,
+        `${agent}/${skill} hands off`
+      );
+    }
+  }
+});
+
+test('static contract: ad-next routes by issue stage, ad-derisk follows the work item, ad-philosophy states the rule', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    assert.match(skillText(agent, 'ad-next'), /each issue's `stage` and its `next` text/);
+    assert.match(skillText(agent, 'ad-derisk'), /`lifecycleOwner` is `external`/);
+    assert.match(skillText(agent, 'ad-philosophy'), /Work inside the team's delivery process/);
+  }
+});
+
 test('Claude Code skills follow the local closing-section contract', () => {
   for (const { name, dir } of listSkills('claude-code')) {
     if (name === 'ad-philosophy') continue;

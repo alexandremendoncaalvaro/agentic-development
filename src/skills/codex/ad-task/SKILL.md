@@ -9,6 +9,8 @@ Drafts `doc/tasks/<NNNN>-<short-slug>.md` for one tracked task. Format chosen so
 </background_information>
 
 <instructions>
+First run `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external` and `process.records.task` is not a `repo-path` record, the team's own delivery process owns work items: show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). A `repo-path` record moves the file to its `path`.
+
 Step 0 — scope preflight. Establish the **current repository** before naming or drafting anything. From the consumer root, run `node .agents/skills/ad-task/scripts/scope-anchors.mjs` (substitute the skill base path when loaded elsewhere). Read its JSON: `cwd` and `gitRoot` identify the target; `anchors` is the complete allow-list of repository-local sources. If `unreadable` is non-empty, stop until access is resolved.
 
 A new task requires one exact repository-local **Scope ref**: a repo-relative path to the PRD roadmap line, an existing feature spec, an accepted ADR, or a root artifact that already defines the work. A board ticket, a global rule, or a request remembered from another repository does not qualify. `Spec ref` remains optional because a small task can be directly grounded in the PRD or an ADR.

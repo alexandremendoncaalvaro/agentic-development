@@ -48,6 +48,8 @@ When the host exposes `AskUserQuestion`, use it for the risk-register review (wh
 
 ## Output contract
 
+When `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` reports that `lifecycleOwner` is `external`, the register goes to the work item the team's process names instead of a task file: draft it as an issue comment, show it, and post it only after the owner approves (ADR-0085, ADR-0097).
+
 No new file of its own. The risk register is appended to the task's `Notes` (never a rewrite); the evidence persists in the spikes and ADRs the loop spawns. The skill reports the resolved register and the stop verdict, cites each retirement's grade per §17, and writes no code. Documentation Discipline (`WORKFLOW.md` §2) applies.
 
 ## Next
