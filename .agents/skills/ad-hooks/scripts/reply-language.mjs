@@ -109,8 +109,10 @@ function main() {
   if (typeof message !== 'string') return;
   const expected = conversationLanguage(process.env, process.env.HOME || homedir());
   if (!expected) return;
+  const primary = expected.toLowerCase().split('-')[0];
+  if (!(primary in STOPWORDS)) return;
   const detected = replyLanguage(message);
-  if (!detected || expected.toLowerCase().split('-')[0] === detected) return;
+  if (!detected || primary === detected) return;
   const dir =
     process.env.AD_REPLY_LANGUAGE_EVIDENCE_DIR || join(tmpdir(), 'agentic-reply-language');
   const session = String(event.session_id || 'unknown').replace(/[^A-Za-z0-9._-]/g, '_');

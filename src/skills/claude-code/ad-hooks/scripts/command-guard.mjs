@@ -26,40 +26,73 @@ import { pathToFileURL } from 'node:url';
 
 const SHELL_TOOLS = new Set(['Bash', 'PowerShell']);
 
-// Remove heredoc bodies, then quoted strings, keeping the command words.
+// Remove heredoc bodies, then quoted strings in one pass, so whichever quote
+// opens first wins (an apostrophe inside double quotes stays literal).
 export function stripLiterals(command) {
   let text = String(command);
   text = text.replace(
     /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1[^\n]*\n[\s\S]*?\n\s*\2(?=\n|$)/g,
     '<<HEREDOC'
   );
-  text = text.replace(/'[^']*'/g, "''");
-  text = text.replace(/"(?:\\.|[^"\\])*"/g, '""');
-  return text;
+  return text.replace(/'[^']*'|"(?:\\.|[^"\\])*"/g, (match) => (match[0] === "'" ? "''" : '""'));
 }
 
-const KILL_BY_NAME = [
-  /(^|[\s;&|(`])pkill\b/,
-  /(^|[\s;&|(`])killall\b/,
-  /\btaskkill\b[^\n;&|]*\s\/im\b/i,
-  /\bStop-Process\b[^\n;&|]*\s-Name\b/i,
-  /\bpgrep\b[^\n;&]*\|\s*xargs\s+(?:-\S+\s+)*kill\b/,
-  /\bkill\b[^\n;&|]*(?:\$\(\s*pgrep\b|`\s*pgrep\b)/,
-];
+// The words of each simple command: split at operators and command
+// substitution, then drop leading assignments and wrappers that run the next
+// word as the command.
+const WRAPPERS = new Set(['sudo', 'env', 'nohup', 'time', 'command', 'exec', 'xargs']);
+
+function commands(text) {
+  return text
+    .split(/;|\n|&&|\|\||\||\$\(|`|\(|\)/)
+    .map((segment) => {
+      const words = segment.trim().split(/\s+/).filter(Boolean);
+      while (words.length > 0) {
+        const word = words[0];
+        if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(word) || WRAPPERS.has(word)) words.shift();
+        else if (/^-/.test(word) && words.length > 1) words.shift();
+        else break;
+      }
+      return words;
+    })
+    .filter((words) => words.length > 0);
+}
+
+function killsByName(text) {
+  const list = commands(text);
+  for (const [name, ...args] of list) {
+    const verb = name.toLowerCase();
+    const flags = args.map((a) => a.toLowerCase());
+    if (verb === 'pkill' || verb === 'killall') return true;
+    if (verb === 'taskkill' && flags.some((f) => f === '/im' || f === '-im')) return true;
+    if (
+      (verb === 'stop-process' || verb === 'spps') &&
+      flags.some((f) => /^-(?:n|na|nam|name|processname)$/.test(f))
+    ) {
+      return true;
+    }
+  }
+  // A name lookup piped or substituted into a kill.
+  if (/\b(?:Get-Process|gps)\b[^\n;]*\|\s*(?:Stop-Process|spps)\b/i.test(text)) return true;
+  if (/\bpgrep\b[^\n;&]*\|\s*xargs\s+(?:-\S+\s+)*kill\b/.test(text)) return true;
+  if (/\bkill\b[^\n;&|]*(?:\$\(\s*pgrep\b|`\s*pgrep\b)/.test(text)) return true;
+  return false;
+}
 
 // A check whose failure should stop a commit: tests, lint, type checks,
 // builds and the repository's verify gate.
 const CHECK_SEGMENT =
-  /\b(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?(?:test|verify|lint|check|typecheck|build)\b|\bnpx\s+(?:eslint|prettier|tsc|vitest|jest)\b|\bnode\s+--test\b|\bpytest\b|\b(?:dotnet|go|cargo)\s+(?:test|build|check|clippy)\b|\bmake\s+(?:test|check|lint)\b|\b(?:eslint|tsc|ruff|mypy|vitest|jest)\b|hook-npm-test|run-tests/;
+  /\b(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?(?:test|verify|lint|check|typecheck|build)\b|\bnpx\s+(?:eslint|prettier|tsc|vitest|jest)\b|\bnode\s+--test\b|\bpytest\b|\b(?:dotnet|go|cargo)\s+(?:test|build|check|clippy)\b|\bmake\s+(?:test|check|lint)\b|\b(?:eslint|tsc|ruff|mypy|vitest|jest)\b|\bgradlew\b|hook-npm-test|run-tests/;
 const GIT_COMMIT = /^\s*git(?:\s+-C\s+\S+|\s+-c\s+\S+)*\s+commit\b/;
 
-// A commit whose previous command, joined by ";" or a newline, is a check.
+// A commit joined by ";" or a newline to an earlier check in the same line:
+// a failed check does not stop it, whatever sits between them.
 function commitAfterSemicolon(text) {
   const segments = text.split(/;|\n/);
   for (let i = 1; i < segments.length; i += 1) {
-    if (!GIT_COMMIT.test(segments[i])) continue;
-    const previous = segments[i - 1].split(/&&|\|\|/).pop();
-    if (CHECK_SEGMENT.test(previous)) return true;
+    const commit = segments[i].split(/&&/).find((part) => GIT_COMMIT.test(part));
+    if (!commit) continue;
+    if (segments.slice(0, i).some((segment) => CHECK_SEGMENT.test(segment))) return true;
   }
   return false;
 }
@@ -67,7 +100,7 @@ function commitAfterSemicolon(text) {
 /** The guard's decision for one shell command line. */
 export function verdict(command) {
   const text = stripLiterals(command);
-  if (KILL_BY_NAME.some((pattern) => pattern.test(text))) {
+  if (killsByName(text)) {
     return {
       deny: true,
       rule: 'kill-by-name',

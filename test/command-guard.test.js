@@ -30,6 +30,15 @@ const DENIED = [
   ['npm run verify\ngit -C repo commit -m x', 'commit-after-semicolon'],
   ['node --test test/a.test.js; git commit -m x', 'commit-after-semicolon'],
   ['npx eslint . ; git commit -am x', 'commit-after-semicolon'],
+  // Review of 4b9c31c: evasions and the check-stage-commit shape.
+  [`echo "it's done"; pkill python; echo 'x'`, 'kill-by-name'],
+  [`git commit -m "don't"; pkill python; echo 'ok'`, 'kill-by-name'],
+  ['Stop-Process -ProcessName python', 'kill-by-name'],
+  ['spps -Name python', 'kill-by-name'],
+  ['Get-Process python | Stop-Process', 'kill-by-name'],
+  ['sudo pkill -f server', 'kill-by-name'],
+  ['npm test || echo fail; git commit -m x', 'commit-after-semicolon'],
+  ['npm run verify; git add -A; git commit -m x', 'commit-after-semicolon'],
 ];
 
 const ALLOWED = [
@@ -46,6 +55,12 @@ const ALLOWED = [
   'git init -q; git add f; git commit -m x',
   'git status --porcelain | head; git commit -m x',
   'echo done; git commit -m x',
+  'man pkill',
+  'which killall',
+  'grep -rn pkill src/',
+  'echo pkill is denied',
+  'Get-Process python',
+  'npm test && git add -A && git commit -m x',
 ];
 
 for (const [command, rule] of DENIED) {

@@ -15,7 +15,7 @@ Both /insights reports show agents killing processes by name (a reviewer killed 
 
 ## Acceptance Criteria
 
-- [x] A command guard in the `ad-hooks` tier (both hosts, byte-identical) denies kill-by-name and a commit chained after `;` or a newline, allows quoted text, heredoc bodies, `kill <pid>` and `&&`-chained commits, fails open, and `AD_COMMAND_GUARD=0` silences it (tests through `verdict` and stdin).
+- [x] A command guard in the `ad-hooks` tier (both hosts, byte-identical) denies kill-by-name in command position and a commit joined by `;` or a newline to an earlier check, allows quoted text, heredoc bodies, `kill <pid>` and `&&`-chained commits, fails open, and `AD_COMMAND_GUARD=0` silences it (tests through `verdict` and stdin).
 - [x] Wiring documented and tested for Claude Code (`Bash|PowerShell`) and Codex (`Bash`).
 - [x] A replay over the owner's recorded shell commands shows zero false denials before the guard is documented as ready.
 - [x] The workflow checkpoint appends one reminder line naming the owner's conversation language and the no-estimate rule when a voice profile defines it (tests with and without).
@@ -50,3 +50,20 @@ sequence gate). The checkpoint line and the shadow `Stop` detector were built
 test first; the checkpoint tests now pin `AGENTIC_VOICE_DIR` so the owner's
 own profile never changes what the suite sees. ADR-0094 amends ADR-0083
 decision 1 and ADR-0074.
+
+### 2026-10-15 — review of 4b9c31c
+
+Both review axes found real gaps, each reproduced as a failing test first:
+an apostrophe inside double quotes hid a later `pkill` (quotes are now
+removed in one pass); `man pkill`, `which killall`, `grep pkill` and
+`echo pkill` were denied (matching is now by command position, after
+`sudo`, `env`, `xargs` and assignments); `Stop-Process -ProcessName`, `spps`
+and `Get-Process ... | Stop-Process` escaped; `npm test || echo fail; git
+commit` and `npm run verify; git add -A; git commit` escaped (a commit now
+counts any earlier check in the line). The replay moved to
+`scripts/replay-command-guard.mjs`; over 65,269 calls it denies 110: 92
+kill-by-name and 18 check-then-commit lines, several of them this session's
+own `verify; ...; git commit` commands, all real instances, no false block.
+The detector no longer logs drift for a conversation language it cannot tell
+apart (its fix and test landed together). Codex's `Stop` payload carries
+`last_assistant_message` (learn.chatgpt.com/docs/hooks, read 2026-10-15).

@@ -1,5 +1,5 @@
 {
-  "description": "Agentic Development dogfood: the ad-hooks artifact-validator gate (ADR-0083, Spec 0008), handoff-chip reminder (ADR-0087) shadow receipt gate (ADR-0089) command guard and shadow reply-language detector (task-0121).",
+  "description": "Agentic Development dogfood: the ad-hooks artifact-validator gate (ADR-0083, Spec 0008), handoff-chip reminder (ADR-0087), shadow receipt gate (ADR-0089), command guard and shadow reply-language detector (ADR-0094).",
   "hooks": {
     "PostToolUse": [
       {

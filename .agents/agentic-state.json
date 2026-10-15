@@ -362,7 +362,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/command-guard.mjs",
-          "sourceSha": "3f280746fedeb6cb27920f18947f0f1e821854abfcd50208364900e9952a8156"
+          "sourceSha": "f846eb297e90f134682e00cf394d04b03db7f8bb4336204b17ec067fca5710e4"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/detect-hooks.mjs",
@@ -386,7 +386,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/reply-language.mjs",
-          "sourceSha": "589aea2a66f62a0e238b394cf9bfb2195ea59d005f9df881e7887ebb3b321135"
+          "sourceSha": "a2f8039dc073a26f434e8910e221982eba72879e77497e42f1a3278eaf94cb78"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/review-receipts.mjs",
@@ -402,7 +402,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "d7a5b2585aaed0f2c86925fe842a15fb36f7170c92be81f01f9b1a8c52eb6749"
+          "sourceSha": "1ef6a828f2544e32499b5aad51c53f8f4e70e4520d4e4a9d59e3ef62ea73811c"
         }
       ]
     },

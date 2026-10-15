@@ -82,3 +82,7 @@ test('reply language: a reply in the conversation language or an undetectable on
   assert.deepEqual(run(PT).lines, []);
   assert.deepEqual(run('ok').lines, []);
 });
+
+test('reply language: a conversation language it cannot tell apart is never logged as drift', () => {
+  assert.deepEqual(run(EN, 'fr').lines, []);
+});

@@ -286,7 +286,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/references/session-tier.md",
-          "sourceSha": "af5a9cd6a78aaca69b55f6ae7f61e8bbd07fb7309d8d7b875394d8728f933f0f"
+          "sourceSha": "44f35c7cea704438ec1f89552e8b5029ffb7088a90ea21c93a370c5f8c317397"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/artifact-gate.mjs",
@@ -294,7 +294,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/command-guard.mjs",
-          "sourceSha": "3f280746fedeb6cb27920f18947f0f1e821854abfcd50208364900e9952a8156"
+          "sourceSha": "f846eb297e90f134682e00cf394d04b03db7f8bb4336204b17ec067fca5710e4"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/detect-hooks.mjs",
@@ -318,7 +318,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/reply-language.mjs",
-          "sourceSha": "589aea2a66f62a0e238b394cf9bfb2195ea59d005f9df881e7887ebb3b321135"
+          "sourceSha": "a2f8039dc073a26f434e8910e221982eba72879e77497e42f1a3278eaf94cb78"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/review-receipts.mjs",
@@ -334,7 +334,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/SKILL.md",
-          "sourceSha": "95e603272505319f4a7ffdbfcb3d583b9f289f1df81d5abaecdb94a7e5294867"
+          "sourceSha": "e56603ebce757eb1388bbd53e9c077aba4a653fccec66bc0366cd9098d4ef93c"
         }
       ]
     },
