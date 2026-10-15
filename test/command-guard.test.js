@@ -67,6 +67,7 @@ const DENIED = [
   ['npm test; ( cd sub && git commit -m x )', 'commit-after-semicolon'],
   ['for p in $(pgrep -f server); do pkill -TERM -P $p; done', 'kill-by-name'],
   ['# a note |\npkill node', 'kill-by-name'],
+  ['cat <<EOF | pkill node\nbody\nEOF', 'kill-by-name'],
   ['# run && \npkill node', 'kill-by-name'],
 ];
 

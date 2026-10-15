@@ -26,15 +26,16 @@ import { pathToFileURL } from 'node:url';
 
 const SHELL_TOOLS = new Set(['Bash', 'PowerShell']);
 
-// Remove heredoc bodies, then quoted strings and comments in one pass, so
-// whichever opens first wins: an apostrophe inside double quotes or a comment
-// stays literal, and a `#` inside quotes starts no comment. Only then join
-// line continuations (a trailing backslash, `&&`, `||` or `|`), so a body or
-// a comment line ending in one never pulls in the next line.
+// Remove heredoc bodies, keeping the rest of their start line, then quoted
+// strings and comments in one pass, so whichever opens first wins: an
+// apostrophe inside double quotes or a comment stays literal, and a `#`
+// inside quotes starts no comment. Only then join line continuations (a
+// trailing backslash, `&&`, `||` or `|`), so a body or a comment line ending
+// in one never pulls in the next line.
 export function stripLiterals(command) {
   const text = String(command).replace(
-    /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1[^\n]*\n[\s\S]*?\n\s*\2(?=\n|$)/g,
-    '<<HEREDOC'
+    /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1([^\n]*)\n[\s\S]*?\n\s*\2(?=\n|$)/g,
+    '<<HEREDOC$3'
   );
   return text
     .replace(/'[^']*'|"(?:\\.|[^"\\])*"|(?<=^|[\s;&|(])#[^\n]*/gm, (match) => {

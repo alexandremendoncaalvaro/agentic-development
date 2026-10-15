@@ -137,3 +137,11 @@ removal, so a heredoc body or a comment line ending in `|`, `&&` or `||`
 pulled in the next line: fixed by joining last, pinned by tests for both
 shapes and for a trailing `|`. The replay over the local corpus gives the
 same verdicts as before the change.
+
+### 2026-10-15 — delta review of a8a11d1
+
+No blocker, no regression from the reordering. Concern, a heredoc removal
+also dropped the rest of its start line, so `cat <<EOF | pkill node` passed:
+fixed, the start line stays, pinned by a test. Concern, the replay claim is
+not reproducible elsewhere: it is the same exploratory local run named
+above, rerun at each change with no verdict changed.
