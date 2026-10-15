@@ -51,7 +51,7 @@ Not applicable to a baseline; PRISM-0045 holds the decision rule the follow-up p
 **Strength:** Low
 **Provenance:** S2
 
-Superseded by E1 and kept for the record: 216 sessions, 1552 owner messages, 398 reviewer and 1085 auditor dispatches, 119 pull requests, 46 CI failure reads, 90 owner corrections. Most of the difference is pull requests: 65 of the 119 were mentions of `pr create` inside quoted text or messages, not commands.
+Superseded by E1 and kept for the record: 216 sessions, 1552 owner messages, 398 reviewer and 1085 auditor dispatches, 119 pull requests, 46 CI failure reads, 90 owner corrections. Most of the difference is pull requests (119 against 54): the corrected script no longer counts `pr create` inside quoted text or lines duplicated by resumed sessions; this record does not split the 65 between the two causes.
 
 ## Limitations and what would reverse the conclusion
 
