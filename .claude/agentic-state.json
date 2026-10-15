@@ -16,7 +16,7 @@
         },
         {
           "path": ".claude/skills/ad-adr/SKILL.md",
-          "sourceSha": "e8c6861d2f66d0aa51663e6d09038c8a7a1aed56b99b315083b520290eaa6697"
+          "sourceSha": "b831cecfbee7f4edee6fe9763d28e89b1990c3585949b493d50517ef35ae0963"
         }
       ]
     },
@@ -114,11 +114,11 @@
         },
         {
           "path": ".claude/skills/ad-commit/scripts/cited-records.mjs",
-          "sourceSha": "d8136e2855d954d5963a02aad8ac32b16ce4996f1ff1113aac8ce61a12eede1f"
+          "sourceSha": "429c4f18b7f0a9cd0086ac6158e7c5fb069937eda84fcb7b81780d156944d973"
         },
         {
           "path": ".claude/skills/ad-commit/SKILL.md",
-          "sourceSha": "e10b197bbe698439edfebc00b970114daf6656c87c9aa851f96eb76764e44b56"
+          "sourceSha": "cb7ae700b9b8f86ea79f4aed99e69bd3d93adfcb0a4c1b329b32c2f708d76050"
         }
       ]
     },
@@ -239,11 +239,11 @@
         },
         {
           "path": ".claude/skills/ad-ground/scripts/validate-record.mjs",
-          "sourceSha": "f52d9254e1e38cbb2373f6f599a9b68cee89ef57912e518c115b022c401fa0d4"
+          "sourceSha": "209a4e90e04e55c3a79d733a02663163564dd93c635d12f60ab89fafd8ca48fa"
         },
         {
           "path": ".claude/skills/ad-ground/SKILL.md",
-          "sourceSha": "c22a7884842de6a9664ada4ed301de9a22748035add69ed89dc0c139be1e7d06"
+          "sourceSha": "eb6632b715abe2c722f27d56ba278889f440693d20dd9c656de7427653e424d3"
         }
       ]
     },
@@ -603,7 +603,7 @@
         },
         {
           "path": ".claude/skills/ad-research/SKILL.md",
-          "sourceSha": "15b0bb303f2c320652cda4b558a5cc0e2253661ca3fd3c1f85e2214bad0eeb16"
+          "sourceSha": "b4853fdc48f599a7e2a7767d85c96ea1657790fa1282185ef5082b5bab0b02b8"
         }
       ]
     },

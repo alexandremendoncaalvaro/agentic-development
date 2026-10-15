@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-08-10
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0097 — a configured delivery process may place the study in another repository directory.
 **Amended by:** ADR-0070
 **Amended by:** ADR-0064 — its profile-based installation scope for `ad-research`; the evidence-graded study process is unchanged.
 **Amended by:** ADR-0095 — Assess becomes Step 8 and Appraise grades from a starting tier.

@@ -24,6 +24,8 @@ Step 5 — conclude (Apply, §17 Axis 2). State the conclusion and its confidenc
 
 Step 6 — write the study. Write doc/research/NNNN-<slug>.md using the template below — conclusion first, evidence graded, sources dated. Status draft. Stop after writing; do not self-flip to concluded (that needs user review).
 
+If `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` names `process.records.research` with `repo-path` and a `path`, write the study there instead of `doc/research/`; for `issue-comment` or `external`, follow `ad-ground`'s Step 5 rule.
+
 Step 7 — graduate (when the conclusion binds). After the study is reviewed, if its conclusion is a binding decision, graduate it: open an ADR (ad-adr) that references this study by path — the study holds the evidence, the ADR records the decision. If the conclusion feeds a pre-construction build, hand to ad-derisk (Front B) rather than building blind.
 
 Step 8 — Assess (when the decision is revisited). When the decision this study grounded is revisited — an ADR amended, a measurement contradicting it, the reopen trigger named in the study — fill its `## Assessment` section: what the study got right or wrong and what the next study should do differently. This closes the Ask → Acquire → Appraise → Apply → Assess loop.

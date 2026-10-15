@@ -5511,3 +5511,46 @@ test('project-state: a matching machine entry may carry a version 2 process', ()
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// Task 0118 slice 2, ADR-0097: records go where the process says.
+function runGroundRecordArgs(cwd, args) {
+  return JSON.parse(execFileSync('node', [GROUND_RECORD, ...args], { cwd, encoding: 'utf8' }));
+}
+
+test('validate-record: --dir accepts a record in the configured research directory', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-dir-'));
+  try {
+    const record = 'docs/evidence/0002-ground-durable-evidence.md';
+    mkdirSync(join(dir, 'docs', 'evidence'), { recursive: true });
+    writeFileSync(join(dir, record), VALID_GROUND_RECORD);
+    const ok = runGroundRecordArgs(dir, [record, '--dir', 'docs/evidence']);
+    assert.equal(ok.valid, true, ok.errors.join('; '));
+    const elsewhere = runGroundRecordArgs(dir, [record]);
+    assert.equal(elsewhere.valid, false);
+    const outside = runGroundRecordArgs(dir, ['../x/0002-ground-a.md', '--dir', '../x']);
+    assert.equal(outside.valid, false);
+    assert.match(
+      outside.errors.join('\n'),
+      /--dir must be a relative directory inside the repository/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: --draft checks the content of a record kept outside the repository', () => {
+  const repo = mkdtempSync(join(tmpdir(), 'agentic-ground-draft-repo-'));
+  const scratch = mkdtempSync(join(tmpdir(), 'agentic-ground-draft-'));
+  try {
+    const draft = join(scratch, 'comment.md');
+    writeFileSync(draft, VALID_GROUND_RECORD.replace('GROUND-0002', 'GROUND-0000'));
+    const ok = runGroundRecordArgs(repo, [draft, '--draft']);
+    assert.equal(ok.valid, true, ok.errors.join('; '));
+    writeFileSync(draft, VALID_GROUND_RECORD.replace('## Evidence', '## Proof'));
+    const bad = runGroundRecordArgs(repo, [draft, '--draft']);
+    assert.equal(bad.valid, false);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+    rmSync(scratch, { recursive: true, force: true });
+  }
+});

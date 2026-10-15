@@ -3,7 +3,10 @@
  * Report the git state of every record a draft commit message cites
  * (task-0092, GROUND-0031). Run from a consumer repository root:
  *
- *   node <skill-base-dir>/scripts/cited-records.mjs <message-file | ->
+ *   node <skill-base-dir>/scripts/cited-records.mjs <message-file | -> [--dir <kind>=<dir>]...
+ *
+ * `--dir` moves a record kind (research, adr, task, spec) to the directory a
+ * delivery process configures (ADR-0097).
  *
  * Prints JSON; never writes and never blocks.
  */
@@ -15,11 +18,18 @@ import { join } from 'node:path';
 // RESEARCH and PRISM records share doc/research/ and its number ledger.
 const ID = /\b(?:(GROUND|RESEARCH|PRISM)-|(ADR)-|([Tt]ask)[- ]|([Ss]pec)[- ])(\d{4})\b/g;
 
+const directories = {
+  research: 'doc/research',
+  adr: 'doc/adr',
+  task: 'doc/tasks',
+  spec: 'doc/specs',
+};
+
 function directoryOf([, research, adr, task]) {
-  if (research) return 'doc/research';
-  if (adr) return 'doc/adr';
-  if (task) return 'doc/tasks';
-  return 'doc/specs';
+  if (research) return directories.research;
+  if (adr) return directories.adr;
+  if (task) return directories.task;
+  return directories.spec;
 }
 
 // A git hook exports these; inherited, they point every probe at another
@@ -140,7 +150,21 @@ function readMessage(source) {
   }
 }
 
-const message = readMessage(process.argv[2]);
+const [messageSource, ...options] = process.argv.slice(2);
+for (let index = 0; index < options.length; index += 1) {
+  const [kind, dir] = options[index] === '--dir' ? (options[(index += 1)] ?? '').split('=') : [];
+  const path = (dir ?? '').replaceAll('\\', '/').replace(/\/+$/, '');
+  if (
+    !(kind in directories) ||
+    path === '' ||
+    /^([A-Za-z]:)?\//.test(path) ||
+    path.split('/').includes('..')
+  ) {
+    fail('--dir needs <kind>=<relative directory>, kind one of research, adr, task, spec');
+  }
+  directories[kind] = path;
+}
+const message = readMessage(messageSource);
 if (message === null)
   fail('usage: cited-records.mjs <message-file | -> (the draft commit message)');
 const seen = new Set();

@@ -4,7 +4,9 @@
 **Date:** 2026-10-15
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0079 — the source configuration gains `schemaVersion` 2 with an optional `process` block, and the fact packet reports it; every other decision binds unchanged.
-**Related:** ADR-0070 and ADR-0060 (record locations, amended as each slice lands); ADR-0085 (skills gate their own outward effects)
+**Amends:** ADR-0070 — decision 1's fixed `doc/research/` location: a configured delivery process may place the ground record in another repository directory or keep it as an issue comment, validated before it is posted; every other decision binds unchanged.
+**Amends:** ADR-0060 — decision 2's fixed `doc/research/` location for studies, under the same configuration; the study process is unchanged.
+**Related:** ADR-0085 (skills gate their own outward effects)
 
 ## Context
 
@@ -43,6 +45,13 @@ should serve.
    labels. No organization's process appears in shipped text; a real process
    lives in the machine layer or in the team's own repository.
 
+6. Record writers honor `process.records`. `validate-record.mjs` takes `--dir <path>`
+   for a configured research directory and `--draft` to check a record kept
+   outside the repository before it is posted as an issue comment;
+   `cited-records.mjs` takes `--dir <kind>=<path>`; `ad-adr` follows the
+   configured directory and, with `naming: date`, names the file by the date
+   with the separator the directory's existing records use.
+
 ## Consequences
 
 Positive:
@@ -53,6 +62,9 @@ Positive:
 Negative:
 
 - Stages come only from GitHub labels; another tracker needs a new source type.
+- The artifact gate validates records under `doc/research/` only; a record in a
+  configured directory is checked when its skill runs the validator, not on
+  write.
 - A misconfigured block is reported and ignored with the rest of the
   configuration, falling back to the repository baseline, as ADR-0079 already
   does for invalid configuration.
