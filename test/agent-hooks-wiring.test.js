@@ -467,7 +467,7 @@ test('agent hooks wiring: the PreToolUse shell entry runs the command guard, whi
     /command-guard\.mjs/.test(h.command)
   );
   const run = spawnSync(hook.command.replace('${CLAUDE_PROJECT_DIR}', KIT_ROOT), {
-    shell: '/bin/sh',
+    shell: true,
     cwd: KIT_ROOT,
     input: JSON.stringify({ tool_name: 'Bash', tool_input: { command: 'pkill node' } }),
     encoding: 'utf8',
