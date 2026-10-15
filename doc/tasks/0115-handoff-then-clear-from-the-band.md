@@ -72,6 +72,14 @@ Fresh-context review, both axes, at 9051cf9: no Blocker on either axis.
 - Standards Notes: the 0116 change moved to a 2026-10-15 addendum; the dead `agentId` check on `turn.start` dropped; per-session reading of the box recorded here: a toggle in one session reaches another at its next start.
 - Spec Concern, a refused resume cannot leave the session as it was after the handoff: by construction the clear already ran; the toast names the handoff file to resume from, recorded in the addendum and the changelog.
 
+### 2026-10-15 — delta reviewed
+
+Fresh-context delta review, both axes, 9051cf9..e218e01: no Blocker; Spec clean, every prior finding resolved or held as rejected.
+
+- Standards Concern, the name filter took only `[A-Za-z0-9._-]` while `ad-handoff`'s slug is free text, so `/ad-handoff "merge cleanup"` would read as no file: fixed, the slug takes any character but `/`, a control character or a line break (`\p{Cc}`, U+2028, U+2029); test first.
+- Standards Concern, the earlier entry's "a clear only follows a handoff written in that turn" overstates the check: the code checks the one new well-named file's time since the turn began, not its writer, so another session of the same person writing a handoff in that window would be resumed from. Recorded as an accepted limit in the ADR-0088 2026-10-15 addendum.
+- Standards Note, restore `kind: 'directory'` in the fixture: rejected; the 2.1.295 typings declare `kind: 'file' | 'dir' | 'other'` (claude-code.d.ts:4925), so `'dir'` is the engine's value.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

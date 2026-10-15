@@ -284,16 +284,22 @@ test('regression: task-0115 handoffsSince lists handoffs written since a time, n
   assert.deepEqual(handoffsSince(entries, 160), []);
 });
 
-test('regression: task-0115 handoffsSince takes only names in the shape ad-handoff writes', () => {
+test('regression: task-0115 handoffsSince takes only names in the shape ad-handoff writes, free of control characters', () => {
   const at = (name) => ({ name, kind: 'file', mtimeMs: 200 });
   const entries = [
     at('notes.md'),
     at('20261015T120000Z-ok_slug.v2.md'),
-    at('20261015T120000Z-two words.md'),
+    at('20261015T120001Z-two words.md'),
+    at('20261015T120002Z-refatoração.md'),
+    at('20261015T120000Z-tab\tname.md'),
     at('20261015T120000Z-line\nbreak.md'),
     at('2026-10-15-x.md'),
   ];
-  assert.deepEqual(handoffsSince(entries, 100), ['20261015T120000Z-ok_slug.v2.md']);
+  assert.deepEqual(handoffsSince(entries, 100).sort(), [
+    '20261015T120000Z-ok_slug.v2.md',
+    '20261015T120001Z-two words.md',
+    '20261015T120002Z-refatoração.md',
+  ]);
 });
 
 test('regression: task-0115 the resume prompt names the handoff and its Resume protocol', () => {

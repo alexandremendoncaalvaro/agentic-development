@@ -50,10 +50,11 @@ export function handoffDirs(tmpdir) {
   return [...new Set([`${base}/agentic-handoffs`, '/tmp/agentic-handoffs'])];
 }
 
-// ad-handoff names its file <UTC stamp>-<slug>.md. The directory may be the
-// shared /tmp, so any other name is not taken: it would reach the model as
-// the person's own words in the resume prompt.
-const HANDOFF_NAME = /^\d{8}T\d{6}Z-[A-Za-z0-9._-]+\.md$/;
+// ad-handoff names its file <UTC stamp>-<slug>.md, the slug free text. The
+// directory may be the shared /tmp and the name reaches the model as the
+// person's own words in the resume prompt, so a name off that shape, or with
+// a control character or line break, is not taken.
+const HANDOFF_NAME = /^\d{8}T\d{6}Z-[^/\p{Cc}\u2028\u2029]+\.md$/u;
 
 // The handoff files written at or after `sinceMs`, newest first, by name. The
 // caller clears only when exactly one is found: none means the handoff wrote
