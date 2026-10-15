@@ -140,3 +140,11 @@ points a record kind at its configured directory" (5 of 5 failed). The audit
 of ba00b66 had one HK nit, accepted: the new gate tests call git with the
 inherited environment, as existing tests do; the suite runs through the
 env-stripping runner.
+
+### 2026-10-15 — delta review of 90f291d
+
+One concern, fixed: with the configured directory inside `doc/research/`, a
+correct GROUND record there lost its `--dir` and was blocked. A GROUND record
+in the configured directory now always gets `--dir`, and every other kind
+stays governed under `doc/research/`; the nested test now also writes a valid
+GROUND record and went red, then green.

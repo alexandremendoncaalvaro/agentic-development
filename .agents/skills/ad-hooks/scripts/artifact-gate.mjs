@@ -140,9 +140,10 @@ export function resolveOwner(absolutePath, cwd, configured = null) {
   if (escapesRepository(rel)) return null;
   const inside = (directory) => rel.startsWith(`${directory.split('/').join(sep)}${sep}`);
   // doc/research keeps every record kind governed, even when the configured
-  // directory sits inside it.
+  // directory sits inside it; a GROUND record in the configured directory is
+  // validated against that directory.
   const inDefault = inside(DEFAULT_RESEARCH_DIR);
-  const inConfigured = !inDefault && configured !== null && inside(configured);
+  const inConfigured = configured !== null && inside(configured);
   if (!(inConfigured || inDefault) || !rel.endsWith('.md')) return null;
   const path = rel.split(sep).join('/');
   let head;
@@ -154,11 +155,12 @@ export function resolveOwner(absolutePath, cwd, configured = null) {
     return { id: 'unknown', validator: null, path, unreadable: error.code ?? 'unknown' };
   }
   const owner = OWNERS.find(
-    (candidate) =>
-      candidate.heading.test(head) && (!inConfigured || candidate.id === 'ground-record')
+    (candidate) => candidate.heading.test(head) && (inDefault || candidate.id === 'ground-record')
   );
   if (!owner) return null;
-  return inConfigured ? { ...owner, path, args: ['--dir', configured] } : { ...owner, path };
+  return inConfigured && owner.id === 'ground-record'
+    ? { ...owner, path, args: ['--dir', configured] }
+    : { ...owner, path };
 }
 
 /** Run the owning validator; classify its outcome without interpreting it. */

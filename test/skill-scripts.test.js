@@ -5700,6 +5700,10 @@ test('artifact-gate: a configured directory inside doc/research leaves every rec
     const rel = join('doc', 'research', 'ground', '0006-prism-v.md');
     writeFileSync(join(root, rel), '# PRISM-0006: broken\n');
     assert.equal(runGate(claudeWriteEvent(root, rel), { root, evidence }).status, 2);
+    const groundRel = join('doc', 'research', 'ground', '0002-ground-durable-evidence.md');
+    writeFileSync(join(root, groundRel), VALID_GROUND_RECORD);
+    const valid = runGate(claudeWriteEvent(root, groundRel), { root, evidence });
+    assert.equal(valid.status, 0, valid.stderr);
   } finally {
     rmSync(root, { recursive: true, force: true });
     rmSync(evidence, { recursive: true, force: true });
