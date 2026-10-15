@@ -68,3 +68,12 @@ again before the second baseline run; measures, lexicon and decision rule are
 unchanged, and the periods are half-open with the follow-up on [2026-10-15,
 2026-11-14). Notes accepted: the interpretive line in RESEARCH-0046 is
 removed; the lexicon stays a proxy.
+
+### 2026-10-15 — corrected baseline
+
+Second run at a6ee778, after the second freeze: 216 sessions, 54 pull
+requests, 389 reviewer and 1082 auditor dispatches (7.2 and 20.04 per pull
+request), 41 CI failure reads (0.76 per pull request), 70 owner messages
+correcting a standing rule (0.32 per session). RESEARCH-0046 records it as
+the baseline and keeps the first run as superseded evidence. The follow-up
+run is due on or after 2026-11-14.
