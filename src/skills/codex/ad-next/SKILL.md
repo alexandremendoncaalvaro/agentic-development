@@ -35,6 +35,8 @@ The survey gives you the facts; Steps 1-5 are the judgment the script deliberate
 
 Step 1 — classify scenario before ranking. Layer status is evidence; scenario determines the right next step.
 
+When the packet's `process` has `lifecycleOwner: external`, recommend from each issue's `stage` and its `next` text, not from the PRD, spec and task chain; show `next` as given and never run it (ADR-0097).
+
 - Fresh / unframed greenfield: no durable product framing, even if a framework scaffold or a few early files already exist. This is a product-framing problem, not an `AGENTS.md` problem.
 - Product-framed greenfield: PRD exists, but no meaningful code yet. This is where `/ad-bootstrap`, `/ad-guidelines`, optional `/ad-design`, then `/ad-spec` become the normal sequence.
 - Brownfield: meaningful code exists and the scan can summarize the current product behavior. Existing code can supply product and architecture evidence; `/ad-bootstrap` is scan-first here and may precede PRD backfill.

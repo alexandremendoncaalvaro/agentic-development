@@ -20,15 +20,15 @@ The kit writes records to fixed repository paths and assumes it owns the deliver
 - [x] `ad-project-state` reads milestones and annotates each issue with its configured stage and next action; an offline `--process` flag prints the resolved block.
 - [x] Record writers use the configured location: the ground validator accepts a draft outside the repository; the artifact gate, cited-records and `ad-adr` (date naming) follow the config.
 - [ ] An `issue-comment` destination drafts, validates, asks the owner, then posts, observed in a recorded run (the skill text describes it; only the validation step is tested).
-- [ ] `ad-task`, `ad-spec` and `ad-prd` refuse when their destination is external and print the handoff; `ad-next` routes by stage when the lifecycle owner is external; `ad-derisk` writes to the configured work item; `ad-philosophy` states the generic rule.
-- [ ] A generic issue-staged example ships; no methodology is named in kit logic; a new ADR records the principle.
+- [x] `ad-task`, `ad-spec` and `ad-prd` refuse when their destination is external and print the handoff; `ad-next` routes by stage when the lifecycle owner is external; `ad-derisk` writes to the configured work item; `ad-philosophy` states the generic rule.
+- [x] A generic issue-staged example ships; no methodology is named in kit logic; a new ADR records the principle.
 
 ## Plan
 
 - [x] Slice 1: resolver schema v2, `--process`, milestone and stage annotation, docs and example (tests first).
 - [x] Slice 2: record writers and validator draft mode (tests first).
-- [ ] Slice 3: planning skills, navigation and the philosophy rule.
-- [ ] Review per slice, audit only where `auditPaths` match, pull requests.
+- [x] Slice 3: planning skills, navigation and the philosophy rule.
+- [x] Review per slice, audit only where `auditPaths` match, pull requests.
 
 ## Notes
 
@@ -154,3 +154,36 @@ GROUND record and went red, then green.
 Both axes ship as-is. Accepted as a known limit: configuring a parent of
 `doc/research/` (such as `doc`) as the research directory hands GROUND
 records under `doc/research/` a `--dir` that does not match them.
+
+### 2026-10-15 — slice 3, handoffs and navigation
+
+Two static-contract tests went red, then green. With `lifecycleOwner:
+external`, `ad-task`, `ad-spec` and `ad-prd` (both hosts) read the process
+first and, unless the record kind is a `repo-path` record, show the
+configured handoff and write nothing; `ad-next` recommends from each issue's
+stage and its next text; `ad-derisk` drafts its register as a comment on the
+team's work item, posted only after the owner approves; `ad-philosophy`
+states the rule to work inside the team's delivery process. The generic
+example and the ADR shipped with slice 1. Still open: the issue-comment
+flow observed end to end in a recorded run.
+
+### 2026-10-15 — review of afd404a
+
+Two-axis review, no blocker. Concerns, fixed and pinned by static-contract
+assertions: `ad-task`, `ad-spec` and `ad-prd` now branch on the record kind
+under an external owner (`external` or none shows the handoff; `issue-comment`
+drafts, shows and posts with `gh issue comment` on the work item the owner
+names only after approval; `repo-path` writes under its path); `ad-derisk`
+reads the process before Step 1, follows `process.records.task` with the same
+branches and states its posting step, and its output contract covers both
+destinations. Concern accepted: these are text contracts; the recorded
+end-to-end run stays open.
+
+### 2026-10-15 — delta review of 2b29a32
+
+Prior findings resolved. One concern on both axes, fixed: `ad-derisk` posted
+to an issue for an `external` or absent record, unlike the other three
+skills; it now shows the handoff and writes nothing there, and posts only for
+`issue-comment` (an assertion went red, then green). Notes accepted: ADR-0097
+decision 4 says an issue-comment record is validated, which holds for ground
+records; the work-item drafts are shown, not validated.

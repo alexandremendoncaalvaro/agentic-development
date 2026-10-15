@@ -36,6 +36,8 @@ The survey gives you the facts; Steps 1-5 are the judgment the script deliberate
 
 ## Step 1 — Classify scenario before ranking
 
+When the packet's `process` has `lifecycleOwner: external`, recommend from each issue's `stage` and its `next` text, not from the PRD, spec and task chain; show `next` as given and never run it (ADR-0097).
+
 Layer status is evidence; scenario determines the right next step.
 
 - **Fresh / unframed greenfield:** no durable product framing, even if a framework scaffold or a few early files already exist. This is a product-framing problem, not an `AGENTS.md` problem.

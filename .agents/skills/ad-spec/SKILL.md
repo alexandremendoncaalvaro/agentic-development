@@ -10,6 +10,8 @@ Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: dra
 </background_information>
 
 <instructions>
+First run `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external`, the team's own delivery process owns specs and `process.records.spec` decides. With `external` or no record, show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). With `issue-comment`, draft it in the OS temporary directory, show it, and post it with `gh issue comment` on the work item the owner names only after the owner approves; then delete the draft. With `repo-path`, write the file under its `path`.
+
 Step 1 — determine NNNN and slug. Run `node .agents/skills/ad-spec/scripts/next-number.mjs doc/specs` from the consumer root. Use JSON `next`; archived gaps stay unused. Stop until access is resolved when `unreadable` is non-empty, and stop for a numbering decision when `exhausted` is true. If loaded elsewhere, substitute the skill base path. Slug: kebab-case, ≤6 words, derived from the feature title.
 
 Step 2 — confirm scope. The spec captures one feature. If the user's request implies multiple, ask which to write first; the others become follow-up specs. A "feature" here is the smallest user-visible outcome that has its own success criteria — not a task (work unit) and not a binding architectural decision (ADR).

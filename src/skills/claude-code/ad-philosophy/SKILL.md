@@ -52,6 +52,8 @@ For non-trivial changes, invoke `/ad-ground` — the workflow-operational skill 
 
 **Read to a stop criterion.** Grounding bounds *what* to read; the read contract in WORKFLOW.md §1 (*Reading order*) bounds *how far*. Three rungs: the definition layer always (every document whose role is *definition* under rule 9 below); an area's decision records only when the change touches that area, and the specific record rather than the whole directory — starting from the layer's state projection when it has one; the evidence behind a decision only when the decision looks wrong. Volume of reading is not comprehension — climb only as far as the change requires, then stop.
 
+**Work inside the team's delivery process.** Work inside the team's delivery process when the repository configures one (`ad-project-state --process`, ADR-0097): its stages, record places and handoffs win over the kit's defaults, and the kit never names or assumes a methodology.
+
 ## Decide When Grounded, Ask When Judgment
 
 Universal rule; WORKFLOW.md §7 subsection *Decide when grounded, ask when judgment* is the canonical source.
