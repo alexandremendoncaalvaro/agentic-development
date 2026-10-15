@@ -446,3 +446,46 @@ test('agent hooks wiring: a PreToolUse entry matched on the chat-send tool runs 
     assert.ok(!new RegExp(`^(?:${entry.matcher})$`).test('mcp__x__slack_read_channel'));
   }
 });
+
+// Task 0121: the command guard is wired on PreToolUse for shell tools and
+// denies a closed list of destructive patterns through the wired command.
+test('agent hooks wiring: the PreToolUse shell entry runs the command guard, which denies kill by name', () => {
+  for (const file of ['.claude/settings.json', '.codex/hooks.json']) {
+    const config = JSON.parse(readFileSync(join(KIT_ROOT, file), 'utf8'));
+    const entry = (config.hooks?.PreToolUse ?? []).find((e) =>
+      e.hooks.some((h) => /command-guard\.mjs/.test(h.command))
+    );
+    assert.ok(entry, `${file}: a PreToolUse entry runs command-guard.mjs`);
+    assert.match(entry.matcher, /Bash/, `${file}: matched on Bash`);
+    if (file === '.claude/settings.json') assert.match(entry.matcher, /PowerShell/);
+    const hook = entry.hooks.find((h) => /command-guard\.mjs/.test(h.command));
+    const rel = /(src\/skills\/[^"]+command-guard\.mjs)"/.exec(hook.command)?.[1];
+    assert.ok(rel && existsSync(join(KIT_ROOT, rel)), `${file}: the wired script exists: ${rel}`);
+  }
+  const config = JSON.parse(readFileSync(join(KIT_ROOT, '.claude/settings.json'), 'utf8'));
+  const hook = config.hooks.PreToolUse.flatMap((e) => e.hooks).find((h) =>
+    /command-guard\.mjs/.test(h.command)
+  );
+  const run = spawnSync(hook.command.replace('${CLAUDE_PROJECT_DIR}', KIT_ROOT), {
+    shell: '/bin/sh',
+    cwd: KIT_ROOT,
+    input: JSON.stringify({ tool_name: 'Bash', tool_input: { command: 'pkill node' } }),
+    encoding: 'utf8',
+    env: { ...process.env, AD_COMMAND_GUARD: '' },
+  });
+  assert.equal(run.status, 0, `exit 0; stderr: ${run.stderr}`);
+  assert.equal(JSON.parse(run.stdout).hookSpecificOutput.permissionDecision, 'deny');
+});
+
+// Task 0121: the shadow reply-language detector runs on Stop on both hosts.
+test('agent hooks wiring: the Stop entry runs the shadow reply-language detector on both hosts', () => {
+  for (const file of ['.claude/settings.json', '.codex/hooks.json']) {
+    const config = JSON.parse(readFileSync(join(KIT_ROOT, file), 'utf8'));
+    const hook = (config.hooks?.Stop ?? [])
+      .flatMap((e) => e.hooks)
+      .find((h) => /reply-language\.mjs/.test(h.command));
+    assert.ok(hook, `${file}: a Stop hook runs reply-language.mjs`);
+    const rel = /(src\/skills\/[^"]+reply-language\.mjs)"/.exec(hook.command)?.[1];
+    assert.ok(rel && existsSync(join(KIT_ROOT, rel)), `${file}: the wired script exists: ${rel}`);
+  }
+});

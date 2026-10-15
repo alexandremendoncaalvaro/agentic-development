@@ -4176,13 +4176,49 @@ const CHECKPOINT = join(
 
 // execFileSync throws on a non-zero exit, so every call below also asserts
 // the "always exit 0, never block the prompt" contract.
+// No voice profile unless a test supplies one, so the machine's own profile
+// never changes what the suite sees.
+const EMPTY_VOICE_DIR = mkdtempSync(join(tmpdir(), 'agentic-no-voice-'));
+
 function runCheckpoint(input, env = {}) {
   return execFileSync('node', [CHECKPOINT], {
     input,
     encoding: 'utf8',
-    env: { ...process.env, AD_WORKFLOW_CHECKPOINT: '', ...env },
+    env: { ...process.env, AD_WORKFLOW_CHECKPOINT: '', AGENTIC_VOICE_DIR: EMPTY_VOICE_DIR, ...env },
   });
 }
+
+function voiceDir(profile) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-'));
+  writeFileSync(
+    join(dir, 'profile.md'),
+    `# Personal voice profile\n\n## Profile data\n\n\`\`\`json\n${JSON.stringify(profile, null, 2)}\n\`\`\`\n`
+  );
+  return dir;
+}
+
+// Task 0121: the owner's conversation language and the no-estimate rule ride
+// on every prompt when a confirmed voice profile names the language.
+test('workflow-checkpoint: a confirmed voice profile adds the language and no-estimate reminder', () => {
+  const dir = voiceDir({
+    status: 'confirmed',
+    languages: { conversation: 'pt-BR', publication: 'en' },
+  });
+  const out = runCheckpoint(PROMPT_EVENT, { AGENTIC_VOICE_DIR: dir });
+  assert.match(out, /Reply to the owner in pt-BR; give no date, duration or deadline estimates\./);
+});
+
+test('workflow-checkpoint: no reminder without a profile, an unconfirmed one, or one without a language', () => {
+  assert.doesNotMatch(runCheckpoint(PROMPT_EVENT), /Reply to the owner/);
+  for (const profile of [
+    { status: 'draft', languages: { conversation: 'pt-BR' } },
+    { status: 'confirmed' },
+    { status: 'confirmed', languages: { conversation: 'pt-BR; rm -rf /' } },
+  ]) {
+    const out = runCheckpoint(PROMPT_EVENT, { AGENTIC_VOICE_DIR: voiceDir(profile) });
+    assert.doesNotMatch(out, /Reply to the owner/);
+  }
+});
 
 const PROMPT_EVENT = JSON.stringify({
   hook_event_name: 'UserPromptSubmit',

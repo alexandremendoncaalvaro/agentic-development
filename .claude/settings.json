@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/src/skills/claude-code/ad-hooks/scripts/handoff-nudge.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/src/skills/claude-code/ad-hooks/scripts/reply-language.mjs\""
           }
         ]
       }
@@ -37,6 +41,15 @@
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/src/skills/claude-code/ad-hooks/scripts/command-guard.mjs\""
+          }
+        ]
+      },
       {
         "matcher": "Bash",
         "hooks": [
