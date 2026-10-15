@@ -136,4 +136,4 @@ for s in sorted(d for d in os.listdir(src) if not d.startswith('.')):
 
 ## Derived decision
 
-None yet. On review, the invocation rule and the budget rule graduate to an ADR that amends ADR-0073, and the per-skill gate verification and the Claude Code listing measurement become that change's task.
+[ADR-0085](../adr/0085-gate-skill-effects-inside-the-skill.md) records the invocation and budget rules, amending ADR-0073; [ADR-0093](../adr/0093-cap-skill-descriptions-at-200-characters.md) later lowered the per-description cap to 200.

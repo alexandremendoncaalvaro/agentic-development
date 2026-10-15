@@ -36,6 +36,20 @@ const REQUIRED_HEADINGS = [
 // the register and claim shapes without them (task-0086).
 const ACCESS_SHAPE = '(accessed <YYYY-MM-DD> via <method>)';
 const STRENGTH_SHAPE = '"**Strength:** <High | Medium | Low | Very-low>"';
+const TIER_SHAPE = '"**Tier:** <Measurement | Primary | Secondary | Single | Opinion>"';
+const STAKES_SHAPE = '"<low | medium | high> × <reversible | irreversible>"';
+
+// Task 0123, WORKFLOW §17: each evidence tier starts at a grade; a claim
+// graded above its start states why on an `Upgrade:` line.
+const GRADES = ['Very-low', 'Low', 'Medium', 'High'];
+const TIER_START = {
+  Measurement: 'High',
+  Primary: 'Medium',
+  Secondary: 'Low',
+  Single: 'Low',
+  Opinion: 'Very-low',
+};
+const STAKES = /^(low|medium|high)\s*[×x]\s*(reversible|irreversible)$/i;
 const PROVENANCE_SHAPE = '"**Provenance:** <A1, B1, C1, D1>"';
 
 function sourceShape(group) {
@@ -104,7 +118,45 @@ function parseSources(body, errors) {
   return { ids, counts };
 }
 
-function parseClaims(body, sourceIds, errors) {
+function stakesOf(body, errors, warnings) {
+  const value = metadata(body, 'Stakes');
+  if (value === null) {
+    warnings.push(
+      `no Stakes line: add "**Stakes:** ${STAKES_SHAPE.slice(1, -1)}" under the title to grade claims from their tier (WORKFLOW §17)`
+    );
+    return null;
+  }
+  const match = STAKES.exec(value);
+  if (!match) {
+    errors.push(`Stakes must be ${STAKES_SHAPE}`);
+    return null;
+  }
+  return { short: match[1].toLowerCase() === 'low' && match[2].toLowerCase() === 'reversible' };
+}
+
+// The tier rules apply only to a record that names its stakes.
+function checkTier(id, claim, stakes, errors) {
+  const tier = metadata(claim, 'Tier');
+  const strength = metadata(claim, 'Strength');
+  if (tier === null) {
+    if (!stakes.short || strength !== null)
+      errors.push(`${id} has no tier: add a line ${TIER_SHAPE} under its heading`);
+    return;
+  }
+  if (!(tier in TIER_START)) {
+    errors.push(`${id} has an unknown tier: write ${TIER_SHAPE}`);
+    return;
+  }
+  if (strength === null || strength === 'design choice') return;
+  const start = TIER_START[tier];
+  if (GRADES.indexOf(strength) > GRADES.indexOf(start) && metadata(claim, 'Upgrade') === null) {
+    errors.push(
+      `${id} is graded ${strength} above its ${tier} start (${start}): add a line "**Upgrade:** <reason>" or lower the strength`
+    );
+  }
+}
+
+function parseClaims(body, sourceIds, errors, stakes = null) {
   const evidence = section(body, 'Evidence');
   if (evidence === null) return [];
 
@@ -130,9 +182,13 @@ function parseClaims(body, sourceIds, errors) {
     }
     seen.add(id);
 
-    if (!/^\*\*Strength:\*\*\s*(High|Medium|Low|Very-low)$/m.test(claim)) {
+    const strengthOk = /^\*\*Strength:\*\*\s*(High|Medium|Low|Very-low)$/m.test(claim);
+    const designChoice = stakes !== null && metadata(claim, 'Strength') === 'design choice';
+    const optional = stakes?.short && metadata(claim, 'Strength') === null;
+    if (!strengthOk && !designChoice && !optional) {
       errors.push(`${id} has no valid strength: add a line ${STRENGTH_SHAPE} under its heading`);
     }
+    if (stakes !== null) checkTier(id, claim, stakes, errors);
     const provenance = metadata(claim, 'Provenance');
     if (!provenance) {
       errors.push(noProvenance(id));
@@ -159,6 +215,7 @@ function parseClaims(body, sourceIds, errors) {
 const requested = process.argv[2];
 const unreadable = [];
 const errors = [];
+const warnings = [];
 const cwd = process.cwd();
 const record = requested === undefined ? null : normalizedPath(requested);
 
@@ -208,7 +265,8 @@ if (body !== null) {
   }
   const parsedSources = parseSources(body, errors);
   sources = parsedSources.counts;
-  claims = parseClaims(body, parsedSources.ids, errors);
+  const stakes = stakesOf(body, errors, warnings);
+  claims = parseClaims(body, parsedSources.ids, errors, stakes);
 }
 
 console.log(
@@ -220,6 +278,7 @@ console.log(
       sources,
       claims,
       errors,
+      warnings,
       unreadable,
     },
     null,

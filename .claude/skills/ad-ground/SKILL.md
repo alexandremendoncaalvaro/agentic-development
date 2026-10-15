@@ -58,7 +58,7 @@ Before handing off to implementation, report a soft verdict. Two modes, chosen b
 
 **Full mode — when stakes times irreversibility justify it.** Grade the evidence per WORKFLOW §17, on top of the coverage checks:
 
-- Seal each load-bearing claim in the happy path High / Medium / Low / Very-low (Axis 1), each with its provenance — citation, date, access method. A claim you cannot source cannot be sealed High. Where sources genuinely disagree, record the positions side by side rather than forcing a consensus.
+- Name each load-bearing claim's tier (Measurement, Primary, Secondary, Single, Opinion), start it at the tier's grade, lower it for risk of bias, inconsistency, indirectness, imprecision or search bias, and raise it only with a stated reason; mark a normative claim "design choice" instead of grading it. Each claim keeps its provenance — citation, date, access method. A claim you cannot source cannot be sealed High. Where sources genuinely disagree, record the positions side by side rather than forcing a consensus.
 - Report one Axis-2 verdict for the decision: **Strong** (proceed), **Conditional** (proceed with a named mitigation), or **Insufficient / spike-first** (do not proceed; the gap is retirable by experiment). The bar for Strong scales with stakes times irreversibility.
 - An Insufficient / spike-first verdict is the handoff to `/ad-spike` (WORKFLOW §14): the technique is not yet grounded enough to build on, and a staged spike is how it gets retired.
 
@@ -68,7 +68,7 @@ When the host exposes `AskUserQuestion`, render the checkpoint as a structured m
 
 ## Step 5 — Persist the evidence receipt
 
-Chat citations are not an audit trail. Before the decision directs a non-trivial repository change, write a versioned ground record under `doc/research/`. It is a receipt for an already-defined implementation path, not an `ad-research` study answering an open question; both share the directory and monotonic number ledger.
+Chat citations are not an audit trail. Before the decision directs a non-trivial repository change, write a versioned ground record under `doc/research/`, with a `**Stakes:**` line. A low and reversible record is the short record of quick mode: sources and claims with their provenance, grades optional; any other stake grades every claim from its tier. It is a receipt for an already-defined implementation path, not an `ad-research` study answering an open question; both share the directory and monotonic number ledger.
 
 When this pass is the Acquire phase of `/ad-research`, the study is already the durable evidence artifact: put the same claim-to-source map in that study and do **not** create a duplicate ground receipt.
 

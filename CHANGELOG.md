@@ -8,6 +8,17 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Changed
 
+- Evidence is graded from a starting tier, after GRADE: Measurement starts
+  High, Primary Medium, Secondary and Single Low, Opinion Very-low; five
+  factors lower a claim and a raise needs a stated reason; a normative claim
+  is a design choice. A ground record names its stakes, and the validator
+  then requires each claim's tier and an `Upgrade:` line for a grade above
+  its start; a low and reversible record may leave claims ungraded. Records
+  without stakes keep the earlier rules and get a warning. `ad-research`
+  gains an Assess step (task-0123, ADR-0095).
+
+### Changed
+
 - Every SKILL.md stays under 500 lines and 20,000 bytes; `ad-hooks` moves
   its session-lifecycle tier to `references/session-tier.md`. The ceremonial
   "Confirm regime" step becomes a "Not for" routing list (or a named
