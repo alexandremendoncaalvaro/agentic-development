@@ -6,6 +6,17 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `ad-hooks` ships a command guard on `PreToolUse` (both hosts) that denies
+  killing processes by name and a `git commit` chained after a check with `;`
+  or a newline, naming the fix in the reason; an exploratory replay of 65,432
+  local Claude Code shell calls denied 135 commands, 134 real instances and
+  one conservative block. The workflow checkpoint names the owner's
+  conversation language and the no-estimate rule when a confirmed voice
+  profile defines it, and a shadow `Stop` hook logs replies in another
+  language without blocking (task-0121, ADR-0094).
+
 ### Changed
 
 - Every SKILL.md stays under 500 lines and 20,000 bytes; `ad-hooks` moves

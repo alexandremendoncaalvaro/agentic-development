@@ -361,6 +361,10 @@
           "sourceSha": "87f975c6b6973d112052a2fa3f69a93dada3ee3dd4c2e0116cadb9b341ab536c"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/command-guard.mjs",
+          "sourceSha": "df561a951d02d45e0aa7066ed1cd05fc0d1adad47e0052501bea259ae695c52c"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/detect-hooks.mjs",
           "sourceSha": "f2b49487dc4419efcb2af9b1bcee25844a574ec3e54249022ea23c6d344dc830"
         },
@@ -381,6 +385,10 @@
           "sourceSha": "0d9976d06fa73bef82db7a85d51865c35a023ebefbf91a9d81564a2902e05365"
         },
         {
+          "path": ".agents/skills/ad-hooks/scripts/reply-language.mjs",
+          "sourceSha": "a2f8039dc073a26f434e8910e221982eba72879e77497e42f1a3278eaf94cb78"
+        },
+        {
           "path": ".agents/skills/ad-hooks/scripts/review-receipts.mjs",
           "sourceSha": "afc8db728ee9361acc4ea3ef04fa1e056a61d614b670fcada0ef5e7641b365a4"
         },
@@ -390,11 +398,11 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
-          "sourceSha": "6f6583233038f53c8891573311b8c00a618c82e278eb02a2e5fd2783ca6f377d"
+          "sourceSha": "65358591e98b95bf3989b2a6aab2296bd1d310469b98026ceb0ecbd7c3f0dc8f"
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "b673e2294c79ff95a3e72fcfad7487b8a469e4f48f660999edae6fe69c70e87e"
+          "sourceSha": "c8de4870f740f593f2bfee22a50baf8a19d5273350e0fd48106ce8f69c320be0"
         }
       ]
     },
