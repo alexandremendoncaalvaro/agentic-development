@@ -661,7 +661,7 @@ test('project-state: project configuration shadows a matching machine entry', ()
 
 test('project-state: invalid configuration falls back to repository evidence with exact errors', () => {
   const cases = [
-    ['unsupported schema', { schemaVersion: 2, sources: [] }, /schemaVersion/],
+    ['unsupported schema', { schemaVersion: 3, sources: [] }, /schemaVersion/],
     [
       'unknown top-level field',
       { schemaVersion: 1, sources: [], extra: true },
@@ -5310,6 +5310,203 @@ test('drift-scan: glossary counts byte-identical copies of a file once', () => {
     const [hit] = runScan(dir).glossary.aliasesInCode;
     assert.equal(hit.count, 1);
     assert.deepEqual(hit.files, ['mirror/voice.js']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// Task 0118, ADR-0097: the delivery process as configuration, with a generic
+// issue-staged lifecycle and neutral labels.
+const GENERIC_PROCESS = {
+  lifecycleOwner: 'external',
+  ownerLabel: 'Issue-staged lifecycle',
+  records: {
+    research: { destination: 'issue-comment', handoff: 'Post the record on the work item.' },
+    adr: { destination: 'repo-path', path: 'docs/decisions', naming: 'date' },
+    task: { destination: 'external', handoff: 'Open a work item in the tracker.' },
+  },
+  stages: [
+    { label: 'stage:design', stage: 'design', next: 'Write the design on the issue.' },
+    { label: 'stage:build', stage: 'build', next: 'Implement the approved plan.' },
+  ],
+  readMilestone: true,
+};
+
+const PROCESS_ISSUE_FIELDS = 'number,title,url,state,updatedAt,labels,assignees,milestone';
+
+function processRepo(config) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-process-'));
+  mkdirSync(join(dir, '.agentic'), { recursive: true });
+  writeFileSync(join(dir, '.agentic', 'project-sources.json'), JSON.stringify(config));
+  return dir;
+}
+
+function githubSources(issues = { state: 'open', limit: 50 }) {
+  return [
+    { id: 'repository', type: 'repository', role: 'supporting' },
+    {
+      id: 'github-work',
+      type: 'github',
+      role: 'primary',
+      host: 'github.com',
+      repository: 'acme/widget',
+      issues,
+    },
+  ];
+}
+
+test('project-state: a version 1 configuration reports no process', () => {
+  const dir = processRepo({
+    schemaVersion: 1,
+    sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+  });
+  try {
+    const report = runProjectState(dir);
+    assert.equal(report.process, null);
+    assert.deepEqual(report.failures, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: a version 2 process is reported and issues carry their first configured stage and milestone', () => {
+  const dir = processRepo({ schemaVersion: 2, process: GENERIC_PROCESS, sources: githubSources() });
+  try {
+    const issues = [
+      { number: 1, title: 'a', labels: [{ name: 'stage:build' }, { name: 'stage:design' }] },
+      { number: 2, title: 'b', labels: [{ name: 'bug' }], milestone: { title: 'M1' } },
+    ];
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status\u0000--hostname\u0000github.com': { stdout: 'ok\n' },
+      [[
+        'issue',
+        'list',
+        '--repo',
+        'acme/widget',
+        '--state',
+        'open',
+        '--limit',
+        '50',
+        '--json',
+        PROCESS_ISSUE_FIELDS,
+      ].join('\u0000')]: { stdout: JSON.stringify(issues) },
+    });
+    const report = runProjectState(dir, env);
+    assert.deepEqual(report.failures, []);
+    assert.deepEqual(report.process, GENERIC_PROCESS);
+    const [first, second] = report.sources[1].issues;
+    assert.deepEqual(first.stage, {
+      label: 'stage:design',
+      stage: 'design',
+      next: 'Write the design on the issue.',
+    });
+    assert.equal(second.stage, null);
+    assert.deepEqual(second.milestone, { title: 'M1' });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: a process block is invalid under version 1 or with an unknown field or destination', () => {
+  for (const [config, message] of [
+    [
+      { schemaVersion: 1, process: GENERIC_PROCESS, sources: [] },
+      /process requires schemaVersion 2/,
+    ],
+    [
+      { schemaVersion: 2, process: { ...GENERIC_PROCESS, run: 'x' }, sources: [] },
+      /process has unknown field run/,
+    ],
+    [
+      {
+        schemaVersion: 2,
+        process: { lifecycleOwner: 'kit', records: { adr: { destination: 'wiki' } } },
+        sources: [],
+      },
+      /process\.records\.adr\.destination is invalid/,
+    ],
+    [
+      { schemaVersion: 2, process: { lifecycleOwner: 'someone' }, sources: [] },
+      /process\.lifecycleOwner must be kit or external/,
+    ],
+    [
+      {
+        schemaVersion: 2,
+        process: { lifecycleOwner: 'kit', ownerLabel: 'a\u001b[31mb' },
+        sources: [],
+      },
+      /process\.ownerLabel must be a single-line string/,
+    ],
+    [
+      {
+        schemaVersion: 2,
+        process: { lifecycleOwner: 'kit', stages: [{ label: 'x', stage: 'y', next: 'a\u2028b' }] },
+        sources: [],
+      },
+      /process\.stages\[0\]\.next is invalid/,
+    ],
+  ]) {
+    const dir = processRepo(config);
+    try {
+      const report = runProjectState(dir);
+      assert.equal(report.process, null);
+      assert.equal(report.failures[0].code, 'INVALID_CONFIGURATION');
+      assert.match(report.failures[0].message, message);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+});
+
+test('project-state: --process prints the resolved process without contacting a provider', () => {
+  const dir = processRepo({ schemaVersion: 2, process: GENERIC_PROCESS, sources: githubSources() });
+  try {
+    const fakeGh = join(dir, 'must-not-run.mjs');
+    writeFileSync(fakeGh, 'process.exit(97);\n');
+    const env = { ...process.env, AGENTIC_GH: fakeGh };
+    delete env.GIT_DIR;
+    delete env.GIT_WORK_TREE;
+    delete env.GIT_INDEX_FILE;
+    const out = JSON.parse(
+      execFileSync('node', [PROJECT_STATE, '--process'], { cwd: dir, encoding: 'utf8', env })
+    );
+    assert.deepEqual(Object.keys(out).sort(), [
+      'configuration',
+      'failures',
+      'observedAt',
+      'process',
+      'schemaVersion',
+    ]);
+    assert.deepEqual(out.process, GENERIC_PROCESS);
+    assert.equal(out.configuration.layer, 'project');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: a matching machine entry may carry a version 2 process', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-process-machine-'));
+  try {
+    execFileSync('git', ['init', '-q', dir]);
+    execFileSync('git', ['-C', dir, 'remote', 'add', 'origin', 'git@example.test:acme/widget.git']);
+    const machine = join(dir, 'machine.json');
+    writeFileSync(
+      machine,
+      JSON.stringify({
+        schemaVersion: 2,
+        projects: [
+          {
+            match: { remote: 'git@example.test:acme/widget.git' },
+            process: { lifecycleOwner: 'external', ownerLabel: 'Team process' },
+            sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+          },
+        ],
+      })
+    );
+    const report = runProjectState(dir, { AGENTIC_PROJECT_SOURCES_FILE: machine });
+    assert.deepEqual(report.failures, []);
+    assert.deepEqual(report.process, { lifecycleOwner: 'external', ownerLabel: 'Team process' });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

@@ -478,15 +478,15 @@
       "files": [
         {
           "path": ".claude/skills/ad-project-state/references/configuration.md",
-          "sourceSha": "bffb1c1627ec1459db5e480464f80ca53253084d8d3188f28581133819780b7c"
+          "sourceSha": "8756d11471125fa37c27ed4ba67a5ba8294b372aead4b50989b03d3fa0aed948"
         },
         {
           "path": ".claude/skills/ad-project-state/scripts/project-state.mjs",
-          "sourceSha": "2dc7bf19d4972bfba116108bd7a557ec722f782cb95c850710a722c6852fa19e"
+          "sourceSha": "6436b0e20d83d5be19a8c173b512b5d402e8a74a14609c271e9cb219ce79922b"
         },
         {
           "path": ".claude/skills/ad-project-state/SKILL.md",
-          "sourceSha": "138f593c0800663e1b58c11ad8b929f0db7cc6a31e14da78ab8de314cf6b3e2d"
+          "sourceSha": "648bdc1199342a1488de6b720f9bf2427c4a6cf12ecd11f4c0083a1e2f268f8a"
         }
       ]
     },
