@@ -1,6 +1,6 @@
 ---
 name: ad-next
-description: Survey the project's artifact stack and recommend prioritized next actions, like flutter doctor. Use when unsure where the work stands; "what's next", "where am I", "project status", "doctor", "what should I do". Read-only.
+description: 'Survey the project''s records and recommend the next actions, like a doctor command. Use on "what''s next", "where am I", "project status". Read-only.'
 summary: State survey + prioritized next-action recommendations across the six-layer artifact stack. Read-only navigation aid (`flutter doctor` pattern).
 allowed-tools: Read, Glob, Grep, Bash
 ---
@@ -35,6 +35,8 @@ work queue.
 The survey gives you the facts; Steps 1-5 are the judgment the script deliberately leaves to you — what the facts mean and what to do next. Work them from the JSON, not from a re-scan. You still read a file's *body* only when a judgment call needs it — the two that always need a read: (a) is the code *meaningful* (non-trivial files under `src/`, `app/`, `lib/`, `test/`, `tests/`, `packages/`, framework entrypoints, or a manifest with real scripts/dependencies — treat README/LICENSE/gitignore, agentic state, empty artifact dirs, and empty manifests as trivial), and (b) can you summarize the product (target user, problem, current behavior) from the README/code? Both feed Step 1.
 
 ## Step 1 — Classify scenario before ranking
+
+When the packet's `process` has `lifecycleOwner: external`, recommend from each issue's `stage` and its `next` text, not from the PRD, spec and task chain; show `next` as given and never run it (ADR-0097).
 
 Layer status is evidence; scenario determines the right next step.
 

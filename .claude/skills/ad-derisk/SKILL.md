@@ -1,6 +1,6 @@
 ---
 name: ad-derisk
-description: De-risk a defined task before building — list unknowns in a risk register, retire each with ad-ground, ad-spike, ad-tdg, or ad-grill-me, stop when technical risk falls below non-technical risk. Use on "de-risk", "before I build", "is this safe to build", "unknowns", "reduce uncertainty".
+description: 'De-risk a defined task before building: list its unknowns and retire each with the right skill. Use on "de-risk", "is this safe to build", "unknowns".'
 summary: Pre-construction de-risking — enumerate a task's unknowns, retire each with the right skill (ad-ground / ad-spike / ad-tdg / ad-grill-me), grade per WORKFLOW §17, and stop when residual technical risk falls below the non-technical risks. Orchestrates existing skills; hands a de-risked design to ad-tdd.
 allowed-tools: Read, Edit, Glob, Grep, Bash
 ---
@@ -10,6 +10,8 @@ allowed-tools: Read, Edit, Glob, Grep, Bash
 A pre-construction de-risking loop. Before building a defined task, enumerate the unknowns, drive each below an acceptable risk threshold using the skill that retires it, and stop when the residual technical risk falls below the non-technical risks (`WORKFLOW.md` §17 Axis-2 bar; the risk-driven "just enough, then stop"). It orchestrates existing skills — it adds no new research tools and writes no artifact of its own. Output is a de-risked design ready to build, not code.
 
 Use it when a task is defined (a spec, PRD, or task file exists) and non-trivial, before implementation. Skip it for a genuinely trivial change. It is not a single research pass (that is `/ad-ground`) or a single technique validation (that is `/ad-spike`) — it sequences those under a stop criterion.
+
+First run `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external`, the register goes where `process.records.task` says instead of a task file. With `external` or no record, show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). With `issue-comment`, draft it in the OS temporary directory, show it, and post it with `gh issue comment` on the work item the owner names only after the owner approves (ADR-0085); then delete the draft. With `repo-path`, append it to the task file under its `path`.
 
 ## Step 1 — Enumerate the unknowns (risk register)
 
@@ -48,7 +50,7 @@ When the host exposes `AskUserQuestion`, use it for the risk-register review (wh
 
 ## Output contract
 
-No new file of its own. The risk register is appended to the task's `Notes` (never a rewrite); the evidence persists in the spikes and ADRs the loop spawns. The skill reports the resolved register and the stop verdict, cites each retirement's grade per §17, and writes no code. Documentation Discipline (`WORKFLOW.md` §2) applies.
+No new file of its own. The risk register is appended to the task's `Notes` (never a rewrite; under an external lifecycle owner, where the opening rule says instead); the evidence persists in the spikes and ADRs the loop spawns. The skill reports the resolved register and the stop verdict, cites each retirement's grade per §17, and writes no code. Documentation Discipline (`WORKFLOW.md` §2) applies.
 
 ## Next
 

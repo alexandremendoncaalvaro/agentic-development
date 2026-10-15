@@ -1,6 +1,6 @@
 ---
 name: ad-rules
-description: Resolve the host's global and project rules for inspection or correction. Use when the user asks which rules apply, says "The Rules", asks to refresh the rules, or corrects workflow discipline. Inventory mode lists topics; correction mode reapplies ad-philosophy, repairs the active plan, and returns a plain-language brief. Read-only.
+description: 'List the rules that apply, or reapply them when the work drifts. Use on "which rules apply", "The Rules", "refresh the rules", or a workflow correction. Read-only.'
 summary: Resolve global, repository, and kit rules using two read-only modes. Inventory lists their topics; correction reapplies the existing philosophy commitment, repairs a conflicting active plan, and returns a decision-maker brief.
 ---
 
@@ -11,7 +11,7 @@ It exists because the practitioner's cross-project rules live in the host's glob
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when the user asks to load, see, list, or refresh the rules in force, asks what governs the current work, says "The Rules" or an equivalent rules correction, or starts in a repo whose conventions they have not read.
+Step 0 — classify the request. Run when the user asks to load, see, list, or refresh the rules in force, asks what governs the current work, says "The Rules" or an equivalent rules correction, or starts in a repo whose conventions they have not read.
 
 Classify the request before reporting:
 

@@ -1,6 +1,6 @@
 ---
 name: ad-adr
-description: Record one architecture decision as an ADR at doc/adr/NNNN-slug.md (Nygard — context, decision, consequences, alternatives). Use when a binding, hard-to-reverse choice surfaces or the user says "record this decision", "write an ADR", "why did we choose". Status starts proposed.
+description: 'Record a binding, hard-to-reverse architecture decision as an ADR. Use on "record this decision", "write an ADR", "why did we choose".'
 summary: Draft a new ADR at `doc/adr/NNNN-<slug>.md`.
 ---
 
@@ -9,6 +9,8 @@ Drafts `doc/adr/NNNN-<short-title>.md` for one architecture decision. Status lif
 </background_information>
 
 <instructions>
+First run `node .agents/skills/ad-project-state/scripts/project-state.mjs --process`. With `process.records.adr.path`, use that directory in place of `doc/adr` here and in Step 4. With `naming: date`, skip the number and name the file `<YYYY-MM-DD><sep><slug>.md`, `<sep>` being the separator the directory's existing records use (`-` when none exist). With `destination: external`, show the `handoff` text and stop.
+
 Step 1 — determine NNNN. Run `node .agents/skills/ad-adr/scripts/next-number.mjs doc/adr` from the consumer root. Use JSON `next`; archived gaps stay unused. Stop until access is resolved when `unreadable` is non-empty, and stop for a numbering decision when `exhausted` is true. If loaded elsewhere, substitute the skill base path.
 
 Step 2 — confirm scope. The ADR captures one decision. If the user's request implies multiple, ask which to write first; the others become follow-up ADRs.

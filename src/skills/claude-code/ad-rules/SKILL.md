@@ -1,6 +1,6 @@
 ---
 name: ad-rules
-description: Resolve the host's global and project rules for inspection or correction. Use when the user asks which rules apply, says "The Rules", asks to refresh the rules, or corrects workflow discipline. Inventory mode lists topics; correction mode reapplies ad-philosophy, repairs the active plan, and returns a plain-language brief. Read-only.
+description: 'List the rules that apply, or reapply them when the work drifts. Use on "which rules apply", "The Rules", "refresh the rules", or a workflow correction. Read-only.'
 summary: Resolve global, repository, and kit rules using two read-only modes. Inventory lists their topics; correction reapplies the existing philosophy commitment, repairs a conflicting active plan, and returns a decision-maker brief.
 allowed-tools: Read, Glob, Grep, Bash
 ---
@@ -11,7 +11,7 @@ Resolves the rules in force for one of two operations. **Inventory mode** lists 
 
 It exists because the practitioner's cross-project rules live in the host's global instruction file, at a path that differs per machine — often a symlink into a personal workflow repo — so every session opened with the same manual instruction: read this file, bring the topics. Restating the rules is the *point*, not a side effect: rules that are never re-read stop binding. What should not repeat is the path archaeology.
 
-## Step 0 — Confirm regime
+## Step 0 — Classify the request
 
 Run when the user asks to load, see, list, or refresh the rules in force, asks what governs the current work, says "The Rules" or an equivalent rules correction, or is starting in a repo whose conventions they have not read yet.
 

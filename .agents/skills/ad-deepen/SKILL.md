@@ -1,6 +1,6 @@
 ---
 name: ad-deepen
-description: Find deepening opportunities (Ousterhout/Feathers — module, interface, depth, seam, adapter) and propose refactors with deletion-test framing. Use when code feels shallow or pass-through; "deepen", "refactor for depth", "shallow module", "deletion test", "two-adapters rule".
+description: 'Find shallow modules and propose deepening refactors (interface, depth, seam, deletion test). Use on "deepen", "refactor for depth", "shallow module".'
 summary: Surface deepening opportunities using WORKFLOW §8 vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality). Three phases — explore, present numbered candidates with deletion-test framing, grill the chosen one. Pairs with `ad-drift`.
 ---
 
@@ -9,18 +9,10 @@ Implements ADR-0020 (`doc/adr/0020-deep-modules-vocabulary.md`) — operational 
 
 Use this only when design friction is real: repeated behavior, callers that need a stable seam, or a module whose interface exposes too much. Architectural deepening is premature for a one-shot ≤200-line experiment. Per ADR-0020 §4.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions deepening, shallow modules, the deletion test, or the two-adapters rule, invoke this skill manually.
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Deepen is for the *stable-codebase, friction-visible* regime. Run when at least one holds:
-- A module's interface is roughly as complex as its implementation (shallow module candidate).
-- A concept is bouncing between modules across recent changes (locality candidate).
-- A test cannot exercise the real bug pattern at the call site (interface-is-test-surface candidate).
-- An adapter has been introduced for a hypothetical second implementation (two-adapters-rule violation).
-- The user explicitly asks "where should this be refactored?" against a stable surface.
-
-Route elsewhere when:
+Not for:
 - The change is a one-line fix or mechanical refactor → no scaffold needed.
 - The codebase is a one-shot script (≤200 lines, no callers): deepening is premature; ship the experiment first.
 - The friction is a *bug*, not a *shape* — `ad-diagnose` (WORKFLOW §15).

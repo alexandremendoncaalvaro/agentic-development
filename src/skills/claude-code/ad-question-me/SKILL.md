@@ -1,6 +1,6 @@
 ---
 name: ad-question-me
-description: Value-first challenger for work in progress — absorbs the intended value, then raises only the questions that are the owner's call or genuinely un-groundable; renders no verdict. Use on "question me", "what am I missing", "am I still on track", "challenge this before I commit".
+description: 'Challenge work in progress with only the questions that are the owner''s call. Use on "question me", "what am I missing", "am I still on track".'
 summary: Value-first challenger — absorbs the value intended, then raises only questions that are the owner's call or genuinely un-groundable, resolving anything answerable from code / docs itself. Ranked questions, killer first, why-it-matters, no verdict. Complements ad-grill-me; feeds ad-review.
 allowed-tools: Read, Glob, Grep, Bash
 ---

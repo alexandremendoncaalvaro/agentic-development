@@ -161,9 +161,9 @@ export function rootDocReplacePrompt(path) {
 
 /**
  * The stderr line an unattended run prints when it declines to write a managed
- * section into a git-tracked root doc (ADR-0051). Shared by init and update so
- * the wording — the part most likely to drift between two call sites — lives in
- * one place; the trivial guard that calls it stays local to each command.
+ * section into a git-tracked root doc (ADR-0051). init and update reach it
+ * through `rootDocConfirmers` in install-flow.js, so the wording lives in one
+ * place.
  */
 export function trackedRootDocSkipNotice(path) {
   return (
@@ -171,6 +171,18 @@ export function trackedRootDocSkipNotice(path) {
     `visible to everyone sharing this repository. Re-run interactively ` +
     `to decide, or pass --force-root-doc.`
   );
+}
+
+/**
+ * The prompt before regenerating a managed section that diverged on disk in an
+ * untracked root doc: the edits between the markers would be lost, so the
+ * default is no.
+ */
+export function rootDocDivergedPrompt(path) {
+  return {
+    message: `${path}: managed section diverged on disk. Regenerate it? (any edits between the agentic-managed-skills markers will be lost)`,
+    initialValue: false,
+  };
 }
 
 /**

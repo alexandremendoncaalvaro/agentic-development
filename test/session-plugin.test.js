@@ -205,14 +205,15 @@ const FULL = async () => ({
   context: { tokens: 90000, window: 200000 },
 });
 
-test('the plugin draws and submits only: it hooks no tool call and rewrites no prompt', async () => {
-  const { hooks, submitted, $ } = await loadPlugin(1, FULL);
+test('the plugin draws and runs the handoff only: it hooks no tool call and rewrites no prompt', async () => {
+  const { hooks, submitted, ran, $ } = await loadPlugin(1, FULL);
   assert.deepEqual(Object.keys(hooks).sort(), [
     'command.run:agentic-briefing',
     'session.compact',
     'session.end',
     'session.start',
     'turn.complete',
+    'turn.start',
     'ui.render:AbovePrompt',
     'ui.render:Pane:agentic-briefing',
   ]);
@@ -222,12 +223,15 @@ test('the plugin draws and submits only: it hooks no tool call and rewrites no p
   const button = findElement(band, 'Button');
   button.props.onPress();
   await new Promise((resolve) => setImmediate(resolve));
-  assert.deepEqual(submitted, [{ text: '/ad-handoff', asUser: true }]);
+  // A plugin's prompt.submit of "/ad-handoff" did nothing in the desktop app;
+  // the command runs as if typed (task-0116).
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(submitted, []);
 });
 
-test('a rejected handoff submit is logged to the debug log only', async () => {
-  const { hooks, logs, $ } = await loadPlugin(1, FULL);
-  $.prompt.submit = async () => {
+test('a rejected handoff command shows a toast and logs the reason', async () => {
+  const { hooks, logs, toasts, $ } = await loadPlugin(1, FULL);
+  $.command.run = async () => {
     throw new Error('submit refused');
   };
   await hooks['session.start']($, {}, async () => undefined);
@@ -237,6 +241,8 @@ test('a rejected handoff submit is logged to the debug log only', async () => {
   assert.equal(logs.length, 1);
   assert.match(logs[0].text, /submit refused/);
   assert.deepEqual(logs[0].options, { to: 'debug' });
+  assert.equal(toasts.length, 1);
+  assert.match(toasts[0], /run \/ad-handoff yourself/);
 });
 
 // Task 0115: hand off, clear and continue.
@@ -288,11 +294,10 @@ test('regression: task-0115 with the box on, the handoff is followed by a clear 
   press(band, 'handoff');
   await tick();
   await runTurn(hooks, $, 't1');
-  assert.deepEqual(ran, [{ command: 'clear' }]);
-  assert.equal(submitted.length, 2);
-  assert.deepEqual(submitted[0], { text: '/ad-handoff', asUser: true });
-  assert.equal(submitted[1].asUser, true);
-  assert.match(submitted[1].text, /agentic-handoffs\/h\.md/);
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
+  assert.equal(submitted.length, 1);
+  assert.equal(submitted[0].asUser, true);
+  assert.match(submitted[0].text, /\/var\/tmp-x\/agentic-handoffs\/h\.md/);
 });
 
 test('regression: task-0115 with the box off, the button only hands off', async () => {
@@ -304,8 +309,8 @@ test('regression: task-0115 with the box off, the button only hands off', async 
   press(band, 'handoff');
   await tick();
   await runTurn(hooks, $, 't1');
-  assert.deepEqual(ran, []);
-  assert.deepEqual(submitted, [{ text: '/ad-handoff', asUser: true }]);
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(submitted, []);
 });
 
 test('regression: task-0115 with no handoff file the session is left as it was', async () => {
@@ -318,8 +323,8 @@ test('regression: task-0115 with no handoff file the session is left as it was',
   press(band, 'handoff');
   await tick();
   await runTurn(hooks, $, 't1');
-  assert.deepEqual(ran, []);
-  assert.equal(submitted.length, 1);
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(submitted, []);
   assert.equal(toasts.length, 1);
   assert.match(toasts[0], /no handoff file/i);
 });
@@ -360,16 +365,16 @@ test('regression: task-0115 a turn already running at the press does not trigger
   await tick();
   await hooks['turn.complete']($, { turnId: 'busy', reason: 'answer' }, async () => undefined);
   await tick();
-  assert.deepEqual(ran, []);
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
   assert.deepEqual(toasts, []);
   await runTurn(hooks, $, 'handoff-turn');
-  assert.deepEqual(ran, [{ command: 'clear' }]);
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }, { command: 'clear' }]);
 });
 
 test('regression: task-0115 an interrupted handoff turn clears nothing', async () => {
   const { hooks, ran, toasts, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
   await runTurn(hooks, $, 't1', 'aborted');
-  assert.deepEqual(ran, []);
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
   assert.match(toasts[0], /did not finish/);
 });
 

@@ -15,7 +15,7 @@ import { SCHEMA_VERSION } from './state.js';
 import { retiredSkillsForAgent } from './skill-migrations.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const KIT_ROOT = join(__dirname, '..', '..');
+export const KIT_ROOT = join(__dirname, '..', '..');
 
 const MANIFEST_FILE = 'manifest.json';
 

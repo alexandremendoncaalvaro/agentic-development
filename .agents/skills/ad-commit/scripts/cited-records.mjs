@@ -3,7 +3,10 @@
  * Report the git state of every record a draft commit message cites
  * (task-0092, GROUND-0031). Run from a consumer repository root:
  *
- *   node <skill-base-dir>/scripts/cited-records.mjs <message-file | ->
+ *   node <skill-base-dir>/scripts/cited-records.mjs <message-file | -> [--dir <kind>=<dir>]...
+ *
+ * `--dir` moves a record kind (research, adr, task, spec) to the directory a
+ * delivery process configures (ADR-0097).
  *
  * Prints JSON; never writes and never blocks.
  */
@@ -15,11 +18,18 @@ import { join } from 'node:path';
 // RESEARCH and PRISM records share doc/research/ and its number ledger.
 const ID = /\b(?:(GROUND|RESEARCH|PRISM)-|(ADR)-|([Tt]ask)[- ]|([Ss]pec)[- ])(\d{4})\b/g;
 
+const directories = {
+  research: 'doc/research',
+  adr: 'doc/adr',
+  task: 'doc/tasks',
+  spec: 'doc/specs',
+};
+
 function directoryOf([, research, adr, task]) {
-  if (research) return 'doc/research';
-  if (adr) return 'doc/adr';
-  if (task) return 'doc/tasks';
-  return 'doc/specs';
+  if (research) return directories.research;
+  if (adr) return directories.adr;
+  if (task) return directories.task;
+  return directories.spec;
 }
 
 // A git hook exports these; inherited, they point every probe at another
@@ -73,8 +83,14 @@ const born = hasHead();
 
 function locations(directory) {
   // --no-renames reports a record moved into place as an addition.
-  const cached = gitLines(['diff', '--cached', '--no-renames', '--name-status', '--', `${directory}/`])
-    .map((line) => line.split('\t'));
+  const cached = gitLines([
+    'diff',
+    '--cached',
+    '--no-renames',
+    '--name-status',
+    '--',
+    `${directory}/`,
+  ]).map((line) => line.split('\t'));
   const added = cached.filter(([status]) => status === 'A').map(([, path]) => path);
   return {
     added,
@@ -87,7 +103,10 @@ function locations(directory) {
           ? readdirSync(join(root, directory)).map((name) => `${directory}/${name}`)
           : [],
       ],
-      ['archived', born ? gitLines(['log', '--format=', '--name-only', '--', `${directory}/`]) : []],
+      [
+        'archived',
+        born ? gitLines(['log', '--format=', '--name-only', '--', `${directory}/`]) : [],
+      ],
     ],
     changedInIndex: new Map(cached.map(([status, path]) => [path, status])),
     changedOnDisk: new Set(gitLines(['diff', '--name-only', '--', `${directory}/`])),
@@ -131,8 +150,29 @@ function readMessage(source) {
   }
 }
 
-const message = readMessage(process.argv[2]);
-if (message === null) fail('usage: cited-records.mjs <message-file | -> (the draft commit message)');
+const [messageSource, ...options] = process.argv.slice(2);
+for (let index = 0; index < options.length; index += 1) {
+  const option = options[index] === '--dir' ? (options[(index += 1)] ?? '') : '';
+  const split = option.indexOf('=');
+  const kind = split === -1 ? '' : option.slice(0, split);
+  const path = (split === -1 ? '' : option.slice(split + 1))
+    .replaceAll('\\', '/')
+    .replace(/\/+$/, '')
+    .replace(/^(\.\/)+/, '');
+  if (
+    !Object.hasOwn(directories, kind) ||
+    path === '' ||
+    path.includes('=') ||
+    /^([A-Za-z]:)?\//.test(path) ||
+    path.split('/').includes('..')
+  ) {
+    fail('--dir needs <kind>=<relative directory>, kind one of research, adr, task, spec');
+  }
+  directories[kind] = path;
+}
+const message = readMessage(messageSource);
+if (message === null)
+  fail('usage: cited-records.mjs <message-file | -> (the draft commit message)');
 const seen = new Set();
 const records = [];
 try {

@@ -1,6 +1,6 @@
 ---
 name: ad-spec
-description: Draft a feature specification at doc/specs/NNNN-slug.md (Spec Kit-aligned — who, what, measurable success criteria, non-goals), inheriting scope from the PRD. Use when a feature needs a contract before tasks; "write a spec", "feature spec", "acceptance criteria", "define the feature".
+description: 'Draft a feature specification: who, what, measurable success criteria, non-goals. Use when a feature needs a contract before tasks; "write a spec", "acceptance criteria".'
 summary: Draft a feature spec at `doc/specs/NNNN-<slug>.md` (Spec Kit-aligned mandatory sections). Layer 4 of the six-layer artifact stack. References parent PRD (`ad-prd`, Layer 3) for product-scope inheritance.
 allowed-tools: Read, Write, Glob, Bash
 ---
@@ -8,6 +8,8 @@ allowed-tools: Read, Write, Glob, Bash
 # /ad-spec
 
 Drafts `doc/specs/<NNNN>-<short-slug>.md` for one feature. Status lifecycle: `draft` → `accepted` → `shipped` | `superseded by SPEC-NNNN`. Spec is the layer-4 artifact in the kit's six-layer stack — Constitution (`AGENTS.md` + `WORKFLOW.md`) → Domain (`CONTEXT.md`) → Product (`doc/product/PRD.md`) → **Spec (this skill)** → Plan/Decisions (`ARCHITECTURE.md` + `doc/adr/` + `doc/tasks/`) → Code. Multiple tasks implement one spec; ADRs may be driven by spec constraints. The Domain layer (`CONTEXT.md`, ubiquitous language per Evans 2003) is the source of canonical nouns the spec must use; if the spec introduces a new noun, resolve it through `CONTEXT.md` first. The Product layer (`PRD.md`) is the source of target user, product-level success metrics, and cross-feature constraints the spec inherits from; a feature spec whose target user or success metric contradicts the PRD is drift that `ad-drift` flags.
+
+First run `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external`, the team's own delivery process owns specs and `process.records.spec` decides. With `external` or no record, show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). With `issue-comment`, draft it in the OS temporary directory, show it, and post it with `gh issue comment` on the work item the owner names only after the owner approves; then delete the draft. With `repo-path`, write the file under its `path`.
 
 ## Step 1 — Determine NNNN and slug
 

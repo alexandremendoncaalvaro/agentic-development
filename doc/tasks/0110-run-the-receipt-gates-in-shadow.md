@@ -190,3 +190,36 @@ All Acceptance Criteria checked, plus:
 - [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [ ] No orphan `TODO`/`FIXME` introduced
 - [ ] Status updated to `done` and Notes log closes the task
+
+### 2026-10-15 — window restarts with ADR-0091
+
+The owner decided on 2026-10-15 to change the gate now and restart the
+window (task 0117, ADR-0091 decision 7): the audit check now applies only to
+branches that change an `auditPaths` path, and a delta review counts when it
+chains to a covered review. Events recorded before this change measure the
+old checks and are excluded from the decision, listed separately. The new
+window opens when task 0117's pull request merges and runs four weeks under
+the unchanged ADR-0089 decision 6 criterion; the merge time and the re-pinned
+company-repository gate commit are recorded in the next entry. PRISM-0042 stays
+frozen; the read-out cites this entry for the moved window.
+
+### 2026-10-15 — new window set up
+
+The new window opens at the merge time of pull request #176 (read with
+`gh pr view 176 --json mergedAt`) and runs four weeks from it. The company
+repository's wrapper under `~/.agentic/gates/` now runs the
+gate copied from commit 3b47fd3 to `~/.agentic/gates/3b47fd3/`, whose scripts
+are the ones #176 merges; 3671059 is kept for the excluded earlier events.
+That repository has no `.agentic/gates.json`, so under ADR-0091 its sessions
+log no audit line until it names `auditPaths` locally. The evidence
+directory, the copy-out job and the criterion are unchanged.
+
+### 2026-10-15 — window open
+
+Pull request #176 merged at 2026-10-15T12:54:19Z, so the new window runs to
+2026-11-12T12:54:19Z. The company repository now names its high-risk paths
+in a machine-local `.agentic/gates.json` (excluded from Git, copied to its
+existing worktrees): database migrations, infrastructure, CI workflows, the
+SLIM cycle gates, the gateway, and the authentication, security and SSO
+code. A worktree created later has no copy and logs no audit line; the
+read-out labels such sessions.

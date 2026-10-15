@@ -132,7 +132,10 @@ function extractShellCommands(content) {
   const commands = [];
   for (const line of content.split('\n')) {
     const raw = line.trim();
-    if (!raw || /^(?:#!|#|\.\s|source\s|set\s|if\s|then$|fi$|for\s|do$|done$|case\s|esac$|export\s)/.test(raw)) {
+    if (
+      !raw ||
+      /^(?:#!|#|\.\s|source\s|set\s|if\s|then$|fi$|for\s|do$|done$|case\s|esac$|export\s)/.test(raw)
+    ) {
       continue;
     }
     const command = raw.replace(/^exec\s+/, '').replace(/\s+#.*$/, '');
@@ -209,11 +212,13 @@ function detectRunners(repoRoot, unreadable) {
   }
   if (isFile(join(repoRoot, '.pre-commit-config.yaml'))) runners.push('pre-commit');
   const hookDir = nativeHookDir(repoRoot);
-  const nativeHook = isDir(hookDir) && listPath(hookDir, '.git/hooks', unreadable).some((name) => {
-    if (name.endsWith('.sample') || !isFile(join(hookDir, name))) return false;
-    const content = tryReadPath(join(hookDir, name), `.git/hooks/${name}`, unreadable);
-    return content !== null && !isRunnerManagedHook(content, runners);
-  });
+  const nativeHook =
+    isDir(hookDir) &&
+    listPath(hookDir, '.git/hooks', unreadable).some((name) => {
+      if (name.endsWith('.sample') || !isFile(join(hookDir, name))) return false;
+      const content = tryReadPath(join(hookDir, name), `.git/hooks/${name}`, unreadable);
+      return content !== null && !isRunnerManagedHook(content, runners);
+    });
   if (nativeHook) {
     runners.push('native');
   }

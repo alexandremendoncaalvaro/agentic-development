@@ -8,7 +8,7 @@ import { detectAgents, detectMode } from '../src/lib/detect.js';
 import { bundledSkills, installSkills } from '../src/lib/install.js';
 import { updateRootDoc, rootDocAppendPrompt, rootDocReplacePrompt } from '../src/lib/rootdoc.js';
 import { writeExcludeEntries, installedPathsToExclude } from '../src/lib/git.js';
-import { offerKitExclude, kitExcludeCandidates } from '../src/commands/kit-exclude.js';
+import { offerKitExclude, kitExcludeCandidates } from '../src/lib/install-flow.js';
 import { userLevelInstallPath } from '../src/lib/state.js';
 
 function mkGitRepo() {
@@ -729,6 +729,8 @@ test('offerKitExclude: non-interactive declines and writes nothing (refuse-to-gu
       cwd: dir,
       paths: ['.claude/skills/ad-audit/SKILL.md'],
       interactive: false,
+      ask: async () => true,
+      warn: () => {},
     });
 
     assert.equal(added, 0);

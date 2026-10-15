@@ -1,3 +1,10 @@
 {
-  "githubCommands": ["gh", "ghp"]
+  "githubCommands": ["gh", "ghp"],
+  "auditPaths": [
+    "src/leak-guard.js",
+    "src/skills/*/ad-hooks/scripts/**",
+    "scripts/**",
+    "lefthook.yml",
+    ".github/workflows/**"
+  ]
 }

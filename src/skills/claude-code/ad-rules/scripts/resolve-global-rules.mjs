@@ -90,10 +90,11 @@ function resolveCandidate(home, relativePath, unreadable) {
  */
 export function resolveGlobalRules({ home = homedir() } = {}) {
   const unreadable = [];
-  const sources = CANDIDATES
-    .map((candidate) => resolveCandidate(home, candidate, unreadable))
-    .filter(Boolean);
-  const primary = sources.find((source) => source.state === 'file' || source.state === 'symlink') ?? null;
+  const sources = CANDIDATES.map((candidate) =>
+    resolveCandidate(home, candidate, unreadable)
+  ).filter(Boolean);
+  const primary =
+    sources.find((source) => source.state === 'file' || source.state === 'symlink') ?? null;
   return { host: HOST, primary, sources, unreadable };
 }
 

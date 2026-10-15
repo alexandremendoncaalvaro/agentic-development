@@ -36,7 +36,7 @@ export const CHECKPOINT = [
   '2. Unknowns or a fuzzy ask: /ad-derisk or /ad-grill-me.',
   '3. Before code: /ad-ground and its evidence record.',
   '4. Implement with /ad-tdd (/ad-tdg when the strategy is the unknown).',
-  '5. After each slice: /ad-review. After each large block or before a PR: /ad-audit.',
+  '5. Review only what is not yet covered: /ad-review on each slice, then on the delta after a fix. /ad-audit only for high-risk or uncovered risks, once.',
   '6. Land with /ad-commit; /ad-pr and /ad-merge ask the owner once before the outward step.',
   '7. Ending, or context running low: /ad-handoff for a resume chip, or a fresh-session prompt where chips are unavailable.',
 ].join('\n');
@@ -147,12 +147,42 @@ function kitLine(kit) {
     : `\nInstalled agentic kit: unknown (${kit.scope} scope; ${kit.problem}).`;
 }
 
+// A language tag such as `pt-BR`; anything else in the profile never reaches
+// the model's context.
+const LANGUAGE_TAG = /^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/;
+
+/**
+ * The owner's conversation language from a confirmed voice profile (task
+ * 0121): `AGENTIC_VOICE_DIR/profile.md`, else `~/.agentic/voice/profile.md`,
+ * as `ad-voice` resolves it. Null when absent, unconfirmed or unreadable.
+ */
+export function conversationLanguage(env, home = homedir()) {
+  const dir = env.AGENTIC_VOICE_DIR || join(home, '.agentic', 'voice');
+  try {
+    const text = readFileSync(join(dir, 'profile.md'), 'utf8');
+    const block = /```json[ \t]*\r?\n([\s\S]*?)\r?\n```/.exec(text);
+    const profile = JSON.parse(block?.[1] ?? 'null');
+    const language = profile?.languages?.conversation;
+    return profile?.status === 'confirmed' && LANGUAGE_TAG.test(language ?? '') ? language : null;
+  } catch {
+    return null;
+  }
+}
+
+function languageLine(language) {
+  return language
+    ? `\nReply to the owner in ${language}; give no date, duration or deadline estimates.`
+    : '';
+}
+
 function main() {
   if (!isEnabled(process.env)) return;
   const event = parseEvent(readStdin());
   if (!event) return;
-  const kit = installedKit(event, process.env.HOME || process.env.USERPROFILE || homedir());
-  process.stdout.write(`${CHECKPOINT}${kitLine(kit)}\n`);
+  const home = process.env.HOME || process.env.USERPROFILE || homedir();
+  const kit = installedKit(event, home);
+  const language = conversationLanguage(process.env, home);
+  process.stdout.write(`${CHECKPOINT}${languageLine(language)}${kitLine(kit)}\n`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

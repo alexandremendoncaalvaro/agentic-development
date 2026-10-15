@@ -1,13 +1,9 @@
-import { readFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import { dirname, resolve } from 'node:path';
 
-const STAGES = [
-  'local-release',
-  'branch-push',
-  'tag-push',
-  'npm-publish',
-  'github-release',
-];
+const STAGES = ['local-release', 'branch-push', 'tag-push', 'npm-publish', 'github-release'];
 
 function input() {
   const text = readFileSync(0, 'utf8');
@@ -157,6 +153,45 @@ function buildPlanApproval(state) {
   return { schemaVersion: 1, digest, target, effects };
 }
 
+// The release receipt lives in the git directory every worktree shares, so a
+// publish from the disposable worktree at the tag reads what the planner
+// recorded in the checkout (ADR-0096). One line per approval scope; an
+// unchanged approval is not appended again.
+function releaseReceiptFile() {
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  const result = spawnSync('git', ['rev-parse', '--git-common-dir'], { encoding: 'utf8', env });
+  if (result.status !== 0) throw new Error('not inside a git repository');
+  return resolve(result.stdout.trim(), 'agentic', 'release.jsonl');
+}
+
+function recordRelease(state, digest, scope) {
+  const identified = [state.packageName, state.packageVersion].every(
+    (value) => typeof value === 'string' && value.length > 0
+  );
+  if (!identified) return 'unavailable: missing package name or version';
+  try {
+    const file = releaseReceiptFile();
+    const receipt = { package: state.packageName, version: state.packageVersion, digest, scope };
+    const same = (line) => {
+      try {
+        const recorded = JSON.parse(line);
+        return Object.keys(receipt).every((key) => recorded[key] === receipt[key]);
+      } catch {
+        return false;
+      }
+    };
+    if (existsSync(file) && readFileSync(file, 'utf8').split('\n').some(same)) return 'present';
+    mkdirSync(dirname(file), { recursive: true });
+    appendFileSync(file, `${JSON.stringify({ at: new Date().toISOString(), ...receipt })}\n`);
+    return 'recorded';
+  } catch (error) {
+    return `unavailable: ${error.message}`;
+  }
+}
+
 function plan(state) {
   const completed = validateCompleted(state.completed);
   const planApproval = buildPlanApproval(state);
@@ -206,9 +241,8 @@ function plan(state) {
     };
   }
 
-  const approvedStage =
-    state.confirmation?.stage === stage && state.confirmation.approved === true;
-  return {
+  const approvedStage = state.confirmation?.stage === stage && state.confirmation.approved === true;
+  const result = {
     next,
     execution: approvedPlan || approvedStage ? commandFor(stage, state) : null,
     complete: false,
@@ -217,6 +251,12 @@ function plan(state) {
     planApproval,
     planAuthorized: approvedPlan,
   };
+  if (approvedPlan) {
+    result.releaseReceipt = recordRelease(state, planApproval.digest, 'release-plan');
+  } else if (approvedStage && ['npm-publish', 'github-release'].includes(stage)) {
+    result.releaseReceipt = recordRelease(state, null, stage);
+  }
+  return result;
 }
 
 try {

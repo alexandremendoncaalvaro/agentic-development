@@ -1,21 +1,17 @@
 ---
 name: ad-commit
-description: Land the current work as atomic Conventional Commits with a DCO Signed-off-by trailer — scope intake, stage-split when concerns mix, message draft, sign and write. Use when a verified change is ready to land or on "commit this", "stage and commit", "split this commit", "sign off". Never bypasses hooks.
+description: 'Commit verified work as atomic Conventional Commits with sign-off. Use on "commit this", "stage and commit", "split this commit".'
 summary: Atomic Conventional Commits with DCO `Signed-off-by` sign-off. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.
 ---
 
 <background_information>
 Implements ADR-0023. Drafts atomic Conventional Commits with DCO `Signed-off-by` sign-off. Helper, not blocker — the senior engineer keeps decision authority.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions committing, staging, or signing off, invoke this skill manually.
-
 Non-negotiables (read first): DCO `Signed-off-by` on every commit, never a `Co-Authored-By` trailer (ADR-0023 §Decision 1); never bypass the hooks (`--no-verify` / `--no-gpg-sign`) — a failing hook stops the commit, so fix the cause rather than skip it.
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when the user wants to land changes as commits and the working tree has staged or unstaged changes worth committing, or the user asks for "commit", "stage", "split this commit", "sign off".
-
-Route elsewhere when:
+Not for:
 - The user wants to open a PR after committing → continue with `ad-pr` after this skill finishes.
 - The user wants to merge an open PR → `ad-merge`.
 - The diff is unfinished work that should not land yet → say so; do not commit speculatively.
@@ -70,6 +66,8 @@ Type guide: `feat:` new user-visible capability; `fix:` bug fix; `chore:` mainte
 Breaking changes: add `!` after the type/scope and a `BREAKING CHANGE:` footer paragraph.
 
 Cited records. When the draft cites a record (`GROUND-`, `RESEARCH-`, `PRISM-`, `ADR-`, `task-`/`Task`, `Spec`/`spec-` plus four digits), pipe the draft into the read-only probe from the repository root:
+
+When `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` configures a `path` for a record kind, pass `--dir <kind>=<path>` for it (kinds `research`, `adr`, `task`, `spec`). A date-named ADR has no number, so a citation such as ADR-0001 cannot resolve to it; cite it by its path.
 
 ```
 node .agents/skills/ad-commit/scripts/cited-records.mjs - <<'EOF'

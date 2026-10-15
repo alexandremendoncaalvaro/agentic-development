@@ -1,6 +1,6 @@
 ---
 name: ad-research
-description: Turn an open question into an evidence-graded study at doc/research/NNNN-slug.md with a defensible conclusion, not code. Use on "should we adopt X", "A vs B", "state of the art", "evaluate options", "literature review", "research this". Graduates binding conclusions to an ADR.
+description: 'Turn an open question into an evidence-graded study with a defensible conclusion, not code. Use on "should we adopt X", "A vs B", "literature review", "research this".'
 summary: Research-to-conclusion — turn an open question into an evidence-graded study at doc/research/NNNN-<slug>.md via the Evidence-Based loop + WORKFLOW §17 grading + the scientific method when measurable. Reuses ad-ground for Acquire; graduates a binding conclusion to an ADR. WORKFLOW §17 + §4-5.
 allowed-tools: Read, Write, Glob, Grep, Bash, WebFetch, WebSearch
 ---
@@ -25,11 +25,11 @@ When the question can be settled by measurement, state a **falsifiable hypothesi
 
 ## Step 3 — Acquire (four-source pass)
 
-Run the four-source research pass — official docs, validated implementation references, in-repo patterns, git history — per `/ad-ground` (`WORKFLOW.md` §4-5). Do not re-implement its mechanics; follow its Source A / B / C / D contract and cite as it does. This study is the durable evidence artifact for its Acquire pass; do not create a duplicate ground receipt. When a load-bearing claim can only be settled by measurement (evidence level E1 in §17), run an experiment or a staged spike (`/ad-spike`, `WORKFLOW.md` §14) and bring the result back as evidence.
+Run the four-source research pass — official docs, validated implementation references, in-repo patterns, git history — per `/ad-ground` (`WORKFLOW.md` §4-5). Do not re-implement its mechanics; follow its Source A / B / C / D contract and cite as it does. This study is the durable evidence artifact for its Acquire pass; do not create a duplicate ground receipt. When a load-bearing claim can only be settled by measurement (the Measurement tier in §17), run an experiment or a staged spike (`/ad-spike`, `WORKFLOW.md` §14) and bring the result back as evidence.
 
 ## Step 4 — Appraise (grade the evidence, §17)
 
-Grade each load-bearing claim per `WORKFLOW.md` §17 Axis 1: seal it **High / Medium / Low / Very-low**, each with its provenance — citation, date, access method. A claim you cannot source cannot be sealed High. Where sources genuinely disagree, record the positions **side by side** — position A, position B, the evidence for each, and the conditions under which each holds — never a manufactured consensus.
+Grade each load-bearing claim per `WORKFLOW.md` §17 Axis 1: name its tier, start it at the tier's grade, lower it for risk of bias, inconsistency, indirectness, imprecision or search bias, raise it only with a stated reason, and seal it **High / Medium / Low / Very-low** — or mark a normative claim **design choice** — each with its provenance: citation, date, access method. A claim you cannot source cannot be sealed High. Where sources genuinely disagree, record the positions **side by side** — position A, position B, the evidence for each, and the conditions under which each holds — never a manufactured consensus.
 
 ## Step 5 — Conclude (Apply, §17 Axis 2)
 
@@ -37,11 +37,17 @@ State the conclusion and its confidence per `WORKFLOW.md` §17 Axis 2: **Strong*
 
 ## Step 6 — Write the study
 
+If `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` names `process.records.research` with `repo-path` and a `path`, write the study there instead of `doc/research/`; for `issue-comment` or `external`, follow `ad-ground`'s Step 5 rule.
+
 Write `doc/research/NNNN-<slug>.md` using the template below — conclusion first, evidence graded, sources dated. Status `draft`. Stop after writing; do not self-flip to `concluded` (that needs user review).
 
 ## Step 7 — Graduate (when the conclusion binds)
 
 After the study is reviewed, if its conclusion is a binding decision, graduate it: open an ADR (`/ad-adr`) that references this study by path — the study holds the evidence, the ADR records the decision. If the conclusion feeds a pre-construction build, hand to `/ad-derisk` (Front B) rather than building blind.
+
+## Step 8 — Assess (when the decision is revisited)
+
+When the decision this study grounded is revisited — an ADR amended, a measurement contradicting it, the reopen trigger named in the study — fill its `## Assessment` section: what the study got right or wrong and what the next study should do differently. This closes the Ask → Acquire → Appraise → Apply → Assess loop.
 
 ## Interview UX
 

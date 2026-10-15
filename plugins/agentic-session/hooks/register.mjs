@@ -332,13 +332,15 @@ function clearReadings($, state) {
   $.ui.invalidate('ui.render');
 }
 
+// Runs /ad-handoff as if typed: a plugin's prompt.submit of the same text did
+// nothing in the desktop app (task-0116). With the box on, the handoff's own
+// turn is followed by a clear and a resume (task-0115).
 function submitHandoff($, state) {
-  // With the box on, the handoff's own turn is followed by a clear and a
-  // resume (task-0115); the press time tells its file from older ones.
   state.pending = state.clearAfter ? { turnId: null } : null;
-  $.prompt.submit({ text: '/ad-handoff', asUser: true }).catch((error) => {
+  $.command.run({ command: 'ad-handoff' }).catch((error) => {
     state.pending = null;
-    logFailure($, 'handoff not submitted', error);
+    $.ui.toast('AD handoff could not start: run /ad-handoff yourself.');
+    logFailure($, 'handoff not run', error);
   });
 }
 

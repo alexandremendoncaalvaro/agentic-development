@@ -1,6 +1,6 @@
 ---
 name: ad-release
-description: "Orchestrate one npm package release (release script, release PR, tag, npm publish, GitHub Release) behind one digest-bound approval from the owner, with per-stage fallback and state-aware resume. Use on \"release this package\", \"publish to npm\", \"prepare a release\", \"resume the release\", \"create the GitHub Release\"."
+description: 'Release one npm package: release script, PR, tag, publish, GitHub Release, behind one approval. Use on "release this package", "publish to npm", "resume the release".'
 summary: Safely orchestrate a single npm package release through its configured release script, PR, tag, npm publish, and GitHub Release with one digest-bound approval and state-aware recovery.
 allowed-tools: Read, Bash, Grep
 ---
@@ -11,7 +11,7 @@ Implements ADR-0063 as amended by ADR-0072 and amends ADR-0048's manually perfor
 
 Only one root npm package released through GitHub is supported. It never switches GitHub authentication, reads credential files, surfaces tokens or OTP values, changes npm dist-tags, or retries an irreversible operation blindly.
 
-## Phase 0 — Confirm regime
+## Phase 0 — Preconditions
 
 Run for a release-ready root npm package when the user asks to prepare a release, publish a tagged version, create its GitHub Release, or resume a partial release.
 
@@ -27,7 +27,7 @@ A changed target or effect yields a digest mismatch and is a hard no-run boundar
 
 ## Phase 1 — Plan
 
-Before every effect, report the current branch and worktree state, package name and configured publish tag, `[Unreleased]` readiness, release-script dry-run result for a new release, local/remote tag state, merged-base reachability, npm package version state, and GitHub Release state. Run `npm pack --dry-run` to show the publish surface. For a resume, verify the named tag is annotated and identify its release commit and package version; refuse an ambiguous or mismatched tag.
+Before every effect, report the current branch and worktree state, package name and configured publish tag, `[Unreleased]` readiness, release-script dry-run result for a new release, local/remote tag state, merged-base reachability, npm package version state, and GitHub Release state. Run `npm pack --dry-run` to show the publish surface. Run `npm profile get --json` and warn when `tfa.mode` is not `auth-and-writes`: the npm one-time password is the barrier an agent cannot forge, and it covers a publish only in that mode. An approved plan leaves a release receipt in the git directory every worktree shares (`releaseReceipt` in the planner output); the `ad-hooks` receipt gate reads it in shadow before `npm publish` and the GitHub release (ADR-0096). For a resume, verify the named tag is annotated and identify its release commit and package version; refuse an ambiguous or mismatched tag.
 
 ## Phase 2 — Local release
 

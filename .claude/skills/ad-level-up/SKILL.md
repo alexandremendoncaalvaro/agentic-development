@@ -1,6 +1,6 @@
 ---
 name: ad-level-up
-description: "Curate the project's rule-set (add, refine, merge, or retire a convention) through four anti-overfitting gates, an effectiveness pass, and an adversarial multi-lens review; writes one item at a time, only on the owner's explicit approval. Use on \"add a convention\", \"make this a rule\", \"retire this rule\", or a rule gap from ad-audit."
+description: 'Add, refine, merge or retire a project rule through anti-overfitting gates, one approved item at a time. Use on "make this a rule", "retire this rule", a rule gap from an audit.'
 summary: Human-gated rule-set curation, companion to ad-audit. Four anti-overfitting gates + effectiveness pass + adversarial multi-lens review of each candidate, then a HARD human-approval gate — never writes unprompted, one item at a time. Writes to the ADR-0035 machine store or the ADR-0043 project layer (.agentic/rules/).
 allowed-tools: Read, Glob, Grep, Bash, Task, Edit, Write
 ---

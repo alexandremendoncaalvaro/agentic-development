@@ -64,12 +64,7 @@ function validateString(value, label, errors) {
   }
 }
 
-function validateStringArray(
-  value,
-  label,
-  errors,
-  { allowEmpty = true, singleLine = false } = {}
-) {
+function validateStringArray(value, label, errors, { allowEmpty = true, singleLine = false } = {}) {
   if (!Array.isArray(value)) {
     errors.push(`${label} must be an array`);
     return;
@@ -122,7 +117,11 @@ export function validateTemplate(template) {
   });
 
   const knownLocators = new Map();
-  if (!template.provenance || typeof template.provenance !== 'object' || Array.isArray(template.provenance)) {
+  if (
+    !template.provenance ||
+    typeof template.provenance !== 'object' ||
+    Array.isArray(template.provenance)
+  ) {
     errors.push('provenance must be an object');
   } else {
     rejectUnknownFields(
@@ -158,9 +157,7 @@ export function validateTemplate(template) {
           seenClasses.add(group.authorClass);
         }
         if (!Array.isArray(group?.sources) || group.sources.length === 0) {
-          errors.push(
-            `provenance.authorGroups[${groupIndex}].sources must be a non-empty array`
-          );
+          errors.push(`provenance.authorGroups[${groupIndex}].sources must be a non-empty array`);
           return;
         }
         group.sources.forEach((source, sourceIndex) => {
@@ -192,12 +189,7 @@ export function validateTemplate(template) {
     const strengthIds = new Set();
     template.strengths.forEach((strength, index) => {
       const prefix = `strengths[${index}]`;
-      rejectUnknownFields(
-        strength,
-        ['id', 'description', 'sourceLocators'],
-        prefix,
-        errors
-      );
+      rejectUnknownFields(strength, ['id', 'description', 'sourceLocators'], prefix, errors);
       if (typeof strength?.id !== 'string' || !TEMPLATE_ID.test(strength.id)) {
         errors.push(`${prefix}.id must be a kebab-case identifier`);
       } else if (strengthIds.has(strength.id)) {
@@ -219,7 +211,11 @@ export function validateTemplate(template) {
     });
   }
 
-  if (!template.approval || typeof template.approval !== 'object' || Array.isArray(template.approval)) {
+  if (
+    !template.approval ||
+    typeof template.approval !== 'object' ||
+    Array.isArray(template.approval)
+  ) {
     errors.push('approval must be an object');
   } else {
     rejectUnknownFields(template.approval, ['status', 'approvedBy'], 'approval', errors);
@@ -309,7 +305,7 @@ export function parseTemplateMarkdown(markdown) {
 function directoryFiles(root) {
   if (!existsSync(root) || !statSync(root).isDirectory()) return [];
   return readdirSync(root, { withFileTypes: true })
-    .sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0)
+    .sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0))
     .flatMap((entry) => {
       const path = join(root, entry.name);
       if (lstatSync(path).isSymbolicLink()) {
@@ -375,7 +371,7 @@ function readLayer(name, root) {
       throw new Error(`${name} template ${item.path} must be stored as ${expected}`);
     }
   }
-  templates.sort((left, right) => left.id < right.id ? -1 : left.id > right.id ? 1 : 0);
+  templates.sort((left, right) => (left.id < right.id ? -1 : left.id > right.id ? 1 : 0));
   return { path: resolvedRoot, templates };
 }
 
@@ -389,9 +385,7 @@ export function resolveTemplateCatalog({
   const repositoryRoot = gitRoot(cwd, { required: false });
   const roots = {
     bundled: bundledDir ? absolute(bundledDir) : join(absolute(cwd), '.agentic-no-bundles'),
-    machine: machineDir
-      ? absolute(machineDir)
-      : defaultMachineDir({ environmentPath, home }),
+    machine: machineDir ? absolute(machineDir) : defaultMachineDir({ environmentPath, home }),
     project: repositoryRoot
       ? join(repositoryRoot, '.agentic', 'templates')
       : join(absolute(cwd), '.agentic-no-project-templates'),
@@ -512,27 +506,16 @@ function readApproval(approvalPath, prepared, target) {
   ) {
     throw new Error('approval does not match the exact candidate');
   }
-  if (
-    approval.targetLayer !== target.layer ||
-    approval.visibility !== target.visibility
-  ) {
+  if (approval.targetLayer !== target.layer || approval.visibility !== target.visibility) {
     throw new Error('approval does not match the target layer and visibility');
   }
   return approval;
 }
 
-export function atomicWrite(
-  path,
-  content,
-  mode,
-  { replace = renameSync } = {}
-) {
+export function atomicWrite(path, content, mode, { replace = renameSync } = {}) {
   const directory = dirname(path);
   mkdirSync(directory, { recursive: true });
-  const temporaryPath = join(
-    directory,
-    `.${basename(path)}.tmp-${process.pid}-${Date.now()}`
-  );
+  const temporaryPath = join(directory, `.${basename(path)}.tmp-${process.pid}-${Date.now()}`);
   try {
     writeFileSync(temporaryPath, content, { encoding: 'utf8', mode });
     replace(temporaryPath, path);
@@ -592,9 +575,7 @@ export function writeTemplateAtomic({
   let root;
   let repositoryRoot = null;
   if (layer === 'machine') {
-    root = machineDir
-      ? absolute(machineDir)
-      : defaultMachineDir({ environmentPath, home });
+    root = machineDir ? absolute(machineDir) : defaultMachineDir({ environmentPath, home });
   } else {
     repositoryRoot = gitRoot(cwd);
     root = join(repositoryRoot, '.agentic', 'templates');
@@ -668,9 +649,7 @@ function main() {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return;
   }
-  throw new Error(
-    'usage: template-store.mjs <resolve|validate|prepare|write> [options]'
-  );
+  throw new Error('usage: template-store.mjs <resolve|validate|prepare|write> [options]');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -1,6 +1,6 @@
 ---
 name: ad-philosophy
-description: Universal posture for non-trivial work — think before coding, decide when grounded, ground in real patterns, simplicity, surgical changes, verifiable goals, verify before claiming done, report for a decision-maker, documentation discipline. Auto-loads on non-trivial changes, refactors, debugging, and any document writing; "think before coding".
+description: 'Posture for non-trivial work: think first, decide when grounded, keep it simple, verify before claiming done, report for a decision-maker. Auto-loads on changes, debugging, docs.'
 summary: Universal agent guardrails (think, decide when grounded, verify done, report for a decision-maker). Auto-loads as posture on non-trivial work; an explicit `/ad-philosophy` additionally forces a binding statement applying all eight behaviors to the current task.
 ---
 
@@ -51,6 +51,8 @@ Before implementing:
 For non-trivial changes, invoke `/ad-ground` — the workflow-operational skill that runs the four-source research pass (official docs, validated implementation references, in-repo patterns, git history) and synthesizes a happy path with citations. The skill carries the prescriptive deviation gate; this section carries the posture only. Skip for diffs you can describe in one sentence.
 
 **Read to a stop criterion.** Grounding bounds *what* to read; the read contract in WORKFLOW.md §1 (*Reading order*) bounds *how far*. Three rungs: the definition layer always (every document whose role is *definition* under rule 9 below); an area's decision records only when the change touches that area, and the specific record rather than the whole directory — starting from the layer's state projection when it has one; the evidence behind a decision only when the decision looks wrong. Volume of reading is not comprehension — climb only as far as the change requires, then stop.
+
+**Work inside the team's delivery process.** Work inside the team's delivery process when the repository configures one (`ad-project-state --process`, ADR-0097): its stages, record places and handoffs win over the kit's defaults, and the kit never names or assumes a methodology.
 
 ## Decide When Grounded, Ask When Judgment
 

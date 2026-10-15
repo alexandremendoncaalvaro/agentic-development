@@ -1,6 +1,6 @@
 ---
 name: ad-diagnose
-description: Disciplined diagnosis for hard bugs and performance regressions — build a feedback loop, reproduce, rank 3-5 falsifiable hypotheses, instrument, fix with a regression test. Use on "this is broken", "debug this", "find the bug", "performance regression", "build a repro".
+description: 'Diagnose a hard bug or performance regression: feedback loop, reproduce, ranked hypotheses, fix with a regression test. Use on "this is broken", "debug this", "regression".'
 summary: Disciplined diagnosis loop for hard bugs and performance regressions per WORKFLOW §15. Five phases — build a feedback loop (the skill itself), reproduce, hypothesise (3-5 ranked falsifiable), instrument (one variable at a time), fix + regression-test.
 allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 ---
@@ -11,16 +11,7 @@ Implements WORKFLOW.md §15 per ADR-0021. Disciplined diagnosis for hard bugs an
 
 The shape is grounded in Kernighan & Pike, *The Practice of Programming* (1999, ch. 5–6) and Karl Popper's falsifiability framing. The Phase-1 framing ("the loop is the skill — everything else is mechanical") is borrowed from [`mattpocock/skills`](https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnose/SKILL.md) with attribution.
 
-## Phase 0 — Confirm regime
-
-Diagnose is for *hard bugs and performance regressions where the cause is unclear*. Run when at least one holds:
-
-- A test is failing and the cause is not obvious from the diff.
-- A symptom is reproducible but the chain of causes is not.
-- A performance regression appeared between two known-good states.
-- The user says "this is broken" / "this is throwing" / "this is slow" without a localized cause.
-
-Route elsewhere when:
+## Not for
 
 - The bug is one-line obvious (typo, off-by-one) — fix it directly; the skill is overkill.
 - The bug is a clean ground-truth-pair regression (test was passing, output unchanged, now failing) → `/ad-tdg` (WORKFLOW §9). TDG handles it with the existing pair as the verification surface.

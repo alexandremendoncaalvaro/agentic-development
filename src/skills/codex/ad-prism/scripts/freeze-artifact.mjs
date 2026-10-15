@@ -64,9 +64,7 @@ function digestDirectory(root) {
       if (receipts.length !== 1) {
         throw new Error("Root audit.md must contain exactly one '- SHA-256:' receipt line");
       }
-      receiptSha256 = receipts[0][2]
-        .trim()
-        .replace(/^`([0-9a-f]{64})`$/i, '$1');
+      receiptSha256 = receipts[0][2].trim().replace(/^`([0-9a-f]{64})`$/i, '$1');
       payload = Buffer.from(text.replace(receipts[0][0], `${receipts[0][1]}<self>`), 'utf8');
     }
 

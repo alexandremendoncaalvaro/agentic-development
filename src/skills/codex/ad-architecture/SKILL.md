@@ -1,6 +1,6 @@
 ---
 name: ad-architecture
-description: "Generate or audit ARCHITECTURE.md at the repo root: scans the code, pre-fills layers, patterns, observability, and deployment from observed signals, then asks only the real gaps. Use to bootstrap, scaffold, document, or audit ARCHITECTURE.md (system patterns and boundaries, paired with the ADRs); an audit reports drift against the existing file."
+description: 'Generate or audit ARCHITECTURE.md from the code: layers, patterns, boundaries, deployment. Use on "document the architecture", "audit ARCHITECTURE.md".'
 summary: Generate or audit `ARCHITECTURE.md` at the repo root.
 ---
 

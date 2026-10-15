@@ -107,7 +107,7 @@ test('collaboration reply baseline is valid and covers supported conversation su
   }
 });
 
-test('publication workflow keeps drafting, composition, curation, and outward gates explicit', () => {
+test('static contract: publication workflow keeps drafting, composition, curation, and outward gates explicit', () => {
   for (const agent of ['claude-code', 'codex']) {
     const root = skillRoot('src/skills', agent);
     const skill = readFileSync(join(root, 'SKILL.md'), 'utf8');

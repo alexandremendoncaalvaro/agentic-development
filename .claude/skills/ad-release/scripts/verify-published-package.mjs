@@ -20,15 +20,11 @@ try {
   writeFileSync(staleBinary, '#!/bin/sh\necho stale global binary\n');
   chmodSync(staleBinary, 0o755);
 
-  const output = execFileSync(
-    'npx',
-    ['--yes', `${packageName}@latest`, '--version'],
-    {
-      cwd: scratch,
-      encoding: 'utf8',
-      env: { ...process.env, PATH: `${binDir}:${process.env.PATH}` },
-    }
-  ).trim();
+  const output = execFileSync('npx', ['--yes', `${packageName}@latest`, '--version'], {
+    cwd: scratch,
+    encoding: 'utf8',
+    env: { ...process.env, PATH: `${binDir}:${process.env.PATH}` },
+  }).trim();
 
   if (output !== expectedVersion) {
     throw new Error(

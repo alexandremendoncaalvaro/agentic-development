@@ -1,6 +1,6 @@
 ---
 name: ad-commit
-description: Land the current work as atomic Conventional Commits with a DCO Signed-off-by trailer — scope intake, stage-split when concerns mix, message draft, sign and write. Use when a verified change is ready to land or on "commit this", "stage and commit", "split this commit", "sign off". Never bypasses hooks.
+description: 'Commit verified work as atomic Conventional Commits with sign-off. Use on "commit this", "stage and commit", "split this commit".'
 summary: Atomic Conventional Commits with DCO `Signed-off-by` sign-off. Four phases — scope intake, stage-split when concerns mix, draft message in Conventional Commits format, sign + write. Helper posture, not blocker.
 allowed-tools: Read, Bash
 ---
@@ -14,14 +14,7 @@ Implements ADR-0023. Drafts atomic Conventional Commits with DCO `Signed-off-by`
 - **DCO `Signed-off-by` on every commit — never a `Co-Authored-By` trailer** (ADR-0023 §Decision 1: DCO only).
 - **Never bypass the hooks** — no `--no-verify`, no `--no-gpg-sign`. A failing hook stops the commit; fix the cause, don't skip it.
 
-## Phase 0 — Confirm regime
-
-Run when the user wants to land changes as commits and at least one holds:
-
-- Working tree has staged or unstaged changes worth committing.
-- User asks for "commit", "stage", "split this commit", "sign off".
-
-Route elsewhere when:
+## Not for
 
 - The user wants to open a PR after committing → continue with `/ad-pr` after this skill finishes.
 - The user wants to merge an open PR → `/ad-merge`.
@@ -71,6 +64,8 @@ For each concern, in user-confirmed order:
 If a partial-file hunk split is too complex (interleaved changes, refactor + behavior in the same line), surface the call: either accept the bundled commit for that file or ask the user to split the file edit first.
 
 ## Phase 3 — Draft message
+
+When `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` configures a `path` for a record kind, pass `--dir <kind>=<path>` for it (kinds `research`, `adr`, `task`, `spec`). A date-named ADR has no number, so a citation such as ADR-0001 cannot resolve to it; cite it by its path.
 
 Apply [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) format:
 

@@ -1,6 +1,6 @@
 ---
 name: ad-publish
-description: "Draft or review collaboration publications (a GitHub proposal issue, a Slack, Discord, issue, or pull-request reply) from approved templates, grounding claims and keeping private context out of outward text. Posts only after an exact-target approval from the owner. Use on \"draft the issue\", \"reply on Slack\", \"publish this\"."
+description: 'Draft or review a post (issue, PR or chat reply) from approved templates; posts only after the owner approves the exact text. Use on "draft the issue", "reply on Slack", "publish this".'
 summary: Draft or review collaboration publications from approved templates and authorized evidence. Preserves facts, composes existing skills, and gates every outward action.
 allowed-tools: Read, Bash
 ---

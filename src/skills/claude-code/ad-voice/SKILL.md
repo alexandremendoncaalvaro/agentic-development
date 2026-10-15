@@ -1,6 +1,6 @@
 ---
 name: ad-voice
-description: "Draft, rewrite, or translate text through the owner's confirmed machine-local voice profile, preserving facts and applying attributed team or community accommodation. Read-only: never changes the profile. Use on \"write like me\", \"use my voice\", \"make this sound like me\", \"adjust this for Slack\", \"translate but keep my personality\"."
+description: 'Draft, rewrite or translate text in the owner''s confirmed voice, preserving facts. Use on "write like me", "use my voice", "adjust this for Slack".'
 summary: Draft, rewrite, or translate through a confirmed local personal-voice profile. Preserves facts; layers owner identity, community accommodation, and context; never changes the profile. Falls back honestly when evidence is missing.
 allowed-tools: Read, Bash
 ---

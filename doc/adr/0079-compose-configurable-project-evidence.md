@@ -3,6 +3,7 @@
 **Status:** accepted
 **Date:** 2026-09-15
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0097 — the configuration gains `schemaVersion` 2 with an optional `process` block, reported in the fact packet.
 **Amends:** ADR-0053 — configured primary project evidence may supplement or replace missing repository-local planning artifacts while roadmap reconciliation remains in `ad-roadmap`.
 
 ## Context

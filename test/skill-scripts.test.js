@@ -661,7 +661,7 @@ test('project-state: project configuration shadows a matching machine entry', ()
 
 test('project-state: invalid configuration falls back to repository evidence with exact errors', () => {
   const cases = [
-    ['unsupported schema', { schemaVersion: 2, sources: [] }, /schemaVersion/],
+    ['unsupported schema', { schemaVersion: 3, sources: [] }, /schemaVersion/],
     [
       'unknown top-level field',
       { schemaVersion: 1, sources: [], extra: true },
@@ -1093,12 +1093,15 @@ const RELEASE_PLAN = join(
   'release-plan.mjs'
 );
 
-function runReleasePlan(input) {
+// Runs outside any repository by default, so an approved plan's release
+// receipt never lands in this repository's git directory.
+function runReleasePlan(input, cwd = mkdtempSync(join(tmpdir(), 'release-plan-'))) {
   const env = { ...process.env };
   delete env.GIT_DIR;
   delete env.GIT_WORK_TREE;
   delete env.GIT_INDEX_FILE;
   const out = execFileSync('node', [RELEASE_PLAN], {
+    cwd,
     encoding: 'utf8',
     input: JSON.stringify(input),
     env,
@@ -1287,6 +1290,115 @@ test('release-plan: one digest-bound approval authorizes every unchanged stage',
   assert.equal(publish.next.requiresConfirmation, false);
 });
 
+const RELEASE_CONTEXT = {
+  releaseKind: 'patch',
+  packageName: '@example/package',
+  packageVersion: '1.2.3',
+  publishTag: 'latest',
+  branch: 'chore/release-v1.2.3',
+  baseBranch: 'main',
+  tag: 'v1.2.3',
+  prTitle: 'chore(release): v1.2.3',
+  prBody: '## Summary\n\n- Release v1.2.3\n',
+  prerelease: false,
+  completed: [],
+  merged: false,
+};
+
+function releaseReceipts(dir) {
+  const file = join(dir, '.git', 'agentic', 'release.jsonl');
+  if (!existsSync(file)) return [];
+  return readFileSync(file, 'utf8')
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+}
+
+test('release-plan: an approved plan leaves one release receipt in the shared git directory', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'release-plan-receipt-'));
+  gitInit(dir);
+  const preview = runReleasePlan(RELEASE_CONTEXT, dir);
+  assert.equal(preview.releaseReceipt, undefined);
+  const confirmation = {
+    scope: 'release-plan',
+    digest: preview.planApproval.digest,
+    approved: true,
+  };
+  const first = runReleasePlan({ ...RELEASE_CONTEXT, confirmation }, dir);
+  const again = runReleasePlan({ ...RELEASE_CONTEXT, confirmation }, dir);
+  assert.equal(first.releaseReceipt, 'recorded');
+  assert.equal(again.releaseReceipt, 'present');
+  const receipts = releaseReceipts(dir);
+  assert.equal(receipts.length, 1);
+  assert.equal(receipts[0].package, '@example/package');
+  assert.equal(receipts[0].version, '1.2.3');
+  assert.equal(receipts[0].digest, preview.planApproval.digest);
+  assert.equal(receipts[0].scope, 'release-plan');
+  assert.match(receipts[0].at, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test('release-plan: an unapproved or mismatched plan writes no release receipt', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'release-plan-receipt-'));
+  gitInit(dir);
+  runReleasePlan(RELEASE_CONTEXT, dir);
+  const mismatched = runReleasePlan(
+    {
+      ...RELEASE_CONTEXT,
+      confirmation: { scope: 'release-plan', digest: 'f'.repeat(64), approved: true },
+    },
+    dir
+  );
+  assert.equal(mismatched.releaseReceipt, undefined);
+  assert.deepEqual(releaseReceipts(dir), []);
+});
+
+test('release-plan: a per-stage publish approval leaves a receipt naming the stage', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'release-plan-receipt-'));
+  gitInit(dir);
+  const result = runReleasePlan(
+    {
+      ...RELEASE_CONTEXT,
+      completed: ['local-release', 'branch-push', 'tag-push'],
+      merged: true,
+      confirmation: { stage: 'npm-publish', approved: true },
+    },
+    dir
+  );
+  assert.deepEqual(result.execution, ['npm', 'publish']);
+  assert.equal(result.releaseReceipt, 'recorded');
+  const [receipt] = releaseReceipts(dir);
+  assert.equal(receipt.scope, 'npm-publish');
+  assert.equal(receipt.digest, null);
+});
+
+test('release-plan: a per-stage approval without the package identity writes no receipt', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'release-plan-receipt-'));
+  gitInit(dir);
+  const withoutName = { ...RELEASE_CONTEXT };
+  delete withoutName.packageName;
+  const result = runReleasePlan(
+    {
+      ...withoutName,
+      completed: ['local-release', 'branch-push', 'tag-push'],
+      merged: true,
+      confirmation: { stage: 'npm-publish', approved: true },
+    },
+    dir
+  );
+  assert.equal(result.releaseReceipt, 'unavailable: missing package name or version');
+  assert.deepEqual(releaseReceipts(dir), []);
+});
+
+test('release-plan: outside a git repository an approval reports the receipt as unavailable', () => {
+  const preview = runReleasePlan(RELEASE_CONTEXT);
+  const result = runReleasePlan({
+    ...RELEASE_CONTEXT,
+    confirmation: { scope: 'release-plan', digest: preview.planApproval.digest, approved: true },
+  });
+  assert.deepEqual(result.execution, ['npm', 'run', 'release', '--', 'patch']);
+  assert.match(result.releaseReceipt, /^unavailable: /);
+});
+
 test('release-plan: a changed target invalidates a plan-wide approval', () => {
   const context = {
     releaseKind: 'patch',
@@ -1379,7 +1491,7 @@ test('release-plan: a resumed release can approve only its remaining effects', (
   assert.deepEqual(approved.execution, ['npm', 'publish']);
 });
 
-test('release plan authorization composes through release PR and merge skills', () => {
+test('static contract: release plan authorization composes through release PR and merge skills', () => {
   for (const host of ['claude-code', 'codex']) {
     const root = join(__dirname, '..', 'src', 'skills', host);
     const release = readFileSync(join(root, 'ad-release', 'SKILL.md'), 'utf8');
@@ -1803,6 +1915,93 @@ The receipt proves a cited source exists in the map; it does not prove the sourc
 
 Run validate-record.mjs, then inspect every cited source.
 `;
+
+// Task 0123: a record that names its stakes is graded from a starting tier.
+function staked(stakes, claimLines) {
+  return VALID_GROUND_RECORD.replace(
+    '**Confidence:** Strong',
+    `**Confidence:** Strong\n**Stakes:** ${stakes}`
+  ).replace('**Strength:** High\n', claimLines);
+}
+
+function groundReport(body) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-tier-'));
+  try {
+    return runGroundRecord(dir, writeGroundRecord(dir, body));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+test('validate-record: a staked claim graded at its tier start is valid', () => {
+  const report = groundReport(
+    staked('medium × reversible', '**Tier:** Measurement\n**Strength:** High\n')
+  );
+  assert.equal(report.valid, true, report.errors.join('; '));
+  assert.deepEqual(report.warnings, []);
+});
+
+test('validate-record: a grade above the tier start needs an Upgrade line', () => {
+  const above = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** High\n')
+  );
+  assert.equal(above.valid, false);
+  assert.match(
+    above.errors.join('\n'),
+    /E1 is graded High above its Primary start \(Medium\): add a line "\*\*Upgrade:\*\* <reason>"/
+  );
+  const justified = groundReport(
+    staked(
+      'medium × reversible',
+      '**Tier:** Primary\n**Strength:** High\n**Upgrade:** two primary sources agree with a measurement\n'
+    )
+  );
+  assert.equal(justified.valid, true, justified.errors.join('; '));
+});
+
+test('validate-record: a staked claim names its tier, and a normative claim is a design choice', () => {
+  const noTier = groundReport(staked('high × irreversible', '**Strength:** Medium\n'));
+  assert.match(
+    noTier.errors.join('\n'),
+    /E1 has no tier: add a line "\*\*Tier:\*\* <Measurement \| Primary \| Secondary \| Single \| Opinion>"/
+  );
+  const design = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** design choice\n')
+  );
+  assert.equal(design.valid, true, design.errors.join('; '));
+});
+
+test('validate-record: a low and reversible record may leave claims ungraded', () => {
+  const short = groundReport(staked('low × reversible', ''));
+  assert.equal(short.valid, true, short.errors.join('; '));
+  const bad = groundReport(staked('modest', '**Tier:** Primary\n**Strength:** Medium\n'));
+  assert.match(
+    bad.errors.join('\n'),
+    /Stakes must be "<low \| medium \| high> × <reversible \| irreversible>"/
+  );
+});
+
+test('validate-record: a grade given in a short record needs its tier', () => {
+  const graded = groundReport(staked('low × reversible', '**Strength:** Medium\n'));
+  assert.equal(graded.valid, false);
+  assert.match(graded.errors.join('\n'), /E1 has no tier/);
+});
+
+test('validate-record: a staked record names design choice as a valid strength', () => {
+  const report = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** Strong\n')
+  );
+  assert.match(
+    report.errors.join('\n'),
+    /E1 has no valid strength: add a line "\*\*Strength:\*\* <High \| Medium \| Low \| Very-low \| design choice>"/
+  );
+});
+
+test('validate-record: a record without stakes keeps the earlier rules and warns', () => {
+  const legacy = groundReport(VALID_GROUND_RECORD);
+  assert.equal(legacy.valid, true);
+  assert.match(legacy.warnings.join('\n'), /no Stakes line/);
+});
 
 test('validate-record: accepts a complete durable ground receipt', () => {
   const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-record-valid-'));
@@ -4176,13 +4375,49 @@ const CHECKPOINT = join(
 
 // execFileSync throws on a non-zero exit, so every call below also asserts
 // the "always exit 0, never block the prompt" contract.
+// No voice profile unless a test supplies one, so the machine's own profile
+// never changes what the suite sees.
+const EMPTY_VOICE_DIR = mkdtempSync(join(tmpdir(), 'agentic-no-voice-'));
+
 function runCheckpoint(input, env = {}) {
   return execFileSync('node', [CHECKPOINT], {
     input,
     encoding: 'utf8',
-    env: { ...process.env, AD_WORKFLOW_CHECKPOINT: '', ...env },
+    env: { ...process.env, AD_WORKFLOW_CHECKPOINT: '', AGENTIC_VOICE_DIR: EMPTY_VOICE_DIR, ...env },
   });
 }
+
+function voiceDir(profile) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-voice-'));
+  writeFileSync(
+    join(dir, 'profile.md'),
+    `# Personal voice profile\n\n## Profile data\n\n\`\`\`json\n${JSON.stringify(profile, null, 2)}\n\`\`\`\n`
+  );
+  return dir;
+}
+
+// Task 0121: the owner's conversation language and the no-estimate rule ride
+// on every prompt when a confirmed voice profile names the language.
+test('workflow-checkpoint: a confirmed voice profile adds the language and no-estimate reminder', () => {
+  const dir = voiceDir({
+    status: 'confirmed',
+    languages: { conversation: 'pt-BR', publication: 'en' },
+  });
+  const out = runCheckpoint(PROMPT_EVENT, { AGENTIC_VOICE_DIR: dir });
+  assert.match(out, /Reply to the owner in pt-BR; give no date, duration or deadline estimates\./);
+});
+
+test('workflow-checkpoint: no reminder without a profile, an unconfirmed one, or one without a language', () => {
+  assert.doesNotMatch(runCheckpoint(PROMPT_EVENT), /Reply to the owner/);
+  for (const profile of [
+    { status: 'draft', languages: { conversation: 'pt-BR' } },
+    { status: 'confirmed' },
+    { status: 'confirmed', languages: { conversation: 'pt-BR; rm -rf /' } },
+  ]) {
+    const out = runCheckpoint(PROMPT_EVENT, { AGENTIC_VOICE_DIR: voiceDir(profile) });
+    assert.doesNotMatch(out, /Reply to the owner/);
+  }
+});
 
 const PROMPT_EVENT = JSON.stringify({
   hook_event_name: 'UserPromptSubmit',
@@ -4211,6 +4446,10 @@ test('workflow-checkpoint: valid prompt event → short imperative checkpoint na
   assert.match(out, /trivial/i, 'checkpoint tells the model when to skip');
   assert.match(out, /summary/i, 'checkpoint asks for the session-opening summary');
   assert.match(out, /roadmap/i, 'checkpoint asks for the checklist roadmap');
+  assert.match(out, /not yet covered/i, 'checkpoint reviews only uncovered work (ADR-0091)');
+  assert.match(out, /delta/i, 'checkpoint reviews the delta after a fix (ADR-0091)');
+  assert.match(out, /\/ad-audit only for high-risk/i, 'checkpoint audits by risk (ADR-0091)');
+  assert.doesNotMatch(out, /before a PR: \/ad-audit/, 'no audit before every PR');
   assert.ok(!out.trimStart().startsWith('{'), 'plain text, not a JSON decision object');
 });
 
@@ -4920,5 +5159,553 @@ test('regression: task-0100 project-state reports current, detached and non-git 
   } finally {
     rmSync(repo.root, { recursive: true, force: true });
     rmSync(plain, { recursive: true, force: true });
+  }
+});
+
+// Task 0125: glossary drift — aliases a CONTEXT.md says to avoid that tracked
+// code still uses, and canonical terms used nowhere. Advisory facts only.
+function glossaryRepo(files, tracked = Object.keys(files)) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-drift-glossary-'));
+  const git = gitInit(dir);
+  for (const [path, text] of Object.entries(files)) {
+    mkdirSync(join(dir, dirname(path)), { recursive: true });
+    writeFileSync(join(dir, path), text);
+  }
+  if (tracked.length > 0) git('add', '--', ...tracked);
+  return dir;
+}
+
+const GLOSSARY = `# Glossary
+
+## Language
+
+### Personal voice
+
+**Definition:** the owner's stable signature.
+
+_Avoid_: "team voice" (other people's writing, not \`readFile\`); "persona" (performed identity); \`tone\` (a situational adjustment).
+
+### Accommodation corpus
+
+**Definition:** messages from the target community.
+
+_Avoid_: "style target" (copying phrasing).
+`;
+
+test('drift-scan: glossary reports multi-word and backticked aliases in tracked code, not single-word prose aliases', () => {
+  const dir = glossaryRepo(
+    {
+      'CONTEXT.md': GLOSSARY,
+      'src/voice.js': 'export const teamVoice = readFile;\nconst persona = 2;\nconst tone = 3;\n',
+      'src/other.py': 'TEAM_VOICE = 1\n',
+      'README.md': 'The team voice is described here.\n',
+      'scratch.js': 'const styleTarget = 1;\n',
+    },
+    ['CONTEXT.md', 'src/voice.js', 'src/other.py', 'README.md']
+  );
+  try {
+    const { glossary } = runScan(dir);
+    assert.deepEqual(glossary.contexts, ['CONTEXT.md']);
+    assert.deepEqual(
+      glossary.aliasesInCode.map(({ term, alias, files }) => ({ term, alias, files })),
+      [
+        { term: 'Personal voice', alias: 'team voice', files: ['src/other.py', 'src/voice.js'] },
+        { term: 'Personal voice', alias: 'tone', files: ['src/voice.js'] },
+      ]
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary lists canonical terms no tracked file uses outside the glossary', () => {
+  const dir = glossaryRepo({
+    'CONTEXT.md': GLOSSARY,
+    'doc/voice.md': 'A personal voice adapts to its audience.\n',
+  });
+  try {
+    const { glossary } = runScan(dir);
+    assert.deepEqual(glossary.unusedTerms, [
+      { context: 'CONTEXT.md', term: 'Accommodation corpus' },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary reads the per-context files a CONTEXT-MAP links', () => {
+  const dir = glossaryRepo({
+    'CONTEXT-MAP.md':
+      '# Context map\n\n- [Voice](voice/CONTEXT.md#terms)\n- [Billing](billing/CONTEXT.md)\n',
+    'voice/CONTEXT.md': GLOSSARY,
+    'billing/CONTEXT.md':
+      '# Billing\n\n### Invoice run\n\n**Definition:** a batch.\n\n_Avoid_: "bill batch".\n',
+    'billing/run.js': 'const billBatch = [];\nexport const invoiceRun = billBatch;\n',
+  });
+  try {
+    const { glossary } = runScan(dir);
+    assert.deepEqual(glossary.contexts, ['billing/CONTEXT.md', 'voice/CONTEXT.md']);
+    assert.deepEqual(
+      glossary.aliasesInCode.map(({ context, alias }) => ({ context, alias })),
+      [{ context: 'billing/CONTEXT.md', alias: 'bill batch' }]
+    );
+    assert.deepEqual(
+      glossary.unusedTerms.map(({ context, term }) => ({ context, term })),
+      [
+        { context: 'voice/CONTEXT.md', term: 'Personal voice' },
+        { context: 'voice/CONTEXT.md', term: 'Accommodation corpus' },
+      ]
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary is empty without a CONTEXT.md and says why outside a git repository', () => {
+  const plain = mkdtempSync(join(tmpdir(), 'agentic-drift-glossary-'));
+  const repo = glossaryRepo({ 'src/a.js': 'x\n' });
+  try {
+    writeFileSync(join(plain, 'CONTEXT.md'), GLOSSARY);
+    const outside = runScan(plain).glossary;
+    assert.equal(outside.skipped, 'not a git repository');
+    const none = runScan(repo).glossary;
+    assert.deepEqual(none, { contexts: [], aliasesInCode: [], unusedTerms: [] });
+  } finally {
+    rmSync(plain, { recursive: true, force: true });
+    rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary resolves map link forms to tracked files only, and falls back to the root glossary with the unresolved links named', () => {
+  const dir = glossaryRepo({
+    'CONTEXT-MAP.md':
+      '# Map\n\n- [A](<a/CONTEXT.md> "Voice")\n- [B](b\\CONTEXT.md)\n- [Out](../outside/CONTEXT.md)\n',
+    'a/CONTEXT.md': GLOSSARY,
+    'b/CONTEXT.md': '# B\n\n### Invoice run\n\n**Definition:** a batch.\n',
+  });
+  const fallback = glossaryRepo({
+    'CONTEXT-MAP.md': '# Map\n\n- [Gone](gone/CONTEXT.md)\n',
+    'CONTEXT.md': GLOSSARY,
+  });
+  try {
+    const resolved = runScan(dir).glossary;
+    assert.deepEqual(resolved.contexts, ['a/CONTEXT.md', 'b/CONTEXT.md']);
+    assert.deepEqual(resolved.unresolvedLinks, ['../outside/CONTEXT.md']);
+    const fell = runScan(fallback).glossary;
+    assert.deepEqual(fell.contexts, ['CONTEXT.md']);
+    assert.deepEqual(fell.unresolvedLinks, ['gone/CONTEXT.md']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+    rmSync(fallback, { recursive: true, force: true });
+  }
+});
+
+test('drift-scan: glossary counts byte-identical copies of a file once', () => {
+  const dir = glossaryRepo({
+    'CONTEXT.md': GLOSSARY,
+    'src/voice.js': 'export const teamVoice = 1;\n',
+    'mirror/voice.js': 'export const teamVoice = 1;\n',
+  });
+  try {
+    const [hit] = runScan(dir).glossary.aliasesInCode;
+    assert.equal(hit.count, 1);
+    assert.deepEqual(hit.files, ['mirror/voice.js']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// Task 0118, ADR-0097: the delivery process as configuration, with a generic
+// issue-staged lifecycle and neutral labels.
+const GENERIC_PROCESS = {
+  lifecycleOwner: 'external',
+  ownerLabel: 'Issue-staged lifecycle',
+  records: {
+    research: { destination: 'issue-comment', handoff: 'Post the record on the work item.' },
+    adr: { destination: 'repo-path', path: 'docs/decisions', naming: 'date' },
+    task: { destination: 'external', handoff: 'Open a work item in the tracker.' },
+  },
+  stages: [
+    { label: 'stage:design', stage: 'design', next: 'Write the design on the issue.' },
+    { label: 'stage:build', stage: 'build', next: 'Implement the approved plan.' },
+  ],
+  readMilestone: true,
+};
+
+const PROCESS_ISSUE_FIELDS = 'number,title,url,state,updatedAt,labels,assignees,milestone';
+
+function processRepo(config) {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-process-'));
+  mkdirSync(join(dir, '.agentic'), { recursive: true });
+  writeFileSync(join(dir, '.agentic', 'project-sources.json'), JSON.stringify(config));
+  return dir;
+}
+
+function githubSources(issues = { state: 'open', limit: 50 }) {
+  return [
+    { id: 'repository', type: 'repository', role: 'supporting' },
+    {
+      id: 'github-work',
+      type: 'github',
+      role: 'primary',
+      host: 'github.com',
+      repository: 'acme/widget',
+      issues,
+    },
+  ];
+}
+
+test('project-state: a version 1 configuration reports no process', () => {
+  const dir = processRepo({
+    schemaVersion: 1,
+    sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+  });
+  try {
+    const report = runProjectState(dir);
+    assert.equal(report.process, null);
+    assert.deepEqual(report.failures, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: a version 2 process is reported and issues carry their first configured stage and milestone', () => {
+  const dir = processRepo({ schemaVersion: 2, process: GENERIC_PROCESS, sources: githubSources() });
+  try {
+    const issues = [
+      { number: 1, title: 'a', labels: [{ name: 'stage:build' }, { name: 'stage:design' }] },
+      { number: 2, title: 'b', labels: [{ name: 'bug' }], milestone: { title: 'M1' } },
+    ];
+    const env = writeFakeGh(dir, {
+      '--version': { stdout: 'gh version fixture\n' },
+      'auth\u0000status\u0000--hostname\u0000github.com': { stdout: 'ok\n' },
+      [[
+        'issue',
+        'list',
+        '--repo',
+        'acme/widget',
+        '--state',
+        'open',
+        '--limit',
+        '50',
+        '--json',
+        PROCESS_ISSUE_FIELDS,
+      ].join('\u0000')]: { stdout: JSON.stringify(issues) },
+    });
+    const report = runProjectState(dir, env);
+    assert.deepEqual(report.failures, []);
+    assert.deepEqual(report.process, GENERIC_PROCESS);
+    const [first, second] = report.sources[1].issues;
+    assert.deepEqual(first.stage, {
+      label: 'stage:design',
+      stage: 'design',
+      next: 'Write the design on the issue.',
+    });
+    assert.equal(second.stage, null);
+    assert.deepEqual(second.milestone, { title: 'M1' });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: a process block is invalid under version 1 or with an unknown field or destination', () => {
+  for (const [config, message] of [
+    [
+      { schemaVersion: 1, process: GENERIC_PROCESS, sources: [] },
+      /process requires schemaVersion 2/,
+    ],
+    [
+      { schemaVersion: 2, process: { ...GENERIC_PROCESS, run: 'x' }, sources: [] },
+      /process has unknown field run/,
+    ],
+    [
+      {
+        schemaVersion: 2,
+        process: { lifecycleOwner: 'kit', records: { adr: { destination: 'wiki' } } },
+        sources: [],
+      },
+      /process\.records\.adr\.destination is invalid/,
+    ],
+    [
+      { schemaVersion: 2, process: { lifecycleOwner: 'someone' }, sources: [] },
+      /process\.lifecycleOwner must be kit or external/,
+    ],
+    [
+      {
+        schemaVersion: 2,
+        process: { lifecycleOwner: 'kit', ownerLabel: 'a\u001b[31mb' },
+        sources: [],
+      },
+      /process\.ownerLabel must be a single-line string/,
+    ],
+    [
+      {
+        schemaVersion: 2,
+        process: { lifecycleOwner: 'kit', stages: [{ label: 'x', stage: 'y', next: 'a\u2028b' }] },
+        sources: [],
+      },
+      /process\.stages\[0\]\.next is invalid/,
+    ],
+  ]) {
+    const dir = processRepo(config);
+    try {
+      const report = runProjectState(dir);
+      assert.equal(report.process, null);
+      assert.equal(report.failures[0].code, 'INVALID_CONFIGURATION');
+      assert.match(report.failures[0].message, message);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+});
+
+test('project-state: --process prints the resolved process without contacting a provider', () => {
+  const dir = processRepo({ schemaVersion: 2, process: GENERIC_PROCESS, sources: githubSources() });
+  try {
+    const fakeGh = join(dir, 'must-not-run.mjs');
+    writeFileSync(fakeGh, 'process.exit(97);\n');
+    const env = { ...process.env, AGENTIC_GH: fakeGh };
+    delete env.GIT_DIR;
+    delete env.GIT_WORK_TREE;
+    delete env.GIT_INDEX_FILE;
+    const out = JSON.parse(
+      execFileSync('node', [PROJECT_STATE, '--process'], { cwd: dir, encoding: 'utf8', env })
+    );
+    assert.deepEqual(Object.keys(out).sort(), [
+      'configuration',
+      'failures',
+      'observedAt',
+      'process',
+      'schemaVersion',
+    ]);
+    assert.deepEqual(out.process, GENERIC_PROCESS);
+    assert.equal(out.configuration.layer, 'project');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('project-state: a matching machine entry may carry a version 2 process', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-project-state-process-machine-'));
+  try {
+    execFileSync('git', ['init', '-q', dir]);
+    execFileSync('git', ['-C', dir, 'remote', 'add', 'origin', 'git@example.test:acme/widget.git']);
+    const machine = join(dir, 'machine.json');
+    writeFileSync(
+      machine,
+      JSON.stringify({
+        schemaVersion: 2,
+        projects: [
+          {
+            match: { remote: 'git@example.test:acme/widget.git' },
+            process: { lifecycleOwner: 'external', ownerLabel: 'Team process' },
+            sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+          },
+        ],
+      })
+    );
+    const report = runProjectState(dir, { AGENTIC_PROJECT_SOURCES_FILE: machine });
+    assert.deepEqual(report.failures, []);
+    assert.deepEqual(report.process, { lifecycleOwner: 'external', ownerLabel: 'Team process' });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// Task 0118 slice 2, ADR-0097: records go where the process says.
+function runGroundRecordArgs(cwd, args) {
+  return JSON.parse(execFileSync('node', [GROUND_RECORD, ...args], { cwd, encoding: 'utf8' }));
+}
+
+test('validate-record: --dir accepts a record in the configured research directory', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-dir-'));
+  try {
+    const record = 'docs/evidence/0002-ground-durable-evidence.md';
+    mkdirSync(join(dir, 'docs', 'evidence'), { recursive: true });
+    writeFileSync(join(dir, record), VALID_GROUND_RECORD);
+    const ok = runGroundRecordArgs(dir, [record, '--dir', 'docs/evidence']);
+    assert.equal(ok.valid, true, ok.errors.join('; '));
+    const elsewhere = runGroundRecordArgs(dir, [record]);
+    assert.equal(elsewhere.valid, false);
+    const outside = runGroundRecordArgs(dir, ['../x/0002-ground-a.md', '--dir', '../x']);
+    assert.equal(outside.valid, false);
+    assert.match(
+      outside.errors.join('\n'),
+      /--dir must be a relative directory inside the repository/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: --draft checks the content of a record kept outside the repository', () => {
+  const repo = mkdtempSync(join(tmpdir(), 'agentic-ground-draft-repo-'));
+  const scratch = mkdtempSync(join(tmpdir(), 'agentic-ground-draft-'));
+  try {
+    const draft = join(scratch, 'comment.md');
+    writeFileSync(draft, VALID_GROUND_RECORD.replace('GROUND-0002', 'GROUND-0000'));
+    const ok = runGroundRecordArgs(repo, [draft, '--draft']);
+    assert.equal(ok.valid, true, ok.errors.join('; '));
+    writeFileSync(draft, VALID_GROUND_RECORD.replace('## Evidence', '## Proof'));
+    const bad = runGroundRecordArgs(repo, [draft, '--draft']);
+    assert.equal(bad.valid, false);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+    rmSync(scratch, { recursive: true, force: true });
+  }
+});
+
+// Task 0118 slice 2, ADR-0097: the artifact gate follows the configured
+// research directory.
+function researchProcess(path) {
+  return {
+    lifecycleOwner: 'external',
+    records: { research: { destination: 'repo-path', path } },
+  };
+}
+
+test('artifact-gate: a configured research directory is governed and the validator gets --dir', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    mkdirSync(join(root, '.agentic'), { recursive: true });
+    writeFileSync(
+      join(root, '.agentic', 'project-sources.json'),
+      JSON.stringify({
+        schemaVersion: 2,
+        process: researchProcess('docs/evidence'),
+        sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+      })
+    );
+    mkdirSync(join(root, 'docs', 'evidence'), { recursive: true });
+    const rel = join('docs', 'evidence', '0001-ground-broken.md');
+    writeFileSync(join(root, rel), '# GROUND-0001: broken\n\n**Status:** recorded\n');
+    const failed = runGate(claudeWriteEvent(root, rel), { root, evidence });
+    assert.equal(failed.status, 2);
+    assert.match(failed.stderr, /missing Decision metadata/);
+    assert.match(
+      failed.stderr,
+      /validate-record\.mjs docs\/evidence\/0001-ground-broken\.md --dir docs\/evidence/
+    );
+    const defaultRel = join('doc', 'research', '0002-ground-x.md');
+    writeFileSync(join(root, defaultRel), '# GROUND-0002: broken\n');
+    const stillGoverned = runGate(claudeWriteEvent(root, defaultRel), { root, evidence });
+    assert.equal(
+      stillGoverned.status,
+      2,
+      'doc/research stays governed beside the configured directory'
+    );
+    const prismRel = join('doc', 'research', '0003-prism-x.md');
+    writeFileSync(join(root, prismRel), '# PRISM-0003: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, prismRel), { root, evidence }).status, 2);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: a matching machine entry configures the research directory; an unsafe path keeps the default', () => {
+  const { root, evidence } = gateRepo();
+  const home = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-gate-machine-')));
+  try {
+    execFileSync('git', ['init', '-q', root]);
+    execFileSync('git', ['-C', root, 'remote', 'add', 'origin', 'git@example.test:acme/w.git']);
+    const machine = join(home, 'sources.json');
+    const write = (path) =>
+      writeFileSync(
+        machine,
+        JSON.stringify({
+          schemaVersion: 2,
+          projects: [
+            {
+              match: { remote: 'git@example.test:acme/w.git' },
+              process: researchProcess(path),
+              sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+            },
+          ],
+        })
+      );
+    const env = { AGENTIC_PROJECT_SOURCES_FILE: machine };
+    write('notes');
+    mkdirSync(join(root, 'notes'), { recursive: true });
+    const rel = join('notes', '0003-ground-y.md');
+    writeFileSync(join(root, rel), '# GROUND-0003: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, rel), { root, evidence, env }).status, 2);
+    write('../outside');
+    const defaultRel = join('doc', 'research', '0004-ground-z.md');
+    writeFileSync(join(root, defaultRel), '# GROUND-0004: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, defaultRel), { root, evidence, env }).status, 2);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: the research directory comes from the resolver, so a ./ path counts and an invalid process does not', () => {
+  for (const [process, governed] of [
+    [researchProcess('./docs/evidence'), true],
+    [{ ...researchProcess('docs/evidence'), unknown: true }, false],
+  ]) {
+    const { root, evidence } = gateRepo();
+    try {
+      mkdirSync(join(root, '.agentic'), { recursive: true });
+      writeFileSync(
+        join(root, '.agentic', 'project-sources.json'),
+        JSON.stringify({
+          schemaVersion: 2,
+          process,
+          sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+        })
+      );
+      mkdirSync(join(root, 'docs', 'evidence'), { recursive: true });
+      const rel = join('docs', 'evidence', '0005-ground-w.md');
+      writeFileSync(join(root, rel), '# GROUND-0005: broken\n');
+      assert.equal(
+        runGate(claudeWriteEvent(root, rel), { root, evidence }).status,
+        governed ? 2 : 0
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+      rmSync(evidence, { recursive: true, force: true });
+    }
+  }
+});
+
+test('validate-record: --dir accepts a ./ prefix', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-dot-'));
+  try {
+    const record = 'docs/evidence/0002-ground-durable-evidence.md';
+    mkdirSync(join(dir, 'docs', 'evidence'), { recursive: true });
+    writeFileSync(join(dir, record), VALID_GROUND_RECORD);
+    const ok = runGroundRecordArgs(dir, [record, '--dir', './docs/evidence']);
+    assert.equal(ok.valid, true, ok.errors.join('; '));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: a configured directory inside doc/research leaves every record kind governed there', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    mkdirSync(join(root, '.agentic'), { recursive: true });
+    writeFileSync(
+      join(root, '.agentic', 'project-sources.json'),
+      JSON.stringify({
+        schemaVersion: 2,
+        process: researchProcess('doc/research/ground'),
+        sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+      })
+    );
+    mkdirSync(join(root, 'doc', 'research', 'ground'), { recursive: true });
+    const rel = join('doc', 'research', 'ground', '0006-prism-v.md');
+    writeFileSync(join(root, rel), '# PRISM-0006: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, rel), { root, evidence }).status, 2);
+    const groundRel = join('doc', 'research', 'ground', '0002-ground-durable-evidence.md');
+    writeFileSync(join(root, groundRel), VALID_GROUND_RECORD);
+    const valid = runGate(claudeWriteEvent(root, groundRel), { root, evidence });
+    assert.equal(valid.status, 0, valid.stderr);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
   }
 });

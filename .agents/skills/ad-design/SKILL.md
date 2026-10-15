@@ -1,6 +1,6 @@
 ---
 name: ad-design
-description: "Generate or audit DESIGN.md from existing design tokens (Figma export, tailwind.config, tokens.json, stylesheets) as W3C-compatible YAML plus Markdown rationale, per the Google Labs design.md spec. Use to bootstrap, document, or audit the visual contract: colors, typography, spacing, motion. Frontend projects only."
+description: 'Generate or audit DESIGN.md from existing design tokens, the visual contract of a frontend. Use on "design tokens", "document the design system", "audit DESIGN.md".'
 summary: Bootstrap `DESIGN.md` from existing tokens (frontend projects).
 ---
 

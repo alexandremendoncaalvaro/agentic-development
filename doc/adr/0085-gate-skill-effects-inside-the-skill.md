@@ -3,6 +3,8 @@
 **Status:** accepted
 **Date:** 2026-09-24
 **Deciders:** Alexandre Alvaro
+**Amended by:** ADR-0093 — decision 3's per-description cap falls to 200 characters; every other decision binds unchanged.
+**Related:** ADR-0096 — release effects are measured in shadow by the receipt gate; the skill's approval step remains the gate.
 **Amends:** ADR-0073 — replaces the invoker-class rule and its user-invocable-only class with an effect-gate rule, and retires the 8,000-character total for model-invocable descriptions; the 350-character per-description cap and the 1,024-character specification maximum remain, now for every skill.
 
 ## Context

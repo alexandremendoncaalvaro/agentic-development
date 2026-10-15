@@ -6,6 +6,91 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-15
+
+### Added
+
+- `ad-hooks` ships a command guard on `PreToolUse` (both hosts) that denies
+  killing processes by name and a `git commit` chained after a check with `;`
+  or a newline, naming the fix in the reason; an exploratory replay of 65,432
+  local Claude Code shell calls denied 135 commands, 134 real instances and
+  one conservative block. The workflow checkpoint names the owner's
+  conversation language and the no-estimate rule when a confirmed voice
+  profile defines it, and a shadow `Stop` hook logs replies in another
+  language without blocking (task-0121, ADR-0094).
+- `ad-release` leaves a release receipt when its plan is approved, in the git
+  directory every worktree shares, and its preflight step tells the agent to warn
+  when the npm account's two-factor mode does not cover writes. The `ad-hooks` receipt
+  gate logs a shadow `release` check before `npm publish` and the GitHub
+  release (task-0122, ADR-0096).
+- `.agentic/project-sources.json` accepts `schemaVersion` 2 with an optional
+  `process` block describing the team's delivery process: who owns the
+  lifecycle, where each kind of record goes, issue stages by label and
+  milestone reading. `ad-project-state` reports it, marks each issue's stage
+  and prints the process alone with `--process` (task-0118, ADR-0097).
+- `ad-drift` reports glossary drift: aliases `CONTEXT.md` says to avoid that
+  tracked code still uses, and canonical terms nothing uses, reading the
+  per-context files of a `CONTEXT-MAP.md`; advisory, judged per hit
+  (task-0125).
+- Records follow a configured delivery process: the ground validator takes
+  `--dir` for a configured research directory and `--draft` for a record
+  posted as an issue comment, `cited-records` takes `--dir <kind>=<path>`,
+  and `ad-ground`, `ad-research`, `ad-adr` (with date naming) and `ad-commit`
+  read the process before writing or citing a record (task-0118, ADR-0097).
+- With a configured external lifecycle owner, `ad-task`, `ad-spec` and
+  `ad-prd` hand off to the team's process instead of writing, `ad-next`
+  recommends by issue stage, `ad-derisk` posts its register on the team's
+  work item after approval, and `ad-philosophy` states the rule to work
+  inside the team's delivery process (task-0118, ADR-0097).
+
+### Changed
+
+- Every SKILL.md stays under 500 lines and 20,000 bytes; `ad-hooks` moves
+  its session-lifecycle tier to `references/session-tier.md`. The ceremonial
+  "Confirm regime" step becomes a "Not for" routing list (or a named
+  preconditions step where it held real checks), the outdated Codex
+  auto-trigger warning is gone, and `ad-project-state` leaves the Claude Code
+  `/` menu (task-0120).
+- Every skill description is at most 200 characters, use case and trigger
+  phrases first, the same on both hosts: the skill listing falls from about
+  13,600 to 7,099 characters per host (task-0120, ADR-0093).
+- `ad-tdd` and WORKFLOW §16 refactor on green in every cycle, treat
+  duplication as a hint, and add discovered tests to the list, as in Kent
+  Beck's Canon TDD; `ad-domain` groups terms by relation instead of
+  alphabetically and allows a lead sentence plus two of scope (task-0125).
+- Evidence is graded from a starting tier, after GRADE: Measurement starts
+  High, Primary Medium, Secondary and Single Low, Opinion Very-low; five
+  factors lower a claim and a raise needs a stated reason; a normative claim
+  is a design choice. A ground record names its stakes, and the validator
+  then requires each claim's tier and an `Upgrade:` line for a grade above
+  its start; a low and reversible record may leave claims ungraded. Records
+  without stakes keep the earlier rules and get a warning. `ad-research`
+  gains an Assess step (task-0123, ADR-0095).
+
+## [1.5.0] - 2026-10-15
+
+### Changed
+
+- The host-global rules file (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`)
+  carries only the TL;DR of `WORKFLOW.md` inline, with the full text's path,
+  instead of importing the whole file: about 49 KB less in every Claude Code
+  session, and the Codex file, whose import Codex never expanded, now holds
+  the summary text itself. An earlier import block or an unedited summary
+  block is refreshed on `init` and `update`; a hand-edited one is kept and
+  reported (task-0119, ADR-0092).
+- The shadow receipt gate expects an audit receipt only when the branch
+  changes a path listed under `auditPaths` in `.agentic/gates.json`, and
+  counts a delta review (`Base-SHA:`) only when its base is an ancestor of
+  its target and is covered by an earlier review; the workflow checkpoint
+  asks for review of uncovered work and the delta after a fix, and an audit
+  only for high-risk or uncovered risks (task-0117, ADR-0091).
+
+### Fixed
+
+- The `agentic-session` band's **AD handoff** button runs `/ad-handoff`; it
+  did nothing in the desktop app, and a refused run now shows a toast
+  (task-0116).
+
 ## [1.4.1] - 2026-10-09
 
 ### Fixed

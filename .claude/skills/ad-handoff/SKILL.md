@@ -1,6 +1,6 @@
 ---
 name: ad-handoff
-description: Compact the session into a handoff a fresh agent can resume from, saved to the OS temp dir with live state, open decisions, and next skills. Use when context runs low or on "handoff", "wrap up the session", "save context for next session", "pass to another agent".
+description: 'Compact the session into a handoff a fresh agent can resume from. Use when context runs low or on "handoff", "wrap up the session", "save context for next session".'
 summary: Compact the session into a temporary handoff. Preserves resumable state while the next session opens with a preparation receipt and canonical brief; retains roadmap, lost asks, hygiene, references, and redaction. Never commits.
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
@@ -11,15 +11,7 @@ Process scaffold for compacting a long or near-exhausted session into a handoff 
 
 The skill exists because long sessions accumulate inherited bias (WORKFLOW §12 — "almost right" failures compound) and because session-window pressure forces ad-hoc summarisation that loses the parts the next agent actually needs. Handoffs replace ad-hoc summarisation with a structured artifact.
 
-## Step 0 — Confirm regime
-
-Run when at least one holds:
-
-- The user says "handoff", "hand off", "wrap up", "compact this", "save context", "pass to another agent", "I need to `/clear`".
-- The session has run long enough that context-window pressure is imminent or stated.
-- The user is about to switch agents (e.g. Claude Code → Codex, or back) and wants the work to continue.
-
-Route elsewhere when:
+## Not for
 
 - The work is finishable in the current turn → finish it; do not pre-emptively hand off.
 - The handoff target is a specific artifact (a PRD / spec / task / ADR) → write that artifact via the matching `/ad-*` skill instead. Handoffs do not replace persistent decision records.

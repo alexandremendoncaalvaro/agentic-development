@@ -1,6 +1,6 @@
 ---
 name: ad-task
-description: Draft a task file at doc/tasks/NNNN-slug.md with checkbox acceptance criteria and an append-only Notes log. Use when work needs a tracked unit; "create a task", "open a ticket", "work item", "backlog entry", "plan this as a task". Status starts proposed.
+description: 'Draft a tracked task with checkbox acceptance criteria and an append-only log. Use on "create a task", "work item", "plan this as a task".'
 summary: Draft a new task at `doc/tasks/NNNN-<slug>.md`.
 ---
 
@@ -9,6 +9,8 @@ Drafts `doc/tasks/<NNNN>-<short-slug>.md` for one tracked task. Format chosen so
 </background_information>
 
 <instructions>
+First run `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external`, the team's own delivery process owns work items and `process.records.task` decides. With `external` or no record, show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). With `issue-comment`, draft it in the OS temporary directory, show it, and post it with `gh issue comment` on the work item the owner names only after the owner approves; then delete the draft. With `repo-path`, write the file under its `path`.
+
 Step 0 — scope preflight. Establish the **current repository** before naming or drafting anything. From the consumer root, run `node .agents/skills/ad-task/scripts/scope-anchors.mjs` (substitute the skill base path when loaded elsewhere). Read its JSON: `cwd` and `gitRoot` identify the target; `anchors` is the complete allow-list of repository-local sources. If `unreadable` is non-empty, stop until access is resolved.
 
 A new task requires one exact repository-local **Scope ref**: a repo-relative path to the PRD roadmap line, an existing feature spec, an accepted ADR, or a root artifact that already defines the work. A board ticket, a global rule, or a request remembered from another repository does not qualify. `Spec ref` remains optional because a small task can be directly grounded in the PRD or an ADR.

@@ -1,6 +1,6 @@
 ---
 name: ad-prd
-description: Draft or update the Product Requirements Document at doc/product/PRD.md — target user, problem, goals, non-goals, success metrics, roadmap, cross-feature constraints. Use when scoping a product or on "PRD", "product brief", "product vision", "roadmap", "target user". Feature specs inherit from it.
+description: 'Draft or update the product requirements: target user, problem, goals, metrics, roadmap. Use when scoping a product or on "PRD", "product brief", "roadmap".'
 summary: Lazy lifecycle owner of `doc/product/PRD.md` (or `doc/product/<slug>.md` multi-product). Layer 3 — product-level scope (target user, problem, success metrics, multi-feature roadmap) that feature specs inherit from. Distinct from `ad-spec` (feature-level).
 ---
 
@@ -9,13 +9,10 @@ Layer 3 of the artifact stack. Lazy lifecycle owner of the PRD (Product Requirem
 
 PRD is product-level scope, not feature-level scope. A feature spec (`ad-spec`, Layer 4) implements *part* of a PRD; a PRD is never implemented by a single task. If the user's ask is single-feature, route to `ad-spec` instead.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions PRD, product requirements, target user, product roadmap, or product success metrics, invoke this skill manually.
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run when the user wants to scope or update product-level context: new product framing, existing PRD update, cross-feature constraint surfaced.
-
-Route elsewhere when:
+Not for:
 
 - Scope is one feature → `ad-spec` (Layer 4).
 - Scope is a vocabulary question → `ad-domain` (Layer 2).
@@ -23,6 +20,8 @@ Route elsewhere when:
 - Scope is fuzzy and needs interview-before-research → `ad-grill-me`, which can route back here once the product framing is sharp.
 
 A spike or one-off change does not need a PRD. If the user invokes `ad-prd`, their request establishes that a durable product contract is in scope; write only the scope the work needs.
+
+First run `node .agents/skills/ad-project-state/scripts/project-state.mjs --process` (ADR-0097). When `lifecycleOwner` is `external`, the team's own delivery process owns the product record and `process.records.prd` decides. With `external` or no record, show its `handoff` text and write nothing (name the `ownerLabel` when no handoff is given). With `issue-comment`, draft it in the OS temporary directory, show it, and post it with `gh issue comment` on the work item the owner names only after the owner approves; then delete the draft. With `repo-path`, write the file under its `path`.
 
 Step 1 — codebase-first scan. Before asking a single question, look. The repo often answers half the fields.
 

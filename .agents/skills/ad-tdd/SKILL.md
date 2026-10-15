@@ -1,7 +1,7 @@
 ---
 name: ad-tdd
-description: Test-driven implementation — red, green, refactor with one behavior per test through public interfaces; tracer bullet first, horizontal slicing rejected. Use when implementing behavior that is test-expressible; "TDD", "test first", "write a failing test", "tracer bullet".
-summary: Test-Driven Development per WORKFLOW §16. Red-green-refactor as deterministic LLM guardrail. Five phases — confirm regime, plan, tracer bullet, incremental loop, refactor. Tests verify behavior through public interfaces. Horizontal slicing rejected.
+description: 'Test-driven implementation: red, green, refactor, one behavior per test through public interfaces. Use on "TDD", "test first", "write a failing test".'
+summary: Test-Driven Development per WORKFLOW §16. Red-green-refactor as deterministic LLM guardrail. Four steps — plan, tracer bullet, incremental loop with refactor on green, close-out. Tests verify behavior through public interfaces. Horizontal slicing rejected.
 ---
 
 <background_information>
@@ -13,13 +13,10 @@ Good tests read like a specification. *"User can checkout with a valid cart"* te
 
 Distinction from `ad-tdg`: TDD focuses on driving code through one test at a time (behavior-known regime); TDG picks between three implementation candidates against one ground-truth pair (technique-known, implementation-strategy-uncertain regime). When both apply, use TDD as the outer loop and invoke `ad-tdg` inside the GREEN phase to pick the implementation strategy for that test cycle.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire when the user mentions TDD, red-green-refactor, test-first, tracer bullet, or behavior-not-implementation, invoke this skill manually.
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. TDD is for the *behavior-known, test-expressible* regime. Run the skill when the change has a clear behavior to express as a test up front (a new API capability, a bug-driven regression test, a refactor with a known contract) AND a test runner is wired.
-
-Route elsewhere when:
+Not for:
 
 - The outcome is known but the *implementation strategy* has multiple plausible paths → `ad-tdg` (WORKFLOW §9).
 - The *technique itself* is uncertain across multiple plausible approaches → `ad-spike` (WORKFLOW §14).
@@ -28,10 +25,10 @@ Route elsewhere when:
 
 Step 1 — plan vertically. Before writing a test or a line of code:
 
-- Read `CONTEXT.md` if it exists — anchor test names and interface vocabulary in the project's ubiquitous language.
+- Read `CONTEXT.md` if it exists — anchor test names and interface vocabulary in the project's ubiquitous language. When a domain term changes, the model changed: rename the tests with the code.
 - Confirm the public interface. What is the smallest surface the caller needs to know? Types, ordering constraints, error modes.
 - Identify deepening opportunities (small interface over deep implementation per WORKFLOW §8). Surface-area-light interfaces are easier to test against and survive refactors.
-- List the behaviors to test, not the implementation steps. Pick the **first** behavior — the one that proves end-to-end the path works. The rest are deferred until the tracer bullet lands.
+- List the behaviors to test, not the implementation steps. Pick the **first** behavior — the one that proves end-to-end the path works. The rest wait on the list until the tracer bullet lands; add behaviors the cycles reveal.
 - Stateful unit: write the state × event table. When the unit keeps state between calls (a tracker, latch, observer, coordinator), list every state, every event that can reach it, and the same-instant, tie, and inclusive/exclusive boundary variant of each before the first test. Each cell becomes a behavior in the list or an explicit N/A with its reason. Review passes over a new state machine find the next unlisted cell one round at a time; the table finds them up front.
 - Test Dependency Map (TDM) for existing code. If the change modifies existing code, list the tests already covering the surface and run them to establish the green baseline. New-code changes skip the TDM and write the first test fresh.
 - Get user approval on the plan. One sentence — "I'll test behavior X first via interface Y, then iterate."
@@ -49,6 +46,7 @@ Step 3 — incremental loop. For each remaining behavior:
 
 - RED: write the next test → run → fail.
 - GREEN: add minimum code to pass → run → green.
+- REFACTOR: optional, on green → run after each step → still green.
 
 Rules:
 
@@ -57,10 +55,12 @@ Rules:
 - Only enough code to pass the current test. Anticipating the next test bloats the implementation and couples it to assumptions not yet verified.
 - Tests verify behavior through public interfaces. No private-method tests, no internal-collaborator mocks, no direct database/file-system assertions when the public interface is what the caller uses. If a test would couple to implementation, surface it and prompt — either rewrite to the public surface or accept the coupling explicitly with rationale in the task notes.
 - Keep the test name behavior-shaped. *"user can sign in with valid credentials"* — yes. *"calls authenticate() with username arg"* — no.
+- Refactor on green, every cycle. Once the test passes, tidy what this cycle touched — names, structure, a helper — and rerun after each step. Never refactor while RED.
+- Duplication is a hint, not a command. Remove it when it obscures intent; leave it while a third case has not shown the right shape.
+- Add each test you discover to the list. Making a test pass often reveals another behavior or edge case; write it on the list, do not chase it mid-cycle.
 
-Step 4 — refactor. Once all planned tests pass:
+Step 4 — close-out. When the list is empty:
 
-- Extract duplication when two tests duplicate setup or two code paths duplicate logic.
 - Deepen — move complexity behind a smaller interface (WORKFLOW §8 vocabulary). The deletion test applies: a module whose interface is nearly as complex as its implementation is shallow; refactor toward depth.
 - Apply SOLID where natural; never force-fit a pattern.
 - Consider what the new code reveals about the existing code — opportunities to deepen pre-existing shallow modules surface during TDD because the new tests pin behavior the old code was implicitly relying on.
@@ -81,7 +81,7 @@ Interview UX: for plan approval and coupling-acceptance prompts, use Codex's `re
 </instructions>
 
 <output_contract>
-No file written. Output is structured conversation: regime confirmation, vertical plan (interface + behaviors-to-test + first behavior + approval), tracer bullet (test + red + minimum code + green), per-behavior incremental loop, refactor pass with rationale, per-cycle checklist confirmation.
+No file written. Output is structured conversation: vertical plan (interface + behaviors-to-test + first behavior + approval), tracer bullet (test + red + minimum code + green), per-behavior incremental loop with refactor on green, close-out with rationale, per-cycle checklist confirmation.
 
 When the change is committed, the behaviors covered, the deepening that surfaced, and the rejected couplings (if any) go into the commit message body. When a task file exists, the same content lands in the task's `Notes` log under a dated entry.
 

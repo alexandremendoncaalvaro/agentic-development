@@ -1,6 +1,6 @@
 ---
 name: ad-release
-description: "Orchestrate one npm package release (release script, release PR, tag, npm publish, GitHub Release) behind one digest-bound approval from the owner, with per-stage fallback and state-aware resume. Use on \"release this package\", \"publish to npm\", \"prepare a release\", \"resume the release\", \"create the GitHub Release\"."
+description: 'Release one npm package: release script, PR, tag, publish, GitHub Release, behind one approval. Use on "release this package", "publish to npm", "resume the release".'
 summary: Safely orchestrate a single npm package release through its configured release script, PR, tag, npm publish, and GitHub Release with one digest-bound approval and state-aware recovery.
 ---
 
@@ -11,7 +11,7 @@ Only one root npm package released through GitHub is supported. It never switche
 </background_information>
 
 <instructions>
-Step 0 — confirm regime. Run for a release-ready root npm package when the user asks to prepare a release, publish a tagged version, create its GitHub Release, or resume a partial release.
+Step 0 — preconditions. Run for a release-ready root npm package when the user asks to prepare a release, publish a tagged version, create its GitHub Release, or resume a partial release.
 
 Stop without mutation when the repository lacks `package.json`, `package-lock.json`, `CHANGELOG.md`, a GitHub remote, `package.json#scripts.release`, or explicit `package.json#publishConfig.tag`. The configured script must accept `patch`, `minor`, `major`, or `prerelease` and `--dry-run`. Route a repository without that contract to its maintainer; do not invent a release script.
 
@@ -23,7 +23,7 @@ Before the first effect, call the planner without `confirmation`. Surface its co
 
 A changed target or effect yields a digest mismatch and is a hard no-run boundary. After a failed or interrupted command, inspect external state first. Reuse the same plan approval when the effect did not occur and the recomputed digest still matches; never turn a retry into another content-free approval prompt. Ambiguous irreversible state still stops for diagnosis.
 
-Phase 1 — plan. Before every effect, report the current branch and worktree state, package name and configured publish tag, `[Unreleased]` readiness, release-script dry-run result for a new release, local/remote tag state, merged-base reachability, npm package version state, and GitHub Release state. Run `npm pack --dry-run` to show the publish surface. For a resume, verify the named tag is annotated and identify its release commit and package version; refuse an ambiguous or mismatched tag.
+Phase 1 — plan. Before every effect, report the current branch and worktree state, package name and configured publish tag, `[Unreleased]` readiness, release-script dry-run result for a new release, local/remote tag state, merged-base reachability, npm package version state, and GitHub Release state. Run `npm pack --dry-run` to show the publish surface. Run `npm profile get --json` and warn when `tfa.mode` is not `auth-and-writes`: the npm one-time password is the barrier an agent cannot forge, and it covers a publish only in that mode. An approved plan leaves a release receipt in the git directory every worktree shares (`releaseReceipt` in the planner output); the `ad-hooks` receipt gate reads it in shadow before `npm publish` and the GitHub release (ADR-0096). For a resume, verify the named tag is annotated and identify its release commit and package version; refuse an ambiguous or mismatched tag.
 
 Phase 2 — local release. Show the exact command and its postcondition. Run it when the planner returns it under the plan-wide receipt; otherwise request the per-stage confirmation:
 

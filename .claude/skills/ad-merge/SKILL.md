@@ -1,6 +1,6 @@
 ---
 name: ad-merge
-description: Check a pull request (CI, review, mergeability), merge once the owner confirms. Use on "merge this PR".
+description: 'Check a pull request (CI, review, mergeability), merge once the owner confirms. Use on "merge this PR".'
 summary: Evaluate and merge a GitHub pull request. Four phases — preflight, evaluate (CI / fresh-context review / linked task / unresolved comments / mergeability), decision (CI green = hard gate; others = warnings), merge with auto-detected mode + `--delete-branch`.
 allowed-tools: Read, Bash, Grep
 ---
@@ -9,16 +9,11 @@ allowed-tools: Read, Bash, Grep
 
 Implements ADR-0025. Evaluates a PR's mergeability and performs the merge via `gh pr merge`. CI green is the only hard gate; everything else surfaces as a warning the senior engineer decides on.
 
-## Phase 0 — Confirm regime
+## Phase 0 — Scope
 
 This skill is model-invocable (ADR-0084): the agent may run it when a pull request is ready, and the merge stays behind the owner's approval given in this session: Phase 3 asks once, recommended answer first, on every path a valid release-plan receipt does not already cover.
 
-Run when:
-
-- A PR is open against the repo and the user wants to land it.
-- The user asks "merge this PR", "evaluate the PR", "is it mergeable".
-
-Route elsewhere when:
+Not for:
 
 - No PR exists yet → `/ad-pr` first.
 - Commits are not on the branch yet → `/ad-commit` first.

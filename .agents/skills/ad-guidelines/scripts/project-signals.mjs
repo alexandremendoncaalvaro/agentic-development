@@ -27,8 +27,16 @@ const STACK_MARKERS = [
   ['dart', ['pubspec.yaml']],
 ];
 const TRIVIAL = new Set([
-  '.git', 'node_modules', '.DS_Store', '.idea', '.vscode', '.gitignore',
-  '.gitattributes', 'README.md', 'LICENSE', 'LICENSE.md',
+  '.git',
+  'node_modules',
+  '.DS_Store',
+  '.idea',
+  '.vscode',
+  '.gitignore',
+  '.gitattributes',
+  'README.md',
+  'LICENSE',
+  'LICENSE.md',
 ]);
 
 function code(error) {
@@ -58,7 +66,12 @@ function rootEntries(repoRoot, unreadable) {
 }
 
 function isTrivial(name) {
-  return name.startsWith('.') || name.startsWith('.env') || name.startsWith('LICENSE') || TRIVIAL.has(name);
+  return (
+    name.startsWith('.') ||
+    name.startsWith('.env') ||
+    name.startsWith('LICENSE') ||
+    TRIVIAL.has(name)
+  );
 }
 
 function detectMode(repoRoot, document, unreadable) {
@@ -68,9 +81,9 @@ function detectMode(repoRoot, document, unreadable) {
 }
 
 function detectStacks(repoRoot, unreadable) {
-  return STACK_MARKERS
-    .filter(([, markers]) => markers.some((marker) => isFile(repoRoot, marker, unreadable)))
-    .map(([stack]) => stack);
+  return STACK_MARKERS.filter(([, markers]) =>
+    markers.some((marker) => isFile(repoRoot, marker, unreadable))
+  ).map(([stack]) => stack);
 }
 
 /**
@@ -89,7 +102,9 @@ export function projectSignals({ repoRoot, document }) {
 
 function main() {
   const [document = 'AGENTS.md'] = process.argv.slice(2);
-  process.stdout.write(`${JSON.stringify(projectSignals({ repoRoot: process.cwd(), document }), null, 2)}\n`);
+  process.stdout.write(
+    `${JSON.stringify(projectSignals({ repoRoot: process.cwd(), document }), null, 2)}\n`
+  );
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

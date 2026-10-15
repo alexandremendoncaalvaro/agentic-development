@@ -1,6 +1,6 @@
 ---
 name: ad-roadmap
-description: Read-only roadmap report — reconciles roadmap tiers against specs and tasks, then explains the main delivery front, current work, next front, blockers, and progress as a plain-language Markdown checklist. Use on "how much is done", "are we on track", "progress report", "percent complete", "what's shipped".
+description: 'Read-only roadmap progress report reconciling specs and tasks: delivered and remaining work as a checklist. Use on "roadmap", "how much is done", "are we on track", "progress report".'
 summary: Read-only roadmap report that reconciles specs and tasks, composes the canonical decision-maker brief, then adds a project- or task-scoped checklist of delivered and remaining work.
 ---
 
@@ -9,7 +9,6 @@ Read-only progress report for a decision-maker or newcomer. It answers: what are
 
 `ad-next` answers a different question: what the practitioner should do next. `ad-prd` authors or changes the roadmap. Do not absorb either responsibility.
 
-Codex auto-trigger on description keywords is less mature than Claude Code's. If auto-invocation does not fire for a roadmap-progress question, invoke this skill manually.
 </background_information>
 
 <instructions>

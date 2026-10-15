@@ -1,6 +1,6 @@
 ---
 name: ad-review
-description: Two-axis fresh-context code review (Standards against AGENTS.md and ADRs; Spec against the originating task) run on Codex as one inline pass and audit trail, findings side by side, no approve verdict. Use before merging a diff, branch, or PR; "review this", "review main..HEAD", "senior review".
+description: 'Fresh-context code review on two axes, standards and spec, findings side by side. Use before merging a diff, branch or PR; "review this", "review main..HEAD".'
 summary: Two-axis code review per WORKFLOW §10. Claude Code uses fresh-context subagents; Codex writes an audit trail, reviews inline by default, and ships a reviewer subagent for explicit escalation.
 ---
 
@@ -52,7 +52,9 @@ Running ad-review (Codex single-pass two-axis). I will read the diff and binding
 NOTE on §10 fidelity: a single-session reviewer with both axes loaded can rationalize across them (axis-bleed). If any Standards finding I produce touches a binding doc (AGENTS / ARCHITECTURE / GUIDELINES / CONTEXT / ADR), I will recommend the user-initiated subagent escalation at Step 7 so you can re-run that finding under fresh context. The escalation TOML schema is at the bottom of this skill.
 ```
 
-Step 1 — scope the review. Confirm what to review. Default scopes, in priority order:
+Step 1 — scope the review. **Read the coverage ledger first (ADR-0091).** Before choosing a scope, list what already covers this work: the receipts under `.agentic/reviews/` (each `*-verdicts.md` with its `Target-SHA:`, and audit summaries), the task's Notes, and the pull request's reviews, a harness's or review bot's included. A record counts as coverage when it names the code state, the rules or criteria applied, the findings and their dispositions. State in one line what is covered and review only the remainder. When a covered review targets an ancestor of the range end, the scope is the delta `<covered SHA>..<range end>`: carry each prior finding with its disposition, and review the changed lines plus the code they interact with. A changed design or integration boundary reopens the coverage it touches. Never re-run a review over a state a receipt already covers.
+
+Then confirm what to review. Default scopes, in priority order:
 1. User-named ref or PR (`ad-review main..HEAD`, `ad-review <commit-sha>`).
 2. Current branch vs `main` (`git diff main...HEAD`).
 3. Working-tree changes (`git diff` plus `git diff --staged`).
@@ -169,7 +171,7 @@ Aggregate: <N Standards Blockers, M Standards Concerns> / <P Spec Blockers, Q Sp
 
 Do NOT synthesize an overall "approve" verdict. §10 frames the review as adversarial; the senior engineer weighs the findings.
 
-Before printing, persist the same two sections verbatim to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the audit-trail file. Begin the file with one line, `Target-SHA: <full SHA>`, naming the commit at the end of the reviewed range (`git rev-parse <range end>`, never a later `HEAD`), or `Target-SHA: none (working tree)` for uncommitted work. That line is the review receipt `ad-hooks`' shadow receipt gate reads before `gh pr create`, `gh pr ready` and `gh pr merge` (ADR-0089): it counts while the commit's tree equals `HEAD`'s or differs only in receipt-neutral paths, and a working-tree review never counts. The audit trail proves what the reviewer was given; only the persisted output proves what the review found. Write it at review time, never as a reconstruction afterwards. The file is a contemporaneous artifact on the reviewing machine, not durable evidence: `.agentic/reviews/` is gitignored by design. A "review found X" claim that must outlive the machine quotes the finding into the tracked record (the task's Notes, the pull request) or carries an OPEN QUESTION label.
+Before printing, persist the same two sections verbatim to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the audit-trail file. Begin the file with one line, `Target-SHA: <full SHA>`, naming the commit at the end of the reviewed range (`git rev-parse <range end>`, never a later `HEAD`), or `Target-SHA: none (working tree)` for uncommitted work. A delta review writes a second line, `Base-SHA: <covered SHA>`, naming the covered review it continues; the gate counts it only when that base is an ancestor of the target and an earlier review receipt covers it. That line is the review receipt `ad-hooks`' shadow receipt gate reads before `gh pr create`, `gh pr ready` and `gh pr merge` (ADR-0089): it counts while the commit's tree equals `HEAD`'s or differs only in receipt-neutral paths, and a working-tree review never counts. The audit trail proves what the reviewer was given; only the persisted output proves what the review found. Write it at review time, never as a reconstruction afterwards. The file is a contemporaneous artifact on the reviewing machine, not durable evidence: `.agentic/reviews/` is gitignored by design. A "review found X" claim that must outlive the machine quotes the finding into the tracked record (the task's Notes, the pull request) or carries an OPEN QUESTION label.
 
 Step 7 — recommend escalation when binding-doc findings exist. Scan the Step 6 output. For each Standards-axis finding (Blocker, Concern, or Note), check whether its `file:line` reference resolves to any of:
 
@@ -208,7 +210,7 @@ Do not silently spawn the agent yourself. The user must explicitly request the e
 
 ## Next
 
-- Address every Standards Blocker before merge — that's the code-quality hard gate. Re-run `ad-review` on the fix to confirm it cleared.
+- Address every Standards Blocker before merge — that's the code-quality hard gate. Review the fix as a delta (`<reviewed SHA>..HEAD`, with its `Base-SHA:` line) to confirm it cleared; never re-run the full range.
 - Address Spec Blockers next — implementation-vs-spec drift is the second hard gate.
 - Each Concern (from either axis) becomes a follow-up `ad-task`; do not let them silently accumulate.
 - Notes are informational; close them out in the original task's `Notes` log if relevant.

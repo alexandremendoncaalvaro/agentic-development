@@ -1,6 +1,6 @@
 ---
 name: ad-tdg
-description: Outcome-based implementation — given input and expected output, generate three strategies and pick one by a single criterion; Test Dependency Map before modifying. Use when the outcome is known but the strategy is not; "TDG", "three approaches", "pick by criterion", "which tests cover this".
+description: 'Outcome-based implementation: from an input and expected output, try three strategies and pick by one criterion. Use on "TDG", "three approaches", "which tests cover this".'
 summary: Outcome-based prompting per WORKFLOW §9. Ground truth pair + Test Dependency Map + three approaches + single-criterion selection, when the technique is known but the implementation strategy is uncertain.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
@@ -14,14 +14,7 @@ Implements WORKFLOW.md §9 (Outcome-Based Prompting / Test Dependency Map) end-t
 - **Never edit the TDM tests to make them pass** — they are the verification surface; changing them while implementing is the hidden "almost right" WORKFLOW §12 names. If a test is wrong, fix it first as a separate diff.
 - **Type-check passing is not the gate — the test gate is.** Do not declare done before the TDM tests are green.
 
-## Step 0 — Confirm regime
-
-TDG is for the *technique-known, implementation-strategy-uncertain* regime. Run the skill only when:
-
-* The canonical approach is settled (via `ad-ground` or prior knowledge), AND
-* Multiple implementation strategies could produce the expected output with different trade-offs along readability / performance / testability axes.
-
-Route elsewhere when:
+## Not for
 
 * The *technique itself* is uncertain across multiple plausible approaches → `/ad-spike` (WORKFLOW §14). Spike validates technique with golden fixture + per-stage debug; TDG validates implementation with ground-truth pair + TDM.
 * The path is fully obvious (one-line fix, mechanical refactor, byte-for-byte port) → TDG is overkill; proceed directly without the skill.
@@ -115,12 +108,11 @@ Verification rules:
 
 No file written. Output is structured conversation:
 
-1. Confirmation of regime (Step 0 — TDG or routed elsewhere).
-2. Ground-truth pair (Step 1).
-3. TDM list with green-baseline confirmation (Step 2).
-4. Three candidates with trade-off table (Step 3).
-5. Selection by criterion + rejection notes (Step 4).
-6. Implementation + verification result (Step 5).
+1. Ground-truth pair (Step 1).
+2. TDM list with green-baseline confirmation (Step 2).
+3. Three candidates with trade-off table (Step 3).
+4. Selection by criterion + rejection notes (Step 4).
+5. Implementation + verification result (Step 5).
 
 When the change is committed, the ground-truth pair, criterion, and rejection notes go into the commit message body. When a task file exists, the same content also lands in the task's `Notes` log under a dated entry.
 
