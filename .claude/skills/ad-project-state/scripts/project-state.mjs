@@ -17,6 +17,11 @@ const ISSUE_FIELDS = 'number,title,url,state,updatedAt,labels,assignees';
 const PULL_REQUEST_FIELDS =
   'number,title,url,state,updatedAt,isDraft,reviewDecision,labels,assignees,headRefName';
 const NODE_SCRIPT = /\.[cm]?js$/i;
+const SCHEMA_VERSIONS = new Set([1, 2]);
+const LIFECYCLE_OWNERS = new Set(['kit', 'external']);
+const RECORD_KINDS = ['research', 'adr', 'task', 'spec', 'prd'];
+const DESTINATIONS = new Set(['repo-path', 'issue-comment', 'external']);
+const NAMINGS = new Set(['sequence', 'date']);
 
 function isFile(path) {
   try {
@@ -214,25 +219,112 @@ function validateSources(sources) {
   return null;
 }
 
+function singleLine(value, max) {
+  return (
+    typeof value === 'string' && value.trim() !== '' && value.length <= max && !/[\r\n]/.test(value)
+  );
+}
+
+function validateRecord(kind, record) {
+  const at = `process.records.${kind}`;
+  if (!plainObject(record)) return `${at} must be an object`;
+  const extra = unknownField(record, ['destination', 'path', 'naming', 'handoff']);
+  if (extra) return `${at} has unknown field ${extra}`;
+  if (!DESTINATIONS.has(record.destination)) return `${at}.destination is invalid`;
+  if (
+    record.path !== undefined &&
+    (!singleLine(record.path, 200) ||
+      /^([A-Za-z]:)?[\\/]/.test(record.path) ||
+      record.path.split(/[\\/]/).includes('..'))
+  ) {
+    return `${at}.path must be a relative path inside the repository`;
+  }
+  if (record.naming !== undefined && !NAMINGS.has(record.naming)) {
+    return `${at}.naming must be sequence or date`;
+  }
+  if (record.handoff !== undefined && !singleLine(record.handoff, 512)) {
+    return `${at}.handoff must be a single-line string up to 512 characters`;
+  }
+  return null;
+}
+
+function validateStages(stages) {
+  if (!Array.isArray(stages) || stages.length > 50)
+    return 'process.stages must be an array of up to 50';
+  const labels = new Set();
+  for (let index = 0; index < stages.length; index += 1) {
+    const stage = stages[index];
+    const at = `process.stages[${index}]`;
+    if (!plainObject(stage)) return `${at} must be an object`;
+    const extra = unknownField(stage, ['label', 'stage', 'next']);
+    if (extra) return `${at} has unknown field ${extra}`;
+    if (!singleLine(stage.label, 100)) return `${at}.label is invalid`;
+    if (!singleLine(stage.stage, 64)) return `${at}.stage is invalid`;
+    if (stage.next !== undefined && !singleLine(stage.next, 512)) return `${at}.next is invalid`;
+    if (labels.has(stage.label)) return `${at}.label duplicates an earlier stage`;
+    labels.add(stage.label);
+  }
+  return null;
+}
+
+// The delivery process (ADR-0097): declarative text and choices only; the
+// kit shows `handoff` and `next`, never interprets or runs them.
+function validateProcess(process, schemaVersion) {
+  if (process === undefined) return null;
+  if (schemaVersion !== 2) return 'process requires schemaVersion 2';
+  if (!plainObject(process)) return 'process must be an object';
+  const extra = unknownField(process, [
+    'lifecycleOwner',
+    'ownerLabel',
+    'records',
+    'stages',
+    'readMilestone',
+  ]);
+  if (extra) return `process has unknown field ${extra}`;
+  if (!LIFECYCLE_OWNERS.has(process.lifecycleOwner)) {
+    return 'process.lifecycleOwner must be kit or external';
+  }
+  if (process.ownerLabel !== undefined && !singleLine(process.ownerLabel, 64)) {
+    return 'process.ownerLabel must be a single-line string up to 64 characters';
+  }
+  if (process.records !== undefined) {
+    if (!plainObject(process.records)) return 'process.records must be an object';
+    const kind = unknownField(process.records, RECORD_KINDS);
+    if (kind) return `process.records has unknown kind ${kind}`;
+    for (const [name, record] of Object.entries(process.records)) {
+      const failure = validateRecord(name, record);
+      if (failure) return failure;
+    }
+  }
+  if (process.stages !== undefined) {
+    const failure = validateStages(process.stages);
+    if (failure) return failure;
+  }
+  if (process.readMilestone !== undefined && typeof process.readMilestone !== 'boolean') {
+    return 'process.readMilestone must be a boolean';
+  }
+  return null;
+}
+
 function validateProjectConfig(config) {
   if (!plainObject(config)) return 'configuration must be an object';
-  const extra = unknownField(config, ['schemaVersion', 'sources']);
+  const extra = unknownField(config, ['schemaVersion', 'process', 'sources']);
   if (extra) return `unknown field ${extra}`;
-  if (config.schemaVersion !== 1) return 'schemaVersion must be 1';
-  return validateSources(config.sources);
+  if (!SCHEMA_VERSIONS.has(config.schemaVersion)) return 'schemaVersion must be 1 or 2';
+  return validateProcess(config.process, config.schemaVersion) || validateSources(config.sources);
 }
 
 function validateMachineConfig(config) {
   if (!plainObject(config)) return 'configuration must be an object';
   const extra = unknownField(config, ['schemaVersion', 'projects']);
   if (extra) return `unknown field ${extra}`;
-  if (config.schemaVersion !== 1) return 'schemaVersion must be 1';
+  if (!SCHEMA_VERSIONS.has(config.schemaVersion)) return 'schemaVersion must be 1 or 2';
   if (!Array.isArray(config.projects)) return 'projects must be an array';
   const remotes = new Set();
   for (let index = 0; index < config.projects.length; index += 1) {
     const project = config.projects[index];
     if (!plainObject(project)) return `project[${index}] must be an object`;
-    const projectExtra = unknownField(project, ['match', 'sources']);
+    const projectExtra = unknownField(project, ['match', 'process', 'sources']);
     if (projectExtra) return `project[${index}] has unknown field ${projectExtra}`;
     if (!plainObject(project.match)) return `project[${index}].match must be an object`;
     const matchExtra = unknownField(project.match, ['remote']);
@@ -244,6 +336,8 @@ function validateMachineConfig(config) {
       return `project[${index}].match.remote duplicates an earlier entry`;
     }
     remotes.add(project.match.remote);
+    const processFailure = validateProcess(project.process, config.schemaVersion);
+    if (processFailure) return `project[${index}] ${processFailure}`;
     const sourcesFailure = validateSources(project.sources);
     if (sourcesFailure) return `project[${index}] ${sourcesFailure}`;
   }
@@ -261,6 +355,7 @@ function projectConfiguration(repoRoot) {
   return {
     detail,
     sources: message ? null : loaded.value.sources,
+    process: message ? null : (loaded.value.process ?? null),
     failure: message ? configurationFailure(relativePath, 'INVALID_CONFIGURATION', message) : null,
   };
 }
@@ -292,6 +387,7 @@ function machineConfiguration(repoRoot, environment) {
   return {
     detail: { ...detail, matchedRemote: project.match.remote },
     sources: project.sources,
+    process: project.process ?? null,
     failure: null,
   };
 }
@@ -336,7 +432,14 @@ function githubFailure(sourceId, probe, code) {
   return { sourceId, probe, code };
 }
 
-function githubSource(source, observedAt, repoRoot, environment) {
+// The first configured stage whose label the issue carries, in configuration
+// order, so a team decides which stage wins when an issue has two.
+function issueStage(issue, stages) {
+  const names = new Set((issue.labels ?? []).map((label) => label?.name));
+  return stages.find((stage) => names.has(stage.label)) ?? null;
+}
+
+function githubSource(source, observedAt, repoRoot, environment, process) {
   const gh = environment.AGENTIC_GH || 'gh';
   const githubEnvironment = cleanGitEnvironment({ ...environment, GH_HOST: source.host });
   const base = {
@@ -376,13 +479,20 @@ function githubSource(source, observedAt, repoRoot, environment) {
   const failures = [];
   let successfulQueries = 0;
   if (source.issues !== undefined) {
+    const fields = process?.readMilestone ? `${ISSUE_FIELDS},milestone` : ISSUE_FIELDS;
     const issues = commandArray(
       gh,
-      listArguments('issue', source, source.issues, ISSUE_FIELDS),
+      listArguments('issue', source, source.issues, fields),
       repoRoot,
       githubEnvironment
     );
     base.issues = issues.value.slice(0, source.issues.limit);
+    if (process?.stages) {
+      base.issues = base.issues.map((issue) => ({
+        ...issue,
+        stage: issueStage(issue, process.stages),
+      }));
+    }
     if (issues.code) failures.push(githubFailure(source.id, 'gh issue list', issues.code));
     else successfulQueries += 1;
   }
@@ -405,9 +515,24 @@ function githubSource(source, observedAt, repoRoot, environment) {
   return { source: base, failures };
 }
 
-export function projectStateReport({ repoRoot = process.cwd(), environment = process.env } = {}) {
+export function projectStateReport({
+  repoRoot = process.cwd(),
+  environment = process.env,
+  processOnly = false,
+} = {}) {
   const observedAt = new Date().toISOString();
   const configured = projectConfiguration(repoRoot) || machineConfiguration(repoRoot, environment);
+  const deliveryProcess = configured?.failure ? null : (configured?.process ?? null);
+  const configuration = configured?.detail || { layer: 'default', path: null, matchedRemote: null };
+  if (processOnly) {
+    return {
+      schemaVersion: 1,
+      observedAt,
+      configuration,
+      process: deliveryProcess,
+      failures: configured?.failure ? [configured.failure] : [],
+    };
+  }
   const sources = configuredSources(configured);
   const repository = sources.find((source) => source.type === 'repository');
   const fallbackRole = configured?.failure ? 'primary' : 'supporting';
@@ -417,7 +542,7 @@ export function projectStateReport({ repoRoot = process.cwd(), environment = pro
 
   if (!configured?.failure) {
     for (const source of sources.filter((candidate) => candidate.type === 'github')) {
-      const resolved = githubSource(source, observedAt, repoRoot, environment);
+      const resolved = githubSource(source, observedAt, repoRoot, environment, deliveryProcess);
       resolvedSources.push(resolved.source);
       failures.push(...resolved.failures);
     }
@@ -426,11 +551,8 @@ export function projectStateReport({ repoRoot = process.cwd(), environment = pro
   return {
     schemaVersion: 1,
     observedAt,
-    configuration: configured?.detail || {
-      layer: 'default',
-      path: null,
-      matchedRemote: null,
-    },
+    configuration,
+    process: deliveryProcess,
     sources: resolvedSources,
     checkout: checkoutState(repoRoot, environment),
     failures,
@@ -438,7 +560,8 @@ export function projectStateReport({ repoRoot = process.cwd(), environment = pro
 }
 
 function main() {
-  process.stdout.write(`${JSON.stringify(projectStateReport(), null, 2)}\n`);
+  const processOnly = process.argv.slice(2).includes('--process');
+  process.stdout.write(`${JSON.stringify(projectStateReport({ processOnly }), null, 2)}\n`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

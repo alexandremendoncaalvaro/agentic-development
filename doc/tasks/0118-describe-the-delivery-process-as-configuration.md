@@ -22,12 +22,12 @@ example.
 
 ## Acceptance Criteria
 
-- [ ] `.agentic/project-sources.json` (project and machine layers) accepts
+- [x] `.agentic/project-sources.json` (project and machine layers) accepts
   `schemaVersion` 2 with an optional `process` block: the lifecycle owner (`kit`
   or `external`), an owner label, per-record destinations, issue stages read from
   labels, and milestone reading; version 1 and an absent block behave exactly as
   before (tests).
-- [ ] `ad-project-state` reports the resolved process, annotates each issue with
+- [x] `ad-project-state` reports the resolved process, annotates each issue with
   its first matching stage and the configured next step, reads milestones when
   asked, and prints the process alone offline with `--process` (tests).
 - [ ] Records go where the process says: configured directories in the ground
@@ -44,7 +44,7 @@ example.
 
 ## Plan
 
-- [ ] PR 1: schema version 2, the `process` block, stages, milestone and
+- [x] PR 1: schema version 2, the `process` block, stages, milestone and
   `--process` in the resolver; docs and the generic example; ADR-0097.
 - [ ] PR 2: record destinations in the validator, the artifact gate and the
   cited-record check; ADR date naming; issue-comment drafting.
@@ -62,3 +62,14 @@ Planned from the kit audit of 2026-10-15; the owner approved doing every
 remaining package and set the principle on 2026-10-15: the kit stays generic and
 methodology-agnostic, works well with SLIM as one configuration, and never ties
 itself to it. The real SLIM block stays in the owner's machine layer.
+
+### 2026-10-15 — PR 1, the process block
+
+Five resolver tests went red, then green: version 1 reports no process; a
+version 2 process is reported and each issue carries its first configured
+stage and its milestone; a process under version 1, with an unknown field, an
+unknown destination or an unknown owner is invalid; `--process` prints the
+process without running the GitHub CLI; a matching machine entry may carry a
+process. The existing "unsupported schema" case moved from version 2 to 3,
+the contract change ADR-0097 decides. The configuration reference documents
+the block with the generic issue-staged example.

@@ -21,6 +21,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   when the npm account's two-factor mode does not cover writes. The `ad-hooks` receipt
   gate logs a shadow `release` check before `npm publish` and the GitHub
   release (task-0122, ADR-0096).
+- `.agentic/project-sources.json` accepts `schemaVersion` 2 with an optional
+  `process` block describing the team's delivery process: who owns the
+  lifecycle, where each kind of record goes, issue stages by label and
+  milestone reading. `ad-project-state` reports it, marks each issue's stage
+  and prints the process alone with `--process` (task-0118, ADR-0097).
 
 ### Changed
 

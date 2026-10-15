@@ -578,15 +578,15 @@
         },
         {
           "path": ".agents/skills/ad-project-state/references/configuration.md",
-          "sourceSha": "bffb1c1627ec1459db5e480464f80ca53253084d8d3188f28581133819780b7c"
+          "sourceSha": "8756d11471125fa37c27ed4ba67a5ba8294b372aead4b50989b03d3fa0aed948"
         },
         {
           "path": ".agents/skills/ad-project-state/scripts/project-state.mjs",
-          "sourceSha": "2dc7bf19d4972bfba116108bd7a557ec722f782cb95c850710a722c6852fa19e"
+          "sourceSha": "98dd34f280808c3fce6450fb960c2534dcb6462d7e98c32ae8a7d1e1cfad0736"
         },
         {
           "path": ".agents/skills/ad-project-state/SKILL.md",
-          "sourceSha": "519a1706c9d1a0b951ced148592f66015347b5fe0ff6d0a45aeedc5feda667ec"
+          "sourceSha": "0b67d463b80e054aa175fbc4b76d38087eec24af4bedf803fc54d2ed0affaa8e"
         }
       ]
     },
