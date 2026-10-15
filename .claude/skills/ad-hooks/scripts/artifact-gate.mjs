@@ -24,10 +24,9 @@
  *     validate-plan.mjs; anything else, including a `RESEARCH-` study, is
  *     unowned and silent (GROUND-0027 E4). When a delivery process
  *     configures another research directory (`process.records.research`
- *     with `repo-path` in `.agentic/project-sources.json`, project layer or
- *     the machine entry matching the `origin` remote; ADR-0097), that
- *     directory replaces `doc/research/` and only `GROUND-` records are
- *     routed there, validated with `--dir`.
+ *     with `repo-path`, read through ad-project-state's resolver; ADR-0097),
+ *     `GROUND-` records there are routed too, validated with `--dir`;
+ *     `doc/research/` stays governed as before.
  *   - Terminal states: `validator-failed` and `runtime-unavailable` exit 2
  *     with stderr; `validator-passed` exits 0 silently; an unowned or
  *     malformed event exits 0 silently and leaves no evidence.
@@ -45,7 +44,7 @@
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync, rmdirSync, statSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { homedir, tmpdir } from 'node:os';
+import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -66,63 +65,38 @@ const OWNERS = [
 
 const DEFAULT_RESEARCH_DIR = 'doc/research';
 
-function readJson(path) {
+function configuredResearchPath(deliveryProcess) {
+  const record = deliveryProcess?.records?.research;
+  if (record?.destination !== 'repo-path' || typeof record.path !== 'string') return null;
+  const path = record.path
+    .replaceAll('\\', '/')
+    .replace(/\/+$/, '')
+    .replace(/^(\.\/)+/, '');
+  if (!path || /^([A-Za-z]:)?\//.test(path) || path.split('/').includes('..')) return null;
+  return path === DEFAULT_RESEARCH_DIR ? null : path;
+}
+
+/**
+ * The research directory a delivery process configures, read through
+ * ad-project-state's resolver so the gate and the skills agree on one
+ * configuration (ADR-0097), or null. A missing resolver, a failure or an
+ * invalid configuration yields null: the gate fails open on configuration.
+ */
+export function configuredResearchDirectory(cwd, root) {
+  const resolver = join(root, 'ad-project-state', 'scripts', 'project-state.mjs');
+  if (!existsSync(resolver)) return null;
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  const run = spawnSync(process.execPath, [resolver, '--process'], { cwd, env, encoding: 'utf8' });
   try {
-    return JSON.parse(readFileSync(path, 'utf8'));
+    return configuredResearchPath(JSON.parse(run.stdout).process);
   } catch {
     return null;
   }
 }
 
-function originRemotes(cwd) {
-  const env = { ...process.env };
-  delete env.GIT_DIR;
-  delete env.GIT_WORK_TREE;
-  delete env.GIT_INDEX_FILE;
-  const run = spawnSync('git', ['remote', 'get-url', '--all', 'origin'], {
-    cwd,
-    env,
-    encoding: 'utf8',
-  });
-  if (run.status !== 0) return [];
-  return run.stdout
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-function configuredResearchPath(deliveryProcess) {
-  const record = deliveryProcess?.records?.research;
-  if (record?.destination !== 'repo-path' || typeof record.path !== 'string') return null;
-  const path = record.path.replaceAll('\\', '/').replace(/\/+$/, '');
-  if (!path || /^([A-Za-z]:)?\//.test(path) || path.split('/').includes('..')) return null;
-  return path;
-}
-
-/**
- * The research directory records are governed in: the configured one, else
- * `doc/research`. A project file shadows the machine layer; a missing,
- * malformed or unsafe setting keeps the default, since the gate fails open
- * on configuration and `ad-project-state` reports configuration errors.
- */
-export function researchDirectory(cwd, env) {
-  const projectFile = join(cwd, '.agentic', 'project-sources.json');
-  if (existsSync(projectFile)) {
-    const project = readJson(projectFile);
-    return (
-      (project?.schemaVersion === 2 && configuredResearchPath(project.process)) ||
-      DEFAULT_RESEARCH_DIR
-    );
-  }
-  const machine = readJson(
-    env.AGENTIC_PROJECT_SOURCES_FILE ||
-      join(env.HOME || env.USERPROFILE || homedir(), '.agentic', 'project-sources.json')
-  );
-  if (machine?.schemaVersion !== 2 || !Array.isArray(machine.projects)) return DEFAULT_RESEARCH_DIR;
-  const remotes = originRemotes(cwd);
-  const entry = machine.projects.find((project) => remotes.includes(project?.match?.remote));
-  return configuredResearchPath(entry?.process) || DEFAULT_RESEARCH_DIR;
-}
 const PATCH_HEADER = /^\*\*\* (Add File|Update File|Move to): (.+)$/;
 
 /** Sibling-skill root: `<root>/ad-hooks/scripts/artifact-gate.mjs` → `<root>`. */
@@ -161,11 +135,12 @@ export function recoverPaths(event, cwd) {
  * back marked `unreadable` so the gate reports a runtime failure instead of a
  * silent pass (GUIDELINES: never swallow a content-read failure).
  */
-export function resolveOwner(absolutePath, cwd, directory = DEFAULT_RESEARCH_DIR) {
+export function resolveOwner(absolutePath, cwd, configured = null) {
   const rel = relative(cwd, absolutePath);
   if (escapesRepository(rel)) return null;
-  const governed = directory.split('/').join(sep);
-  if (!rel.startsWith(`${governed}${sep}`) || !rel.endsWith('.md')) return null;
+  const inside = (directory) => rel.startsWith(`${directory.split('/').join(sep)}${sep}`);
+  const inConfigured = configured !== null && inside(configured);
+  if (!(inConfigured || inside(DEFAULT_RESEARCH_DIR)) || !rel.endsWith('.md')) return null;
   const path = rel.split(sep).join('/');
   let head;
   try {
@@ -175,12 +150,12 @@ export function resolveOwner(absolutePath, cwd, directory = DEFAULT_RESEARCH_DIR
     if (error.code === 'ENOENT' || error.code === 'ENOTDIR') return null;
     return { id: 'unknown', validator: null, path, unreadable: error.code ?? 'unknown' };
   }
-  const configured = directory !== DEFAULT_RESEARCH_DIR;
   const owner = OWNERS.find(
-    (candidate) => candidate.heading.test(head) && (!configured || candidate.id === 'ground-record')
+    (candidate) =>
+      candidate.heading.test(head) && (!inConfigured || candidate.id === 'ground-record')
   );
   if (!owner) return null;
-  return configured ? { ...owner, path, args: ['--dir', directory] } : { ...owner, path };
+  return inConfigured ? { ...owner, path, args: ['--dir', configured] } : { ...owner, path };
 }
 
 /** Run the owning validator; classify its outcome without interpreting it. */
@@ -383,9 +358,9 @@ function main() {
   let exitCode = 0;
 
   const paths = recoverPaths(event, cwd);
-  const directory = paths.length > 0 ? researchDirectory(cwd, process.env) : DEFAULT_RESEARCH_DIR;
+  const configured = paths.length > 0 ? configuredResearchDirectory(cwd, root) : null;
   for (const absolutePath of paths) {
-    const owner = resolveOwner(absolutePath, cwd, directory);
+    const owner = resolveOwner(absolutePath, cwd, configured);
     if (!owner) continue;
     const result = runValidator({ owner, root, cwd });
     let surfaced = surfacedText(result, owner);

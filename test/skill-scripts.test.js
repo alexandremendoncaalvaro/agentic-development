@@ -5588,9 +5588,15 @@ test('artifact-gate: a configured research directory is governed and the validat
     );
     const defaultRel = join('doc', 'research', '0002-ground-x.md');
     writeFileSync(join(root, defaultRel), '# GROUND-0002: broken\n');
-    const moved = runGate(claudeWriteEvent(root, defaultRel), { root, evidence });
-    assert.equal(moved.status, 0);
-    assert.equal(moved.stderr, '');
+    const stillGoverned = runGate(claudeWriteEvent(root, defaultRel), { root, evidence });
+    assert.equal(
+      stillGoverned.status,
+      2,
+      'doc/research stays governed beside the configured directory'
+    );
+    const prismRel = join('doc', 'research', '0003-prism-x.md');
+    writeFileSync(join(root, prismRel), '# PRISM-0003: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, prismRel), { root, evidence }).status, 2);
   } finally {
     rmSync(root, { recursive: true, force: true });
     rmSync(evidence, { recursive: true, force: true });
@@ -5632,5 +5638,48 @@ test('artifact-gate: a matching machine entry configures the research directory;
     rmSync(root, { recursive: true, force: true });
     rmSync(evidence, { recursive: true, force: true });
     rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: the research directory comes from the resolver, so a ./ path counts and an invalid process does not', () => {
+  for (const [process, governed] of [
+    [researchProcess('./docs/evidence'), true],
+    [{ ...researchProcess('docs/evidence'), unknown: true }, false],
+  ]) {
+    const { root, evidence } = gateRepo();
+    try {
+      mkdirSync(join(root, '.agentic'), { recursive: true });
+      writeFileSync(
+        join(root, '.agentic', 'project-sources.json'),
+        JSON.stringify({
+          schemaVersion: 2,
+          process,
+          sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+        })
+      );
+      mkdirSync(join(root, 'docs', 'evidence'), { recursive: true });
+      const rel = join('docs', 'evidence', '0005-ground-w.md');
+      writeFileSync(join(root, rel), '# GROUND-0005: broken\n');
+      assert.equal(
+        runGate(claudeWriteEvent(root, rel), { root, evidence }).status,
+        governed ? 2 : 0
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+      rmSync(evidence, { recursive: true, force: true });
+    }
+  }
+});
+
+test('validate-record: --dir accepts a ./ prefix', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-dot-'));
+  try {
+    const record = 'docs/evidence/0002-ground-durable-evidence.md';
+    mkdirSync(join(dir, 'docs', 'evidence'), { recursive: true });
+    writeFileSync(join(dir, record), VALID_GROUND_RECORD);
+    const ok = runGroundRecordArgs(dir, [record, '--dir', './docs/evidence']);
+    assert.equal(ok.valid, true, ok.errors.join('; '));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 });

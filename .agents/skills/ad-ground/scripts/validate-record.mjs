@@ -224,14 +224,15 @@ let directory = DEFAULT_DIR;
 let draft = false;
 for (let index = 0; index < args.length; index += 1) {
   if (args[index] === '--draft') draft = true;
-  else if (args[index] === '--dir') directory = normalizedPath(args[(index += 1)] ?? '');
+  else if (args[index] === '--dir')
+    directory = normalizedPath(args[(index += 1)] ?? '').replace(/^(\.\/)+/, '');
   else if (requested === undefined) requested = args[index];
 }
 const unreadable = [];
 const errors = [];
 const warnings = [];
 const cwd = process.cwd();
-const record = requested === undefined ? null : normalizedPath(requested);
+const record = requested === undefined ? null : normalizedPath(requested).replace(/^(\.\/)+/, '');
 const insideDirectory =
   directory !== '' && !/^([A-Za-z]:)?\//.test(directory) && !directory.split('/').includes('..');
 const recordPath = new RegExp(

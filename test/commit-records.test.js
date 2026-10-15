@@ -360,7 +360,7 @@ test('cited-records: --dir points a record kind at its configured directory', ()
   withRepo((dir) => {
     write(dir, 'docs/evidence/0007-ground-moved.md');
     commitAll(dir);
-    const result = spawnSync(process.execPath, [SCRIPT, '-', '--dir', 'research=docs/evidence'], {
+    const result = spawnSync(process.execPath, [SCRIPT, '-', '--dir', 'research=./docs/evidence'], {
       cwd: dir,
       input: 'feat: x\n\nRefs: GROUND-0007\n',
       encoding: 'utf8',

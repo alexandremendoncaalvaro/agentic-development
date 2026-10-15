@@ -18,7 +18,8 @@ The kit writes records to fixed repository paths and assumes it owns the deliver
 - [x] With no `process` block in the project-sources config, every skill behaves exactly as before (test).
 - [x] The config accepts an optional `process` block (schema version 2; version 1 still accepted): lifecycle owner, per-record destination (`repo-path`, `issue-comment`, `external`), directory and naming (`sequence`, `date`), opaque handoff text, and label-to-stage-to-next mappings.
 - [x] `ad-project-state` reads milestones and annotates each issue with its configured stage and next action; an offline `--process` flag prints the resolved block.
-- [x] Record writers use the configured location: the ground validator accepts a draft outside the repository; the artifact gate, cited-records and `ad-adr` (date naming) follow the config; an `issue-comment` destination drafts, validates, asks the owner, then posts.
+- [x] Record writers use the configured location: the ground validator accepts a draft outside the repository; the artifact gate, cited-records and `ad-adr` (date naming) follow the config.
+- [ ] An `issue-comment` destination drafts, validates, asks the owner, then posts, observed in a recorded run (the skill text describes it; only the validation step is tested).
 - [ ] `ad-task`, `ad-spec` and `ad-prd` refuse when their destination is external and print the handoff; `ad-next` routes by stage when the lifecycle owner is external; `ad-derisk` writes to the configured work item; `ad-philosophy` states the generic rule.
 - [ ] A generic issue-staged example ships; no methodology is named in kit logic; a new ADR records the principle.
 
@@ -92,3 +93,30 @@ the first `=`, refuses a path with `=` and an inherited name such as
 a `PRISM-` plan is gated only under `doc/research/`, and a date-named ADR is
 cited by path. Note accepted: `--draft` reads any path the caller names; it
 only reports validation errors, never the content.
+
+### 2026-10-15 — review and audit of ba00b66
+
+Reviewed SHAs for the record: slice 1 at 62aded9 (both axes) and its delta at
+1ef9791 (no findings); slice 2 at 8a2d7bd (findings in the entry above, with
+their severities: Spec blocker, the unimplemented gate clause; Spec concerns,
+the Codex `ad-adr` order, the `ad-ground` hard-coded steps and date-named ADR
+citations; Standards concerns, the hard-coded steps and `--dir adr=a=b`;
+notes, `--dir .`, `task` and `spec` kinds, `ad-research` coverage).
+
+Delta review of ba00b66: no blocker. Concerns, fixed here: the gate read the
+configuration on its own, more loosely than the resolver, so an invalid
+process still moved the gate and a `./docs/evidence` path matched nothing; the
+gate now asks the `ad-project-state` resolver, and the validator and
+`cited-records` strip a leading `./`. A spec concern on the PRISM limit is
+answered by the next fix.
+
+Audit of ba00b66 (CV on two models, HK): HK no finding. CV blocker, fixed: the
+criterion was ticked although only the validation step of the issue-comment
+flow is tested; it is now split, and the unobserved flow stays open. CV major,
+fixed: with a configured directory a PRISM plan in `doc/research/` went
+ungated, contradicting ADR-0097; `doc/research/` now stays governed for every
+kind, pinned by a test. CV major, fixed: the `./` path above. CV minor, fixed:
+this entry names the reviewed SHAs and severities. CV judgement-call, retired
+by mutation in a disposable worktree: with 8a2d7bd's gate the two gate tests
+fail, and with cf632f7's validator and cited-records the three slice-2 tests
+fail; restored afterwards, worktree clean.

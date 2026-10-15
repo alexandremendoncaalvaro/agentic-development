@@ -49,7 +49,8 @@ should serve.
    for a configured research directory and `--draft` to check a record kept
    outside the repository before it is posted as an issue comment;
    `cited-records.mjs` takes `--dir <kind>=<path>`; the artifact gate reads the
-   configured research directory; `ad-adr` follows the
+   configured research directory through the `ad-project-state` resolver and
+   governs it beside `doc/research/`; `ad-adr` follows the
    configured directory and, with `naming: date`, names the file by the date
    with the separator the directory's existing records use.
 
@@ -63,8 +64,8 @@ Positive:
 Negative:
 
 - Stages come only from GitHub labels; another tracker needs a new source type.
-- The artifact gate follows a configured research directory for `GROUND-`
-  records only; a `PRISM-` plan is gated only under `doc/research/`.
+- In a configured research directory the artifact gate routes `GROUND-`
+  records only; `doc/research/` stays governed for every record kind.
 - A date-named ADR has no number, so a commit cites it by path, not by
   `ADR-NNNN`.
 - A misconfigured block is reported and ignored with the rest of the

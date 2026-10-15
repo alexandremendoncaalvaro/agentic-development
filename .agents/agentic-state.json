@@ -138,7 +138,7 @@
         },
         {
           "path": ".agents/skills/ad-commit/scripts/cited-records.mjs",
-          "sourceSha": "fa7bc949c4086ce0104edc5e724530611976f9239c0014a76043113dee52fca2"
+          "sourceSha": "420b78f159090900356d6d3c14656232e708c7edee9d12f507954744db50fab6"
         },
         {
           "path": ".agents/skills/ad-commit/SKILL.md",
@@ -299,7 +299,7 @@
         },
         {
           "path": ".agents/skills/ad-ground/scripts/validate-record.mjs",
-          "sourceSha": "209a4e90e04e55c3a79d733a02663163564dd93c635d12f60ab89fafd8ca48fa"
+          "sourceSha": "45cdca823cf692a4f22e8c5a0381389c4c6159721c33cdb38caa5706c65ad856"
         },
         {
           "path": ".agents/skills/ad-ground/SKILL.md",
@@ -358,7 +358,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/artifact-gate.mjs",
-          "sourceSha": "6dd2fc7453f12be754c8ef7feb8cda801f30b743de7ee79f4c3587718d8331b8"
+          "sourceSha": "06363cee6a807236bb17c78cae4d1f2b268a695662aaf1ae136ef778c5932839"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/command-guard.mjs",

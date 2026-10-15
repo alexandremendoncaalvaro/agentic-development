@@ -157,7 +157,8 @@ for (let index = 0; index < options.length; index += 1) {
   const kind = split === -1 ? '' : option.slice(0, split);
   const path = (split === -1 ? '' : option.slice(split + 1))
     .replaceAll('\\', '/')
-    .replace(/\/+$/, '');
+    .replace(/\/+$/, '')
+    .replace(/^(\.\/)+/, '');
   if (
     !Object.hasOwn(directories, kind) ||
     path === '' ||
