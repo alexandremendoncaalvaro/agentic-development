@@ -798,7 +798,7 @@ test('voice profile references remain byte-identical across hosts and consumers'
   }
 });
 
-test('language preferences drive conversation, preview, and publication across the workflow', () => {
+test('static contract: language preferences drive conversation, preview, and publication across the workflow', () => {
   const root = join(__dirname, '..');
   const workflow = readFileSync(join(root, 'WORKFLOW.md'), 'utf8');
   assert.match(workflow, /languages\.conversation[\s\S]*direct.*conversation/is);
@@ -835,7 +835,7 @@ test('language preferences drive conversation, preview, and publication across t
   }
 });
 
-test('ad-voice audits every active profile pattern before returning a draft', () => {
+test('static contract: ad-voice audits every active profile pattern before returning a draft', () => {
   const root = join(__dirname, '..', 'src', 'skills');
 
   for (const agent of ['claude-code', 'codex']) {
@@ -853,7 +853,7 @@ test('ad-voice audits every active profile pattern before returning a draft', ()
   }
 });
 
-test('ad-voice keeps private context out of collaboration replies', () => {
+test('static contract: ad-voice keeps private context out of collaboration replies', () => {
   const root = join(__dirname, '..', 'src', 'skills');
 
   for (const agent of ['claude-code', 'codex']) {
@@ -877,7 +877,7 @@ test('ad-voice keeps private context out of collaboration replies', () => {
   }
 });
 
-test('ad-voice always naturalizes through humanizer or its bundled fallback', () => {
+test('static contract: ad-voice always naturalizes through humanizer or its bundled fallback', () => {
   const root = join(__dirname, '..', 'src', 'skills');
 
   for (const agent of ['claude-code', 'codex']) {

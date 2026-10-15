@@ -15,14 +15,14 @@
 
 ## Acceptance Criteria
 
-- [ ] An approved release plan appends `{package, version, digest, at}` to `.agentic/receipts/release.jsonl`; an unapproved or mismatched plan writes nothing (tests).
+- [ ] An approved release plan leaves a local release receipt naming the package, version, plan digest and time; an unapproved or mismatched plan writes nothing (tests).
 - [ ] The receipt gate logs a shadow `release` check before `npm publish` and `<gh> release create`: clear only with a receipt for the `package.json` name and version (tests; always exit 0).
 - [ ] `ad-release` preflight warns when the npm account's two-factor mode does not cover writes.
 - [ ] A new ADR records the measurement and amends ADR-0089 decision 2; ADR-0085 points to it.
 
 ## Plan
 
-- [ ] Receipt, gate check, preflight and ADR in one PR, audited (enforcement tooling).
+- [ ] Receipt in `.agentic/receipts/release.jsonl` from `release-plan.mjs`, gate check in `sequence-gate.mjs`, preflight and ADR in one PR, audited (enforcement tooling).
 
 ## Notes
 

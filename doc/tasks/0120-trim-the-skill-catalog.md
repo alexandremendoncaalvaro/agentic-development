@@ -3,7 +3,7 @@
 **Status:** proposed
 **Created:** 2026-10-15
 **Scope ref:** doc/adr/0085-gate-skill-effects-inside-the-skill.md (decision 3 amended by a new ADR)
-**Evidence ref:** doc/research/0030-skill-invocation-and-listing-budget.md
+**Evidence ref:** doc/research/0030-skill-invocation-control-and-listing-budget.md
 **Owner:** Alexandre Alvaro
 **Execution:** AFK
 **Spec ref:**

@@ -15,15 +15,15 @@
 
 ## Acceptance Criteria
 
-- [x] `src/**/*.mjs` is in `format:check` and formatted in one commit listed in `.git-blame-ignore-revs`.
-- [ ] `src/lib/install-flow.js` holds the shared root-doc confirmers, exclude offer and report formatting with prompts injected; `src/commands/kit-exclude.js` is gone; `init` and `update` output is unchanged (existing tests) and the new module has its own tests.
+- [x] Every executable script under `src/` is checked by the formatting gate, and the one formatting commit is skipped by blame.
+- [ ] `init` and `update` share one tested library module for root-doc confirmation, the exclude offer and the report, with prompts injected and no prompting in the library; their output is unchanged (existing tests).
 - [ ] GUIDELINES and ARCHITECTURE state that decision cores are pure and `src/lib` does file and git I/O through injected seams, never prompting or printing.
-- [ ] `validateProfile` and `validateTemplate` are split into per-sub-object validators with identical messages and order, after a coverage run fills any untested branch.
+- [ ] The voice-profile and template validators are split into per-sub-object validators with identical messages and order, after a coverage run fills any untested branch.
 
 ## Plan
 
 - [x] PR: formatting gate.
-- [ ] PR: install flow and docs.
+- [ ] PR: `src/lib/install-flow.js` (with `kit-exclude` moved from `src/commands/`) and docs.
 - [ ] PR: validator split.
 
 ## Notes

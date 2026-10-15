@@ -15,7 +15,7 @@ Both /insights reports show agents killing processes by name (a reviewer killed 
 
 ## Acceptance Criteria
 
-- [ ] `ad-hooks/scripts/command-guard.mjs` (both hosts, byte-identical) denies kill-by-name and a commit chained after `;` or a newline, allows quoted text, heredoc bodies, `kill <pid>` and `&&`-chained commits, fails open, and `AD_COMMAND_GUARD=0` silences it (tests through `verdict` and stdin).
+- [ ] A command guard in the `ad-hooks` tier (both hosts, byte-identical) denies kill-by-name and a commit chained after `;` or a newline, allows quoted text, heredoc bodies, `kill <pid>` and `&&`-chained commits, fails open, and `AD_COMMAND_GUARD=0` silences it (tests through `verdict` and stdin).
 - [ ] Wiring documented and tested for Claude Code (`Bash|PowerShell`) and Codex (`Bash`).
 - [ ] A replay over the owner's recorded shell commands shows zero false denials before the guard is documented as ready.
 - [ ] The workflow checkpoint appends one reminder line naming the owner's conversation language and the no-estimate rule when a voice profile defines it (tests with and without).
@@ -24,7 +24,7 @@ Both /insights reports show agents killing processes by name (a reviewer killed 
 
 ## Plan
 
-- [ ] Guard script and tests; replay; wiring; checkpoint line; detector; ADR; one PR, audited (enforcement tooling).
+- [ ] `ad-hooks/scripts/command-guard.mjs` and its tests; replay; wiring; checkpoint line; detector; ADR; one PR, audited (enforcement tooling).
 
 ## Notes
 

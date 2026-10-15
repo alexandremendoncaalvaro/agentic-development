@@ -270,6 +270,10 @@ Per [WORKFLOW.md §15](WORKFLOW.md) Phase 5. Every fixed bug gets a permanent te
 
 Regression tests are never deleted.
 
+### 9.5a Static Contract Tests
+
+A test that only reads a skill's or document's text proves that the text declares a behaviour, not that an agent performs it. Name it `static contract: <what the text declares>` (after `regression:` when both apply) so the suite does not read as behavioural coverage it lacks. Behavioural claims about skills belong to the evaluation harness under `eval/`.
+
 ### 9.6 E2E Tests
 
 Currently none. Add when the CLI grows surfaces that integration tests cannot exercise (e.g., interactive TTY flows, real npm publish dry-run).
