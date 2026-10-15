@@ -139,8 +139,11 @@ export function resolveOwner(absolutePath, cwd, configured = null) {
   const rel = relative(cwd, absolutePath);
   if (escapesRepository(rel)) return null;
   const inside = (directory) => rel.startsWith(`${directory.split('/').join(sep)}${sep}`);
-  const inConfigured = configured !== null && inside(configured);
-  if (!(inConfigured || inside(DEFAULT_RESEARCH_DIR)) || !rel.endsWith('.md')) return null;
+  // doc/research keeps every record kind governed, even when the configured
+  // directory sits inside it.
+  const inDefault = inside(DEFAULT_RESEARCH_DIR);
+  const inConfigured = !inDefault && configured !== null && inside(configured);
+  if (!(inConfigured || inDefault) || !rel.endsWith('.md')) return null;
   const path = rel.split(sep).join('/');
   let head;
   try {
@@ -358,7 +361,10 @@ function main() {
   let exitCode = 0;
 
   const paths = recoverPaths(event, cwd);
-  const configured = paths.length > 0 ? configuredResearchDirectory(cwd, root) : null;
+  // The resolver runs only for a Markdown write, the only kind the gate governs.
+  const configured = paths.some((path) => path.endsWith('.md'))
+    ? configuredResearchDirectory(cwd, root)
+    : null;
   for (const absolutePath of paths) {
     const owner = resolveOwner(absolutePath, cwd, configured);
     if (!owner) continue;

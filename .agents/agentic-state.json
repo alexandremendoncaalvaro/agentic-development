@@ -358,7 +358,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/artifact-gate.mjs",
-          "sourceSha": "06363cee6a807236bb17c78cae4d1f2b268a695662aaf1ae136ef778c5932839"
+          "sourceSha": "ea9bcf819f6bbc8f42b7f94c688867d5d937ca9b5f295714b83f3f31c85c2081"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/command-guard.mjs",

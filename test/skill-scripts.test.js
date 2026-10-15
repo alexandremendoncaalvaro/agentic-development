@@ -5683,3 +5683,25 @@ test('validate-record: --dir accepts a ./ prefix', () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('artifact-gate: a configured directory inside doc/research leaves every record kind governed there', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    mkdirSync(join(root, '.agentic'), { recursive: true });
+    writeFileSync(
+      join(root, '.agentic', 'project-sources.json'),
+      JSON.stringify({
+        schemaVersion: 2,
+        process: researchProcess('doc/research/ground'),
+        sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+      })
+    );
+    mkdirSync(join(root, 'doc', 'research', 'ground'), { recursive: true });
+    const rel = join('doc', 'research', 'ground', '0006-prism-v.md');
+    writeFileSync(join(root, rel), '# PRISM-0006: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, rel), { root, evidence }).status, 2);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});

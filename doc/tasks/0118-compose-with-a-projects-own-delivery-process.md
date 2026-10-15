@@ -120,3 +120,23 @@ this entry names the reviewed SHAs and severities. CV judgement-call, retired
 by mutation in a disposable worktree: with 8a2d7bd's gate the two gate tests
 fail, and with cf632f7's validator and cited-records the three slice-2 tests
 fail; restored afterwards, worktree clean.
+
+### 2026-10-15 — review and re-audit of 70d0fdb
+
+Delta review: no blocker; Spec ships as-is. Two Standards notes, fixed: a
+configured directory inside `doc/research/` left a `PRISM-` plan there
+ungated, so the default directory now wins (one test went red, then green);
+the resolver ran on every write, so it now runs only for a Markdown path.
+CV re-audit (primary model): every prior finding resolved; two judgement
+calls answered here. The mutation run's output, for the record: with
+8a2d7bd's gate, "not ok 1 - artifact-gate: a configured research directory
+is governed and the validator gets --dir" and "not ok 2 - artifact-gate: a
+matching machine entry configures the research directory; an unsafe path
+keeps the default" (pass 0, fail 2); with cf632f7's scripts, "not ok 1 -
+validate-record: --dir accepts a record in the configured research
+directory", "not ok 2 - validate-record: --draft checks the content of a
+record kept outside the repository" and "not ok 1 - cited-records: --dir
+points a record kind at its configured directory" (5 of 5 failed). The audit
+of ba00b66 had one HK nit, accepted: the new gate tests call git with the
+inherited environment, as existing tests do; the suite runs through the
+env-stripping runner.
