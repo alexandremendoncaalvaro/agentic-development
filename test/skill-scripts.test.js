@@ -5277,6 +5277,22 @@ test('project-state: a process block is invalid under version 1 or with an unkno
       { schemaVersion: 2, process: { lifecycleOwner: 'someone' }, sources: [] },
       /process\.lifecycleOwner must be kit or external/,
     ],
+    [
+      {
+        schemaVersion: 2,
+        process: { lifecycleOwner: 'kit', ownerLabel: 'a\u001b[31mb' },
+        sources: [],
+      },
+      /process\.ownerLabel must be a single-line string/,
+    ],
+    [
+      {
+        schemaVersion: 2,
+        process: { lifecycleOwner: 'kit', stages: [{ label: 'x', stage: 'y', next: 'a\u2028b' }] },
+        sources: [],
+      },
+      /process\.stages\[0\]\.next is invalid/,
+    ],
   ]) {
     const dir = processRepo(config);
     try {

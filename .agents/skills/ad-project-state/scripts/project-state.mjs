@@ -219,9 +219,14 @@ function validateSources(sources) {
   return null;
 }
 
+// Text the skills show as given: one line, no control or line-separator
+// characters, so it cannot carry a terminal escape or a hidden line.
 function singleLine(value, max) {
   return (
-    typeof value === 'string' && value.trim() !== '' && value.length <= max && !/[\r\n]/.test(value)
+    typeof value === 'string' &&
+    value.trim() !== '' &&
+    value.length <= max &&
+    !/[\p{Cc}\u2028\u2029]/u.test(value)
   );
 }
 
@@ -269,11 +274,11 @@ function validateStages(stages) {
 
 // The delivery process (ADR-0097): declarative text and choices only; the
 // kit shows `handoff` and `next`, never interprets or runs them.
-function validateProcess(process, schemaVersion) {
-  if (process === undefined) return null;
+function validateProcess(deliveryProcess, schemaVersion) {
+  if (deliveryProcess === undefined) return null;
   if (schemaVersion !== 2) return 'process requires schemaVersion 2';
-  if (!plainObject(process)) return 'process must be an object';
-  const extra = unknownField(process, [
+  if (!plainObject(deliveryProcess)) return 'process must be an object';
+  const extra = unknownField(deliveryProcess, [
     'lifecycleOwner',
     'ownerLabel',
     'records',
@@ -281,26 +286,29 @@ function validateProcess(process, schemaVersion) {
     'readMilestone',
   ]);
   if (extra) return `process has unknown field ${extra}`;
-  if (!LIFECYCLE_OWNERS.has(process.lifecycleOwner)) {
+  if (!LIFECYCLE_OWNERS.has(deliveryProcess.lifecycleOwner)) {
     return 'process.lifecycleOwner must be kit or external';
   }
-  if (process.ownerLabel !== undefined && !singleLine(process.ownerLabel, 64)) {
+  if (deliveryProcess.ownerLabel !== undefined && !singleLine(deliveryProcess.ownerLabel, 64)) {
     return 'process.ownerLabel must be a single-line string up to 64 characters';
   }
-  if (process.records !== undefined) {
-    if (!plainObject(process.records)) return 'process.records must be an object';
-    const kind = unknownField(process.records, RECORD_KINDS);
+  if (deliveryProcess.records !== undefined) {
+    if (!plainObject(deliveryProcess.records)) return 'process.records must be an object';
+    const kind = unknownField(deliveryProcess.records, RECORD_KINDS);
     if (kind) return `process.records has unknown kind ${kind}`;
-    for (const [name, record] of Object.entries(process.records)) {
+    for (const [name, record] of Object.entries(deliveryProcess.records)) {
       const failure = validateRecord(name, record);
       if (failure) return failure;
     }
   }
-  if (process.stages !== undefined) {
-    const failure = validateStages(process.stages);
+  if (deliveryProcess.stages !== undefined) {
+    const failure = validateStages(deliveryProcess.stages);
     if (failure) return failure;
   }
-  if (process.readMilestone !== undefined && typeof process.readMilestone !== 'boolean') {
+  if (
+    deliveryProcess.readMilestone !== undefined &&
+    typeof deliveryProcess.readMilestone !== 'boolean'
+  ) {
     return 'process.readMilestone must be a boolean';
   }
   return null;
@@ -439,7 +447,7 @@ function issueStage(issue, stages) {
   return stages.find((stage) => names.has(stage.label)) ?? null;
 }
 
-function githubSource(source, observedAt, repoRoot, environment, process) {
+function githubSource(source, observedAt, repoRoot, environment, deliveryProcess) {
   const gh = environment.AGENTIC_GH || 'gh';
   const githubEnvironment = cleanGitEnvironment({ ...environment, GH_HOST: source.host });
   const base = {
@@ -479,7 +487,7 @@ function githubSource(source, observedAt, repoRoot, environment, process) {
   const failures = [];
   let successfulQueries = 0;
   if (source.issues !== undefined) {
-    const fields = process?.readMilestone ? `${ISSUE_FIELDS},milestone` : ISSUE_FIELDS;
+    const fields = deliveryProcess?.readMilestone ? `${ISSUE_FIELDS},milestone` : ISSUE_FIELDS;
     const issues = commandArray(
       gh,
       listArguments('issue', source, source.issues, fields),
@@ -487,10 +495,10 @@ function githubSource(source, observedAt, repoRoot, environment, process) {
       githubEnvironment
     );
     base.issues = issues.value.slice(0, source.issues.limit);
-    if (process?.stages) {
+    if (deliveryProcess?.stages) {
       base.issues = base.issues.map((issue) => ({
         ...issue,
-        stage: issueStage(issue, process.stages),
+        stage: issueStage(issue, deliveryProcess.stages),
       }));
     }
     if (issues.code) failures.push(githubFailure(source.id, 'gh issue list', issues.code));
