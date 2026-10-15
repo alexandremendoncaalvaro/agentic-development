@@ -322,7 +322,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/SKILL.md",
-          "sourceSha": "937d89bdf4aae15a558427ef64b0cd0fe5893895f5cff4764e5404f2021bba46"
+          "sourceSha": "2ffbf46f35b0c47579a11d9737136a47d9b08073357635820181c0a672ec5b04"
         }
       ]
     },
@@ -604,7 +604,7 @@
         },
         {
           "path": ".claude/skills/ad-review/SKILL.md",
-          "sourceSha": "9abdf3a3b7317fc4669909a9b32c4bb475b498443fcb3ee9221138808640f8a1"
+          "sourceSha": "3b99b72002f8e47b8229273c3872262237c2b6d00fc46a7dcc0a4a5961b76be9"
         }
       ]
     },

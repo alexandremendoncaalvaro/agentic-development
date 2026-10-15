@@ -8,7 +8,7 @@
 
 ## Context
 
-The installer writes a managed block into each host's global rules file that imports the whole `WORKFLOW.md` (55,072 bytes). Claude Code loads an imported file at launch at the same context cost as inline text, and targets under 200 lines per instruction file. Codex expands no import at all and caps combined instructions at 32 KiB, so its sessions receive the literal import line and none of the Constitution. On the owner's machine the always-loaded stack measured about 104 KB per session, more than half of it this one file.
+The installer writes a managed block into each host's global rules file that imports the whole `WORKFLOW.md` (55,072 bytes). Claude Code loads an imported file at launch at the same context cost as inline text, and targets under 200 lines per instruction file. Codex expands no import at all and caps combined instructions at 32 KiB, so its sessions receive the literal import line and none of the Constitution. On the owner's machine the always-loaded stack of a session in this repository measured 104,210 bytes on 2026-10-15, more than half of it this one file (GROUND-0044 C8).
 
 ## Decision
 
@@ -20,8 +20,8 @@ The installer writes a managed block into each host's global rules file that imp
 
 Positive:
 
-- About 49 KB less instruction text in every session on both hosts.
-- Codex sessions receive the Constitution's rules for the first time.
+- About 49 KB less instruction text in every Claude Code session (55,072 bytes of `WORKFLOW.md` replaced by its 5,685-byte TL;DR).
+- The Codex global file holds the Constitution's summary as text instead of an import line Codex cannot expand, so a Codex session gains about 5.7 KB it never received before; a Codex session observed after the change confirms it (task 0119).
 - A kit update refreshes the summary without touching user-owned text.
 
 Negative:

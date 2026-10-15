@@ -2,12 +2,11 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { KIT_ROOT } from './install.js';
 
 const MARKER_START = '<!-- agentic-global-constitution:start -->';
 const MARKER_END = '<!-- agentic-global-constitution:end -->';
 const DIGEST_LINE = /^<!-- agentic-global-constitution:digest ([0-9a-f]{64}) -->\n/;
-const KIT_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 const GLOBAL_RULE_PATHS = {
   'claude-code': '.claude/CLAUDE.md',

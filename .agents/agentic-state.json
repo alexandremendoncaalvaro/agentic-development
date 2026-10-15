@@ -394,7 +394,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "c58158f8ec3b0aa3bce98d8529aaa29c6c8784a39a1702f0ec1df275dde127f1"
+          "sourceSha": "2f8eea0d621cf490769a5dc8d09ecee6bb86af7741a3d6053ebb7633761cef7a"
         }
       ]
     },
@@ -732,7 +732,7 @@
         },
         {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "07998508a15b6ed4ca7c2799f17f3cde1f77cb413762fa77aa322843ed4dd077"
+          "sourceSha": "aa9a80c554ce73218805651c308648c49210418f254a4d126f59fe0e4ccb7dd7"
         },
         {
           "path": ".codex/agents/fresh-context-reviewer.toml",

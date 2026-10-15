@@ -11,7 +11,7 @@
 
 ## Context
 
-The kit audit of 2026-10-15 scored review economy 1.6 of 4: no skill reads the coverage ledger, a fix triggers a full re-review, the shadow gate expects an audit before every pull request action, and the critical second pass ran on the same model as the first. The owner approved this package on 2026-10-15 together with restarting the task 0110 shadow window.
+The kit audit of 2026-10-15 found that no skill reads the coverage ledger, a fix triggers a full re-review, the shadow gate expects an audit before every pull request action, and the critical second pass ran on the same model as the first. The owner approved this package on 2026-10-15 together with restarting the task 0110 shadow window.
 
 ## Acceptance Criteria
 
@@ -77,3 +77,34 @@ A delta review of 10a48ca..7a87be8 confirmed the three fixes, accepted the
 the ancestry requirement the code applies. Accepted as is: a refreshed CRLF
 summary block is written with LF endings (stable on the next run), and a git
 error in the ancestry probe reads as not chained (fails closed in shadow).
+
+### 2026-10-15 — audit of d1cfc23 and dispositions
+
+The owner's approval of the plan and of ADR-0091 and ADR-0092 was given in
+the session chat on 2026-10-15; these Notes are its record.
+
+Audit of origin/main..d1cfc23 on the groups the review left uncovered
+(machine store): HK 2/2 pass, GH 3/3 pass (origin/main still 55fe6de after
+a fetch), NET n/a (no .NET). Binding-doc groups: covered by the review of
+10a48ca and the delta review of 7a87be8. CV (critical) ran twice, the second
+pass on `opus` with rules and files reversed; findings, union of both:
+
+- critical, fixed: dispatch and model counts without a source. 133 of 133 on
+  `claude-sonnet-5-5`, with 22 `sonnet` overrides, is now reproduced and
+  registered (GROUND-0044 C7); the per-pull-request dispatch counts and the
+  audit score are removed; the 104,210-byte stack is registered (C8).
+- critical, fixed: "Codex now receives it" stated an unobserved session; it
+  now states what the file holds, and task 0119 requires a Codex session.
+- major, fixed: "49 KB less on both hosts" held for Claude Code only.
+- minor, fixed: the projection's mixed-shape count now names 0089.
+- minor, fixed: `global-rules.js` defined its own `KIT_ROOT`; it imports it
+  from `install.js`, as ARCHITECTURE's boundary rule requires.
+- minor, fixed: skill text and the changelog now name the ancestry rule.
+- minor, fixed: task 0119's Plan named a `test/init.test.js` change that did
+  not land; it now says the test is unchanged.
+- minor, accepted: GROUND-0044 C1 and C5 are files on the owner's machine,
+  outside the tree; the documentation sources A1 and A2 carry the same claims.
+- nit, accepted: the earlier review dispositions above list Concerns, not
+  every Note; the verdict files hold the rest.
+- Red-before evidence for the ancestry test: `not ok 70` was observed before
+  `isAncestor` existed, in this session's run.

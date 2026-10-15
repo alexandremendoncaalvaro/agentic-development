@@ -14,7 +14,7 @@ The owner's binding rule (C1) classes redundant review as a critical failure: re
 ### E1 — An imported file costs the same context as inline text, and Codex does not expand imports
 
 **Strength:** High
-**Provenance:** A1, A2, C5, C6
+**Provenance:** A1, A2, C5, C6, C8
 
 The Claude Code memory documentation says imports "don't reduce its context cost, because imported files also load at launch" and targets under 200 lines per file. The Codex AGENTS.md documentation caps combined instructions at 32 KiB and describes no import directive; the owner's Codex session of 2026-10-13 received the literal `@/Users/ale/dev/ales-workflow/AGENTS.ale.md` line, not its content. Measured: the full `WORKFLOW.md` is 55,072 bytes; its TL;DR is 5,685 bytes.
 
@@ -30,14 +30,14 @@ The memory documentation moves instructions that matter only sometimes out of th
 **Strength:** High
 **Provenance:** C1, C2, C3, D1
 
-`sequence-gate.mjs:70-72` asks for an audit receipt before `gh pr create`, `ready` and `merge`; `ad-review` ends with "Re-run `/ad-review` on the fix"; `ad-audit` rebuilds every group on a re-audit and runs the critical second pass twice. The audit of 2026-10-15 measured pull requests #162 and #163 at 23 and 25 reviewer dispatches over 4 and 6 rounds. The audit check entered with commit `0b52d75`.
+`sequence-gate.mjs:70-72` asks for an audit receipt before `gh pr create`, `ready` and `merge`; `ad-review` ends with "Re-run `/ad-review` on the fix"; `ad-audit` rebuilds every group on a re-audit and runs the critical second pass twice. The audit check entered with commit `0b52d75`.
 
 ### E4 — The second pass of `ad-audit` does not change model today
 
 **Strength:** High
-**Provenance:** A3, C4, D1
+**Provenance:** A3, C4, C7, D1
 
-The subagent documentation resolves a subagent's model from the per-invocation `model` parameter first, then its frontmatter. `audit-group-reviewer.md:5` pins `model: sonnet` since commit `5400127`, so a `sonnet` override is the same model; the audit of 2026-10-15 measured 133 of 133 group reviews on one model.
+The subagent documentation resolves a subagent's model from the per-invocation `model` parameter first, then its frontmatter. `audit-group-reviewer.md:5` pins `model: sonnet` since commit `5400127`, so a `sonnet` override is the same model. Measured over this repository's recorded subagent sessions before 2026-10-15: 133 of 133 `audit-group-reviewer` dispatches ran on `claude-sonnet-5-5`, and the 22 that passed an override passed `sonnet`.
 
 ### E5 — Delta review is an established reviewer mechanism
 
@@ -59,6 +59,8 @@ GitHub's pull request review marks a file as viewed and unmarks it "if the file 
 - **C4:** `src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md:5`, `model: sonnet` (accessed 2026-10-15 via grep)
 - **C5:** `~/.codex/sessions/2026/10/13/rollout-2026-10-13T18-32-05-01a1372e-042f-7e30-9dd8-25e382b6542c.jsonl`, injected global instructions carry the literal import line (accessed 2026-10-15 via grep)
 - **C6:** `wc -c WORKFLOW.md` 55,072 and `awk '/^## TL;DR/{f=1} /^## 1\./{f=0} f' WORKFLOW.md | wc -c` 5,685 (accessed 2026-10-15 via Bash)
+- **C7:** `~/.claude/projects/-Users-ale-Personal-agentic-development*/*/subagents/*.meta.json` with `agentType` `audit-group-reviewer`, excluding the session that wrote this record: the `model` override field (absent 111, `sonnet` 22) and the `message.model` values in each sibling `.jsonl` (`claude-sonnet-5-5` in 133 of 133); enumeration by a Python scan of those files, no false positives found because each file is one dispatch (accessed 2026-10-15 via Bash)
+- **C8:** `wc -c ~/.claude/CLAUDE.md /Users/ale/dev/ales-workflow/AGENTS.ale.md ~/.claude/RTK.md ~/.agentic/kit/WORKFLOW.md ~/.claude/projects/-Users-ale-Personal-agentic-development/memory/MEMORY.md AGENTS.md` totals 104,210 bytes, the always-loaded stack of a session in this repository (accessed 2026-10-15 via Bash)
 - **D1:** `git log -S"checks: ['gate-run', 'review', 'audit']" -- src/skills/claude-code/ad-hooks/scripts/sequence-gate.mjs` gives `0b52d75` (2026-10-07); `git log -S'model: sonnet' -- src/skills/claude-code/ad-audit/agents/audit-group-reviewer.md` gives `5400127` (2026-07-27); `git log -- src/lib/global-rules.js` starts at `886baa9` (2026-08-14) (accessed 2026-10-15 via git log)
 
 ## Limitations and reversal
