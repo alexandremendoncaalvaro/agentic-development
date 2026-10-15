@@ -19,7 +19,8 @@
 import { readFileSync } from 'node:fs';
 import { relative, resolve, sep } from 'node:path';
 
-const RECORD_PATH = /^doc\/research\/(\d{4})-ground-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
+const RECORD_NAME = String.raw`(\d{4})-ground-[a-z0-9]+(?:-[a-z0-9]+)*\.md`;
+const DEFAULT_DIR = 'doc/research';
 const ACCESS_PROVENANCE = /\(accessed \d{4}-\d{2}-\d{2} via [^)]+\)(?:[.!])?\s*$/;
 const REQUIRED_METADATA = ['Status', 'Decision', 'Decision ref', 'Confidence'];
 const REQUIRED_HEADINGS = [
@@ -214,24 +215,43 @@ function parseClaims(body, sourceIds, errors, stakes = null) {
   return claims;
 }
 
-const requested = process.argv[2];
+// `--dir <path>`: the research directory a delivery process configures
+// (ADR-0097). `--draft`: content only, for a record kept outside the
+// repository until it is posted elsewhere, such as an issue comment.
+const args = process.argv.slice(2);
+let requested;
+let directory = DEFAULT_DIR;
+let draft = false;
+for (let index = 0; index < args.length; index += 1) {
+  if (args[index] === '--draft') draft = true;
+  else if (args[index] === '--dir')
+    directory = normalizedPath(args[(index += 1)] ?? '').replace(/^(\.\/)+/, '');
+  else if (requested === undefined) requested = args[index];
+}
 const unreadable = [];
 const errors = [];
 const warnings = [];
 const cwd = process.cwd();
-const record = requested === undefined ? null : normalizedPath(requested);
+const record = requested === undefined ? null : normalizedPath(requested).replace(/^(\.\/)+/, '');
+const insideDirectory =
+  directory !== '' && !/^([A-Za-z]:)?\//.test(directory) && !directory.split('/').includes('..');
+const recordPath = new RegExp(
+  `^${directory.replace(/\/+$/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/${RECORD_NAME}$`
+);
 
 if (!record) {
   errors.push('record path is required');
-} else if (!RECORD_PATH.test(record)) {
-  errors.push('record must be a doc/research/NNNN-ground-<slug>.md path');
+} else if (!draft && !insideDirectory) {
+  errors.push('--dir must be a relative directory inside the repository');
+} else if (!draft && !recordPath.test(record)) {
+  errors.push(`record must be a ${directory}/NNNN-ground-<slug>.md path`);
 }
 
 let body = null;
-if (record && RECORD_PATH.test(record)) {
+if (record && (draft || (insideDirectory && recordPath.test(record)))) {
   const target = resolve(cwd, record);
   const targetRelative = relative(cwd, target);
-  if (targetRelative === '..' || targetRelative.startsWith(`..${sep}`)) {
+  if (!draft && (targetRelative === '..' || targetRelative.startsWith(`..${sep}`))) {
     errors.push('record must stay inside the current repository');
   } else {
     try {
@@ -245,11 +265,11 @@ if (record && RECORD_PATH.test(record)) {
 let sources = { A: 0, B: 0, C: 0, D: 0 };
 let claims = [];
 if (body !== null) {
-  const number = record.match(RECORD_PATH)[1];
+  const number = draft ? null : record.match(recordPath)[1];
   const title = /^# GROUND-(\d{4}): .+$/m.exec(body);
   if (!title) {
-    errors.push(`record title must be GROUND-NNNN: ${titleShape(number)}`);
-  } else if (title[1] !== number) {
+    errors.push(`record title must be GROUND-NNNN: ${titleShape(number ?? 'NNNN')}`);
+  } else if (number !== null && title[1] !== number) {
     errors.push(`record title number must match filename: ${titleShape(number)}`);
   }
   for (const label of REQUIRED_METADATA) {

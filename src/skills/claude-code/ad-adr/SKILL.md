@@ -11,6 +11,8 @@ Drafts `doc/adr/NNNN-<short-title>.md` for one architecture decision. Status lif
 
 ## Step 1 — Determine NNNN
 
+First run `node .claude/skills/ad-project-state/scripts/project-state.mjs --process`. With `process.records.adr.path`, use that directory in place of `doc/adr` here and in Step 4. With `naming: date`, skip the number and name the file `<YYYY-MM-DD><sep><slug>.md`, `<sep>` being the separator the directory's existing records use (`-` when none exist). With `destination: external`, show the `handoff` text and stop.
+
 Run `node .claude/skills/ad-adr/scripts/next-number.mjs doc/adr` from the consumer root. Use JSON `next` as NNNN; it preserves archived gaps. If `unreadable` is non-empty, stop until access is resolved; if `exhausted` is true, stop for a numbering decision. If loaded elsewhere, substitute the skill base path. The decision scope stays in this step's text.
 
 ## Step 2 — Confirm scope
