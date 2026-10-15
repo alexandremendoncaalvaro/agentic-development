@@ -4,7 +4,9 @@
 **Date:** 2026-10-15
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0079 — the source configuration gains `schemaVersion` 2 with an optional `process` block, and the fact packet reports it; every other decision binds unchanged.
-**Related:** ADR-0070 and ADR-0060 (record locations, amended as each slice lands); ADR-0085 (skills gate their own outward effects)
+**Amends:** ADR-0070 — decision 1's fixed `doc/research/` location: a configured delivery process may place the ground record in another repository directory or keep it as an issue comment, validated before it is posted; every other decision binds unchanged.
+**Amends:** ADR-0060 — decision 2's fixed `doc/research/` location for studies, under the same configuration; the study process is unchanged.
+**Related:** ADR-0085 (skills gate their own outward effects)
 
 ## Context
 
@@ -43,6 +45,15 @@ should serve.
    labels. No organization's process appears in shipped text; a real process
    lives in the machine layer or in the team's own repository.
 
+6. Record writers honor `process.records`. `validate-record.mjs` takes `--dir <path>`
+   for a configured research directory and `--draft` to check a record kept
+   outside the repository before it is posted as an issue comment;
+   `cited-records.mjs` takes `--dir <kind>=<path>`; the artifact gate reads the
+   configured research directory through the `ad-project-state` resolver and
+   governs it beside `doc/research/`; `ad-adr` follows the
+   configured directory and, with `naming: date`, names the file by the date
+   with the separator the directory's existing records use.
+
 ## Consequences
 
 Positive:
@@ -53,6 +64,10 @@ Positive:
 Negative:
 
 - Stages come only from GitHub labels; another tracker needs a new source type.
+- In a configured research directory the artifact gate routes `GROUND-`
+  records only; `doc/research/` stays governed for every record kind.
+- A date-named ADR has no number, so a commit cites it by path, not by
+  `ADR-NNNN`.
 - A misconfigured block is reported and ignored with the rest of the
   configuration, falling back to the repository baseline, as ADR-0079 already
   does for invalid configuration.

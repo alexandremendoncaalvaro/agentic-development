@@ -354,3 +354,29 @@ test('cited-records: a record renamed or removed in the index is reported as suc
     ]);
   });
 });
+
+// Task 0118 slice 2, ADR-0097: a record kind the delivery process moved.
+test('cited-records: --dir points a record kind at its configured directory', () => {
+  withRepo((dir) => {
+    write(dir, 'docs/evidence/0007-ground-moved.md');
+    commitAll(dir);
+    const result = spawnSync(process.execPath, [SCRIPT, '-', '--dir', 'research=./docs/evidence'], {
+      cwd: dir,
+      input: 'feat: x\n\nRefs: GROUND-0007\n',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.deepEqual(JSON.parse(result.stdout).records, [
+      { id: 'GROUND-0007', path: 'docs/evidence/0007-ground-moved.md', state: 'in-head' },
+    ]);
+    for (const option of ['research=../x', 'adr=a=b', 'toString=x']) {
+      const bad = spawnSync(process.execPath, [SCRIPT, '-', '--dir', option], {
+        cwd: dir,
+        input: 'x',
+        encoding: 'utf8',
+      });
+      assert.equal(bad.status, 1, option);
+      assert.match(bad.stdout, /--dir needs <kind>=<relative directory>/);
+    }
+  });
+});

@@ -5511,3 +5511,201 @@ test('project-state: a matching machine entry may carry a version 2 process', ()
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// Task 0118 slice 2, ADR-0097: records go where the process says.
+function runGroundRecordArgs(cwd, args) {
+  return JSON.parse(execFileSync('node', [GROUND_RECORD, ...args], { cwd, encoding: 'utf8' }));
+}
+
+test('validate-record: --dir accepts a record in the configured research directory', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-dir-'));
+  try {
+    const record = 'docs/evidence/0002-ground-durable-evidence.md';
+    mkdirSync(join(dir, 'docs', 'evidence'), { recursive: true });
+    writeFileSync(join(dir, record), VALID_GROUND_RECORD);
+    const ok = runGroundRecordArgs(dir, [record, '--dir', 'docs/evidence']);
+    assert.equal(ok.valid, true, ok.errors.join('; '));
+    const elsewhere = runGroundRecordArgs(dir, [record]);
+    assert.equal(elsewhere.valid, false);
+    const outside = runGroundRecordArgs(dir, ['../x/0002-ground-a.md', '--dir', '../x']);
+    assert.equal(outside.valid, false);
+    assert.match(
+      outside.errors.join('\n'),
+      /--dir must be a relative directory inside the repository/
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('validate-record: --draft checks the content of a record kept outside the repository', () => {
+  const repo = mkdtempSync(join(tmpdir(), 'agentic-ground-draft-repo-'));
+  const scratch = mkdtempSync(join(tmpdir(), 'agentic-ground-draft-'));
+  try {
+    const draft = join(scratch, 'comment.md');
+    writeFileSync(draft, VALID_GROUND_RECORD.replace('GROUND-0002', 'GROUND-0000'));
+    const ok = runGroundRecordArgs(repo, [draft, '--draft']);
+    assert.equal(ok.valid, true, ok.errors.join('; '));
+    writeFileSync(draft, VALID_GROUND_RECORD.replace('## Evidence', '## Proof'));
+    const bad = runGroundRecordArgs(repo, [draft, '--draft']);
+    assert.equal(bad.valid, false);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+    rmSync(scratch, { recursive: true, force: true });
+  }
+});
+
+// Task 0118 slice 2, ADR-0097: the artifact gate follows the configured
+// research directory.
+function researchProcess(path) {
+  return {
+    lifecycleOwner: 'external',
+    records: { research: { destination: 'repo-path', path } },
+  };
+}
+
+test('artifact-gate: a configured research directory is governed and the validator gets --dir', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    mkdirSync(join(root, '.agentic'), { recursive: true });
+    writeFileSync(
+      join(root, '.agentic', 'project-sources.json'),
+      JSON.stringify({
+        schemaVersion: 2,
+        process: researchProcess('docs/evidence'),
+        sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+      })
+    );
+    mkdirSync(join(root, 'docs', 'evidence'), { recursive: true });
+    const rel = join('docs', 'evidence', '0001-ground-broken.md');
+    writeFileSync(join(root, rel), '# GROUND-0001: broken\n\n**Status:** recorded\n');
+    const failed = runGate(claudeWriteEvent(root, rel), { root, evidence });
+    assert.equal(failed.status, 2);
+    assert.match(failed.stderr, /missing Decision metadata/);
+    assert.match(
+      failed.stderr,
+      /validate-record\.mjs docs\/evidence\/0001-ground-broken\.md --dir docs\/evidence/
+    );
+    const defaultRel = join('doc', 'research', '0002-ground-x.md');
+    writeFileSync(join(root, defaultRel), '# GROUND-0002: broken\n');
+    const stillGoverned = runGate(claudeWriteEvent(root, defaultRel), { root, evidence });
+    assert.equal(
+      stillGoverned.status,
+      2,
+      'doc/research stays governed beside the configured directory'
+    );
+    const prismRel = join('doc', 'research', '0003-prism-x.md');
+    writeFileSync(join(root, prismRel), '# PRISM-0003: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, prismRel), { root, evidence }).status, 2);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: a matching machine entry configures the research directory; an unsafe path keeps the default', () => {
+  const { root, evidence } = gateRepo();
+  const home = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-gate-machine-')));
+  try {
+    execFileSync('git', ['init', '-q', root]);
+    execFileSync('git', ['-C', root, 'remote', 'add', 'origin', 'git@example.test:acme/w.git']);
+    const machine = join(home, 'sources.json');
+    const write = (path) =>
+      writeFileSync(
+        machine,
+        JSON.stringify({
+          schemaVersion: 2,
+          projects: [
+            {
+              match: { remote: 'git@example.test:acme/w.git' },
+              process: researchProcess(path),
+              sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+            },
+          ],
+        })
+      );
+    const env = { AGENTIC_PROJECT_SOURCES_FILE: machine };
+    write('notes');
+    mkdirSync(join(root, 'notes'), { recursive: true });
+    const rel = join('notes', '0003-ground-y.md');
+    writeFileSync(join(root, rel), '# GROUND-0003: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, rel), { root, evidence, env }).status, 2);
+    write('../outside');
+    const defaultRel = join('doc', 'research', '0004-ground-z.md');
+    writeFileSync(join(root, defaultRel), '# GROUND-0004: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, defaultRel), { root, evidence, env }).status, 2);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: the research directory comes from the resolver, so a ./ path counts and an invalid process does not', () => {
+  for (const [process, governed] of [
+    [researchProcess('./docs/evidence'), true],
+    [{ ...researchProcess('docs/evidence'), unknown: true }, false],
+  ]) {
+    const { root, evidence } = gateRepo();
+    try {
+      mkdirSync(join(root, '.agentic'), { recursive: true });
+      writeFileSync(
+        join(root, '.agentic', 'project-sources.json'),
+        JSON.stringify({
+          schemaVersion: 2,
+          process,
+          sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+        })
+      );
+      mkdirSync(join(root, 'docs', 'evidence'), { recursive: true });
+      const rel = join('docs', 'evidence', '0005-ground-w.md');
+      writeFileSync(join(root, rel), '# GROUND-0005: broken\n');
+      assert.equal(
+        runGate(claudeWriteEvent(root, rel), { root, evidence }).status,
+        governed ? 2 : 0
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+      rmSync(evidence, { recursive: true, force: true });
+    }
+  }
+});
+
+test('validate-record: --dir accepts a ./ prefix', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'agentic-ground-dot-'));
+  try {
+    const record = 'docs/evidence/0002-ground-durable-evidence.md';
+    mkdirSync(join(dir, 'docs', 'evidence'), { recursive: true });
+    writeFileSync(join(dir, record), VALID_GROUND_RECORD);
+    const ok = runGroundRecordArgs(dir, [record, '--dir', './docs/evidence']);
+    assert.equal(ok.valid, true, ok.errors.join('; '));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('artifact-gate: a configured directory inside doc/research leaves every record kind governed there', () => {
+  const { root, evidence } = gateRepo();
+  try {
+    mkdirSync(join(root, '.agentic'), { recursive: true });
+    writeFileSync(
+      join(root, '.agentic', 'project-sources.json'),
+      JSON.stringify({
+        schemaVersion: 2,
+        process: researchProcess('doc/research/ground'),
+        sources: [{ id: 'repository', type: 'repository', role: 'primary' }],
+      })
+    );
+    mkdirSync(join(root, 'doc', 'research', 'ground'), { recursive: true });
+    const rel = join('doc', 'research', 'ground', '0006-prism-v.md');
+    writeFileSync(join(root, rel), '# PRISM-0006: broken\n');
+    assert.equal(runGate(claudeWriteEvent(root, rel), { root, evidence }).status, 2);
+    const groundRel = join('doc', 'research', 'ground', '0002-ground-durable-evidence.md');
+    writeFileSync(join(root, groundRel), VALID_GROUND_RECORD);
+    const valid = runGate(claudeWriteEvent(root, groundRel), { root, evidence });
+    assert.equal(valid.status, 0, valid.stderr);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(evidence, { recursive: true, force: true });
+  }
+});

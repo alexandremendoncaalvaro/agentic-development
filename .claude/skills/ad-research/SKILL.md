@@ -37,6 +37,8 @@ State the conclusion and its confidence per `WORKFLOW.md` §17 Axis 2: **Strong*
 
 ## Step 6 — Write the study
 
+If `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` names `process.records.research` with `repo-path` and a `path`, write the study there instead of `doc/research/`; for `issue-comment` or `external`, follow `ad-ground`'s Step 5 rule.
+
 Write `doc/research/NNNN-<slug>.md` using the template below — conclusion first, evidence graded, sources dated. Status `draft`. Stop after writing; do not self-flip to `concluded` (that needs user review).
 
 ## Step 7 — Graduate (when the conclusion binds)

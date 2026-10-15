@@ -30,6 +30,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   tracked code still uses, and canonical terms nothing uses, reading the
   per-context files of a `CONTEXT-MAP.md`; advisory, judged per hit
   (task-0125).
+- Records follow a configured delivery process: the ground validator takes
+  `--dir` for a configured research directory and `--draft` for a record
+  posted as an issue comment, `cited-records` takes `--dir <kind>=<path>`,
+  and `ad-ground`, `ad-research`, `ad-adr` (with date naming) and `ad-commit`
+  read the process before writing or citing a record (task-0118, ADR-0097).
 - With a configured external lifecycle owner, `ad-task`, `ad-spec` and
   `ad-prd` hand off to the team's process instead of writing, `ad-next`
   recommends by issue stage, `ad-derisk` posts its register on the team's

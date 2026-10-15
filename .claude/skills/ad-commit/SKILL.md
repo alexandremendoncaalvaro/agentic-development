@@ -65,6 +65,8 @@ If a partial-file hunk split is too complex (interleaved changes, refactor + beh
 
 ## Phase 3 — Draft message
 
+When `node .claude/skills/ad-project-state/scripts/project-state.mjs --process` configures a `path` for a record kind, pass `--dir <kind>=<path>` for it (kinds `research`, `adr`, `task`, `spec`). A date-named ADR has no number, so a citation such as ADR-0001 cannot resolve to it; cite it by its path.
+
 Apply [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) format:
 
 ```
