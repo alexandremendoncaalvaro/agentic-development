@@ -1,6 +1,6 @@
 # ADR-0092: Load the Constitution's summary, not its full text
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-10-15
 **Deciders:** Alexandre Alvaro
 **Related:** ADR-0069 (the global kit under `~/.agentic/kit/`)

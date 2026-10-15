@@ -4,6 +4,7 @@
 **Date:** 2026-07-27
 **Deciders:** Alexandre Alvaro
 **Amended by:** ADR-0064 — its profile-based installation scope for `ad-audit`; the maximum-gate process and its evidence requirements are unchanged.
+**Amended by:** ADR-0091 — decision 4's critical second pass runs once, on a model other than the first pass's, and swap-and-agree compares the two passes; a re-audit dispatches only changed groups.
 
 ## Context
 

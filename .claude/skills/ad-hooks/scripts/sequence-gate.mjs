@@ -26,7 +26,9 @@
  *     `.agentic/receipts/` and `.agentic/reviews/` are always neutral).
  *   - gate-run: a gate-run.mjs receipt with exit 0, keyed by tree.
  *   - review and audit: `review-receipts.mjs` (GROUND-0040). Neither result
- *     is judged.
+ *     is judged. A delta review's `Base-SHA:` must chain to a covered review;
+ *     the audit is expected only when the branch changes an `auditPaths`
+ *     glob against its merge base with the default branch (ADR-0091).
  *   - publish: `publish-receipt.mjs`; a receipt whose hash equals the
  *     normalized outgoing body (GROUND-0041). A body known only when the
  *     command runs is runtime-unavailable.
@@ -225,14 +227,29 @@ export function checkGateRun(cwd) {
   };
 }
 
+/**
+ * The review receipts that cover their whole range: a full review, or a delta
+ * review whose base an earlier one of these covers (ADR-0091 decision 3).
+ * Receipts arrive oldest first, so a chain resolves in one pass.
+ */
+function chainedReviews(root, receipts) {
+  const chained = [];
+  for (const receipt of receipts) {
+    if (!receipt.baseTree || newestCovering(root, receipt.baseTree, chained).receipt) {
+      chained.push(receipt);
+    }
+  }
+  return chained;
+}
+
 // A review or an audit names the commit it covered; the check compares that
 // commit's tree with HEAD's under the same freshness rule as a gate run.
-function commitReceiptCheck(check, readCommitReceipts, reproduction) {
+function commitReceiptCheck(check, readCommitReceipts, reproduction, select = (_, r) => r) {
   return (cwd) => {
     const root = repositoryRoot(cwd);
     const tree = headTree(root);
     const { receipts, unreadable } = readCommitReceipts(root);
-    const { receipt, uncomparable } = newestCovering(root, tree, receipts);
+    const { receipt, uncomparable } = newestCovering(root, tree, select(root, receipts));
     return {
       check,
       state: receipt ? 'clear' : 'would-block',
@@ -249,7 +266,8 @@ function commitReceiptCheck(check, readCommitReceipts, reproduction) {
 export const checkReview = commitReceiptCheck(
   'review',
   readReviewReceipts,
-  'run /ad-review on the range ending at HEAD'
+  'run /ad-review on the range not yet covered, ending at HEAD',
+  chainedReviews
 );
 export const checkAudit = commitReceiptCheck(
   'audit',
@@ -258,6 +276,39 @@ export const checkAudit = commitReceiptCheck(
 );
 
 const CHECKS = { 'gate-run': checkGateRun, review: checkReview, audit: checkAudit };
+
+// The default branch a pull request lands on: the remote's HEAD when it is
+// known, else the first of the usual names that exists.
+function defaultBranch(root) {
+  try {
+    return git(root, ['rev-parse', '--abbrev-ref', 'origin/HEAD']);
+  } catch {
+    for (const ref of ['origin/main', 'origin/master', 'main', 'master']) {
+      try {
+        git(root, ['rev-parse', '--verify', '--quiet', `${ref}^{commit}`]);
+        return ref;
+      } catch {
+        // try the next name
+      }
+    }
+    throw new Error('no default branch to compare the branch with');
+  }
+}
+
+/**
+ * Whether the branch changes a path the repository lists under `auditPaths`
+ * in `.agentic/gates.json`, against its merge base with the default branch
+ * (ADR-0091 decision 4). Without `auditPaths`, no audit is expected.
+ */
+export function auditRequired(cwd) {
+  const root = repositoryRoot(cwd);
+  const globs = gatesConfig(root).auditPaths;
+  if (!Array.isArray(globs) || globs.length === 0) return false;
+  const risky = globs.map(globToRegExp);
+  const base = git(root, ['merge-base', 'HEAD', defaultBranch(root)]);
+  const paths = changedPaths(root, base, 'HEAD');
+  return paths.some((path) => risky.some((glob) => glob.test(path)));
+}
 
 function runCheck(check, cwd) {
   const setting = checkSetting(cwd, check);
@@ -364,6 +415,7 @@ function main() {
     if (checkSetting(cwd, check) === false) continue;
     let result;
     try {
+      if (check === 'audit' && !auditRequired(cwd)) continue;
       result = runCheck(check, cwd);
     } catch (error) {
       result = { check, state: 'runtime-unavailable', output: String(error.message) };

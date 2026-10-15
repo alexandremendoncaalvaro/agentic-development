@@ -1,9 +1,11 @@
 # ADR-0091: Review the uncovered delta once, and audit by risk
 
-**Status:** proposed
+**Status:** accepted
 **Date:** 2026-10-15
 **Deciders:** Alexandre Alvaro
-**Amends:** ADR-0036, decision 4's second-pass realization and its twice-run swap-and-agree; ADR-0074, the checkpoint's review and audit line; ADR-0089, decision 2's audit receipt before every pull request action and decision 3's freshness rule for review receipts. Every other decision of the three binds unchanged.
+**Amends:** ADR-0036 — decision 4's second-pass realization and its twice-run swap-and-agree; every other decision binds unchanged.
+**Amends:** ADR-0074 — the checkpoint's review and audit line; every other decision binds unchanged.
+**Amends:** ADR-0089 — decision 2's audit receipt before every pull request action, and decision 3's freshness rule for review receipts; every other decision binds unchanged.
 **Evidence ref:** doc/research/0044-ground-review-economy-and-context-budget.md
 
 ## Context

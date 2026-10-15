@@ -190,3 +190,15 @@ All Acceptance Criteria checked, plus:
 - [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
 - [ ] No orphan `TODO`/`FIXME` introduced
 - [ ] Status updated to `done` and Notes log closes the task
+
+### 2026-10-15 — window restarts with ADR-0091
+
+The owner decided on 2026-10-15 to change the gate now and restart the
+window (task 0117, ADR-0091 decision 7): the audit check now applies only to
+branches that change an `auditPaths` path, and a delta review counts when it
+chains to a covered review. Events recorded before this change measure the
+old checks and are excluded from the decision, listed separately. The new
+window opens when task 0117's pull request merges and runs four weeks under
+the unchanged ADR-0089 decision 6 criterion; the merge time and the re-pinned
+company-repository gate commit are recorded in the next entry. PRISM-0042 stays
+frozen; the read-out cites this entry for the moved window.

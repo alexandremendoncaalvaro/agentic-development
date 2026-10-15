@@ -4,6 +4,7 @@
 **Date:** 2026-09-09
 **Deciders:** Alexandre Alvaro
 **Amended by:** ADR-0083, the Codex-out-of-scope stanza only: Codex now documents lifecycle hooks with context-injection parity, so the tier is no longer Claude-Code-scoped as a category; its first dual-host member is the artifact-validator gate, and this checkpoint stays wired on Claude Code only until its own Codex follow-up. The static, exit-0, kill-switch, and no-coercion decisions stand.
+**Amended by:** ADR-0091 — the checkpoint's fifth line: review only uncovered work and the delta after a fix, and audit only for high-risk or uncovered risks.
 
 ## Context
 
