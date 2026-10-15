@@ -36,3 +36,29 @@ The owner approved this plan and ADR-0092 on 2026-10-15. Three tests in
 file), then green with `configureGlobalConstitution` taking a `kitRoot`
 seam: the TL;DR inline, a digest line, the earlier import block and an
 unedited summary block refreshed, a hand-edited block skipped.
+
+### 2026-10-15 — applied on the owner's machine
+
+Applied from the branch head after the audit, with `configureGlobalConstitution`
+for both hosts: `updated` on the first run, `unchanged` on the second.
+
+- Claude Code, a session in this repository: the always-loaded stack went
+  from 104,210 bytes (GROUND-0044 C8) to 53,124 bytes
+  (`wc -c ~/.claude/CLAUDE.md /Users/ale/dev/ales-workflow/AGENTS.ale.md
+  ~/.claude/RTK.md <memory>/MEMORY.md AGENTS.md`); `WORKFLOW.md` is no longer
+  imported.
+- Codex: `~/.codex/AGENTS.md` went from 619 to 6,666 bytes, now holding the
+  summary text; with this repository's `AGENTS.md` that is 31,066 bytes of
+  auto-injected instructions, under the 32 KiB default with little room.
+  Its `@` lines became an explicit read instruction for `AGENTS.ale.md` and
+  `RTK.md`.
+- The owner's files: the company-repository composition moved to
+  its own overlay file in `/Users/ale/dev/ales-workflow/`, read only in that
+  repository, with the company AI-service documentation rule from
+  `~/.claude/CLAUDE.md`; the "never `gh auth switch`" rule moved into both
+  global files; two memory entries that repeated those rules were removed.
+  The owner commits `ales-workflow`.
+- Open: no Codex session has been observed after the change. The local Codex
+  CLI under mise is broken (its package files are missing), so the check
+  waits for the owner's next Codex session: its rollout file should contain
+  "Context is the product" and no `@/Users/ale/.agentic/kit/WORKFLOW.md` line.

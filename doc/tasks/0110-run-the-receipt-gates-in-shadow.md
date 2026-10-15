@@ -202,3 +202,14 @@ window opens when task 0117's pull request merges and runs four weeks under
 the unchanged ADR-0089 decision 6 criterion; the merge time and the re-pinned
 company-repository gate commit are recorded in the next entry. PRISM-0042 stays
 frozen; the read-out cites this entry for the moved window.
+
+### 2026-10-15 — new window set up
+
+The new window opens at the merge time of pull request #176 (read with
+`gh pr view 176 --json mergedAt`) and runs four weeks from it. The company
+repository's wrapper under `~/.agentic/gates/` now runs the
+gate copied from commit 3b47fd3 to `~/.agentic/gates/3b47fd3/`, whose scripts
+are the ones #176 merges; 3671059 is kept for the excluded earlier events.
+That repository has no `.agentic/gates.json`, so under ADR-0091 its sessions
+log no audit line until it names `auditPaths` locally. The evidence
+directory, the copy-out job and the criterion are unchanged.
