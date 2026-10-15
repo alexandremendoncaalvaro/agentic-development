@@ -29,6 +29,10 @@
  *     is judged. A delta review's `Base-SHA:` must chain to a covered review;
  *     the audit is expected only when the branch changes an `auditPaths`
  *     glob against its merge base with the default branch (ADR-0091).
+ *   - release (`npm publish`, `pnpm publish`, `yarn publish`, `<gh> release
+ *     create`): a line in `<git common dir>/agentic/release.jsonl`, left by
+ *     an approved `ad-release` plan, naming the `package.json` name and
+ *     version; the newest 20 lines are read (ADR-0096).
  *   - publish: `publish-receipt.mjs`; a receipt whose hash equals the
  *     normalized outgoing body (GROUND-0041). A body known only when the
  *     command runs is runtime-unavailable.
@@ -48,7 +52,7 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { appendEvidence } from './artifact-gate.mjs';
 import { git, headTree, readReceipts, repositoryRoot } from './gate-run.mjs';
@@ -87,6 +91,16 @@ function actionsFor(githubCommands) {
       pattern: new RegExp(String.raw`(^|[\s;&|(])(?:${names})\s+pr\s+${verb}\b`),
       checks,
     })),
+    {
+      id: 'npm publish',
+      pattern: /(^|[\s;&|(])(?:npm|pnpm|yarn)\s+publish\b/,
+      checks: ['release'],
+    },
+    {
+      id: 'gh release create',
+      pattern: new RegExp(String.raw`(^|[\s;&|(])(?:${names})\s+release\s+create\b`),
+      checks: ['release'],
+    },
   ];
 }
 
@@ -290,7 +304,52 @@ export const checkAudit = commitReceiptCheck(
   'run /ad-audit on the range ending at HEAD'
 );
 
-const CHECKS = { 'gate-run': checkGateRun, review: checkReview, audit: checkAudit };
+const RELEASE_RECEIPT_WINDOW = 20;
+
+/**
+ * Whether an approved release plan left a receipt for the package version
+ * about to ship. The receipt sits in the git directory every worktree shares,
+ * so the publish from a disposable worktree at the tag finds it.
+ */
+export function checkRelease(cwd) {
+  const root = repositoryRoot(cwd);
+  const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+  if (typeof manifest?.name !== 'string' || typeof manifest?.version !== 'string') {
+    throw new Error('package.json names no package name and version');
+  }
+  const commonDir = resolve(root, git(root, ['rev-parse', '--git-common-dir']));
+  const file = join(commonDir, 'agentic', 'release.jsonl');
+  const lines = existsSync(file)
+    ? readFileSync(file, 'utf8').split('\n').filter(Boolean).slice(-RELEASE_RECEIPT_WINDOW)
+    : [];
+  let unreadable = 0;
+  const receipt = lines.reverse().find((line) => {
+    try {
+      const value = JSON.parse(line);
+      return value.package === manifest.name && value.version === manifest.version;
+    } catch {
+      unreadable += 1;
+      return false;
+    }
+  });
+  return {
+    check: 'release',
+    state: receipt ? 'clear' : 'would-block',
+    package: manifest.name,
+    version: manifest.version,
+    receipt: receipt ? JSON.parse(receipt).scope : null,
+    missing: receipt ? [] : ['release'],
+    unreadable_receipts: unreadable,
+    reproduction: 'approve the release plan through /ad-release before publishing',
+  };
+}
+
+const CHECKS = {
+  'gate-run': checkGateRun,
+  review: checkReview,
+  audit: checkAudit,
+  release: checkRelease,
+};
 
 // The default branch a pull request lands on: the remote's HEAD when it is
 // known, else the first of the usual names that exists.
@@ -399,7 +458,7 @@ function logPublication(event, cwd) {
 
 const MAY_PUBLISH = /\b(?:pr|issue)\b[\s\\]+comment\b|\/comments\b/;
 const MAY_ACT =
-  /\bpush\b|\bpr\b[\s\\]+(?:create|ready|merge|comment)\b|\bissue\b[\s\\]+comment\b|\/comments\b/;
+  /\bpush\b|\bpr\b[\s\\]+(?:create|ready|merge|comment)\b|\bissue\b[\s\\]+comment\b|\/comments\b|\bpublish\b|\brelease\b[\s\\]+create\b/;
 
 function main() {
   if (process.env.AD_SEQUENCE_GATE === '0') return;

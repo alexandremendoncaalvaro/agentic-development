@@ -1093,12 +1093,15 @@ const RELEASE_PLAN = join(
   'release-plan.mjs'
 );
 
-function runReleasePlan(input) {
+// Runs outside any repository by default, so an approved plan's release
+// receipt never lands in this repository's git directory.
+function runReleasePlan(input, cwd = mkdtempSync(join(tmpdir(), 'release-plan-'))) {
   const env = { ...process.env };
   delete env.GIT_DIR;
   delete env.GIT_WORK_TREE;
   delete env.GIT_INDEX_FILE;
   const out = execFileSync('node', [RELEASE_PLAN], {
+    cwd,
     encoding: 'utf8',
     input: JSON.stringify(input),
     env,
@@ -1285,6 +1288,115 @@ test('release-plan: one digest-bound approval authorizes every unchanged stage',
   assert.equal(publish.planAuthorized, true);
   assert.equal(local.next.requiresConfirmation, false);
   assert.equal(publish.next.requiresConfirmation, false);
+});
+
+const RELEASE_CONTEXT = {
+  releaseKind: 'patch',
+  packageName: '@example/package',
+  packageVersion: '1.2.3',
+  publishTag: 'latest',
+  branch: 'chore/release-v1.2.3',
+  baseBranch: 'main',
+  tag: 'v1.2.3',
+  prTitle: 'chore(release): v1.2.3',
+  prBody: '## Summary\n\n- Release v1.2.3\n',
+  prerelease: false,
+  completed: [],
+  merged: false,
+};
+
+function releaseReceipts(dir) {
+  const file = join(dir, '.git', 'agentic', 'release.jsonl');
+  if (!existsSync(file)) return [];
+  return readFileSync(file, 'utf8')
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+}
+
+test('release-plan: an approved plan leaves one release receipt in the shared git directory', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'release-plan-receipt-'));
+  gitInit(dir);
+  const preview = runReleasePlan(RELEASE_CONTEXT, dir);
+  assert.equal(preview.releaseReceipt, undefined);
+  const confirmation = {
+    scope: 'release-plan',
+    digest: preview.planApproval.digest,
+    approved: true,
+  };
+  const first = runReleasePlan({ ...RELEASE_CONTEXT, confirmation }, dir);
+  const again = runReleasePlan({ ...RELEASE_CONTEXT, confirmation }, dir);
+  assert.equal(first.releaseReceipt, 'recorded');
+  assert.equal(again.releaseReceipt, 'present');
+  const receipts = releaseReceipts(dir);
+  assert.equal(receipts.length, 1);
+  assert.equal(receipts[0].package, '@example/package');
+  assert.equal(receipts[0].version, '1.2.3');
+  assert.equal(receipts[0].digest, preview.planApproval.digest);
+  assert.equal(receipts[0].scope, 'release-plan');
+  assert.match(receipts[0].at, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test('release-plan: an unapproved or mismatched plan writes no release receipt', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'release-plan-receipt-'));
+  gitInit(dir);
+  runReleasePlan(RELEASE_CONTEXT, dir);
+  const mismatched = runReleasePlan(
+    {
+      ...RELEASE_CONTEXT,
+      confirmation: { scope: 'release-plan', digest: 'f'.repeat(64), approved: true },
+    },
+    dir
+  );
+  assert.equal(mismatched.releaseReceipt, undefined);
+  assert.deepEqual(releaseReceipts(dir), []);
+});
+
+test('release-plan: a per-stage publish approval leaves a receipt naming the stage', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'release-plan-receipt-'));
+  gitInit(dir);
+  const result = runReleasePlan(
+    {
+      ...RELEASE_CONTEXT,
+      completed: ['local-release', 'branch-push', 'tag-push'],
+      merged: true,
+      confirmation: { stage: 'npm-publish', approved: true },
+    },
+    dir
+  );
+  assert.deepEqual(result.execution, ['npm', 'publish']);
+  assert.equal(result.releaseReceipt, 'recorded');
+  const [receipt] = releaseReceipts(dir);
+  assert.equal(receipt.scope, 'npm-publish');
+  assert.equal(receipt.digest, null);
+});
+
+test('release-plan: a per-stage approval without the package identity writes no receipt', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'release-plan-receipt-'));
+  gitInit(dir);
+  const withoutName = { ...RELEASE_CONTEXT };
+  delete withoutName.packageName;
+  const result = runReleasePlan(
+    {
+      ...withoutName,
+      completed: ['local-release', 'branch-push', 'tag-push'],
+      merged: true,
+      confirmation: { stage: 'npm-publish', approved: true },
+    },
+    dir
+  );
+  assert.equal(result.releaseReceipt, 'unavailable: missing package name or version');
+  assert.deepEqual(releaseReceipts(dir), []);
+});
+
+test('release-plan: outside a git repository an approval reports the receipt as unavailable', () => {
+  const preview = runReleasePlan(RELEASE_CONTEXT);
+  const result = runReleasePlan({
+    ...RELEASE_CONTEXT,
+    confirmation: { scope: 'release-plan', digest: preview.planApproval.digest, approved: true },
+  });
+  assert.deepEqual(result.execution, ['npm', 'run', 'release', '--', 'patch']);
+  assert.match(result.releaseReceipt, /^unavailable: /);
 });
 
 test('release-plan: a changed target invalidates a plan-wide approval', () => {

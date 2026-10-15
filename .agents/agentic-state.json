@@ -394,7 +394,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "83cdb1b8226764a636a2898437ad73ecce63a543f13d71c108ec5e32f8d89fcf"
+          "sourceSha": "9d8eb72973f7218c426657b613c88ff99908b6f53abc3d694fd64e734eebe5a4"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
@@ -402,7 +402,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "c8de4870f740f593f2bfee22a50baf8a19d5273350e0fd48106ce8f69c320be0"
+          "sourceSha": "07deb0a8a02e424c369b707336ba3e8a37e621fdc5eb29698e6e5926c057d734"
         }
       ]
     },
@@ -657,7 +657,7 @@
         },
         {
           "path": ".agents/skills/ad-release/scripts/release-plan.mjs",
-          "sourceSha": "99df63c2d9b6d233e0b3095dd8ea898765d44db3c14396dfac26670557b43ee4"
+          "sourceSha": "af474e43ab49a621fadbe98e0b7a4fbb2101ea2df9e30f70bdcca5b25621f6c7"
         },
         {
           "path": ".agents/skills/ad-release/scripts/release-state.mjs",
@@ -669,7 +669,7 @@
         },
         {
           "path": ".agents/skills/ad-release/SKILL.md",
-          "sourceSha": "583c32e5fe71cd9abb8a291db3ad3a4fa2e53a042e48305db07ac86d7f2b42af"
+          "sourceSha": "550b389ffde21953676be116e88676378165b518981f0e4f82cb95825bf12fc4"
         }
       ]
     },
