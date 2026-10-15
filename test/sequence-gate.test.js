@@ -37,12 +37,34 @@ function git(repo, ...args) {
   ).trim();
 }
 
-function fixtureRepo() {
+// A feature branch one commit ahead of `main`, in a repository whose every
+// path is high-risk, so a pull request action also asks for an audit
+// (ADR-0091 decision 4); `bareFixtureRepo` leaves out the risk list.
+function bareFixtureRepo() {
   const repo = mkdtempSync(join(tmpdir(), 'sequence-gate-repo-'));
-  git(repo, 'init', '-q');
+  git(repo, 'init', '-q', '-b', 'main');
   writeFileSync(join(repo, 'a.txt'), 'one\n');
   git(repo, 'add', '-A');
   git(repo, 'commit', '-qm', 'base');
+  git(repo, 'switch', '-q', '-c', 'feature');
+  writeFileSync(join(repo, 'feature.txt'), 'feature\n');
+  git(repo, 'add', '-A');
+  git(repo, 'commit', '-qm', 'feature');
+  return repo;
+}
+
+function fixtureRepo() {
+  const repo = mkdtempSync(join(tmpdir(), 'sequence-gate-repo-'));
+  git(repo, 'init', '-q', '-b', 'main');
+  writeFileSync(join(repo, 'a.txt'), 'one\n');
+  mkdirSync(join(repo, '.agentic'), { recursive: true });
+  writeFileSync(join(repo, '.agentic', 'gates.json'), '{"auditPaths": ["**"]}\n');
+  git(repo, 'add', '-A');
+  git(repo, 'commit', '-qm', 'base');
+  git(repo, 'switch', '-q', '-c', 'feature');
+  writeFileSync(join(repo, 'feature.txt'), 'feature\n');
+  git(repo, 'add', '-A');
+  git(repo, 'commit', '-qm', 'feature');
   return repo;
 }
 
@@ -393,7 +415,10 @@ test('sequence-gate: each pull request action writes one line per check it requi
 
 function writeGates(repo, config) {
   mkdirSync(join(repo, '.agentic'), { recursive: true });
-  writeFileSync(join(repo, '.agentic', 'gates.json'), `${JSON.stringify(config)}\n`);
+  writeFileSync(
+    join(repo, '.agentic', 'gates.json'),
+    `${JSON.stringify({ auditPaths: ['**'], ...config })}\n`
+  );
 }
 
 test('sequence-gate: gates.json turns a check off for the repository', () => {
@@ -861,4 +886,103 @@ test('regression: task-0109 review, a gates.json that is not an object surfaces 
     ['gate-run'],
     'a branch name is not a comment'
   );
+});
+
+// ADR-0091 decision 4: an audit receipt is expected only when the branch
+// changes a path the repository lists as high-risk.
+test('sequence-gate: without auditPaths no audit line is written', () => {
+  const repo = bareFixtureRepo();
+  const checks = runGate(repo, 'gh pr create --fill').lines.map((line) => line.check);
+  assert.deepEqual(checks, ['gate-run', 'review']);
+});
+
+test('sequence-gate: a branch that changes no high-risk path writes no audit line', () => {
+  const repo = bareFixtureRepo();
+  mkdirSync(join(repo, '.agentic'), { recursive: true });
+  writeFileSync(join(repo, '.agentic', 'gates.json'), '{"auditPaths": ["src/gate/**"]}\n');
+  assert.deepEqual(linesFor(runGate(repo, 'gh pr merge').lines, 'audit'), []);
+});
+
+test('sequence-gate: a branch that changes a high-risk path asks for the audit', () => {
+  const repo = bareFixtureRepo();
+  mkdirSync(join(repo, '.agentic'), { recursive: true });
+  writeFileSync(join(repo, '.agentic', 'gates.json'), '{"auditPaths": ["src/gate/**"]}\n');
+  mkdirSync(join(repo, 'src', 'gate'), { recursive: true });
+  writeFileSync(join(repo, 'src', 'gate', 'check.js'), 'export {};\n');
+  git(repo, 'add', 'src');
+  git(repo, 'commit', '-qm', 'touch the gate');
+  const [audit] = linesFor(runGate(repo, 'gh pr merge').lines, 'audit');
+  assert.equal(audit.state, 'would-block');
+  writeAudit(repo, git(repo, 'rev-parse', 'HEAD'));
+  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'audit')[0].state, 'clear');
+});
+
+test('sequence-gate: with auditPaths and no default branch to compare, the audit could not be read', () => {
+  const repo = mkdtempSync(join(tmpdir(), 'sequence-gate-repo-'));
+  git(repo, 'init', '-q', '-b', 'trunk');
+  mkdirSync(join(repo, '.agentic'), { recursive: true });
+  writeFileSync(join(repo, '.agentic', 'gates.json'), '{"auditPaths": ["**"]}\n');
+  writeFileSync(join(repo, 'a.txt'), 'one\n');
+  git(repo, 'add', '-A');
+  git(repo, 'commit', '-qm', 'base');
+  const [audit] = linesFor(runGate(repo, 'gh pr merge').lines, 'audit');
+  assert.equal(audit.state, 'runtime-unavailable');
+  assert.match(audit.output, /default branch/);
+});
+
+// ADR-0091 decisions 2 and 3: a delta review names its covered base, and
+// counts only when an earlier review covers that base.
+function writeDeltaReview(repo, targetSha, baseSha, stamp) {
+  mkdirSync(join(repo, '.agentic', 'reviews'), { recursive: true });
+  writeFileSync(
+    join(repo, '.agentic', 'reviews', `${stamp}-delta-verdicts.md`),
+    `Target-SHA: ${targetSha}\nBase-SHA: ${baseSha}\n\n## Standards Findings\n\nnone\n`
+  );
+}
+
+function commitChange(repo, text) {
+  writeFileSync(join(repo, 'a.txt'), text);
+  git(repo, 'commit', '-qam', text.trim());
+  return git(repo, 'rev-parse', 'HEAD');
+}
+
+test('sequence-gate: a delta review chained to a covered review clears the review check', () => {
+  const repo = fixtureRepo();
+  const first = git(repo, 'rev-parse', 'HEAD');
+  writeReview(repo, first, '20261015T100000Z');
+  const second = commitChange(repo, 'fix one\n');
+  writeDeltaReview(repo, second, first, '20261015T110000Z');
+  const third = commitChange(repo, 'fix two\n');
+  writeDeltaReview(repo, third, second, '20261015T120000Z');
+  const [review] = linesFor(runGate(repo, 'gh pr merge').lines, 'review');
+  assert.equal(review.state, 'clear');
+  assert.equal(review.receipt, third);
+});
+
+test('sequence-gate: a delta review whose base no review covers is a would-block', () => {
+  const repo = fixtureRepo();
+  const first = git(repo, 'rev-parse', 'HEAD');
+  const second = commitChange(repo, 'fix one\n');
+  writeDeltaReview(repo, second, first, '20261015T110000Z');
+  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'review')[0].state, 'would-block');
+});
+
+test('sequence-gate: a malformed Base-SHA is counted as unreadable', () => {
+  const repo = fixtureRepo();
+  const head = git(repo, 'rev-parse', 'HEAD');
+  writeDeltaReview(repo, head, 'not-a-sha', '20261015T110000Z');
+  const [review] = linesFor(runGate(repo, 'gh pr merge').lines, 'review');
+  assert.equal(review.state, 'would-block');
+  assert.equal(review.unreadable_receipts, 1);
+});
+
+test('sequence-gate: a delta review whose covered base is not an ancestor of its target is a would-block', () => {
+  const repo = fixtureRepo();
+  git(repo, 'switch', '-q', '-c', 'side', 'main');
+  const side = commitChange(repo, 'side work\n');
+  writeReview(repo, side, '20261015T100000Z');
+  git(repo, 'switch', '-q', 'feature');
+  const head = commitChange(repo, 'fix one\n');
+  writeDeltaReview(repo, head, side, '20261015T110000Z');
+  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'review')[0].state, 'would-block');
 });

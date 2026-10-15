@@ -63,7 +63,7 @@
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "4214f0a2c5512c8e36ac395eb31f370197af814e759588025554977d9613a54d"
+          "sourceSha": "9a4c24467b64a8df8bcec1db1b889853b0c0d9fdb9abd0e29e898c2438ef59ff"
         }
       ]
     },
@@ -310,19 +310,19 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/review-receipts.mjs",
-          "sourceSha": "6abdbf19cbcdc079bcac5a179d06a4e94e338f2afb0e53499b61a56d32504026"
+          "sourceSha": "afc8db728ee9361acc4ea3ef04fa1e056a61d614b670fcada0ef5e7641b365a4"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "bbe7fd59349d2ba661b028754101efb7e64f1e2d02e70fbe510da3ad26972ce7"
+          "sourceSha": "83cdb1b8226764a636a2898437ad73ecce63a543f13d71c108ec5e32f8d89fcf"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
-          "sourceSha": "4929ac3427e18779bf48fc10eb4227d1b3d41972cf5acb14734bc9f185248aac"
+          "sourceSha": "6f6583233038f53c8891573311b8c00a618c82e278eb02a2e5fd2783ca6f377d"
         },
         {
           "path": ".claude/skills/ad-hooks/SKILL.md",
-          "sourceSha": "c42dd9be0a09aa8db30fe33854c478ccde7ff4c7d1d507a629c2c1f6a4b36308"
+          "sourceSha": "2ffbf46f35b0c47579a11d9737136a47d9b08073357635820181c0a672ec5b04"
         }
       ]
     },
@@ -604,7 +604,7 @@
         },
         {
           "path": ".claude/skills/ad-review/SKILL.md",
-          "sourceSha": "751d11e263164a4a221de51073f4a54c099a0df15eb70c574f7790960492d89a"
+          "sourceSha": "3b99b72002f8e47b8229273c3872262237c2b6d00fc46a7dcc0a4a5961b76be9"
         }
       ]
     },

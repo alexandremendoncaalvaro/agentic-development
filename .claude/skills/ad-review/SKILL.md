@@ -11,7 +11,9 @@ Implements WORKFLOW §10 (Reviewer With Fresh Context). The current session is b
 
 ## Step 0 — Scope the review
 
-Confirm what to review. Default scopes, in priority order:
+**Read the coverage ledger first (ADR-0091).** Before choosing a scope, list what already covers this work: the receipts under `.agentic/reviews/` (each `*-verdicts.md` with its `Target-SHA:`, and audit summaries), the task's Notes, and the pull request's reviews, a harness's or review bot's included. A record counts as coverage when it names the code state, the rules or criteria applied, the findings and their dispositions. State in one line what is covered and review only the remainder. When a covered review targets an ancestor of the range end, the scope is the delta `<covered SHA>..<range end>`: carry each prior finding with its disposition, and review the changed lines plus the code they interact with. A changed design or integration boundary reopens the coverage it touches. Never re-run a review over a state a receipt already covers.
+
+Then confirm what to review. Default scopes, in priority order:
 
 1. User-named ref or PR (`/ad-review main..HEAD`, `/ad-review PR#42`, `/ad-review <commit-sha>`).
 2. Current branch vs `main` (`git diff main...HEAD`).
@@ -135,7 +137,7 @@ Present the two sub-agents' reports verbatim, under explicit headings, in this o
 
 Do **not** merge or rerank findings — the two axes are deliberately separate so the user can see them independently. Do **not** synthesize an overall "approve" verdict.
 
-**Persist the verdicts before presenting them.** Write both sub-agents' reports verbatim, under the same two headings, to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the handoffs. Begin the file with one line, `Target-SHA: <full SHA>`, naming the commit at the end of the reviewed range (`git rev-parse <range end>`, never a later `HEAD`), or `Target-SHA: none (working tree)` for uncommitted work. That line is the review receipt `ad-hooks`' shadow receipt gate reads before `gh pr create`, `gh pr ready` and `gh pr merge` (ADR-0089): it counts while the commit's tree equals `HEAD`'s or differs only in receipt-neutral paths, and a working-tree review never counts. A handoff proves what the reviewer was given; only the persisted output proves what the reviewer found. Write the file at review time, in this step, never as a reconstruction afterwards. The file is a contemporaneous artifact on the reviewing machine, not durable evidence: `.agentic/reviews/` is gitignored by design. A "review found X" claim that must outlive the machine quotes the finding into the tracked record (the task's Notes, the pull request) or carries an OPEN QUESTION label.
+**Persist the verdicts before presenting them.** Write both sub-agents' reports verbatim, under the same two headings, to `.agentic/reviews/<ISO-timestamp>-<scope-slug>-verdicts.md` beside the handoffs. Begin the file with one line, `Target-SHA: <full SHA>`, naming the commit at the end of the reviewed range (`git rev-parse <range end>`, never a later `HEAD`), or `Target-SHA: none (working tree)` for uncommitted work. A delta review writes a second line, `Base-SHA: <covered SHA>`, naming the covered review it continues; the gate counts it only when that base is an ancestor of the target and an earlier review receipt covers it. That line is the review receipt `ad-hooks`' shadow receipt gate reads before `gh pr create`, `gh pr ready` and `gh pr merge` (ADR-0089): it counts while the commit's tree equals `HEAD`'s or differs only in receipt-neutral paths, and a working-tree review never counts. A handoff proves what the reviewer was given; only the persisted output proves what the reviewer found. Write the file at review time, in this step, never as a reconstruction afterwards. The file is a contemporaneous artifact on the reviewing machine, not durable evidence: `.agentic/reviews/` is gitignored by design. A "review found X" claim that must outlive the machine quotes the finding into the tracked record (the task's Notes, the pull request) or carries an OPEN QUESTION label.
 
 End with a one-line aggregate summary:
 
@@ -157,7 +159,7 @@ Reference both persisted handoff paths in your reply so the user can audit what 
 
 ## Next
 
-- Address every Standards Blocker before merge — that's the code-quality hard gate. Re-run `/ad-review` on the fix to confirm it cleared.
+- Address every Standards Blocker before merge — that's the code-quality hard gate. Review the fix as a delta (`<reviewed SHA>..HEAD`, with its `Base-SHA:` line) to confirm it cleared; never re-run the full range.
 - Address Spec Blockers next — implementation-vs-spec drift is the second hard gate.
 - Each Concern (from either axis) becomes a follow-up `/ad-task`; do not let them silently accumulate.
 - Notes are informational; close them out in the original task's `Notes` log if relevant.

@@ -21,6 +21,7 @@ import { git, headTree, repositoryRoot } from './gate-run.mjs';
 export const REVIEWS_DIR = join('.agentic', 'reviews');
 const SHA = /^[0-9a-f]{40}$/;
 const TARGET_SHA_LINE = /^Target-SHA:[ \t]*(.*?)\s*$/;
+const BASE_SHA_LINE = /^Base-SHA:[ \t]*(.*?)\s*$/;
 const WORKING_TREE = 'none (working tree)';
 export const MAX_COMMIT_RECEIPTS = 20;
 
@@ -32,9 +33,11 @@ export const MAX_COMMIT_RECEIPTS = 20;
  * target, read by `targetOf`, is a full commit SHA, resolved to that
  * commit's tree. A file with no target (written before receipts existed) or
  * a working-tree target is no receipt; an unparsable file, any other target
- * or a commit that cannot be resolved is counted as unreadable.
+ * or a commit that cannot be resolved is counted as unreadable. `baseOf`,
+ * for review receipts only, reads the covered base a delta review names
+ * (ADR-0091); a malformed or unresolvable base is unreadable too.
  */
-function readCommitReceipts(root, suffix, targetOf) {
+function readCommitReceipts(root, suffix, targetOf, baseOf = () => undefined) {
   const dir = join(root, REVIEWS_DIR);
   const receipts = [];
   let unreadable = 0;
@@ -45,8 +48,11 @@ function readCommitReceipts(root, suffix, targetOf) {
     .slice(-MAX_COMMIT_RECEIPTS);
   for (const name of names) {
     let sha;
+    let base;
     try {
-      sha = targetOf(readFileSync(join(dir, name), 'utf8'));
+      const text = readFileSync(join(dir, name), 'utf8');
+      sha = targetOf(text);
+      base = baseOf(text);
     } catch {
       unreadable += 1;
       continue;
@@ -56,8 +62,17 @@ function readCommitReceipts(root, suffix, targetOf) {
       unreadable += 1;
       continue;
     }
+    if (base !== undefined && !SHA.test(base)) {
+      unreadable += 1;
+      continue;
+    }
     try {
-      receipts.push({ sha, tree: git(root, ['rev-parse', `${sha}^{tree}`]) });
+      const receipt = { sha, tree: git(root, ['rev-parse', `${sha}^{tree}`]) };
+      if (base !== undefined) {
+        receipt.base = base;
+        receipt.baseTree = git(root, ['rev-parse', `${base}^{tree}`]);
+      }
+      receipts.push(receipt);
     } catch {
       unreadable += 1;
     }
@@ -65,12 +80,16 @@ function readCommitReceipts(root, suffix, targetOf) {
   return { receipts, unreadable };
 }
 
-/** `ad-review` verdicts files, by their `Target-SHA:` line. */
+/**
+ * `ad-review` verdicts files, by their `Target-SHA:` line, and the
+ * `Base-SHA:` line a delta review writes second.
+ */
 export function readReviewReceipts(root) {
   return readCommitReceipts(
     root,
     '-verdicts.md',
-    (text) => TARGET_SHA_LINE.exec(text.split('\n', 1)[0])?.[1]
+    (text) => TARGET_SHA_LINE.exec(text.split('\n', 1)[0])?.[1],
+    (text) => BASE_SHA_LINE.exec(text.split('\n', 2)[1] ?? '')?.[1]
   );
 }
 

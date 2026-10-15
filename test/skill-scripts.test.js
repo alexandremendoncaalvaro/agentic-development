@@ -4211,6 +4211,10 @@ test('workflow-checkpoint: valid prompt event → short imperative checkpoint na
   assert.match(out, /trivial/i, 'checkpoint tells the model when to skip');
   assert.match(out, /summary/i, 'checkpoint asks for the session-opening summary');
   assert.match(out, /roadmap/i, 'checkpoint asks for the checklist roadmap');
+  assert.match(out, /not yet covered/i, 'checkpoint reviews only uncovered work (ADR-0091)');
+  assert.match(out, /delta/i, 'checkpoint reviews the delta after a fix (ADR-0091)');
+  assert.match(out, /\/ad-audit only for high-risk/i, 'checkpoint audits by risk (ADR-0091)');
+  assert.doesNotMatch(out, /before a PR: \/ad-audit/, 'no audit before every PR');
   assert.ok(!out.trimStart().startsWith('{'), 'plain text, not a JSON decision object');
 });
 

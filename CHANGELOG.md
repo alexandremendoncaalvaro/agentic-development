@@ -6,6 +6,22 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Changed
+
+- The host-global rules file (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`)
+  carries only the TL;DR of `WORKFLOW.md` inline, with the full text's path,
+  instead of importing the whole file: about 49 KB less in every Claude Code
+  session, and the Codex file, whose import Codex never expanded, now holds
+  the summary text itself. An earlier import block or
+  an unedited summary block is refreshed on `init` and `update`; a hand-edited
+  one is kept and reported (task-0119, ADR-0092).
+- The shadow receipt gate expects an audit receipt only when the branch
+  changes a path listed under `auditPaths` in `.agentic/gates.json`, and
+  counts a delta review (`Base-SHA:`) only when its base is an ancestor of
+  its target and a covered review; the workflow checkpoint asks for review of uncovered work and the
+  delta after a fix, and an audit only for high-risk or uncovered risks
+  (task-0117, ADR-0091).
+
 ### Fixed
 
 - The `agentic-session` band's **AD handoff** button runs `/ad-handoff`; it
