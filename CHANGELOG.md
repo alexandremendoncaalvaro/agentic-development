@@ -6,6 +6,8 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-15
+
 ### Added
 
 - `ad-hooks` ships a command guard on `PreToolUse` (both hosts) that denies
