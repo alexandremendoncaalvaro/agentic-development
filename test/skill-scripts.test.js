@@ -1869,6 +1869,22 @@ test('validate-record: a low and reversible record may leave claims ungraded', (
   );
 });
 
+test('validate-record: a grade given in a short record needs its tier', () => {
+  const graded = groundReport(staked('low × reversible', '**Strength:** Medium\n'));
+  assert.equal(graded.valid, false);
+  assert.match(graded.errors.join('\n'), /E1 has no tier/);
+});
+
+test('validate-record: a staked record names design choice as a valid strength', () => {
+  const report = groundReport(
+    staked('medium × reversible', '**Tier:** Primary\n**Strength:** Strong\n')
+  );
+  assert.match(
+    report.errors.join('\n'),
+    /E1 has no valid strength: add a line "\*\*Strength:\*\* <High \| Medium \| Low \| Very-low \| design choice>"/
+  );
+});
+
 test('validate-record: a record without stakes keeps the earlier rules and warns', () => {
   const legacy = groundReport(VALID_GROUND_RECORD);
   assert.equal(legacy.valid, true);

@@ -47,3 +47,13 @@ downgrade factors; the template, `ad-ground` (both hosts) and `ad-research`
 (Step 8, Assess, and an Assessment section) follow. RESEARCH-0030's derived
 decision now names ADR-0085 and ADR-0093. The new WORKFLOW.md hash joins the
 legacy-migration list.
+
+### 2026-10-15 — review of 3a5ca8c
+
+Two-axis review, no blocker. Concerns and dispositions: two `### Changed`
+headings in the CHANGELOG (fixed, one heading); the strength hint did not
+name "design choice" (fixed for a staked record, pinned by a test); a short
+record rejected a grade without a tier (kept, as ADR-0095 decision 2 and
+`ad-ground` now state: a grade, once given, needs its tier; pinned by a
+test). Notes on the RESEARCH-0030 line and the legacy hash were already
+disclosed above.

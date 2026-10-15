@@ -239,11 +239,11 @@
         },
         {
           "path": ".claude/skills/ad-ground/scripts/validate-record.mjs",
-          "sourceSha": "170258bd384a8cd067cfbd89a3d5628e836d2f5c75a2e581e9bb81c3ba655f8a"
+          "sourceSha": "f52d9254e1e38cbb2373f6f599a9b68cee89ef57912e518c115b022c401fa0d4"
         },
         {
           "path": ".claude/skills/ad-ground/SKILL.md",
-          "sourceSha": "eb7de7dd8b4acf5f7955fc7038a58d2a5eaad0d8deb4a1450142329568f7f52b"
+          "sourceSha": "c22a7884842de6a9664ada4ed301de9a22748035add69ed89dc0c139be1e7d06"
         }
       ]
     },

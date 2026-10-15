@@ -68,7 +68,7 @@ When the host exposes `AskUserQuestion`, render the checkpoint as a structured m
 
 ## Step 5 — Persist the evidence receipt
 
-Chat citations are not an audit trail. Before the decision directs a non-trivial repository change, write a versioned ground record under `doc/research/`, with a `**Stakes:**` line. A low and reversible record is the short record of quick mode: sources and claims with their provenance, grades optional; any other stake grades every claim from its tier. It is a receipt for an already-defined implementation path, not an `ad-research` study answering an open question; both share the directory and monotonic number ledger.
+Chat citations are not an audit trail. Before the decision directs a non-trivial repository change, write a versioned ground record under `doc/research/`, with a `**Stakes:**` line. A low and reversible record is the short record of quick mode: sources and claims with their provenance, grades optional (a grade, once given, needs its tier); any other stake grades every claim from its tier. It is a receipt for an already-defined implementation path, not an `ad-research` study answering an open question; both share the directory and monotonic number ledger.
 
 When this pass is the Acquire phase of `/ad-research`, the study is already the durable evidence artifact: put the same claim-to-source map in that study and do **not** create a duplicate ground receipt.
 

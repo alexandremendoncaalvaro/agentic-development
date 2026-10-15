@@ -36,6 +36,7 @@ const REQUIRED_HEADINGS = [
 // the register and claim shapes without them (task-0086).
 const ACCESS_SHAPE = '(accessed <YYYY-MM-DD> via <method>)';
 const STRENGTH_SHAPE = '"**Strength:** <High | Medium | Low | Very-low>"';
+const STAKED_STRENGTH_SHAPE = '"**Strength:** <High | Medium | Low | Very-low | design choice>"';
 const TIER_SHAPE = '"**Tier:** <Measurement | Primary | Secondary | Single | Opinion>"';
 const STAKES_SHAPE = '"<low | medium | high> × <reversible | irreversible>"';
 
@@ -186,7 +187,8 @@ function parseClaims(body, sourceIds, errors, stakes = null) {
     const designChoice = stakes !== null && metadata(claim, 'Strength') === 'design choice';
     const optional = stakes?.short && metadata(claim, 'Strength') === null;
     if (!strengthOk && !designChoice && !optional) {
-      errors.push(`${id} has no valid strength: add a line ${STRENGTH_SHAPE} under its heading`);
+      const shape = stakes === null ? STRENGTH_SHAPE : STAKED_STRENGTH_SHAPE;
+      errors.push(`${id} has no valid strength: add a line ${shape} under its heading`);
     }
     if (stakes !== null) checkTier(id, claim, stakes, errors);
     const provenance = metadata(claim, 'Provenance');

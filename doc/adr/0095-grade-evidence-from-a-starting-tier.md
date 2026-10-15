@@ -13,7 +13,7 @@ The evidence records under `doc/research/` held 139 High and 25 Medium grades an
 ## Decision
 
 1. WORKFLOW §17 names five tiers with a starting grade, after GRADE: Measurement (High), Primary (Medium), Secondary (Low), Single (Low), Opinion (Very-low). Five factors lower a claim: risk of bias, inconsistency, indirectness (recency placed here by the kit), imprecision and search bias. A grade above the tier's start needs a stated reason. A normative claim is a design choice and carries no grade.
-2. A ground record names its stakes (`**Stakes:** <low | medium | high> × <reversible | irreversible>`). With stakes, each claim names its tier, a grade above the start needs an `**Upgrade:**` line, and "design choice" is a valid strength. A low and reversible record is the short record: sources and claims with provenance, grades optional.
+2. A ground record names its stakes (`**Stakes:** <low | medium | high> × <reversible | irreversible>`). With stakes, each claim names its tier, a grade above the start needs an `**Upgrade:**` line, and "design choice" is a valid strength. A low and reversible record is the short record: sources and claims with provenance, grades optional; a grade, once given, needs its tier.
 3. A record without stakes keeps the earlier rules and receives a warning; existing records are not re-graded.
 4. `ad-research` gains Step 8, Assess: when the decision a study grounded is revisited, its `## Assessment` section records what the study got right or wrong.
 
