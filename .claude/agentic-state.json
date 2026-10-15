@@ -294,7 +294,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/command-guard.mjs",
-          "sourceSha": "3ad05a733bb40adea34a5a5060b07e29354e983b332779420bbc43a1c2c606e4"
+          "sourceSha": "5d07ff8915e84fde7538d80871bbac2c88e443593003c2e9f5dbca05eaa018de"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/detect-hooks.mjs",

@@ -101,6 +101,8 @@ const ALLOWED = [
   'rtk git commit -m x',
   'git commit -m "fix #12"; git push',
   'pkill -P 54608',
+  'npm test &&\n  git commit -m x',
+  'npm test ||\n  echo failed',
   'pkill -TERM -P 1234 -f worker',
 ];
 

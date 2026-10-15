@@ -95,7 +95,8 @@ Delta review (no blocker) and the audit of the enforcement-tooling groups
 - Concern, an apostrophe in a comment hid a later commit: fixed; quotes and
   comments are removed in one pass.
 - Concern, `if check; then git commit; fi` and `check || exit 1; git commit`
-  denied: fixed; both guard what follows.
+  denied: fixed for these bare forms; a guard written inside a group or an
+  `if` stays a documented conservative block (ADR-0094).
 - Note, `npx -y eslint` not read as a check: fixed.
 - Critical (CV, second model), `rtk` and `rtk proxy` prefixes hid eight real
   check-then-commit chains: fixed; `rtk` is a wrapper. The "cannot recur"
@@ -118,3 +119,13 @@ Delta review (no blocker) and the audit of the enforcement-tooling groups
 Final exploratory replay on 2026-10-15: 65,432 calls, 135 denied (92
 kill-by-name, 43 check-then-commit), 134 real instances and one
 conservative block.
+
+### 2026-10-15 — delta review of 8580c8d
+
+No blocker; every prior disposition reproduced. Concern, `npm test &&` then
+a newline before `git commit` denied: fixed, a trailing `&&`, `||` or `|`
+joins the next line, pinned by a test. Concern, a guard inside a group or an
+`if` (`|| { exit 1; }`, `if ! check; then exit 1; fi`) still denied: kept and
+documented in ADR-0094 as a conservative block. Note, `echo $(git commit)`
+no longer seen: documented. Note, `p\kill` and `pkill -P 1 <name>`:
+accepted for a closed, non-adversarial list.
