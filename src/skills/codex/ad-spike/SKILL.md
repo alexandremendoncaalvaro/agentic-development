@@ -1,6 +1,6 @@
 ---
 name: ad-spike
-description: 'Staged spike with golden fixtures when the technique is uncertain across plausible approaches. Use on "spike", "which library", "evaluate approaches".'
+description: 'Staged spike with golden fixtures when the technique is uncertain across plausible approaches. Use on "spike", "which library", "golden fixture", "uncertain technique".'
 summary: Staged spike with golden fixtures per WORKFLOW §14. Discovery + fixture + pipeline-with-gates + two-layer evaluation, when the *technique* is uncertain across multiple plausible approaches.
 ---
 

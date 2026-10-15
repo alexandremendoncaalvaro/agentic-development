@@ -1,6 +1,6 @@
 ---
 name: ad-audit
-description: 'Adversarial audit of a diff, PR or drafted claims against every rule in the rule-set. Use for high-risk changes or uncovered risks; "audit against the rules", "verify before I post".'
+description: 'Adversarial audit of a diff, PR or drafted claims against every rule in the rule-set; heavier than ad-review. Use for high-risk changes or uncovered risks; "audit against the rules".'
 summary: Maximum-gate rules-anchored audit. Fans out one fresh-context reviewer per rule-group, exhaustive per-rule verdicts (coverage matrix), one cross-model pass on critical groups, evidence-gated, never approves. Heavier than ad-review; hands rule gaps to ad-level-up.
 allowed-tools: Read, Write, Glob, Grep, Bash, Task
 ---

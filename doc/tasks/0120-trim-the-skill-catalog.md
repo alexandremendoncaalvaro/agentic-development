@@ -66,3 +66,13 @@ description was rewritten as use case then trigger phrases, the same text on
 both hosts (the four that differed by host now match); they total 7,099
 characters per host, down from about 13,600. ADR-0093 amends ADR-0085
 decision 3. The listing probe waits for the release.
+
+### 2026-10-15 — review of the description cap
+
+Spec review: five descriptions lost cues that separate them from a neighbour.
+`ad-roadmap` regained "roadmap" and "specs and tasks"; `ad-research` regained
+"not code" and "literature review"; `ad-spike` traded "evaluate approaches"
+for "golden fixture" and "uncertain technique"; `ad-audit` says it is heavier
+than `ad-review`; `ad-report` gained trigger phrases. Standards review:
+AGENTS.md and ARCHITECTURE.md still named the 350 cap; ADR-0093 decision 4
+now names this task.
