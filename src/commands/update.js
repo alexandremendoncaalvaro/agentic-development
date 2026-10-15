@@ -12,15 +12,14 @@ import {
 } from '../lib/install.js';
 import { retiredSkillNamesForAgent } from '../lib/skill-migrations.js';
 import { loadState, saveState, userLevelInstallPath } from '../lib/state.js';
-import {
-  updateRootDoc,
-  rootDocAppendPrompt,
-  rootDocReplacePrompt,
-  trackedRootDocSkipNotice,
-} from '../lib/rootdoc.js';
-import { trackedState } from '../lib/git.js';
+import { updateRootDoc } from '../lib/rootdoc.js';
 import { homedir } from 'node:os';
-import { offerKitExclude } from './kit-exclude.js';
+import {
+  ACTION_SYMBOL,
+  formatInstallReport,
+  offerKitExclude,
+  rootDocConfirmers,
+} from '../lib/install-flow.js';
 import { configureGlobalConstitution, globalKitPath } from '../lib/global-rules.js';
 import { migrateLegacyProject } from '../lib/legacy-project-migration.js';
 import { resolveScope, targetForScope } from '../lib/scope.js';
@@ -36,31 +35,15 @@ const AGENT_LABEL = {
   codex: 'Codex',
 };
 
-const ACTION_SYMBOL = {
-  created: '+',
-  updated: '~',
-  replaced: '~',
-  unchanged: '·',
-  kept: '·',
-  skipped: '!',
-  removed: '-',
-  'removed-missing': '?',
-  'orphan-kept': '?',
-  'dropped-kept': '!',
-  'migration-removed': '-',
-  'migration-kept': '!',
-  'migration-state-removed': '-',
-  'migration-state-updated': '!',
-};
+// Prompts and warnings for the shared install flow (src/lib/install-flow.js).
+async function ask(prompt) {
+  const answer = await p.confirm(prompt);
+  return !p.isCancel(answer) && answer;
+}
 
-const ROOT_DOC_LABEL = {
-  appended: '+ ',
-  updated: '~ ',
-  unchanged: '· ',
-  skipped: '! ',
-  'kept-stale': '! ',
-  absent: '',
-};
+function warn(line) {
+  process.stderr.write(`${line}\n`);
+}
 
 function resolveAgents(flagValue, detectedAgents, previousAgents) {
   if (flagValue === 'both') return ['claude-code', 'codex'];
@@ -241,54 +224,18 @@ export async function updateCommand(opts) {
 
   const skillDisplayOrder = [...installedSkillSet].sort();
 
-  // An unattended run must not decide for the team: a tracked root doc is
-  // shared with everyone who clones the repo (ADR-0051). Mirrors init.js;
-  // `--force-root-doc` is the explicit override, distinct from `--force`
-  // (which overwrites user-edited skill files on conflict). Unknown tracking
-  // state keeps the prior behaviour.
-  const allowUnattendedRootDocWrite = (path) => {
-    if (forceRootDoc) return true;
-    if (trackedState(cwd, path) !== 'tracked') return true;
-    process.stderr.write(trackedRootDocSkipNotice(path) + '\n');
-    return false;
-  };
-
-  const confirmAppend = interactive
-    ? async (path) => {
-        const answer = await p.confirm(rootDocAppendPrompt(path, trackedState(cwd, path)));
-        if (p.isCancel(answer)) return false;
-        return answer;
-      }
-    : async (path) => allowUnattendedRootDocWrite(path);
-
-  const confirmRootDocReplace = interactive
-    ? async (path) => {
-        // A tracked doc names the sharing risk (ADR-0051 Decision 2); an
-        // untracked doc keeps the pre-existing diverged-section warning.
-        const answer = await p.confirm(
-          trackedState(cwd, path) === 'tracked'
-            ? rootDocReplacePrompt(path)
-            : {
-                message: `${path}: managed section diverged on disk. Regenerate it? (any edits between the agentic-managed-skills markers will be lost)`,
-                initialValue: false,
-              }
-        );
-        if (p.isCancel(answer)) return false;
-        return answer;
-      }
-    : // Tracked-state is checked FIRST: `--force-root-doc` authorizes writing a
-      // tracked (shared) doc only. On an untracked doc the pre-existing
-      // `--force` gate alone governs overwriting a diverged, hand-edited
-      // section — `--force-root-doc` must not reach it, or it would destroy a
-      // local edit it was never scoped to touch.
-      async (path) => {
-        if (trackedState(cwd, path) === 'tracked') {
-          if (forceRootDoc) return true;
-          process.stderr.write(trackedRootDocSkipNotice(path) + '\n');
-          return false;
-        }
-        return Boolean(force);
-      };
+  // A tracked root doc is shared with everyone who clones the repo (ADR-0051):
+  // --force-root-doc authorizes that write only; on an untracked doc --force
+  // alone governs overwriting a diverged, hand-edited section.
+  const { confirmAppend, confirmReplace: confirmRootDocReplace } = rootDocConfirmers({
+    cwd,
+    interactive,
+    force,
+    forceRootDoc,
+    untrackedReplace: 'force-gated',
+    ask,
+    warn,
+  });
 
   const rootDocAction =
     scope === 'project'
@@ -310,27 +257,18 @@ export async function updateCommand(opts) {
           cwd,
           paths: [...new Set(allActions.map((a) => a.path))],
           interactive,
+          ask,
+          warn,
         });
 
-  const lines = allActions.map((a) => {
-    const sym = ACTION_SYMBOL[a.type] ?? '?';
-    // Kit-doc actions are agent-independent and carry no `agent` field; tagging
-    // them would print `[undefined]`.
-    return a.agent ? `${sym} [${a.agent}] ${a.path}` : `${sym} ${a.path}`;
-  });
-  if (rootDocAction.type !== 'absent') {
-    lines.push(`${ROOT_DOC_LABEL[rootDocAction.type]}${rootDocAction.path}`);
-  }
-  if (excluded > 0) {
-    lines.push(`! .git/info/exclude (+${excluded})`);
-  }
   const userInstall = scope === 'user' || cwd === homedir() ? null : userLevelInstallPath();
-  if (userInstall) {
-    lines.push(
-      `note: agentic is also installed at the user level (${userInstall}); ` +
-        `a project install is only needed to pin a version or share it via the repo.`
-    );
-  }
+  const lines = formatInstallReport({
+    actions: allActions,
+    rootDocAction,
+    excluded,
+    tagAgent: true,
+    userInstall,
+  });
 
   if (interactive) {
     p.note(lines.join('\n') || '(no changes)', dryRun ? 'Plan' : 'Result');

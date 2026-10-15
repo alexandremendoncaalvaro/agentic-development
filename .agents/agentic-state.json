@@ -261,11 +261,11 @@
         },
         {
           "path": ".agents/skills/ad-drift/scripts/drift-scan.mjs",
-          "sourceSha": "da43ee3c240ab1e41721a2ddc608f34c76b4dd28d331e067d38e3575e49af4c6"
+          "sourceSha": "1a124a4b3adadd1872135a22292f54456aaafe0f7ee35f223af40d280ccfceb3"
         },
         {
           "path": ".agents/skills/ad-drift/SKILL.md",
-          "sourceSha": "92ccffc7eaa4f0dc688188456734f3349afe8e45a8160c3161c2d283ece0ad46"
+          "sourceSha": "466c400f6da4f54e6e7a6306ddbd6ea0db2b0c60ea8ddb971fd60a5bd1d48150"
         }
       ]
     },

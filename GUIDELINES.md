@@ -15,7 +15,7 @@ The codebase follows a strict two-phase split per [ADR-0002](doc/adr/0002-two-ph
 ```
 CLI (bin/agentic.js → src/index.js → src/commands/<verb>.js)
         depends on
-src/lib/ (pure helpers: detect, install, rootdoc, state)
+src/lib/ (library: detect, install, install-flow, rootdoc, state; no prompts, no printing)
         depends on
 src/skills/<agent>/<skill>/ (kit content — read at install time)
 ```
@@ -83,7 +83,7 @@ No abbreviations except established domain terms: `cli`, `cwd`, `fs`, `os`, `tty
 ### 2.4 Immutability and State
 
 - **No global mutable state.** Configuration passed explicitly through function arguments; module-scope `const` only.
-- **Pure helpers in `src/lib/`** — given the same arguments, return the same output. Side effects (file write, prompt) live in commands.
+- **Pure decision cores in `src/lib/`** — the choice (what to install, which prompt, which line to report) is a function of its arguments. File and git I/O goes through parameters a test can redirect (`cwd`, the home directory, the kit root). Prompts, printing and exit codes live in commands, which inject `ask` and `warn` where the library needs them.
 - **State files (`agentic-state.json`) are write-then-read.** Never mutate in place.
 
 ### 2.5 Forbidden Patterns
@@ -256,7 +256,7 @@ The kit's nature (filesystem operations) means most tests are integration-style 
 
 ### 9.3 Unit Tests
 
-Pure helpers in `src/lib/` — `detect.js`, `install.js`, `rootdoc.js`, `state.js`. No filesystem, no subprocess. Each test under one second.
+The library in `src/lib/`, through its exported functions: pure decision cores directly, and file and git I/O against a temporary directory or a scratch git repository passed as `cwd`, never the real repository or home directory. Each test under one second.
 
 ### 9.4 Integration Tests
 

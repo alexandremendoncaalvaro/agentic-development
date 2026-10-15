@@ -8,8 +8,8 @@
  * Prints a single JSON object with the seven mechanical drift checks the audit
  * used to re-derive as prose or inline `grep` every run: artifact numbering,
  * `Status:` validity, supersession-target existence, amendment-pair matching,
- * emoji in narrative docs, checkbox UI in definition docs / specs, and
- * AGENTS-to-GUIDELINES reciprocity. The
+ * emoji in narrative docs, checkbox UI in definition docs / specs,
+ * AGENTS-to-GUIDELINES reciprocity, and glossary drift. The
  * SKILL.md body reads this JSON and keeps the JUDGMENT as text — AGENTS.md /
  * ARCHITECTURE.md-vs-code conformance, business-context-first, scope
  * duplication, directory-as-index duplication, decoration cross-references,
@@ -33,7 +33,8 @@
  */
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { join, posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 // Pictographic emoji, regional-indicator flags, and the emoji variation
@@ -362,6 +363,126 @@ function scanConstitutionReciprocity(repoRoot, unreadable) {
   return report;
 }
 
+// --- Glossary drift (task 0125) ---------------------------------------------
+// Facts only, advisory: aliases a glossary says to avoid that tracked code
+// still uses, and canonical terms no tracked file uses outside the glossary.
+// A single-word alias is matched only when the glossary backticks it, since a
+// common word ("tone") would otherwise match ordinary prose.
+
+const GLOSSARY_FILE_LIMIT = 1024 * 1024;
+const ALIAS_FILE_SAMPLE = 5;
+
+function trackedFiles(repoRoot) {
+  const env = { ...process.env };
+  delete env.GIT_DIR;
+  delete env.GIT_WORK_TREE;
+  delete env.GIT_INDEX_FILE;
+  const result = spawnSync('git', ['ls-files', '-z'], { cwd: repoRoot, encoding: 'utf8', env });
+  if (result.status !== 0) return null;
+  return result.stdout.split('\0').filter(Boolean);
+}
+
+// The glossary files: the tracked per-context files a CONTEXT-MAP.md links
+// (angle brackets, titles, anchors and backslashes accepted), else the root
+// CONTEXT.md. A link that resolves to no tracked file, or outside the
+// repository, is named in `unresolved`; when none resolves, the root
+// glossary is read instead.
+function glossaryFiles(repoRoot, tracked, unreadable) {
+  const root = tracked.has('CONTEXT.md') ? ['CONTEXT.md'] : [];
+  const map = readContent(repoRoot, 'CONTEXT-MAP.md', unreadable);
+  if (!map) return { contexts: root, unresolved: null };
+  const targets = [...map.matchAll(/\]\(\s*<?([^)>\s]+)>?(?:\s+"[^"]*")?\s*\)|`([^`\s]+)`/g)]
+    .map((m) => (m[1] ?? m[2]).replace(/[#?].*$/, '').replace(/\\/g, '/'))
+    .filter((target) => /(^|\/)CONTEXT\.md$/.test(target));
+  const contexts = [];
+  const unresolved = [];
+  for (const target of [...new Set(targets)]) {
+    const path = posix.normalize(target);
+    if (tracked.has(path) && !path.startsWith('..') && !path.startsWith('/')) contexts.push(path);
+    else unresolved.push(target);
+  }
+  return { contexts: contexts.length > 0 ? contexts.sort() : root, unresolved };
+}
+
+function glossaryTerms(text) {
+  const terms = [];
+  for (const block of text.split(/^### /m).slice(1)) {
+    const term = block.split('\n', 1)[0].trim();
+    // An alias is a quoted or backticked item outside the parenthetical that
+    // explains it; names quoted inside the explanation are not aliases.
+    const avoid = (block.match(/^_Avoid_:(.*)$/m)?.[1] ?? '').replace(/\([^)]*\)/g, '');
+    const aliases = [];
+    for (const m of avoid.matchAll(/["\u201c]([^"\u201d]+)["\u201d]|`([^`]+)`/g)) {
+      const alias = (m[1] ?? m[2]).trim();
+      if (m[2] !== undefined || /\s/.test(alias)) aliases.push(alias);
+    }
+    terms.push({ term, aliases });
+  }
+  return terms;
+}
+
+// The spellings a phrase takes in prose and code: spaced, kebab, snake and
+// joined (camelCase and PascalCase match the joined form case-insensitively).
+function phrasePattern(phrase) {
+  const words = phrase
+    .toLowerCase()
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return new RegExp(`(?<![a-z0-9])${words.join('[\\s_-]?')}(?![a-z0-9])`, 'i');
+}
+
+function scanGlossary(repoRoot, unreadable) {
+  const files = trackedFiles(repoRoot);
+  if (files === null) {
+    const contexts = isFile(join(repoRoot, 'CONTEXT.md')) ? ['CONTEXT.md'] : [];
+    const result = { contexts, aliasesInCode: [], unusedTerms: [] };
+    return contexts.length > 0 ? { ...result, skipped: 'not a git repository' } : result;
+  }
+  const { contexts, unresolved } = glossaryFiles(repoRoot, new Set(files), unreadable);
+  const base = unresolved === null ? {} : { unresolvedLinks: unresolved };
+  if (contexts.length === 0) return { contexts: [], aliasesInCode: [], unusedTerms: [], ...base };
+  // Byte-identical copies (an installed mirror of a source tree) count once.
+  const seen = new Set();
+  const texts = [];
+  for (const path of files) {
+    if (contexts.includes(path) || path === 'CONTEXT-MAP.md') continue;
+    try {
+      if (statSync(join(repoRoot, path)).size > GLOSSARY_FILE_LIMIT) continue;
+    } catch {
+      continue;
+    }
+    const text = readContent(repoRoot, path, unreadable);
+    if (text.includes('\0') || seen.has(text)) continue;
+    seen.add(text);
+    texts.push({ path, text, code: !/\.(md|markdown)$/i.test(path) });
+  }
+  const aliasesInCode = [];
+  const unusedTerms = [];
+  for (const context of contexts) {
+    for (const { term, aliases } of glossaryTerms(readContent(repoRoot, context, unreadable))) {
+      const termPattern = phrasePattern(term);
+      if (!texts.some(({ text }) => termPattern.test(text))) unusedTerms.push({ context, term });
+      for (const alias of aliases) {
+        const pattern = phrasePattern(alias);
+        const hits = texts
+          .filter(({ code, text }) => code && pattern.test(text))
+          .map((t) => t.path);
+        if (hits.length > 0) {
+          aliasesInCode.push({
+            context,
+            term,
+            alias,
+            count: hits.length,
+            files: hits.sort().slice(0, ALIAS_FILE_SAMPLE),
+          });
+        }
+      }
+    }
+  }
+  return { contexts, aliasesInCode, unusedTerms, ...base };
+}
+
 /**
  * Build the full drift-scan object. Exported so tests can exercise it
  * in-process; `main()` owns cwd resolution and printing.
@@ -380,6 +501,7 @@ export function scanReport({ repoRoot }) {
     emoji: scanEmoji(repoRoot, unreadable),
     checkbox: scanCheckbox(repoRoot, unreadable),
     constitutionReciprocity: scanConstitutionReciprocity(repoRoot, unreadable),
+    glossary: scanGlossary(repoRoot, unreadable),
     // A file read by more than one check (e.g. a spec, read for status and again
     // for checkbox) records once per failed read; collapse to one entry per
     // (path, code) so a caller narrating "N unreadable files" does not over-count.

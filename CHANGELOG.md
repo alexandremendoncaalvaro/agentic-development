@@ -26,6 +26,10 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   lifecycle, where each kind of record goes, issue stages by label and
   milestone reading. `ad-project-state` reports it, marks each issue's stage
   and prints the process alone with `--process` (task-0118, ADR-0097).
+- `ad-drift` reports glossary drift: aliases `CONTEXT.md` says to avoid that
+  tracked code still uses, and canonical terms nothing uses, reading the
+  per-context files of a `CONTEXT-MAP.md`; advisory, judged per hit
+  (task-0125).
 
 ### Changed
 
