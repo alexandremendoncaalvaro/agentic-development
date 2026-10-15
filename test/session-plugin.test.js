@@ -130,6 +130,8 @@ function loadPlugin(threshold, usage, { script = null } = {}) {
     const runs = [];
     const opened = [];
     const commands = [];
+    const ran = [];
+    const toasts = [];
     const element = (type) => (props) => ({ type, props });
     const $ = {
       session: {
@@ -150,16 +152,20 @@ function loadPlugin(threshold, usage, { script = null } = {}) {
           return typeof script.result === 'function' ? script.result() : script.result;
         },
       },
-      command: { register: async (spec) => commands.push(spec) },
+      command: {
+        register: async (spec) => commands.push(spec),
+        run: async (spec) => ran.push(spec),
+      },
       prompt: { submit: async (input) => submitted.push(input) },
       ui: {
         invalidate: () => {},
         open: async (request) => opened.push(request),
         log: (text, options) => logs.push({ text, options }),
+        toast: (text) => toasts.push(text),
         resolve: () => ({ Box: element('Box'), Text: element('Text'), Button: element('Button') }),
       },
     };
-    return { hooks, logs, submitted, runs, opened, commands, $ };
+    return { hooks, logs, submitted, runs, opened, commands, ran, toasts, $ };
   });
 }
 
@@ -178,8 +184,8 @@ const FULL = async () => ({
   context: { tokens: 90000, window: 200000 },
 });
 
-test('the plugin draws and submits only: it hooks no tool call and rewrites no prompt', async () => {
-  const { hooks, submitted, $ } = await loadPlugin(1, FULL);
+test('the plugin draws and runs the handoff only: it hooks no tool call and rewrites no prompt', async () => {
+  const { hooks, submitted, ran, $ } = await loadPlugin(1, FULL);
   assert.deepEqual(Object.keys(hooks).sort(), [
     'command.run:agentic-briefing',
     'session.compact',
@@ -195,12 +201,15 @@ test('the plugin draws and submits only: it hooks no tool call and rewrites no p
   const button = findElement(band, 'Button');
   button.props.onPress();
   await new Promise((resolve) => setImmediate(resolve));
-  assert.deepEqual(submitted, [{ text: '/ad-handoff', asUser: true }]);
+  // A plugin's prompt.submit of "/ad-handoff" did nothing in the desktop app;
+  // the command runs as if typed (task-0116).
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }]);
+  assert.deepEqual(submitted, []);
 });
 
-test('a rejected handoff submit is logged to the debug log only', async () => {
-  const { hooks, logs, $ } = await loadPlugin(1, FULL);
-  $.prompt.submit = async () => {
+test('a rejected handoff command shows a toast and logs the reason', async () => {
+  const { hooks, logs, toasts, $ } = await loadPlugin(1, FULL);
+  $.command.run = async () => {
     throw new Error('submit refused');
   };
   await hooks['session.start']($, {}, async () => undefined);
@@ -210,6 +219,8 @@ test('a rejected handoff submit is logged to the debug log only', async () => {
   assert.equal(logs.length, 1);
   assert.match(logs[0].text, /submit refused/);
   assert.deepEqual(logs[0].options, { to: 'debug' });
+  assert.equal(toasts.length, 1);
+  assert.match(toasts[0], /run \/ad-handoff yourself/);
 });
 
 test('the npm package does not ship the plugin or the marketplace', () => {

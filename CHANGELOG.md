@@ -6,6 +6,12 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Fixed
+
+- The `agentic-session` band's **AD handoff** button runs `/ad-handoff`; it
+  did nothing in the desktop app, and a refused run now shows a toast
+  (task-0116).
+
 ## [1.4.1] - 2026-10-09
 
 ### Fixed

@@ -283,10 +283,13 @@ function clearReadings($, state) {
   $.ui.invalidate('ui.render');
 }
 
+// Runs /ad-handoff as if typed: a plugin's prompt.submit of the same text did
+// nothing in the desktop app (task-0116).
 function submitHandoff($) {
-  $.prompt
-    .submit({ text: '/ad-handoff', asUser: true })
-    .catch((error) => logFailure($, 'handoff not submitted', error));
+  $.command.run({ command: 'ad-handoff' }).catch((error) => {
+    $.ui.toast('AD handoff could not start: run /ad-handoff yourself.');
+    logFailure($, 'handoff not run', error);
+  });
 }
 
 function logFailure($, what, error) {
