@@ -8,7 +8,7 @@
 
 ## Conclusion and confidence
 
-Before the review-economy changes, in the period [2026-09-15, 2026-10-15), the owner's sessions dispatched about 7.2 reviewers and 20 auditors per pull request created, and the owner corrected a standing rule in about one of every three sessions. Conditional: the counts are measured by the corrected, re-frozen instrument, but the period is one owner on one machine, the correction count is a lexical proxy, and the comparison that decides anything waits for the follow-up period under PRISM-0045.
+Before the review-economy changes, in the period [2026-09-15, 2026-10-15), the owner's sessions dispatched about 7.2 reviewers and 20 auditors per pull request created, and the owner sent about one message correcting a standing rule per three sessions. Conditional: the counts are measured by the corrected, re-frozen instrument, but the period is one owner on one machine, the correction count is a lexical proxy, and the comparison that decides anything waits for the follow-up period under PRISM-0045.
 
 ## Question and scope
 
@@ -51,7 +51,7 @@ Not applicable to a baseline; PRISM-0045 holds the decision rule the follow-up p
 **Strength:** Low
 **Provenance:** S2
 
-Superseded by E1 and kept for the record: 216 sessions, 1552 owner messages, 398 reviewer and 1085 auditor dispatches, 119 pull requests, 46 CI failure reads, 90 owner corrections. Most of the difference is pull requests (119 against 54): the corrected script no longer counts `pr create` inside quoted text or lines duplicated by resumed sessions; this record does not split the 65 between the two causes.
+Superseded by E1 and kept for the record: 216 sessions, 1552 owner messages, 398 reviewer and 1085 auditor dispatches, 119 pull requests, 46 CI failure reads, 90 owner corrections. Most of the difference is pull requests: the corrected script counts 54 where the first counted 119; the cause of the drop is not attributed.
 
 ## Limitations and what would reverse the conclusion
 
@@ -59,6 +59,7 @@ Superseded by E1 and kept for the record: 216 sessions, 1552 owner messages, 398
 - The correction lexicon counts phrases, not intent; a correction worded otherwise is missed, and a matching phrase used for another purpose is counted.
 - A dispatch counts a reviewer started, not one that changed the outcome; a pull request counts a `pr create` command, including any that failed.
 - Transcript retention bounds the period to what the machine still holds.
+- Commands are counted in command position only; forms such as `command gh`, `time gh` or a full path to `gh` are missed, and a heredoc line starting with `gh pr create` is counted. The same script reads both periods, so the comparison holds, but the absolute counts are approximate.
 - A reading of the same transcripts by a different rule would change the counts; the frozen script is the reference.
 
 ## Provenance and artifacts

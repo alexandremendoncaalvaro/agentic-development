@@ -77,3 +77,11 @@ request), 41 CI failure reads (0.76 per pull request), 70 owner messages
 correcting a standing rule (0.32 per session). RESEARCH-0046 records it as
 the baseline and keeps the first run as superseded evidence. The follow-up
 run is due on or after 2026-11-14.
+
+### 2026-10-15 — delta review of 6b74579
+
+Spec ships as-is; the criterion change after the first baseline is a
+disclosed retrofit. Standards concerns, fixed in RESEARCH-0046: corrections
+are stated per message, not per session; the drop in counted pull requests
+is no longer attributed to a cause; the command forms the matcher misses are
+listed as a limit.
