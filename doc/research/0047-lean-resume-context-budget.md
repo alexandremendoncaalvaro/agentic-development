@@ -30,11 +30,11 @@ H1: most of the resume-turn growth is tool output from inline reconciliation, no
 **Strength:** High
 **Provenance:** S1
 
-| Point | Context tokens |
-| --- | --- |
-| First call (instructions, memory, prompt) | 75,591 |
-| After the handoff Read; host listings (skills, agents, deferred tools) arrive with this call | 106,994 |
-| End of the resume turn (18 API calls, 23 tool results) | 136,235 |
+| Point                                                                                        | Context tokens |
+| -------------------------------------------------------------------------------------------- | -------------- |
+| First call (instructions, memory, prompt)                                                    | 75,591         |
+| After the handoff Read; host listings (skills, agents, deferred tools) arrive with this call | 106,994        |
+| End of the resume turn (18 API calls, 23 tool results)                                       | 136,235        |
 
 The handoff file is 11,679 characters (about 3.4k tokens), so the floor before any work is about 103.6k. The 29.2k growth after the handoff came from a `ToolSearch` loading MCP schemas (+5.7k), a 20-line tail of a log whose lines embed whole commands (+6.5k), another session's event pages (four calls, ~3.7k), unbounded directory listings, and git probes. No subagent was used and no output was bounded. H1 holds: the handoff itself was 12% of the turn's cost.
 
@@ -70,12 +70,12 @@ The long-running-agent harness starts each fresh session with `pwd`, the git log
 **Strength:** High for the mechanisms; savings are estimates
 **Provenance:** A4, A5, S1
 
-| Floor part (panel) | Tokens | Documented switch |
-| --- | --- | --- |
-| MCP tools (loaded) | 19.2k | `/mcp` disable per project (`disabledMcpServers` in `~/.claude.json`); tool search defers schemas (`ENABLE_TOOL_SEARCH`) |
-| Memory files | 14.8k | CLAUDE.md under 200 lines; `@imports` load in full; auto-memory `MEMORY.md` loads its first 200 lines or 25KB |
-| Skills listing | 9.8k | `skillOverrides` per skill (`name-only`, `off`); does not apply to plugin skills |
-| Custom agents | 5.8k (33 agents, mostly one plugin) | `enabledPlugins` per settings scope; `permissions.deny: ["Agent(name)"]` |
+| Floor part (panel) | Tokens                              | Documented switch                                                                                                        |
+| ------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| MCP tools (loaded) | 19.2k                               | `/mcp` disable per project (`disabledMcpServers` in `~/.claude.json`); tool search defers schemas (`ENABLE_TOOL_SEARCH`) |
+| Memory files       | 14.8k                               | CLAUDE.md under 200 lines; `@imports` load in full; auto-memory `MEMORY.md` loads its first 200 lines or 25KB            |
+| Skills listing     | 9.8k                                | `skillOverrides` per skill (`name-only`, `off`); does not apply to plugin skills                                         |
+| Custom agents      | 5.8k (33 agents, mostly one plugin) | `enabledPlugins` per settings scope; `permissions.deny: ["Agent(name)"]`                                                 |
 
 The Maestro's always-loaded instruction set is 26.6k characters (`~/.claude/CLAUDE.md` 7.5k, `AGENTS.ale.md` 18.1k, `RTK.md` 1k) plus a 103-line, 15.4k-character `MEMORY.md` index, which exceeds the 200-line guidance only in spirit (A4).
 
@@ -85,7 +85,7 @@ The Maestro's always-loaded instruction set is 26.6k characters (`~/.claude/CLAU
 **Strength:** Medium (whether the host forwards these notices to the model is not documented)
 **Provenance:** S1
 
-The resume turn recorded 91 `hook_non_blocking_error` attachments with exit 127 (program not found) on `PreToolUse:Bash`, `PostToolUse:Bash`, `Stop` and `UserPromptSubmit`, about 29k characters. Not diagnosed here; listed as a follow-up.
+The resume turn recorded 91 `hook_non_blocking_error` attachments with exit 127 (program not found) on `PreToolUse:Bash`, `PostToolUse:Bash`, `Stop` and `UserPromptSubmit`, about 29k characters. Diagnosed after the study (task-0127 Notes): the cause is the `slim` plugin's cache checkout, not the kit. 23 git-tracked files, 20 of them hook scripts named in its `hooks/claude-hooks.json`, were missing from the working tree, so each run ended in `sh: ...: No such file or directory`, exit 127. The failing hook numbers match the missing scripts one to one. Restoring them with `git checkout` took hook-error characters per tool call from 1,329 to 0 in this repository's session.
 
 ## Limitations and what would reverse the conclusion
 
