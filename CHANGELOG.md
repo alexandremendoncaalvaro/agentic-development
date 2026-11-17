@@ -20,6 +20,17 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 - The `agentic-session` band appears from 80% of the way to the auto-compact
   point by default, up from 60%; the option still takes 1 to 99 (task-0115).
+- A session resumed from an `/ad-handoff` file now spends a bounded first
+  turn: it reads the handoff in full, loads referenced records only when the
+  first move needs them, runs two bounded git probes, and hands every other
+  check to one subagent that returns a short digest. Handoffs stay at or
+  under 12,000 characters, and the moment to hand off is measured against working
+  space (the auto-compact point minus the fixed floor), not a fixed total.
+  A measured resume under the old protocol grew 29k tokens after the
+  handoff read, 60k from its first call (task-0127).
+- The `agentic-session` band reports the conversation's share of working
+  space when the host's context breakdown carries a `Messages` row, and keeps
+  the auto-compact basis otherwise (task-0127).
 
 ## [1.6.0] - 2026-10-15
 

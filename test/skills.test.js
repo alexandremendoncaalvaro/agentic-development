@@ -1284,7 +1284,7 @@ test('static contract: ad-ground persists a validated evidence receipt before no
   }
 });
 
-test('static contract: ad-handoff keeps preparation exhaustive but makes the resume brief concise', () => {
+test('static contract: ad-handoff keeps preparation private and makes the resume brief concise', () => {
   for (const agent of ['claude-code', 'codex']) {
     const skillDir = join(SKILLS_ROOT, agent, 'ad-handoff');
     const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
@@ -1340,6 +1340,99 @@ test('static contract: ad-handoff keeps preparation exhaustive but makes the res
         'Claude handoff chip must not restore the verbose explicit-invocation path'
       );
     }
+  }
+});
+
+test('static contract: ad-handoff bounds the resume turn and sizes handoffs against working space', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const skillDir = join(SKILLS_ROOT, agent, 'ad-handoff');
+    const body = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+    const template = readFileSync(join(skillDir, 'references', 'handoff-template.md'), 'utf8');
+
+    assert.doesNotMatch(
+      template,
+      /reading obligations|every task, spec, ADR, research record, or other artifact referenced/i,
+      `${agent} resume must not order every referenced artifact read inline`
+    );
+    assert.match(
+      template,
+      /resume budget[\s\S]{0,200}10,000 tokens/i,
+      `${agent} resume protocol must state a token budget for the resume turn`
+    );
+    assert.match(
+      template,
+      /references are pointers[\s\S]{0,200}just in time/i,
+      `${agent} resume must load referenced artifacts just in time`
+    );
+    assert.match(
+      template,
+      /`git status --short \| head -n 20`[\s\S]{0,400}`git log --oneline -5`/,
+      `${agent} resume must name its fixed bounded inline probes`
+    );
+    assert.match(
+      template,
+      /one subagent[\s\S]{0,400}15 lines/i,
+      `${agent} resume must delegate other reconciliation to one subagent with a bounded digest`
+    );
+    assert.match(
+      template,
+      /every inline output is bounded/i,
+      `${agent} resume must bound every inline command output`
+    );
+    assert.doesNotMatch(
+      body,
+      /preparation exhaustive/i,
+      `${agent} must not promise exhaustive inline preparation`
+    );
+    assert.match(
+      body,
+      /working space[\s\S]{0,200}auto-compact point minus[\s\S]{0,40}floor/i,
+      `${agent} must define the hand-off threshold against working space`
+    );
+    assert.match(
+      body,
+      /never a fixed total/i,
+      `${agent} must reject a fixed total-token hand-off threshold`
+    );
+    assert.match(
+      body,
+      /12,000 characters[\s\S]{0,200}`wc -c`/,
+      `${agent} must cap the handoff size and check it`
+    );
+    assert.match(
+      template,
+      /only file read in full/i,
+      `${agent} must read only the handoff in full`
+    );
+    assert.match(
+      template,
+      /cheapest capable model/i,
+      `${agent} must run the reconciliation subagent on the cheapest capable model`
+    );
+    assert.match(
+      template,
+      /no subagent[\s\S]{0,200}same 10,000-token budget/i,
+      `${agent} inline fallback must stay inside the resume budget`
+    );
+    const protocol = template.slice(
+      template.indexOf('Resume protocol'),
+      template.indexOf('resume fact packet')
+    );
+    assert.doesNotMatch(
+      protocol,
+      /every (task|referenced|artifact)[\s\S]{0,60}(read|reading)/i,
+      `${agent} resume protocol must not mandate reading every referenced artifact`
+    );
+    assert.match(
+      body,
+      /about 80% of that working space/i,
+      `${agent} must state the hand-off threshold as a share of working space`
+    );
+    assert.match(
+      body,
+      /host shows neither number/i,
+      `${agent} must say what to do when the host shows no context panel`
+    );
   }
 });
 

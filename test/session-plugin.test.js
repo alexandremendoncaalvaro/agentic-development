@@ -49,6 +49,61 @@ test('fillReading has no reading before the first response or without a window',
   assert.equal(fillReading({ tokens: 10, window: 0 }), null);
 });
 
+const MAESTRO_ROWS = [
+  { name: 'System prompt', tokens: 9_000, kind: 'used' },
+  { name: 'MCP tools', tokens: 19_000, kind: 'used' },
+  { name: 'Memory files', tokens: 15_000, kind: 'used' },
+  { name: 'Skills', tokens: 10_000, kind: 'used' },
+  { name: 'Other used rows', tokens: 51_000, kind: 'used' },
+  { name: 'MCP tools (deferred)', tokens: 30_000, kind: 'deferred' },
+  { name: 'Messages', tokens: 32_000, kind: 'used' },
+  { name: 'Free space', tokens: 1_000, kind: 'free' },
+  { name: 'Autocompact buffer', tokens: 33_000, kind: 'buffer' },
+];
+
+test('fillReading measures the conversation against working space when the breakdown has a Messages row', () => {
+  // Floor 104k of used non-message rows under a 168k auto-compact point leaves
+  // 64k of working space; 32k of messages is half of it (RESEARCH-0047 E1).
+  const reading = fillReading({
+    tokens: 136_000,
+    window: 200_000,
+    breakdown: {
+      isAutoCompactEnabled: true,
+      autoCompactThreshold: 168_000,
+      categories: MAESTRO_ROWS,
+    },
+  });
+  assert.deepEqual(reading, { percent: 50, basis: 'working-space' });
+});
+
+test('fillReading keeps the auto-compact basis without a Messages row or without working space', () => {
+  const noMessages = MAESTRO_ROWS.filter((row) => row.name !== 'Messages');
+  assert.deepEqual(
+    fillReading({
+      tokens: 84_000,
+      window: 200_000,
+      breakdown: {
+        isAutoCompactEnabled: true,
+        autoCompactThreshold: 168_000,
+        categories: noMessages,
+      },
+    }),
+    { percent: 50, basis: 'auto-compact' }
+  );
+  assert.deepEqual(
+    fillReading({
+      tokens: 168_000,
+      window: 200_000,
+      breakdown: {
+        isAutoCompactEnabled: true,
+        autoCompactThreshold: 100_000,
+        categories: MAESTRO_ROWS,
+      },
+    }),
+    { percent: 100, basis: 'auto-compact' }
+  );
+});
+
 test('fillReading caps the percentage at 100', () => {
   const reading = fillReading({
     tokens: 160_000,
@@ -84,6 +139,7 @@ test('bandLabel names the percentage and what it is measured against', () => {
     'Context 72% of the auto-compact point'
   );
   assert.equal(bandLabel({ percent: 72, basis: 'window' }), 'Context 72% of the window');
+  assert.equal(bandLabel({ percent: 50, basis: 'working-space' }), 'Context 50% of working space');
 });
 
 test('the marketplace lists agentic-session by a relative source whose manifest name matches', () => {
