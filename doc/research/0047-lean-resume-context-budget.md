@@ -83,9 +83,9 @@ The Maestro's always-loaded instruction set is 26.6k characters (`~/.claude/CLAU
 
 **Tier:** Measurement
 **Strength:** Medium (whether the host forwards these notices to the model is not documented)
-**Provenance:** S1
+**Provenance:** S1 (resume turn), S2 (cause and fix)
 
-The resume turn recorded 91 `hook_non_blocking_error` attachments with exit 127 (program not found) on `PreToolUse:Bash`, `PostToolUse:Bash`, `Stop` and `UserPromptSubmit`, about 29k characters. Diagnosed after the study (task-0127 Notes): the cause is the `slim` plugin's cache checkout, not the kit. 23 git-tracked files, 20 of them hook scripts named in its `hooks/claude-hooks.json`, were missing from the working tree, so each run ended in `sh: ...: No such file or directory`, exit 127. The failing hook numbers match the missing scripts one to one. Restoring them with `git checkout` took hook-error characters per tool call from 1,329 to 0 in this repository's session.
+The resume turn recorded 91 `hook_non_blocking_error` attachments with exit 127 (program not found) on `PreToolUse:Bash`, `PostToolUse:Bash`, `Stop` and `UserPromptSubmit`, about 29k characters. Diagnosed after the study (task-0127 Notes): the cause is the `slim` plugin's cache checkout, not the kit. 23 git-tracked files, 20 of them hook scripts named in its `hooks/claude-hooks.json`, were missing from the working tree, so each run ended in `sh: ...: No such file or directory`, exit 127. Every failing hook position maps to a missing slim script; the other missing scripts belong to events or matchers that did not fire in the measured turns. Restoring them with `git checkout` took hook-error characters per tool call from 1,329 to 0 in this repository's session (S2). That figure and the Maestro's (about 1,007 per call) come from different sessions and tool-call mixes, so they are not directly comparable.
 
 ## Limitations and what would reverse the conclusion
 
@@ -94,6 +94,7 @@ One transcript, one host (Claude Code desktop). Token counts are the API's own; 
 ## Provenance and artifacts
 
 - S1: `eval/resume-cost.mjs` over the Maestro transcript of 2026-11-17; the transcript stays local.
+- S2: this repository's session transcript of 2026-11-17 (hook attachments before and after the restore) and `git status` of the `slim` 3.0.0 cache checkout on the same machine; both stay local.
 - A1: code.claude.com/docs/en/context-window, /sub-agents ("What loads at startup", "Isolate high-volume operations").
 - A2: code.claude.com/docs/en/env-vars (`BASH_MAX_OUTPUT_LENGTH`, `CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS`), /mcp ("MCP output limits").
 - A3: code.claude.com/docs/en/hooks ("SessionStart", "JSON output").
