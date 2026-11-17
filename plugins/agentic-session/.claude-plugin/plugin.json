@@ -10,7 +10,7 @@
     "threshold": {
       "type": "number",
       "title": "Context band threshold (%)",
-      "description": "Show the band once context reaches this share of the auto-compact point (or of the window when auto-compaction is off). 1 to 99.",
+      "description": "Show the band once context reaches this share of working space (the auto-compact point minus the fixed floor), of the auto-compact point when the floor is unknown, or of the window when auto-compaction is off. 1 to 99.",
       "default": 80,
       "min": 1,
       "max": 99

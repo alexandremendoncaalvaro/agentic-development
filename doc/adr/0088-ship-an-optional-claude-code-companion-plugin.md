@@ -91,3 +91,14 @@ names the handoff file to resume from. The failure notices are toasts from the
 band's plugin, the channel Task 0116 uses for a press that cannot start. The
 directory lookup assumes POSIX paths, as `ad-handoff`'s own `${TMPDIR:-/tmp}`
 does; elsewhere it finds no file and clears nothing.
+
+## Addendum 2026-11-17: the band measures working space when it can
+
+Item 4's basis gains a first choice. When the context breakdown carries a used
+`Messages` row and an auto-compact point, the band reports the conversation's
+share of working space: the auto-compact point minus the fixed floor, the floor
+being every other used row. A 104k floor under a 168k auto-compact point leaves
+64k, so a share of the whole window hides how little room a session has
+(GROUND-0048 E3, task-0127). Without a `Messages` row, or when the floor
+reaches the auto-compact point, the band falls back to item 4's basis
+unchanged, and its label names whichever basis it used.
