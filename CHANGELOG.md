@@ -32,6 +32,11 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 - The `agentic-session` band appears from 80% of the way to the auto-compact
   point by default, up from 60%; the option still takes 1 to 99 (task-0115).
+- An installed `agentic-session` plugin changes behaviour as soon as it
+  updates, because it ships from `main`: it now asks for a handoff and
+  clears the session by itself near the auto-compact point. Set the plugin
+  option `autoHandoff` to false or `AGENTIC_AUTO_HANDOFF=off` to keep the
+  band only (ADR-0098).
 - `ad-handoff` no longer says a session is never cleared without a keypress:
   the skill itself still never runs `/clear`, and the `agentic-session`
   plugin clears only after the whole handoff file exists (ADR-0098).

@@ -92,12 +92,10 @@ export function tierOf(percent, at) {
 }
 
 export function isHandoffComplete(text) {
-  return (
-    typeof text === 'string' &&
-    text.length >= MIN_HANDOFF_CHARS &&
-    text.trimEnd().endsWith(END_MARKER) &&
-    REQUIRED_HEADINGS.every((heading) => text.includes(heading))
-  );
+  if (typeof text !== 'string' || text.length < MIN_HANDOFF_CHARS) return false;
+  if (!text.trimEnd().endsWith(END_MARKER)) return false;
+  const lines = new Set(text.split('\n').map((line) => line.trimEnd()));
+  return REQUIRED_HEADINGS.every((heading) => lines.has(heading));
 }
 
 // A handoff the model gave as its answer, when the Write tool was refused:

@@ -41,6 +41,20 @@ Two task-0099 checkpoint tests were red on this machine on `main` too: the test'
 
 Limits recorded, not fixed here: the manual button's file lookup stays POSIX-only (task 0115); Codex, and Claude Code without the plugin, have the skill's `--auto` mode and the Stop nudge but nothing that clears; plain-text `-p` output was not measured, and the stream prints one result per turn, the `handoff written` turns included.
 
+### 2026-11-21 — fresh-context review, both axes
+
+`ad-review` on `origin/main..d8e9826` found no Blocker on either axis. Its Concerns and what was done with each:
+
+- "a refused `/clear` triggers a fresh handoff on every later turn": fixed, a refused clear starts the ten-minute rest (test first).
+- "no exclusion between the automatic cycle and the manual button flow": fixed, the mid-turn note is not added while a button press waits for its handoff (test first).
+- "handoffs now persist in a permanent home directory with no cleanup": recorded as an accepted trade-off in ADR-0098 and stated in `CONTEXT.md`; no pruning, because deleting a file the owner may resume from is worse.
+- "three binding docs now contradict ADR-0098": `ARCHITECTURE.md`, `CONTEXT.md` and `AGENTS.md` updated.
+- "The README states a proven result the record does not support": reworded to headless proven, interactive unmeasured.
+- "Each tier asks once" against note-then-prompt: ADR-0098 item 2 now says once per channel.
+- Minimum builds unverified: ADR-0098 and the README say only 2.1.327 was measured.
+
+Notes taken: the heading check now needs each heading on a line of its own; the wrong record reference in a comment is fixed; `on|true` is documented; the changelog warns that an installed plugin changes behaviour on update. Left open and recorded in ADR-0098: a per-session label, and the stream captures not kept in the repository (GROUND-0047 Limitations). The checkpoint script reading a user-level install above the temp directory as project scope is task 0128. Not verified: whether `$.fs.write` creates the missing parent directory in the refused-`Write` fallback; a failure there is caught, logged and clears nothing.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

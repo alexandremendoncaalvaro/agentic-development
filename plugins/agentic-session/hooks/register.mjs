@@ -93,7 +93,7 @@ export function register(on, options) {
       return result;
     }
     // Awaited here: a headless run exits as soon as its last turn ends, so a
-    // request or a clear sent later finds no session (RESEARCH-0047 M3).
+    // request or a clear sent later finds no session (GROUND-0047 E4).
     await autoTurnEnd($, state, auto, e).catch((error) =>
       logFailure($, 'automatic handoff failed', error)
     );
@@ -103,7 +103,8 @@ export function register(on, options) {
   // Each model request of the main loop. A generator, as the engine requires.
   on('turn.step', async function* ($, e, next) {
     const result = yield* next(e);
-    if (!e.agentId && result?.toolUses?.length > 0) {
+    // Not during the handoff turn of a button press: that flow clears itself.
+    if (!e.agentId && !state.pending && result?.toolUses?.length > 0) {
       await autoMidTurn($, auto).catch((error) =>
         logFailure($, 'automatic handoff note failed', error)
       );
@@ -548,6 +549,9 @@ async function rollOver($, auto, path) {
   } catch (error) {
     $.ui.toast(`AD handoff: the session was not cleared; the handoff is at ${path}.`);
     logFailure($, 'automatic clear failed', error);
+    // A host that refuses the clear would otherwise be asked for a new
+    // handoff at every turn.
+    auto.restUntil = Date.now() + COOLDOWN_MS;
     return;
   }
   auto.fresh = true;

@@ -1015,6 +1015,11 @@ test('task-0127 a handoff counts only when whole: long enough, every heading, th
   assert.equal(auto.isHandoffComplete(whole.replace(auto.END_MARKER, '')), false);
   assert.equal(auto.isHandoffComplete(`${whole}\nmore`), false);
   assert.equal(auto.isHandoffComplete(whole.replace('## Roadmap', '## Plan')), false);
+  assert.equal(
+    auto.isHandoffComplete(whole.replace('## Roadmap', 'the ## Roadmap comes later')),
+    false,
+    'a heading is a line of its own'
+  );
   assert.equal(auto.isHandoffComplete(`## Roadmap\n${auto.END_MARKER}`), false);
   assert.equal(auto.isHandoffComplete(undefined), false);
 });
@@ -1301,7 +1306,10 @@ test('task-0127 a request left behind is dropped when the context falls below th
 });
 
 test('task-0127 a refused clear sends no resume and names the handoff', async () => {
-  const { hooks, submitted, ran, files, toasts, logs, $ } = await loadPlugin(80, at(82_000));
+  const { hooks, submitted, appended, ran, files, toasts, logs, $ } = await loadPlugin(
+    80,
+    at(82_000)
+  );
   await hooks['session.start']($, {}, async () => undefined);
   await endTurn(hooks, $);
   const path = requestedPath(submitted[0].text);
@@ -1314,6 +1322,16 @@ test('task-0127 a refused clear sends no resume and names the handoff', async ()
   assert.equal(submitted.length, 1);
   assert.ok(toasts[0].includes(path));
   assert.match(logs.at(-1).text, /clear refused/);
+  await runStep(hooks, $);
+  await endTurn(hooks, $);
+  assert.equal(submitted.length, 1, 'a refused clear rests: no new handoff every turn');
+  assert.deepEqual(appended, []);
+});
+
+test('task-0127 the handoff turn of a button press gets no automatic note', async () => {
+  const { hooks, appended, $ } = await pressWithBoxOn({ handoffs: oneNewFile });
+  await runStep(hooks, $);
+  assert.deepEqual(appended, []);
 });
 
 test('task-0127 a refused request or resume never breaks the turn', async () => {
