@@ -67,6 +67,8 @@ Notes taken: the heading check now needs each heading on a line of its own; the 
 
 `ad-review` on `d7ffc71..a176b2c` found no Blocker and no Concern on either axis. Notes left as they are: the hold is ten minutes from the press and ten more from the start of the turn that takes it; a press that waits more than ten minutes behind a running turn is dropped, so a clear-and-continue asked with the box on is then not performed and no toast says so; the hold reuses the rest rule's constant. The local gate (`npm run verify`) is green on this state: 1684 tests pass.
 
+The real headless run was repeated on this final code (`a176b2c`, start point 55, Windows 11, Claude Code 2.1.327): three rollovers, each a clear and a resume from its own file, no compaction, exit code 0 and the task's answer last.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
