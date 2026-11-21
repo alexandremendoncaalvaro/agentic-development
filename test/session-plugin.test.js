@@ -121,7 +121,11 @@ test('the plugin manifest declares the threshold option and one hooks module tha
 
 // A fake engine: hooks keyed by event and matcher, and a host with no kit
 // script installed unless `script` gives the path and the run's result.
-function loadPlugin(threshold, usage, { script = null, handoffs = null, stored = {} } = {}) {
+function loadPlugin(
+  threshold,
+  usage,
+  { script = null, handoffs = null, stored = {}, options = {}, env = {}, files = {} } = {}
+) {
   return import(pathToFileURL(join(PLUGIN, 'hooks', 'register.mjs')).href).then(({ register }) => {
     const hooks = {};
     register(
@@ -132,7 +136,7 @@ function loadPlugin(threshold, usage, { script = null, handoffs = null, stored =
           .join(':');
         hooks[key] = rest.at(-1);
       },
-      { threshold }
+      { threshold, ...options }
     );
     const logs = [];
     const submitted = [];
@@ -141,6 +145,7 @@ function loadPlugin(threshold, usage, { script = null, handoffs = null, stored =
     const commands = [];
     const ran = [];
     const toasts = [];
+    const appended = [];
     const store = { ...stored };
     const element = (type) => (props) => ({ type, props });
     const $ = {
@@ -148,9 +153,10 @@ function loadPlugin(threshold, usage, { script = null, handoffs = null, stored =
         usage,
         root: async () => '/work/repo',
         id: async () => 'sess-1',
+        append: async (input) => appended.push(input),
       },
       env: {
-        get: async (name) => ({ HOME: '/home/ale', TMPDIR: '/var/tmp-x/' })[name],
+        get: async (name) => ({ HOME: '/home/ale', TMPDIR: '/var/tmp-x/', ...env })[name],
       },
       store: {
         get: async (key) => store[key],
@@ -166,6 +172,13 @@ function loadPlugin(threshold, usage, { script = null, handoffs = null, stored =
         stat: async (path) => {
           if (script && path === script.path) return { size: 1 };
           throw new Error('ENOENT');
+        },
+        read: async (path) => {
+          if (path in files) return files[path];
+          throw new Error('ENOENT');
+        },
+        write: async (path, text) => {
+          files[path] = text;
         },
       },
       process: {
@@ -192,7 +205,20 @@ function loadPlugin(threshold, usage, { script = null, handoffs = null, stored =
         resolve: () => ({ Box: element('Box'), Text: element('Text'), Button: element('Button') }),
       },
     };
-    return { hooks, logs, submitted, runs, opened, commands, ran, toasts, store, $ };
+    return {
+      hooks,
+      logs,
+      submitted,
+      runs,
+      opened,
+      commands,
+      ran,
+      toasts,
+      store,
+      appended,
+      files,
+      $,
+    };
   });
 }
 
@@ -211,15 +237,17 @@ const FULL = async () => ({
   context: { tokens: 90000, window: 200000 },
 });
 
-test('the plugin draws and runs the handoff only: it hooks no tool call and rewrites no prompt', async () => {
+test('the plugin draws and runs the handoff only: it hooks no tool call and rewrites no typed prompt', async () => {
   const { hooks, submitted, ran, $ } = await loadPlugin(1, FULL);
   assert.deepEqual(Object.keys(hooks).sort(), [
     'command.run:agentic-briefing',
+    'prompt.compose',
     'session.compact',
     'session.end',
     'session.start',
     'turn.complete',
     'turn.start',
+    'turn.step',
     'ui.render:AbovePrompt',
     'ui.render:Pane:agentic-briefing',
   ]);
@@ -908,4 +936,455 @@ test('regression: task-0111 detailsMarkdown cuts a single long line without drop
   );
   assert.ok(md.length <= 500);
   assert.match(md, /_Cut to fit the pane; the task file has the rest\._$/);
+});
+
+// Task 0127, ADR-0098: the automatic rollover. Near the auto-compact point the
+// plugin asks for a handoff, waits for the whole file, clears and resumes.
+const auto = await import(pathToFileURL(join(PLUGIN, 'hooks', 'auto.mjs')).href);
+
+const at = (tokens) => async () => ({
+  context: {
+    tokens,
+    window: 200_000,
+    breakdown: { isAutoCompactEnabled: true, autoCompactThreshold: 100_000 },
+  },
+});
+const wholeHandoff = () =>
+  [
+    '# Handoff (automatic)',
+    ...auto.REQUIRED_HEADINGS.map((h) => `${h}\n\n${'state '.repeat(30)}`),
+    auto.END_MARKER,
+  ].join('\n\n');
+// One model request of the main loop, answered with or without tool uses.
+async function runStep(hooks, $, toolUses = [{ name: 'Bash' }], agentId) {
+  const step = hooks['turn.step'](
+    $,
+    { turnId: 't', index: 0, agentId },
+    // eslint-disable-next-line require-yield
+    async function* () {
+      return { toolUses, stopReason: 'tool_use' };
+    }
+  );
+  let result = await step.next();
+  while (!result.done) result = await step.next();
+  return result.value;
+}
+const endTurn = async (hooks, $, input = {}) => {
+  await hooks['turn.complete'](
+    $,
+    { turnId: 't', reason: 'answer', answer: 'done', ...input },
+    async () => undefined
+  );
+  await tick();
+};
+const requestedPath = (text) => /"([^"]+\.md)"/.exec(text)[1];
+
+test('task-0127 autoSettings is on by default and the option or the environment turns it off', () => {
+  assert.deepEqual(auto.autoSettings({}, undefined), { enabled: true, at: 80 });
+  assert.deepEqual(auto.autoSettings({ autoHandoff: false }, undefined), {
+    enabled: false,
+    at: 80,
+  });
+  assert.equal(auto.autoSettings({ autoHandoff: 'false' }, undefined).enabled, false);
+  assert.deepEqual(auto.autoSettings({ autoHandoffAt: 70 }, undefined), { enabled: true, at: 70 });
+  for (const off of ['off', 'OFF', 'false', 'no', '0'])
+    assert.equal(auto.autoSettings({}, off).enabled, false, off);
+  assert.deepEqual(auto.autoSettings({ autoHandoff: false }, '30'), { enabled: true, at: 30 });
+  assert.deepEqual(auto.autoSettings({ autoHandoff: false }, 'on'), { enabled: true, at: 80 });
+  assert.deepEqual(auto.autoSettings({ autoHandoffAt: 150 }, 'nonsense'), {
+    enabled: true,
+    at: 80,
+  });
+});
+
+test('task-0127 tierOf splits the way from the start point to the auto-compact point', () => {
+  assert.equal(auto.tierOf(79, 80), 0);
+  assert.equal(auto.tierOf(80, 80), 1);
+  assert.equal(auto.tierOf(90, 80), 2);
+  assert.equal(auto.tierOf(95, 80), 3);
+  assert.equal(auto.tierOf(60, 60), 1);
+  assert.equal(auto.tierOf(80, 60), 2);
+  assert.equal(auto.tierOf(90, 60), 3);
+  assert.equal(auto.tierOf(undefined, 80), 0);
+});
+
+test('task-0127 a handoff counts only when whole: long enough, every heading, the marker last', () => {
+  const whole = wholeHandoff();
+  assert.equal(auto.isHandoffComplete(whole), true);
+  assert.equal(auto.isHandoffComplete(`${whole}\n\n`), true);
+  assert.equal(auto.isHandoffComplete(whole.replace(auto.END_MARKER, '')), false);
+  assert.equal(auto.isHandoffComplete(`${whole}\nmore`), false);
+  assert.equal(auto.isHandoffComplete(whole.replace('## Roadmap', '## Plan')), false);
+  assert.equal(auto.isHandoffComplete(`## Roadmap\n${auto.END_MARKER}`), false);
+  assert.equal(auto.isHandoffComplete(undefined), false);
+});
+
+test('task-0127 the handoff path sits under the home directory on any system and refuses unsafe text', () => {
+  const ms = Date.UTC(2026, 10, 21, 12, 5, 3);
+  assert.equal(
+    auto.autoHandoffPath('C:\\Users\\ale', ms, 'abcdef12-3456'),
+    'C:/Users/ale/.agentic/handoffs/20261121T120503Z-auto-abcdef12.md'
+  );
+  assert.equal(
+    auto.autoHandoffPath('/home/ale/', ms, 'sess-1'),
+    '/home/ale/.agentic/handoffs/20261121T120503Z-auto-sess-1.md'
+  );
+  assert.equal(auto.autoHandoffPath(undefined, ms, 's'), null);
+  assert.equal(auto.autoHandoffPath('/home/a"b', ms, 's'), null);
+  assert.equal(auto.autoHandoffPath('/home/a\nb', ms, 's'), null);
+  assert.match(auto.autoHandoffPath('/home/ale', ms, '../x"y'), /-auto-xy\.md$/);
+  assert.ok(
+    !auto.autoHandoffPath('/home/ale', ms, 's').includes('agentic-handoffs'),
+    'outside the directory name the handoff-chip reminder fires on'
+  );
+});
+
+test('task-0127 the request names the path, every section, the marker and the answer fallback', () => {
+  const text = auto.handoffRequest(1, { percent: 81, basis: 'auto-compact' }, '/h/x.md');
+  assert.match(text, /81% of the auto-compact point/);
+  assert.match(text, /"\/h\/x\.md"/);
+  for (const heading of auto.AUTO_HEADINGS) assert.ok(text.includes(heading), heading);
+  assert.ok(text.includes(auto.END_MARKER));
+  assert.match(text, /handoff deferred/);
+  assert.match(text, /do not run \/clear/i);
+  assert.doesNotMatch(
+    auto.handoffRequest(3, { percent: 96, basis: 'window' }, '/h/x.md'),
+    /deferred/
+  );
+  const resume = auto.autoResumePrompt('/h/x.md');
+  assert.ok(resume.includes('"/h/x.md"'));
+  assert.match(resume, /Resume protocol/);
+});
+
+test('task-0127 below the start point nothing is asked', async () => {
+  const { hooks, submitted, appended, ran, $ } = await loadPlugin(80, at(70_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await runStep(hooks, $);
+  await endTurn(hooks, $);
+  assert.deepEqual([submitted, appended, ran], [[], [], []]);
+});
+
+test('task-0127 past the start point the turn end asks for the handoff, once per tier', async () => {
+  const { hooks, submitted, ran, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $);
+  assert.equal(submitted.length, 1);
+  assert.equal(submitted[0].asUser, undefined, 'the request is the plugin speaking, not the owner');
+  assert.match(submitted[0].text, /\/home\/ale\/\.agentic\/handoffs\/\d{8}T\d{6}Z-auto-sess-1\.md/);
+  await endTurn(hooks, $, { answer: 'handoff deferred: a job is running' });
+  assert.equal(submitted.length, 1, 'a deferral is not asked again at the same tier');
+  assert.deepEqual(ran, []);
+});
+
+test('task-0127 a deferred handoff is asked again when the next tier is reached', async () => {
+  let tokens = 82_000;
+  const { hooks, submitted, $ } = await loadPlugin(80, async () => at(tokens)());
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $);
+  tokens = 91_000;
+  await endTurn(hooks, $);
+  assert.equal(submitted.length, 2);
+  assert.equal(requestedPath(submitted[1].text), requestedPath(submitted[0].text));
+  assert.match(submitted[1].text, /this turn/i);
+});
+
+test('task-0127 a whole handoff is followed by a clear and a resume in the same window', async () => {
+  const { hooks, submitted, ran, files, toasts, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $);
+  const path = requestedPath(submitted[0].text);
+  files[path] = wholeHandoff();
+  await endTurn(hooks, $, { answer: 'handoff written' });
+  assert.deepEqual(ran, [{ command: 'clear' }]);
+  assert.equal(submitted.length, 2);
+  assert.equal(submitted[1].asUser, true);
+  assert.equal(submitted[1].text, auto.autoResumePrompt(path));
+  assert.equal(toasts.length, 1);
+});
+
+test('task-0127 an unfinished handoff file clears nothing', async () => {
+  const { hooks, submitted, ran, files, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $);
+  files[requestedPath(submitted[0].text)] = wholeHandoff().replace(auto.END_MARKER, '');
+  await endTurn(hooks, $, { answer: 'handoff written' });
+  assert.deepEqual(ran, []);
+  assert.equal(submitted.length, 1);
+});
+
+test('task-0127 a handoff given as the answer is saved by the plugin and then resumed from', async () => {
+  const { hooks, submitted, ran, files, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $);
+  const path = requestedPath(submitted[0].text);
+  await endTurn(hooks, $, { answer: `The Write tool was refused.\n\n${wholeHandoff()}` });
+  assert.ok(auto.isHandoffComplete(files[path]));
+  assert.ok(files[path].startsWith('# Handoff'), 'the words before the handoff are dropped');
+  assert.deepEqual(ran, [{ command: 'clear' }]);
+  assert.equal(submitted[1].asUser, true);
+});
+
+test('task-0127 in a long turn the handoff is asked mid-turn, as a note beside the tool results', async () => {
+  const { hooks, submitted, appended, ran, files, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await runStep(hooks, $);
+  assert.equal(appended.length, 1);
+  const note = appended[0].message;
+  assert.equal(note.type, 'user');
+  const path = requestedPath(note.content[0].text);
+  assert.ok(note.content[0].text.includes(auto.END_MARKER));
+  await runStep(hooks, $);
+  assert.equal(appended.length, 1, 'one note per tier');
+  files[path] = wholeHandoff();
+  await endTurn(hooks, $, { answer: 'handoff written' });
+  assert.deepEqual(ran, [{ command: 'clear' }]);
+  assert.equal(submitted.length, 1);
+  assert.equal(submitted[0].text, auto.autoResumePrompt(path));
+});
+
+test('task-0127 a step that ends the turn or runs in a subagent gets no note', async () => {
+  const { hooks, appended, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await runStep(hooks, $, []);
+  await runStep(hooks, $, [{ name: 'Bash' }], 'agent-1');
+  assert.deepEqual(appended, []);
+  const result = await runStep(hooks, $);
+  assert.deepEqual(result, { toolUses: [{ name: 'Bash' }], stopReason: 'tool_use' });
+});
+
+test('task-0127 a note the model ignored becomes a request at the end of the turn', async () => {
+  const { hooks, submitted, appended, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await runStep(hooks, $);
+  await endTurn(hooks, $);
+  assert.equal(appended.length, 1);
+  assert.equal(submitted.length, 1);
+  assert.equal(
+    requestedPath(submitted[0].text),
+    requestedPath(appended[0].message.content[0].text)
+  );
+});
+
+test('task-0127 turned off by the option or the environment, nothing is asked or cleared', async () => {
+  for (const extra of [
+    { options: { autoHandoff: false } },
+    { env: { AGENTIC_AUTO_HANDOFF: 'off' } },
+  ]) {
+    const { hooks, submitted, appended, ran, $ } = await loadPlugin(80, at(97_000), extra);
+    await hooks['session.start']($, {}, async () => undefined);
+    await runStep(hooks, $);
+    await endTurn(hooks, $);
+    assert.deepEqual([submitted, appended, ran], [[], [], []]);
+  }
+});
+
+test('task-0127 the environment sets the start point, for headless runs', async () => {
+  const { hooks, submitted, $ } = await loadPlugin(80, at(35_000), {
+    env: { AGENTIC_AUTO_HANDOFF: '30' },
+  });
+  await endTurn(hooks, $);
+  assert.equal(submitted.length, 1, 'works with no session.start heard, as after a /clear');
+});
+
+test('task-0127 an interrupted or failed turn asks for nothing and clears nothing', async () => {
+  const { hooks, submitted, ran, files, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $, { reason: 'aborted' });
+  assert.deepEqual(submitted, []);
+  await endTurn(hooks, $);
+  files[requestedPath(submitted[0].text)] = wholeHandoff();
+  await endTurn(hooks, $, { reason: 'error' });
+  assert.deepEqual(ran, []);
+});
+
+test('task-0127 a subagent turn end never starts the cycle', async () => {
+  const { hooks, submitted, $ } = await loadPlugin(80, at(97_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $, { agentId: 'agent-1' });
+  assert.deepEqual(submitted, []);
+});
+
+test('task-0127 the system prompt vouches for the requests, and bounds what they may ask', async () => {
+  const engine = { sections: [{ id: 'intro', text: 'x', scope: 'shared' }] };
+  const { hooks, $ } = await loadPlugin(80, at(10_000));
+  const { sections } = await hooks['prompt.compose']($, {}, async () => engine);
+  assert.deepEqual(sections[0], engine.sections[0], "the engine's sections stay first");
+  assert.equal(sections.length, 2);
+  assert.deepEqual(Object.keys(sections[1]).sort(), ['id', 'scope', 'text']);
+  assert.equal(sections[1].id, 'agentic-session:auto-handoff');
+  assert.equal(sections[1].scope, 'session');
+  assert.ok(sections[1].text.includes(auto.AUTO_LABEL));
+  assert.ok(sections[1].text.includes(auto.HANDOFF_DIR));
+  for (const text of [
+    auto.handoffRequest(1, { percent: 80 }, '/h/x.md'),
+    auto.midTurnNote(2, { percent: 90 }, '/h/x.md'),
+  ])
+    assert.ok(text.startsWith(auto.AUTO_LABEL), 'every request opens with the label');
+});
+
+test('task-0127 with the cycle off the system prompt is left as the engine composed it', async () => {
+  const engine = { sections: [{ id: 'intro', text: 'x', scope: 'shared' }] };
+  const { hooks, $ } = await loadPlugin(80, at(10_000), {
+    env: { AGENTIC_AUTO_HANDOFF: 'off' },
+  });
+  assert.equal(await hooks['prompt.compose']($, {}, async () => engine), engine);
+});
+
+// Ask, write the whole handoff and roll over: two prompts submitted.
+async function rollOnce(hooks, $, submitted, files) {
+  await endTurn(hooks, $);
+  files[requestedPath(submitted.at(-1).text)] = wholeHandoff();
+  await endTurn(hooks, $, { answer: 'handoff written' });
+}
+
+test('task-0127 a session resumed already past the start point rests instead of handing off for ever', async () => {
+  let tokens = 82_000;
+  const { hooks, submitted, appended, files, $ } = await loadPlugin(80, async () => at(tokens)());
+  await hooks['session.start']($, {}, async () => undefined);
+  await rollOnce(hooks, $, submitted, files);
+  assert.equal(submitted.length, 2);
+  await runStep(hooks, $);
+  await endTurn(hooks, $);
+  tokens = 97_000;
+  await runStep(hooks, $);
+  await endTurn(hooks, $);
+  assert.equal(submitted.length, 2, 'no request while resting, critical or not');
+  assert.deepEqual(appended, []);
+});
+
+test('task-0127 a session resumed below the start point is asked again when it reaches it', async () => {
+  let tokens = 82_000;
+  const { hooks, submitted, appended, files, ran, $ } = await loadPlugin(80, async () =>
+    at(tokens)()
+  );
+  await hooks['session.start']($, {}, async () => undefined);
+  await rollOnce(hooks, $, submitted, files);
+  tokens = 30_000;
+  await runStep(hooks, $);
+  assert.deepEqual(appended, []);
+  tokens = 85_000;
+  await runStep(hooks, $);
+  assert.equal(appended.length, 1, 'the long resumed turn is asked mid-turn');
+  const second = requestedPath(appended[0].message.content[0].text);
+  files[second] = wholeHandoff();
+  await endTurn(hooks, $, { answer: 'handoff written' });
+  assert.deepEqual(ran, [{ command: 'clear' }, { command: 'clear' }]);
+  assert.equal(submitted.at(-1).text, auto.autoResumePrompt(second));
+});
+
+test('task-0127 a compaction that overtakes the handoff drops it: its file clears nothing', async () => {
+  let tokens = 96_000;
+  const { hooks, submitted, appended, files, ran, $ } = await loadPlugin(80, async () =>
+    at(tokens)()
+  );
+  await hooks['session.start']($, {}, async () => undefined);
+  await runStep(hooks, $);
+  files[requestedPath(appended[0].message.content[0].text)] = wholeHandoff();
+  await hooks['session.compact']($, { trigger: 'auto' }, async () => undefined);
+  tokens = 30_000;
+  await endTurn(hooks, $, { answer: 'ALL-DONE' });
+  assert.deepEqual(ran, [], 'the work went on in the compacted context');
+  assert.deepEqual(submitted, []);
+});
+
+test('task-0127 a request left behind is dropped when the context falls below the start point', async () => {
+  let tokens = 82_000;
+  const { hooks, submitted, ran, files, $ } = await loadPlugin(80, async () => at(tokens)());
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $);
+  const path = requestedPath(submitted[0].text);
+  tokens = 20_000;
+  await endTurn(hooks, $);
+  files[path] = wholeHandoff();
+  await endTurn(hooks, $);
+  assert.deepEqual(ran, [], 'a file written for a dropped request clears nothing');
+});
+
+test('task-0127 a refused clear sends no resume and names the handoff', async () => {
+  const { hooks, submitted, ran, files, toasts, logs, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $);
+  const path = requestedPath(submitted[0].text);
+  files[path] = wholeHandoff();
+  $.command.run = async (spec) => {
+    ran.push(spec);
+    throw new Error('clear refused');
+  };
+  await endTurn(hooks, $, { answer: 'handoff written' });
+  assert.equal(submitted.length, 1);
+  assert.ok(toasts[0].includes(path));
+  assert.match(logs.at(-1).text, /clear refused/);
+});
+
+test('task-0127 a refused request or resume never breaks the turn', async () => {
+  const { hooks, ran, files, toasts, logs, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  const asked = [];
+  $.prompt.submit = async (input) => {
+    asked.push(input);
+    throw new Error('submit refused');
+  };
+  await endTurn(hooks, $);
+  assert.match(logs.at(-1).text, /submit refused/);
+  files[requestedPath(asked[0].text)] = wholeHandoff();
+  await endTurn(hooks, $, { answer: 'handoff written' });
+  assert.deepEqual(ran, [{ command: 'clear' }]);
+  assert.match(toasts.at(-1), /cleared, but the resume prompt was not sent/);
+});
+
+test('task-0127 with no home directory the cycle does nothing and says why in the debug log', async () => {
+  const { hooks, submitted, logs, $ } = await loadPlugin(80, at(82_000), {
+    env: { HOME: undefined },
+  });
+  await hooks['session.start']($, {}, async () => undefined);
+  await endTurn(hooks, $);
+  assert.deepEqual(submitted, []);
+  assert.match(logs.at(-1).text, /no home directory/);
+});
+
+test('task-0127 an automatic compaction that still happens is told what to preserve', async () => {
+  const { hooks, submitted, $ } = await loadPlugin(80, at(82_000));
+  await hooks['session.start']($, {}, async () => undefined);
+  const seen = [];
+  const next = async (e) => {
+    seen.push(e);
+  };
+  await hooks['session.compact']($, { trigger: 'auto', instructions: 'keep X' }, next);
+  assert.match(seen[0].instructions, /^keep X\n\n/);
+  assert.match(seen[0].instructions, /roadmap/i);
+  await endTurn(hooks, $);
+  await hooks['session.compact']($, { trigger: 'auto' }, next);
+  assert.ok(seen[1].instructions.includes(requestedPath(submitted[0].text)));
+  await hooks['session.compact']($, { trigger: 'manual', instructions: 'mine' }, next);
+  assert.deepEqual(seen[2], { trigger: 'manual', instructions: 'mine' });
+  await hooks['session.compact']($, { trigger: 'auto', agentId: 'a' }, next);
+  assert.equal(seen[3].instructions, undefined);
+});
+
+test('task-0127 the manifest declares the automatic handoff options, on by default', () => {
+  const config = readJson(join(PLUGIN, '.claude-plugin', 'plugin.json')).userConfig;
+  assert.equal(config.autoHandoff.type, 'boolean');
+  assert.equal(config.autoHandoff.default, true);
+  const point = config.autoHandoffAt;
+  assert.deepEqual(
+    [point.type, point.default, point.min, point.max],
+    ['number', auto.DEFAULT_AUTO_AT, 1, 99]
+  );
+});
+
+test('task-0127 the skill and the plugin agree on the automatic handoff contract', () => {
+  for (const host of ['claude-code', 'codex']) {
+    const dir = join(ROOT, 'src', 'skills', host, 'ad-handoff');
+    const skill = readFileSync(join(dir, 'SKILL.md'), 'utf8');
+    const template = readFileSync(join(dir, 'references', 'auto-handoff-template.md'), 'utf8');
+    assert.match(skill, /--auto/, host);
+    assert.ok(skill.includes(auto.END_MARKER), `${host} skill names the end marker`);
+    assert.ok(skill.includes(auto.HANDOFF_DIR), `${host} skill names the stable directory`);
+    for (const heading of auto.AUTO_HEADINGS)
+      assert.ok(template.includes(`\n${heading}\n`), `${host} template has ${heading}`);
+    assert.ok(
+      template.trimEnd().endsWith(`${auto.END_MARKER}\n\`\`\`\``),
+      `${host} template ends with the marker`
+    );
+  }
 });

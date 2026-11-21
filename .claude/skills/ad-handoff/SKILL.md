@@ -1,7 +1,7 @@
 ---
 name: ad-handoff
 description: 'Compact the session into a handoff a fresh agent can resume from. Use when context runs low or on "handoff", "wrap up the session", "save context for next session".'
-summary: Compact the session into a temporary handoff. Preserves resumable state while the next session opens with a preparation receipt and canonical brief; retains roadmap, lost asks, hygiene, references, and redaction. Never commits.
+summary: Compact the session into a temporary handoff. Preserves resumable state while the next session opens with a preparation receipt and canonical brief; retains roadmap, lost asks, hygiene, references, and redaction. `--auto` writes the compact rollover handoff. Never commits.
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
@@ -140,7 +140,21 @@ Tell the user:
 
 When the host exposes a background-task chip primitive — a tool that renders a suggested task as a one-click chip spawning a fresh session (e.g. `spawn_task` in the Claude Code desktop app) — offer the handoff as a chip (item 6). The chip's prompt must stand alone: the absolute handoff path with the instruction to read it first, follow its `Resume protocol` before any work, and continue with its recommended first action. Do not separately invoke `/ad-philosophy`; that would replace the compact receipt with the verbose explicit-invocation mode the resume protocol deliberately avoids. Prefer the chip over a pasted prompt where the host offers one — it survives the clipboard and carries the path verbatim. Title: short imperative naming the work. The chip complements the file — the file stays the durable artifact; on hosts without the primitive (terminal CLI, IDE extensions, Codex) the printed path is the handoff, as above.
 
-Do **not** auto-execute `/clear` or anything destructive. The user decides when to discard the current session.
+The skill itself never runs `/clear` or anything destructive. In a manual handoff the user decides when to discard the current session. The automatic rollover below is the one place a session is cleared without a keypress, and the skill is not what clears it: the owner keeps the switch, and the `agentic-session` plugin clears only after the whole handoff file exists (ADR-0098).
+
+## Automatic mode — `--auto [path]`
+
+The automatic context rollover (ADR-0098) is a handoff in place of a compaction. Near the auto-compaction point the `agentic-session` plugin asks for a handoff, waits for the whole file, clears the session and submits the resume prompt in the same window, interactive or headless (`claude -p`). On by default; `AGENTIC_AUTO_HANDOFF=off` (or the plugin option `autoHandoff`) turns it off and `AGENTIC_AUTO_HANDOFF=<1-99>` moves the start point from 80%. The plugin's request names this mode and the path; an owner or an orchestrator may also invoke `--auto` directly.
+
+In this mode the steps above shrink to:
+
+1. Ask nothing and delete nothing. No question to the user, no branch deletion (hygiene is reported under `Running`, never run), no chip, no roadmap rendered in the reply.
+2. Path: the one given. Without one, `<home>/.agentic/handoffs/<ISO>-auto-<slug>.md` under the user's home directory (`$HOME`, or `%USERPROFILE%` on Windows) — the same place on every system, with no POSIX `/tmp` and no shell needed. Never inside the repository.
+3. Shape: [references/auto-handoff-template.md](references/auto-handoff-template.md) — its eight sections, in that order, none omitted; an empty one is written as "none". Compact and factual, in the language of the conversation. The roadmap, lost-ask sweep and redaction rules above still bind; state only what this session has evidence for.
+4. End marker: the last line of the file is exactly `<!-- ad-handoff:end -->`. The plugin treats a file without it, or without the required headings, as unfinished and clears nothing.
+5. Write the file with the write tool. If the write is refused, give the whole handoff as the answer, ending with that same last line. Otherwise answer only `handoff written` and end the turn. Do not run `/clear`.
+
+Where nothing asks at a turn's end and nothing clears — Codex, or Claude Code without the plugin — `--auto` still writes the same file and gives the same one-line answer; the owner or the orchestrator starts the fresh session with `Read "<path>" first and follow its Resume protocol`.
 
 ## Output contract
 
@@ -153,12 +167,13 @@ Do **not** auto-execute `/clear` or anything destructive. The user decides when 
 - References artifacts by path; never duplicates their content.
 - Secrets are replaced with `<REDACTED:type>` placeholders.
 - Suggested skills are drawn from the installed `ad-*` set and each line carries a one-clause rationale.
+- With `--auto`: one file at the given path or under `<home>/.agentic/handoffs/`, in the automatic template's shape, ending with `<!-- ad-handoff:end -->`; no question, no deletion, and the answer is only `handoff written`.
 - The user receives the absolute path of the file and the recommended first action; on hosts exposing a background-task chip primitive, a one-click resume chip is also offered. No destructive session ops are performed.
 
 ## Next
 
 - Paste the handoff path into the next session: `cat /tmp/agentic-handoffs/<file>.md` (or the host-specific opener).
-- On Claude Code: `/clear` then `Read <path>` as the first turn.
+- On Claude Code: `/clear` then `Read <path>` as the first turn; with the `agentic-session` plugin the automatic rollover does both by itself.
 - On Codex: `/clear` then paste the file contents, or explicitly spawn a Codex subagent with the handoff path as its context packet.
 - If the handoff surfaced an unresolved decision worth recording: open an ADR with `/ad-adr` before the next agent picks the work up.
 - If the handoff surfaced a vocabulary drift (a term you kept paraphrasing): `/ad-domain` to land it in `CONTEXT.md` so the next agent inherits the canonical noun.

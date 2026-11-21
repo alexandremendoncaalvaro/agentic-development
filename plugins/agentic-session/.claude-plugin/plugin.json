@@ -1,6 +1,6 @@
 {
   "name": "agentic-session",
-  "description": "Agentic Development companion for Claude Code: a context band above the prompt, shown only past your threshold, with a one-press /ad-handoff and an opt-in clear-and-continue, and /agentic-briefing, which opens the work-in-progress briefing in a pane.",
+  "description": "Agentic Development companion for Claude Code: near the auto-compact point it asks for a handoff, clears the session and resumes from it, in place of a compaction (on by default, can be turned off); a context band above the prompt with a one-press /ad-handoff; and /agentic-briefing, which opens the work-in-progress briefing in a pane.",
   "author": {
     "name": "Alexandre Alvaro"
   },
@@ -11,6 +11,20 @@
       "type": "number",
       "title": "Context band threshold (%)",
       "description": "Show the band once context reaches this share of the auto-compact point (or of the window when auto-compaction is off). 1 to 99.",
+      "default": 80,
+      "min": 1,
+      "max": 99
+    },
+    "autoHandoff": {
+      "type": "boolean",
+      "title": "Automatic handoff in place of compaction",
+      "description": "Near the auto-compact point, ask for a handoff, clear the session and resume from the handoff in the same window. Turn off to keep the engine's compaction.",
+      "default": true
+    },
+    "autoHandoffAt": {
+      "type": "number",
+      "title": "Automatic handoff start (%)",
+      "description": "Start asking for the handoff once context reaches this share of the auto-compact point (or of the window when auto-compaction is off). 1 to 99.",
       "default": 80,
       "min": 1,
       "max": 99

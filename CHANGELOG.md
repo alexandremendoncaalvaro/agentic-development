@@ -15,11 +15,26 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   wrote no file or more than one, or the clear is refused, a toast says so and
   the session is left as the handoff left it; when only the resume prompt is
   refused, the toast names the handoff file to resume from (task-0115).
+- The `agentic-session` plugin rolls the context over by itself, a handoff
+  in place of a compaction: near the auto-compact point it asks for a
+  handoff, at a turn's end or inside a long turn, waits for the whole file
+  under `<home>/.agentic/handoffs/`, clears the session and resumes from it
+  in the same window. It works in `claude -p` and on Windows, is on by
+  default, and is turned off with the plugin option `autoHandoff` or
+  `AGENTIC_AUTO_HANDOFF=off`; `autoHandoffAt` or `AGENTIC_AUTO_HANDOFF=<1-99>`
+  moves the start point (80 by default). A compaction that happens anyway is
+  told what to keep (task-0127, ADR-0098).
+- `ad-handoff` has an automatic mode, `/ad-handoff --auto [path]`, on both
+  hosts: a compact template ending with an end marker, no question, no
+  deletion and a one-line answer (task-0127).
 
 ### Changed
 
 - The `agentic-session` band appears from 80% of the way to the auto-compact
   point by default, up from 60%; the option still takes 1 to 99 (task-0115).
+- `ad-handoff` no longer says a session is never cleared without a keypress:
+  the skill itself still never runs `/clear`, and the `agentic-session`
+  plugin clears only after the whole handoff file exists (ADR-0098).
 
 ## [1.6.0] - 2026-10-15
 

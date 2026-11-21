@@ -1,7 +1,7 @@
 ---
 name: ad-handoff
 description: 'Compact the session into a handoff a fresh agent can resume from. Use when context runs low or on "handoff", "wrap up the session", "save context for next session".'
-summary: Compact the session into a temporary handoff. Preserves resumable state while the next session opens with a preparation receipt and canonical brief; retains roadmap, lost asks, hygiene, references, and redaction. Never commits.
+summary: Compact the session into a temporary handoff. Preserves resumable state while the next session opens with a preparation receipt and canonical brief; retains roadmap, lost asks, hygiene, references, and redaction. `--auto` writes the compact rollover handoff. Never commits.
 ---
 
 <background_information>
@@ -107,7 +107,19 @@ Step 7 — hand off. Tell the user:
 4. Any ask the sweep found unlanded — surface these even when inconvenient. A handoff that quietly drops a request is worse than none, because it looks complete.
 5. The single recommended first action, and the suggested-skills list verbatim.
 
-Do not auto-execute `/clear` or anything destructive. The user decides when to discard the current session.
+The skill itself never runs `/clear` or anything destructive. In a manual handoff the user decides when to discard the current session. The automatic rollover below is the one place a session is cleared without a keypress, and the skill is not what clears it: the owner keeps the switch, and the `agentic-session` plugin clears only after the whole handoff file exists (ADR-0098).
+
+Automatic mode — `--auto [path]`. The automatic context rollover (ADR-0098) is a handoff in place of a compaction. Near the auto-compaction point the `agentic-session` plugin asks for a handoff, waits for the whole file, clears the session and submits the resume prompt in the same window, interactive or headless (`claude -p`). On by default; `AGENTIC_AUTO_HANDOFF=off` (or the plugin option `autoHandoff`) turns it off and `AGENTIC_AUTO_HANDOFF=<1-99>` moves the start point from 80%. The plugin's request names this mode and the path; an owner or an orchestrator may also invoke `--auto` directly.
+
+In this mode the steps above shrink to:
+
+1. Ask nothing and delete nothing. No question to the user, no branch deletion (hygiene is reported under `Running`, never run), no chip, no roadmap rendered in the reply.
+2. Path: the one given. Without one, `<home>/.agentic/handoffs/<ISO>-auto-<slug>.md` under the user's home directory (`$HOME`, or `%USERPROFILE%` on Windows) — the same place on every system, with no POSIX `/tmp` and no shell needed. Never inside the repository.
+3. Shape: [references/auto-handoff-template.md](references/auto-handoff-template.md) — its eight sections, in that order, none omitted; an empty one is written as "none". Compact and factual, in the language of the conversation. The roadmap, lost-ask sweep and redaction rules above still bind; state only what this session has evidence for.
+4. End marker: the last line of the file is exactly `<!-- ad-handoff:end -->`. The plugin treats a file without it, or without the required headings, as unfinished and clears nothing.
+5. Write the file with the write tool. If the write is refused, give the whole handoff as the answer, ending with that same last line. Otherwise answer only `handoff written` and end the turn. Do not run `/clear`.
+
+Where nothing asks at a turn's end and nothing clears — Codex, or Claude Code without the plugin — `--auto` still writes the same file and gives the same one-line answer; the owner or the orchestrator starts the fresh session with `Read "<path>" first and follow its Resume protocol`.
 </instructions>
 
 <output_contract>
@@ -120,6 +132,7 @@ Do not auto-execute `/clear` or anything destructive. The user decides when to d
 - References artifacts by path; never duplicates their content.
 - Secrets are replaced with `<REDACTED:type>` placeholders.
 - Suggested skills are drawn from the installed `ad-*` set and each line carries a one-clause rationale.
+- With `--auto`: one file at the given path or under `<home>/.agentic/handoffs/`, in the automatic template's shape, ending with `<!-- ad-handoff:end -->`; no question, no deletion, and the answer is only `handoff written`.
 - The user receives the absolute path of the file and the recommended first action; no destructive session ops are performed.
 </output_contract>
 

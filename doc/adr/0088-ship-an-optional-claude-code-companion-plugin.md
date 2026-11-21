@@ -5,6 +5,7 @@
 **Deciders:** Alexandre Alvaro
 **Amends:** ADR-0041, its "do not package the kit as a Claude Code plugin" clause only, through the revisit trigger ADR-0041 names
 **Amended by:** ADR-0090, items 3 and 8, for the work-in-progress briefing: a display of the kit's own briefing script may summarize the work in progress, and ADR-0090 is the workflow-stage segment's own decision.
+**Amended by:** ADR-0098, item 4's "changes no prompt" and the 2026-10-13 addendum's "off by default" clear: an automatic context rollover, on by default, submits its own prompts, adds a note to a running turn and adds one system-prompt section.
 
 ## Context
 

@@ -8,7 +8,26 @@
 // $.noun.method(...) from source, so they are spelled literally, and helpers
 // that take $ are top-level functions. A threshold changed in /config reloads
 // the module with the new options.
+//
+// The automatic rollover (ADR-0098, task-0127): from the owner's start point
+// the plugin asks the model for a handoff, mid-turn as a note or at a turn's
+// end as a prompt, and once the file is whole it clears the session and
+// resumes from it. It blocks nothing: every failure is a toast or a debug line.
 
+import {
+  COOLDOWN_MS,
+  autoHandoffPath,
+  autoResumePrompt,
+  autoSettings,
+  SYSTEM_SECTION_ID,
+  compactInstructions,
+  handoffInAnswer,
+  handoffRequest,
+  isHandoffComplete,
+  midTurnNote,
+  systemSection,
+  tierOf,
+} from './auto.mjs';
 import {
   CLEAR_KEY,
   HANDOFF_LABEL,
@@ -38,6 +57,8 @@ const SCRIPT_TIMEOUT_MS = 10_000;
 export function register(on, options) {
   const threshold = normalizeThreshold(options?.threshold);
   const state = { fill: null, briefing: null, briefingRun: 0, clearAfter: false, pending: null };
+  // Kept in the module, not the session: /clear starts no new session.start.
+  const auto = { options, settings: null, cycle: null, fresh: false, restUntil: 0 };
 
   on('session.start', async ($, e, next) => {
     const result = await next(e);
@@ -69,12 +90,46 @@ export function register(on, options) {
       void clearAndResume($, pending, e.reason).catch((error) =>
         logFailure($, 'clear and resume failed', error)
       );
+      return result;
+    }
+    // Awaited here: a headless run exits as soon as its last turn ends, so a
+    // request or a clear sent later finds no session (RESEARCH-0047 M3).
+    await autoTurnEnd($, state, auto, e).catch((error) =>
+      logFailure($, 'automatic handoff failed', error)
+    );
+    return result;
+  });
+
+  // Each model request of the main loop. A generator, as the engine requires.
+  on('turn.step', async function* ($, e, next) {
+    const result = yield* next(e);
+    if (!e.agentId && result?.toolUses?.length > 0) {
+      await autoMidTurn($, auto).catch((error) =>
+        logFailure($, 'automatic handoff note failed', error)
+      );
     }
     return result;
   });
 
-  on('session.compact', async ($, e, next) => {
+  // The system prompt vouches for the cycle's requests while the cycle is on.
+  on('prompt.compose', async ($, e, next) => {
     const result = await next(e);
+    try {
+      const { enabled } = await autoConfig($, auto);
+      if (!enabled || !Array.isArray(result?.sections)) return result;
+      const section = { id: SYSTEM_SECTION_ID, text: systemSection(), scope: 'session' };
+      return { ...result, sections: [...result.sections, section] };
+    } catch (error) {
+      logFailure($, 'system prompt section not added', error);
+      return result;
+    }
+  });
+
+  on('session.compact', async ($, e, next) => {
+    const result = await next(await withAutoInstructions($, auto, e));
+    // A compaction of the main loop overtook the handoff: a file written for
+    // the context that is gone must not clear the one that replaced it.
+    if (!e.agentId) auto.cycle = null;
     await refresh($, state);
     return result;
   });
@@ -83,6 +138,7 @@ export function register(on, options) {
   on('session.end', async ($, e, next) => {
     const result = await next(e);
     state.pending = null;
+    auto.cycle = null;
     clearReadings($, state);
     return result;
   });
@@ -392,6 +448,134 @@ async function clearAndResume($, pending, reason) {
       `AD handoff: the session was cleared, but the resume prompt was not sent; resume from ${path}.`
     );
     logFailure($, 'resume prompt not submitted', error);
+  }
+}
+
+async function autoConfig($, auto) {
+  if (!auto.settings) {
+    const env = await $.env.get('AGENTIC_AUTO_HANDOFF').catch(() => undefined);
+    auto.settings = autoSettings(auto.options, env);
+  }
+  return auto.settings;
+}
+
+// The first reading after a resume. A session that starts already past the
+// start point gains nothing from another rollover, and asking again would
+// hand off for ever with no work in between: the cycle rests instead.
+function tierNow(auto, fill, at) {
+  const tier = tierOf(fill?.percent, at);
+  if (auto.fresh && fill) {
+    auto.fresh = false;
+    if (tier > 0) auto.restUntil = Date.now() + COOLDOWN_MS;
+  }
+  return tier;
+}
+
+// Opens the cycle with the file the handoff goes to, or says why not.
+async function openCycle($, auto) {
+  if (auto.cycle) return true;
+  if (Date.now() < auto.restUntil) return false;
+  const home =
+    (await $.env.get('HOME').catch(() => undefined)) ||
+    (await $.env.get('USERPROFILE').catch(() => undefined));
+  const sessionId = await $.session.id().catch(() => undefined);
+  const path = autoHandoffPath(home, Date.now(), sessionId);
+  if (!path) {
+    logFailure($, 'automatic handoff off', 'no home directory to write the handoff under');
+    return false;
+  }
+  auto.cycle = { path, noted: 0, prompted: 0 };
+  return true;
+}
+
+// A turn still running past the start point: one note per tier, beside the
+// tool results, so a long turn hands off before it reaches the compaction.
+async function autoMidTurn($, auto) {
+  const { enabled, at } = await autoConfig($, auto);
+  if (!enabled) return;
+  const { context } = await $.session.usage({ breakdown: 'summary' });
+  const fill = fillReading(context);
+  const tier = tierNow(auto, fill, at);
+  if (tier === 0 || !(await openCycle($, auto))) return;
+  const cycle = auto.cycle;
+  if (tier <= Math.max(cycle.noted, cycle.prompted)) return;
+  cycle.noted = tier;
+  await $.session.append({
+    message: {
+      type: 'user',
+      content: [{ type: 'text', text: midTurnNote(tier, fill, cycle.path) }],
+    },
+  });
+}
+
+// The end of a main-loop turn: a whole handoff is followed by the clear and
+// the resume; otherwise the handoff is asked for, once per tier.
+async function autoTurnEnd($, state, auto, e) {
+  const { enabled, at } = await autoConfig($, auto);
+  if (!enabled) return;
+  const tier = tierNow(auto, state.fill, at);
+  if (auto.cycle) {
+    const { path } = auto.cycle;
+    if (e.reason === 'answer' && (await handoffReady($, path, e.answer))) {
+      auto.cycle = null;
+      await rollOver($, auto, path);
+      return;
+    }
+    // The context fell back (a compaction, a manual clear): drop the request.
+    if (tier === 0) auto.cycle = null;
+  }
+  if (e.reason !== 'answer' || tier === 0 || !(await openCycle($, auto))) return;
+  const cycle = auto.cycle;
+  if (tier <= cycle.prompted) return;
+  cycle.prompted = tier;
+  await $.prompt.submit({ text: handoffRequest(tier, state.fill, cycle.path) });
+}
+
+// The file the model wrote, or the handoff it gave as its answer when the
+// Write tool was refused, which the plugin saves itself.
+async function handoffReady($, path, answer) {
+  const text = await $.fs.read(path).catch(() => '');
+  if (isHandoffComplete(text)) return true;
+  const given = handoffInAnswer(answer);
+  if (!given) return false;
+  await $.fs.write(path, given);
+  return true;
+}
+
+async function rollOver($, auto, path) {
+  try {
+    await $.command.run({ command: 'clear' });
+  } catch (error) {
+    $.ui.toast(`AD handoff: the session was not cleared; the handoff is at ${path}.`);
+    logFailure($, 'automatic clear failed', error);
+    return;
+  }
+  auto.fresh = true;
+  try {
+    await $.prompt.submit({ text: autoResumePrompt(path), asUser: true });
+    $.ui.toast(`AD handoff: context rolled over; resuming from ${path}.`);
+  } catch (error) {
+    $.ui.toast(
+      `AD handoff: the session was cleared, but the resume prompt was not sent; resume from ${path}.`
+    );
+    logFailure($, 'automatic resume not submitted', error);
+  }
+}
+
+// The safety net: an automatic compaction of the main loop that happens all
+// the same is told what a handoff would have kept.
+async function withAutoInstructions($, auto, e) {
+  try {
+    if (e.trigger !== 'auto' || e.agentId) return e;
+    const { enabled } = await autoConfig($, auto);
+    if (!enabled) return e;
+    const instructions = [e.instructions, compactInstructions(auto.cycle?.path)]
+      .filter(Boolean)
+      .join('\n\n');
+    return { ...e, instructions };
+  } catch (error) {
+    logFailure($, 'compaction instructions not added', error);
+    return e;
   }
 }
 
