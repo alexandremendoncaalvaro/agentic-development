@@ -73,8 +73,11 @@ export function register(on, options) {
   // tells the handoff's file from older ones.
   on('turn.start', async ($, e, next) => {
     const result = await next(e);
-    if (state.pending && !state.pending.turnId) {
-      state.pending = { ...state.pending, turnId: e.turnId, since: Date.now() };
+    if (!e.agentId && state.pending && !state.pending.turnId) {
+      // A press no turn took in time is over: a later turn is not its handoff.
+      state.pending = pressOwns(state)
+        ? { ...state.pending, turnId: e.turnId, since: Date.now() }
+        : null;
     }
     return result;
   });
@@ -94,7 +97,7 @@ export function register(on, options) {
       return result;
     }
     // A button press owns the handoff until its turn ends.
-    if (pending) return result;
+    if (pressOwns(state)) return result;
     // Awaited here: a headless run exits as soon as its last turn ends, so a
     // request or a clear sent later finds no session (GROUND-0047 E4).
     await autoTurnEnd($, state, auto, e).catch((error) =>
@@ -107,7 +110,7 @@ export function register(on, options) {
   on('turn.step', async function* ($, e, next) {
     const result = yield* next(e);
     // Not during the handoff turn of a button press: that flow clears itself.
-    if (!e.agentId && !state.pending && result?.toolUses?.length > 0) {
+    if (!e.agentId && !pressOwns(state) && result?.toolUses?.length > 0) {
       await autoMidTurn($, auto).catch((error) =>
         logFailure($, 'automatic handoff note failed', error)
       );
@@ -398,12 +401,19 @@ function clearReadings($, state) {
 // turn is followed by a clear and a resume (task-0115).
 function submitHandoff($, state) {
   // Set at every press: the automatic cycle stays out of that turn.
-  state.pending = { turnId: null, clear: state.clearAfter };
+  state.pending = { turnId: null, clear: state.clearAfter, at: Date.now() };
   $.command.run({ command: 'ad-handoff' }).catch((error) => {
     state.pending = null;
     $.ui.toast('AD handoff could not start: run /ad-handoff yourself.');
     logFailure($, 'handoff not run', error);
   });
+}
+
+// Whether a button press still holds the automatic cycle back. Bounded, so a
+// press whose turn never starts or never ends cannot switch the cycle off.
+function pressOwns(state) {
+  const pending = state.pending;
+  return Boolean(pending) && Date.now() - (pending.since ?? pending.at) < COOLDOWN_MS;
 }
 
 function toggleClearAfter($, state) {

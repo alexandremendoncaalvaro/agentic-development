@@ -1355,6 +1355,42 @@ test('task-0127 a button press with the box off keeps the automatic cycle out of
   assert.equal(submitted.length, 1, 'the next turn is the automatic cycle again');
 });
 
+async function pressAtEighty() {
+  const plugin = await loadPlugin(80, at(82_000), { handoffs: oneNewFile });
+  const { hooks, $ } = plugin;
+  await hooks['session.start']($, {}, async () => undefined);
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'handoff'
+  );
+  await tick();
+  return plugin;
+}
+
+test('task-0127 a subagent turn does not take the button press', async () => {
+  const { hooks, submitted, $ } = await pressAtEighty();
+  await hooks['turn.start']($, { turnId: 'sub', agentId: 'a1' }, async () => undefined);
+  await hooks['turn.start']($, { turnId: 'manual' }, async () => undefined);
+  await hooks['turn.complete']($, { turnId: 'manual', reason: 'answer' }, async () => undefined);
+  await endTurn(hooks, $);
+  assert.equal(submitted.length, 1, 'the press ended with its own turn');
+});
+
+test('task-0127 a button press that never got a turn stops holding the automatic cycle', async () => {
+  const { hooks, submitted, $ } = await pressAtEighty();
+  await endTurn(hooks, $);
+  assert.deepEqual(submitted, [], 'held while the press is fresh');
+  const realNow = Date.now;
+  const later = realNow() + 11 * 60 * 1000;
+  Date.now = () => later;
+  try {
+    await endTurn(hooks, $);
+  } finally {
+    Date.now = realNow;
+  }
+  assert.equal(submitted.length, 1);
+});
+
 test('task-0127 a refused request or resume never breaks the turn', async () => {
   const { hooks, ran, files, toasts, logs, $ } = await loadPlugin(80, at(82_000));
   await hooks['session.start']($, {}, async () => undefined);

@@ -59,6 +59,10 @@ Notes taken: the heading check now needs each heading on a line of its own; the 
 
 `ad-review` on `d8e9826..e1bde87` found no Blocker and one Concern: "the button/auto exclusion works only when the clear-and-continue box is on". Fixed test first: every press now owns the handoff until its turn ends, box on or off, and the automatic cycle adds no note and submits no request meanwhile. `CONTEXT.md` no longer calls the automatic file ephemeral.
 
+### 2026-11-21 — second delta review
+
+`ad-review` on `e1bde87..d7ffc71` found no Blocker and confirmed the exclusion. Its Concern: "`state.pending` can now stay stuck for box-off users", which would leave the automatic cycle silent. Fixed test first: a subagent turn no longer takes the press, and the hold lasts ten minutes at most.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
