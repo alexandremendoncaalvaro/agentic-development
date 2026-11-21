@@ -1334,6 +1334,27 @@ test('task-0127 the handoff turn of a button press gets no automatic note', asyn
   assert.deepEqual(appended, []);
 });
 
+test('task-0127 a button press with the box off keeps the automatic cycle out of its turn', async () => {
+  const { hooks, appended, submitted, ran, $ } = await loadPlugin(80, at(82_000), {
+    handoffs: oneNewFile,
+  });
+  await hooks['session.start']($, {}, async () => undefined);
+  press(
+    hooks['ui.render:AbovePrompt']($, { hasSurvey: false }, () => 'band'),
+    'handoff'
+  );
+  await tick();
+  await hooks['turn.start']($, { turnId: 'manual' }, async () => undefined);
+  await runStep(hooks, $);
+  await hooks['turn.complete']($, { turnId: 'manual', reason: 'answer' }, async () => undefined);
+  await tick();
+  assert.deepEqual(appended, []);
+  assert.deepEqual(submitted, []);
+  assert.deepEqual(ran, [{ command: 'ad-handoff' }], 'the box is off: nothing is cleared');
+  await endTurn(hooks, $);
+  assert.equal(submitted.length, 1, 'the next turn is the automatic cycle again');
+});
+
 test('task-0127 a refused request or resume never breaks the turn', async () => {
   const { hooks, ran, files, toasts, logs, $ } = await loadPlugin(80, at(82_000));
   await hooks['session.start']($, {}, async () => undefined);

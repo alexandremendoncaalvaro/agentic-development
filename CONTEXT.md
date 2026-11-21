@@ -213,7 +213,7 @@ _Avoid_: using "handoff" without a qualifier (`session` / `review` / `audit`) â€
 
 ### Session handoff
 
-**Definition:** the markdown file `ad-handoff` writes to `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md` so a fresh agent can resume the session cold. It holds live state, open artifacts, unresolved decisions and next steps, references records by path instead of copying them, and is redacted, ephemeral and never committed. In automatic mode (`--auto`, ADR-0098) the file is the compact rollover handoff at `<home>/.agentic/handoffs/<ISO>-auto-<slug>.md`, ending with the `<!-- ad-handoff:end -->` marker; that file is outside every repository and stays until the owner deletes it.
+**Definition:** the markdown file `ad-handoff` writes to `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md` so a fresh agent can resume the session cold. It holds live state, open artifacts, unresolved decisions and next steps, references records by path instead of copying them, and is redacted, never committed and ephemeral by default. In automatic mode (`--auto`, ADR-0098) the file is the compact rollover handoff at `<home>/.agentic/handoffs/<ISO>-auto-<slug>.md`, ending with the `<!-- ad-handoff:end -->` marker; that file is outside every repository and stays until the owner deletes it.
 
 _Avoid_: "context dump" (passive â€” `ad-handoff` curates, doesn't dump); "session export" (implies the agent state is portable; only the curated subset is); "handoff file" (acceptable in informal prose but not as the canonical noun).
 

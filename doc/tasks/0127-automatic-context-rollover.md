@@ -55,6 +55,10 @@ Limits recorded, not fixed here: the manual button's file lookup stays POSIX-onl
 
 Notes taken: the heading check now needs each heading on a line of its own; the wrong record reference in a comment is fixed; `on|true` is documented; the changelog warns that an installed plugin changes behaviour on update. Left open and recorded in ADR-0098: a per-session label, and the stream captures not kept in the repository (GROUND-0047 Limitations). The checkpoint script reading a user-level install above the temp directory as project scope is task 0128. Not verified: whether `$.fs.write` creates the missing parent directory in the refused-`Write` fallback; a failure there is caught, logged and clears nothing.
 
+### 2026-11-21 — delta review of the fixes
+
+`ad-review` on `d8e9826..e1bde87` found no Blocker and one Concern: "the button/auto exclusion works only when the clear-and-continue box is on". Fixed test first: every press now owns the handoff until its turn ends, box on or off, and the automatic cycle adds no note and submits no request meanwhile. `CONTEXT.md` no longer calls the automatic file ephemeral.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:

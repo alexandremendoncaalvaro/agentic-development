@@ -74,7 +74,7 @@ export function register(on, options) {
   on('turn.start', async ($, e, next) => {
     const result = await next(e);
     if (state.pending && !state.pending.turnId) {
-      state.pending = { turnId: e.turnId, since: Date.now() };
+      state.pending = { ...state.pending, turnId: e.turnId, since: Date.now() };
     }
     return result;
   });
@@ -86,12 +86,15 @@ export function register(on, options) {
     const pending = state.pending;
     if (pending?.turnId && pending.turnId === e.turnId) {
       state.pending = null;
+      if (!pending.clear) return result;
       // Run after this hook returns: the clear ends the session.
       void clearAndResume($, pending, e.reason).catch((error) =>
         logFailure($, 'clear and resume failed', error)
       );
       return result;
     }
+    // A button press owns the handoff until its turn ends.
+    if (pending) return result;
     // Awaited here: a headless run exits as soon as its last turn ends, so a
     // request or a clear sent later finds no session (GROUND-0047 E4).
     await autoTurnEnd($, state, auto, e).catch((error) =>
@@ -394,7 +397,8 @@ function clearReadings($, state) {
 // nothing in the desktop app (task-0116). With the box on, the handoff's own
 // turn is followed by a clear and a resume (task-0115).
 function submitHandoff($, state) {
-  state.pending = state.clearAfter ? { turnId: null } : null;
+  // Set at every press: the automatic cycle stays out of that turn.
+  state.pending = { turnId: null, clear: state.clearAfter };
   $.command.run({ command: 'ad-handoff' }).catch((error) => {
     state.pending = null;
     $.ui.toast('AD handoff could not start: run /ad-handoff yourself.');
@@ -405,7 +409,7 @@ function submitHandoff($, state) {
 function toggleClearAfter($, state) {
   state.clearAfter = !state.clearAfter;
   // The latest choice wins, even over a handoff already running.
-  if (!state.clearAfter) state.pending = null;
+  if (!state.clearAfter && state.pending) state.pending.clear = false;
   $.store
     .set(CLEAR_KEY, state.clearAfter)
     .catch((error) => logFailure($, 'clear-and-continue not saved', error));
