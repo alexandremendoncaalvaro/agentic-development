@@ -20,7 +20,7 @@ The owner asked on 2026-11-21 that the point where automatic compaction happens 
 - [x] It works in `claude -p`: a long single turn is asked mid-turn, and the clear and resume are awaited inside the turn-end hook. What a long `-p` does at the limit without the cycle is measured and recorded.
 - [x] `ad-handoff` has an automatic mode on both hosts: given or stable path, end marker, compact template, no question, no deletion; its "never auto-clear" line agrees with ADR-0098.
 - [x] Unit tests cover the cycle's rules and failure cases; one real headless run shows `/clear` and the resume happening, with no compaction.
-- [ ] Pull request opened with the local gate green and `ad-review` without a Blocker.
+- [x] Pull request opened with the local gate green and `ad-review` without a Blocker.
 - [ ] Merged and released through the repository's release process, or the reason for not publishing recorded here.
 
 ## Plan
@@ -63,11 +63,15 @@ Notes taken: the heading check now needs each heading on a line of its own; the 
 
 `ad-review` on `e1bde87..d7ffc71` found no Blocker and confirmed the exclusion. Its Concern: "`state.pending` can now stay stuck for box-off users", which would leave the automatic cycle silent. Fixed test first: a subagent turn no longer takes the press, and the hold lasts ten minutes at most.
 
+### 2026-11-21 — third delta review, clean
+
+`ad-review` on `d7ffc71..a176b2c` found no Blocker and no Concern on either axis. Notes left as they are: the hold is ten minutes from the press and ten more from the start of the turn that takes it; a press that waits more than ten minutes behind a running turn is dropped, so a clear-and-continue asked with the box on is then not performed and no toast says so; the hold reuses the rest rule's constant. The local gate (`npm run verify`) is green on this state: 1684 tests pass.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
 
 - [x] Local tests pass (or N/A documented in Notes)
-- [ ] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
-- [ ] No orphan `TODO`/`FIXME` introduced
+- [x] Code review completed (human or fresh-context reviewer per WORKFLOW §10)
+- [x] No orphan `TODO`/`FIXME` introduced
 - [ ] Status updated to `done` and Notes log closes the task
