@@ -21,7 +21,7 @@ The owner asked on 2026-11-21 that the point where automatic compaction happens 
 - [x] `ad-handoff` has an automatic mode on both hosts: given or stable path, end marker, compact template, no question, no deletion; its "never auto-clear" line agrees with ADR-0098.
 - [x] Unit tests cover the cycle's rules and failure cases; one real headless run shows `/clear` and the resume happening, with no compaction.
 - [x] Pull request opened with the local gate green and `ad-review` without a Blocker.
-- [ ] Merged and released through the repository's release process, or the reason for not publishing recorded here.
+- [x] Merged and released through the repository's release process, or the reason for not publishing recorded here.
 
 ## Plan
 
@@ -68,6 +68,14 @@ Notes taken: the heading check now needs each heading on a line of its own; the 
 `ad-review` on `d7ffc71..a176b2c` found no Blocker and no Concern on either axis. Notes left as they are: the hold is ten minutes from the press and ten more from the start of the turn that takes it; a press that waits more than ten minutes behind a running turn is dropped, so a clear-and-continue asked with the box on is then not performed and no toast says so; the hold reuses the rest rule's constant. The local gate (`npm run verify`) is green on this state: 1684 tests pass.
 
 The real headless run was repeated on this final code (`a176b2c`, start point 55, Windows 11, Claude Code 2.1.327): three rollovers, each a clear and a resume from its own file, no compaction, exit code 0 and the task's answer last.
+
+### 2026-11-21 — merged, release not published
+
+Merged as pull request #195 (merge commit `bffe105`), with the CI matrix green on Ubuntu and Windows for Node 22.13 and 24. The plugin ships from `main`, so its part is live for installed users.
+
+The npm release was not published. `npm run release -- minor --dry-run` passes and would cut 1.7.0, but npm on this machine is not logged in (`npm whoami` answers `ENEEDAUTH`), and a headless agent cannot log in. No release commit, tag or release pull request was made, so nothing is half done. To finish: `npm login`, then `/ad-release minor` from a clean checkout of `main`. On Windows the release script needs `npm run release --script-shell <path to bash.exe> -- minor`, because `./scripts/release.sh` does not run under `cmd`.
+
+The task stays `in-progress` until 1.7.0 is on npm.
 
 ## Definition of Done
 
