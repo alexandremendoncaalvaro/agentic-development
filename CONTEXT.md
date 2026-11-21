@@ -213,7 +213,7 @@ _Avoid_: using "handoff" without a qualifier (`session` / `review` / `audit`) â€
 
 ### Session handoff
 
-**Definition:** the markdown file `ad-handoff` writes to `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md` so a fresh agent can resume the session cold. It holds live state, open artifacts, unresolved decisions and next steps, references records by path instead of copying them, and is redacted, ephemeral and never committed.
+**Definition:** the markdown file `ad-handoff` writes to `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md` so a fresh agent can resume the session cold. It holds live state, open artifacts, unresolved decisions and next steps, references records by path instead of copying them, and is redacted, never committed and ephemeral by default. In automatic mode (`--auto`, ADR-0098) the file is the compact rollover handoff at `<home>/.agentic/handoffs/<ISO>-auto-<slug>.md`, ending with the `<!-- ad-handoff:end -->` marker; that file is outside every repository and stays until the owner deletes it.
 
 _Avoid_: "context dump" (passive â€” `ad-handoff` curates, doesn't dump); "session export" (implies the agent state is portable; only the curated subset is); "handoff file" (acceptable in informal prose but not as the canonical noun).
 
@@ -673,7 +673,7 @@ grounded in [`doc/research/0027-ground-artifact-validator-gate.md`](doc/research
 
 ### Companion plugin
 
-**Definition:** the optional Claude Code plugin `agentic-session`, installed from this repository's marketplace with `claude plugin install`, separate from the `agentic` installer and the npm package. It carries host-native add-ons only, mods that need the screen or the host, never skills (ADR-0088): the context band and the `/agentic-briefing` pane (ADR-0090).
+**Definition:** the optional Claude Code plugin `agentic-session`, installed from this repository's marketplace with `claude plugin install`, separate from the `agentic` installer and the npm package. It carries host-native add-ons only, mods that need the screen or the host, never skills (ADR-0088): the context band, the `/agentic-briefing` pane (ADR-0090) and the automatic context rollover, which asks for a session handoff, clears the session and resumes from the file (ADR-0098).
 
 _Avoid_: "the kit plugin" or "the agentic plugin" (the kit is installed by `agentic init`; the plugin is an add-on); "mod" for the whole plugin (a mod is the hooks module inside it).
 

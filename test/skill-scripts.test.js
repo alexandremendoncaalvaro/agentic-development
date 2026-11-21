@@ -4486,9 +4486,12 @@ function checkpointIn({
   subdir = '',
   projectRaw = null,
 } = {}) {
+  // The project sits under the home, as real ones do, so the walk up from it
+  // stops there: a kit installed for the machine's own user, above the OS
+  // temporary directory, is never read as this project's.
   const root = mkdtempSync(join(tmpdir(), 'agentic-checkpoint-version-'));
+  const home = root;
   const cwd = join(root, 'project');
-  const home = join(root, 'home');
   mkdirSync(join(cwd, '.claude'), { recursive: true });
   mkdirSync(join(home, '.claude'), { recursive: true });
   if (projectVersion) {

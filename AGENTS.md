@@ -66,7 +66,8 @@ eval/                                repo-only skill trajectory evaluation harne
 .claude-plugin/marketplace.json      Claude Code marketplace `agentic-development`
                                      (ADR-0088); never shipped to npm
 plugins/agentic-session/             optional Claude Code companion plugin (context
-                                     band mod); installed with `claude plugin install`,
+                                     band, automatic handoff rollover, ADR-0098);
+                                     installed with `claude plugin install`,
                                      never by `agentic`; never shipped to npm
 CHANGELOG.md                         release record (Keep a Changelog), rotated
                                      only by scripts/release.sh

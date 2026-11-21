@@ -60,7 +60,7 @@ These are routes, not gates. A one-off change should not produce artifacts that 
 
 ## Optional: Claude Code companion plugin
 
-On Claude Code (2.1.287+ in the terminal, 2.1.286+ in the desktop app) you can add `agentic-session`, an opt-in plugin that draws a context band above the prompt once the session reaches your threshold of the auto-compact point (80% by default, set in `/config`), with an **AD handoff** button that runs `/ad-handoff` and an opt-in **clear and continue** box that then clears the session and resumes from the handoff in the same window:
+On Claude Code (2.1.287+ in the terminal, 2.1.286+ in the desktop app) you can add `agentic-session`, an opt-in plugin that draws a context band above the prompt once the session reaches your threshold of the auto-compact point (80% by default, set in `/config`), with an **AD handoff** button that runs `/ad-handoff` and an opt-in **clear and continue** box that then clears the session and resumes from the handoff in the same window. It also rolls the context over by itself: near the auto-compact point it asks for a handoff, waits for the whole file, clears the session and resumes from it, in place of a compaction. That cycle is proven in `claude -p` on Windows with Claude Code 2.1.327; the terminal and the desktop app share the same hooks and were not measured, and neither was a build older than 2.1.327. It is on by default; turn it off with the plugin option `autoHandoff` or `AGENTIC_AUTO_HANDOFF=off`:
 
 ```bash
 claude plugin marketplace add alexandremendoncaalvaro/agentic-development
