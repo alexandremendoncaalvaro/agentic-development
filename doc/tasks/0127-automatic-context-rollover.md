@@ -77,6 +77,16 @@ The npm release was not published. `npm run release -- minor --dry-run` passes a
 
 The task stays `in-progress` until 1.7.0 is on npm.
 
+### 2026-11-21 — 1.7.0 tagged, npm publish waits for the one-time password
+
+After the owner logged in to npm, `/ad-release minor` ran from `main` at `ae6859f` with the local gate green. Release commit `8dba3cc` and the annotated tag `v1.7.0` were made, the release pull request #197 was merged as a merge commit (`fe1fdc6`) with the CI matrix green, and the tag is on the remote.
+
+`npm publish`, run from a disposable worktree at the tag after its own `npm run verify` passed, stopped with `EOTP`: the account's two-factor mode is `auth-and-writes`, so a publish needs the owner's one-time password, which a headless agent cannot give. The registry still answers 1.6.0 and no GitHub Release exists, so nothing is half published.
+
+This supersedes the "To finish" line above: do not run `/ad-release minor` again, it would cut 1.8.0. To finish, resume with `/ad-release` on the existing tag `v1.7.0` in a session where the owner can approve npm's browser prompt, or run `npm publish` in a checkout of `v1.7.0` (`main` at `fe1fdc6` has the same tree); then `gh release create v1.7.0 --verify-tag --notes-from-tag`. `ghp`, the GitHub frontend the skill names, is not installed on this machine; `gh` is logged in to the repository owner's account.
+
+Pull request #193 and its remote branch `chore/release-1.7.0` are an older 1.7.0 attempt from 2026-11-12, cut before this task and stalled because CI did not start (account billing lock). It is superseded by #197 and was left open, untouched.
+
 ## Definition of Done
 
 All Acceptance Criteria checked, plus:
