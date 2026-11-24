@@ -6,6 +6,16 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ## [Unreleased]
 
+### Added
+
+- `ad-hooks` ships an **ask gate** on `Stop` for both hosts
+  (`scripts/ask-gate.mjs`, ADR-0099). When a reply ends by asking the owner
+  a question with no recommendation, or with labelled options and no
+  trade-off, it keeps the turn going once: decide when the evidence settles
+  it, otherwise restate the question as a decision card. Loop-guarded by
+  `stop_hook_active` and a per-session cooldown; `AD_ASK_GATE=shadow` only
+  logs, `AD_ASK_GATE=0` turns it off. Opt-in through `ad-hooks` (task-0129).
+
 ## [1.7.0] - 2026-11-21
 
 ### Added

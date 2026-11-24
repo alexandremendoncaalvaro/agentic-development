@@ -11,6 +11,10 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/src/skills/claude-code/ad-hooks/scripts/reply-language.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/src/skills/claude-code/ad-hooks/scripts/ask-gate.mjs\""
           }
         ]
       }
