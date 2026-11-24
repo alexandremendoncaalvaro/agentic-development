@@ -11,10 +11,11 @@ Loaded on demand from `ad-hooks/SKILL.md`. Each subsection is one hook of the ti
 - Shadow receipt gate on `PreToolUse` (ADR-0089)
 - Command guard on `PreToolUse` (ADR-0094)
 - Reply-language detector on `Stop` (ADR-0094, shadow)
+- Ask gate on `Stop` (ADR-0099)
 - Resolving the script path
 
 
-Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; it has five members. The first two are wired on Claude Code only (their Codex extension is a follow-up under ADR-0083); the artifact-validator gate, the handoff-chip reminder and the shadow receipt gate are wired on both hosts because Codex documents the same `PostToolUse` and `PreToolUse` contracts (GROUND-0027, GROUND-0034, GROUND-0038).
+Steps 0–6 scaffold *git* hooks (they fire on commit / push). Claude Code also exposes *session-lifecycle* hooks in `.claude/settings.json` that fire on agent events. This tier scaffolds those; it has eight members. The first two are wired on Claude Code only (their Codex extension is a follow-up under ADR-0083); the artifact-validator gate, the handoff-chip reminder, the shadow receipt gate, the command guard, the reply-language detector and the ask gate are wired on both hosts because Codex documents the same `PostToolUse`, `PreToolUse` and `Stop` contracts (GROUND-0027, GROUND-0034, GROUND-0038).
 
 ## Handoff-nudge `Stop` hook (ADR-0055)
 
@@ -159,6 +160,24 @@ Scaffold it in three parts: the receipt hook beside the CI-mirror command, the `
 ## Reply-language detector on `Stop` (ADR-0094, shadow)
 
 `scripts/reply-language.mjs` reads the owner's conversation language from a confirmed voice profile (`AGENTIC_VOICE_DIR/profile.md`, else `~/.agentic/voice/profile.md`) and appends a line to `<tmpdir>/agentic-reply-language/<session_id>.jsonl` (`AD_REPLY_LANGUAGE_EVIDENCE_DIR` redirects it) when the reply just shown reads as another language (Portuguese, English or Spanish). It never blocks, prints nothing and stores no reply text; `AD_REPLY_LANGUAGE=0` silences it. Wire it in the `Stop` hooks of both hosts. The same profile adds one line to the workflow checkpoint: "Reply to the owner in <language>; give no date, duration or deadline estimates."
+
+## Ask gate on `Stop` (ADR-0099)
+
+**What.** `scripts/ask-gate.mjs` holds a reply that ends by asking the owner a question without a recommendation. A reply asks when one of its last three prose lines ends in `?` (trailing marks, brackets, quote marks or emoji allowed), after fenced and inline code, text in quotation marks and `>` blockquotes are removed, so a quoted draft or a command prompt does not count. It is held when it names no pick (`recomendo`, `sugiro`, `minha escolha`, `escolho`, `vou de A`, `I recommend`, `I'd go with`, `I'll pick` and similar), or when it names labelled options (`opção A`, `option 2`) without a trade-off word (`vantagem`, `prós`, `contras`, `custo`, `risco`, `trade-off` and English forms).
+
+**Why.** The owner's most frequent complaint is the agent asking what the evidence or an earlier decision already settles; the written rule did not hold. A `Stop` hook is the one point every reply passes on both hosts.
+
+**How.** On a hold it prints `{"decision":"block","reason":…}` and exits 0; the host keeps the turn going with the reason (Codex as a continuation prompt): if the evidence settles it, decide, act and report; ask only for a design or product call, an approval before something leaves the repository, or what grounding cannot settle, restated as a decision card (evidence, each option with advantage and disadvantage, recommendation with a one-line reason); a fact only the owner can supply gets one line. `stop_hook_active: true` always lets the turn stop, and a per-session cooldown (`AD_ASK_GATE_COOLDOWN_SECONDS`, default 300) covers hosts where that flag stays false. Each hold appends `{at, state, missing}` (`blocked`, `cooldown`, `would-block`) to `<tmpdir>/agentic-ask-gate/<session_id>.jsonl` (`AD_ASK_GATE_EVIDENCE_DIR` redirects it); no reply text is stored. `AD_ASK_GATE=shadow` only logs; `AD_ASK_GATE=0` turns it off; it fails open.
+
+```json
+{ "hooks": { "Stop": [ { "hooks": [
+  { "type": "command", "command": "node \"<ad-hooks-dir>/scripts/ask-gate.mjs\"" }
+] } ] } }
+```
+
+On Codex add `"timeout": 30` and wire it in `.codex/hooks.json`.
+
+**Current state.** Measured by `scripts/replay-ask-gate.mjs` (repository only) over one owner's Claude Code transcripts: about one closing question in two is held, and about one held reply in ten is a false hold (ADR-0099 decision 5). It checks the shape of the question, not the quality of the evidence, and a recommendation word anywhere in the reply satisfies it; review still owns that. Codex rates are not yet measured: start it there with `AD_ASK_GATE=shadow`. Portuguese and English phrasings only.
 
 ## Resolving the script path
 

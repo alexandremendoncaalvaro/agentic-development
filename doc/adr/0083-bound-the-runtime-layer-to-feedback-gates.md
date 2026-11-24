@@ -7,6 +7,7 @@
 **Amends:** ADR-0074 — its Codex-out-of-scope stanza only, on the same trigger and with the same scope: the checkpoint stays wired on Claude Code only until its own follow-up. The static, exit-0, kill-switch decisions and the rejection of blocking as coercion are unchanged.
 **Amended by:** ADR-0089, decisions 1 and 7, decision 3's validator clause and decision 5's every-state-is-recorded clause, for receipt gates only: a receipt gate checks that a workflow receipt exists and is fresh before a landing or outward action, may run before the tool call, and ships in shadow mode (it never denies) while the artifact-validator gate stays the only feedback gate. Every other decision here binds receipt gates unchanged.
 **Amended by:** ADR-0094 — decision 1's never-blocks clause, for the command guard only: it denies a closed list of destructive shell patterns before they run.
+**Amended by:** ADR-0099 — for the ask gate only: decision 1's never-blocks clause, decision 3's no-judgment clause, and decisions 4 and 5's every-firing-is-recorded clauses: a `Stop` hook keeps a turn going once when the reply ends by asking the owner without a recommendation, and records only held replies.
 
 ## Context
 

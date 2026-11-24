@@ -489,3 +489,16 @@ test('agent hooks wiring: the Stop entry runs the shadow reply-language detector
     assert.ok(rel && existsSync(join(KIT_ROOT, rel)), `${file}: the wired script exists: ${rel}`);
   }
 });
+
+// Task 0129: the ask gate runs on Stop on both hosts.
+test('agent hooks wiring: the Stop entry runs the ask gate on both hosts', () => {
+  for (const file of ['.claude/settings.json', '.codex/hooks.json']) {
+    const config = JSON.parse(readFileSync(join(KIT_ROOT, file), 'utf8'));
+    const hook = (config.hooks?.Stop ?? [])
+      .flatMap((e) => e.hooks)
+      .find((h) => /ask-gate\.mjs/.test(h.command));
+    assert.ok(hook, `${file}: a Stop hook runs ask-gate.mjs`);
+    const rel = /(src\/skills\/[^"]+ask-gate\.mjs)"/.exec(hook.command)?.[1];
+    assert.ok(rel && existsSync(join(KIT_ROOT, rel)), `${file}: the wired script exists: ${rel}`);
+  }
+});
