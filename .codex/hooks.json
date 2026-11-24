@@ -55,7 +55,7 @@
           },
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/ask-gate.mjs\"",
+            "command": "AD_ASK_GATE=shadow node \"$(git rev-parse --show-toplevel)/src/skills/codex/ad-hooks/scripts/ask-gate.mjs\"",
             "timeout": 30
           }
         ]

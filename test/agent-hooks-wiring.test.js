@@ -499,6 +499,12 @@ test('agent hooks wiring: the Stop entry runs the ask gate on both hosts', () =>
       .find((h) => /ask-gate\.mjs/.test(h.command));
     assert.ok(hook, `${file}: a Stop hook runs ask-gate.mjs`);
     const rel = /(src\/skills\/[^"]+ask-gate\.mjs)"/.exec(hook.command)?.[1];
+    const shadow = /^AD_ASK_GATE=shadow /.test(hook.command);
+    assert.equal(
+      shadow,
+      file === '.codex/hooks.json',
+      `${file}: ask gate starts in shadow on Codex only (ADR-0099)`
+    );
     assert.ok(rel && existsSync(join(KIT_ROOT, rel)), `${file}: the wired script exists: ${rel}`);
   }
 });

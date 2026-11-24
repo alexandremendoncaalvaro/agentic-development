@@ -34,7 +34,7 @@ Negative:
 - The owner sees a held reply and then its correction; each hold costs one extra model turn.
 - About one held reply in ten is a false hold (decision 5); the reason tells the model to answer those in one line.
 - A recommendation word anywhere in the reply satisfies the check, even in an unrelated paragraph or when the evidence and trade-offs are thin; review still owns their quality. The check does not detect evidence, and options named without a label ("a primeira ou a segunda") never trigger the trade-off check.
-- The figures come from Claude Code transcripts only; running it with `AD_ASK_GATE=shadow` on Codex first gives that host's rate.
+- The figures come from Claude Code transcripts only; the Codex wiring ships with `AD_ASK_GATE=shadow` in the command, so that host logs its own rate before the prefix is dropped.
 - Only Portuguese and English phrasings are recognised.
 
 ## Alternatives Considered
