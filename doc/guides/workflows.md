@@ -48,7 +48,7 @@ Use this when code already defines most of the product behavior.
 1. `/ad-review` is the normal two-axis diff review.
 2. `/ad-audit` is the maximum gate for a rules-anchored, evidence-heavy check before a consequential handoff or publication.
 3. `/ad-commit` prepares atomic Conventional Commits with DCO sign-off.
-4. `/ad-pr` opens a pull request; `/ad-merge` evaluates and merges it.
+4. `/ad-pr` opens a pull request; `/ad-merge` evaluates and merges it, then runs `/ad-5s` to remove its worktree, branches and temp files.
 5. `/ad-release` orchestrates a supported npm release with explicit confirmation boundaries.
 
 Use `/ad-hooks` when the repository needs executable quality gates, not simply because the skill exists.

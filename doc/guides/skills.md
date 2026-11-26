@@ -75,6 +75,7 @@ Every skill below installs for each selected host. Installation is not a mandate
 | `/ad-commit` | Changes are ready to become atomic commits. | Conventional Commit with DCO sign-off. |
 | `/ad-pr` | A branch is ready for a pull request. | GitHub PR with a uniform body. |
 | `/ad-merge` | A PR is ready for merge evaluation. | CI-aware merge decision and merge. |
+| `/ad-5s` | A PR merged, or the repo or a path needs tidying. | Proved-finished worktrees, branches and temp files removed, each with an undo; the rest asked or kept. |
 | `/ad-release` | A supported npm package is ready to release. | Confirmed release, publish, and GitHub Release workflow. |
 | `/ad-update` | You want to inspect or apply the current kit update from the agent session. | Safe project-local update plan, then an explicit apply when requested. |
 | `/ad-handoff` | A session must continue with fresh context. | Temporary resumable packet whose preparation composes the canonical brief and retains roadmap, lost asks, hygiene, and redaction. |

@@ -71,7 +71,7 @@ Unresolved comments — count entries from `gh api` that lack a `resolved` flag 
 
 Apply the bar:
 
-- **CI failing** → **Hard stop.** Refuse to merge until CI is green, *unless* the user explicitly overrides ("merge anyway"). On override, log a loud warning that this is a deliberate CI-failing merge and the responsibility is the user's. Per ADR-0025 §3, even the hard gate yields to explicit user authorization, but the override is surfaced visibly.
+- **CI failing** → **Hard stop.** Refuse to merge until CI is green, _unless_ the user explicitly overrides ("merge anyway"). On override, log a loud warning that this is a deliberate CI-failing merge and the responsibility is the user's. Per ADR-0025 §3, even the hard gate yields to explicit user authorization, but the override is surfaced visibly.
 - **CI pending** → Wait by default. Ask whether to proceed only when no valid
   release-plan receipt exists and the user requests a decision before CI finishes.
 - **CI green + warnings** (no fresh-context review / no linked task / unresolved comments) → Surface each warning. Ask the user to confirm the merge under the normal flow; under a valid release-plan receipt, continue without another question unless a warning changes the approved release target or effect.
@@ -103,6 +103,14 @@ Run the merge:
 
 Capture and report the merge commit URL.
 
+## Phase 5 — Clean up (`/ad-5s`)
+
+Run `/ad-5s` for the merged pull request by default, unless the owner said in this session not to clean up (ADR-0101). A pull request that did not merge gets no cleanup. Steps:
+
+1. Find the main worktree: the first `worktree` line of `git worktree list --porcelain`. Change directory there; do not switch its branch.
+2. Run the classifier by its absolute path in the `ad-5s` base directory: `node <ad-5s base>/scripts/sweep.mjs after-merge --pr <n> --branch <head> [--temp <path>]...`, with `<head>` the merged head branch and a `--temp` for each temp path this session made.
+3. Follow `ad-5s` Step 0 to Step 5 on its JSON: show the slate, ask once (the CANDIDATEs recommended), then run the approved commands in order and record each removal. If `--delete-branch` could not delete the local branch because a worktree holds it, this is where it goes: worktree first, then the branch.
+
 ## Output contract
 
 The output is a merged PR. The skill returns:
@@ -110,6 +118,7 @@ The output is a merged PR. The skill returns:
 - The merge commit URL.
 - A one-line summary of what was merged (`<count> commits merged into <base> via <mode>`).
 - The list of warnings the user proceeded past (if any), for the audit trail.
+- The cleanup line: `cleanup: <removed> removed, <asked> asked, <kept> kept`, or `cleanup: skipped (<why>)`.
 
 ## Next
 

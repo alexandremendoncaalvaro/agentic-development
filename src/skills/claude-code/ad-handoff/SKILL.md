@@ -161,7 +161,7 @@ Where nothing asks at a turn's end and nothing clears — Codex, or Claude Code 
 - A single markdown file at `${TMPDIR:-/tmp}/agentic-handoffs/<ISO>-<slug>.md`.
 - File contains only the sections above, in that order. Omitted sections are removed entirely (not left as `## Heading\n\nN/A`). `Roadmap` and `Asks that never landed` are never omitted — an empty sweep is written as "none", because silence and emptiness are indistinguishable to the next agent.
 - The roadmap is a single checklist covering done and open work in dependency order, each line self-sufficient, with an explicit priority-alignment line.
-- Repo hygiene deletes fully-merged branches with `git branch -d` and reports them; everything destructive (`-D`, worktree removal, file deletion) is reported with its command and never run. Confirmation is matched to blast radius (WORKFLOW §7), not waived and not inflated.
+- Repo hygiene deletes fully-merged branches with `git branch -d` and reports them; everything destructive (`-D`, worktree removal, file deletion) is reported with its command and never run. `/ad-5s` removes it with a merge proof (ADR-0101). Confirmation is matched to blast radius (WORKFLOW §7), not waived and not inflated.
 - The `Working rules` section states the rules outright rather than pointing at them; `/ad-philosophy` binds posture and is never presented as covering grounding, hypothesis, test or review discipline.
 - The resume protocol keeps preparation exhaustive and private, passes a settled resume fact packet to `/ad-brief`, emits a four-line preparation receipt plus the returned one-screen brief, and never prints the full `/ad-philosophy` applied-binding statement.
 - References artifacts by path; never duplicates their content.

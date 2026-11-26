@@ -72,6 +72,7 @@ Phase 4 — merge. Use `mergeMethods` from the preflight to detect the repo's al
 When invoked with `--release --preflight`, stop after this check: require `mergeCommitAllowed: true` and report whether the release PR may be opened. When invoked with `--release <PR>`, repeat the check immediately before merging. If merge commits are no longer allowed, stop; never substitute squash or rebase.
 
 Decision tree:
+
 - Release-only mode → use `<github-command> pr merge <num> --merge --delete-branch`. Do not ask for a mode, and reject a request for `--squash` or `--rebase`.
 - Exactly one mode allowed → use it.
 - Multiple modes allowed → ask the user: "Repo allows squash / rebase / merge-commit. Pick one." Wait for their choice.
@@ -88,14 +89,24 @@ Run the merge:
 `--delete-branch` by default for feature branches (`feat/*`, `fix/*`, `chore/*`, `docs/*`, `refactor/*`). Skip `--delete-branch` if the source branch is a long-lived integration branch (e.g., `cli`, `develop`, `release/*`).
 
 Capture and report the merge commit URL.
+
+Phase 5 — clean up (`ad-5s`).
+
+Run `ad-5s` for the merged pull request by default, unless the owner said in this session not to clean up (ADR-0101). A pull request that did not merge gets no cleanup. Steps:
+
+1. Find the main worktree: the first `worktree` line of `git worktree list --porcelain`. Change directory there; do not switch its branch.
+2. Run the classifier by its absolute path in the `ad-5s` base directory: `node <ad-5s base>/scripts/sweep.mjs after-merge --pr <n> --branch <head> [--temp <path>]...`, with `<head>` the merged head branch and a `--temp` for each temp path this session made.
+3. Follow `ad-5s` Step 0 to Step 5 on its JSON: show the slate, ask once (the CANDIDATEs recommended), then run the approved commands in order and record each removal. If `--delete-branch` could not delete the local branch because a worktree holds it, this is where it goes: worktree first, then the branch.
 </instructions>
 
 <output_contract>
 The output is a merged PR. The skill returns:
+
 - The merge commit URL.
 - A one-line summary (`<count> commits merged into <base> via <mode>`).
 - The list of warnings the user proceeded past (if any), for the audit trail.
-</output_contract>
+- The cleanup line: `cleanup: <removed> removed, <asked> asked, <kept> kept`, or `cleanup: skipped (<why>)`.
+  </output_contract>
 
 ## Next
 
