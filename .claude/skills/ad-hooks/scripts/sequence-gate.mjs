@@ -223,6 +223,14 @@ export function freshReceipt(root, tree) {
   return { receipt, unreadable: unreadable + uncomparable };
 }
 
+/**
+ * The newest receipt, passing or not, that covers `tree`, or null: a later
+ * failed run of the same tree outranks an earlier pass (ADR-0100).
+ */
+export function latestReceipt(root, tree) {
+  return newestCovering(root, tree, readReceipts(root).receipts).receipt;
+}
+
 export function checkGateRun(cwd) {
   const root = repositoryRoot(cwd);
   const tree = headTree(root);
