@@ -98,20 +98,6 @@ export function readAuditReceipts(root) {
   return readCommitReceipts(root, '-summary.json', (text) => JSON.parse(text)?.target ?? null);
 }
 
-/**
- * The `ad-audit` summaries that also ran the review's spec axis, which name it
- * in a non-empty `specAxis` field (the spec source, or that there was none).
- * Such an audit is a review of its target as well (ADR-0100); a summary
- * without the field, every one written before ADR-0100, is no review receipt.
- */
-export function readSpecAuditReceipts(root) {
-  return readCommitReceipts(root, '-summary.json', (text) => {
-    const summary = JSON.parse(text);
-    const axis = summary?.specAxis;
-    return typeof axis === 'string' && axis.trim() ? (summary.target ?? null) : undefined;
-  });
-}
-
 export const DEFAULT_COMMAND_TIMEOUT_SECONDS = 10;
 // A design choice, under the 30 seconds this repository's Codex wiring gives
 // the hook, leaving room for its git calls.

@@ -108,7 +108,7 @@ When the change is committed, the behaviors covered, the deepening that surfaced
 ## Next
 
 - After the close-out (Step 4): use `/ad-commit` to land one or a small handful of behavior-shaped tests with their implementation; commits stay atomic.
-- `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10; for a high-risk change (a path under `auditPaths` in `.agentic/gates.json`) `/ad-audit` instead, which runs the review's two axes inside it, never both on one state (ADR-0100). TDD verifies the implementation against tested behaviors; §10 review checks coupling, edge cases, spec drift the tests did not cover.
+- `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10. TDD verifies the implementation against tested behaviors; §10 review checks coupling, edge cases, spec drift the tests did not cover.
 - If the cycle surfaced a refactor opportunity larger than the GREEN-phase refactor allows: `/ad-deepen` (WORKFLOW §8), when the design friction is load-bearing.
 - If multiple tests fail in unexpected ways during the cycle (not the predicted RED for the new test): `/ad-diagnose` to investigate the regression before continuing the TDD loop.
 - If the work spans multiple sessions: `/ad-task` for explicit decomposition; cite this TDD run in the task `Notes`.

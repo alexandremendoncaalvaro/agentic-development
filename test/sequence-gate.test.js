@@ -1,7 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -1113,38 +1120,31 @@ test('gate-run check: a change only to receipt-neutral paths keeps the run fresh
   assert.equal(checkRun(repo).status, 0);
 });
 
-// ADR-0100: an audit that ran the review's spec axis covers the review; one
-// that did not (every audit written before ADR-0100) does not.
-function writeSpecAudit(repo, target, specAxis, stamp = '20261007T140000Z') {
-  mkdirSync(join(repo, '.agentic', 'reviews'), { recursive: true });
-  writeFileSync(
-    join(repo, '.agentic', 'reviews', `${stamp}-audit-branch-summary.json`),
-    `${JSON.stringify({ target, specAxis, findings: [] })}\n`
-  );
-}
-
-test('sequence-gate: an audit summary that ran the spec axis clears the review check', () => {
+// A newer failing run of the same tree outranks an older pass: the latest
+// result is what the commit's gate says now.
+test('gate-run check: a newer failed run of the same tree exits 1', () => {
   const repo = fixtureRepo();
-  writeSpecAudit(repo, git(repo, 'rev-parse', 'HEAD'), 'doc/tasks/0001-x.md');
-  const lines = runGate(repo, 'gh pr merge').lines;
-  assert.equal(linesFor(lines, 'review')[0].state, 'clear');
-  assert.equal(linesFor(lines, 'audit')[0].state, 'clear');
+  recordRun(repo, 0);
+  recordRun(repo, 1);
+  const run = checkRun(repo);
+  assert.equal(run.status, 1);
+  assert.match(run.stdout, /newest run of tree .* failed/);
 });
 
-test('sequence-gate: an audit summary without the spec axis does not clear the review check', () => {
+// Exit 0 means "covered", so the script must never exit 0 without running:
+// reached through a junction or symlink, argv[1] and import.meta.url differ
+// until both are resolved to real paths.
+test('gate-run check: reached through a linked directory, it still runs', () => {
   const repo = fixtureRepo();
-  writeAudit(repo, git(repo, 'rev-parse', 'HEAD'));
-  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'review')[0].state, 'would-block');
-});
-
-test('sequence-gate: a delta review chains to a spec-axis audit of its base', () => {
-  const repo = fixtureRepo();
-  const audited = git(repo, 'rev-parse', 'HEAD');
-  writeSpecAudit(repo, audited, 'none (no spec source)');
-  writeFileSync(join(repo, 'a.txt'), 'fix after the audit\n');
-  git(repo, 'commit', '-qam', 'fix');
-  writeDeltaReview(repo, git(repo, 'rev-parse', 'HEAD'), audited, '20261007T150000Z');
-  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'review')[0].state, 'clear');
+  const link = join(mkdtempSync(join(tmpdir(), 'gate-run-link-')), 'scripts');
+  symlinkSync(SCRIPTS, link, 'junction');
+  const run = spawnSync('node', [join(link, 'gate-run.mjs'), 'check'], {
+    cwd: repo,
+    encoding: 'utf8',
+    env: cleanEnv(),
+  });
+  assert.equal(run.status, 1, run.stderr);
+  assert.match(run.stdout, /no passing run covers tree/);
 });
 
 // ADR-0100: on a checkout with core.filemode=false (Windows) the temporary

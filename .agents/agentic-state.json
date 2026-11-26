@@ -70,12 +70,16 @@
           "sourceSha": "c6397d113b8b485635475589e536041cd56c0e3bdac08026c41d5e933fcd6ba8"
         },
         {
+          "path": ".agents/skills/ad-audit/references/cite-a-gate-run.md",
+          "sourceSha": "51a8b57b1365a5bb5390c79347163bd1852dbe0810cebe4b3f4b2abd863aa752"
+        },
+        {
           "path": ".agents/skills/ad-audit/scripts/resolve-rules.mjs",
           "sourceSha": "749acc2b4c31da05d79c677dc67bbddde4c62878d04bcd25cdb5ae63e128f090"
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "1726d89800213c657c1b973f68a25ff572b574603203f31eddeb359c6724fa6d"
+          "sourceSha": "9a52eec68b9ff959810e6c0d15f85bd8865cb88281f74c752dbc6f64512d706c"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
@@ -378,7 +382,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/gate-run.mjs",
-          "sourceSha": "d06981d7bd5631b0493c3a357ffa905e23eec28f5fc235143fc1695fadaf71a4"
+          "sourceSha": "84afd6481387ecb53e818b0c8e98d042b577bd38279a2d1435adce153a472f28"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/handoff-chip.mjs",
@@ -398,11 +402,11 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/review-receipts.mjs",
-          "sourceSha": "7bbba4c4ed21f00f8a90f6408ae9b1ab4d90985cbaeb80bb55f0f876624a9514"
+          "sourceSha": "afc8db728ee9361acc4ea3ef04fa1e056a61d614b670fcada0ef5e7641b365a4"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "e221128469941676c5ee6467122e5cac0e2b7be45c8544de20ac704d09c1f179"
+          "sourceSha": "ec01f440eac78581fbef0b3cbf35fa9d4afde785e15384c872259e01c5fd20a3"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
@@ -410,7 +414,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "4bb5c03d4f9ed09ab3090df628b24a1fb11a3627997bd5f299333b4ca2c303ea"
+          "sourceSha": "54a513a395d34af57aaf33612ffad46fa048c0cf0da8358eed115fee0c1bcdcf"
         }
       ]
     },
@@ -748,7 +752,7 @@
         },
         {
           "path": ".agents/skills/ad-review/SKILL.md",
-          "sourceSha": "c8da610db2b98001f515b2031d55d9e55b77c26ff09a9b13685dbb6963179bc5"
+          "sourceSha": "3b0b0ddf597af6d9db12d3dd99b485532939a0769ec22648f81009003ab158f9"
         },
         {
           "path": ".codex/agents/fresh-context-reviewer.toml",
@@ -896,7 +900,7 @@
         },
         {
           "path": ".agents/skills/ad-tdd/SKILL.md",
-          "sourceSha": "fe4417429bf6023765a6d91b289498f849aad8498eb4c96cd0bc49384eb711f1"
+          "sourceSha": "e59d2ee49358e31ca4dd59bd7606a4669110a94e5eb60518476d8a87db75349e"
         }
       ]
     },
@@ -909,7 +913,7 @@
         },
         {
           "path": ".agents/skills/ad-tdg/SKILL.md",
-          "sourceSha": "ed9c151764fd4f9ffa7fd37b9c4d679767edbfac2b51a1c2f7c9fd5cb4e416ef"
+          "sourceSha": "23c7500b6a7c7ff91b92850ee31744da8e4cc5fced968cd39d89d88df599c869"
         }
       ]
     },

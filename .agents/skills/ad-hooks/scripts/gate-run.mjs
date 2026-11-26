@@ -11,8 +11,8 @@
  * written through a temporary index outside the repository, seeded from HEAD's
  * tree, so the real index is never touched.
  *
- * `node gate-run.mjs check` exits 0 when a passing receipt covers HEAD's tree
- * under the receipt gate's own freshness rule, and 1 when none does, so a
+ * `node gate-run.mjs check` exits 0 when the newest receipt that covers HEAD's
+ * tree under the receipt gate's own freshness rule passed, and 1 otherwise, so a
  * skill that needs a green gate on the commit cites that run instead of
  * running the same command again (ADR-0100).
  *
@@ -22,11 +22,19 @@
  * Zero dependencies; byte-identical in both host trees.
  */
 
-import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+} from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 export const RECEIPTS_DIR = join('.agentic', 'receipts');
 export const GATE_RUN_FILE = 'gate-run.jsonl';
@@ -132,12 +140,20 @@ function parseArgs(argv) {
 // The freshness rule lives in the receipt gate, which imports this module;
 // loading it here only when asked keeps the import graph acyclic.
 async function check(cwd) {
-  const { freshReceipt } = await import('./sequence-gate.mjs');
+  const { latestReceipt } = await import('./sequence-gate.mjs');
   const root = repositoryRoot(cwd);
   const tree = headTree(root);
-  const { receipt } = freshReceipt(root, tree);
+  const receipt = latestReceipt(root, tree);
   if (!receipt) {
     process.stdout.write(`gate-run: no passing run covers tree ${tree.slice(0, 12)}\n`);
+    process.exitCode = 1;
+    return;
+  }
+  if (receipt.exit !== 0) {
+    process.stdout.write(
+      `gate-run: the newest run of tree ${tree.slice(0, 12)} failed ` +
+        `("${receipt.command}", exit ${receipt.exit}, at ${receipt.at})\n`
+    );
     process.exitCode = 1;
     return;
   }
@@ -186,8 +202,23 @@ async function main() {
   );
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Real paths on both sides: reached through a junction or symlink, argv[1]
+// keeps the link while import.meta.url names the target, and a check that
+// silently skipped main() would exit 0, which reads as "covered".
+function invokedDirectly() {
+  if (!process.argv[1]) return false;
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
+if (invokedDirectly()) {
   // Not awaited: the receipt gate the check loads imports this module, which
   // must finish evaluating first.
-  main();
+  main().catch((error) => {
+    process.stderr.write(`gate-run: ${error.message}\n`);
+    process.exitCode = 1;
+  });
 }
