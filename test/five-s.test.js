@@ -66,7 +66,7 @@ function commit(cwd, file, text) {
 // A clone with origin/main, plus feat/x worked on in its own worktree and
 // pushed, then squash-merged into main: the shape the kit's own flow leaves.
 function fixture() {
-  const dir = realpathSync(mkdtempSync(join(tmpdir(), 'agentic-5s-')));
+  const dir = realpathSync.native(mkdtempSync(join(tmpdir(), 'agentic-5s-')));
   const remote = join(dir, 'remote.git');
   const repo = join(dir, 'repo');
   const wt = join(dir, 'wt-x');
@@ -121,7 +121,8 @@ function fixture() {
 
 const find = (out, kind, target) =>
   out.items.find((i) => i.kind === kind && (target === undefined || i.target === target));
-const same = (a, b) => realpathSync(a).toLowerCase() === realpathSync(b).toLowerCase();
+const same = (a, b) =>
+  realpathSync.native(a).toLowerCase() === realpathSync.native(b).toLowerCase();
 
 test('after-merge: a squash-merged PR at its exact head clears worktree, branch and remote, in order', () => {
   const f = fixture();
