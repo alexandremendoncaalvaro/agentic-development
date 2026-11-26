@@ -10,7 +10,7 @@
 
 On one commit the flow the skills prescribe ran the full gate three times. `ad-audit` Step 4 runs the full gate before dispatch; `git push` runs it again through the pre-push hook; `/ad-pr` Phase 1 step 2 runs the pre-push commands a third time. ADR-0032 decision 3 added the third run because a skipped or miswired hook let PRs open on red, and ADR-0089 added gate-run receipts so a later step could see an earlier green run.
 
-The receipts never matched on Windows. `gate-run.mjs` wrote the tree through an empty temporary index, and with `core.filemode=false` `git add -A` records every executable as `100644`, a tree no commit has. Measured on this repository at commit `3be3ae5`: the three runs took 84 s, 62 s and 72 s, all exit 0, and none of the three receipts named the commit's tree (`12b8c82` against `5a69e6f`; `git diff --summary` showed nine `100755 => 100644` changes).
+The receipts never matched on Windows. `gate-run.mjs` wrote the tree through an empty temporary index, and with `core.filemode=false` `git add -A` records every executable as `100644`, a tree no commit has. Measured in a scratch clone of this repository, at `3be3ae5`, a one-line docs commit on top of `e515bfe` (`origin/main`): the three runs took 84 s, 62 s and 72 s, all exit 0, and none of the three receipts named the commit's tree (`12b8c82` against `5a69e6f`; `git diff --summary` showed nine `100755 => 100644` changes).
 
 ## Decision
 

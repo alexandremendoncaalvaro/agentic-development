@@ -34,7 +34,7 @@ import {
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const RECEIPTS_DIR = join('.agentic', 'receipts');
 export const GATE_RUN_FILE = 'gate-run.jsonl';
@@ -210,7 +210,7 @@ function invokedDirectly() {
   try {
     return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
   } catch {
-    return false;
+    return pathToFileURL(process.argv[1]).href === import.meta.url;
   }
 }
 

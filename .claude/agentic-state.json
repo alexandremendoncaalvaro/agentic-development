@@ -59,7 +59,7 @@
         },
         {
           "path": ".claude/skills/ad-audit/references/cite-a-gate-run.md",
-          "sourceSha": "51a8b57b1365a5bb5390c79347163bd1852dbe0810cebe4b3f4b2abd863aa752"
+          "sourceSha": "86206d0fdac7f3a02c0eb215a4f80f51f227651cd63e8f6ef5bc9aedd12bd404"
         },
         {
           "path": ".claude/skills/ad-audit/scripts/resolve-rules.mjs",
@@ -67,7 +67,7 @@
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "7059988cebea5deafa051f7b831a687f639ff317701346ef30ca9aef04532abb"
+          "sourceSha": "f49bc729130f339218ac92df0ad4e527cfc5ac1c3a83a0d533ca0b80f158b6d9"
         }
       ]
     },
@@ -314,7 +314,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/gate-run.mjs",
-          "sourceSha": "84afd6481387ecb53e818b0c8e98d042b577bd38279a2d1435adce153a472f28"
+          "sourceSha": "8070e7985df67b7381b279d84c319295eeb15067613592e2e12798d739c7a8f3"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/handoff-chip.mjs",
@@ -411,7 +411,7 @@
         },
         {
           "path": ".claude/skills/ad-pr/SKILL.md",
-          "sourceSha": "59c16b55fdbd24715f7a49c092c195e9e34338a4ded118cd59f6cead3d5cf5c3"
+          "sourceSha": "0ff3a2d0a8da707961a3901572889f9b0f055961ea4e05a68ad65e2347fd5ee0"
         }
       ]
     },
