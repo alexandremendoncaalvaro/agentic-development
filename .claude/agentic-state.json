@@ -63,7 +63,7 @@
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "93d59c68072d0f830c38e9303586f844a72d6643cc185919b0d6bb34b0cd64f3"
+          "sourceSha": "5d9823bd8503cec1720f35484b5a3d47bf774d258d84ec6d5e12a936d09cc104"
         }
       ]
     },
@@ -290,7 +290,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/references/session-tier.md",
-          "sourceSha": "afb526e1c03a5c36407e7142b8fe41cffca770a3e7fcb51098d7dd9797ad21a4"
+          "sourceSha": "9b5b1810bc0f3cb12f8263bf16b0889d4c0a8c6e9fc0e6bcf6125c449c2a016a"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/artifact-gate.mjs",
@@ -310,7 +310,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/gate-run.mjs",
-          "sourceSha": "626e30fd66d269d0aaa49ccf9ccffc35dac442a44ebabcfe503341cda5e957a1"
+          "sourceSha": "d06981d7bd5631b0493c3a357ffa905e23eec28f5fc235143fc1695fadaf71a4"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/handoff-chip.mjs",
@@ -330,11 +330,11 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/review-receipts.mjs",
-          "sourceSha": "afc8db728ee9361acc4ea3ef04fa1e056a61d614b670fcada0ef5e7641b365a4"
+          "sourceSha": "7bbba4c4ed21f00f8a90f6408ae9b1ab4d90985cbaeb80bb55f0f876624a9514"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "9d8eb72973f7218c426657b613c88ff99908b6f53abc3d694fd64e734eebe5a4"
+          "sourceSha": "e221128469941676c5ee6467122e5cac0e2b7be45c8544de20ac704d09c1f179"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
@@ -407,7 +407,7 @@
         },
         {
           "path": ".claude/skills/ad-pr/SKILL.md",
-          "sourceSha": "f528a9566bac9b2f5a4f28c0020ca905bc64af4549e642ec67c029116e59a693"
+          "sourceSha": "59c16b55fdbd24715f7a49c092c195e9e34338a4ded118cd59f6cead3d5cf5c3"
         }
       ]
     },
@@ -624,7 +624,7 @@
         },
         {
           "path": ".claude/skills/ad-review/SKILL.md",
-          "sourceSha": "506c4cb9ca2d8fab609e3cb187c60d7ac0ff9d15fd7db8cdd18400485ac544c3"
+          "sourceSha": "af1d9731a96b5ec6150a5b0d17572f01818f400d23c80ff2de1f4f3adc5bfee7"
         }
       ]
     },
@@ -740,7 +740,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-tdd/SKILL.md",
-          "sourceSha": "78c1500a959a684927732ad04afe81d66f37ebe61eb3c9470ccfb16370dbf571"
+          "sourceSha": "2e3a8328704e5991a6e4122474166edd08b198ee0f8427c350a8abd1fe76299e"
         }
       ]
     },
@@ -749,7 +749,7 @@
       "files": [
         {
           "path": ".claude/skills/ad-tdg/SKILL.md",
-          "sourceSha": "292306cc3bd4d1ef56b5c574a3209329da54809d556b66feb90211cfc4f36fde"
+          "sourceSha": "28a289eb2b9b3f920fcba6020f99495b573deecb6cda16c20a8c315190ab0888"
         }
       ]
     },

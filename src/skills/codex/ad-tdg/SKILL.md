@@ -103,6 +103,6 @@ When the change is committed, the ground-truth pair, criterion, and rejection no
 
 - After Step 5 verification passes: use `/ad-commit` with the ground-truth pair + criterion + rejection notes in the body.
 - When `/ad-diagnose` hands off a behavior-known regression, use `/ad-tdd` as the outer loop and TDG only inside a GREEN phase where strategy remains uncertain.
-- `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10. The TDM tests verify the implementation matches ground truth; §10 review checks coupling, edge cases, spec drift the pair did not cover.
+- `/ad-review main..HEAD` (or current scope) before merge — WORKFLOW §10; for a high-risk change (a path under `auditPaths` in `.agentic/gates.json`) `/ad-audit` instead, which runs the review's two axes inside it, never both on one state (ADR-0100). The TDM tests verify the implementation matches ground truth; §10 review checks coupling, edge cases, spec drift the pair did not cover.
 - If the work spans multiple sessions: `/ad-task` for explicit decomposition (Spec ref the original spec; cite this TDG run in the task `Notes`).
 - If iteration stalled at Step 5 and routing back was needed: `/ad-ground` (re-research) or `/ad-spike` (technique uncertain).

@@ -1070,3 +1070,96 @@ test('sequence-gate: pnpm and yarn publish are release actions too', () => {
     assert.equal(line.state, 'would-block');
   }
 });
+
+// ADR-0100: one green gate run per tree. `gate-run.mjs check` tells a skill
+// whether a passing run already covers HEAD's tree under the receipt gate's
+// own freshness rule, so ad-pr and ad-audit cite it instead of rerunning.
+function checkRun(repo) {
+  return spawnSync('node', [GATE_RUN, 'check'], { cwd: repo, encoding: 'utf8', env: cleanEnv() });
+}
+
+test('gate-run check: a passing run of HEAD tree exits 0 and names the receipt', () => {
+  const repo = fixtureRepo();
+  recordRun(repo);
+  const run = checkRun(repo);
+  assert.equal(run.status, 0, run.stderr);
+  assert.match(
+    run.stdout,
+    new RegExp(`covered tree ${git(repo, 'rev-parse', 'HEAD^{tree}').slice(0, 12)}`)
+  );
+  assert.match(run.stdout, /npm run verify/);
+});
+
+test('gate-run check: no receipt, a failed run or a later code change exits 1', () => {
+  const repo = fixtureRepo();
+  assert.equal(checkRun(repo).status, 1);
+  recordRun(repo, 1);
+  assert.equal(checkRun(repo).status, 1);
+  recordRun(repo);
+  writeFileSync(join(repo, 'a.txt'), 'changed after the run\n');
+  git(repo, 'commit', '-qam', 'untested change');
+  const run = checkRun(repo);
+  assert.equal(run.status, 1);
+  assert.match(run.stdout, /no passing run covers tree/);
+});
+
+test('gate-run check: a change only to receipt-neutral paths keeps the run fresh', () => {
+  const repo = fixtureRepo();
+  recordRun(repo);
+  mkdirSync(join(repo, 'doc', 'tasks'), { recursive: true });
+  writeFileSync(join(repo, 'doc', 'tasks', '0001-x.md'), 'notes\n');
+  git(repo, 'add', '-A');
+  git(repo, 'commit', '-qm', 'task notes only');
+  assert.equal(checkRun(repo).status, 0);
+});
+
+// ADR-0100: an audit that ran the review's spec axis covers the review; one
+// that did not (every audit written before ADR-0100) does not.
+function writeSpecAudit(repo, target, specAxis, stamp = '20261007T140000Z') {
+  mkdirSync(join(repo, '.agentic', 'reviews'), { recursive: true });
+  writeFileSync(
+    join(repo, '.agentic', 'reviews', `${stamp}-audit-branch-summary.json`),
+    `${JSON.stringify({ target, specAxis, findings: [] })}\n`
+  );
+}
+
+test('sequence-gate: an audit summary that ran the spec axis clears the review check', () => {
+  const repo = fixtureRepo();
+  writeSpecAudit(repo, git(repo, 'rev-parse', 'HEAD'), 'doc/tasks/0001-x.md');
+  const lines = runGate(repo, 'gh pr merge').lines;
+  assert.equal(linesFor(lines, 'review')[0].state, 'clear');
+  assert.equal(linesFor(lines, 'audit')[0].state, 'clear');
+});
+
+test('sequence-gate: an audit summary without the spec axis does not clear the review check', () => {
+  const repo = fixtureRepo();
+  writeAudit(repo, git(repo, 'rev-parse', 'HEAD'));
+  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'review')[0].state, 'would-block');
+});
+
+test('sequence-gate: a delta review chains to a spec-axis audit of its base', () => {
+  const repo = fixtureRepo();
+  const audited = git(repo, 'rev-parse', 'HEAD');
+  writeSpecAudit(repo, audited, 'none (no spec source)');
+  writeFileSync(join(repo, 'a.txt'), 'fix after the audit\n');
+  git(repo, 'commit', '-qam', 'fix');
+  writeDeltaReview(repo, git(repo, 'rev-parse', 'HEAD'), audited, '20261007T150000Z');
+  assert.equal(linesFor(runGate(repo, 'gh pr merge').lines, 'review')[0].state, 'clear');
+});
+
+// ADR-0100: on a checkout with core.filemode=false (Windows) the temporary
+// index must inherit HEAD's file modes, or an executable file is recorded as
+// 100644 and the receipt never matches the commit it tested.
+test('gate-run record: an executable file keeps its mode when core.filemode is false', () => {
+  const repo = fixtureRepo();
+  writeFileSync(join(repo, 'tool.sh'), '#!/bin/sh\n');
+  git(repo, 'add', 'tool.sh');
+  git(repo, 'update-index', '--chmod=+x', 'tool.sh');
+  git(repo, 'commit', '-qm', 'executable');
+  git(repo, 'config', 'core.filemode', 'false');
+  recordRun(repo, 0);
+  const receipt = JSON.parse(
+    readFileSync(join(repo, '.agentic', 'receipts', 'gate-run.jsonl'), 'utf8').trim()
+  );
+  assert.equal(receipt.tree, git(repo, 'rev-parse', 'HEAD^{tree}'));
+});

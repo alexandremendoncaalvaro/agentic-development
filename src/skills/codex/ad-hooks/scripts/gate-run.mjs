@@ -8,8 +8,13 @@
  * tree of the working copy, untracked files included, not to a commit: the
  * command normally runs before the commit that lands the tested change, and
  * that commit's tree is the tree recorded here (GROUND-0038 E2). The tree is
- * written through an empty temporary index outside the repository, so the real
- * index is never touched.
+ * written through a temporary index outside the repository, seeded from HEAD's
+ * tree, so the real index is never touched.
+ *
+ * `node gate-run.mjs check` exits 0 when a passing receipt covers HEAD's tree
+ * under the receipt gate's own freshness rule, and 1 when none does, so a
+ * skill that needs a green gate on the commit cites that run instead of
+ * running the same command again (ADR-0100).
  *
  * The receipt is a local working copy; the durable record of a gate run stays
  * the tracked task Notes or pull request body.
@@ -41,14 +46,19 @@ export function repositoryRoot(cwd) {
 
 /**
  * The tree the next commit of every change in the working copy would have.
- * The temporary index starts empty, so git hashes every file's content: a
- * copy of the real index would carry its stat cache, and a same-size edit in
- * the index's second could be recorded as unchanged ("racy git").
+ * The temporary index is seeded from HEAD's tree with `read-tree`, which
+ * carries each entry's mode and no stat data, so git still hashes every
+ * file's content: a copy of the real index would carry its stat cache, and a
+ * same-size edit in the index's second could be recorded as unchanged ("racy
+ * git"). The seed matters where core.filemode is false (Windows): `add` then
+ * keeps the mode an entry already has, and an index that starts empty would
+ * record every executable as 100644, a tree no commit has (ADR-0100).
  */
 export function workingTree(root) {
   const scratch = mkdtempSync(join(tmpdir(), 'agentic-gate-run-'));
   try {
     const env = { ...process.env, GIT_INDEX_FILE: join(scratch, 'index') };
+    if (headCommit(root)) git(root, ['read-tree', 'HEAD'], env);
     git(root, ['add', '-A'], env);
     return git(root, ['write-tree'], env);
   } finally {
@@ -111,18 +121,52 @@ export function recordReceipt(cwd, { command, exit }) {
 
 function parseArgs(argv) {
   const [verb, ...rest] = argv;
+  if (verb === 'check' && rest.length === 0) return { verb };
   const options = {};
   for (let i = 0; i < rest.length; i += 2) options[rest[i]] = rest[i + 1];
   const exit = Number(options['--exit']);
   if (verb !== 'record' || !options['--command'] || !Number.isInteger(exit)) return null;
-  return { command: options['--command'], exit };
+  return { verb, command: options['--command'], exit };
 }
 
-function main() {
+// The freshness rule lives in the receipt gate, which imports this module;
+// loading it here only when asked keeps the import graph acyclic.
+async function check(cwd) {
+  const { freshReceipt } = await import('./sequence-gate.mjs');
+  const root = repositoryRoot(cwd);
+  const tree = headTree(root);
+  const { receipt } = freshReceipt(root, tree);
+  if (!receipt) {
+    process.stdout.write(`gate-run: no passing run covers tree ${tree.slice(0, 12)}\n`);
+    process.exitCode = 1;
+    return;
+  }
+  process.stdout.write(
+    `gate-run: covered tree ${tree.slice(0, 12)} by "${receipt.command}" ` +
+      `(exit 0, recorded on tree ${receipt.tree.slice(0, 12)} at ${receipt.at})\n`
+  );
+}
+
+async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args) {
-    process.stderr.write('usage: gate-run.mjs record --command "<command>" --exit <code>\n');
+    process.stderr.write(
+      'usage: gate-run.mjs record --command "<command>" --exit <code>\n' +
+        '       gate-run.mjs check\n'
+    );
     process.exitCode = 64;
+    return;
+  }
+  if (args.verb === 'check') {
+    try {
+      await check(process.cwd());
+    } catch (error) {
+      const reason = String(error.stderr || error.message)
+        .trim()
+        .split('\n')[0];
+      process.stdout.write(`gate-run: no passing run found (${reason})\n`);
+      process.exitCode = 1;
+    }
     return;
   }
   let receipt;
@@ -143,5 +187,7 @@ function main() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  // Not awaited: the receipt gate the check loads imports this module, which
+  // must finish evaluating first.
   main();
 }

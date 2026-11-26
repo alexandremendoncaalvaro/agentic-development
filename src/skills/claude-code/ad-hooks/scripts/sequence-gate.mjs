@@ -26,7 +26,8 @@
  *     `.agentic/receipts/` and `.agentic/reviews/` are always neutral).
  *   - gate-run: a gate-run.mjs receipt with exit 0, keyed by tree.
  *   - review and audit: `review-receipts.mjs` (GROUND-0040). Neither result
- *     is judged. A delta review's `Base-SHA:` must chain to a covered review;
+ *     is judged. An audit summary with a `specAxis` field covers the review
+ *     too (ADR-0100). A delta review's `Base-SHA:` must chain to a covered review;
  *     the audit is expected only when the branch changes an `auditPaths`
  *     glob against its merge base with the default branch (ADR-0091).
  *   - release (`npm publish`, `pnpm publish`, `yarn publish`, `<gh> release
@@ -57,7 +58,12 @@ import { pathToFileURL } from 'node:url';
 import { appendEvidence } from './artifact-gate.mjs';
 import { git, headTree, readReceipts, repositoryRoot } from './gate-run.mjs';
 import { checkPublish, outgoingPublications } from './publish-receipt.mjs';
-import { commandCheck, readAuditReceipts, readReviewReceipts } from './review-receipts.mjs';
+import {
+  commandCheck,
+  readAuditReceipts,
+  readReviewReceipts,
+  readSpecAuditReceipts,
+} from './review-receipts.mjs';
 
 export const GATE_ID = 'sequence-gate';
 export const DEFAULT_RECEIPT_NEUTRAL = ['doc/tasks/**'];
@@ -292,9 +298,23 @@ function commitReceiptCheck(check, readCommitReceipts, reproduction, select = (_
   };
 }
 
+/**
+ * Review coverage: the verdicts files, after the audits that also ran the
+ * review's spec axis (ADR-0100). Those audits are full reviews with no base,
+ * so listing them first lets a delta review chain to one.
+ */
+function readReviewCoverage(root) {
+  const audits = readSpecAuditReceipts(root);
+  const reviews = readReviewReceipts(root);
+  return {
+    receipts: [...audits.receipts, ...reviews.receipts],
+    unreadable: audits.unreadable + reviews.unreadable,
+  };
+}
+
 export const checkReview = commitReceiptCheck(
   'review',
-  readReviewReceipts,
+  readReviewCoverage,
   'run /ad-review on the range not yet covered, ending at HEAD',
   chainedReviews
 );

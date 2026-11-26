@@ -15,6 +15,25 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
   it, otherwise restate the question as a decision card. Loop-guarded by
   `stop_hook_active` and a per-session cooldown; `AD_ASK_GATE=shadow` only
   logs, `AD_ASK_GATE=0` turns it off. Opt-in through `ad-hooks` (task-0129).
+- `ad-hooks`' `gate-run.mjs check` exits 0 when a passing gate-run receipt
+  covers `HEAD`'s tree. `/ad-pr` Phase 1 and `ad-audit` Step 4 cite that run
+  instead of running the gate a second and third time on the same commit;
+  the pre-push hook still runs on every push (ADR-0100).
+
+### Changed
+
+- On a high-risk change (`auditPaths`), `ad-tdd` and `ad-tdg` send to
+  `/ad-audit` instead of `/ad-review`, never both on one state. The audit
+  runs the review's Spec axis as a `spec` group, reads `CONTRIBUTING.md`, and
+  writes `specAxis` in its summary; the receipt gate counts such a summary as
+  the review receipt too (ADR-0100).
+
+### Fixed
+
+- `gate-run.mjs` seeds its temporary index from `HEAD`, so a receipt names
+  the commit's tree where `core.filemode` is false (Windows). Before, every
+  executable was recorded as `100644` and no receipt ever matched a commit
+  (ADR-0100).
 
 ## [1.7.0] - 2026-11-21
 
