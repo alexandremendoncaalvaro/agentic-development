@@ -135,8 +135,12 @@ function parseArgs(argv) {
       continue;
     }
     const name = arg.slice(2);
+    if (name === '') throw new Error('an option needs a name after --');
     const value = argv[i + 1];
-    if (value === undefined || value.startsWith('--')) throw new Error(`--${name} needs a value`);
+    // Only a bare option name is taken for a missing value; free text may start with --.
+    if (value === undefined || /^--[a-z][a-z-]*$/.test(value) || value === '--') {
+      throw new Error(`--${name} needs a value`);
+    }
     i += 1;
     if (name === 'temp') opts.temp.push(value);
     else opts[name] = value;
@@ -237,8 +241,19 @@ class Context {
     return before ? tryGit(this.cwd, ['merge-base', pr.headRefOid, before]) : null;
   }
 
-  // The merge proof for a branch tip, before any worktree is considered.
+  // The merge proof for a branch tip, before any worktree is considered. Without a
+  // full GitHub answer an open pull request may be on it, so nothing is a CANDIDATE.
   proveBranch(name, tip, pr) {
+    const proof = this.proveTip(name, tip, pr);
+    if (proof.verdict !== 'CANDIDATE' || this.github.ok) return proof;
+    return {
+      ...proof,
+      verdict: 'ASK',
+      reason: `${proof.reason}, but GitHub could not be asked whether an open pull request needs it`,
+    };
+  }
+
+  proveTip(name, tip, pr) {
     const opened = this.open.find((p) => p.headRefName === name);
     if (opened) return { verdict: 'KEEP', reason: `pull request #${opened.number} on it is open` };
     if (pr) {
@@ -250,7 +265,13 @@ class Context {
         };
       if (this.hasCommit(head) && this.ancestor(tip, head)) {
         const fork = this.forkPoint(pr);
-        if (fork && this.ancestor(tip, fork)) {
+        if (!fork) {
+          return {
+            verdict: 'ASK',
+            reason: `the point where pull request #${pr.number} left its base could not be found`,
+          };
+        }
+        if (this.ancestor(tip, fork)) {
           return {
             verdict: 'ASK',
             reason: `holds none of pull request #${pr.number}'s commits; it may be new work under the same name`,

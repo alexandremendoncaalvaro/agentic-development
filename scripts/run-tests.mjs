@@ -24,7 +24,7 @@
  * suite runs as before and says so.
  */
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, realpathSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -42,16 +42,35 @@ if (files.length === 0) {
 }
 
 // A long-named folder in the temp directory, and its 8.3 short name when the volume makes one.
+// Any failure here only loses the mirror: the suite still runs, with the reason printed.
 function shortTemp() {
   if (process.platform !== 'win32') return null;
-  const long = mkdtempSync(join(tmpdir(), 'agentic-short-name-temp-'));
+  let long;
+  try {
+    long = realpathSync.native(mkdtempSync(join(tmpdir(), 'agentic-short-name-temp-')));
+  } catch (error) {
+    console.error(
+      `run-tests: no temp folder for the 8.3 mirror (${error.message}); temp paths stay long`
+    );
+    return null;
+  }
   const probe = spawnSync('cmd.exe', ['/d', '/s', '/c', `"for %I in ("${long}") do @echo %~sI"`], {
     encoding: 'utf8',
     windowsVerbatimArguments: true,
   });
   const short = (probe.stdout ?? '').trim();
-  if (probe.status !== 0 || !short || short.toLowerCase() === long.toLowerCase()) {
+  if (probe.error || probe.status !== 0 || !short) {
+    console.error('run-tests: the 8.3 short-name probe failed; temp paths stay long');
+    return { long, short: null };
+  }
+  if (short.toLowerCase() === long.toLowerCase()) {
     console.error('run-tests: this volume makes no 8.3 short names; temp paths stay long');
+    return { long, short: null };
+  }
+  if (!existsSync(short) || realpathSync.native(short).toLowerCase() !== long.toLowerCase()) {
+    console.error(
+      `run-tests: the probe answered ${short}, which is not ${long}; temp paths stay long`
+    );
     return { long, short: null };
   }
   return { long, short };
@@ -63,7 +82,13 @@ const result = spawnSync(process.execPath, ['--test', ...files], {
   stdio: 'inherit',
   env,
 });
-if (temp) rmSync(temp.long, { recursive: true, force: true });
+if (temp) {
+  try {
+    rmSync(temp.long, { recursive: true, force: true, maxRetries: 3 });
+  } catch (error) {
+    console.error(`run-tests: could not remove ${temp.long} (${error.message})`);
+  }
+}
 if (result.error) {
   console.error(`run-tests: failed to spawn the test runner: ${result.error.message}`);
   process.exit(1);

@@ -12,11 +12,11 @@
         },
         {
           "path": ".agents/skills/ad-5s/scripts/sweep.mjs",
-          "sourceSha": "04f9ff3fc16066694ca8d4776d4298cde17a1c8ae74c389500b8bddee2d45eef"
+          "sourceSha": "43411ab6095e2e7c992448382dbbdebf7ed16b50e0ea3128d9fd473fd8d04924"
         },
         {
           "path": ".agents/skills/ad-5s/SKILL.md",
-          "sourceSha": "5fe19552343fb4f87afc8fee4f1f3502cce5a36bcc42a2d1ac8b2b7b72b219eb"
+          "sourceSha": "3eb8a5fff62d7a67e0999c07a2dd5df0526823195f3136497383325c4af0e466"
         }
       ]
     },
