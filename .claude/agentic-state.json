@@ -58,12 +58,16 @@
           "sourceSha": "e090477469b2727a3fba0ccd0e30f07f1e387dd626e8de3fa03953c95fde1608"
         },
         {
+          "path": ".claude/skills/ad-audit/references/cite-a-gate-run.md",
+          "sourceSha": "86206d0fdac7f3a02c0eb215a4f80f51f227651cd63e8f6ef5bc9aedd12bd404"
+        },
+        {
           "path": ".claude/skills/ad-audit/scripts/resolve-rules.mjs",
           "sourceSha": "749acc2b4c31da05d79c677dc67bbddde4c62878d04bcd25cdb5ae63e128f090"
         },
         {
           "path": ".claude/skills/ad-audit/SKILL.md",
-          "sourceSha": "93d59c68072d0f830c38e9303586f844a72d6643cc185919b0d6bb34b0cd64f3"
+          "sourceSha": "f49bc729130f339218ac92df0ad4e527cfc5ac1c3a83a0d533ca0b80f158b6d9"
         }
       ]
     },
@@ -290,7 +294,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/references/session-tier.md",
-          "sourceSha": "afb526e1c03a5c36407e7142b8fe41cffca770a3e7fcb51098d7dd9797ad21a4"
+          "sourceSha": "096003501d61b2e5631e8666261c8d67afe23316e8bc42a2fb1dc732e8d9c040"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/artifact-gate.mjs",
@@ -310,7 +314,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/gate-run.mjs",
-          "sourceSha": "626e30fd66d269d0aaa49ccf9ccffc35dac442a44ebabcfe503341cda5e957a1"
+          "sourceSha": "8070e7985df67b7381b279d84c319295eeb15067613592e2e12798d739c7a8f3"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/handoff-chip.mjs",
@@ -334,7 +338,7 @@
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "9d8eb72973f7218c426657b613c88ff99908b6f53abc3d694fd64e734eebe5a4"
+          "sourceSha": "ec01f440eac78581fbef0b3cbf35fa9d4afde785e15384c872259e01c5fd20a3"
         },
         {
           "path": ".claude/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
@@ -407,7 +411,7 @@
         },
         {
           "path": ".claude/skills/ad-pr/SKILL.md",
-          "sourceSha": "f528a9566bac9b2f5a4f28c0020ca905bc64af4549e642ec67c029116e59a693"
+          "sourceSha": "0ff3a2d0a8da707961a3901572889f9b0f055961ea4e05a68ad65e2347fd5ee0"
         }
       ]
     },

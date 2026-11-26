@@ -4,6 +4,7 @@
 **Date:** 2026-07-01
 **Deciders:** Alexandre Alvaro
 **Amended by:** ADR-0065 — its CI OS matrix example and realized runner set.
+**Amended by:** ADR-0100 — decision 3's explicit rerun in `/ad-pr`, skipped when a passing gate-run receipt covers the tree.
 
 ## Context
 

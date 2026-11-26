@@ -1,7 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -1069,4 +1076,90 @@ test('sequence-gate: pnpm and yarn publish are release actions too', () => {
     assert.equal(line.action, 'npm publish');
     assert.equal(line.state, 'would-block');
   }
+});
+
+// ADR-0100: one green gate run per tree. `gate-run.mjs check` tells a skill
+// whether a passing run already covers HEAD's tree under the receipt gate's
+// own freshness rule, so ad-pr and ad-audit cite it instead of rerunning.
+function checkRun(repo) {
+  return spawnSync('node', [GATE_RUN, 'check'], { cwd: repo, encoding: 'utf8', env: cleanEnv() });
+}
+
+test('gate-run check: a passing run of HEAD tree exits 0 and names the receipt', () => {
+  const repo = fixtureRepo();
+  recordRun(repo);
+  const run = checkRun(repo);
+  assert.equal(run.status, 0, run.stderr);
+  assert.match(
+    run.stdout,
+    new RegExp(`covered tree ${git(repo, 'rev-parse', 'HEAD^{tree}').slice(0, 12)}`)
+  );
+  assert.match(run.stdout, /npm run verify/);
+});
+
+test('gate-run check: no receipt, a failed run or a later code change exits 1', () => {
+  const repo = fixtureRepo();
+  assert.equal(checkRun(repo).status, 1);
+  recordRun(repo, 1);
+  assert.equal(checkRun(repo).status, 1);
+  recordRun(repo);
+  writeFileSync(join(repo, 'a.txt'), 'changed after the run\n');
+  git(repo, 'commit', '-qam', 'untested change');
+  const run = checkRun(repo);
+  assert.equal(run.status, 1);
+  assert.match(run.stdout, /no passing run covers tree/);
+});
+
+test('gate-run check: a change only to receipt-neutral paths keeps the run fresh', () => {
+  const repo = fixtureRepo();
+  recordRun(repo);
+  mkdirSync(join(repo, 'doc', 'tasks'), { recursive: true });
+  writeFileSync(join(repo, 'doc', 'tasks', '0001-x.md'), 'notes\n');
+  git(repo, 'add', '-A');
+  git(repo, 'commit', '-qm', 'task notes only');
+  assert.equal(checkRun(repo).status, 0);
+});
+
+// A newer failing run of the same tree outranks an older pass: the latest
+// result is what the commit's gate says now.
+test('gate-run check: a newer failed run of the same tree exits 1', () => {
+  const repo = fixtureRepo();
+  recordRun(repo, 0);
+  recordRun(repo, 1);
+  const run = checkRun(repo);
+  assert.equal(run.status, 1);
+  assert.match(run.stdout, /newest run of tree .* failed/);
+});
+
+// Exit 0 means "covered", so the script must never exit 0 without running:
+// reached through a junction or symlink, argv[1] and import.meta.url differ
+// until both are resolved to real paths.
+test('gate-run check: reached through a linked directory, it still runs', () => {
+  const repo = fixtureRepo();
+  const link = join(mkdtempSync(join(tmpdir(), 'gate-run-link-')), 'scripts');
+  symlinkSync(SCRIPTS, link, 'junction');
+  const run = spawnSync('node', [join(link, 'gate-run.mjs'), 'check'], {
+    cwd: repo,
+    encoding: 'utf8',
+    env: cleanEnv(),
+  });
+  assert.equal(run.status, 1, run.stderr);
+  assert.match(run.stdout, /no passing run covers tree/);
+});
+
+// ADR-0100: on a checkout with core.filemode=false (Windows) the temporary
+// index must inherit HEAD's file modes, or an executable file is recorded as
+// 100644 and the receipt never matches the commit it tested.
+test('gate-run record: an executable file keeps its mode when core.filemode is false', () => {
+  const repo = fixtureRepo();
+  writeFileSync(join(repo, 'tool.sh'), '#!/bin/sh\n');
+  git(repo, 'add', 'tool.sh');
+  git(repo, 'update-index', '--chmod=+x', 'tool.sh');
+  git(repo, 'commit', '-qm', 'executable');
+  git(repo, 'config', 'core.filemode', 'false');
+  recordRun(repo, 0);
+  const receipt = JSON.parse(
+    readFileSync(join(repo, '.agentic', 'receipts', 'gate-run.jsonl'), 'utf8').trim()
+  );
+  assert.equal(receipt.tree, git(repo, 'rev-parse', 'HEAD^{tree}'));
 });

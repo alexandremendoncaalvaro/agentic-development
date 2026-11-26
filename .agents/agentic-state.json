@@ -70,12 +70,16 @@
           "sourceSha": "c6397d113b8b485635475589e536041cd56c0e3bdac08026c41d5e933fcd6ba8"
         },
         {
+          "path": ".agents/skills/ad-audit/references/cite-a-gate-run.md",
+          "sourceSha": "86206d0fdac7f3a02c0eb215a4f80f51f227651cd63e8f6ef5bc9aedd12bd404"
+        },
+        {
           "path": ".agents/skills/ad-audit/scripts/resolve-rules.mjs",
           "sourceSha": "749acc2b4c31da05d79c677dc67bbddde4c62878d04bcd25cdb5ae63e128f090"
         },
         {
           "path": ".agents/skills/ad-audit/SKILL.md",
-          "sourceSha": "457572b746c4aa8148c689c108286986abdaa9dffbca4c5494ad60ab89468f6c"
+          "sourceSha": "27abfb39c27ffbe59a477bb369e05dca5a5abb693136e9578df1c2e1b8bbca9a"
         },
         {
           "path": ".codex/agents/audit-group-reviewer.toml",
@@ -378,7 +382,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/gate-run.mjs",
-          "sourceSha": "626e30fd66d269d0aaa49ccf9ccffc35dac442a44ebabcfe503341cda5e957a1"
+          "sourceSha": "8070e7985df67b7381b279d84c319295eeb15067613592e2e12798d739c7a8f3"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/handoff-chip.mjs",
@@ -402,7 +406,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/sequence-gate.mjs",
-          "sourceSha": "9d8eb72973f7218c426657b613c88ff99908b6f53abc3d694fd64e734eebe5a4"
+          "sourceSha": "ec01f440eac78581fbef0b3cbf35fa9d4afde785e15384c872259e01c5fd20a3"
         },
         {
           "path": ".agents/skills/ad-hooks/scripts/workflow-checkpoint.mjs",
@@ -410,7 +414,7 @@
         },
         {
           "path": ".agents/skills/ad-hooks/SKILL.md",
-          "sourceSha": "d1692af19306ab5c98f72c94fd1a7f958cd4e7ffc22c527f66f30da673bff2c9"
+          "sourceSha": "54a513a395d34af57aaf33612ffad46fa048c0cf0da8358eed115fee0c1bcdcf"
         }
       ]
     },
@@ -495,7 +499,7 @@
         },
         {
           "path": ".agents/skills/ad-pr/SKILL.md",
-          "sourceSha": "68c0aaeae9a2bf0691b5bcb99cb09d73e3dab59899719cfe921869a3460ee18c"
+          "sourceSha": "0be7a5c398df7a74c77d1447ec5d0410aa46c79c8d556d348cfc24679076791b"
         }
       ]
     },
