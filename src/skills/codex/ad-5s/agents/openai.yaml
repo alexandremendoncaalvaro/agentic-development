@@ -1,0 +1,5 @@
+interface:
+  display_name: ad-5s
+  short_description: Clean what a merged task left behind, or sweep a repo or path for stale worktrees, merged branches and temp files, removing only what it proves finished.
+policy:
+  allow_implicit_invocation: true

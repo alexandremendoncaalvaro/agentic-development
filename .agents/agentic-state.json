@@ -3,6 +3,23 @@
   "kitVersion": "1.7.0",
   "agent": "codex",
   "skills": {
+    "ad-5s": {
+      "version": "1.7.0",
+      "files": [
+        {
+          "path": ".agents/skills/ad-5s/agents/openai.yaml",
+          "sourceSha": "7f8b20d0f96ee07ba916e9884ed6de79aece7b2b22906fadf5472dcb4bf6aaee"
+        },
+        {
+          "path": ".agents/skills/ad-5s/scripts/sweep.mjs",
+          "sourceSha": "de83fa3a3666d20cadfad3d00fdc220e643c1dc62054c3fbef70c5b48791e31c"
+        },
+        {
+          "path": ".agents/skills/ad-5s/SKILL.md",
+          "sourceSha": "a958c17db37dd6434ccb199692c34df2312478980207032b78557748841e92e2"
+        }
+      ]
+    },
     "ad-adr": {
       "version": "1.7.0",
       "files": [
@@ -349,7 +366,7 @@
         },
         {
           "path": ".agents/skills/ad-handoff/SKILL.md",
-          "sourceSha": "2dde747eaaf998f560a3e6a3e94b87c69abe1693daabf3a9b6d9ab194c5fe26f"
+          "sourceSha": "d0168955eedc5f89c6d8869d8d5c97cb4cf14b14d7312deab8dd8e6424f8ad0d"
         }
       ]
     },
@@ -448,7 +465,7 @@
         },
         {
           "path": ".agents/skills/ad-merge/SKILL.md",
-          "sourceSha": "4755021451ea86e3c46e8b8bc21a67fd985d241d262ad0ee4090cabb6ba783b3"
+          "sourceSha": "093f32b812334151f87045efe76d1efd30db4f9ba497d34a67caa36eba1c9d52"
         }
       ]
     },

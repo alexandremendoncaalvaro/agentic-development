@@ -3,6 +3,19 @@
   "kitVersion": "1.7.0",
   "agent": "claude-code",
   "skills": {
+    "ad-5s": {
+      "version": "1.7.0",
+      "files": [
+        {
+          "path": ".claude/skills/ad-5s/scripts/sweep.mjs",
+          "sourceSha": "de83fa3a3666d20cadfad3d00fdc220e643c1dc62054c3fbef70c5b48791e31c"
+        },
+        {
+          "path": ".claude/skills/ad-5s/SKILL.md",
+          "sourceSha": "67561f6cc716671b4e73267a7c22eed9cd7333e4ad0c2030ad48b5b3ef46d7da"
+        }
+      ]
+    },
     "ad-adr": {
       "version": "1.7.0",
       "files": [
@@ -281,7 +294,7 @@
         },
         {
           "path": ".claude/skills/ad-handoff/SKILL.md",
-          "sourceSha": "7b769c1053ff24870757741f9ca14b1b1918ba7a149d37cfad225f6e24adfabc"
+          "sourceSha": "a976b28d7010420ed4442c5d75d8af4b154ca035895701a2502f09759b2da1dc"
         }
       ]
     },
@@ -372,7 +385,7 @@
         },
         {
           "path": ".claude/skills/ad-merge/SKILL.md",
-          "sourceSha": "36a9ecc27595829e26e4dad3416496f0e73ce3136b30bdae6be5eaf513c93f21"
+          "sourceSha": "903acf63cf9fd4328bce3eae1a0cd9e13554b42d9c8323e48aa5c24f8b0e47ac"
         }
       ]
     },

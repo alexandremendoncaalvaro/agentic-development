@@ -2379,3 +2379,15 @@ test('ad-ground records name the public identity of a locally installed artifact
     assert.match(template, /reproduction command/);
   }
 });
+
+// Task 0130, ADR-0101: ad-merge ends by running ad-5s's classifier from the
+// main worktree, and asks once before deleting (ADR-0085).
+test('static contract: ad-merge Phase 5 runs ad-5s after-merge from the main worktree', () => {
+  for (const agent of ['claude-code', 'codex']) {
+    const text = skillText(agent, 'ad-merge');
+    assert.match(text, /sweep\.mjs after-merge --pr <n> --branch <head>/, agent);
+    assert.match(text, /git worktree list --porcelain/, agent);
+    assert.match(text, /`ad-5s` Step 0 to Step 5/, agent);
+    assert.match(text, /cleanup: <removed> removed, <asked> asked, <kept> kept/, agent);
+  }
+});

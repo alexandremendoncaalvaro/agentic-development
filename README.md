@@ -54,7 +54,7 @@ Start every unfamiliar repository or fuzzy request with `/ad-next`.
 | New product | `/ad-grill-me` → `/ad-prd` → `/ad-bootstrap` → `/ad-spec` → `/ad-task` |
 | Existing feature | `/ad-ground` → `/ad-spec` when scope needs a contract → `/ad-tdd` → `/ad-review` |
 | Bug or regression | `/ad-diagnose` → regression test → `/ad-review` |
-| Finish and ship | `/ad-commit` → `/ad-pr` → `/ad-merge`; package maintainers use `/ad-release` |
+| Finish and ship | `/ad-commit` → `/ad-pr` → `/ad-merge` → `/ad-5s`; package maintainers use `/ad-release` |
 
 These are routes, not gates. A one-off change should not produce artifacts that do not change the work; a durable or high-risk change should use the documentation and quality checks it needs.
 
