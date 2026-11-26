@@ -309,6 +309,8 @@ test('after-merge: the fork point holds for a merge commit and for a rebase merg
     git(f.repo, 'merge', '-q', '--no-ff', '-m', 'merge feat/x', 'feat/x');
     const merge = git(f.repo, 'rev-parse', 'HEAD');
     git(f.repo, 'switch', '-q', '-c', 'rebased', 'main~2');
+    // A commit of its own first: a copy on the same parent in the same second is the same commit.
+    commit(f.repo, 'base-moved.txt', 'm\n');
     git(f.repo, 'cherry-pick', `${f.tip}~1`, f.tip);
     const rebase = git(f.repo, 'rev-parse', 'HEAD');
     git(f.repo, 'switch', '-q', 'main');
