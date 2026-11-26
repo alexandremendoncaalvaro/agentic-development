@@ -8,11 +8,11 @@
       "files": [
         {
           "path": ".claude/skills/ad-5s/scripts/sweep.mjs",
-          "sourceSha": "de83fa3a3666d20cadfad3d00fdc220e643c1dc62054c3fbef70c5b48791e31c"
+          "sourceSha": "43411ab6095e2e7c992448382dbbdebf7ed16b50e0ea3128d9fd473fd8d04924"
         },
         {
           "path": ".claude/skills/ad-5s/SKILL.md",
-          "sourceSha": "67561f6cc716671b4e73267a7c22eed9cd7333e4ad0c2030ad48b5b3ef46d7da"
+          "sourceSha": "5fc05d161592bf9ccda03d1a621ccc4c992dfbbe2d73268905debe54ecb56584"
         }
       ]
     },

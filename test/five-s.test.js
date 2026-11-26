@@ -89,6 +89,7 @@ function fixture() {
   git(repo, 'merge', '-q', '--squash', 'feat/x');
   git(repo, 'commit', '-q', '-m', 'feat: x (#7)');
   git(repo, 'push', '-q', 'origin', 'main');
+  const squash = git(repo, 'rev-parse', 'HEAD');
   const pr = {
     number: 7,
     state: 'MERGED',
@@ -96,6 +97,7 @@ function fixture() {
     headRefOid: tip,
     baseRefName: 'main',
     isCrossRepository: false,
+    mergeCommit: { oid: squash },
   };
   const ghData = join(dir, 'gh.json');
   const writeGh = (data) => writeFileSync(ghData, JSON.stringify(data));
@@ -245,6 +247,127 @@ test('after-merge: a remote ref that only ends in the branch name is not the bra
     git(f.repo, 'push', '-q', 'origin', '--delete', 'feat/x');
     const out = f.run(['after-merge', '--pr', '7']);
     assert.equal(find(out, 'remote'), undefined);
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('after-merge: a branch reset to the base with none of the pull request commits asks', () => {
+  const f = fixture();
+  try {
+    git(f.repo, 'worktree', 'remove', f.wt);
+    git(f.repo, 'branch', '-f', 'feat/x', `${f.tip}~2`);
+    assert.equal(find(f.run(['after-merge', '--pr', '7']), 'branch').verdict, 'ASK');
+    git(f.repo, 'branch', '-f', 'feat/x', `${f.tip}~1`);
+    const behind = find(f.run(['after-merge', '--pr', '7']), 'branch');
+    assert.equal(behind.verdict, 'CANDIDATE', 'behind the merged head with its own commit');
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('after-merge: an open pull request list that may be cut short is no proof', () => {
+  const f = fixture();
+  try {
+    const open = Array.from({ length: 1000 }, (_, i) => ({
+      number: 100 + i,
+      headRefName: `other/${i}`,
+      baseRefName: 'main',
+    }));
+    f.writeGh({ view: { 7: f.pr }, merged: [f.pr], open });
+    const out = f.run(['after-merge', '--pr', '7']);
+    assert.equal(out.github.ok, false);
+    assert.match(out.github.error, /1000/);
+    assert.equal(find(out, 'remote').verdict, 'ASK');
+    assert.equal(find(out, 'branch').verdict, 'ASK');
+    assert.equal(find(out, 'worktree').verdict, 'ASK');
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('after-merge: a branch behind the merged head whose fork point is unknown asks', () => {
+  const f = fixture();
+  try {
+    const { mergeCommit, ...bare } = f.pr;
+    assert.ok(mergeCommit);
+    f.writeGh({ view: { 7: bare }, merged: [bare], open: [] });
+    git(f.repo, 'worktree', 'remove', f.wt);
+    git(f.repo, 'branch', '-f', 'feat/x', `${f.tip}~1`);
+    const br = find(f.run(['after-merge', '--pr', '7']), 'branch');
+    assert.equal(br.verdict, 'ASK');
+    assert.match(br.reason, /could not be found/);
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('after-merge: the fork point holds for a merge commit and for a rebase merge', () => {
+  const f = fixture();
+  try {
+    git(f.repo, 'worktree', 'remove', f.wt);
+    git(f.repo, 'merge', '-q', '--no-ff', '-m', 'merge feat/x', 'feat/x');
+    const merge = git(f.repo, 'rev-parse', 'HEAD');
+    git(f.repo, 'switch', '-q', '-c', 'rebased', 'main~2');
+    // A commit of its own first: a copy on the same parent in the same second is the same commit.
+    commit(f.repo, 'base-moved.txt', 'm\n');
+    git(f.repo, 'cherry-pick', `${f.tip}~1`, f.tip);
+    const rebase = git(f.repo, 'rev-parse', 'HEAD');
+    git(f.repo, 'switch', '-q', 'main');
+    for (const oid of [merge, rebase]) {
+      const pr = { ...f.pr, mergeCommit: { oid } };
+      f.writeGh({ view: { 7: pr }, merged: [pr], open: [] });
+      git(f.repo, 'branch', '-f', 'feat/x', `${f.tip}~2`);
+      assert.equal(find(f.run(['after-merge', '--pr', '7']), 'branch').verdict, 'ASK', oid);
+      git(f.repo, 'branch', '-f', 'feat/x', `${f.tip}~1`);
+      assert.equal(find(f.run(['after-merge', '--pr', '7']), 'branch').verdict, 'CANDIDATE', oid);
+    }
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('after-merge: a branch that merged the base in after the pull request is kept', () => {
+  const f = fixture();
+  try {
+    commit(f.repo, 'later.txt', 'later\n');
+    git(f.wt, 'merge', '-q', '--no-edit', 'main');
+    const out = f.run(['after-merge', '--pr', '7']);
+    assert.equal(find(out, 'branch').verdict, 'KEEP');
+    assert.equal(find(out, 'worktree').verdict, 'KEEP');
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('sweep: a merged pull request list that may be cut short is no proof', () => {
+  const f = fixture();
+  try {
+    const merged = Array.from({ length: 1000 }, (_, i) => ({
+      ...f.pr,
+      number: 100 + i,
+      headRefName: `other/${i}`,
+    }));
+    f.writeGh({ view: {}, merged: [f.pr, ...merged.slice(1)], open: [] });
+    const out = f.run(['sweep', '--idle-hours', '0']);
+    assert.equal(out.github.ok, false);
+    assert.match(out.github.error, /merged/);
+    assert.notEqual(find(out, 'branch', 'feat/x').verdict, 'CANDIDATE');
+    assert.notEqual(find(out, 'remote', 'origin/feat/x').verdict, 'CANDIDATE');
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('an option given without its value is an error that names it', () => {
+  const f = fixture();
+  try {
+    const r = f.fails(['sweep', '--temp']);
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /--temp needs a value/);
+    assert.match(f.fails(['sweep', '--']).stderr, /an option needs a name/);
+    const kept = f.run(['record', '--kind', 'branch', '--target', 'x', '--proof', '--lease held']);
+    assert.equal(kept.recorded, true, 'a value that only starts with -- is still a value');
   } finally {
     f.cleanup();
   }

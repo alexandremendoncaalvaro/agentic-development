@@ -24,7 +24,8 @@
  * `.agentic/receipts/5s.jsonl`.
  *
  * Merged is proved, never guessed: a branch is a CANDIDATE when its tip is the
- * exact head of a merged pull request (or behind it), or reachable from
+ * exact head of a merged pull request (or behind it, holding one of its
+ * commits), or reachable from
  * origin's default branch with commits of its own. A remote branch needs the
  * pull request proof and a GitHub answer. A squash merge leaves no git-only
  * proof, so with no GitHub answer it is ASK. GitHub is reached through AGENTIC_GH (default `gh`),
@@ -120,6 +121,11 @@ function inside(child, parent) {
   return child === parent || child.startsWith(`${parent}/`);
 }
 
+// GitHub returns at most this many pull requests per list; a full list may be cut short.
+const LIST_LIMIT = 1000;
+const cutShort = (state) =>
+  `${LIST_LIMIT} or more ${state} pull requests; the list may be cut short, so it proves nothing`;
+
 function parseArgs(argv) {
   const opts = { temp: [], positional: [] };
   for (let i = 0; i < argv.length; i += 1) {
@@ -129,7 +135,12 @@ function parseArgs(argv) {
       continue;
     }
     const name = arg.slice(2);
+    if (name === '') throw new Error('an option needs a name after --');
     const value = argv[i + 1];
+    // Only a bare option name is taken for a missing value; free text may start with --.
+    if (value === undefined || /^--[a-z][a-z-]*$/.test(value) || value === '--') {
+      throw new Error(`--${name} needs a value`);
+    }
     i += 1;
     if (name === 'temp') opts.temp.push(value);
     else opts[name] = value;
@@ -210,18 +221,39 @@ class Context {
         '--state',
         'open',
         '--limit',
-        '1000',
+        String(LIST_LIMIT),
         '--json',
         'number,headRefName,baseRefName',
       ],
       this.cwd
     );
-    if (open.ok) this.open = open.value;
+    if (open.ok && open.value.length >= LIST_LIMIT) {
+      this.github = { ok: false, error: cutShort('open') };
+    } else if (open.ok) this.open = open.value;
     else this.github = { ok: false, error: open.error };
   }
 
-  // The merge proof for a branch tip, before any worktree is considered.
+  // Where the pull request left its base: what its head and the base held before the merge.
+  forkPoint(pr) {
+    const merge = pr.mergeCommit && pr.mergeCommit.oid;
+    if (!merge || !this.hasCommit(merge) || !this.hasCommit(pr.headRefOid)) return null;
+    const before = tryGit(this.cwd, ['rev-parse', '--verify', '--quiet', `${merge}^1`]);
+    return before ? tryGit(this.cwd, ['merge-base', pr.headRefOid, before]) : null;
+  }
+
+  // The merge proof for a branch tip, before any worktree is considered. Without a
+  // full GitHub answer an open pull request may be on it, so nothing is a CANDIDATE.
   proveBranch(name, tip, pr) {
+    const proof = this.proveTip(name, tip, pr);
+    if (proof.verdict !== 'CANDIDATE' || this.github.ok) return proof;
+    return {
+      ...proof,
+      verdict: 'ASK',
+      reason: `${proof.reason}, but GitHub could not be asked whether an open pull request needs it`,
+    };
+  }
+
+  proveTip(name, tip, pr) {
     const opened = this.open.find((p) => p.headRefName === name);
     if (opened) return { verdict: 'KEEP', reason: `pull request #${opened.number} on it is open` };
     if (pr) {
@@ -232,6 +264,19 @@ class Context {
           reason: `pull request #${pr.number} merged at this exact head`,
         };
       if (this.hasCommit(head) && this.ancestor(tip, head)) {
+        const fork = this.forkPoint(pr);
+        if (!fork) {
+          return {
+            verdict: 'ASK',
+            reason: `the point where pull request #${pr.number} left its base could not be found`,
+          };
+        }
+        if (this.ancestor(tip, fork)) {
+          return {
+            verdict: 'ASK',
+            reason: `holds none of pull request #${pr.number}'s commits; it may be new work under the same name`,
+          };
+        }
         return {
           verdict: 'CANDIDATE',
           reason: `behind the head pull request #${pr.number} merged`,
@@ -468,7 +513,7 @@ function afterMerge(ctx, opts) {
           'view',
           String(opts.pr),
           '--json',
-          'number,state,headRefName,headRefOid,baseRefName,isCrossRepository',
+          'number,state,headRefName,headRefOid,baseRefName,isCrossRepository,mergeCommit',
         ],
         ctx.cwd
       );
@@ -541,13 +586,15 @@ function sweep(ctx, opts) {
       '--state',
       'merged',
       '--limit',
-      '1000',
+      String(LIST_LIMIT),
       '--json',
-      'number,headRefName,headRefOid,isCrossRepository',
+      'number,headRefName,headRefOid,isCrossRepository,mergeCommit',
     ],
     ctx.cwd
   );
-  if (merged.ok) {
+  if (merged.ok && merged.value.length >= LIST_LIMIT) {
+    ctx.github = { ok: false, error: cutShort('merged') };
+  } else if (merged.ok) {
     ctx.merged = merged.value;
     ctx.loadOpen();
   } else {
