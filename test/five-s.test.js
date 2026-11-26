@@ -250,6 +250,55 @@ test('after-merge: a remote ref that only ends in the branch name is not the bra
   }
 });
 
+test('after-merge: a branch reset to the base with none of the pull request commits asks', () => {
+  const f = fixture();
+  try {
+    const squash = git(f.repo, 'rev-parse', 'main');
+    f.writeGh({
+      view: { 7: { ...f.pr, mergeCommit: { oid: squash } } },
+      merged: [f.pr],
+      open: [],
+    });
+    git(f.repo, 'worktree', 'remove', f.wt);
+    git(f.repo, 'branch', '-f', 'feat/x', `${f.tip}~2`);
+    assert.equal(find(f.run(['after-merge', '--pr', '7']), 'branch').verdict, 'ASK');
+    git(f.repo, 'branch', '-f', 'feat/x', `${f.tip}~1`);
+    const behind = find(f.run(['after-merge', '--pr', '7']), 'branch');
+    assert.equal(behind.verdict, 'CANDIDATE', 'behind the merged head with its own commit');
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('after-merge: an open pull request list that may be cut short is no proof', () => {
+  const f = fixture();
+  try {
+    const open = Array.from({ length: 1000 }, (_, i) => ({
+      number: 100 + i,
+      headRefName: `other/${i}`,
+      baseRefName: 'main',
+    }));
+    f.writeGh({ view: { 7: f.pr }, merged: [f.pr], open });
+    const out = f.run(['after-merge', '--pr', '7']);
+    assert.equal(out.github.ok, false);
+    assert.match(out.github.error, /1000/);
+    assert.equal(find(out, 'remote').verdict, 'ASK');
+  } finally {
+    f.cleanup();
+  }
+});
+
+test('an option given without its value is an error that names it', () => {
+  const f = fixture();
+  try {
+    const r = f.fails(['sweep', '--temp']);
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /--temp needs a value/);
+  } finally {
+    f.cleanup();
+  }
+});
+
 test('after-merge: a local commit newer than what merged keeps the branch and its worktree', () => {
   const f = fixture();
   try {

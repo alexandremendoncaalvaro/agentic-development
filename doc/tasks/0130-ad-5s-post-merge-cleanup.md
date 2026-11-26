@@ -1,6 +1,6 @@
 # Task `0130`: `ad-5s` — clean what a merged task left behind, and sweep on demand
 
-**Status:** in-progress
+**Status:** done
 **Created:** 2026-11-25
 **Scope ref:** doc/adr/0101-clean-up-after-a-merge-by-default.md
 **Evidence ref:** doc/research/0049-ground-post-merge-cleanup.md
@@ -20,11 +20,13 @@ After `/ad-merge`, worktrees, squash-merged branches and temp files stayed behin
 - [x] Temp paths: only session-named, untracked, inside the repository or the OS temp directory, not a link, not a repository; `remove-temp` re-checks before deleting; `record` writes a receipt line.
 - [x] Byte-identical script on both hosts; skill on both hosts; `/ad-merge` Phase 5 runs it by default; `ad-handoff` points to it; guide row.
 - [x] Fresh-context review (two reviewers; findings fixed), local gate, local commit.
-- [ ] PR with the owner's OK.
+- [x] PR with the owner's OK: #201, merged with the owner's OK; CI green on Ubuntu and Windows.
+- [x] The review's three logged nits closed: a pull request list as long as its limit proves nothing, a branch named like the merged one that holds none of its commits is ASK, an option without its value is an error that names it.
+- [x] The local gate runs the suite with an 8.3 short temp path on Windows, as the GitHub runner does: the path comparison #201 failed only in CI now fails locally too.
 
 ## Plan
 
 - [x] Ground (GROUND-0049).
 - [x] TDD the classifier (`test/five-s.test.js`).
 - [x] Skill, wiring, ADR-0101, CHANGELOG.
-- [ ] Review, gate, PR.
+- [x] Review, gate, PR.

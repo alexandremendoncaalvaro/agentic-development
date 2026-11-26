@@ -29,6 +29,14 @@ Releases older than 0.19.0-beta.1 predate this file; their record is the annotat
 
 ### Fixed
 
+- `ad-5s` fails closed in three more cases: a GitHub pull request list
+  as long as its limit may be cut short, so it proves nothing; a local
+  branch named like the merged one that holds none of its commits is
+  asked, not deleted; an option given without its value is an error that
+  names it (task-0130).
+- On Windows `npm test` runs the suite with a temp folder reached through
+  its 8.3 short name, as the GitHub runner does, so a short-versus-long
+  path mismatch fails locally instead of only in CI.
 - `gate-run.mjs` seeds its temporary index from `HEAD`, so a receipt names
   the commit's tree where `core.filemode` is false (Windows). Before, every
   executable was recorded as `100644` and no receipt ever matched a commit
